@@ -89,7 +89,7 @@
 
               </table>
               <% if hbx_enrollment.coverage_termination_pending? %>
-                <div class="enrollment-effective info">
+                <div class="enrollment-terminate info">
                   <p>
                     <label class="bullet-separator">Future enrollment termination date: </label>
                     <strong><%= hbx_enrollment.future_enrollment_termination_date %></strong>
@@ -97,7 +97,7 @@
                 </div>
               <% end %>
 
-              <div class="enrollment-effective info">
+              <div class="enrollment-market info">
                 <p>
                   <label class="bullet-separator">Market Type: </label>
                   <strong><%= show_market_name_by_enrollment hbx_enrollment %></strong>
