@@ -28,6 +28,7 @@ Rails.application.routes.draw do
         get :family_index
         get :employer_index
         get :broker_agency_index
+        get :general_agency_index
         get :issuer_index
         get :product_index
         get :configuration
@@ -235,6 +236,13 @@ Rails.application.routes.draw do
         get :staff_index
         get :agency_messages
       end
+      member do
+        get :general_agency_index
+        get :manage_employers
+        post :clear_assign_for_employer
+        get :assign
+        post :update_assign
+      end
 
       resources :applicants
     end
@@ -245,6 +253,24 @@ Rails.application.routes.draw do
         get :new_staff_member
         get :new_broker_agency
         get :search_broker_agency
+      end
+    end
+  end
+
+  match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
+  namespace :general_agencies do
+    root 'profiles#new'
+    resources :profiles do
+      collection do
+        get :new_agency
+        get :messages
+        get :edit_staff
+        post :update_staff
+      end
+      member do
+        get :employers
+        get :families
+        get :staffs
       end
     end
   end

@@ -2,7 +2,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer]
   before_action :set_current_person, only: [:staff_index]
 
   def index
@@ -140,6 +140,60 @@ class BrokerAgencies::ProfilesController < ApplicationController
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
     @employer_profiles = @organizations.map {|o| o.employer_profile}
+  end
+
+  def general_agency_index
+    @general_agency_profiles = GeneralAgencyProfile.all
+  end
+
+  def assign
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+    else
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.by_broker_role(broker_role_id)
+    end
+    @employers = @orgs.map {|o| o.employer_profile}
+    @general_agency_profiles = GeneralAgencyProfile.all
+  end
+
+  def update_assign
+    if params[:general_agency_id].present? && params[:employer_ids].present?
+      general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
+      case params[:type]
+      when 'fire'
+        params[:employer_ids].each do |employer_id|
+          employer_profile = EmployerProfile.find(employer_id) rescue nil
+          if employer_profile.present?
+            employer_profile.fire_general_agency
+            employer_profile.save
+          end
+        end
+        notice = "Fire these employers successful."
+      else
+        params[:employer_ids].each do |employer_id|
+          employer_profile = EmployerProfile.find(employer_id) rescue nil
+          if employer_profile.present?
+            employer_profile.hire_general_agency(general_agency_profile)
+            employer_profile.save
+          end
+        end
+        notice = "Assign successful."
+      end
+    end
+    redirect_to broker_agencies_profile_path(@broker_agency_profile), flash: {notice: notice}
+  end
+
+  def clear_assign_for_employer
+    employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
+    employer_profile.fire_general_agency
+    employer_profile.save
+    redirect_to broker_agencies_profile_path(@broker_agency_profile)
+  end
+
+  def manage_employers
+    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
+    @employers = @general_agency_profile.employer_clients
   end
 
   def messages

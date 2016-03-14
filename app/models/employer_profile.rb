@@ -41,10 +41,11 @@ class EmployerProfile
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
+  embeds_many :general_agency_accounts, cascade_callbacks: true, validate: true
 
   embeds_many :workflow_state_transitions, as: :transitional
 
-  accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
+  accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
   validates_presence_of :entity_kind
 
@@ -99,6 +100,7 @@ class EmployerProfile
     @today = TimeKeeper.date_of_record
   end
 
+  # for broker agency
   def hire_broker_agency(new_broker_agency, start_on = today)
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
@@ -132,6 +134,35 @@ class EmployerProfile
       Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
     end
   end
+
+  # for General Agency
+  def active_general_agency_account
+    return @active_general_agency_account if defined? @active_general_agency_account
+    @active_general_agency_account = general_agency_accounts.detect { |account| account.active? }
+  end
+
+  def general_agency_profile
+    return @general_agency_profile if defined? @general_agency_profile
+    @general_agency_profile = active_general_agency_account.general_agency_profile if active_general_agency_account.present?
+  end
+
+  def hire_general_agency(new_general_agency, start_on = today)
+    start_on = start_on.to_date.beginning_of_day
+    if active_general_agency_account.present?
+      terminate_on = (start_on - 1.day).end_of_day
+      fire_general_agency(terminate_on)
+    end
+    general_agency_accounts.build(general_agency_profile: new_general_agency, start_on: start_on)
+    @general_agency_profile = new_general_agency
+  end
+
+  def fire_general_agency(terminate_on = today)
+    return unless active_general_agency_account
+    active_general_agency_account.end_on = terminate_on
+    active_general_agency_account.terminate if active_general_agency_account.may_terminate?
+  end
+  alias_method :general_agency_profile=, :hire_general_agency
+
 
   def employee_roles
     return @employee_roles if defined? @employee_roles
@@ -227,6 +258,12 @@ class EmployerProfile
     def find_by_broker_agency_profile(broker_agency_profile)
       raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
       orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
+      orgs.collect(&:employer_profile)
+    end
+
+    def find_by_general_agency_profile(general_agency_profile)
+      raise ArgumentError.new("expected GeneralAgencyProfile") unless general_agency_profile.is_a?(GeneralAgencyProfile)
+      orgs = Organization.by_general_agency_profile(general_agency_profile.id)
       orgs.collect(&:employer_profile)
     end
 

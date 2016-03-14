@@ -65,6 +65,11 @@ class Person
                 inverse_of: :broker_agency_contacts,
                 index: true
 
+  belongs_to :general_agency_contact,
+                class_name: "GeneralAgencyProfile",
+                inverse_of: :general_agency_contacts,
+                index: true
+
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
@@ -76,6 +81,7 @@ class Person
   embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
+  embeds_many :general_agency_staff_roles, cascade_callbacks: true, validate: true
 
   embeds_many :person_relationships, cascade_callbacks: true, validate: true
   embeds_many :addresses, cascade_callbacks: true, validate: true

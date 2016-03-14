@@ -125,6 +125,15 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def general_agency_indx
+    @general_agency_profiles = GeneralAgencyProfile.all
+
+    respond_to do |format|
+      format.html { render 'general_agency' }
+      format.js
+    end
+  end
+
   def issuer_index
     @issuers = CarrierProfile.all
 

@@ -111,6 +111,7 @@ class User
     hbx_staff: "hbx_staff",
     employer_staff: "employer_staff",
     broker_agency_staff: "broker_agency_staff",
+    general_agency_staff: "general_agency_staff",
     assister: 'assister',
     csr: 'csr',
   }
@@ -198,6 +199,10 @@ class User
 
   def has_broker_agency_staff_role?
     has_role?(:broker_agency_staff)
+  end
+
+  def has_general_agency_staff_role?
+    has_role?(:general_agency_staff)
   end
 
   def has_insured_role?

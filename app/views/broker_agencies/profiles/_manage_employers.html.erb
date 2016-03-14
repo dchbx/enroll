@@ -1,0 +1,44 @@
+<div class="profile-content top-pd">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+      <div class="container">
+        <div class="row">
+          <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post) do %>
+          <h3>Manage Employers for <%= @general_agency_profile.legal_name %></h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>HBX Acct</th>
+                <th>Legal Name</th>
+                <th>FEIN</th>
+                <th>EE Ct</th>
+                <th>Enroll Status</th>
+                <th>Effective Date</th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @employers.each do |er| %>
+                <tr>
+                  <td><%= check_box_tag "employer_ids[]", er.id %></td>
+                  <td><%= er.hbx_id %></td>
+                  <td><%= link_to er.legal_name, employers_employer_profile_path(er) + "?tab=home" %></td>
+                  <td><%= number_to_obscured_fein(er.fein) %></td>
+                  <td><%= er.roster_size %></td>
+                  <td><%= er.aasm_state.humanize %></td>
+                  <td><%= er.published_plan_year.try(:effective_date) %>
+                  <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+          <%= hidden_field_tag 'general_agency_id', @general_agency_profile.id %>
+          <%= hidden_field_tag 'type', 'fire' %>
+          <%= submit_tag "Remove these selected employers", class: 'btn btn-primary' %>
+        <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

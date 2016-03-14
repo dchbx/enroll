@@ -1,0 +1,41 @@
+<div class="container" id="inbox_provider_form">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="title-inline">General Agencies</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+    <div class="table-border table-responsive">
+      <table class="table">
+      <% @general_agency_profiles = GeneralAgencyProfile.all %>
+      <% if @general_agency_profiles.present? %>
+        <thead>
+          <th>Legal Name</th>
+          <th>dba</th>
+          <th>Fein</th>
+          <th>Entity Kind</th>
+          <th>Market Kind</th>
+          <th>State</th>
+          <th></th>
+        </thead>
+        <% @general_agency_profiles.each do |general_agency_profile| %>
+          <tbody>
+            <td><%= link_to general_agency_profile.legal_name, general_agencies_profile_path(general_agency_profile) %></td>
+            <td><%= general_agency_profile.dba %></td>
+            <td><%= general_agency_profile.fein %></td>
+            <td><%= general_agency_profile.entity_kind.titleize %></td>
+            <td><%= general_agency_profile.market_kind.titleize %></td>
+            <td><%= general_agency_profile.current_state %></td>
+            <td><%#= link_to 'Send Secure Message'.html_safe,
+            new_broker_agencies_inbox_path(id: general_agency_profile.id, profile_id: @profile._id), class: "btn btn-default", remote: true %></td>
+          </tbody>
+        <% end %>
+      <% else %>
+        <tr><td>No General Agency Profiles found.</td></tr>
+      <% end %>
+      </table>
+    </div>
+   </div>
+  </div>
+</div>

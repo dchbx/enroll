@@ -1,0 +1,22 @@
+<div class="profile-content top-pd">
+  <div class="tab-row">
+    <div class="tab-content container" id="myTabContent">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h3>General Agency Staff</h3>
+        <div class="table-border table-responsive">
+          <table class="table">
+            <tbody>
+              <% @staffs.each do |staff| %>
+                <tr>
+                  <td><%= link_to staff.first_name + ' ' + staff.last_name, edit_staff_general_agencies_profiles_path(id: staff.general_agency_staff_roles.last.id), remote: true %></td>
+                  <td><%= GeneralAgencyProfile.find(staff.general_agency_staff_roles.last.general_agency_profile_id).legal_name %></td>
+                  <td><%= staff.general_agency_staff_roles.last.current_state %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,86 @@
+<%= form_for @staff, url: update_staff_general_agencies_profiles_path(id: @staff.id), method: :post do |f| %>
+  <div class="container content-bottom">
+    <div class="row">
+      <div class="table-responsive">
+        <table class="table table-message-wrapper none_margin_bottom none_margin_top">
+          <tbody>
+            <tr>
+              <th>Staff Name:</th>
+              <td><%= @staff.person.full_name %></td>
+            </tr>
+            <tr>
+              <th>Npn:</th>
+              <td><%= @staff.npn %></td>
+            </tr>
+            <tr>
+              <th>Email:</th>
+              <td><%= @staff.person.home_email %></td>
+            </tr>
+            <tr>
+              <th>Agency:</th>
+              <td><%= @staff.general_agency_profile.legal_name %></td>
+            </tr>
+            <tr>
+              <th>Market Kinds: </th>
+              <td>
+                <%= @staff.general_agency_profile.try(:market_kind).try(:capitalize) %>
+              </td>
+            </tr>
+            <tr>
+              <th>Languages:</th>
+              <td>
+                <%= @staff.general_agency_profile.languages_spoken.map do |lang| lang.upcase end.to_sentence %>
+              </td>
+            </tr>
+            <tr>
+              <th>Office Locations:</th>
+              <td>
+                <% @staff.general_agency_profile.organization.office_locations.each do |office_location| %>
+                  <%= office_location.address.to_html %>
+                <% end %>
+
+              </td>
+            </tr>
+            <tr>
+              <th>Phone Number:</th>
+              <td><%= @staff.general_agency_profile.phone %></td>
+            </tr>
+            <tr>
+              <th>History</th>
+              <td>
+                <% @staff.workflow_state_transitions.each do |transition| %>
+                  <%= transition.to_html %>
+                <% end %>
+              </td>
+            </tr>
+            <tr>
+              <th>Status:</th>
+              <td><%= @staff.current_state %></td>
+            </tr>
+          </tbody>
+        </table>
+        <br/>
+        <div class="row top-row no-border">
+          <div class="col-xs-12 text-center broker_approve_deny_btn">
+            <% if current_user.has_hbx_staff_role? %>
+              <% if @staff.may_approve? %>
+                <%= submit_tag 'Approve', name: 'approve', class: "btn btn-primary btn-br interaction-click-control-broker-approve" %>
+              <% elsif @staff.may_deny? %>
+                <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary btn-br interaction-click-control-general-deny" %>
+              <% elsif @staff.may_decertify? %>
+                <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary btn-br interaction-click-control-general-decertify" %>
+              <% end %>
+            <% else %>
+              <% if @staff.may_general_agency_accept? %>
+                <%= submit_tag 'Accept', name: 'accept', class: "btn btn-primary btn-br interaction-click-control-broker-accept" %>
+              <% elsif @staff.may_general_agency_decline? %>
+                <%= submit_tag 'Decline', name: 'decline', class: "btn btn-primary btn-br interaction-click-control-general-decline" %>
+              <% elsif @staff.may_general_agency_terminate? %>
+                <%= submit_tag 'Terminate', name: 'terminate', class: "btn btn-primary btn-br interaction-click-control-general-terminate" %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
