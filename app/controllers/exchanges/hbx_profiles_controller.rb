@@ -2,7 +2,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show]
+  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
@@ -11,6 +11,533 @@ class Exchanges::HbxProfilesController < ApplicationController
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
+  end
+
+  def binder_index
+    # @employer_profile = EmployerProfile.all
+    @data = {
+   "data": [
+      [
+         "1",
+         "Tiger Nixon",
+         "System Architect",
+         "Edinburgh",
+         "5421",
+         "2011/04/25",
+         "$320,800"
+      ],
+      [
+         "2",
+         "Garrett Winters",
+         "Accountant",
+         "Tokyo",
+         "8422",
+         "2011/07/25",
+         "$170,750"
+      ],
+      [
+         "3",
+         "Ashton Cox",
+         "Junior Technical Author",
+         "San Francisco",
+         "1562",
+         "2009/01/12",
+         "$86,000"
+      ],
+      [
+         "4",
+         "Cedric Kelly",
+         "Senior Javascript Developer",
+         "Edinburgh",
+         "6224",
+         "2012/03/29",
+         "$433,060"
+      ],
+      [
+         "5",
+         "Airi Satou",
+         "Accountant",
+         "Tokyo",
+         "5407",
+         "2008/11/28",
+         "$162,700"
+      ],
+      [
+         "6",
+         "Brielle Williamson",
+         "Integration Specialist",
+         "New York",
+         "4804",
+         "2012/12/02",
+         "$372,000"
+      ],
+      [
+         "7",
+         "Herrod Chandler",
+         "Sales Assistant",
+         "San Francisco",
+         "9608",
+         "2012/08/06",
+         "$137,500"
+      ],
+      [
+         "8",
+         "Rhona Davidson",
+         "Integration Specialist",
+         "Tokyo",
+         "6200",
+         "2010/10/14",
+         "$327,900"
+      ],
+      [
+         "9",
+         "Colleen Hurst",
+         "Javascript Developer",
+         "San Francisco",
+         "2360",
+         "2009/09/15",
+         "$205,500"
+      ],
+      [
+         "10",
+         "Sonya Frost",
+         "Software Engineer",
+         "Edinburgh",
+         "1667",
+         "2008/12/13",
+         "$103,600"
+      ],
+      [
+         "11",
+         "Jena Gaines",
+         "Office Manager",
+         "London",
+         "3814",
+         "2008/12/19",
+         "$90,560"
+      ],
+      [
+         "12",
+         "Quinn Flynn",
+         "Support Lead",
+         "Edinburgh",
+         "9497",
+         "2013/03/03",
+         "$342,000"
+      ],
+      [
+         "13",
+         "Charde Marshall",
+         "Regional Director",
+         "San Francisco",
+         "6741",
+         "2008/10/16",
+         "$470,600"
+      ],
+      [
+         "14",
+         "Haley Kennedy",
+         "Senior Marketing Designer",
+         "London",
+         "3597",
+         "2012/12/18",
+         "$313,500"
+      ],
+      [
+         "15",
+         "Tatyana Fitzpatrick",
+         "Regional Director",
+         "London",
+         "1965",
+         "2010/03/17",
+         "$385,750"
+      ],
+      [
+         "16",
+         "Michael Silva",
+         "Marketing Designer",
+         "London",
+         "1581",
+         "2012/11/27",
+         "$198,500"
+      ],
+      [
+         "17",
+         "Paul Byrd",
+         "Chief Financial Officer (CFO)",
+         "New York",
+         "3059",
+         "2010/06/09",
+         "$725,000"
+      ],
+      [
+         "18",
+         "Gloria Little",
+         "Systems Administrator",
+         "New York",
+         "1721",
+         "2009/04/10",
+         "$237,500"
+      ],
+      [
+         "19",
+         "Bradley Greer",
+         "Software Engineer",
+         "London",
+         "2558",
+         "2012/10/13",
+         "$132,000"
+      ],
+      [
+         "20",
+         "Dai Rios",
+         "Personnel Lead",
+         "Edinburgh",
+         "2290",
+         "2012/09/26",
+         "$217,500"
+      ],
+      [
+         "21",
+         "Jenette Caldwell",
+         "Development Lead",
+         "New York",
+         "1937",
+         "2011/09/03",
+         "$345,000"
+      ],
+      [
+         "22",
+         "Yuri Berry",
+         "Chief Marketing Officer (CMO)",
+         "New York",
+         "6154",
+         "2009/06/25",
+         "$675,000"
+      ],
+      [
+         "23",
+         "Caesar Vance",
+         "Pre-Sales Support",
+         "New York",
+         "8330",
+         "2011/12/12",
+         "$106,450"
+      ],
+      [
+         "24",
+         "Doris Wilder",
+         "Sales Assistant",
+         "Sidney",
+         "3023",
+         "2010/09/20",
+         "$85,600"
+      ],
+      [
+         "25",
+         "Angelica Ramos",
+         "Chief Executive Officer (CEO)",
+         "London",
+         "5797",
+         "2009/10/09",
+         "$1,200,000"
+      ],
+      [
+         "26",
+         "Gavin Joyce",
+         "Developer",
+         "Edinburgh",
+         "8822",
+         "2010/12/22",
+         "$92,575"
+      ],
+      [
+         "27",
+         "Jennifer Chang",
+         "Regional Director",
+         "Singapore",
+         "9239",
+         "2010/11/14",
+         "$357,650"
+      ],
+      [
+         "28",
+         "Brenden Wagner",
+         "Software Engineer",
+         "San Francisco",
+         "1314",
+         "2011/06/07",
+         "$206,850"
+      ],
+      [
+         "29",
+         "Fiona Green",
+         "Chief Operating Officer (COO)",
+         "San Francisco",
+         "2947",
+         "2010/03/11",
+         "$850,000"
+      ],
+      [
+         "30",
+         "Shou Itou",
+         "Regional Marketing",
+         "Tokyo",
+         "8899",
+         "2011/08/14",
+         "$163,000"
+      ],
+      [
+         "31",
+         "Michelle House",
+         "Integration Specialist",
+         "Sidney",
+         "2769",
+         "2011/06/02",
+         "$95,400"
+      ],
+      [
+         "32",
+         "Suki Burks",
+         "Developer",
+         "London",
+         "6832",
+         "2009/10/22",
+         "$114,500"
+      ],
+      [
+         "33",
+         "Prescott Bartlett",
+         "Technical Author",
+         "London",
+         "3606",
+         "2011/05/07",
+         "$145,000"
+      ],
+      [
+         "34",
+         "Gavin Cortez",
+         "Team Leader",
+         "San Francisco",
+         "2860",
+         "2008/10/26",
+         "$235,500"
+      ],
+      [
+         "35",
+         "Martena Mccray",
+         "Post-Sales support",
+         "Edinburgh",
+         "8240",
+         "2011/03/09",
+         "$324,050"
+      ],
+      [
+         "36",
+         "Unity Butler",
+         "Marketing Designer",
+         "San Francisco",
+         "5384",
+         "2009/12/09",
+         "$85,675"
+      ],
+      [
+         "37",
+         "Howard Hatfield",
+         "Office Manager",
+         "San Francisco",
+         "7031",
+         "2008/12/16",
+         "$164,500"
+      ],
+      [
+         "38",
+         "Hope Fuentes",
+         "Secretary",
+         "San Francisco",
+         "6318",
+         "2010/02/12",
+         "$109,850"
+      ],
+      [
+         "39",
+         "Vivian Harrell",
+         "Financial Controller",
+         "San Francisco",
+         "9422",
+         "2009/02/14",
+         "$452,500"
+      ],
+      [
+         "40",
+         "Timothy Mooney",
+         "Office Manager",
+         "London",
+         "7580",
+         "2008/12/11",
+         "$136,200"
+      ],
+      [
+         "41",
+         "Jackson Bradshaw",
+         "Director",
+         "New York",
+         "1042",
+         "2008/09/26",
+         "$645,750"
+      ],
+      [
+         "42",
+         "Olivia Liang",
+         "Support Engineer",
+         "Singapore",
+         "2120",
+         "2011/02/03",
+         "$234,500"
+      ],
+      [
+         "43",
+         "Bruno Nash",
+         "Software Engineer",
+         "London",
+         "6222",
+         "2011/05/03",
+         "$163,500"
+      ],
+      [
+         "44",
+         "Sakura Yamamoto",
+         "Support Engineer",
+         "Tokyo",
+         "9383",
+         "2009/08/19",
+         "$139,575"
+      ],
+      [
+         "45",
+         "Thor Walton",
+         "Developer",
+         "New York",
+         "8327",
+         "2013/08/11",
+         "$98,540"
+      ],
+      [
+         "46",
+         "Finn Camacho",
+         "Support Engineer",
+         "San Francisco",
+         "2927",
+         "2009/07/07",
+         "$87,500"
+      ],
+      [
+         "47",
+         "Serge Baldwin",
+         "Data Coordinator",
+         "Singapore",
+         "8352",
+         "2012/04/09",
+         "$138,575"
+      ],
+      [
+         "48",
+         "Zenaida Frank",
+         "Software Engineer",
+         "New York",
+         "7439",
+         "2010/01/04",
+         "$125,250"
+      ],
+      [
+         "49",
+         "Zorita Serrano",
+         "Software Engineer",
+         "San Francisco",
+         "4389",
+         "2012/06/01",
+         "$115,000"
+      ],
+      [
+         "50",
+         "Jennifer Acosta",
+         "Junior Javascript Developer",
+         "Edinburgh",
+         "3431",
+         "2013/02/01",
+         "$75,650"
+      ],
+      [
+         "51",
+         "Cara Stevens",
+         "Sales Assistant",
+         "New York",
+         "3990",
+         "2011/12/06",
+         "$145,600"
+      ],
+      [
+         "52",
+         "Hermione Butler",
+         "Regional Director",
+         "London",
+         "1016",
+         "2011/03/21",
+         "$356,250"
+      ],
+      [
+         "53",
+         "Lael Greer",
+         "Systems Administrator",
+         "London",
+         "6733",
+         "2009/02/27",
+         "$103,500"
+      ],
+      [
+         "54",
+         "Jonas Alexander",
+         "Developer",
+         "San Francisco",
+         "8196",
+         "2010/07/14",
+         "$86,500"
+      ],
+      [
+         "55",
+         "Shad Decker",
+         "Regional Director",
+         "Edinburgh",
+         "6373",
+         "2008/11/13",
+         "$183,000"
+      ],
+      [
+         "56",
+         "Michael Bruce",
+         "Javascript Developer",
+         "Singapore",
+         "5384",
+         "2011/06/27",
+         "$183,000"
+      ],
+      [
+         "57",
+         "Donna Snider",
+         "Customer Support",
+         "New York",
+         "4226",
+         "2011/01/25",
+         "$112,000"
+      ]
+   ]
+}
+
+
+    respond_to do |format|
+      format.html { render "employers/employer_profiles/binder_index" }
+      format.js {}
+    end
   end
 
   def employer_index

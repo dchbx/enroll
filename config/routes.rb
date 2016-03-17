@@ -35,6 +35,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :assister_index
         get :request_help
+        get :binder_index
       end
 
       member do

@@ -1,0 +1,57 @@
+<div class='container'>
+  <div class="row">
+    <h3 class="title-inline">Employers who are eligible for binder paid</h3>
+  </div>
+</div>
+
+<table id="example" class="table table-lockbox table-striped table-bordered dataTable">
+   <thead>
+      <tr>
+         <th>
+            <input type="checkbox">
+         </th>
+         <th>Name</th>
+         <th>Position</th>
+         <th>Office</th>
+         <th>Extn</th>
+         <th>Start date</th>
+         <th>Salary</th>
+      </tr>
+   </thead>
+   <tbody>
+    <% @data[:data].each do |data| %>
+      <tr>
+         <th></th>
+         <th><%= data[0]%></th>
+         <th><%= data[1]%></th>
+         <th><%= data[2]%></th>
+         <th><%= data[3]%></th>
+         <th><%= data[4]%></th>
+         <th><%= data[5]%></th>
+      </tr>
+      <% end %>
+   </tbody>
+</table>
+
+<hr>
+
+<p>Press <b>Submit</b> and check console for URL-encoded form data that would be submitted.</p>
+
+<p><button>Submit</button></p>
+
+<b>Data submitted to the server:</b><br>
+<pre id="example-console">
+</pre>
+</form>
+
+<style type="text/css">
+  table.dataTable.select tbody tr,
+  table.dataTable thead th:first-child {
+     cursor: pointer;
+  }
+</style>
+
+<script type="text/javascript">
+  // $("#example").dataTable({"iDisplayLength": 10, "bLengthChange": false, "bFilter": false, "bSort": false });
+  $("#example").DataTable();
+</script>
