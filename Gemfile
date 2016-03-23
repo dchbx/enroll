@@ -15,7 +15,7 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails', '4.0.5'
+gem 'jquery-rails', '4.1.0'
 gem 'jquery-ui-rails'
 gem 'animate-rails', '~> 1.0.7'
 gem 'maskedinput-rails'
