@@ -2,35 +2,39 @@ require 'date'
 module Forms
   class EmployerProfile  < ::Forms::OrganizationSignup
     attr_reader :employer_profile
-
+    attr_accessor :email
+    attr_accessor :area_code
+    attr_accessor :number
+    attr_accessor :extension
     class OrganizationAlreadyMatched < StandardError; end
 
     def check_existing_organization
+      claimed = false
       existing_org = Organization.where(:fein => fein).first
       if existing_org.present?
         if existing_org.employer_profile.present?
           if (Person.where({"employer_staff_roles.employer_profile_id" => existing_org.employer_profile._id}).any?)
-            raise OrganizationAlreadyMatched.new
+            claimed = true
           end
         end
-        return existing_org
       end
-      nil
+      [existing_org, claimed]
     end
 
-    def create_employer_staff_role(current_user, employer_profile)
+    def create_employer_staff_role(current_user, employer_profile, existing_company)
       person.user = current_user
-      person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true)
+      person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: (existing_company ? 'is_applicant': 'is_active'))
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
       current_user.save!
       person.save!
     end
 
-    def save(current_user)
+    def save(current_user, employer_profile_id)
       return false unless valid?
       begin
         match_or_create_person(current_user)
         person.save!
+        person.contact_info(email, area_code, number, extension) if email
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
         return false
@@ -38,24 +42,24 @@ module Forms
         errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
         return false
       end
-      existing_org = nil
-      begin
-        existing_org = check_existing_organization
-      rescue OrganizationAlreadyMatched
-        errors.add(:base, "a staff role for this organization has already been claimed.")
-        return false
-      end
-      employer_profile = nil
-      if existing_org
-        update_organization(existing_org)
-        @employer_profile = existing_org.employer_profile
+      return false if person.errors.present?
+      if !employer_profile_id.present?
+        existing_org, claimed = check_existing_organization
+        if existing_org
+          update_organization(existing_org) unless claimed
+          @employer_profile = existing_org.employer_profile
+        else
+          org = create_new_organization
+          org.save!
+          @employer_profile = org.employer_profile
+        end
       else
-        org = create_new_organization
-        org.save!
-        @employer_profile = org.employer_profile
+        #TODOJF TODO Change the variable name to organization id or fix the employer_profile.js
+        @employer_profile = Organization.find(employer_profile_id).employer_profile
       end
-      create_employer_staff_role(current_user, @employer_profile)
-      true
+      pending =  employer_profile_id.present? || claimed   
+      create_employer_staff_role(current_user, @employer_profile, pending)
+      [true, pending]
     end
 
     def create_new_organization

@@ -404,6 +404,11 @@ class Person
     emails.detect { |adr| adr.kind == "work" }
   end
 
+  def work_email_or_best
+    email = emails.detect { |adr| adr.kind == "work" } || emails.first
+    (email && email.address) || (user && user.email)
+  end
+
   def work_phone
     phones.detect { |phone| phone.kind == "work" } || main_phone
   end
@@ -430,6 +435,14 @@ class Person
 
   def active_employee_roles
     employee_roles.present? ? employee_roles.active : []
+  end
+
+  def has_active_employer_staff_role?
+    employer_staff_roles.present? and employer_staff_roles.active.present?
+  end
+
+  def active_employer_staff_roles
+    employer_staff_roles.present? ? employer_staff_roles.active : []
   end
 
   def has_multiple_roles?
@@ -507,7 +520,8 @@ class Person
     end
 
     def find_all_staff_roles_by_employer_profile(employer_profile)
-      where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
+      #where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
+      staff_for_employer(employer_profile)
     end
 
     def match_existing_person(personish)
@@ -543,6 +557,54 @@ class Person
                          ).selector
                )
     end
+
+    def staff_for_employer(employer_profile)
+      staff_had_role = self.where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
+      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.is_active?}.map(&:person)
+    end
+
+    def staff_for_employer_including_pending(employer_profile)
+      self.where(:employer_staff_roles => {
+        '$elemMatch' => {
+            employer_profile_id: employer_profile.id,
+            :aasm_state.ne => :is_closed
+        }
+        })
+    end
+
+    # Adds employer staff role to person
+    # Returns status and message if failed
+    # Returns status and person if successful
+    def add_employer_staff_role(first_name, last_name, dob, email, employer_profile)
+      person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
+
+      return false, 'Person count too high, please contact HBX Admin' if person.count > 1
+      return false, 'Person does not exist on the HBX Exchange' if person.count == 0
+
+      employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      employer_staff_role.save
+      return true, person.first
+    end
+
+    # Sets employer staff role to inactive
+    # Returns false if person not found
+    # Returns false if employer staff role not matches
+    # Returns true is role was marked inactive
+    def deactivate_employer_staff_role(person_id, employer_profile_id)
+
+      begin
+        person = Person.find(person_id)
+      rescue
+        return false, 'Person not found'
+      end
+      if role = person.employer_staff_roles.detect{|role| role.is_active? && role.employer_profile_id.to_s == employer_profile_id.to_s}
+        role.update_attributes!(:aasm_state => :is_closed)
+        return true, 'Employee Staff Role is inactive'
+      else
+        return false, 'No matching employer staff role'
+      end
+    end
+
   end
 
   # HACK
@@ -622,6 +684,29 @@ class Person
   def agent?
     agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role
     !!agent
+  end
+
+  def contact_info(email_address, area_code, number, extension)
+    if email_address.present?
+      email = emails.detect{|mail|mail.kind == 'work'}
+      if email
+        email.update_attributes!(address: email_address)
+      else
+        email= Email.new(kind: 'work', address: email_address)
+        emails.append(email)
+        self.update_attributes!(emails: emails)
+        save!
+      end
+    end
+    phone = phones.detect{|p|p.kind == 'work'}
+    if phone
+      phone.update_attributes!(area_code: area_code, number: number, extension: extension)
+    else
+      phone = Phone.new(kind: 'work', area_code: area_code, number: number, extension: extension)
+      phones.append(phone)
+      self.update_attributes!(phones: phones)
+      save!
+    end
   end
 
   private

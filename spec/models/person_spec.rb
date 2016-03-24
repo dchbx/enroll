@@ -426,10 +426,10 @@ describe Person do
   describe '#find_all_staff_roles_by_employer_profile' do
     employer_profile = FactoryGirl.build(:employer_profile)
     person = FactoryGirl.build(:person)
-
+    FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
     it "should have the same search criteria" do
-      allow(Person).to receive(:where).and_return(person)
-      expect(Person.find_all_staff_roles_by_employer_profile(employer_profile)).to eq person
+      allow(Person).to receive(:where).and_return([person])
+      expect(Person.find_all_staff_roles_by_employer_profile(employer_profile)).to eq [person]
     end
 
   end
@@ -818,6 +818,80 @@ describe Person do
 
       it "returns true if persons is AQHP" do
         expect(@person_aqhp.is_aqhp?).to eq true
+      end
+    end
+  end
+
+  describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
+    let(:employer_profile){FactoryGirl.create(:employer_profile)}
+    let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
+    let(:person1) {FactoryGirl.create(:person, person_params)}
+
+    context 'duplicate person PII' do
+      before do
+        FactoryGirl.create(:person, person_params)
+        @status, @result = Person.add_employer_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', employer_profile )
+      end
+      it 'returns false' do
+        expect(@status).to eq false
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+    end
+
+    context 'zero matching person PII' do
+      before {@status, @result = Person.add_employer_staff_role('sam', person1.last_name, person1.dob,'#default@email.com', employer_profile )}
+
+      it 'returns false' do
+        expect(@status).to eq false
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+    end
+
+    context 'matching one person PII' do
+      before {@status, @result = Person.add_employer_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', employer_profile )}
+
+      it 'returns true' do
+        expect(@status).to eq true
+      end
+
+      it 'returns the person' do
+        expect(@result).to eq person1
+      end
+    end
+  end
+
+  describe ".deactivate_employer_staff_role" do
+    let(:person) {FactoryGirl.create(:person)}
+    let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, person: person)}
+
+    context 'does not find the person' do
+      before {@status, @result = Person.deactivate_employer_staff_role(1, employer_staff_role.employer_profile_id)}
+      it 'returns false' do
+        expect(@status).to be false
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+    end
+    context 'finds the person and inactivates the role' do
+      before {@status, @result = Person.deactivate_employer_staff_role(person.id, employer_staff_role.employer_profile_id)}
+      it 'returns true' do
+        expect(@status).to be true
+      end
+
+      it 'returns msg' do
+        expect(@result).to be_instance_of String
+      end
+
+      it 'sets is_active to false' do
+        expect(employer_staff_role.reload.is_active?).to eq false
       end
     end
   end

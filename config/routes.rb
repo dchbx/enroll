@@ -156,10 +156,17 @@ Rails.application.routes.draw do
   end
 
   namespace :employers do
+    post 'search', to: 'employers#search'
     root 'employer_profiles#new'
 
     resources :premium_statements, :only => [:show]
 
+    resources :employer_staff_roles, :only => [:create, :destroy] do
+      member do
+        get :approve
+      end
+    end
+    
     #TODO REFACTOR
     resources :people do
       collection do

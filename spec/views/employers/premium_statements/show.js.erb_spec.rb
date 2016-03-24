@@ -66,10 +66,10 @@ describe "employers/premium_statements/show.js.erb" do
     render file: "employers/premium_statements/show.js.erb"
   end
 
-  it "should display start on and end on dates of premium billing report" do
+  it "should display start on and end on dates of Enrollment Report" do
     expect(rendered).to match(/#{current_plan_year.start_on}/m)
     expect(rendered).to match(/#{current_plan_year.start_on.end_of_month}/m)
-    expect(rendered).to match(/.*Premium Billing Report.*#{current_plan_year.start_on}.*-.*#{current_plan_year.start_on.end_of_month}.*/m)
+    expect(rendered).to match(/.*Enrollment Report.*#{current_plan_year.start_on}.*-.*#{current_plan_year.start_on.end_of_month}.*/m)
   end
 
   it "should display billing report of a user" do

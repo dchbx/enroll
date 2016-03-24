@@ -422,7 +422,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       let(:owner_person) { instance_double("Person")}
 
       it "should return an array of persons" do
-        allow(Person).to receive(:find_all_staff_roles_by_employer_profile).with(employer_profile).and_return([owner_person])
+        allow(Person).to receive(:staff_for_employer).with(employer_profile).and_return([owner_person])
         expect(employer_profile.staff_roles).to include(owner_person)
       end
     end

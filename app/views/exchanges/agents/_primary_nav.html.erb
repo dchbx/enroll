@@ -12,13 +12,13 @@
           <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
        <% end %>
       </li>
-          
+
       <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>>
-        <%= link_to(inbox_exchanges_agent_path(current_user.person), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
+        <%= link_to(inbox_exchanges_agent_path(current_user.person), {:remote => true}, {class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' }) do  %>
           <span class="badge message-unread"><%= @unread_messages %></span>
           Inbox
         <% end %>
-        <%= link_to(inbox_exchanges_agent_path(current_user.person), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+        <%= link_to(inbox_exchanges_agent_path(current_user.person), {:remote => true},{ class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab"} ) do  %>
           <span class="hidden-xs">Inbox</span>
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Inbox"></span>
         <% end %>

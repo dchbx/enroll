@@ -280,12 +280,11 @@ end
 
 And(/^.+ should see a button to create new plan year$/) do
   screenshot("employer_plan_year")
+  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
   find('a.interaction-click-control-add-plan-year').click
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
-  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
-
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
   find(:xpath, "//li[@data-index='1'][contains(., '#{Date.today.year}')]").click
 

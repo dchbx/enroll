@@ -58,11 +58,7 @@ namespace :reports do
           if staff_role
             staff_name    = staff_role.full_name
             staff_phone   = staff_role.work_phone || staff_role.mobile_phone
-            if staff_role.emails.detect { |email| email.kind == "work" }
-              staff_email = staff_role.emails.detect { |email| email.kind == "work" }.address
-            else
-              staff_email = staff_role.emails.first.address if staff_role.emails.size > 0
-            end
+            staff_email   = staff_role.work_email_or_best
           end
 
           if er.broker_agency_profile

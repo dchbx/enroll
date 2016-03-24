@@ -9,11 +9,11 @@ RSpec.describe "employers/employer_profiles/my_account/_index_table.html.erb" do
     render "employers/employer_profiles/index_table"
   end
 
-  it "should display a link to the premium billing report for employer profile a" do
+  it "should display a link to the Enrollment Report for employer profile a" do
     expect(rendered).to match(/#{employers_premium_statement_path(employer_profile_a)}/)
   end
 
-  it "should display a link to the premium billing report for employer profile b" do
+  it "should display a link to the Enrollment Report for employer profile b" do
     expect(rendered).to match(/#{employers_premium_statement_path(employer_profile_b)}/)
   end
 end

@@ -1,7 +1,7 @@
 <br>
 <div class="container">
   <div class="row no-buffer">
-    <h3 class="title-inline">Premium Billing Report
+    <h3 class="title-inline">Enrollment Report
     <% if @current_plan_year.present? %>
       <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h3>
     <% end %>
@@ -22,7 +22,7 @@
           <th>Issuer</th>
           <th style="text-align: center;">Covered Ct</th>
           <th style="text-align: center;">Employer Contribution</th>
-          <th style="text-align: center;">Employee Premium</th>
+          <th style="text-align: center;">Employee Contribution</th>
           <th style="text-align: center;">Total Premium</th>
         </tr>
       </thead>

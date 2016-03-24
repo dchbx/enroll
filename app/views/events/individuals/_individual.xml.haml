@@ -13,15 +13,21 @@
 = render :partial => "events/individuals/person_demographics", :object => individual
 - if individual.broker_role.present? 
   - if !individual.broker_role.broker_agency_profile_id.blank?
+    - broker_role = individual.broker_role
+    - broker_agency_profile = broker_role.broker_agency_profile
     %broker_roles
       %broker_role
         %id
-          %id= individual.broker_role.npn
-        %npn= individual.broker_role.npn
+          %id= broker_role.npn
+        %npn= broker_role.npn
         %broker_agency
           %id
-            %id= individual.broker_role.broker_agency_profile.id
-          %name= individual.broker_role.broker_agency_profile.legal_name
-          - if !individual.broker_role.broker_agency_profile.corporate_npn.blank?
-            %npn= individual.broker_role.broker_agency_profile.corporate_npn
-        = render :partial => "events/shared/versioned_resource", :object => individual.broker_role
+            %id= broker_agency_profile.id
+          %name= broker_agency_profile.legal_name
+          - if !broker_agency_profile.corporate_npn.blank?
+            %npn= broker_agency_profile.corporate_npn
+          - if broker_agency_profile.organization.primary_office_location.present?
+            - office_location = broker_agency_profile.organization.primary_office_location
+            %office_locations
+              = render :partial => "events/organizations/office_location", :object => office_location
+        = render :partial => "events/shared/versioned_resource", :object => broker_role

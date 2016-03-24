@@ -1,5 +1,5 @@
 <fieldset>
-  <h4> Office Location </h4>
+  <h4> <% if !@row && !params[:child_index] %> Primary <% end %> Office Location </h4>
   <div id="address_info" class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
       <%= f.fields_for :address, errors: {}, fieldset: false do |address| %>
@@ -21,7 +21,8 @@
               <div class="row" style="margin: 0;">
                 <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                   <div class="col-md-6 col-sm-6 col-xs-12 no-pd office_kind_select">
-                    <%= address.select :kind, options_for_select(Address::OFFICE_KINDS.map {|a| [a.to_s.humanize, a.to_s]}, f.object.address.kind ),class: "floatlabel form-control interaction-choice-control-office-location-address-kind", required: true, placeholder: 'KIND' %>
+                    <% kinds = Address::OFFICE_KINDS; kinds = kinds.rotate if params[:child_index] %>
+                    <%= address.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, f.object.address.kind ),class: "floatlabel form-control interaction-choice-control-office-location-address-kind", required: true, placeholder: 'KIND' %>
                   </div>
                   <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                 </div>

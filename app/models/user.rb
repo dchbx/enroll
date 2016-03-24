@@ -193,7 +193,7 @@ class User
   end
 
   def has_employer_staff_role?
-    has_role?(:employer_staff)
+    person && person.has_active_employer_staff_role?
   end
 
   def has_broker_agency_staff_role?

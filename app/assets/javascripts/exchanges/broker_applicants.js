@@ -15,6 +15,6 @@ function enableBrokerApplicantFilters() {
         type: "GET",
         data : { 'status': filter }
       });
-    })
-  })
+    });
+  });
 }

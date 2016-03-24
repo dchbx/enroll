@@ -112,9 +112,14 @@ RSpec.describe User, :type => :model do
     end
 
     context "roles" do
-      let(:params){valid_params.deep_merge({roles: ["employee", "employer_staff", "broker", "hbx_staff"]})}
+      let(:params){valid_params.deep_merge({roles: ["employee", "broker", "hbx_staff"]})}
       it "should return proper roles" do
         user = User.new(**params)
+        person = FactoryGirl.create(:person)
+        allow(user).to receive(:person).and_return(person)
+        employer_staff_role =FactoryGirl.create(:employer_staff_role, person: person)
+        #allow(person).to receive(:employee_roles).and_return([role])
+        FactoryGirl.create(:employer_staff_role, person: person)
         expect(user.has_employee_role?).to be_truthy
         expect(user.has_employer_staff_role?).to be_truthy
         expect(user.has_broker_role?).to be_truthy

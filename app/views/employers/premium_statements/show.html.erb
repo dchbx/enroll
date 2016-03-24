@@ -3,11 +3,10 @@
 <% end %>
 <div class="col-xs-12 premium-reports-tab">
   <div class="row no-buffer">
-    <% calender_month = TimeKeeper.date_of_record.next_month %>
-    <% if @current_plan_year.present? && !(@current_plan_year.start_on..@current_plan_year.end_on).cover?(calender_month) %>
-       <% calender_month = TimeKeeper.date_of_record %>
+     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
+      <% if plan_year.present? && billing_date.present? %>
+    <h1>Enrollment Report <%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></h1>
     <% end %>
-    <h1>Premium Billing Report <%= calender_month.beginning_of_month %> - <%= calender_month.end_of_month %>
 
   </div>
   <div class="premium-reports-table">

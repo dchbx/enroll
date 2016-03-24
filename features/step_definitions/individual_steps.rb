@@ -7,6 +7,15 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   screenshot("individual_start")
 end
 
+When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
+  visit "/"
+  click_link 'Consumer/Family Portal'
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  Caches::PlanDetails.load_record_cache!
+  screenshot("individual_start")
+end
+
 Then(/Individual creates HBX account$/) do
   click_button 'Create account'
 
@@ -77,7 +86,7 @@ Then (/Individual sees previously saved address/) do
   click_button "CONTINUE"
 end
 
-Then(/Individual agrees to the privacy agreeement/) do
+Then(/^\w+ agrees? to the privacy agreeement/) do
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
@@ -140,6 +149,10 @@ end
 
 And(/I click on continue button on household info form/) do
   click_link "Continue"
+end
+
+When(/I click on continue button on group selection page during a sep/) do
+  click_button "CONTINUE"
 end
 
 And(/I click on continue button on group selection page/) do
@@ -207,15 +220,15 @@ Then(/^Second user should see a form to enter personal information$/) do
   @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set(@u.email :email2)
 end
 
-Then(/Second user asks for help$/) do
-  @browser.divs(text: /Help me sign up/).last.click
-  wait_and_confirm_text /Options/
-  click_when_present(@browser.a(class: /interaction-click-control-help-from-a-customer-service-representative/))
-  @browser.text_field(class: /interaction-field-control-help-first-name/).set("Sherry")
-  @browser.text_field(class: /interaction-field-control-help-last-name/).set("Buckner")
+Then(/Individual asks for help$/) do
+  find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[2]').click
+  click_link "Help from a Customer Service Representative"
+  #TODO bombs on help_first_name sometimes
+  fill_in "help_first_name", with: "Sherry"
+  fill_in "help_last_name", with: "Buckner"
   screenshot("help_from_a_csr")
-  @browser.div(id: 'search_for_plan_shopping_help').click
-  @browser.button(class: 'close').click
+  find("#search_for_plan_shopping_help").click
+  find(".interaction-click-control-×").click
 end
 
 And(/^.+ clicks? the continue button$/i) do
@@ -226,49 +239,49 @@ Then(/^.+ sees the Verify Identity Consent page/)  do
   wait_and_confirm_text(/Verify Identity/)
 end
 
-When(/^CSR accesses the HBX portal$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /hbx portal/i).wait_until_present
-  @browser.a(text: /hbx portal/i).click
-  wait_and_confirm_text(/Sign In Existing Account/)
-  click_when_present(@browser.link(class: /interaction-click-control-sign-in-existing-account/))
-  sleep 2
-  @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set("sherry.buckner@dc.gov")
-  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
-  @browser.element(class: /interaction-click-control-sign-in/).click
-  sleep 1
+When(/^a CSR exists/) do
+  p = FactoryGirl.create(:person, :with_csr_role, first_name: "Sherry", last_name: "Buckner")
+  FactoryGirl.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"] )
+end
 
+When(/^CSR accesses the HBX portal$/) do
+  visit '/'
+  click_link 'HBX Portal'
+
+  find('.interaction-click-control-sign-in-existing-account').click
+  fill_in "user[email]", :with => "sherry.buckner@dc.gov"
+  find('#user_email').set("sherry.buckner@dc.gov")
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  #TODO this fixes the random login fails b/c of empty params on email
+  fill_in "user[email]", :with => person[:email] unless find(:xpath, '//*[@id="user_email"]').value == "sherry.buckner@dc.gov"
+  find('.interaction-click-control-sign-in').click
 end
 
 Then(/CSR should see the Agent Portal/) do
-  wait_and_confirm_text /a Trained Expert/
+  expect(page).to have_content("a Trained Expert")
 end
 
 Then(/CSR opens the most recent Please Contact Message/) do
-  wait_and_confirm_text /Please contact/
-  sleep 1
-  tr=@browser.trs(text: /Please contact/).last
-  scroll_then_click(tr.a(text: /show/i))
+  expect(page).to have_content "Please contact"
+  find(:xpath,'//*[@id="message_list_form"]/table/tbody/tr[2]/td[4]/a[1]').click
 end
 
 Then(/CSR clicks on Resume Application via phone/) do
-  wait_and_confirm_text /Assist Customer/
-  @browser.a(text: /Assist Customer/).fire_event('onclick')
+  expect(page).to have_content "Assist Customer"
+  click_link "Assist Customer"
 end
 
 When(/I click on the header link to return to CSR page/) do
-  wait_and_confirm_text /Trained/
-  @browser.a(text: /I'm a Trained Expert/i).click
+  expect(page).to have_content "I'm a Trained Expert"
+  click_link "I'm a Trained Expert"
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do
-  click_when_present(@browser.a(text: /New Consumer Paper Application/i))
+  click_link "New Consumer Paper Application"
 end
 
 Then(/CSR starts a new enrollment/) do
-  wait_and_confirm_text /Personal Information/
-  wait_and_confirm_text /15% Complete/
+  expect(page).to have_content("Personal Information")
 end
 
 Then(/^click continue again$/) do

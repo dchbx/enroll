@@ -55,7 +55,7 @@ class Exchanges::AgentsController < ApplicationController
     @inbox_provider = current_user.person
     @profile=@inbox_provider
     @folder = params[:folder] || 'inbox'
-    @sent_box = false  
+    @sent_box = false
   end
 
   def show
