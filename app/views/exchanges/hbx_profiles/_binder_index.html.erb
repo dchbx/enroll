@@ -4,46 +4,46 @@
   </div>
 </div>
 
-<div class="module your-documents-table">
-  <div class="table-responsive">
-    <table id="example" class="table table-striped table-hover table-sm display select">
-      <thead class="thead-default">
-        <tr>
-         <th>
-            <%= check_box_tag "checkall" %> &nbsp; &nbsp;Select All
-         </th>
-         <th>Name</th>
-         <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @employers.each do |employer| %>
+<%= form_tag binder_paid_exchanges_hbx_profiles_path, method: :post, remote: true, id: 'binder_paid_index' do %>
+  <div class="module your-documents-table">
+    <div class="table-responsive">
+      <table id="example" class="table table-striped table-hover table-sm display select">
+        <thead class="thead-default">
           <tr>
-            <td><input type='checkbox' name='numbers[]' value=' <%= employer.id %> '></td>
-            <td><%= employer.legal_name %></td>
-            <td><%= employer.aasm_state %></td>
+           <th>
+              <%= check_box_tag "checkall" %> &nbsp; &nbsp;Select All
+           </th>
+           <th>Name</th>
+           <th>Status</th>
+           <th>Employer Type</th>
+           <th>Eligibility Criteria Met</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @employers.each do |employer| %>
+            <% if employer.is_new_employer? || employer.is_renewing_employer? %>
+              <tr>
+                <td><input type='checkbox' name='employer_profile_ids[]' value='<%= employer.id %>' class="binderCheckBox"></td>
+                <td><%= employer.legal_name %></td>
+                <td><%= employer.aasm_state %></td>
+                <td><%= employer.renewing_plan_year.present? ? "Renewing" : "New" %></td>
+                <td><%= employer.show_plan_year.additional_required_participants_count == 0 ? "Yes" : ("No: #{employer.show_plan_year.additional_required_participants_count} more required" ) %></td>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+  <%= submit_tag "Binder Paid", class: 'btn btn-primary', id: "binderSubmit" %>
+<% end %>
 
 <hr>
 
-<p>Press <b>Submit</b> and check console for URL-encoded form data that would be submitted.</p>
-
-<p><button>Submit</button></p>
-
-<b>Data submitted to the server:</b><br>
-<pre id="example-console">
-</pre>
-</form>
-
 <style type="text/css">
-  .dataTables_length {
+/*  .dataTables_length {
     display: none;
-  }
+  }*/
 </style>
 
 <script type="text/javascript">
@@ -55,9 +55,32 @@
       "bSort": false,
     });
 
+    var checkBoxes = $('tbody .binderCheckBox');
+    var headCheckBox = $('thead #checkall');
+
+    headCheckBox.change(function (){
+      $('#binderSubmit').prop('disabled', checkBoxes.filter(':checked').length < 1);
+    });
+
+    checkBoxes.change(function () {
+      var selectedCheckBoxesLength = checkBoxes.filter(':checked').length;
+
+      $('#binderSubmit').prop('disabled', selectedCheckBoxesLength < 1);
+
+      if (selectedCheckBoxesLength != 0 && checkBoxes.length != selectedCheckBoxesLength){
+        headCheckBox.prop("indeterminate", true);
+      }else if (checkBoxes.length == selectedCheckBoxesLength){
+        headCheckBox.prop({'indeterminate': false, 'checked': true });
+      }else if(selectedCheckBoxesLength == 0){
+        headCheckBox.prop({'indeterminate': false, 'checked': false });
+      }
+    });
+
     $('#checkall').click(function () {
       $(':checkbox', table.rows().nodes()).prop('checked', this.checked);
     });
+
+    checkBoxes.change();
 
   });
 </script>

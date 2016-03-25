@@ -181,7 +181,7 @@ class EmployerProfile
       plan_year = plan_years.published.detect{|py| py.start_on > billing_report_date }
       billing_report_date = plan_year.start_on if plan_year
     end
-    
+
     if plan_year.blank?
       billing_report_date = TimeKeeper.date_of_record
       plan_year = find_plan_year_by_effective_date(billing_report_date)
@@ -272,9 +272,9 @@ class EmployerProfile
     end
 
     def organizations_for_open_enrollment_begin(new_date)
-      Organization.where(:"employer_profile.plan_years" => 
-          { :$elemMatch => { 
-           :"open_enrollment_start_on".lte => new_date, 
+      Organization.where(:"employer_profile.plan_years" =>
+          { :$elemMatch => {
+           :"open_enrollment_start_on".lte => new_date,
            :"open_enrollment_end_on".gte => new_date,
            :"aasm_state".in => ['published', 'renewing_published']
          }
@@ -282,8 +282,8 @@ class EmployerProfile
     end
 
     def organizations_for_open_enrollment_end(new_date)
-      Organization.where(:"employer_profile.plan_years" => 
-          { :$elemMatch => { 
+      Organization.where(:"employer_profile.plan_years" =>
+          { :$elemMatch => {
            :"open_enrollment_end_on".lt => new_date,
            :"start_on".gt => new_date,
            :"aasm_state".in => ['published', 'renewing_published', 'enrolling', 'renewing_enrolling']
@@ -292,8 +292,8 @@ class EmployerProfile
     end
 
     def organizations_for_plan_year_begin(new_date)
-      Organization.where(:"employer_profile.plan_years" => 
-        { :$elemMatch => { 
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
           :"start_on".lte => new_date,
           :"end_on".gt => new_date,
           :"aasm_state".in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE - ['active'])
@@ -302,8 +302,8 @@ class EmployerProfile
     end
 
     def organizations_for_plan_year_end(new_date)
-      Organization.where(:"employer_profile.plan_years" => 
-        { :$elemMatch => { 
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
           :"end_on".lt => new_date,
           :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE
         }
@@ -509,7 +509,7 @@ class EmployerProfile
       transitions from: [:registered, :eligible, :ineligible, :suspended, :binder_paid, :enrolled], to: :applicant
     end
 
-    event :force_enroll, :after => :record_transition do 
+    event :force_enroll, :after => :record_transition do
       transitions from: [:applicant, :eligible, :registered], to: :enrolled
     end
   end
@@ -555,6 +555,29 @@ class EmployerProfile
   # def is_eligible_to_shop?
   #   registered? or published_plan_year.enrolling?
   # end
+
+  def self.update_status_to_binder_paid(employer_profile_ids)
+    employer_profile_ids.each do |id|
+      empr = self.find(id)
+      empr.update_attribute(:aasm_state => "binder_paid")
+    end
+  end
+
+  def is_new_employer?
+    TimeKeeper.date_of_record.day > 10 && !renewing_plan_year.present?
+  end
+
+  def is_renewing_employer?
+    TimeKeeper.date_of_record.day > 13 && renewing_plan_year.present?
+  end
+
+  def has_next_month_plan_year?
+    show_plan_year.present? && (show_plan_year.start_on == (TimeKeeper.date_of_record.next_month).beginning_of_month)
+  end
+
+  def self.filter_employers_for_binder_paid
+    all.select{ |empr| empr.has_next_month_plan_year? }
+  end
 
   def is_eligible_to_enroll?
     published_plan_year.enrolling?
