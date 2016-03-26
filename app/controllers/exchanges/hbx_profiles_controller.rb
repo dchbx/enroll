@@ -23,9 +23,9 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def binder_paid
-    flash["notice"] = "Successfully submitted the selected employer for binder paid."
-    @employers = EmployerProfile.update_status_to_binder_paid(params[:employer_profile_ids])
-    redirect_to exchanges_hbx_profile_path
+    EmployerProfile.update_status_to_binder_paid(params[:employer_profile_ids])
+    flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
+    redirect_to exchanges_hbx_profiles_root_path
   end
 
   def employer_index
