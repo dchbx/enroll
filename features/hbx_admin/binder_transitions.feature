@@ -7,7 +7,7 @@ Feature: Binder transitions
     And the HBX admin is logged in
 
   Scenario: HBX-Admin participation requirements checklist for new ER
-    Given the HBX admin visits the blank page
+    Given the HBX admin visits the Dashboard page
     When the HBX admin selects the employer to confirm
     Then the HBX admin sees a checklist
       | checklist                                                              |

@@ -1,12 +1,12 @@
 module BinderTransitionWorld
   def hbx_admin(*traits)
     attributes = traits.extract_options!
-    @hbx_admin = FactoryGirl.create :user, *traits, attributes
+    @hbx_admin ||= FactoryGirl.create :user, *traits, attributes
   end
 
   def employer(*traits)
     attributes = traits.extract_options!
-    @employer = FactoryGirl.create :employer
+    @employer ||= FactoryGirl.create :employer, *traits, attributes
   end
 end
 World(BinderTransitionWorld)
@@ -23,15 +23,21 @@ Given(/^the HBX admin is logged in$/) do
   login_as hbx_admin, scope: :user
 end
 
-Given(/^the HBX admin visits the blank page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+Given(/^the HBX admin visits the Dashboard page$/) do
+  # pending # Write code here that turns the phrase above into concrete actions
+  visit exchanges_hbx_profiles_root_path
+  find('.interaction-click-control-binder').click
+  expect(page).to have_content('Employers who are eligible for binder paid')
 end
 
 When(/^the HBX admin selects the employer to confirm$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  # pending # Write code here that turns the phrase above into concrete actions
+  binding.pry
+  sleep(5)
+  expect(false).to be_truthy
 end
 
-Then(/^the HBX admin sees a checklist$/) do |table|
+Then(/^the HBX admin sees a checklist$/) do |checklist|
   # table is a Cucumber::Core::Ast::DataTable
   pending # Write code here that turns the phrase above into concrete actions
 end

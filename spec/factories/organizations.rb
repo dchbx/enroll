@@ -47,19 +47,20 @@ FactoryGirl.define do
 
     trait :with_insured_employees do
       after :create do |organization, evaluator|
-        plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile
+        plan_year = FactoryGirl.create :next_month_plan_year, employer_profile: organization.employer_profile
+        # hbx_enrollment = FactoryGirl.create(:hbx_enrollment)
         plan_year.benefit_groups.push(benefit_group = FactoryGirl.create(:benefit_group, plan_year: plan_year))
 
-        organization.employer_profile.census_employees = FactoryGirl.create_list(:census_employee, 5).tap do |census_employees|
+        # organization.employer_profile.census_employees = FactoryGirl.create_list(:census_employee, 5).tap do |census_employees|
+        census_employes = FactoryGirl.create_list(:census_employee, 5, :with_enrolled_census_employee, employer_profile_id: organization.employer_profile.id).tap do |census_employees|
           census_employees.each do |census_employee|
-            census_employee.benefit_group_assignments.create benefit_group: benefit_group, start_on: benefit_group.start_on
-            person = FactoryGirl.create :person, first_name: census_employee.first_name,
-                                                 middle_name: census_employee.middle_name,
-                                                 last_name: census_employee.last_name,
-                                                 ssn: census_employee.ssn,
-                                                 gender: census_employee.gender,
-                                                 employee_roles: [ FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile,
-                                                                                                      census_employee: census_employee) ]
+            census_employee.aasm_state = "employee_role_linked"
+            census_employee.benefit_group_assignments.create benefit_group: benefit_group, start_on: benefit_group.start_on, aasm_state: "coverage_selected", hbx_enrollment_id: hbx_enrollment.id
+            binding.pry
+            person = FactoryGirl.create :person, first_name: census_employee.first_name, middle_name: census_employee.middle_name, last_name: census_employee.last_name, ssn: census_employee.ssn, gender: census_employee.gender
+            person.employee_roles.build person: person, hired_on: census_employee.hired_on, employer_profile_id: organization.employer_profile.id, census_employee_id: census_employee.id
+            census_employee.save!
+            person.save!
           end
         end
       end

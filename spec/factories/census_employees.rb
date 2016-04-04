@@ -11,9 +11,13 @@ FactoryGirl.define do
     association :address, strategy: :build
     association :email, strategy: :build
     association :employer_profile, strategy: :build
-    
+
     trait :owner do
       is_business_owner  true
+    end
+
+    trait :with_enrolled_census_employee do
+      aasm_state :eligible
     end
   end
 
