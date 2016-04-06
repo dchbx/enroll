@@ -116,32 +116,41 @@ class CoverageHousehold
     state :terminated
 
     event :move_to_contingent!, :after => :record_transition do
+      transitions from: :terminated, to: :terminated
+      transitions from: :canceled, to: :canceled
       transitions from: :unverified, to: :enrolled_contingent, after: :notify_verification_outstanding
+      transitions from: :enrollment_submitted, to: :enrolled_contingent, after: :notify_verification_outstanding
       transitions from: :enrolled_contingent, to: :enrolled_contingent
       transitions from: :enrolled, to: :enrolled_contingent, after: :notify_verification_outstanding
     end
 
     event :move_to_enrolled!, :after => :record_transition do
+      transitions from: :terminated, to: :terminated
+      transitions from: :canceled, to: :canceled
       transitions from: :unverified, to: :enrolled, after: :notify_verification_success
       transitions from: :enrolled_contingent, to: :enrolled, after: :notify_verification_success
       transitions from: :enrolled, to: :enrolled
+      transitions from: :enrollment_submitted, to: :enrolled, after: :notify_verification_success
     end
 
     event :move_to_pending!, :after => :record_transition do
+      transitions from: :terminated, to: :terminated
+      transitions from: :canceled, to: :canceled
       transitions from: :unverified, to: :unverified
       transitions from: :enrolled_contingent, to: :unverified
       transitions from: :enrolled, to: :unverified
+      transitions from: :enrollment_submitted, to: :unverified
     end
   end
 
   def self.update_individual_eligibilities_for(consumer_role)
-    found_families = Family.find_all_by_person(consumer_role.try(:person))
+    found_families = Family.find_all_by_person(consumer_role.person)
     found_families.each do |ff|
       ff.households.each do |hh|
         hh.coverage_households.each do |ch|
           ch.evaluate_individual_market_eligiblity
         end
-        hh.hbx_enrollments.active.each do |he|
+        hh.hbx_enrollments.each do |he|
           he.evaluate_individual_market_eligiblity
         end
       end
