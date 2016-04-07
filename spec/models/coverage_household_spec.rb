@@ -26,7 +26,7 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
   let(:mock_consumer_role) { double(person: mock_person) }
   let(:matching_coverage_household) { instance_double("CoverageHousehold") }
   let(:matching_hbx_enrollment) { instance_double("HbxEnrollment") }
-  let(:hbxs) { double(active: [matching_hbx_enrollment]) }
+  let(:hbxs) { [matching_hbx_enrollment] }
   let(:mock_household) { instance_double("Household", :coverage_households => [matching_coverage_household], hbx_enrollments: hbxs) }
   let(:mock_family) { instance_double("Family", :households => [mock_household]) }
 
