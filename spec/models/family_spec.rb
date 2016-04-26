@@ -388,6 +388,42 @@ describe Family do
       expect(family.earliest_effective_sep).to eq @current_sep
     end
   end
+
+  describe '#all_family_member_relations_defined' do
+    let!(:husband) { FactoryGirl.build_stubbed :person, :male, first_name: 'Bill' }
+    let!(:wife) { FactoryGirl.build_stubbed :person, :female, first_name: 'Kelly' }
+
+    before :each do
+      husband.person_relationships << PersonRelationship.new({
+        :kind => 'spouse',
+        :relative_id => wife.id
+      })
+
+      family.family_members = [
+        FactoryGirl.build_stubbed(:family_member, is_active: true, is_primary_applicant: true, person: husband),
+        FactoryGirl.build_stubbed(:family_member, person: wife)
+      ]
+    end
+
+    context "with dependents not having relationships with primary_family_member" do
+      it 'is not valid' do
+        expect(family).to_not be_valid
+      end
+    end
+
+    context "with dependent having relationships with primary_family_member" do
+      before :each do
+        wife.person_relationships << PersonRelationship.new({
+          :kind => 'spouse',
+          :relative_id => husband.id
+        })
+      end
+
+      it "is valid" do
+        expect(family).to be_valid
+      end
+    end
+  end
 end
 
 describe "special enrollment periods" do

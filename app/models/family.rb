@@ -625,7 +625,7 @@ private
     primary_member_id = primary_family_member.id
     primary_person = primary_family_member.person
     other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
-    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? }
+    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? or fm.person.find_relationship_with(primary_person).blank? }
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end
 

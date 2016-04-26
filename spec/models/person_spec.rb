@@ -564,6 +564,53 @@ describe Person do
     end
   end
 
+  describe '#ensure_relationship_with' do
+    let!(:husband) { FactoryGirl.build_stubbed :person, :male, first_name: 'Bill' }
+    let!(:wife) { FactoryGirl.build_stubbed :person, :female, first_name: 'Kelly' }
+
+    context 'when no relationship exists between two people' do
+      before :each do
+        husband.ensure_relationship_with(wife, 'spouse')
+      end
+
+      it 'creates a relationship between husband and wife' do
+        expect(husband.person_relationships.any? { |r| r.relative_id == wife.id }).to be_truthy
+      end
+
+      it 'creates a relationship between wife and husband' do
+        expect(wife.person_relationships.any? { |r| r.relative_id == husband.id }).to be_truthy
+      end
+    end
+
+    context 'when a one sided relationship exists between two people' do
+      before :each do
+        husband.person_relationships << PersonRelationship.new({
+          :kind => 'spouse',
+          :relative_id => wife.id
+        })
+        wife.ensure_relationship_with(husband, 'spouse')
+      end
+
+      it "doesn't create a new relationship between husband and wife" do
+        expect(husband.person_relationships.count).to eq(1)
+      end
+
+      it 'creates a relationship between wife and husband' do
+        expect(wife.person_relationships.any? { |r| r.relative_id == husband.id }).to be_truthy
+      end
+    end
+
+    context 'when two people are parent/child' do
+      let!(:child) { FactoryGirl.build_stubbed :person, :male, first_name: 'Danny' }
+
+      before(:each) { husband.ensure_relationship_with(child, 'child') }
+
+      it 'creates a child relationship between child and parent' do
+        expect(child.person_relationships.detect { |fm| fm.relative_id == husband.id }.kind).to eq('parent')
+      end
+    end
+  end
+
   describe "with no relationship to a dependent" do
     describe "after ensure_relationship_with" do
       it "should have the new relationship"

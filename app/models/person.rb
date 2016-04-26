@@ -373,6 +373,18 @@ class Person
         :relative_id => person.id
       })
     end
+
+    existing_reverse_relationship = person.person_relationships.detect do |rel|
+      rel.relative_id.to_s == id.to_s
+    end
+    if existing_reverse_relationship
+      existing_reverse_relationship.update_attributes(:kind => PersonRelationship::InverseMap[relationship])
+    else
+      person.person_relationships << PersonRelationship.new({
+        :kind => PersonRelationship::InverseMap[relationship],
+        :relative_id => id
+      })
+    end
   end
 
   def add_work_email(email)
