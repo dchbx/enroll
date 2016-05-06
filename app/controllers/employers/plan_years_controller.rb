@@ -337,7 +337,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
- 
+
     @benefit_group = @plan_year.benefit_groups[0]
 
     if @coverage_type == '.dental'
@@ -383,7 +383,7 @@ class Employers::PlanYearsController < ApplicationController
 
     employee_costs = @plan_year.employer_profile.census_employees.active.inject({}) do |census_employees, employee|
 
-     
+
       costs = {
         ref_plan_cost: @benefit_group.employee_cost_for_plan(employee, plan)
       }
@@ -430,7 +430,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year_params = params.require(:plan_year).permit(
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
-      :benefit_groups_attributes => [ :id, :title, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
+      :benefit_groups_attributes => [ :id, :title, :description, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
                                       :carrier_for_elected_plan, :carrier_for_elected_dental_plan, :metal_level_for_elected_plan,
                                       :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy, :dental_relationship_benefits_attributes_time,
                                       :relationship_benefits_attributes => [

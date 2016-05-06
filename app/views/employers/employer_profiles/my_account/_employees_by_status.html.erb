@@ -65,8 +65,8 @@
               <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;"onclick="$(this).closest('tr').next().show();">Rehire</span>
             </a>
           <% else %>
-          <%= link_to raw('<i class="fa fa-pencil fa-lg" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
-            <i class="fa fa-trash-o fa-lg" data-toggle="tooltip" title="Terminate"></i>
+          <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
+            <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
           <% end %>
           </td>
         </tr>

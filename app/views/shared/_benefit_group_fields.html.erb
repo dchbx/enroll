@@ -12,19 +12,27 @@
       <h1>
         Benefit Package - Set Up
       </h1>
-      <div class="row row-form-wrapper no-buffer plan-title">
-        <div class="col-xs-12 form-group form-group-lg">
-          <!-- Offset :  -->
-          <label class="title">NAME YOUR BENEFIT PACKAGE</label>
-          <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
-          <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
+      <div class="module benefit-properties">
+        <div class="row row-form-wrapper no-buffer plan-title">
+          <div class="col-xs-12 form-group form-group-lg">
+            <!-- Offset :  -->
+            <label class="title">NAME YOUR BENEFIT PACKAGE</label>
+            <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
+            <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
+          </div>
         </div>
-      </div>
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-xs-12 form-group form-group-lg">
-          <!-- Offset :  -->
-          <label class="title">WHEN SHOULD NEWLY HIRED EMPLOYEES START THEIR COVERAGE? <!--<i class="fa fa-chevron-down"></i>--></label>
-          <%= f.select(:effective_on_offset, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following date of hire", 1], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.effective_on_offset), { :class => ''}) %>
+        <div class="row row-form-wrapper no-buffer description">
+          <div class="col-xs-12 form-group form-group-lg">
+            <label class="title">DESCRIPTION</label>
+            <%= f.text_field :description, class: "form-control", style: "font-weight: normal !important;" %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-xs-12 form-group form-group-lg">
+            <!-- Offset :  -->
+            <label class="title">WHEN SHOULD NEWLY HIRED EMPLOYEES START THEIR COVERAGE? <!--<i class="fa fa-chevron-down"></i>--></label>
+            <%= f.select(:effective_on_offset, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.effective_on_offset), { :class => ''}) %>
+          </div>
         </div>
       </div>
       <br/>

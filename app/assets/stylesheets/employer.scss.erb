@@ -1,0 +1,34 @@
+$primary-color: #007bc4;
+$primay-active-button-text-color: #ffffff;
+$primary-bold: 600;
+$primary-green: #69A30D;
+
+.module {
+  &.benefit-group {
+    .title {
+      text-transform: uppercase;
+      color: $primary-green;
+      font-weight: bold;
+      span {
+        color: #333;
+        font-weight: normal;
+      }
+    }
+    .description {
+      text-transform: none;
+      font-weight: normal;
+      margin-bottom: 15px;
+    }
+    .health {
+      padding-top: 10px;
+    }
+    .dental {
+      padding-top: 15px;
+    }
+  }
+  &.benefit-properties {
+    .description {
+      border-bottom: none;
+    }
+  }
+}
