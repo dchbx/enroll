@@ -29,6 +29,7 @@
 
   <div class="row no-buffer plan-year">
     <h3>
+<<<<<<< Updated upstream
       <% if plan_year.draft? || plan_year.renewing_draft? %>
       <i class="fa fa-file"></i>
       <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
@@ -36,9 +37,26 @@
       <% elsif plan_year.published? || plan_year.renewing_published? %>
       <i class="fa fa-star published"></i>
       <% end %>
+<<<<<<< Updated upstream
       <strong><%= plan_year.aasm_state.to_s.humanize.upcase %>
         Plan Year for
         <%= plan_year.start_on.to_date.year%></strong>
+=======
+      <strong><%= plan_year.aasm_state.to_s.humanize.upcase %> Plan Year for <%= plan_year.start_on.to_date.year%></strong>
+=======
+      <span data-toggle="tooltip" title="<%= plan_year.aasm_state.to_s.humanize %>">
+        <% if plan_year.draft? || plan_year.renewing_draft? %>
+        <i class="fa fa-file"></i>
+        <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
+        <i class="fa fa-star enrolling"></i>
+        <% elsif plan_year.published? || plan_year.renewing_published? %>
+        <i class="fa fa-users"></i>
+        <% end %>
+      </span>
+      <%= plan_year.start_on.to_date.year%>
+      Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     </h3>
 
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
@@ -48,6 +66,13 @@
       <% active = 'active' %>
       <% end %>
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+    <div class="benefit-package">
+    <a href="#" data-href="<%= employers_employer_profile_plan_year_make_default_benefit_group_path(@employer_profile, plan_year.id) %>" class='make_default_benefit_group_link' data-benefit-group-id="<%= bg.id %>" data-plan-year-id="<%= plan_year.id %>" style='display:none;'></a>
+=======
+>>>>>>> Stashed changes
       <div class="benefit-package">
         <a class='make_default_benefit_group_link' data-benefit-group-id="<%= bg.id %>" data-href="<%= employers_employer_profile_plan_year_make_default_benefit_group_path(@employer_profile, plan_year.id) %>" data-plan-year-id="<%= plan_year.id %>" href="#"
           style='display:none;'></a>
@@ -83,9 +108,7 @@
                 </td>
                 <td>
                   <p>
-                    <%= plan_year.start_on.to_date.to_formatted_s :long_ordinal %>
-                    -
-                    <%= plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
+                    <%= plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
                   </p>
                 </td>
               </tr>
@@ -105,6 +128,10 @@
               </tr>
             </table>
           </div>
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
         </div>
       </div>
@@ -388,6 +415,7 @@
           </div>
           <!--Dental Plan Contribution: end -->
 
+<<<<<<< Updated upstream
           <!-- Dental plan Estimated Cost: start -->
           <div class="col-xs-12">
             <div class="col-xs-1">
@@ -415,6 +443,45 @@
                     </tr>
                   </table>
                 </div>
+=======
+<<<<<<< Updated upstream
+        <!-- Dental plan Estimated Cost: start -->
+        <div class="col-xs-12">
+          <div class="col-xs-1">
+            &nbsp;
+          </div>
+          <div class="est-month col-xs-11">
+            <% if bg.census_employees.present? %>
+              <div class="col-xs-4">
+                <div class="row">
+                  <span>Employer Estimated Maximum Monthly Cost</span>
+                  <h2><%= number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan)) %></h2>
+                </div>
+=======
+                <div class="col-xs-4">
+                  <div class="row">
+                    <span>Employer Estimated Maximum Monthly Cost</span>
+                    <h2><%= number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan)) %></h2>
+                  </div>
+                </div>
+                <div class="col-xs-8">
+                  <div class="row">
+                    <table>
+                      <tr>
+                        <th colspan="2"></th>
+                        <th>Min</th>
+                        <th>Max</th>
+                      </tr>
+                      <tr>
+                        <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                        <td><%= number_to_currency(bg.monthly_min_employee_cost('dental')) %></td>
+                        <td><%= number_to_currency(bg.monthly_max_employee_cost('dental')) %></td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
               </div>
 
               <% else %>

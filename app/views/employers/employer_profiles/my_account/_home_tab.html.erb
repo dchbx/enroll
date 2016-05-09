@@ -54,10 +54,10 @@
         </p>
         <% end %>
     </div>
-    <div class="panel panel-default myplanyear col-xs-12">
+    <div class="module benefit-group panel panel-default myplanyear col-xs-12">
 
       <div class="panel-heading">
-        <h5>Plan Year</h5>
+        <h3 class="title">Plan Year</h3>
       </div>
       <table>
         <tr>
@@ -94,10 +94,10 @@
     </div>
     <% @current_plan_year.benefit_groups.each do |bg| %>
 
-    <div class="panel benefitgroup col-xs-12">
+    <div class="module panel benefitgroup benefit-group col-xs-12">
       <section class="col-xs-6">
         <header class="row">
-          <h5 class="bg-title">Benefit Group: <span><%= bg.title.capitalize %></span></h5>
+          <h3 class="title"><%= bg.title.capitalize %></h3>
         </header>
       </section>
       <section class="col-xs-6">
@@ -127,12 +127,12 @@
     </div>
 
 
-    <div class="plan-details panel benefitgroup col-xs-12" style="display: true;">
+    <div class="module plan-details panel benefitgroup benefit-group col-xs-12" style="display: true;">
 
         <div class="panel benefitgroup referenceplan home">
 
           <!--Health Plan Summary: start-->
-          <div>
+          <div class="health">
             <div style="float:right">
               <button id = "showhidebutton" href="#collapse-health-<%=bg.id%>" class="nav-toggle">
                 View Details
@@ -141,7 +141,7 @@
             </div>
             <div style="float:left">
               <% if bg.dental_reference_plan_id.present? %>
-                <h5 class="bg-title">Health</h5>
+                <h5 class="title">Health</h5>
               <% end%>
             </div>
           </div>
@@ -229,22 +229,26 @@
               <div class="panel benefitgroup col-xs-12 referenceplan home est">
                 <div class="plan-details">
                   <div class="col-xs-4">
-                    <span>Employer Estimated Maximum Monthly Cost</span>
-                    <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
+                    <div class="row">
+                      <span>Employer Estimated Maximum Monthly Cost</span>
+                      <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
+                    </div>
                   </div>
                   <div class="col-xs-8">
-                    <table>
-                      <tr>
-                        <th colspan="2"></th>
-                        <th>Min</th>
-                        <th>Max</th>
-                      </tr>
-                      <tr>
-                        <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
-                        <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
-                        <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
-                      </tr>
-                    </table>
+                    <div class="row">
+                      <table>
+                        <tr>
+                          <th colspan="2"></th>
+                          <th>Min</th>
+                          <th>Max</th>
+                        </tr>
+                        <tr>
+                          <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                          <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
+                          <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
+                        </tr>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -268,7 +272,7 @@
               </button>
             </div>
             <div style="float:left">
-              <h5 class="bg-title">Dental</h5>
+              <h5 class="title">Dental</h5>
             </div>
           </div>
 
@@ -361,22 +365,26 @@
             <div class="panel benefitgroup col-xs-12 referenceplan home est">
               <div class="plan-details">
                 <div class="col-xs-4">
-                  <span>Employer Estimated Maximum Monthly Cost</span>
-                  <h2><%= number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan)) %></h2>
+                  <div class="row">
+                    <span>Employer Estimated Maximum Monthly Cost</span>
+                    <h2><%= number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan)) %></h2>
+                  </div>
                 </div>
                 <div class="col-xs-8">
-                  <table>
-                    <tr>
-                      <th colspan="2"></th>
-                      <th>Min</th>
-                      <th>Max</th>
-                    </tr>
-                    <tr>
-                      <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
-                      <td><%= number_to_currency(bg.monthly_min_employee_cost('dental')) %></td>
-                      <td><%= number_to_currency(bg.monthly_max_employee_cost('dental')) %></td>
-                    </tr>
-                  </table>
+                  <div class="row">
+                    <table>
+                      <tr>
+                        <th colspan="2"></th>
+                        <th>Min</th>
+                        <th>Max</th>
+                      </tr>
+                      <tr>
+                        <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                        <td><%= number_to_currency(bg.monthly_min_employee_cost('dental')) %></td>
+                        <td><%= number_to_currency(bg.monthly_max_employee_cost('dental')) %></td>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
