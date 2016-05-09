@@ -147,7 +147,7 @@ end
 
 And (/^.+ should see broker active for the employer$/) do
   expect(page).to have_content('Logistics Inc')
-  expect(page).to have_content('RICKY MARTIN')
+  expect(page).to have_content(/RICKY MARTIN/i)
 end
 
 When(/^.+ terminates broker$/) do
