@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
 
-  context "Plan year display" do 
+  context "Plan year display" do
 
     let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
     let(:plan_year) { FactoryGirl.build_stubbed(:plan_year) }
@@ -38,6 +38,11 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       expect(rendered).to have_selector("p", text: "#{plan_year.start_on.to_date.to_formatted_s(:long_ordinal)} - #{plan_year.end_on.to_date.to_formatted_s(:long_ordinal)}")
     end
 
+    it "should display the benfit group description" do
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to have_selector("h5", text: "my first benefit group")
+    end
+
     it "should display a link to custom dental plans modal" do
       render "employers/employer_profiles/my_account/benefits"
       expect(rendered).to have_selector("a", text: "View Plans")
@@ -61,7 +66,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       assign(:employer_profile, employer_profile)
     end
 
-    context "when overlapping published plan years present "do 
+    context "when overlapping published plan years present "do
 
       before do
         allow(plan_year).to receive(:overlapping_published_plan_years).and_return([published_plan_year])
@@ -74,7 +79,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       end
     end
 
-    context "when overlapping published plan years present "do 
+    context "when overlapping published plan years present "do
       before do
         allow(plan_year).to receive(:overlapping_published_plan_years).and_return([])
       end

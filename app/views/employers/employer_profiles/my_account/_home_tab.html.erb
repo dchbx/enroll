@@ -98,6 +98,9 @@
       <section class="col-xs-6">
         <header class="row">
           <h3 class="title"><%= bg.title.capitalize %></h3>
+          <% if bg.description.present? %>
+          <h5 class="description no-buffer"><%= bg.description %></h5>
+          <% end %>
         </header>
       </section>
       <section class="col-xs-6">
