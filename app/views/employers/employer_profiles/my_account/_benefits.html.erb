@@ -19,6 +19,7 @@
         </strong>
         – Once you select 'Publish Plan Year', your employees will receive a notification and open enrollment will begin according to the timeline you selected for your plan year.
       </h4>
+      <br/>
     </div>
     <% end %>
     <% end %>
@@ -26,24 +27,41 @@
   <% if @plan_years.present? %>
 
   <% @plan_years.each_with_index do |plan_year, pi| %>
-
-  <div class="row no-buffer plan-year">
-    <h3>
-      <span data-toggle="tooltip" title="<%= plan_year.aasm_state.to_s.humanize %>">
+  <div class="row no-buffer module plan-year">
+    <div class="col-xs-6">
+      <h3 class="no-buffer">
+        <div class="row">
+        <span data-toggle="tooltip" title="<%= plan_year.aasm_state.to_s.humanize %>">
+          <% if plan_year.draft? || plan_year.renewing_draft? %>
+          <i class="fa fa-file"></i>
+          <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
+          <i class="fa fa-star enrolling"></i>
+          <% elsif plan_year.published? || plan_year.renewing_published? %>
+          <i class="fa fa-users"></i>
+          <% end %>
+        </span>
+        <%= plan_year.start_on.to_date.year%>
+        Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)
+        </div>
+      </h3>
+    </div>
+    <div class="col-xs-6 above">
+      <div class="row">
         <% if plan_year.draft? || plan_year.renewing_draft? %>
-        <i class="fa fa-file"></i>
-        <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
-        <i class="fa fa-star enrolling"></i>
-        <% elsif plan_year.published? || plan_year.renewing_published? %>
-        <i class="fa fa-users"></i>
+        <% if plan_year.overlapping_published_plan_years.empty? %>
+        <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans pull-right" %>
         <% end %>
-      </span>
-      <%= plan_year.start_on.to_date.year%>
-      Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)
-    </h3>
+        <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans pull-right mrz"%>
+        <% end %>
 
+        <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
+        <span class="btn btn-trans pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
+        <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-trans pull-right"%> -->
+        <% end %>
+      </div>
+    </div>
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
-    <div class="module benefit-group">
+    <div class="benefit-group">
       <% next if bg.reference_plan_id.blank? %>
       <% if bg.default == true %>
       <% active = 'active' %>
@@ -437,26 +455,14 @@
       </div>
 
     </div>
-
+    <div class="below">
+      <%= link_to "<i class='fa fa-trash-o' aria-hidden='true'></i> &nbsp;Delete #{bg.title}".html_safe, employers_employer_profile_plan_year_delete_benefit_group_path(employer_profile_id: @employer_profile.id, plan_year_id: plan_year.id, benefit_group_id: bg.id), method: :post, remote: true, class: 'btn btn-trans' %>
+    </div>
     <% end %>
   </div>
-  <div class="bottom-mgn-xs">
-    <% if plan_year.draft? || plan_year.renewing_draft? %>
-    <% if plan_year.overlapping_published_plan_years.empty? %>
-    <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
-    <% end %>
-    <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
-    <% end %>
-
-    <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
-    <span class="btn btn-trans pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
-    <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-trans pull-right"%> -->
-  </div>
-  <% end %>
-
-</br>
-</br>
-</br>
+  <br/>
+  <br/>
+  <br/>
 
 <div class="col-xs-12"></div>
 

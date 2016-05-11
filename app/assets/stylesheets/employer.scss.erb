@@ -4,26 +4,43 @@ $primary-bold: 600;
 $primary-green: #69A30D;
 
 .module {
-  &.benefit-group {
-    .title {
-      text-transform: uppercase;
-      color: $primary-green;
-      font-weight: bold;
-      span {
-        color: #333;
-        font-weight: normal;
+  &.plan-year {
+    .btn {
+      .fa {
+        margin: 0;
       }
     }
-    .description {
-      text-transform: none;
-      font-weight: normal;
-      margin-bottom: 15px;
+    .above {
+      .btn {
+        margin: 0 0px 10px 10px;
+      }
     }
-    .health {
-      padding-top: 10px;
+    .below {
+      .btn {
+        margin: 0 10px 25px 0;
+      }
     }
-    .dental {
-      padding-top: 15px;
+    .benefit-group {
+      .title {
+        text-transform: uppercase;
+        color: $primary-green;
+        font-weight: bold;
+        span {
+          color: #333;
+          font-weight: normal;
+        }
+      }
+      .description {
+        text-transform: none;
+        font-weight: normal;
+        margin-bottom: 15px;
+      }
+      .health {
+        padding-top: 10px;
+      }
+      .dental {
+        padding-top: 15px;
+      }
     }
   }
   &.benefit-properties {

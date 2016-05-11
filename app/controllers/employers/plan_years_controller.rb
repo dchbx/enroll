@@ -76,6 +76,24 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def delete_benefit_group
+    plan_year = params[:plan_year_id]
+    plan_year = PlanYear.find(plan_year)
+    benefit_group_id = params[:benefit_group_id]
+    benefit_groups = plan_year.benefit_groups
+    if benefit_groups.count > 1
+      bg = benefit_groups.find(benefit_group_id)
+      bg_title = bg.title
+      bg.delete
+      if plan_year.save
+        flash[:notice] = "Benefit Group: #{bg.title} successfully deleted."
+      end
+    else
+      flash[:error] = "Benefit group can not be deleted because it is the only benefit package in the plan year."
+    end
+    render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
+  end
+
   def make_default_benefit_group
     plan_year = @employer_profile.plan_years.where(_id: params[:plan_year_id]).first
     if plan_year && benefit_group = plan_year.benefit_groups.where(_id: params[:benefit_group_id]).first
