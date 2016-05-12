@@ -31,17 +31,17 @@
     <div class="col-xs-6">
       <h3 class="no-buffer">
         <div class="row">
-        <span data-toggle="tooltip" title="<%= plan_year.aasm_state.to_s.humanize %>">
-          <% if plan_year.draft? || plan_year.renewing_draft? %>
-          <i class="fa fa-file"></i>
-          <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
-          <i class="fa fa-star enrolling"></i>
-          <% elsif plan_year.published? || plan_year.renewing_published? %>
-          <i class="fa fa-users"></i>
-          <% end %>
-        </span>
-        <%= plan_year.start_on.to_date.year%>
-        Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)
+          <span data-toggle="tooltip" title="<%= plan_year.aasm_state.to_s.humanize %>">
+            <% if plan_year.draft? || plan_year.renewing_draft? %>
+            <i class="fa fa-file"></i>
+            <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
+            <i class="fa fa-star enrolling"></i>
+            <% elsif plan_year.published? || plan_year.renewing_published? %>
+            <i class="fa fa-users"></i>
+            <% end %>
+          </span>
+          <%= plan_year.start_on.to_date.year%>
+          Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)
         </div>
       </h3>
     </div>
@@ -86,7 +86,8 @@
               </header>
             </section>
             <div class="col-xs-2">
-              <button class="nav-toggle row view" onclick="EmployerProfile.viewDetails($(this))" id="showhidebutton">View Details<i class="fa fa-chevron-down fa-lg"></i>
+              <button class="nav-toggle row view" id="showhidebutton" onclick="EmployerProfile.viewDetails($(this))">View Details
+                <i class="fa fa-chevron-down fa-lg"></i>
               </button>
             </div>
             <table>
@@ -96,7 +97,9 @@
                 </td>
                 <td>
                   <p>
-                    <%= plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
+                    <%= plan_year.start_on.to_date.to_formatted_s :long_ordinal %>
+                    -
+                    <%= plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
                   </p>
                 </td>
               </tr>
@@ -119,344 +122,346 @@
 
         </div>
 
-      <div class="panel benefitgroup col-xs-12 referenceplan">
+        <div class="panel benefitgroup col-xs-12 referenceplan">
 
-        <div class="col-xs-1">
-          &nbsp;
-        </div>
+          <div class="col-xs-1">
+            &nbsp;
+          </div>
 
-        <!-- Health Plan Summary: start -->
-        <div class="col-xs-11 health">
+          <!-- Health Plan Summary: start -->
+          <div class="col-xs-11 health">
+            <% if bg.dental_reference_plan_id.present? %>
+
+            <div class="row">
+              <div class="col-xs-6">
+                <% if bg.dental_reference_plan_id.present? %>
+                <h5 class="title no-buffer">Health</h5>
+                <% else %>
+                <h5 class="title no-buffer">&nbsp;</h5>
+                <% end%>
+              </div>
+            </div>
+            <% end%>
+
+            <table>
+              <tr>
+                <th colspan="2">
+                  <header>Reference Plan</header>
+                </th>
+                <th>
+                  <header>Carrier</header>
+                </th>
+                <th>
+                  <header>Type</header>
+                </th>
+                <th>
+                  <header>Metal Level</header>
+                </th>
+                <th>
+                  <header>Plans By</header>
+                </th>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <p>
+                    <%= bg.reference_plan.name.try(:upcase) %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <%= bg.reference_plan.carrier_profile.legal_name %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <%= bg.reference_plan.metal_level.titleize %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <% if bg.plan_option_kind == "single_carrier" %>
+                    All Plans From A Single Carrier
+                    <% elsif bg.plan_option_kind == "metal_level" %>
+                    All Plans From A Given Metal Level
+                    <% elsif bg.plan_option_kind == "single_plan" %>
+                    A Single Plan
+                    <% end %>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <!-- Health Plan Summary: end -->
+
+          <!--Health plan collapsible: starts -->
+          <div class="health-offering" style="display:none">
+            <div class="col-xs-1">
+              &nbsp;
+            </div>
+
+            <!--Health plan contribution: start-->
+            <div class="col-xs-11 package-offering">
+              <div class="col-xs-12">
+                <table>
+                  <tr>
+                    <th>Offered</th>
+                    <th>Employer
+                      <% if bg.dental_reference_plan_id.present? %>Health
+                      <% end %>Contribution</th>
+                  </tr>
+                  <% bg.relationship_benefits.each_with_index do |rb, i| %>
+                  <tr>
+                    <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+                    <td id="pct">
+                      <strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong>
+                    </td>
+                  </tr>
+                  <% end %>
+                </table>
+              </div>
+            </div>
+            <!--Health plan contribution: end -->
+
+            <!--Health plan Estimated Cost: start-->
+            <div class="col-xs-12">
+              <div class="col-xs-1">
+                &nbsp;
+              </div>
+              <div class="est-month col-xs-11">
+                <% if bg.census_employees.present? %>
+                <div class="row">
+                  <div class="col-xs-4">
+                    <div class="row">
+                      <span>Employer Estimated Maximum Monthly Cost</span>
+                      <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
+                    </div>
+                  </div>
+                  <div class="col-xs-8">
+                    <div class="row">
+                      <table>
+                        <tr>
+                          <th colspan="2"></th>
+                          <th>Min</th>
+                          <th>Max</th>
+                        </tr>
+                        <tr>
+                          <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                          <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
+                          <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <% else %>
+                <div class="row">
+                  <h4 class="starter">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
+                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
+                </div>
+                <% end %>
+                <br/>
+                <br/>
+                <div class="row">
+                  <hr/>
+                </div>
+              </div>
+
+            </div>
+            <!--Health plan Estimated Cost: end-->
+          </div>
+          <!--Health plan collapsible: end -->
+
+          <!--Dental Plan Summary: start -->
           <% if bg.dental_reference_plan_id.present? %>
-
-          <div class="row">
-            <div class="col-xs-6">
-              <% if bg.dental_reference_plan_id.present? %>
-              <h5 class="title no-buffer">Health</h5>
-              <% else %>
-              <h5 class="title no-buffer">&nbsp;</h5>
-              <% end%>
-            </div>
-          </div>
-          <% end%>
-
-          <table>
-            <tr>
-              <th colspan="2">
-                <header>Reference Plan</header>
-              </th>
-              <th>
-                <header>Carrier</header>
-              </th>
-              <th>
-                <header>Type</header>
-              </th>
-              <th>
-                <header>Metal Level</header>
-              </th>
-              <th>
-                <header>Plans By</header>
-              </th>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <p>
-                  <%= bg.reference_plan.name.try(:upcase) %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <%= bg.reference_plan.carrier_profile.legal_name %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <%= bg.try(:reference_plan).try(:plan_type).try(:upcase) %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <%= bg.reference_plan.metal_level.titleize %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <% if bg.plan_option_kind == "single_carrier" %>
-                  All Plans From A Single Carrier
-                  <% elsif bg.plan_option_kind == "metal_level" %>
-                  All Plans From A Given Metal Level
-                  <% elsif bg.plan_option_kind == "single_plan" %>
-                  A Single Plan
-                  <% end %>
-                </p>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <!-- Health Plan Summary: end -->
-
-        <!--Health plan collapsible: starts -->
-        <div class="health-offering" style="display:none">
           <div class="col-xs-1">
             &nbsp;
           </div>
 
-          <!--Health plan contribution: start-->
-          <div class="col-xs-11 package-offering">
-            <div class="col-xs-12">
-              <table>
-                <tr>
-                  <th>Offered</th>
-                  <th>Employer
-                    <% if bg.dental_reference_plan_id.present? %>Health
-                    <% end %>Contribution</th>
-                </tr>
-                <% bg.relationship_benefits.each_with_index do |rb, i| %>
-                <tr>
-                  <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-                  <td id="pct">
-                    <strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong>
-                  </td>
-                </tr>
-                <% end %>
-              </table>
+          <div class="col-xs-11 dental">
+            <div class="row">
+              <div class="col-xs-6">
+                <h5 class="title no-buffer">Dental</h5>
+              </div>
             </div>
-          </div>
-          <!--Health plan contribution: end -->
+            <table>
+              <tr>
+                <th colspan="2">
+                  <header>Reference Plan</header>
+                </th>
+                <th>
+                  <header>Carrier</header>
+                </th>
+                <th>
+                  <header>Type</header>
+                </th>
+                <th>
+                  <header>Metal Level</header>
+                </th>
+                <th>
+                  <header>Plans By</header>
+                </th>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <p>
+                    <%= bg.dental_reference_plan.name %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <%= bg.dental_reference_plan.carrier_profile.legal_name %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <%= bg.dental_reference_plan.plan_type.to_s.upcase %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <%= display_dental_metal_level(bg.dental_reference_plan) %>
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <% if bg.dental_plan_option_kind == "single_carrier" %>
+                    All Plans From A Single Carrier
+                    <% elsif bg.dental_plan_option_kind == "single_plan" %>
+                    <% if bg.elected_dental_plan_ids.count < 13 %>
+                    Custom (<%= bg.elected_dental_plans.count %>
+                    Plans)
+                    <br/>
+                    <%= link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"} %>
 
-          <!--Health plan Estimated Cost: start-->
-          <div class="col-xs-12">
+                    <% else %>
+                    All Plans
+                    <% end %>
+                    <% end %>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
+          <%= render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg } %>
+          <% end %>
+
+          <% end %>
+          <!--Dental Plan Summary: end -->
+
+          <br class="clear"/>
+
+          <!--Dental plan collapsible: start -->
+          <% if bg.dental_reference_plan_id.present? %>
+          <div class="dental-offering" style="display:none">
+
             <div class="col-xs-1">
               &nbsp;
             </div>
-            <div class="est-month col-xs-11">
-              <% if bg.census_employees.present? %>
-              <div class="row">
-                <div class="col-xs-4">
-                  <div class="row">
-                    <span>Employer Estimated Maximum Monthly Cost</span>
-                    <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
-                  </div>
-                </div>
-                <div class="col-xs-8">
-                  <div class="row">
-                    <table>
-                      <tr>
-                        <th colspan="2"></th>
-                        <th>Min</th>
-                        <th>Max</th>
-                      </tr>
-                      <tr>
-                        <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
-                        <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
-                        <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <% else %>
-              <div class="row">
-                <h4 class="starter">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
-                  <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
-              </div>
-              <% end %>
-              <br/>
-              <br/>
-              <div class="row">
-                <hr/>
+
+            <!--Dental Plan Contribution: start -->
+            <div class="col-xs-11 package-offering">
+              <div class="col-xs-12">
+                <table>
+                  <tr>
+                    <th>Offered</th>
+                    <th>Employer Dental Contribution</th>
+                  </tr>
+                  <% bg.relationship_benefits.each_with_index do |rb, i| %>
+                  <tr>
+                    <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td>
+                    <% if bg.dental_reference_plan_id.present? %>
+                    <td>
+                      <strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.ceil, precision: 0 %></strong>
+                    </td>
+                    <% end %>
+                  </tr>
+                  <% end %>
+                </table>
               </div>
             </div>
+            <!--Dental Plan Contribution: end -->
 
-          </div>
-          <!--Health plan Estimated Cost: end-->
-        </div>
-        <!--Health plan collapsible: end -->
+            <!-- Dental plan Estimated Cost: start -->
+            <div class="col-xs-12">
+              <div class="col-xs-1">
+                &nbsp;
+              </div>
+              <div class="est-month col-xs-11">
+                <% if bg.census_employees.present? %>
+                <div class="row">
 
-        <!--Dental Plan Summary: start -->
-        <% if bg.dental_reference_plan_id.present? %>
-        <div class="col-xs-1">
-          &nbsp;
-        </div>
+                  <div class="col-xs-4">
+                    <div class="row">
+                      <span>Employer Estimated Maximum Monthly Cost</span>
+                      <h2><%= number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan)) %></h2>
+                    </div>
+                  </div>
+                  <div class="col-xs-8">
+                    <div class="row">
+                      <table>
+                        <tr>
+                          <th colspan="2"></th>
+                          <th>Min</th>
+                          <th>Max</th>
+                        </tr>
+                        <tr>
+                          <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                          <td><%= number_to_currency(bg.monthly_min_employee_cost('dental')) %></td>
+                          <td><%= number_to_currency(bg.monthly_max_employee_cost('dental')) %></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
 
-        <div class="col-xs-11 dental">
-          <div class="row">
-            <div class="col-xs-6">
-              <h5 class="title no-buffer">Dental</h5>
+                <% else %>
+                <div class="row">
+                  <h4 class="starter">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
+                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
+                </div>
+                <% end %>
+              </div>
             </div>
+            <!-- Dental plan Estimated Cost: end -->
+
           </div>
-          <table>
-            <tr>
-              <th colspan="2">
-                <header>Reference Plan</header>
-              </th>
-              <th>
-                <header>Carrier</header>
-              </th>
-              <th>
-                <header>Type</header>
-              </th>
-              <th>
-                <header>Metal Level</header>
-              </th>
-              <th>
-                <header>Plans By</header>
-              </th>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <p>
-                  <%= bg.dental_reference_plan.name %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <%= bg.dental_reference_plan.carrier_profile.legal_name %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <%= bg.dental_reference_plan.plan_type.to_s.upcase %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <%= display_dental_metal_level(bg.dental_reference_plan) %>
-                </p>
-              </td>
-              <td>
-                <p>
-                  <% if bg.dental_plan_option_kind == "single_carrier" %>
-                  All Plans From A Single Carrier
-                  <% elsif bg.dental_plan_option_kind == "single_plan" %>
-                  <% if bg.elected_dental_plan_ids.count < 13 %>
-                  Custom (<%= bg.elected_dental_plans.count %>
-                  Plans)
-                  <br/>
-                  <%= link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"} %>
+          <%end%>
+          <!--Dental plan collapsible: end -->
 
-                  <% else %>
-                  All Plans
-                  <% end %>
-                  <% end %>
-                </p>
-              </td>
-            </tr>
-          </table>
         </div>
-
-        <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
-        <%= render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg } %>
-        <% end %>
-
-        <% end %>
-        <!--Dental Plan Summary: end -->
-
         <br class="clear"/>
-
-        <!--Dental plan collapsible: start -->
-        <% if bg.dental_reference_plan_id.present? %>
-        <div class="dental-offering" style="display:none">
-
-          <div class="col-xs-1">
-            &nbsp;
-          </div>
-
-          <!--Dental Plan Contribution: start -->
-          <div class="col-xs-11 package-offering">
-            <div class="col-xs-12">
-              <table>
-                <tr>
-                  <th>Offered</th>
-                  <th>Employer Dental Contribution</th>
-                </tr>
-                <% bg.relationship_benefits.each_with_index do |rb, i| %>
-                <tr>
-                  <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td>
-                  <% if bg.dental_reference_plan_id.present? %>
-                  <td>
-                    <strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.ceil, precision: 0 %></strong>
-                  </td>
-                  <% end %>
-                </tr>
-                <% end %>
-              </table>
-            </div>
-          </div>
-          <!--Dental Plan Contribution: end -->
-
-          <!-- Dental plan Estimated Cost: start -->
-          <div class="col-xs-12">
-            <div class="col-xs-1">
-              &nbsp;
-            </div>
-            <div class="est-month col-xs-11">
-              <% if bg.census_employees.present? %>
-              <div class="row">
-
-                <div class="col-xs-4">
-                  <div class="row">
-                    <span>Employer Estimated Maximum Monthly Cost</span>
-                    <h2><%= number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan)) %></h2>
-                  </div>
-                </div>
-                <div class="col-xs-8">
-                  <div class="row">
-                    <table>
-                      <tr>
-                        <th colspan="2"></th>
-                        <th>Min</th>
-                        <th>Max</th>
-                      </tr>
-                      <tr>
-                        <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
-                        <td><%= number_to_currency(bg.monthly_min_employee_cost('dental')) %></td>
-                        <td><%= number_to_currency(bg.monthly_max_employee_cost('dental')) %></td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <% else %>
-              <div class="row">
-                <h4 class="starter">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
-                  <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
-              </div>
-              <% end %>
-            </div>
-          </div>
-          <!-- Dental plan Estimated Cost: end -->
-
-        </div>
-        <%end%>
-        <!--Dental plan collapsible: end -->
-
       </div>
-      <br class="clear"/>
+      <div class="below clear">
+        <%= link_to "Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-trans' if plan_year.aasm_state == "draft" %>
+        <%= render partial: "employers/plan_years/delete_benefit_package_modal", locals: { plan_year: plan_year, bg: bg } if plan_year.aasm_state == "draft" %>
+      </div>
+      <% end %>
     </div>
-    <div class="below clear">
-      <%= link_to "Delete Benefit Group &nbsp;<i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, employers_employer_profile_plan_year_delete_benefit_group_path(employer_profile_id: @employer_profile.id, plan_year_id: plan_year.id, benefit_group_id: bg.id), method: :post, remote: true, class: 'btn btn-trans' if plan_year.aasm_state == "draft" %>
-    </div>
+    <br/>
+    <br/>
+
+    <div class="col-xs-12"></div>
+
+    <%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
+    <%= render "employers/plan_years/revert_modal", plan_year: plan_year %>
+
+    <% end %>
+
+    <% else %>
+    <h4>
+      It's time to create a benefits package. Select 'Add Plan Year' to create your first one. Most employers only create one benefits package but you'll have the opportunity to create more than one if you want to offer different benefits to different
+      groups of employees.
+    </h4>
+    <br/>
+    <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
+
     <% end %>
   </div>
-  <br/>
-  <br/>
-
-<div class="col-xs-12"></div>
-
-<%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
-<%= render "employers/plan_years/revert_modal", plan_year: plan_year %>
-
-<% end %>
-
-<% else %>
-<h4>
-It's time to create a benefits package. Select 'Add Plan Year' to create your first one. Most employers only create one benefits package but you'll have the opportunity to create more than one if you want to offer different benefits to different
-groups of employees.
-</h4>
-<br/>
-<%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
-
-<% end %>
 </div>

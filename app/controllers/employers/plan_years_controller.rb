@@ -95,7 +95,7 @@ class Employers::PlanYearsController < ApplicationController
         flash[:notice] = "Benefit Group: #{bg.title} successfully deleted."
       end
     else
-      flash[:error] = "Benefit group can not be deleted because it is the only benefit package in the plan year."
+      flash[:error] = "Benefit package can not be deleted because it is the only benefit package remaining in the plan year."
     end
     render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
   end

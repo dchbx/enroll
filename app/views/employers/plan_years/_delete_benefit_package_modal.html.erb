@@ -1,0 +1,26 @@
+<div class="modal deleteBenefitPackageModal" id="deleteBenefitPackageModal-<%= bg.id%>" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class='fa fa-trash-o fa-lg' aria-hidden='true'></i> Delete Benefit Package: <%= bg.title %></h4>
+      </div>
+      <div class="modal-body">
+				<p>
+          Are you sure you want to delete benefit package <%= bg.title %>?
+          <br/><br/>
+          <strong>Note:</strong> If employees are assigned to this benefit package you will have to reassign them to a different benefit package.
+				</p>
+
+        <ul class="application-warnings"></ul>
+      </div>
+      <div class="modal-footer">
+				<%= link_to 'Cancel', "", class: 'btn btn-trans', data: {'dismiss': 'modal' } %>
+        <%= link_to "Delete <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, employers_employer_profile_plan_year_delete_benefit_group_path(employer_profile_id: @employer_profile.id, plan_year_id: plan_year.id, benefit_group_id: bg.id), method: :post, remote: true, class: 'btn btn-primary mtz btn-br' %>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+</script>
