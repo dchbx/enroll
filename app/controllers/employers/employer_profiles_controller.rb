@@ -91,6 +91,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'benefits'
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         @plan_years = @employer_profile.plan_years.order(id: :desc)
+        @plan_years = @plan_years.partition { |plan_year| plan_year.aasm_state == "draft" }.flatten.reverse
       when 'documents'
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year

@@ -1,4 +1,4 @@
-<div class="col-xs-12 home-tab">
+<div class="col-xs-12 module home-tab content-bottom">
   <h1>My Health Benefits Program</h1>
   <% if @current_plan_year.present? %>
 <!--<div class="panel panel-default alert" id="panelOne">
@@ -54,10 +54,9 @@
         </p>
         <% end %>
     </div>
-    <div class="module benefit-group panel panel-default myplanyear col-xs-12">
-
+    <div class="benefit-group panel panel-default myplanyear plan-year col-xs-12">
       <div class="panel-heading">
-        <h3 class="title">Plan Year</h3>
+        <h3 class="title no-buffer">Plan Year</h3>
       </div>
       <table>
         <tr>
@@ -93,11 +92,11 @@
       </table>
     </div>
     <% @current_plan_year.benefit_groups.each do |bg| %>
-
-    <div class="module panel benefitgroup benefit-group col-xs-12">
+    <div class="benefit-packages">
+    <div class="panel benefitgroup benefit-group col-xs-12">
       <section class="col-xs-6">
         <header class="row">
-          <h3 class="title"><%= bg.title.capitalize %></h3>
+          <h3 class="title no-buffer"><%= bg.title.capitalize %></h3>
           <% if bg.description.present? %>
           <h5 class="description no-buffer"><%= bg.description %></h5>
           <% end %>
@@ -130,7 +129,7 @@
     </div>
 
 
-    <div class="module plan-details panel benefitgroup benefit-group col-xs-12" style="display: true;">
+    <div class="plan-details panel benefitgroup benefit-group col-xs-12" style="display: true;">
 
         <div class="panel benefitgroup referenceplan home">
 
@@ -144,10 +143,11 @@
             </div>
             <div style="float:left">
               <% if bg.dental_reference_plan_id.present? %>
-                <h5 class="title">Health</h5>
+                <h5 class="title no-buffer">Health</h5>
               <% end%>
             </div>
           </div>
+          <br/>
 
 
           <table>
@@ -261,11 +261,8 @@
           <!--Health plan collapsible: end -->
 
 
-        <br class="clear"/>
-        <hr />
-
         <% if bg.dental_reference_plan_id.present? %>
-
+        <hr class="clear"/>
           <!--Dental Plan Summary: start-->
           <div>
             <div style="float:right">
@@ -275,9 +272,10 @@
               </button>
             </div>
             <div style="float:left">
-              <h5 class="title">Dental</h5>
+              <h5 class="title no-buffer">Dental</h5>
             </div>
           </div>
+          <br/>
 
           <div></div>
 
@@ -403,10 +401,8 @@
 
     <% end %>
     </div>  <!--end of div with class="panel benefitgroup referenceplan home"-->
-
-
     </div>  <!--end of div with class="plan-details panel benefitgroup col-xs-12"-->
-
+  </div>
     <% end %>
     <% else %>
     <%= render partial: 'employers/employer_profiles/my_account/employer_welcome' %>

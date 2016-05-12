@@ -85,16 +85,10 @@
                 <% end %>
               </header>
             </section>
-            <% if !bg.is_offering_dental? %>
             <div class="col-xs-2">
-              <button class="nav-toggle row" href="#collapse-health-<%=bg.id%>" id="showhidebutton">
-                View Details
-                <a>
-                  <i class="fa fa-chevron-down fa-lg"></i>
-                </a>
+              <button class="nav-toggle row view" onclick="EmployerProfile.viewDetails($(this))" id="showhidebutton">View Details<i class="fa fa-chevron-down fa-lg"></i>
               </button>
             </div>
-            <% end %>
             <table>
               <tr>
                 <td>
@@ -124,7 +118,6 @@
           </div>
 
         </div>
-      </div>
 
       <div class="panel benefitgroup col-xs-12 referenceplan">
 
@@ -143,14 +136,6 @@
               <% else %>
               <h5 class="title no-buffer">&nbsp;</h5>
               <% end%>
-            </div>
-            <div class="col-xs-6">
-              <button class="nav-toggle" href="#collapse-health-<%=bg.id%>" id="showhidebutton">
-                View Details
-                <a>
-                  <i class="fa fa-chevron-down fa-lg"></i>
-                </a>
-              </button>
             </div>
           </div>
           <% end%>
@@ -211,7 +196,7 @@
         <!-- Health Plan Summary: end -->
 
         <!--Health plan collapsible: starts -->
-        <div id="collapse-health-<%=bg.id%>" style="display:none">
+        <div class="health-offering" style="display:none">
           <div class="col-xs-1">
             &nbsp;
           </div>
@@ -277,15 +262,14 @@
               </div>
               <% end %>
             </div>
+
           </div>
           <!--Health plan Estimated Cost: end-->
-
         </div>
         <!--Health plan collapsible: end -->
 
         <!--Dental Plan Summary: start -->
         <% if bg.dental_reference_plan_id.present? %>
-
         <div class="col-xs-1">
           &nbsp;
         </div>
@@ -294,14 +278,6 @@
           <div class="row">
             <div class="col-xs-6">
               <h5 class="title no-buffer">Dental</h5>
-            </div>
-            <div class="col-xs-6">
-              <button class="nav-toggle" href="#collapse-dental-<%=bg.id%>" id="showhidebutton">
-                View Details
-                <a>
-                  <i class="fa fa-chevron-down fa-lg"></i>
-                </a>
-              </button>
             </div>
           </div>
 
@@ -363,7 +339,6 @@
               </td>
             </tr>
           </table>
-          <br class="clear"/>
         </div>
 
         <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
@@ -377,7 +352,8 @@
 
         <!--Dental plan collapsible: start -->
         <% if bg.dental_reference_plan_id.present? %>
-        <div id="collapse-dental-<%=bg.id%>" style="display:none">
+        <div class="dental-offering" style="display:none">
+
           <div class="col-xs-1">
             &nbsp;
           </div>
@@ -453,14 +429,13 @@
         <!--Dental plan collapsible: end -->
 
       </div>
-
+      <br class="clear"/>
     </div>
-    <div class="below">
-      <%= link_to "<i class='fa fa-trash-o' aria-hidden='true'></i> &nbsp;Delete #{bg.title}".html_safe, employers_employer_profile_plan_year_delete_benefit_group_path(employer_profile_id: @employer_profile.id, plan_year_id: plan_year.id, benefit_group_id: bg.id), method: :post, remote: true, class: 'btn btn-trans' %>
+    <div class="below clear">
+      <%= link_to "Delete Benefit Group &nbsp;<i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, employers_employer_profile_plan_year_delete_benefit_group_path(employer_profile_id: @employer_profile.id, plan_year_id: plan_year.id, benefit_group_id: bg.id), method: :post, remote: true, class: 'btn btn-trans' if plan_year.aasm_state == "draft" %>
     </div>
     <% end %>
   </div>
-  <br/>
   <br/>
   <br/>
 
