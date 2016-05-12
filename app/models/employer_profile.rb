@@ -83,6 +83,7 @@ class EmployerProfile
   end
 
   def benefit_group_assignments
+    debugger
     benefit_group_assignments = []
     self.census_employees.each do |census_employee|
       census_employee.benefit_group_assignments.each do |benefit_group_assignment|
