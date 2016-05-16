@@ -49,6 +49,36 @@ FactoryGirl.define do
     before :create do |organization, evaluator|
       organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization
     end
+
+    trait :with_insured_employees do
+      after :create do |organization, evaluator|
+
+        plan_year = FactoryGirl.create :next_month_plan_year, employer_profile: organization.employer_profile
+        plan_year.benefit_groups.push(benefit_group = FactoryGirl.create(:benefit_group, plan_year: plan_year, relationship_benefits: [relationship_benefit = FactoryGirl.build(:relationship_benefit)]))
+
+        # data to create an enrollment
+        family = FactoryGirl.create(:family, :with_primary_family_member)
+        household = FactoryGirl.create(:household, family: family)
+        hbx_enrollment_member = FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)
+        hbx_enrollment = FactoryGirl.create(:hbx_enrollment, household: household, plan: FactoryGirl.create(:plan), benefit_group: benefit_group, hbx_enrollment_members: [hbx_enrollment_member], coverage_kind: "health" )
+        # end of data to create an enrollment
+
+        census_employees = FactoryGirl.create_list(:census_employee, 1, :with_enrolled_census_employee, employer_profile_id: organization.employer_profile.id).tap do |census_employees|
+          census_employees.each do |census_employee|
+            census_employee.aasm_state = "employee_role_linked"
+            census_employee.benefit_group_assignments.create benefit_group: benefit_group, start_on: benefit_group.start_on, aasm_state: "coverage_selected", hbx_enrollment_id: hbx_enrollment.id
+
+            person = FactoryGirl.create :person, first_name: census_employee.first_name, middle_name: census_employee.middle_name, last_name: census_employee.last_name, ssn: census_employee.ssn, gender: census_employee.gender
+            person.employee_roles.build person: person, hired_on: census_employee.hired_on, employer_profile_id: organization.employer_profile.id, census_employee_id: census_employee.id
+
+            hbx_enrollment.benefit_group_assignment_id = census_employee.benefit_group_assignments.first.id
+            hbx_enrollment.save!
+            census_employee.save!
+            person.save!
+          end
+        end
+      end
+    end
   end
 
   factory :general_agency, class: Organization do

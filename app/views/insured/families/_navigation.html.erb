@@ -8,9 +8,17 @@
         <%= link_to "My Broker", brokers_insured_families_path(tab: 'broker') %>
       </li>
     <% end %>
-    <li <%= menu_tab_class(@tab, 'documents') %>>
-      <%= link_to "Documents",  documents_index_insured_families_path(tab: 'documents') %>
-    </li>
+
+    <% if @person.has_consumer_role? %>
+      <li <%= menu_tab_class(@tab, 'verification') %>>
+        <%= link_to verification_insured_families_path(tab: 'verification') do %>
+            Documents
+          <% unless enrollment_group_verified?(@person) %>
+            <span class="badge message-unread">Action Needed</span>
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
     <li <%= menu_tab_class(@tab, 'messages') %>>
       <%= link_to(inbox_insured_families_path(tab: 'messages')) do  %>
         Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.try(:count) %></span>

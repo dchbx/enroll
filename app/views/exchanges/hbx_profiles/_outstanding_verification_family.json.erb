@@ -1,0 +1,26 @@
+<% person = outstanding_verification_family.primary_applicant.person %>
+[
+"<%= json_escape person.hbx_id %>",
+"<%= json_escape person.first_name%>",
+"<%= json_escape person.last_name %>",
+"<%= documents_count(person) %>",
+<% verification_due_info = capture do %>
+	<%= verification_due_date(outstanding_verification_family) %>
+
+
+	<%= link_to extend_due_date_documents_path(:family_id => outstanding_verification_family.id), method: :put, data: { confirm: "Verification due date will be extended." } do %>
+
+		<br><i class="fa fa-clock-o"></i>&nbsp;extend
+	<% end %>
+<% end %>
+<%= raw verification_due_info.to_json %>,
+<% review_status_info = capture do %>
+	<%= review_status(outstanding_verification_family) %><br>
+	<% if verification_due_date(outstanding_verification_family) <= TimeKeeper.date_of_record %>
+		<span class="label label-danger">Past Due</span>
+	<% end %>
+<% end %>
+<%= raw review_status_info.to_json %>,
+<%= raw (link_to "Review", show_docs_documents_path(:person_id => person.id, :status => "in review"), class:"btn btn-#{review_button_class(outstanding_verification_family)} btn-xs").to_json %>,
+<%= raw (link_to "Federal Hub Detail", "#", class:"btn btn-default btn-xs").to_json %>
+]

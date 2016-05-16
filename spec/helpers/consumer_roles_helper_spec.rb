@@ -152,27 +152,4 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       end
     end
   end
-
-  context "show_consumer_role_state" do
-    let(:consumer_role) {FactoryGirl.build(:consumer_role)}
-
-    it "should return blank when consumer_role is nil" do
-      expect(helper.show_consumer_role_state(nil)).to eq ""
-    end
-
-    it "should return Pending when consumer_role is verifications_pending" do
-      allow(consumer_role).to receive(:aasm_state).and_return "verifications_pending"
-      expect(helper.show_consumer_role_state(consumer_role)).to eq "Pending"
-    end
-
-    it "should return Verified when consumer_role is Verified" do
-      allow(consumer_role).to receive(:aasm_state).and_return "fully_verified"
-      expect(helper.show_consumer_role_state(consumer_role)).to eq "Verified"
-    end
-
-    it "should return Outstanding verifications when consumer_role is verification_outstanding" do
-      allow(consumer_role).to receive(:aasm_state).and_return "verification_outstanding"
-      expect(helper.show_consumer_role_state(consumer_role)).to eq "Outstanding verification"
-    end
-  end
 end

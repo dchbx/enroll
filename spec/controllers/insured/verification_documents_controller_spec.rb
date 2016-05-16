@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.build(:person) }
+  let(:person) { FactoryGirl.build(:person, :with_consumer_role) }
   let(:consumer_role) { {consumer_role: ''} }
   let(:consumer_wrapper) { double }
 
@@ -61,6 +61,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       it "fails with an error message" do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).and_return(nil)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
         sign_in user
         get :download, key:"sample-key"
         expect(flash[:error]).to eq("File does not exist or you are not authorized to access it.")
@@ -69,6 +70,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
     context "Successful Download" do
       it "downloads a file" do
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).with('sample-key').and_return(VlpDocument.new)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:send_data).with(nil, {:content_type=>"application/octet-stream", :filename=>"untitled"}) {

@@ -204,6 +204,30 @@ describe EmployerProfile, dbclean: :after_each do
 
   end
 
+   context "binder paid methods" do
+       let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
+       let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'enrolling') }
+       let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
+       let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
+
+       before do
+         renewing_employer.save!
+         new_employer.save!
+       end
+
+       it "#instance methods" do
+         expect(new_employer.is_new_employer?).to eq true
+         expect(renewing_employer.is_renewing_employer?).to eq true
+         expect(renewing_employer.plan_years.renewing).to eq renewing_plan_year.to_a
+         expect(new_employer.has_next_month_plan_year?).to eq true
+       end
+
+       it "#class method" do
+         expect(EmployerProfile.filter_employers_for_binder_paid.size).to eq 1
+       end
+
+     end
+
   context ".billing_plan_year" do
     let(:active_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'published') }
     let(:employer_profile)    { EmployerProfile.new(**valid_params, plan_years: [active_plan_year, renewing_plan_year]) }

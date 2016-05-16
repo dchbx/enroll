@@ -298,14 +298,16 @@ class ConsumerRole
       transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :residency_denied?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :residency_verified?
+      transitions from: :fully_verified, to: :fully_verified
     end
 
     event :authorize_residency, :after => [:record_transition, :mark_residency_authorized, :notify_of_eligibility_change] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
-      transitions from: :verifications_pending, to: :fully_verified, guard: :lawful_presence_verified?
+      transitions from: :verifications_pending, to: :fully_verified, guard: :lawful_presence_authorized?
       transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
+      transitions from: :fully_verified, to: :fully_verified
     end
 
     event :deny_residency, :after => [:record_transition, :mark_residency_denied, :notify_of_eligibility_change] do
@@ -372,17 +374,6 @@ class ConsumerRole
       next if document.identifier.blank?
       doc_key = document.identifier.split('#').last
       doc_key == key
-    end
-  end
-
-  def find_document_to_download(subject)
-    subject_doc = vlp_documents.detect do |documents|
-      documents.subject.eql?(subject)
-    end
-    if subject_doc && !subject_doc.identifier
-      subject_doc
-    else
-      vlp_documents.build({subject:subject})
     end
   end
 

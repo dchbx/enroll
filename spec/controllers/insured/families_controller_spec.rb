@@ -56,6 +56,7 @@ RSpec.describe Insured::FamiliesController do
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
+    allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
@@ -242,6 +243,25 @@ RSpec.describe Insured::FamiliesController do
           expect(assigns(:waived)).to eq true
         end
       end
+    end
+  end
+
+  describe "GET verification" do
+
+    it "should be success" do
+      get :verification
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders verification template" do
+      get :verification
+      expect(response).to render_template("verification")
+    end
+
+    it "assign variables" do
+      get :verification
+      expect(assigns(:family_members)).to be_an_instance_of(Array)
+      expect(assigns(:family_members)).to eq(family_members)
     end
   end
 

@@ -1,0 +1,23 @@
+<% person = member.person %>
+<table class="sub-table">
+  <% person.verification_types.each do |v_type| %>
+      <tr>
+        <td>
+          <%=v_type%>&nbsp;
+        </td>
+        <td>
+          <span class="label label-<%=verification_type_class(v_type, person)%>"><%= verification_type_status(v_type, person) %></span>
+        </td>
+        <td>
+          <!-- HBX admin inclusion -->
+          <% unless member.person.consumer_role.aasm_state.eql? "fully_verified" %>
+              <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: member.person, v_type: v_type } %>
+          <% end %>
+          <!-- >>>> hbx admin inclusion -->
+        </td>
+        <td>
+          <%= render partial: 'insured/families/verification/verification_upload', locals: {member: member, v_type: v_type} %>
+        </td>
+      </tr>
+  <% end %>
+</table>

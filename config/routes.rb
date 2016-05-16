@@ -36,9 +36,15 @@ Rails.application.routes.draw do
         get :staff_index
         get :assister_index
         get :request_help
+        get :binder_index
+        get :binder_index_datatable
+        post :binder_paid
+        get :verification_index
+        get :verifications_index_datatable
       end
 
       member do
+        post :transmit_group_xml
         get :home
         get :inbox
       end
@@ -107,7 +113,7 @@ Rails.application.routes.draw do
         get 'personal'
         get 'inbox'
         get 'brokers'
-        get 'documents_index'
+        get 'verification'
         get 'document_upload'
         get 'find_sep'
         post 'record_sep'
@@ -366,12 +372,15 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
 
-  resources :documents, only: [:index, :update] do
+  resources :documents, only: [:update, :destroy, :update] do
     collection do
-      get :consumer_role_status
-      put :change_doc_status
       put :change_person_aasm_state
-      get :new_comment
+      get :show_docs
+      put :update_individual
+      get :enrollment_verification
+      put :enrollment_docs_state
+      put :extend_due_date
+      get :fed_hub_request
     end
   end
 
