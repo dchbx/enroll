@@ -131,7 +131,7 @@ $(document).on 'click', 'form .remove_fields', (event) ->
 $(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
   $('.benefit-group-fields:last').remove()
   event.preventDefault()
-  if $('.benefit-group-fields').length == 1
+  if $('.benefit-group-fields').length == 1 || $('.benefit-group-fields').length == $('#plan_year').data('benefit-group-count') 
     $('.remove_fields').hide();
   if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
     EmployerProfile.validateEditPlanYear

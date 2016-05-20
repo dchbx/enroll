@@ -1,4 +1,4 @@
-$primary-color: #007bc4;
+$primary-blue: #007bc4;
 $primay-active-button-text-color: #ffffff;
 $primary-bold: 600;
 $primary-green: #69A30D;
@@ -47,6 +47,11 @@ $primary-green: #69A30D;
     }
     .plan-year {
       padding-bottom: 15px;
+    }
+  }
+  &#plan_year {
+    .fa {
+      color: $primary-blue;
     }
   }
   &.plan-year {
@@ -120,7 +125,20 @@ $primary-green: #69A30D;
       }
     }
   }
-  &.controls
+  &.controls {
+    .above {
+      z-index: 100;
+      .btn {
+        margin: 0 0px 10px 10px;
+      }
+    }
+    .below {
+      z-index: 100;
+      .btn {
+        margin: 0 10px 25px 0;
+      }
+    }
+  }
   &.benefit-properties {
     .description {
       border-bottom: none;
