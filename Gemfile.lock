@@ -7,6 +7,17 @@ GIT
       activesupport (~> 4.2.0)
       bunny (~> 1.7.0)
 
+GIT
+  remote: https://github.com/prawnpdf/prawn.git
+  revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
+  ref: 8028ca0cd2
+  specs:
+    prawn (1.0.0.rc2)
+      afm
+      pdf-reader (~> 1.2)
+      ruby-rc4
+      ttfunk (~> 1.0.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -183,7 +194,7 @@ GEM
       mail (~> 2.6.3)
     equalizer (0.0.11)
     erubis (2.7.0)
-    execjs (2.6.0)
+    execjs (2.7.0)
     eye (0.8)
       celluloid (~> 0.17.2)
       celluloid-io (~> 0.17.0)
@@ -254,9 +265,9 @@ GEM
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.0.0)
     method_source (0.8.2)
-    mime-types (2.99.1)
+    mime-types (2.99.2)
     mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    minitest (5.9.0)
     monetize (1.1.0)
       money (~> 6.5.0)
     money (6.5.1)
@@ -289,7 +300,7 @@ GEM
     mongoid-versioning (2.0.0)
       activesupport (~> 4.0)
       mongoid (>= 4.0.0, <= 6.0.0)
-    multi_json (1.12.0)
+    multi_json (1.12.1)
     multi_test (0.1.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -316,9 +327,6 @@ GEM
       cliver (~> 0.3.1)
       multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
-    prawn (0.11.1)
-      pdf-reader (>= 0.9.0)
-      ttfunk (~> 1.0.0)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -499,7 +507,7 @@ GEM
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
     websocket (1.2.3)
-    websocket-driver (0.6.3)
+    websocket-driver (0.6.4)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
     wicked_pdf (1.0.4)
@@ -560,7 +568,7 @@ DEPENDENCIES
   nokogiri-happymapper
   parallel_tests
   poltergeist
-  prawn (~> 0.11.1)
+  prawn!
   pry
   pry-byebug
   pry-rails

@@ -88,7 +88,7 @@ gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-slider-rails', '6.0.17'
 
-gem 'prawn', '~> 0.11.1'
+gem 'prawn', :git => "https://github.com/prawnpdf/prawn.git", :ref => '8028ca0cd2'
 gem 'virtus'
 gem 'wkhtmltopdf-binary-edge', '0.12.3.0'
 gem 'wicked_pdf', '1.0.4'
