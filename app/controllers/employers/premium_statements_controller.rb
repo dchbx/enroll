@@ -143,7 +143,7 @@ class Employers::PremiumStatementsController < ApplicationController
 
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
     
-    @pdf.move_down 36
+    @pdf.move_down 40
 
     # activity_header_data = [ 
     #   ["Activity since your last statement", ""],
@@ -163,10 +163,10 @@ class Employers::PremiumStatementsController < ApplicationController
       @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 549]
     end
 
-    @pdf.move_down 48
+    @pdf.move_down 54
 
     @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 36
+    @pdf.move_down 48
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
@@ -176,7 +176,7 @@ class Employers::PremiumStatementsController < ApplicationController
     @pdf.text_box "Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
     @pdf.text_box "Call DC Health Link Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 60
+    @pdf.move_down 72
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
 
     @pdf.move_down 36
@@ -186,8 +186,8 @@ class Employers::PremiumStatementsController < ApplicationController
     dchbx_table_light_blue(invoice_header_data,address_x)
 
     @pdf.move_down 18
-    @pdf.text_box "Amount Enclosed:", :at => [address_x, 114], :align => :center, :style => :bold
-    @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, @pdf.cursor]
+    @pdf.text_box "Amount Enclosed:", :at => [address_x, 136], :align => :center, :style => :bold
+    @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 142]
 
     @pdf.text_box "DC Health Link", :at => [320,  72]
     @pdf.text_box "PO Box 97022", :at => [320,  60]
