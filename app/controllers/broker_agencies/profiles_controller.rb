@@ -140,9 +140,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
       broker_role_id = current_user.person.broker_role.id
       @orgs = Organization.by_broker_role(broker_role_id)
     end
+
+
+    @organizations = @orgs
     @page_alphabets = page_alphabets(@orgs, "legal_name")
-    page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    page_no = cur_page_no(@page_alphabets)
+    @organizations = @orgs.where("legal_name" => /^#{page_no}/i) unless @orgs.blank?
     @employer_profiles = @organizations.map {|o| o.employer_profile}
 
     @broker_role = current_user.person.broker_role || nil
