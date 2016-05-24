@@ -13,7 +13,7 @@ geographic_rating_area = GeographicRatingArea.new(
 
 organization = Organization.new(
       dba: "DCHL",
-      legal_name: "DC Health Link",
+      legal_name: "#{Settings.site.short_name}",
       fein: 123123456,
       office_locations: [office_location]
     )

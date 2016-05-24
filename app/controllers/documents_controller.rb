@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
-  helper_method :sort_filter, :sort_direction
-  before_action :set_doc, only: [:change_doc_status, :change_person_aasm_state]
+  before_action :set_document, only: [:destroy, :update]
+  before_action :set_person, only: [:enrollment_docs_state, :update_individual, :fed_hub_request, :enrollment_verification, :update_verification_type]
   respond_to :html, :js
 
   def download
@@ -10,96 +10,159 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
-  def consumer_role_status
-    docs_page_filter
-    search_box
+  def update_individual
+      @person.consumer_role.authorize_residency! verification_attr
+      @person.consumer_role.authorize_lawful_presence! verification_attr
     respond_to do |format|
-      format.html { render partial: "index_consumer_role_status" }
-      format.js {}
+      format.html { redirect_to :back }
     end
   end
 
- def index
-   @person = Person.find(params[:person_id])
-   @person_documents = @person.consumer_role.vlp_documents
-   mark_as_reviewed
- end
+  def update_verification_type
+    v_type = params[:verification_type]
+    if v_type == "Social Security Number"
+      @person.consumer_role.update_attributes(:ssn_validation => "valid",
+                                              :ssn_update_reason => params[:verification_reason])
+    else
+     @person.consumer_role.lawful_presence_determination.authorize! verification_attr
+     @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
+                                             {:v_type => v_type,
+                                              :update_reason => params[:verification_reason]
+                                             } )
+    end
+    respond_to do |format|
+      format.html {
+        if all_types_verified?(@person)
+          flash[:notice] = "Individual verification status was completely approved."
+          redirect_to update_individual_documents_path(:person_id => @person)
+        else
+          flash[:notice] = "Verification type successfully approved."
+          redirect_to :back
+        end
+      }
+    end
+  end
 
- def new_comment
-   @person = Person.find(params[:person_id])
-   @document = @person.consumer_role.vlp_documents.where(id: params[:doc_id]).first
- end
-
- def update
-   @person = Person.find(params[:person][:id])
-   @document = @person.consumer_role.vlp_documents.where(id: params[:person][:vlp_document][:id]).first
-   @document.update_attributes(:comment => params[:person][:vlp_document][:comment])
- end
-
- def mark_as_reviewed
-   @person_documents.each do |doc|
-     if doc.status && doc.status == "downloaded"
-       doc.status = "in review"
-       doc.save
-     end
-   end
- end
-
- def change_doc_status
-   @document.update_attributes(:status => params[:status])
-   respond_to do |format|
-          format.html {redirect_to documents_path(:person_id => @doc_owner.id), notice: "Document Status Updated"}
-          end
- end
-
-
-
-def change_person_aasm_state
-  @doc_owner.consumer_role.update_attributes(:aasm_state => params[:state])
-  respond_to do |format|
-         format.html {redirect_to exchanges_hbx_profiles_root_path, notice: "Person Verification Status Updated"}
-         end
-
-end
-
- private
- def get_options(params)
-   options = {}
-   options[:content_type] = params[:content_type] if params[:content_type]
-   options[:filename] = params[:filename] if params[:filename]
-   options[:disposition] = params[:disposition] if params[:disposition]
-   options
- end
-
- def set_doc
-  @doc_owner = Person.where(id: params[:person_id]).first
-  @document = @doc_owner.consumer_role.vlp_documents.where(id: params[:doc_id]).first
- end
-
- def sort_filter
-   %w(first_name last_name created_at).include?(params[:sort]) ? params[:sort] : 'created_at'
- end
-
- def sort_direction
-   %w(asc desc).include?(params[:direction]) ? params[:direction] : 'desc'
- end
-
- def search_box
-   if params[:q]
-     @q = params[:q]
-     @unverified_persons = @unverified_persons.search(params[:q])
-   end
- end
-
- def docs_page_filter
-   case params[:sort]
-     when 'waiting'
-       @unverified_persons=Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-     when 'no_docs_uloaded'
-       @unverified_persons=Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').order_by(sort_filter => sort_direction).page(params[:page]).per(20)
+  def enrollment_verification
+     family = @person.primary_family
+     if family.try(:active_household).try(:hbx_enrollments) &&  family.active_household.hbx_enrollments.verification_needed.first
+       family.active_household.hbx_enrollments.verification_needed.first.evaluate_individual_market_eligiblity
+       family.save!
+       respond_to do |format|
+         format.html {
+           flash[:success] = "Enrollment group was completely verified."
+           redirect_to :back
+         }
+       end
      else
-       @unverified_persons=Person.unverified_persons.order_by(sort_filter => sort_direction).page(params[:page]).per(20)
-   end
- end
+       respond_to do |format|
+         format.html {
+           flash[:danger] = "Family does not have any active Enrollment to verify."
+           redirect_to :back
+         }
+       end
+     end
+  end
 
+  def fed_hub_request
+    @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record)
+    respond_to do |format|
+      format.html {
+        flash[:success] = "Request was sent to FedHub."
+        redirect_to :back
+      }
+      format.js
+    end
+  end
+
+  def enrollment_docs_state
+    @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:docs_status])
+    flash[:success] = "Your documents were sent for verification."
+    redirect_to :back
+  end
+
+  def show_docs
+    if current_user.has_hbx_staff_role?
+      session[:person_id] = params[:person_id]
+      set_current_person
+      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:status])
+    end
+    redirect_to verification_insured_families_path
+  end
+
+  def extend_due_date
+    family = Family.find(params[:family_id])
+      if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
+        if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
+          family.active_household.hbx_enrollments.verification_needed.first.special_verification_period += 30.days
+          family.save!
+          flash[:success] = "Special verification period was extended for 30 days."
+        else
+          family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:special_verification_period => TimeKeeper.date_of_record + 30.days)
+          flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.hbx_enrollments.verification_needed.first.special_verification_period}"
+        end
+      else
+        flash[:danger] = "Family does not have any active Enrollment to extend verification due date."
+      end
+    redirect_to :back
+  end
+
+  def destroy
+    @document.delete
+    respond_to do |format|
+      format.html { redirect_to verification_insured_families_path }
+      format.js
+    end
+
+  end
+
+  def update
+    if params[:comment]
+      @document.update_attributes(:status => params[:status],
+                                  :comment => params[:person][:vlp_document][:comment])
+    else
+      @document.update_attributes(:status => params[:status])
+    end
+    respond_to do |format|
+      format.html {redirect_to verification_insured_families_path, notice: "Document Status Updated"}
+      format.js
+    end
+  end
+
+  private
+  def get_options(params)
+    options = {}
+    options[:content_type] = params[:content_type] if params[:content_type]
+    options[:filename] = params[:filename] if params[:filename]
+    options[:disposition] = params[:disposition] if params[:disposition]
+    options
+  end
+
+  def all_types_verified?(person)
+    person.verification_types.all?{ |type| is_type_verified?(person, type) }
+  end
+
+  def is_type_verified?(person, type)
+    if type == 'Social Security Number'
+      person.consumer_role.ssn_verified?
+    elsif type == 'Citizenship' || type == 'Immigration status'
+      person.consumer_role.citizenship_verified?
+    end
+  end
+
+  def set_document
+    set_person
+    @document = @person.consumer_role.vlp_documents.find(params[:id])
+  end
+
+  def set_person
+    @person = Person.find(params[:person_id])
+  end
+
+  def verification_attr
+    OpenStruct.new({
+       :verified_at => Time.now,
+       :authority => "hbx"
+                   })
+  end
 end

@@ -47,5 +47,7 @@
 </div><br>
 <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-trans mz' %>
   <a class='btn btn-trans' data-toggle='modal' data-target='#downloadCsv'>Download</a>
+  <a class='btn btn-trans' data-toggle='modal' data-target='#downloadPdf'>Download PDF</a>
 </div>
 <%= render "download_csv_modal" %>
+<%= render "download_pdf_modal" %>

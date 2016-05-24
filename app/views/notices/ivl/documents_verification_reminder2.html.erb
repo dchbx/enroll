@@ -22,7 +22,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "You submitted an application or renewal for health insurance
-  through DC Health Link which we processed on [date of application/renewal].
+  through #{Settings.site.short_name} which we processed on [date of application/renewal].
   The information you provided does not match our records or is not enough to
   make a final determination of your eligibility. This is your first reminder notice to provide documentation."} %>
 

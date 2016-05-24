@@ -1,0 +1,84 @@
+<div class="row">
+  <div class="col-xs-6">
+    <h4>
+      <% if enrollment_group_unverified?(@person) %>
+          Document Due Date:&nbsp;&nbsp;
+          <% if verification_due_date(@family) <= TimeKeeper.date_of_record %>
+              <span class="label label-danger"><%= verification_due_date(@person.primary_family) %> (Past Due)</span>
+          <% else %>
+              <span class="label label-warning"><%= verification_due_date(@person.primary_family) %></span>
+          <% end %>
+      <% end %>
+    </h4>
+  </div>
+</div>
+<div class="module ivl-documents-table panel">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover table-sm">
+      <thead class="thead-default">
+      <tr>
+        <th>Family Member</th>
+        <th>Verification Type</th>
+        <th>Status</th>
+
+        <% if current_user && current_user.has_hbx_staff_role? %>
+            <!--<th>Complete</th>-->
+        <% end %>
+        <th>Documents</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @family_members.each do |member|%>
+          <tr class="<%= cycle("odd top", "even top") %>">
+            <td><%= member.person.first_name.capitalize %>
+              <%= member.person.last_name.capitalize %></td>
+            <td colspan="3">
+              <% if unverified?(member.person) %>
+                  <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
+              <% end %>
+            </td>
+            <td class="table-functions">
+              <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
+                  <% if member_has_uploaded_docs(member) %>
+                    <span data-toggle="tooltip" title="View Documents" class="function-text">
+                      <i class="fa fa-caret-down fa-2x"></i>
+                    </span>
+                  <% end %>
+              <% end %>
+            </td>
+          </tr>
+          <div id="verification_docs_table">
+            <%= render partial: "insured/families/verification/verification_docs_table", locals: {member: member} %>
+          </div>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-6">
+    <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>
+        <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
+    <% elsif show_send_button_for_consumer? %>
+        <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm pull-right", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
+    <% end %>
+  </div>
+  <div class="col-xs-6">
+    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-trans btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button">
+      Documents FAQ
+    </a>
+  </div>
+</div>
+
+<div class="collapse" id="docs-verification-faq">
+  <%= render partial: "insured/families/verification/documents_verification_list" %>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("[data-toggle='tooltip']").tooltip();
+    Insured.custom_upload_init();
+  });
+</script>

@@ -7,11 +7,22 @@ GIT
       activesupport (~> 4.2.0)
       bunny (~> 1.7.0)
 
+GIT
+  remote: https://github.com/prawnpdf/prawn.git
+  revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
+  ref: 8028ca0cd2
+  specs:
+    prawn (1.0.0.rc2)
+      afm
+      pdf-reader (~> 1.2)
+      ruby-rc4
+      ttfunk (~> 1.0.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.0.2)
-    aasm (4.0.8)
+    aasm (4.8.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
     actionmailer (4.2.3)
@@ -52,7 +63,7 @@ GEM
     addressable (2.3.8)
     afm (0.2.2)
     amq-protocol (1.9.2)
-    animate-rails (1.0.9)
+    animate-rails (1.0.10)
       rails
     arel (6.0.3)
     aws-sdk (2.2.4)
@@ -65,7 +76,7 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    bcrypt (3.1.10)
+    bcrypt (3.1.11)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     bootstrap-multiselect-rails (0.9.9)
@@ -96,7 +107,7 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    capybara-screenshot (1.0.11)
+    capybara-screenshot (1.0.12)
       capybara (>= 1.0, < 3)
       launchy
     carrierwave (0.10.0)
@@ -147,7 +158,7 @@ GEM
     config (1.0.0)
       activesupport (>= 3.0)
       deep_merge (~> 1.0.0)
-    cucumber (2.3.2)
+    cucumber (2.3.3)
       builder (>= 2.1.2)
       cucumber-core (~> 1.4.0)
       cucumber-wire (~> 0.0.1)
@@ -183,7 +194,7 @@ GEM
       mail (~> 2.6.3)
     equalizer (0.0.11)
     erubis (2.7.0)
-    execjs (2.6.0)
+    execjs (2.7.0)
     eye (0.8)
       celluloid (~> 0.17.2)
       celluloid-io (~> 0.17.0)
@@ -204,16 +215,17 @@ GEM
       activesupport (>= 4.1.0)
     haml (4.0.7)
       tilt
-    hashery (2.1.1)
+    hashery (2.1.2)
     hike (1.2.3)
-    hitimes (1.2.3)
+    hitimes (1.2.4)
     htmlentities (4.3.4)
     i18n (0.7.0)
     ice_nine (0.11.2)
     jbuilder (2.4.1)
       activesupport (>= 3.0.0, < 5.1)
       multi_json (~> 1.2)
-    jmespath (1.1.3)
+    jmespath (1.2.4)
+      json_pure (>= 1.8.1)
     jquery-datatables-rails (3.4.0)
       actionpack (>= 3.1)
       jquery-rails
@@ -229,6 +241,7 @@ GEM
     jquery-ui-rails (5.0.5)
       railties (>= 3.2.16)
     json (1.8.3)
+    json_pure (1.8.3)
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -243,7 +256,7 @@ GEM
       less (~> 2.6.0)
     less-rails-bootstrap (3.3.1.0)
       less-rails (~> 2.6.0)
-    libv8 (3.16.14.13)
+    libv8 (3.16.14.15)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     macaddr (1.7.1)
@@ -252,9 +265,9 @@ GEM
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.0.0)
     method_source (0.8.2)
-    mime-types (2.99.1)
+    mime-types (2.99.2)
     mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    minitest (5.9.0)
     monetize (1.1.0)
       money (~> 6.5.0)
     money (6.5.1)
@@ -273,8 +286,8 @@ GEM
       mongo (~> 2.1)
       origin (~> 2.1)
       tzinfo (>= 0.3.37)
-    mongoid-autoinc (5.0.1)
-      mongoid (~> 5.0.0)
+    mongoid-autoinc (5.0.2)
+      mongoid (~> 5.0)
     mongoid-enum (0.4.0)
       mongoid (~> 5.0)
     mongoid-grid_fs (2.2.1)
@@ -284,15 +297,15 @@ GEM
       mongoid (~> 5.0)
       rake
       rspec (~> 3.3)
-    mongoid-versioning (1.2.0)
+    mongoid-versioning (2.0.0)
       activesupport (~> 4.0)
       mongoid (>= 4.0.0, <= 6.0.0)
-    multi_json (1.11.3)
+    multi_json (1.12.1)
     multi_test (0.1.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (3.0.2)
-    newrelic_rpm (3.15.0.314)
+    net-ssh (3.1.1)
+    newrelic_rpm (3.15.2.317)
     nio4r (1.2.1)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -314,9 +327,6 @@ GEM
       cliver (~> 0.3.1)
       multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
-    prawn (0.11.1)
-      pdf-reader (>= 0.9.0)
-      ttfunk (~> 1.0.0)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -364,13 +374,13 @@ GEM
       activesupport (= 4.2.3)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    raindrops (0.15.0)
+    raindrops (0.16.0)
     rake (11.1.2)
     rdoc (4.2.2)
       json (~> 1.4)
     recaptcha (1.1.0)
       json
-    redis (3.2.2)
+    redis (3.3.0)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
       redis-rack (~> 1.5.0)
@@ -388,7 +398,7 @@ GEM
     redis-store (1.1.7)
       redis (>= 2.2)
     ref (2.0.0)
-    responders (2.1.1)
+    responders (2.2.0)
       railties (>= 4.2.0, < 5.1)
     roo (2.1.1)
       nokogiri (~> 1)
@@ -433,9 +443,8 @@ GEM
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
-    selenium-webdriver (2.52.0)
+    selenium-webdriver (2.53.0)
       childprocess (~> 0.5)
-      multi_json (~> 1.0)
       rubyzip (~> 1.0)
       websocket (~> 1.0)
     shoulda-matchers (3.1.1)
@@ -452,7 +461,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    sshkit (1.8.1)
+    sshkit (1.10.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     state_machine (1.2.0)
@@ -472,9 +481,8 @@ GEM
       coffee-rails
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (2.7.2)
-      execjs (>= 0.3.0)
-      json (>= 1.8.0)
+    uglifier (3.0.0)
+      execjs (>= 0.3.0, < 3)
     unicorn (4.8.3)
       kgio (~> 2.6)
       rack
@@ -498,8 +506,8 @@ GEM
       binding_of_caller (>= 0.7.2)
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
-    websocket (1.2.2)
-    websocket-driver (0.6.3)
+    websocket (1.2.3)
+    websocket-driver (0.6.4)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
     wicked_pdf (1.0.4)
@@ -511,7 +519,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aasm (~> 4.0.7)
+  aasm (~> 4.8.0)
   acapi!
   action_mailer_cache_delivery (~> 0.3.7)
   addressable (= 2.3.8)
@@ -538,7 +546,7 @@ DEPENDENCIES
   forgery
   haml
   jbuilder (~> 2.0)
-  jquery-datatables-rails
+  jquery-datatables-rails (= 3.4.0)
   jquery-rails (= 4.0.5)
   jquery-turbolinks
   jquery-ui-rails
@@ -560,7 +568,7 @@ DEPENDENCIES
   nokogiri-happymapper
   parallel_tests
   poltergeist
-  prawn (~> 0.11.1)
+  prawn!
   pry
   pry-byebug
   pry-rails

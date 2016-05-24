@@ -26,35 +26,35 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through DC Health Link and will contribute to the monthly premium to make the cost of coverage more affordable. ".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable. ".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Your Current Plan is No Longer Available</strong><br>
-  The plan in which you are currently enrolled will no longer be available 
+  The plan in which you are currently enrolled will no longer be available
   to you beginning #{notice.plan.try(:coverage_start_on).try(:to_s)}.  You must select another plan by #{notice.plan.try(:open_enrollment_end_on).try(:to_s)} in order to continue coverage effective #{notice.plan.try(:coverage_start_on).try(:to_s)}.".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>IMPORTANT:  You MUST Select a New Plan to Continue Coverage into Upcoming Plan Year</strong><br>
-  If you do not make a new plan selection by #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}, your current 
-  coverage will be terminated on #{notice.plan.try(:coverage_start_on) - 1} and you will 
+  If you do not make a new plan selection by #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}, your current
+  coverage will be terminated on #{notice.plan.try(:coverage_start_on) - 1} and you will
   not have coverage for the upcoming plan year beginning on #{notice.plan.try(:coverage_start_on).try(:to_s)}.".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>What is Open Enrollment?</strong><br>
-  Open enrollment is your annual opportunity to enroll in health plans 
-  offered by your employer or make changes to your current plan 
-  selection.  Outside of this annual open enrollment period, you will only 
-  be allowed to make changes to your enrollment if you experience certain 
+  Open enrollment is your annual opportunity to enroll in health plans
+  offered by your employer or make changes to your current plan
+  selection.  Outside of this annual open enrollment period, you will only
+  be allowed to make changes to your enrollment if you experience certain
   life events such as marriage, birth, or adoption.".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
-  Please log-in to your existing DC Health Link account at #{notice.hbe.url} to 
-  view your plan options and complete the enrollment process.".html_safe} %>  
+  Please log-in to your existing #{Settings.site.short_name} account at #{notice.hbe.url} to
+  view your plan options and complete the enrollment process.".html_safe} %>
 
 <% if notice.broker.present? %>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your employer or your broker for further assistance.".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %> 
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your employer or your broker for further assistance.".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your employer for further assistance.".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %> 
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your employer for further assistance.".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact DC Health Link with any questions:".html_safe} %> 
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:".html_safe} %> 
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Online at www.DCHealthLink.com;".html_safe,
@@ -68,7 +68,7 @@
         <tr><td>#{notice.employer_name}</td></tr>
       </tbody>
      </table>
-   </p>".html_safe} %> 
+   </p>".html_safe} %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
@@ -77,4 +77,3 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)".html_safe} %>
-

@@ -51,7 +51,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       allow(CensusEmployee).to receive(:new).and_return(census_employee)
-      allow(census_employee).to receive(:check_coverage_terminated_on).and_return(true)
     end
 
     it "should be redirect when valid" do
@@ -170,7 +169,7 @@ RSpec.describe Employers::CensusEmployeesController do
         allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
         allow(controller).to receive(:benefit_group_id).and_return(nil)
         post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-        expect(flash[:notice]).to eq "Note: new employee cannot enroll on DC Health Link until they are assigned a benefit group. Census Employee is successfully updated."
+        expect(flash[:notice]).to eq "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. Census Employee is successfully updated."
       end
     end
 

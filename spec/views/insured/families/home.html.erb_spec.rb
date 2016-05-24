@@ -16,7 +16,7 @@ RSpec.describe "insured/families/home.html.erb" do
   end
 
   it "should display the title" do
-    expect(rendered).to have_selector('h1', text: 'My DC Health Link')
+    expect(rendered).to have_selector('h1', text: "My #{Settings.site.short_name}")
   end
 
   it "should have plan-summary area" do

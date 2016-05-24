@@ -1,7 +1,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<h3><span style='color:#ff0000;'>[SHOP Broker 1b]<br>
    New Broker, outstanding requirements </span></h3>".html_safe} %>
-  
+
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 
@@ -12,11 +12,11 @@
   </tr>
   </tbody>
 </table>
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<h3><strong'>RE: 	Broker interest in being appointed with DC Health link</h3></strong>".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<h3><strong'>RE: 	Broker interest in being appointed with #{Settings.site.short_name}</h3></strong>".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Greetings,".html_safe} %>
 
-<%#= render partial: 'notices/shared/paragraph', :locals => { content: "Thank you for your interest in becoming a DC Health Link Registered Broker.  Based on our review you must complete the following requirements before you can be registered as a broker with DC Health Link:".html_safe} %>
+<%#= render partial: 'notices/shared/paragraph', :locals => { content: "Thank you for your interest in becoming a #{Settings.site.short_name} Registered Broker.  Based on our review you must complete the following requirements before you can be registered as a broker with #{Settings.site.short_name}:".html_safe} %>
 <%= render partial: 'notices/shared/ordered_list', locals: {
         previous: "[This will pull from the comments section populated from the Admin on DCHL….]",
         listings: ["Policy training",
@@ -24,8 +24,8 @@
                    "Outstanding carrier appointments"
                    ] } %>
 <%= render partial: 'notices/shared/unordered_list', locals: {
-        previous: "Once you have completed these outstanding requirements, you can complete your DC Health Link Broker Registration by completing the following:",
-        listings: ["Register as a <a style='color:rgb(0,0,241)'> trained expert </a> on DC Health Link",
+        previous: "Once you have completed these outstanding requirements, you can complete your #{Settings.site.short_name} Broker Registration by completing the following:",
+        listings: ["Register as a <a style='color:rgb(0,0,241)'> trained expert </a> on #{Settings.site.short_name}",
                    "Allow 7-10 business days for your registration to be processed",
                    "Upon approval of your registration, you will receive an email from <a style= 'color:rgb(0,0,241)'> noreply@dchealthlink.com </a> with important information about how to access your broker portal and how your clients can assign you as their broker"] } %>
 
@@ -45,4 +45,3 @@
   </tr>
   </tbody>
 </table>
-

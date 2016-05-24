@@ -8,7 +8,7 @@ class BenefitGroup
 
   PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level)
   EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
-  OFFSET_KINDS = [0, 30, 60]
+  OFFSET_KINDS = [0, 1, 30, 60]
   TERMINATE_ON_KINDS = %w(end_of_month)
   PERSONAL_RELATIONSHIP_KINDS = [
     :employee,
@@ -129,7 +129,7 @@ class BenefitGroup
   end
 
   def is_offering_dental?
-    dental_reference_plan_id.present? && elected_dental_plan_ids.any? 
+    dental_reference_plan_id.present? && elected_dental_plan_ids.any?
   end
 
   def is_open_enrollment?
@@ -414,6 +414,8 @@ class BenefitGroup
     case effective_on_offset
     when 0
       "First of the month following or coinciding with date of hire"
+    when 1
+      "First of the month following date of hire"
     when 30
       "First of the month following 30 days"
     when 60
@@ -425,11 +427,15 @@ class BenefitGroup
     if effective_on_kind == "date_of_hire"
       date_of_hire
     else
+      if effective_on_offset == 1
+        date_of_hire.end_of_month + 1.day
+      else
       if (date_of_hire + effective_on_offset.days).day == 1
         (date_of_hire + effective_on_offset.days)
       else
         (date_of_hire + effective_on_offset.days).end_of_month + 1.day
       end
+    end
     end
   end
 

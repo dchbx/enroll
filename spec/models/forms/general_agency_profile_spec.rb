@@ -82,10 +82,10 @@ describe Forms::BrokerAgencyProfile, ".save" do
   end
 
   context 'when general agency already exists with same FEIN' do
-    let(:general_agency) { FactoryGirl.create(:general_agency_with_organization, fein: "223230323") }
+    let(:general_agency) { FactoryGirl.create(:general_agency_with_organization) }
     let(:other_attributes) {
       {
-        fein: "223230323"
+        fein: general_agency.fein
       }
     }
 

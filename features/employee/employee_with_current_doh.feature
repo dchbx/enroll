@@ -6,7 +6,7 @@ Feature: Employee with current date of hire
   Then New Employee should be able to match Employer
   And Employee should be able to purchase Insurance
 
-  
+
   Scenario: New hire has enrollment period based on hired date
     Given Employer for Soren White exists with a published health plan year
     And Employee has current hired on date
@@ -30,6 +30,10 @@ Feature: Employee with current date of hire
     Then Employee should see "my account" page with enrollment
 
     Given I set the eligibility rule to first of month following or coinciding with date of hire
+    Then Employee tries to complete purchase of another plan
+    Then Employee should see "my account" page with enrollment
+
+    Given I set the eligibility rule to first of the month following date of hire
     Then Employee tries to complete purchase of another plan
     Then Employee should see "my account" page with enrollment
 

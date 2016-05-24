@@ -22,7 +22,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This decision is supported by the following provision of the Code of Federal Regulations: 45 C.F.R. §155.420(d)."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "This means that, although you may be eligible to participate in DC Health Link, either with or without financial assistance (such as premium tax credits and/or cost-sharing reductions), you <u>either</u> are not eligible to enroll in a health plan at this time OR are not eligible to <u>change</u> from the plan you are currently enrolled in because open enrollment is closed.  Circumstances that allow individuals to enroll in health plans outside of open enrollment include the following, <u>when reported promptly</u>."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "This means that, although you may be eligible to participate in #{Settings.site.short_name}, either with or without financial assistance (such as premium tax credits and/or cost-sharing reductions), you <u>either</u> are not eligible to enroll in a health plan at this time OR are not eligible to <u>change</u> from the plan you are currently enrolled in because open enrollment is closed.  Circumstances that allow individuals to enroll in health plans outside of open enrollment include the following, <u>when reported promptly</u>."} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Moving to the #{Settings.aca.state_name}",
@@ -30,8 +30,8 @@
    "Getting married",
    "Losing health coverage during the year",
    "Becoming a citizen or gaining a new immigration status",
-   "Experiencing a change in eligibility for premium tax credits or cost-sharing reductions, or the amount of premium tax credits or cost-sharing reductions, if already enrolled in a DC Health Link plan",
-   "Not enrolling during the open enrollment period was unintentional, inadvertent, or erroneous and was the fault of a DC Health Link employee or the enrollment error was the result of misconduct by someone providing enrollment assistance, or an insurance company representative."] } %>
+   "Experiencing a change in eligibility for premium tax credits or cost-sharing reductions, or the amount of premium tax credits or cost-sharing reductions, if already enrolled in a #{Settings.site.short_name} plan",
+   "Not enrolling during the open enrollment period was unintentional, inadvertent, or erroneous and was the fault of a #{Settings.site.short_name} employee or the enrollment error was the result of misconduct by someone providing enrollment assistance, or an insurance company representative."] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "For more information, go to www.DCHealthLink.com and click on “Get Help”. Click on “Read the FAQs” and search for “Special Enrollment Periods”."} %>
 

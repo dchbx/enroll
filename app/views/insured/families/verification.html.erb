@@ -1,0 +1,14 @@
+<% content_for :navigation do %>
+    <%= render 'navigation' %>
+<% end %>
+<div class="col-xs-12">
+  <h1 class="darkblue no-buffer">Documents</h1>
+</div>
+<div class="col-xs-12 documents-tab">
+  <% if @person && @person.consumer_role %>
+      <h4 class="starter">We verify the information you give us using electronic data sources.
+        If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.</h4>
+
+      <%= render 'insured/families/verification/verification' %>
+  <% end %>
+</div>

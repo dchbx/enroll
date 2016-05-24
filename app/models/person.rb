@@ -352,6 +352,18 @@ class Person
     is_active
   end
 
+  # collect all verification types user can have based on information he provided
+  def verification_types
+    verification_types = []
+    verification_types << 'Social Security Number' if self.ssn
+    if self.us_citizen
+      verification_types << 'Citizenship'
+    else
+      verification_types << 'Immigration status'
+    end
+    verification_types
+  end
+
   def relatives
     person_relationships.reject do |p_rel|
       p_rel.relative_id.to_s == self.id.to_s
@@ -764,7 +776,7 @@ class Person
     welcome_subject = "Welcome to #{Settings.site.short_name}"
     welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{Settings.site.short_name}")
   end
 
   def update_full_name

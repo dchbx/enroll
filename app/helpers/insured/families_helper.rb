@@ -104,4 +104,10 @@ module Insured::FamiliesHelper
   def has_writing_agent?(employee_role)
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
+
+  def display_aasm_state?(aasm_state)
+    if aasm_state == "coverage_selected" || aasm_state == "coverage_canceled" || aasm_state == "coverage_terminated"
+     true
+    end  
+  end  
 end

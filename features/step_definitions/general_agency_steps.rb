@@ -104,7 +104,7 @@ When(/^.+ registers? with valid information for staff$/) do
 end
 
 Then(/^.+ should see successful message with general agency home page$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   expect(page).to have_content('General Agency : Housecare Inc')
 end
 
@@ -126,8 +126,6 @@ And(/^.+ enters broker agency information for ga flow$/) do
   fill_in 'organization[dba]', with: "CareFirst Inc"
   fill_in 'organization[fein]', with: "890222111"
 
-  fill_in 'organization[home_page]', with: 'www.carefirst.example.com'
-
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
 
@@ -148,7 +146,7 @@ Then(/^.+ should receive an invitation email for ga flow$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page for ga flow$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   expect(page).to have_content('Broker Agency : CareFirst Inc')
 end
 

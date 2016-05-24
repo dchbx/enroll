@@ -1,4 +1,5 @@
-$primary-color: #007bc4;
+$primary-blue: #007bc4;
+$primary-green: #69A30D;
 $primay-active-button-text-color: #ffffff;
 $primary-bold: 600;
 .module {
@@ -45,7 +46,7 @@ $primary-bold: 600;
           text-decoration: underline;
         }
         .fa {
-          color: #007bc4;
+          color: $primary-blue;
         }
       }
       &.important {
@@ -85,179 +86,9 @@ $primary-bold: 600;
       border-radius: 3px;
       text-transform: capitalize;
       &.active {
-        background-color: $primary-color;
+        background-color: $primary-blue;
         a {
           color: $primay-active-button-text-color;
-        }
-      }
-    }
-  }
-  &.ivl-documents-table {
-    margin-top: 1.25%;
-    .demo-up {
-      border: 0 !important;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      width: 150px;
-      text-overflow: "";
-      border-radius: 15px;
-      padding: 0px;
-      margin: 0px;
-    }
-
-    &.verif-type {
-      margin-right: 20px;
-    }
-
-  	&.modal-footer {
-  		.modal-sbc-link {
-  			text-align: left;
-  			position: relative;
-  			.fa.fa-file-pdf-o {
-  				margin: 2px auto auto 5px;
-  			}
-  			.sbc-text {
-  				font-size: 14px;
-  				margin-left: 10px;
-  				position: absolute;
-  				white-space: nowrap;
-  				top: 10px;
-  			}
-  		}
-  	}
-    .table {
-      width: 100%;
-      .thead-default {
-        tr {
-          background-color: #fff;
-          th {
-            text-align: center;
-            vertical-align: middle;
-          }
-        }
-      }
-      tbody {
-        tr {
-          &.top {
-            &.even {
-              background-color: #ffffff !important;
-              &:hover {
-                background-color: #f5f5f5 !important;
-              }
-            }
-          }
-          &.dn {
-            &:hover {
-              background-color: transparent;
-            }
-            td.td-container {
-              padding: 0px 12px;
-              .table-responsive {
-                overflow: visible;
-              }
-            }
-            table {
-              &.table {
-                background-color: #fff;
-                margin: 0 0 12px;
-                tr {
-                  &.bt-n {
-                    td {
-                      border-top: none !important;
-                    }
-                  }
-                  &.bb {
-                    td {
-                      border-bottom: 1px solid #ddd;
-                    }
-                  }
-                  td {
-                    padding: 10px 12px;
-                    .fa {
-                      &.fa-download {
-                        color: #b7b7b7;
-                        &:hover {
-                          color: #23527c;
-                        }
-                      }
-                      &.fa-comments-o {
-                        color: #b7b7b7;
-                        margin-left: 20px;
-                        &:hover {
-                          color: #23527c;
-                        }
-                      }
-                    }
-                  }
-                }
-                .upload {
-
-                  td.td-container {
-                    padding: 6px 12px 30px;
-                  }
-                }
-              }
-            }
-          }
-          td {
-            vertical-align: middle;
-						.sub-table {
-							width: 100%;
-							table-layout: auto;
-							td {
-								padding: 1.25% 1.25%;
-							}
-							.select-upload {
-								float: left;
-							}
-							.doc-upload-file {
-							  font-size: 10px;
-								padding: 0;
-								width:170px;
-							}
-							.selectric {
-								border-radius: 5px;
-								max-width: 140px;
-								width: 140px;
-							}
-							.btn-trans {
-								background-color: transparent;
-							}
-						}
-            &.table-functions {
-							a {
-								&:hover {
-									color: #23527c !important;
-								}
-								span {
-									text-align: center !important;
-									float: none !important;
-									white-space: nowrap;
-
-									.function-text {
-										font-size: 12px;
-										color: #b7b7b7;
-									}
-								}
-							}
-              .fa {
-                cursor: pointer;
-                display: inline-block;
-                color: #b7b7b7;
-              }
-            }
-          }
-          &:hover {
-            td {
-              &.table-functions {
-                .fa {
-                  &:hover {
-                    color: #23527c;
-                  }
-                }
-              }
-            }
-          }
         }
       }
     }

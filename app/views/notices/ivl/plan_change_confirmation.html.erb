@@ -18,7 +18,7 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "On [date of plan selection], you requested that we switch you or others in your household to a different DC Health Link plan.  The following individual(s) are now enrolled in [plan 1 name] health insurance plan."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "On [date of plan selection], you requested that we switch you or others in your household to a different #{Settings.site.short_name} plan.  The following individual(s) are now enrolled in [plan 1 name] health insurance plan."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content:  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   [Plan 1 Enrollee First Name][Plan 1 Enrollee Last Name]
