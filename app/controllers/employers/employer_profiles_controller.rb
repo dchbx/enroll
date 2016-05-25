@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :export_census_employees]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -213,6 +213,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def consumer_override
     session[:person_id] = params['person_id']
     redirect_to family_account_path
+  end
+
+  def export_census_employees
+    respond_to do |format|
+      format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+    end
   end
 
   def bulk_employee_upload_form
