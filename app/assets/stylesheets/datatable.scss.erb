@@ -1,0 +1,83 @@
+.module {
+  &#employers_dataTable_wrapper,
+  #families_dataTable_wrapper,
+  #verification-dataTable_wrapper {
+    .small-6 {
+      width: 50%;
+      &:first-of-type {
+        float: left;
+        .selectric {
+          height: 30px;
+          position: relative;
+          p {
+            position: relative;
+            &.label {
+              top: 4px;
+              height: auto !important;
+              line-height: normal !important;
+            }
+          }
+          .button {
+            top: -6px;
+          }
+        }
+        span {
+          position: relative;
+          top: 5px;
+          left: 8px;
+        }
+      }
+      &:last-of-type {
+        float: right;
+        input.form-control {
+          padding-top: 5px !important;
+        }
+        span.search {
+          position: relative;
+          top: 3px;
+        }
+      }
+    }
+    div.dataTables_length label {
+      font-weight: normal;
+      text-align: left;
+      white-space: nowrap;
+    }
+    ​ div.dataTables_length select {
+      width: 75px;
+      display: inline-block;
+    }
+    ​ div.dataTables_filter input {
+      height: 30px;
+    }
+    ​ div.dataTables_filter {
+      text-align: right;
+    }
+    ​ div.dataTables_filter label {
+      font-weight: normal;
+      white-space: nowrap;
+      text-align: left;
+    }
+    ​ div.dataTables_filter input {
+      margin-left: 0.5em;
+      display: inline-block;
+      width: auto;
+    }
+    ​ div.dataTables_info {
+      padding-top: 8px;
+      white-space: nowrap;
+      text-align: right;
+    }
+    ​ div.dataTables_paginate {
+      margin: 20px;
+      white-space: nowrap;
+    }
+  }
+}
+.dataTables_info {
+  text-align: right;
+}
+
+.dataTables_paginate {
+  text-align: center !important;
+}

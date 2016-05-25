@@ -828,6 +828,78 @@ describe Person do
     end
   end
 
+  describe "verification types" do
+    let(:person) {FactoryGirl.create(:person)}
+    context "consumer is us citizen with ssn" do
+      before :each do
+        allow(person).to receive(:ssn).and_return("2222222222")
+        allow(person).to receive(:us_citizen).and_return(false)
+      end
+      it "returns array" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns array with two elements" do
+        expect(person.verification_types.count).to eq(2)
+      end
+
+      it "contains SSN verification type for person" do
+        expect(person.verification_types).to include("Social Security Number")
+      end
+
+      it "contains Immigration status verification type for person" do
+        expect(person.verification_types).to include("Immigration status")
+      end
+
+    end
+
+    context "consumer is not us citizen with ssn" do
+      before :each do
+        allow(person).to receive(:ssn).and_return("2222222222")
+        allow(person).to receive(:us_citizen).and_return(true)
+      end
+
+      it "returns array" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns array with two elements" do
+        expect(person.verification_types.count).to eq(2)
+      end
+
+      it "contains SSN verification type for person" do
+        expect(person.verification_types).to include("Social Security Number")
+      end
+
+      it "contains Immigration status verification type for person" do
+        expect(person.verification_types).to include("Citizenship")
+      end
+
+    end
+
+    context "consumer is us citizen with no ssn" do
+      before :each do
+        allow(person).to receive(:us_citizen).and_return(true)
+      end
+
+      it "returns array" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns array with one elements" do
+        expect(person.verification_types.count).to eq(1)
+      end
+
+      it "contains SSN verification type for person" do
+        expect(person.verification_types).not_to include("SSN")
+      end
+
+      it "contains Immigration status verification type for person" do
+        expect(person.verification_types).to include("Citizenship")
+      end
+    end
+  end
+
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
     let(:employer_profile){FactoryGirl.create(:employer_profile)}
     let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}

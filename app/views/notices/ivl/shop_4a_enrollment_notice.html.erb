@@ -26,7 +26,7 @@
   </tbody>
 </table>
 <br/>
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "This is a reminder that you have until <OE End Date> to enroll into health coverage offered by <Employer Name> through DC Health Link. ".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "This is a reminder that you have until <OE End Date> to enroll into health coverage offered by <Employer Name> through #{Settings.site.short_name}. ".html_safe} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
   To complete the enrollment process, please complete the following steps:".html_safe} %>
@@ -36,15 +36,15 @@
      <li>Log-in or create an account</li>
      <li>If necessary, update your household information.</li>
      <li>Select your health plan option.</li></ol>".html_safe} %>
-   
+
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>What is Open Enrollment?</strong><br>
    Open enrollment is your annual opportunity to enroll in your employer’s health plan or make changes to your current plan selection.  Outside of this annual open enrollment period, you will only be allowed to make changes to your health plan enrollment if you experience certain life events such as marriage, birth, or adoption.".html_safe} %>
-   
+
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<span style='color:#ff0000; font-weight:bold;'> [If ER has a Broker/Assister] </span> Contact your employer or your broker for further assistance.<br/>
-   <span style='color:#ff0000; font-weight:bold;'> [If ER does NOT have a Broker/Assister] </span> Contact your employer further assistance.  
+   <span style='color:#ff0000; font-weight:bold;'> [If ER does NOT have a Broker/Assister] </span> Contact your employer further assistance.
 ".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact DC Health Link with any questions:".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:".html_safe} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
  ["Online at [HBEURL]".html_safe,
   "By email at [HBEEMAIL]; or".html_safe,
@@ -57,7 +57,7 @@
         <tr><td>[Employer Name]</td></tr>
       </tbody>
      </table>
-   </p>".html_safe} %> 
+   </p>".html_safe} %>
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong style='color:#ff0000;'>[If ER has a Broker/Assister, include contact info below]</strong><br>
@@ -71,6 +71,6 @@
       <tr><td>[Broker/Assister City], [Broker/Assister State] [Broker/Assister Zip]</td></tr>
       <tr><td>[Broker/Assister Direct Phone #]</td></tr>
       <tr><td>[Broker/Assister Email]</td></tr>
-      <tr><td>[Broker/Assister Web]</td></tr> 
+      <tr><td>[Broker/Assister Web]</td></tr>
     </tbody>
-  </table></p>".html_safe} %> 
+  </table></p>".html_safe} %>

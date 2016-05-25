@@ -27,8 +27,6 @@ And(/^.+ enters broker agency information$/) do
   # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
   # find(:xpath, "//li[contains(., 'C Corporation')]").click
 
-  fill_in 'organization[home_page]', with: 'www.logistics.example.com'
-
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
 
@@ -69,7 +67,7 @@ end
 And(/^.+ should receive an invitation email$/) do
   open_email("ricky.martin@example.com")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
-  #current_email.should have_subject('Invitation from your Employer to Sign up for Health Insurance at DC Health Link ')
+  #current_email.should have_subject("Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} ")
 end
 
 When(/^.+ visits? invitation url in email$/) do
@@ -98,7 +96,7 @@ When(/^.+ registers? with valid information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  expect(page).to have_content('Welcome to DC Health Link. Your account has been created.')
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
 
   expect(page).to have_content('Broker Agency : Logistics Inc')
 end
@@ -220,7 +218,7 @@ end
 
 Then(/^.+ goes to the Consumer page$/) do
   click_link 'Consumer'
-  expect(page).to have_content('My DC Health Link')
+  expect(page).to have_content("My #{Settings.site.short_name}")
 end
 
 # Then(/^.+ is on the consumer home page$/) do

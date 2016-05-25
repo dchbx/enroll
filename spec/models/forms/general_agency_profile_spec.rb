@@ -16,7 +16,7 @@ describe Forms::GeneralAgencyProfile, "given nothing" do
   end
 end
 
-describe Forms::BrokerAgencyProfile, ".save" do
+describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
 
   let(:attributes) { {
@@ -82,10 +82,10 @@ describe Forms::BrokerAgencyProfile, ".save" do
   end
 
   context 'when general agency already exists with same FEIN' do
-    let(:general_agency) { FactoryGirl.create(:general_agency_with_organization, fein: "223230323") }
+    let(:general_agency) { FactoryGirl.create(:general_agency_with_organization) }
     let(:other_attributes) {
       {
-        fein: "223230323"
+        fein: general_agency.fein
       }
     }
 
@@ -183,7 +183,7 @@ describe Forms::BrokerAgencyProfile, ".save" do
 end
 
 
-describe Forms::GeneralAgencyProfile, ".match_or_create_person" do
+describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :after_each do
   let(:attributes) { {
     first_name: "steve",
     last_name: "smith",

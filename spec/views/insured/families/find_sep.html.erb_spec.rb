@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "insured/families/find_sep.html.erb" do
+RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
   let(:current_user) {FactoryGirl.create(:user)}
 
   before do

@@ -14,6 +14,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
   let(:employer_profile){ instance_double("EmployerProfile") }
   let(:broker_agency_profile){ instance_double("BrokerAgencyProfile") }
   let(:inbox){ instance_double("Inbox") }
+  let(:active_family_members){ instance_double("ActiveFamilyMembers")}
   def family_member
     random_value = rand(999_999_999)
     instance_double(
@@ -28,8 +29,10 @@ RSpec.describe "insured/families/_navigation.html.erb" do
   before :each do
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:has_active_employee_role?).and_return(true)
+    allow(person).to receive(:has_consumer_role?).and_return(true)
     allow(person).to receive(:inbox).and_return(inbox)
     allow(inbox).to receive(:unread_messages).and_return(3)
+    allow(view).to receive(:enrollment_group_unverified?).and_return(true)
     allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
     allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
     assign(:person, person)
@@ -39,9 +42,9 @@ RSpec.describe "insured/families/_navigation.html.erb" do
   end
 
   it "should match the side bar tabs info on family home page" do
-    expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: 'My DC Health Link')
+    expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
     expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
-    expect(rendered).to have_selector('a[href="/insured/families/documents_index?tab=documents"]', text: 'Documents')
+    expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
     expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
   end
 

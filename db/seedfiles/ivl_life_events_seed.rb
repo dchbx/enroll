@@ -115,8 +115,8 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Enrollment error caused by DC Health Link",
-  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by DC Health Link or the Department of Health and Human Services",
+  title: "Enrollment error caused by #{Settings.site.short_name}",
+  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by #{Settings.site.short_name} or the Department of Health and Human Services",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 70,
@@ -132,7 +132,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "Change in income that may impact my tax credits/cost-sharing reductions ",
-  tool_tip: "Increases or decreases to income that may impact eligibility for or the dollar amount of household tax credits or cost-sharing reductions. (Only applies to those currently enrolled in a plan through DC Health Link).",
+  tool_tip: "Increases or decreases to income that may impact eligibility for or the dollar amount of household tax credits or cost-sharing reductions. (Only applies to those currently enrolled in a plan through #{Settings.site.short_name}).",
   action_kind: "change_benefit",
   market_kind: "individual",
   event_kind_label: "Date of change",
@@ -265,7 +265,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "Enrollment error caused by someone providing me with enrollment assistance",
-  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by a broker, in-person assister, or another expert trained by DC Health Link",
+  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by a broker, in-person assister, or another expert trained by #{Settings.site.short_name}",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -297,7 +297,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "Found ineligible for employer-sponsored insurance after open enrollment ended",
-  tool_tip: "Did not enroll in individual or family coverage because employer was applying to provide coverage through DC Health Link during open enrollment",
+  tool_tip: "Did not enroll in individual or family coverage because employer was applying to provide coverage through #{Settings.site.short_name} during open enrollment",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -345,7 +345,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "System outage prevented enrollment",
-  tool_tip: "A DC Health Link outage or outage in federal or local data sources close to an open enrollment or special enrollment deadline prevented enrollment",
+  tool_tip: "A #{Settings.site.short_name} outage or outage in federal or local data sources close to an open enrollment or special enrollment deadline prevented enrollment",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,

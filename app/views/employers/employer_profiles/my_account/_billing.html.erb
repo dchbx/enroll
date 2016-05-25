@@ -1,9 +1,9 @@
 <div class="col-xs-12 documents-tab">
   <h1>Billing</h1>
   <h4 class="starter">
-  	DC Health Link will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
+  	<%= Settings.site.short_name %> will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
   </h4>
-  	<h3>DC Health Link offers multiple payment options including:</h3>
+  	<h3><%= Settings.site.short_name %> offers multiple payment options including:</h3>
   	<h4>
   	<ol>
 			<li>Pay Online - <%= link_to 'How to Pay Online', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%></li>
@@ -14,7 +14,7 @@
 			<br/>
 			<li>Pay by Mail
 			<div class="row col-md-offset-1">
-			DC Health Link</div>
+			<%= Settings.site.short_name %></div>
 			<div class="row col-md-offset-1">
 			PO Box 97022</div>
 			<div class="row col-md-offset-1">

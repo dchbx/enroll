@@ -82,7 +82,7 @@ Feature: Create General Agency and General Agency Staff Role
       And CareFirst log out
 
     When General Agency staff logs on the General Agency Portal
-      Then General Agency should see general agency home page 
+      Then General Agency should see general agency home page
       When General Agency clicks on the link of employers
       Then General Agency should see the list of employer
       And General Agency log out

@@ -1,1 +1,3 @@
-$('#comment-form').slideUp(350);
+<% if @document %>
+$("#doc_table_row_<%=@document.id%>").hide();
+<% end %>

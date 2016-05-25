@@ -1,9 +1,9 @@
 <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-  <%= v.text_field :expiration_date, {id: "doc_date_field", class: "doc_fields", placeholder: "#{name} Expiration Date"} %><br>
+  <%= v.text_field :expiration_date, {id: "doc_date_field", class: "date-field doc_fields", placeholder: "#{name} Expiration Date"} %><br>
 </div>
 
 <script>
   $(function() {
-  $( "#doc_date_field" ).datepicker({ dateFormat: 'dd-mm-yy' });
+  $( "#doc_date_field" ).datepicker({ dateFormat: 'dd/mm/yy' });
   });
 </script>

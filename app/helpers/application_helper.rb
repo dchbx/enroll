@@ -521,24 +521,6 @@ module ApplicationHelper
     "dchbx-enroll-#{bucket_name}-#{aws_env}"
   end
 
-  def admin_docs_filter(filter_param, title = nil, style = nil)
-    direction = filter_param == sort_filter && sort_direction == 'asc' ? 'desc' : 'asc'
-    style = direction if style == 'admin_docs'
-    link_to title, consumer_role_status_documents_path(:sort => filter_param, :direction => direction), remote: true, class: style
-  end
-
-  def docs_waiting_for_review
-    Person.unverified_persons.in('consumer_role.vlp_documents.status':['downloaded', 'in review']).count
-  end
-
-  def missing_docs
-    Person.unverified_persons.where('consumer_role.vlp_documents.status': 'not submitted').count
-  end
-
-  def all_unverified
-    number_with_delimiter(@unverified_persons.count)
-  end
-
   def display_dental_metal_level(plan)
     return plan.metal_level.humanize if plan.coverage_kind == "health"
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""

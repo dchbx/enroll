@@ -107,4 +107,27 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       expect(helper.has_writing_agent?(employee_role)).to eq false
     end
   end
+
+  describe "display_aasm_state?" do
+    let(:aasm_state1) {"shopping"}
+    let(:aasm_state2) {"inactive"}
+    let(:aasm_state3) {"unverified"}
+    let(:aasm_state4) {"coverage_enrolled"}
+    let(:aasm_state5) {"coverage_selected"}
+    let(:aasm_state6) {"coverage_canceled"}
+    let(:aasm_state7) {"coverage_terminated"}
+
+    it "should return true" do
+      expect(helper.display_aasm_state?(aasm_state5)).to eq true
+      expect(helper.display_aasm_state?(aasm_state6)).to eq true
+      expect(helper.display_aasm_state?(aasm_state7)).to eq true
+    end
+
+    it "should return false" do
+      expect(helper.display_aasm_state?(aasm_state1)).to be_falsey
+      expect(helper.display_aasm_state?(aasm_state2)).to be_falsey
+      expect(helper.display_aasm_state?(aasm_state3)).to be_falsey
+      expect(helper.display_aasm_state?(aasm_state4)).to be_falsey
+    end  
+  end
 end

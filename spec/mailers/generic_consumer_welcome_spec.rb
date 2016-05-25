@@ -14,12 +14,12 @@ RSpec.describe UserMailer do
       expect(email.body).to match(/Dear john/)
     end
 
-    it 'should have subject of DC Health Link' do
+    it "should have subject of #{Settings.site.short_name}" do
       expect(email.subject).to match(/DC HealthLink/)
     end
 
     it 'should have body text' do
-      expect(email.body).to match(/DC Health Link is strongly committed/)
+      expect(email.body).to match(/#{Settings.site.short_name} is strongly committed/)
       expect(email.body).to match(/Your Account/)
       expect(email.body).to match(/Customer Care Center/)
     end

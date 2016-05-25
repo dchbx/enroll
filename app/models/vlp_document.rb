@@ -16,6 +16,18 @@ class VlpDocument < Document
       "Card Number"
     ]
 
+  #list of the documents consumer can provide to verify SSN
+  SSN_DOCUMENTS_KINDS = ['US Passport', 'Social Security Card',]
+
+  #list of the documents consumer can provide to verify Citizenship
+  CITIZENSHIP_DOCUMENTS_KINDS = [
+      'US Passport',
+      'Social Security Card',
+      'Certification of Birth Abroad (issued by the U.S. Department of State Form FS-545)',
+      'Original or certified copy of a birth certificate'
+  ]
+
+  #list of the documents user can provide to verify Immigration status
   VLP_DOCUMENT_KINDS = [
       "I-327 (Reentry Permit)",
       "I-551 (Permanent Resident Card)",
@@ -34,7 +46,7 @@ class VlpDocument < Document
       "Other (With I-94 Number)"
     ]
 
-    VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'in review', 'verified', 'rejected']
+    VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'verified', 'rejected']
 
     COUNTRIES_LIST = [ "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
 		"Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
@@ -82,16 +94,16 @@ class VlpDocument < Document
   # country which issued the document. e.g. passport issuing country
   field :issuing_country, type: String
 
-  # document verification status ::VlpDocument::VLP_DOCUMENT_KINDS
+  # document verification status ::VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
   field :status, type: String, default: "not submitted"
+
+  # verification type this document can support: Social Security Number, Citizenship, Immigration status
+  field :verification_type, default: "Citizenship"
 
   field :comment, type: String
 
   scope :uploaded, ->{ where(identifier: {:$exists => true}) }
 
-  validates :subject,
-        inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid subject" },
-        allow_blank: false
 
   validates :alien_number, length: { is: 9 }, :allow_blank => true
   validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true

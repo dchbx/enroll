@@ -15,17 +15,17 @@ class CensusEmployeeImport
   MEMBER_RELATIONSHIP_KINDS = %w(employee spouse domestic_partner child)
 
   CENSUS_MEMBER_RECORD = %w(
-      employer_assigned_family_id 
+      employer_assigned_family_id
       employee_relationship
-      last_name 
-      first_name 
-      middle_name 
+      last_name
+      first_name
+      middle_name
       name_sfx
-      email 
-      ssn 
-      dob 
+      email
+      ssn
+      dob
       gender
-      hire_date 
+      hire_date
       termination_date
       is_business_owner
       benefit_group
@@ -99,14 +99,14 @@ class CensusEmployeeImport
     @sheet = @roster.sheet(0)
     @last_ee_member = {}
 
-    # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references 
+    # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references
     # First three rows are header content
     sheet_header_row = @sheet.row(1)
     @column_header_row = @sheet.row(2)
     # label_header_row  = @sheet.row(3)
 
     unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
-      raise "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
+      raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template."
     end
 
     census_employees = []
@@ -268,7 +268,7 @@ class CensusEmployeeImport
   end
 
   def parse_relationship(cell)
-    # defined? @last_employer_assigned_family_id ? 
+    # defined? @last_employer_assigned_family_id ?
     return nil if cell.blank?
     field_map = case parse_text(cell).downcase
                   when "employee"
@@ -371,4 +371,3 @@ class ImportErrorValue < Exception;
 end
 class ImportErrorDate < Exception;
 end
-

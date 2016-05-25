@@ -53,6 +53,10 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, 15))
     end
 
+    after :all do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     it "is_dependent_loss_of_coverage?" do
       expect(esi_qlek.is_dependent_loss_of_coverage?).to eq true
       expect(qle.is_dependent_loss_of_coverage?).to eq true

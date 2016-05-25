@@ -26,6 +26,7 @@ class LawfulPresenceDetermination
     event :authorize, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_successful, after: :record_approval_information
       transitions from: :verification_outstanding, to: :verification_successful, after: :record_approval_information
+      transitions from: :verification_successful, to: :verification_successful, after: :record_approval_information
     end
 
     event :deny, :after => :record_transition do
@@ -68,6 +69,15 @@ class LawfulPresenceDetermination
     approval_information = args.first
     self.vlp_verified_at = approval_information.determined_at
     self.vlp_authority = approval_information.vlp_authority
+    if ["ssa", "curam"].include?(approval_information.vlp_authority)
+      if self.consumer_role
+        if self.consumer_role.person
+          unless self.consumer_role.person.ssn.blank?
+            self.consumer_role.ssn_verification = "valid"
+          end
+        end
+      end
+    end
     self.citizen_status = approval_information.citizen_status
   end
 
@@ -75,7 +85,7 @@ class LawfulPresenceDetermination
     denial_information = args.first
     self.vlp_verified_at = denial_information.determined_at
     self.vlp_authority = denial_information.vlp_authority
-#    self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+    #    self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
   end
 
   def record_transition(*args)

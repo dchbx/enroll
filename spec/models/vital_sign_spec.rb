@@ -2,10 +2,13 @@ require 'rails_helper'
 
 RSpec.describe VitalSign, :dbclean => :around_each do
 
+  before (:all) do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
   let(:shop_current_enrollment_count) { 1 }
   let(:shop_past_enrollment_count)    { 2 }
   let(:shop_total_enrollment_count)   { shop_current_enrollment_count + shop_past_enrollment_count }
-
 
   let(:shop_current_enrollments) do
     families = FactoryGirl.create_list(:family, shop_current_enrollment_count, :with_primary_family_member)
@@ -60,8 +63,6 @@ RSpec.describe VitalSign, :dbclean => :around_each do
     end
   end
 
-
-
   context "New VitalSign query is created without date/time constraints" do
     let(:vital_sign)  { VitalSign.new }
 
@@ -92,5 +93,4 @@ RSpec.describe VitalSign, :dbclean => :around_each do
   #   let(:vital_sign)  { VitalSign.new(start_at, end_at) }
 
   # end
-
 end

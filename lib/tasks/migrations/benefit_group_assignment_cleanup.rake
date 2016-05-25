@@ -1,37 +1,43 @@
 namespace :migrations do
 
-  # desc "Cancel renewal for employer"
-  # task :benefit_group_assignment_cleanup, [:fein] => [:environment] do |task, args|
+  desc "Make benefit group assignment linked to coverage as default benefit group assignment"
+  task :enable_benefit_group_assignments_with_coverage => [:environment] do
+    count = 0
+    orgs = Organization.exists(:employer_profile => true)    
+    orgs.each do |org|
+      employer_profile = org.employer_profile
+      
+      census_employees = employer_profile.census_employees
+      next if census_employees.empty?
 
-  #   orgs = Organization.exists(:employer_profile => true)
-  #   count = 0
-  #   missing_count = 0
-  #   orgs.each do |org|
-  #     employer_profile = org.employer_profile
-  #     census_employees = employer_profile.census_employees
-  #     if employer_profile.active_plan_year && employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record) && census_employees.size > 1
-  #       benefit_group_ids = employer_profile.active_plan_year.benefit_groups.map(&:_id)
-  #       census_employees.each do |census_employee|
-  #         active_bg_assignment = census_employee.active_benefit_group_assignment
+      plan_year = employer_profile.active_plan_year 
+      next if plan_year.blank?
 
-  #         if active_bg_assignment.present?
-  #           if benefit_group_ids.include?(active_bg_assignment.benefit_group_id) && active_bg_assignment.initialized?
-  #             bg_assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids)
-  #             if bg_assignments.where(:aasm_state.nin => ['initialized']).any?
-  #               puts "#{census_employee.full_name}---#{employer_profile.legal_name}"
-  #               count += 1
-  #             end
-  #           end
-  #         else
-  #           missing_count += 1
-  #         end
-  #       end
-  #     end
-  #   end
-  #   puts count
-  #   puts missing_count
-  # end
+      census_employees.each do |census_employee|
+        enrollments = enrollments_for_census_empoyee(plan_year, census_employee)
+        assignment_ids = enrollments.map(&:benefit_group_assignment_id).compact.uniq
+        next unless assignment_ids.size == 1
+        next if assignment_ids.include?(census_employee.active_benefit_group_assignment.try(:_id))
+        enrollments.first.benefit_group_assignment.make_active
+        puts "Fixed #{census_employee.full_name} under #{employer_profile.legal_name}"
+        count += 1
+      end
+    end
+    puts "Fixed #{count} census employees records."
+  end
 
+  def enrollments_for_census_empoyee(plan_year, census_employee)
+    id_list = plan_year.benefit_groups.collect(&:_id).uniq
+    assignment_id_list = census_employee.benefit_group_assignments.where(:"benefit_group_id".in => id_list).map(&:_id).uniq
+    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => assignment_id_list)
+    families.inject([]) do |enrollments, family|
+      enrollments += family.active_household.hbx_enrollments
+            .any_of([HbxEnrollment.enrolled.selector, HbxEnrollment.terminated.selector, HbxEnrollment.waived.selector])
+            .where(:benefit_group_id.in => id_list)
+            .where(:benefit_group_assignment_id.in => assignment_id_list)
+            # .show_enrollments_sans_canceled
+    end
+  end
 
   desc "Cleanup benefit group assignments which failed date gaurds"
   task :fix_benefit_group_assigments_with_invalid_dates => :environment do

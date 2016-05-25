@@ -7,14 +7,14 @@ class UserMailer < ApplicationMailer
   end
 
   def plan_shopping_completed(user, hbx_enrollment, plan_decorator)
-    mail({to: user.email, subject: "Your DC Health Link Enrollment Confirmation"}) do |format|
+    mail({to: user.email, subject: "Your #{Settings.site.short_name} Enrollment Confirmation"}) do |format|
       format.html { render "plan_shopping_completed", :locals => { :user => user, :enrollment => hbx_enrollment, :plan => plan_decorator } }
     end
   end
 
   def invitation_email(email, person_name, invitation)
 
-    mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at DC Health Link "}) do |format|
+    mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
       format.html { render "invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
     end
   end
@@ -27,7 +27,7 @@ class UserMailer < ApplicationMailer
 
   def broker_invitation_email(email, person_name, invitation)
 
-    mail({to: email, subject: "Invitation to create your Broker account on DC Health Link "}) do |format|
+    mail({to: email, subject: "Invitation to create your Broker account on #{Settings.site.short_name} "}) do |format|
       format.html { render "broker_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
     end
   end

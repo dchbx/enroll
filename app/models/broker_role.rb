@@ -113,7 +113,7 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone
+    parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone rescue ""
   end  
 
   def email=(new_email)

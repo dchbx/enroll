@@ -56,7 +56,7 @@ gem 'symmetric-encryption', '~> 3.6.0'
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 
-gem 'aasm', '~> 4.0.7'
+gem 'aasm', '~> 4.8.0'
 gem 'haml'
 gem 'sass', '3.4.21'
 # gem 'bh'
@@ -84,8 +84,6 @@ gem 'bson', '3.2.6'
 gem 'addressable', '2.3.8'
 # gem 'rypt', '0.2.0'
 
-gem 'jquery-datatables-rails'
-
 gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-slider-rails', '6.0.17'
@@ -97,6 +95,8 @@ gem 'wicked_pdf', '1.0.4'
 
 # provide recaptcha services
 gem "recaptcha", '1.1.0'
+
+gem 'jquery-datatables-rails', '3.4.0'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

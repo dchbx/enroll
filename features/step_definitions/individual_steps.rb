@@ -199,12 +199,12 @@ And(/I click on continue button to go to the individual home page/) do
 end
 
 And(/I should see the individual home page/) do
-  expect(page).to have_content "My DC Health Link"
+  expect(page).to have_content "My #{Settings.site.short_name}"
   screenshot("my_account")
   # something funky about these tabs in JS
   # click_link "Documents"
   # click_link "Manage Family"
-  # click_link "My DC Health Link"
+  # click_link "My #{Settings.site.short_name}"
 end
 
 Then(/^Individual edits a dependents address$/) do
@@ -496,7 +496,7 @@ Then(/Aptc user should see aptc amount on receipt page/) do
 end
 
 Then(/Aptc user should see aptc amount on individual home page/) do
-  @browser.h1(text: /My DC Health Link/).wait_until_present
+  @browser.h1(text: /My #{Settings.site.short_name}/).wait_until_present
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")

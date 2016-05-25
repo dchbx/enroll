@@ -45,14 +45,19 @@ namespace :employers do
           employer_attributes = []
           employer_attributes += [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code]
           office_location = get_primary_office_location(employer.organization)
-          employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
-                                  office_location.address.state, office_location.address.zip]
 
-          if office_location.phone.present?
+          #6780 Add unless office_location.nil? in case Organization has no office_locations.
+          employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
+                                  office_location.address.state, office_location.address.zip] unless office_location.nil?
+
+          #6780. Add try in case office_location is nil
+          if office_location.try(:phone).present?
             employer_attributes += [office_location.phone.full_phone_number]
           else
             employer_attributes += [""]
           end
+
+          puts "WARNING: #{employer.legal_name} has no office locations" if office_location.nil?
 
           if employer.staff_roles.size > 0
             staff_role = employer.staff_roles.first

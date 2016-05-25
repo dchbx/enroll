@@ -21,7 +21,6 @@
           </div>
           <% end %>
           <div class="col-xs-8">
-            <div class="row">
               <h4>
                   Your Broker
               </h4>
@@ -31,12 +30,11 @@
                   <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %><br>
                 </small>
                 <small>
-                   <%= mail_to @person.primary_family.current_broker_agency.writing_agent.email.address  ,truncate(@person.primary_family.current_broker_agency.writing_agent.email.address , :length => 25) %><br>
+                   <%= mail_to @person.primary_family.current_broker_agency.writing_agent.email.address, @person.primary_family.current_broker_agency.writing_agent.email.address %><br>
 +                  <%= @person.primary_family.current_broker_agency.writing_agent.phone %>
                   <br/><br/>
                 </small>
               </span>
-            </div>
           </div>
         </div>
       </article>

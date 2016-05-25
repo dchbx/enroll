@@ -6,7 +6,9 @@ percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0
 
 
 <h4 class="ttc wsn">
-  <%= hbx_enrollment.aasm_state.titleize %>
+  <% if display_aasm_state? hbx_enrollment.aasm_state %>
+    <%= hbx_enrollment.aasm_state.titleize %>
+  <% end %>
 </h4>
 
 <!-- Hide Train stops temporarily (Refs #3725) -->

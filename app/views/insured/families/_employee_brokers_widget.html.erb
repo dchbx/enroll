@@ -22,7 +22,6 @@
       </div>
       <% end %>
       <div class="col-xs-8">
-        <div class="row">
           <h4>
               Your Broker
           </h4>
@@ -33,12 +32,11 @@
             <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %><br>
           </small>
           <small>
-            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address %><br>
+            <%= mail_to @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address, @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address %><br>
             <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>
             <br/><br/>
           </small>
         </span>
-      </div>
     </div>
   </div>
 </article>

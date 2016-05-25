@@ -25,6 +25,7 @@
 //= require floatlabels
 //= require jq_datepicker
 //= require date
+//= require insured
 //= require qle
 //= require modal_actions
 //= require print
@@ -33,6 +34,7 @@
 //= require consumer_role
 //= require plan_year_selection
 //= require bootstrap-slider
+//= require bootstrap-hooks
 //= require general_agency
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
@@ -435,7 +437,7 @@ $(document).ready(function () {
   //warn user before exiting to gmail, ymail, or aol
 
   $('.email-alert').on('click', function() {
-    if ( !confirm("You are leaving the DC Health Link web site and entering a privately owned web site created, operated and maintained by a private business. The information that this private business collects and maintains as a result of your visit to its web site is different from the information that the DC Health Link collects and maintains. DC Health Link does not share information with this private company. DC Health Link cannot help you with any information regarding this website, including your username or password, or other technical issues. By linking to this private business, the DC Health Link is not endorsing its products, services, or privacy or security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by this private business.") )
+    if ( !confirm("You are leaving the <%= Settings.site.short_name %> web site and entering a privately owned web site created, operated and maintained by a private business. The information that this private business collects and maintains as a result of your visit to its web site is different from the information that the <%= Settings.site.short_name %> collects and maintains. <%= Settings.site.short_name %> does not share information with this private company. <%= Settings.site.short_name %> cannot help you with any information regarding this website, including your username or password, or other technical issues. By linking to this private business, the <%= Settings.site.short_name %> is not endorsing its products, services, or privacy or security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by this private business.") )
     { return false; }
   })
 
@@ -843,7 +845,7 @@ $(document).ready(function () {
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
-  $("#jq_datepicker_ignore_census_employee_dob, #jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, [name='jq_datepicker_ignore_dependent[dob]']").mask("99/99/9999");
+  $("#jq_datepicker_ignore_census_employee_dob, #jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, [name='jq_datepicker_ignore_dependent[dob]'], .date-field").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
@@ -1082,6 +1084,7 @@ $(document).on('click', '.interaction-click-control-cancel, .interaction-click-c
 
 $(document).on('click', '.fa-pencil', function(){
   $('.fa-pencil').hide();
+
 });
 
 

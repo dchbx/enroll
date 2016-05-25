@@ -393,18 +393,12 @@ describe "#find_document" do
   end
 
   context "consumer role has a vlp_document" do
-    xit "it returns the document" do
+    it "it returns the document" do
       document = consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
       found_document = consumer_role.find_document("Certificate of Citizenship")
       expect(found_document).to be_a_kind_of(VlpDocument)
       expect(found_document).to eq(document)
       expect(found_document.subject).to eq("Certificate of Citizenship")
-    end
-  end
-
-  context "has a vlp_document without a file uploaded" do
-    it "" do
-
     end
   end
 end
@@ -480,3 +474,72 @@ describe "#latest_active_tax_household_with_year" do
     expect(ConsumerRole.new.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq nil
   end
 end
+
+context "Verification process and notices" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  describe "#has_docs_for_type?" do
+    before do
+      person.consumer_role.vlp_documents=[]
+    end
+    context "vlp exist but document is NOT uploaded" do
+      it "returns false for vlp doc without uploaded copy" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => nil )
+        expect(person.consumer_role.has_docs_for_type?("Citizenship")).to be_falsey
+      end
+      it "returns false for Immigration type" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => nil, :verification_type  => "Immigration type")
+        expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_falsey
+      end
+    end
+    context "vlp with uploaded copy" do
+      it "returns true if person has uploaded documents for this type" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Citizenship")
+        expect(person.consumer_role.has_docs_for_type?("Citizenship")).to be_truthy
+      end
+      it "returns false if person has NO documents for this type" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Immigration type")
+        expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_truthy
+      end
+    end
+  end
+
+  describe "#is_type_outstanding?" do
+    context "Social Security Number" do
+      it "returns true for unverified ssn and NO docs uploaded for this type" do
+        person.consumer_role.ssn_validation = "ne"
+        expect(person.consumer_role.is_type_outstanding?("Social Security Number")).to be_truthy
+      end
+      it "return false if documents uploaded" do
+        person.consumer_role.ssn_validation = "ne"
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
+        expect(person.consumer_role.is_type_outstanding?("Social Security Number")).to be_falsey
+      end
+      it "return false for verified ssn" do
+        person.consumer_role.ssn_validation = "valid"
+        expect(person.consumer_role.is_type_outstanding?("Social Security Number")).to be_falsey
+      end
+    end
+    context "Citizenship" do
+      it "returns true for if lawful_presence fails and No documents for this type" do
+        person.consumer_role.vlp_documents = []
+        expect(person.consumer_role.is_type_outstanding?("Citizenship")).to be_truthy
+      end
+    end
+    context "Immigration status" do
+      it "returns true for if lawful_presence fails and No documents for this type" do
+        expect(person.consumer_role.is_type_outstanding?("Immigration status")).to be_truthy
+      end
+    end
+
+    context "always false if documents uploaded for this type" do
+      types = ["Social Security Number", "Citizenship", "Immigration status"]
+      types.each do |type|
+        it "returns false for #{type} and documents for this type" do
+          person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => type)
+          expect(person.consumer_role.is_type_outstanding?(type)).to be_falsey
+        end
+      end
+    end
+  end
+end
+
