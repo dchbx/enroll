@@ -89,7 +89,7 @@ class VlpDocument < Document
 
 
   # date of expiration of the document. e.g. passport / documentexpiration date
-  field :expiration_date, type: Date
+  field :expiration_date, type: DateTime
 
   # country which issued the document. e.g. passport issuing country
   field :issuing_country, type: String
