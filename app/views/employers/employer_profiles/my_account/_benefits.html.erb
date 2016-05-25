@@ -128,11 +128,11 @@
 
           <!-- Health Plan Summary: start -->
           <div class="col-xs-11 health">
-            <% if bg.dental_reference_plan_id.present? %>
+            <% if bg.is_offering_dental? %>
 
             <div class="row">
               <div class="col-xs-6">
-                <% if bg.dental_reference_plan_id.present? %>
+                <% if bg.is_offering_dental? %>
                 <h5 class="title no-buffer">Health</h5>
                 <% else %>
                 <h5 class="title no-buffer">&nbsp;</h5>
@@ -209,7 +209,7 @@
                   <tr>
                     <th>Offered</th>
                     <th>Employer
-                      <% if bg.dental_reference_plan_id.present? %>Health
+                      <% if bg.is_offering_dental? %>Health
                       <% end %>Contribution</th>
                   </tr>
                   <% bg.relationship_benefits.each_with_index do |rb, i| %>
@@ -262,11 +262,13 @@
                     <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
                 </div>
                 <% end %>
+                <% if bg.is_offering_dental? %>
                 <br/>
                 <br/>
                 <div class="row">
                   <hr/>
                 </div>
+                <% end %>
               </div>
 
             </div>
@@ -275,7 +277,7 @@
           <!--Health plan collapsible: end -->
 
           <!--Dental Plan Summary: start -->
-          <% if bg.dental_reference_plan_id.present? %>
+          <% if bg.is_offering_dental? %>
           <div class="col-xs-1">
             &nbsp;
           </div>
@@ -356,7 +358,7 @@
           <br class="clear"/>
 
           <!--Dental plan collapsible: start -->
-          <% if bg.dental_reference_plan_id.present? %>
+          <% if bg.is_offering_dental? %>
           <div class="dental-offering" style="display:none">
 
             <div class="col-xs-1">
@@ -374,7 +376,7 @@
                   <% bg.relationship_benefits.each_with_index do |rb, i| %>
                   <tr>
                     <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td>
-                    <% if bg.dental_reference_plan_id.present? %>
+                    <% if bg.is_offering_dental? %>
                     <td>
                       <strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.ceil, precision: 0 %></strong>
                     </td>
