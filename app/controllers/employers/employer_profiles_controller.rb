@@ -244,7 +244,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   private
 
   def sort_plan_years(plans)
-    debugger
     renewing_states = PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::RENEWING
     renewing = plans.select { |plan_year| renewing_states.include? plan_year.aasm_state }
     ineligible_plans, active_plans = plans.partition { |plan_year| PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state }
