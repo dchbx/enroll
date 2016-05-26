@@ -37,11 +37,14 @@
               <%= submit_tag 'Terminate', name: 'terminate', class: "btn btn-primary btn-br interaction-click-control-broker-decertify" %>
             <% end %>
           <% else %>
-            <% if broker_or_staff_role.may_approve? %>
+            <% if broker_or_staff_role.may_approve? || (broker_or_staff_role.may_broker_agency_accept? && broker_or_staff_role.is_primary_broker?) %>
               <%= submit_tag 'Approve', class: "btn btn-primary btn-br interaction-click-control-broker-approve" %>
             <% end %>
-            <% if broker_or_staff_role.may_deny? %>
-              <%= submit_tag 'Pending', name: 'pending', class: "btn btn-primary btn-br interaction-click-control-broker-deny" %>
+            <% if broker_or_staff_role.may_pending? %>
+              <%= submit_tag 'Pending', name: 'pending', class: "btn btn-primary btn-br interaction-click-control-broker-pending" %>
+            <% end %>
+            <% if broker_or_staff_role.may_broker_agency_decline? %>
+              <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary btn-br interaction-click-control-broker-deny" %>
             <% end %>
             <% if broker_or_staff_role.may_decertify? %>
               <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary btn-br interaction-click-control-broker-decertify" %>

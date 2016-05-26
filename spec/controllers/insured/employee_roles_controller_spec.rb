@@ -27,18 +27,19 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
       sign_in user
-      put :update, :person => person_parameters, :id => person_id
     end
 
     describe "given valid person parameters" do
       let(:save_result) { true }
       it "should redirect to dependent_details" do
+        put :update, :person => person_parameters, :id => person_id
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_family_members_path(:employee_role_id => employee_role_id))
       end
 
       context "clean duplicate addresses" do
         it "returns empty array for people's addresses" do
+          put :update, :person => person_parameters, :id => person_id
           expect(person.addresses).to eq []
         end
       end
@@ -47,10 +48,18 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     describe "given invalid person parameters" do
       let(:save_result) { false }
       it "should render edit" do
+        put :update, :person => person_parameters, :id => person_id
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
         expect(assigns(:person)).to eq role_form
       end
+
+     it "should call bubble_address_errors_by_person" do
+       expect(controller).to receive(:bubble_address_errors_by_person)
+       put :update, :person => person_parameters, :id => person_id
+       expect(response).to have_http_status(:success)
+       expect(response).to render_template(:edit)
+     end
     end
   end
 

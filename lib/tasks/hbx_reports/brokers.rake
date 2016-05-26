@@ -38,29 +38,39 @@ namespace :reports do
         brokers.each do |broker|  
             csv << [
             broker.broker_role.npn,
-            broker.broker_role.broker_agency_profile.legal_name,
-            broker.first_name, 
+            broker.broker_role.broker_agency_profile.try(:legal_name),
+            broker.first_name,
             broker.last_name, 
             broker.broker_role.email_address, 
             broker.broker_role.phone,
-            broker.broker_role.broker_agency_profile.market_kind,
-            broker.broker_role.broker_agency_profile.languages_spoken,
-            broker.broker_role.broker_agency_profile.working_hours,
-            broker.broker_role.broker_agency_profile.accept_new_clients,
-            broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_1 , 
-            broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_2,
-            broker.broker_role.broker_agency_profile.organization.primary_office_location.address.city, 
-            broker.broker_role.broker_agency_profile.organization.primary_office_location.address.state, 
-            broker.broker_role.broker_agency_profile.organization.primary_office_location.address.zip, 
-            broker.broker_role.created_at.try(:strftime,'%Y-%m-%d'),
-            broker.broker_role.aasm_state,
-            broker.broker_role.updated_at.try(:strftime,'%Y-%m-%d')
-          ]
+            broker.broker_role.broker_agency_profile.try(:market_kind),
+            broker.broker_role.broker_agency_profile.try(:languages_spoken),
+            broker.broker_role.broker_agency_profile.try(:working_hours),
+            broker.broker_role.broker_agency_profile.try(:accept_new_clients)] +
+
+            organization_info(broker) +
+
+            [
+              broker.broker_role.created_at.try(:strftime,'%Y-%m-%d'),
+              broker.broker_role.aasm_state,
+              broker.broker_role.updated_at.try(:strftime,'%Y-%m-%d')
+            ]
            processed_count += 1
         end
       end
 
       puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} Brokers to output file: #{file_name}"
+    end
+
+    def organization_info(broker)
+      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil?
+      [
+        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_1,
+        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_2,
+        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.city,
+        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.state,
+        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.zip
+      ]
     end
   end
 end

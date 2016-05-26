@@ -105,6 +105,21 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         end
       end
 
+      context 'when application is pending' do
+        before :each do
+          broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
+          put :update, id: broker_role.person.id, pending: true, format: :js
+          broker_role.reload
+        end
+
+        it "should change applicant status to broker_agency_pending" do
+          expect(assigns(:broker_applicant))
+          expect(broker_role.aasm_state).to eq 'broker_agency_pending'
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to('/exchanges/hbx_profiles')
+        end
+      end
+
       context 'when application is decertified' do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })

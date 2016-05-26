@@ -8,7 +8,11 @@
       <% style = "" %>
       <% div_class = kind+"-div" %>
       <% if kind != 'home' && address.object.new_record? %>
-        <% style="display:none;" %>
+        <% if f.object.addresses[1].present? %>
+          <% style="display:block;" %>
+        <% else %>
+          <% style="display:none;" %>
+        <% end %>
       <% end %>
       <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
         <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">

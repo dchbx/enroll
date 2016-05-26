@@ -136,7 +136,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @status = status_params[:status] || 'applicant'
     @people = @people.send("general_agency_staff_#{@status}") if @people.respond_to?("general_agency_staff_#{@status}")
 
-    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.last.general_agency_profile }.uniq rescue []
+    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.map(&:general_agency_profile) }.flatten.uniq rescue []
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|

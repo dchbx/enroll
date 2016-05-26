@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe GeneralAgencies::InboxesController do
+RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
   let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:person) { FactoryGirl.create(:person) }

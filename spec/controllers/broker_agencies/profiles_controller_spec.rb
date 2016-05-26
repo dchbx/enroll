@@ -283,7 +283,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET assign" do
+  describe "GET assign", dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role) }
     let(:person) { broker_role.person }
@@ -370,7 +370,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    context "when we Assign agency" do 
+    context "when we Assign agency" do
       before :each do
         sign_in user
         post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
@@ -384,7 +384,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
         expect(flash[:notice]).to eq 'Assign successful.'
       end
     end
-    context "when we Unassign agency" do 
+    context "when we Unassign agency" do
       before :each do
         sign_in user
         post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
@@ -398,7 +398,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
         expect(flash[:notice]).to eq 'Unassign successful.'
       end
       it "should update aasm_state" do
-        employer_profile.reload 
+        employer_profile.reload
         expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
       end
     end
@@ -417,7 +417,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should set default_general_agency_profile" do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
-      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile 
+      expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
     end
 
     it "should clear default general_agency_profile" do

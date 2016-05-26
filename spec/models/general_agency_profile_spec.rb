@@ -90,7 +90,7 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
     end
   end
 
-  describe "instance method" do
+  describe "instance method", dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:person) { FactoryGirl.create(:person, :with_family) }

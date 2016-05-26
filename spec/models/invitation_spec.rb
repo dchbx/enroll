@@ -170,4 +170,26 @@ describe Invitation do
       end
     end
   end
+
+  context "general_agency_staff_role invitation email" do
+    let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role) }
+    let(:person) { general_agency_staff_role.person }
+    let(:invitation) { Invitation.new }
+    before :each do
+      person.add_work_email('test@dc.com') if person.work_email.blank?
+      person.save
+    end
+
+    describe "invite_general_agency_staff!" do
+      it "returns an Invitation" do
+        expect(Invitation.invite_general_agency_staff!(general_agency_staff_role)).to be_a_kind_of(Invitation)
+      end
+
+      it "should call send_agent_invitation" do
+        allow(Invitation).to receive(:create).and_return invitation
+        expect(invitation).to receive(:send_agent_invitation!)
+        Invitation.invite_general_agency_staff!(general_agency_staff_role)
+      end
+    end
+  end
 end

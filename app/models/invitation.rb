@@ -240,7 +240,7 @@ class Invitation
         :source_id => staff_role.id,
         :invitation_email => staff_role.email_address
       )
-      invitation.send_invitation!(staff_role.parent.full_name)
+      invitation.send_agent_invitation!(staff_role.parent.full_name)
       invitation
     end
   end
