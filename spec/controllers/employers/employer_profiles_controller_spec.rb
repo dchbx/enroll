@@ -170,8 +170,8 @@ RSpec.describe Employers::EmployerProfilesController do
 
 
   describe "GET show" do
-    let(:user){ double("User", last_portal_visited: double("last_portal_visited")) }
-    let(:person){ double("Person") }
+    let(:user) { FactoryGirl.create(:user) }
+    let(:person){ FactoryGirl.create(:person) }
     let(:employer_profile) {instance_double("EmployerProfile", id: double("id"))}
     let(:hbx_enrollment) {
       instance_double("HbxEnrollment",
@@ -211,6 +211,14 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(assigns(:employer_contribution_total)).to eq hbx_enrollment.total_employer_contribution
         expect(assigns(:premium_amt_total)).to eq hbx_enrollment.total_premium
         expect(assigns(:employee_cost_total)).to eq hbx_enrollment.total_employee_cost
+      end
+
+      it "should get announcement" do
+        FactoryGirl.create(:announcement, content: "msg for Employer", audiences: ['Employer'])
+        allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_employer_staff_role?).and_return true
+        get :show, id: employer_profile.id, tab: "home"
+        expect(flash.now[:warning]).to eq ["msg for Employer"]
       end
     end
   end

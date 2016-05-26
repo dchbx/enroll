@@ -38,7 +38,7 @@ end
 RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
-  let(:user) { double("User", last_portal_visited: "test.com") }
+  let(:user) { FactoryGirl.create(:user) }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false) }
   let(:family) { double("Family", active_household: household) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
@@ -55,6 +55,7 @@ RSpec.describe Insured::FamiliesController do
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(user).to receive(:person).and_return(person)
+    allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
     allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
@@ -98,10 +99,11 @@ RSpec.describe Insured::FamiliesController do
       let(:employee_role) { [double("EmployeeRole")] }
 
       before :each do
-        sign_in user
+        FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
+        sign_in user
         get :home
       end
 
@@ -122,17 +124,25 @@ RSpec.describe Insured::FamiliesController do
       it "should get shop market events" do
         expect(assigns(:qualifying_life_events)).to eq QualifyingLifeEventKind.shop_market_events
       end
+
+      it "should get announcement" do
+        expect(flash.now[:warning]).to eq ["msg for Employee"]
+      end
     end
 
     context "for IVL market" do
-      let(:user) { double(identity_verified?: true, idp_verified?: true, last_portal_visited: '') }
+      let(:user) { FactoryGirl.create(:user) }
       let(:employee_roles) { double }
 
       before :each do
+        allow(user).to receive(:idp_verified?).and_return true
+        allow(user).to receive(:identity_verified?).and_return true
+        allow(user).to receive(:last_portal_visited).and_return ''
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
+        sign_in user
         get :home
       end
 
@@ -156,12 +166,17 @@ RSpec.describe Insured::FamiliesController do
 
       context "who has not passed ridp" do
         let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false) }
+        let(:user) { FactoryGirl.create(:user) }
 
         before do
+          allow(user).to receive(:idp_verified?).and_return false
+          allow(user).to receive(:identity_verified?).and_return false
+          allow(user).to receive(:last_portal_visited).and_return ''
           allow(person).to receive(:user).and_return(user)
           allow(person).to receive(:has_active_employee_role?).and_return(false)
           allow(person).to receive(:has_active_consumer_role?).and_return(true)
           allow(person).to receive(:active_employee_roles).and_return([])
+          sign_in user
           get :home
         end
 

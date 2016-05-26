@@ -209,6 +209,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       end
     end
     session[:person_id] = nil
+    session[:dismiss_announcements] = nil
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 

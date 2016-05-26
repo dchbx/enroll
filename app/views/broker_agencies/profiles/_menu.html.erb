@@ -2,7 +2,7 @@
   <div class="container">
     <ul role="tablist" class="list-unstyled list-inline" id="myTab">
       <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>>
-        <%= link_to(broker_agencies_profile_path(@broker_agency_profile), "aria-expanded" => "true", :remote => true, "aria-controls" => "home", "role" => "tab" ) do  %>
+        <%= link_to(broker_agencies_profile_path(@broker_agency_profile), "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
           <span class="hidden-xs">Home</span>
           <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
         <% end %>

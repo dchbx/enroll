@@ -31,6 +31,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
+    set_flash_by_announcement
     session[:person_id] = nil
      @provider = current_user.person
      @staff_role = current_user.has_broker_agency_staff_role?

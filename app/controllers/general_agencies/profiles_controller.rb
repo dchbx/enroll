@@ -42,6 +42,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def show
+    set_flash_by_announcement
     @provider = current_user.person
     @staff_role = current_user.has_general_agency_staff_role?
     @id=params[:id]

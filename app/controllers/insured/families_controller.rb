@@ -7,6 +7,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
 
   def home
+    set_flash_by_announcement
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?

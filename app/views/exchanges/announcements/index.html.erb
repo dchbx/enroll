@@ -1,0 +1,27 @@
+<div class="content landing">
+  <%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
+  
+  <div class="announcements">
+    <div class="tab-row">
+      <div class="tab-content" id="myTabContent"></div>
+
+      <div class="container top-pd">
+        <div class="row">
+          <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane-hbx" role="tabpanel">
+            <div class="col-md-10 col-sm-12">
+              <h1>Announcements</h1>
+              <div class="btn-group pull-right" role="group">
+                <%= link_to 'Current', exchanges_announcements_path(filter: 'current'), class: "btn btn-default  #{'active' if @filter != 'all'}" %>
+                <%= link_to 'All', exchanges_announcements_path(filter: 'all'), class: "btn btn-default #{'active' if @filter == 'all'}" %>
+              </div>
+              <%= render 'list' %>
+              <hr />
+              
+              <%= render 'new_form' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

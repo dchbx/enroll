@@ -180,13 +180,19 @@ RSpec.describe Exchanges::HbxProfilesController do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      session[:dismiss_announcements] = 'hello'
       sign_in(user)
-      get :show
     end
 
     it "renders 'show' " do
+      get :show
       expect(response).to have_http_status(:success)
       expect(response).to render_template("exchanges/hbx_profiles/show")
+    end
+
+    it "should clear session for dismiss_announcements" do
+      get :show
+      expect(session[:dismiss_announcements]).to eq nil
     end
   end
 

@@ -1,0 +1,22 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Current Announcements</th>
+      <th>Msg Start Date</th>
+      <th>Msg End Date</th>
+      <th>Audience</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @announcements.each do |announcement| %>
+      <tr>
+        <td><%= announcement.content %></td>
+        <td><%= announcement.start_date %></td>
+        <td><%= announcement.end_date %></td>
+        <td><%= announcement.audiences_for_display %></td>
+        <td><%= link_to 'Destroy', exchanges_announcement_path(announcement), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

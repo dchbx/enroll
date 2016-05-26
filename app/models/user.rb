@@ -326,6 +326,28 @@ class User
     self.save!
   end
 
+  def get_announcements_by_roles_and_portal(portal_path="")
+    announcements = []
+
+    case 
+    when portal_path.include?("employers/employer_profiles")
+      announcements.concat(Announcement.current_msg_for_employer) if has_employer_staff_role?
+    when portal_path.include?("families/home")
+      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.has_active_consumer_role?)
+    when portal_path.include?("employee")
+      announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
+    when portal_path.include?("consumer")
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.has_active_consumer_role?)
+    when portal_path.include?("broker_agencies")
+      announcements.concat(Announcement.current_msg_for_broker) if has_broker_role?
+    when portal_path.include?("general_agencies")
+      announcements.concat(Announcement.current_msg_for_ga) if has_general_agency_staff_role?
+    end
+
+    announcements.uniq
+  end
+
   def self.get_saml_settings
     settings = OneLogin::RubySaml::Settings.new
 
