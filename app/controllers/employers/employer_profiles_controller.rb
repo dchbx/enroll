@@ -249,6 +249,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     ineligible_plans, active_plans = plans.partition { |plan_year| PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state }
     ineligible_plans = ineligible_plans.select { |plan_year| renewing.exclude? plan_year }
     active_plans = active_plans.partition { |plan_year| PlanYear::PUBLISHED.include? plan_year.aasm_state }.flatten
+    active_plans = active_plans.select { |plan_year| renewing.exclude? plan_year }
     @plan_years = renewing + active_plans + ineligible_plans
   end
 
