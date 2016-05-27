@@ -1,0 +1,21 @@
+var Responsive = ( function( window, undefined ) {
+
+	function setSizeListeners() {
+    $(window).resize(function(){
+    	if ($(window).width() <= 992){
+    		// do something here
+    	} else if ($(window).width() <= 768){
+        // do something here
+      } else if ($(window).width() <= 480){
+        // do something here
+      } else if ($(window).width() <= 320){
+        // do something here
+      }
+    });
+	}
+
+	return {
+	    setSizeListeners : setSizeListeners,
+	  };
+
+} )( window );

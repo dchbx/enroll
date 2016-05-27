@@ -170,7 +170,7 @@ Rails.application.routes.draw do
         get :approve
       end
     end
-    
+
     #TODO REFACTOR
     resources :people do
       collection do
@@ -329,7 +329,6 @@ Rails.application.routes.draw do
   resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
-    get 'person_landing'
 
     collection do
       post 'person_confirm'

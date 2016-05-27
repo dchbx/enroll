@@ -73,7 +73,7 @@ ready = function() {
       $(this).closest('.benefit-group-fields').find('.dental .edit-offering').show();
       $(this).closest('.benefit-group-fields').find('.dental .reference-steps').show();
       $(this).closest('.benefit-group-fields').find('.dental:first').slideDown();
-      $("[data-toggle='tooltip']").tooltip();
+      Freebies.tooltip();
 
     });
 
@@ -296,10 +296,10 @@ ready = function() {
     $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
 
     if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
-      validateEditPlanYear();
+      EmployerProfile.validateEditPlanYear();
 
     } else {
-      validatePlanYear();
+      EmployerProfile.validatePlanYear();
 
     }
 
@@ -339,9 +339,9 @@ ready = function() {
           $(this).closest('.form-group').find('input').val(data);
           $(this).closest('.form-group').find('.slide-label').text(data + "%");
           if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
-            validateEditPlanYear();
+            EmployerProfile.validateEditPlanYear();
           } else {
-            validatePlanYear();
+            EmployerProfile.validatePlanYear();
           }
           if ( $(this).closest('.health').length > 0 ) {
           } else {
@@ -396,10 +396,10 @@ ready = function() {
 
     $(document).on('change', '.nav-tabs li input', function() {
       if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
-        validateEditPlanYear();
+        EmployerProfile.validateEditPlanYear();
 
       } else {
-        validatePlanYear();
+        EmployerProfile.validatePlanYear();
       }
       if ( $(this).closest('.nav').parent().hasClass('health') ) {
         nav = '.health';
@@ -435,10 +435,10 @@ ready = function() {
     $(document).on('click', '.plan-options a', function() {
       if ( $(this).closest('.elected-plans-tab').length == 0 ) {
         if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
-          validateEditPlanYear();
+          EmployerProfile.validateEditPlanYear();
 
         } else {
-          validatePlanYear();
+          EmployerProfile.validatePlanYear();
         }
         if ( $(this).closest('.plan-options').parent().hasClass('health') ) {
           nav = '.health';

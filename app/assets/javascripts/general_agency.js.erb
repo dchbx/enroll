@@ -1,5 +1,5 @@
 $(document).on('page:update', function() {
-  $('[data-toggle="tooltip"]').tooltip();
+  Freebies.tooltip();
 
   $('#general_agency_id').on('change', function() {
     check_allow_assign(this);
@@ -11,7 +11,7 @@ $(document).on('page:update', function() {
 });
 
 function check_allow_assign(element) {
-  
+
   var allow_assign = ($('#general_agency_id').val() != undefined && $('#general_agency_id').val() != "") && $("[name='employer_ids[]']").is(':checked');
   var allow_unassign = false;
   $('input.employer_id_checkbox').each(function (){

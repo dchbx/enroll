@@ -1,4 +1,4 @@
-  <div class="col-xs-12" id='plan_year'> <!--onKeyPress="return disableEnterKey(event)"-->
+  <div class="col-xs-12" id='plan_year' onKeyPress="return Freebies.disableEnterKey(event);">
       <div class="row">
         <div class="col-xs-12 planyear-add-tab">
           <div id="choose-coverage">
@@ -48,8 +48,8 @@
 
               <div class="col-xs-6">
                 <div class="row">
-              <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-trans pull-left xs_full_width abg' %>
-              <a href="#" class="btn btn-trans remove_fields">Remove Benefit Group</a>
+              <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-default pull-left xs_full_width abg' %>
+              <a href="#" class="btn btn-default remove_fields">Remove Benefit Group</a>
             </div></div>
             <div class="col-xs-6">
               <div class="row">
@@ -57,10 +57,10 @@
 
               <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
               <% button_tooltip = @plan_year.persisted? ? 'Click here to save your plan year' : 'Click here to create your plan year' %>
-                <button class="btn btn-primary pull-right btn-br btn-right mtz disabled plan-year-primary" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>">
+                <button class="btn btn-primary pull-right  btn-right mtz disabled plan-year-primary" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>">
                   <%= "#{button_name}".html_safe %>
                 </button> &nbsp;&nbsp;
-              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-trans pull-right' %>
+              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-default pull-right' %>
             </div>
             </div>
 

@@ -1,25 +1,25 @@
 module PortalHeaderHelper
   def portal_display_name(controller)
     if current_user.nil?
-      Settings.site.header_message
+      "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
-      link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, exchanges_hbx_profiles_root_path
+      link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, exchanges_hbx_profiles_root_path, class: "portal"
     elsif current_user.person.try(:broker_role)
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path, class: "portal"
     elsif current_user.person && current_user.person.active_employee_roles.any?
-      link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe, family_account_path
+      link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe, family_account_path, class: "portal"
     elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?))
-      link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, family_account_path
+      link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, family_account_path, class: "portal"
     elsif current_user.try(:has_broker_agency_staff_role?)
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
     elsif current_user.try(:has_employer_staff_role?)
-      link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employers_employer_profile_path(id: current_user.person.employer_staff_roles.first.employer_profile_id)
+      link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employers_employer_profile_path(id: current_user.person.employer_staff_roles.first.employer_profile_id), class: "portal"
     elsif current_user.has_general_agency_staff_role?
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path, class: "portal"
     else
-      Settings.site.header_message
+      "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
     end
   end
 

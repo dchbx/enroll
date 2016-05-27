@@ -136,11 +136,11 @@
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <br/>
             <h3>What would you like to do?</h3>
-            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary btn-br' %>
+            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg' %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
-              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary btn-br' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
+              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
 
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary ' if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->
@@ -148,7 +148,7 @@
           <% end %>
           <br/>
           <br/>
-          <%= link_to "Back to my account", family_account_path, class: 'btn btn-trans btn btn-br' %>
+          <%= link_to "Back to my account", family_account_path, class: 'btn btn-default btn btn-lg' %>
         </div>
 
         <div class="col-xs-3 right-section pull-right">
@@ -195,7 +195,7 @@ function setGroupSelectionHandlers(){
     $("#coverage_kind_health").prop("checked", true);
     $("#ivl-coverage-household input[type=checkbox]").prop("checked", false);
   }
-  
+
   $('#group-selection-form').on('change', function() {
     if ( $('#market_kind_shop').is(':checked') ) {
     } else {

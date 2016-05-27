@@ -324,7 +324,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  click_link "LOGOUT"
+  click_link "Logout"
   visit "/"
 end
 

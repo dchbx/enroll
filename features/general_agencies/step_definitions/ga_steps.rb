@@ -26,17 +26,15 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   find('.interaction-field-control-organization-email').click
   fill_in 'organization[email]', with: Forgery(:email).address
   fill_in 'organization[npn]', with: '2222222222'
-
   fill_in 'organization[legal_name]', with: (company_name = Forgery(:name).company_name)
   fill_in 'organization[dba]', with: company_name
   fill_in 'organization[fein]', with: '333333333'
-
   find(:xpath, "//p[contains(., 'Select Practice Area')]").click
-  find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
-
-  find(:xpath, "//div[@class='language_multi_select']//p[@class='label']").click
+  find('.selectric-items').find('.interaction-choice-control-organization-market-kind-1').click
+  find('.multiselect').click
   find(:xpath, "//li[contains(., 'English')]").click
-
+  find('.multiselect').trigger('click')
+  find('input.interaction-field-control-organization-legal-name').click
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', with: Forgery(:address).street_address
   fill_in 'organization[office_locations_attributes][0][address_attributes][city]', with: 'Washington'
 

@@ -22,15 +22,15 @@
 
 - if show_waive
   - enrollment = @hbx_enrollment || @enrollment
-  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-trans' if (enrollment && (enrollment.employee_role.present? || enrollment.benefit_group.present?))
+  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if (enrollment && (enrollment.employee_role.present? || enrollment.benefit_group.present?))
 - if step == 2 && !no_purchase
   - enrollment = @hbx_enrollment || @enrollment
   - disabled_in_ivl = (enrollment && enrollment.is_shop?) ? '' : 'disabled'
-  = link_to 'Confirm', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => "btn btn-lg btn-primary btn-br btn-block #{disabled_in_ivl}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
+  = link_to 'Confirm', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => "btn btn-lg btn-primary  btn-block #{disabled_in_ivl}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
   %ul.list-unstyled.list-right-section
     %li
       %a.back{href: '#'}
         = image_tag 'icons/list.png'
         PREVIOUS
 - elsif step == 3
-  = link_to 'Continue', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+  = link_to 'Continue', family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'

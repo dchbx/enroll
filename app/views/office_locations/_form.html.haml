@@ -3,5 +3,5 @@
     = render("shared/office_location_fields", f: builder)
 
 .form-inputs#office_locations_buttons
-  = link_to(new_office_location_path(:child_index => @child_index.to_i + 1, :parent_object => @parent_object), remote: true, class: 'btn btn-transparent pull-left') do
+  = link_to(new_office_location_path(:child_index => @child_index.to_i + 1, :parent_object => @parent_object), remote: true, class: 'btn btn-default pull-left') do
     Add Office Location

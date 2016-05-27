@@ -9,7 +9,7 @@ if ( $("#<%= @location_id %> .select-dental-plan").is(":hidden") ) {
   // $('#<%#=# @location_id %> .elected-plans-continue span').trigger('click');
 }
 
-$("#<%= @location_id %> .edit-add-dental .btn-trans").on('click', function () {
+$("#<%= @location_id %> .edit-add-dental .btn-default").on('click', function () {
   $(this).closest('.edit-add-dental').slideUp();
   $("#<%= @location_id %> .select-dental-plan").slideDown();
   //unbind handlers for health input after click on add dental plans.

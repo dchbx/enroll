@@ -184,27 +184,6 @@ class PeopleController < ApplicationController
     end
   end
 
-  def person_landing
-    #TODO fix me!! fix me!!
-    @person = Person.find(params[:person_id])
-    @family = @person.primary_family
-    @family_members = @family.family_members if @family.present?
-    @employee_roles = @person.employee_roles
-    @employer_profile = @employee_roles.first.employer_profile if @employee_roles.present?
-    @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
-    @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
-    @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
-    @qualifying_life_events = QualifyingLifeEventKind.all
-    @hbx_enrollments = @family.latest_household.hbx_enrollments
-
-    build_nested_models
-
-    respond_to do |format|
-      format.js {}
-      format.html {}
-    end
-  end
-
   def get_census_employee(id)
     CensusEmployee.find(id)
   end

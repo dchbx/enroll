@@ -87,7 +87,7 @@
             </div>
             <br>
             <button type="submit" class="btn btn-primary pull-left mtz sm_full_width"> <%= "Save".html_safe %></button>
-            <%= link_to 'Cancel', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'no'), class:'btn btn-trans pull-left' %>
+            <%= link_to 'Cancel', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'no'), class:'btn btn-default pull-left' %>
    
       <% end %>
 
@@ -96,7 +96,7 @@
 
       <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(id: @organization.id), method: :put} do |f| %>
           <br>
-          <%= link_to 'Add Employer Staff Role', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'yes'), class: 'btn btn-trans pull-left col-12' %>
+          <%= link_to 'Add Employer Staff Role', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'yes'), class: 'btn btn-default pull-left col-12' %>
           <br/><br><br>
           <div class="">
             <h4> Employer Information</h4>
@@ -113,12 +113,12 @@
             <% end %>
             <br/>
             <div class="form-inputs">
-              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-trans pull-left' %>
-              <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-trans pull-left' %>
+              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default pull-left' %>
+              <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-default pull-left' %>
             </div>
             <div class="top-row no-border">
               <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
-              <button type="submit" class="btn btn-primary pull-right btn-br mtz sm_full_width">
+              <button type="submit" class="btn btn-primary pull-right  mtz sm_full_width">
                 <%= "#{button_name}".html_safe %>
               </button> &nbsp;&nbsp;
             </div>

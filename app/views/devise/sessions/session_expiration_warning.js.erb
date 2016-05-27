@@ -15,7 +15,7 @@ function session_countdown (){
     clearInterval(countdown_timer);
     $('#sessionExpirationWarningModal p').text("Your session has timed out due to inactivity. Please log back in.");
     $('h4.modal-title').text("Session Ended");
-    $('.modal-footer .btn-trans').hide();
+    $('.modal-footer .btn-default').hide();
     $('.modal-footer .btn-primary').text('Login');
   }
 }

@@ -26,11 +26,11 @@
 
 
 - if @market_kind == 'shop'
-  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-trans' if @hbx_enrollment and @hbx_enrollment.employee_role.present?
+  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if @hbx_enrollment and @hbx_enrollment.employee_role.present?
 
 
 - if step == 3 && !no_purchase
-  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => "btn btn-lg btn-primary btn-br btn-block #{'disabled' if kind == 'individual'}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => "btn btn-lg btn-primary  btn-block #{'disabled' if kind == 'individual'}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
 
   %ul.list-unstyled.list-right-section
     %li
@@ -38,4 +38,4 @@
         = image_tag 'icons/list.png'
         PREVIOUS
 - elsif step == 4
-  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', style: 'width: 100%;'
+  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', style: 'width: 100%;'

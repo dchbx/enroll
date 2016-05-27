@@ -24,9 +24,9 @@
               <% end %>
               <div class="bottom-pd">
                 <% if current_user.can_change_broker? %>
-                  <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-trans", data: {toggle: "modal", target: "#terminate_broker"} %>
+                  <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-default", data: {toggle: "modal", target: "#terminate_broker"} %>
                 <% else %>
-                  <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-trans disabled" %>
+                  <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-default disabled" %>
                 <% end %>
                 <!-- employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true) -->
               </div>
@@ -34,9 +34,9 @@
 
             <div class="bottom-pd">
               <% if current_user.can_change_broker? %>
-                <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-trans", id: "show_confirm_#{@employer_profile.broker_agency_profile.id}" %>
+                <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-default", id: "show_confirm_#{@employer_profile.broker_agency_profile.id}" %>
               <% else %>
-                <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-trans disabled" %>
+                <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-default disabled" %>
               <% end %>
             </div>
             <table class="table table-wrapper" style="opacity: 1;">
@@ -140,8 +140,8 @@
         <p>Select 'Terminate' to unhire the selected Broker. They will be terminated effective immediately.</p>
       </div>
       <div class="modal-footer">
-        <%= link_to 'Terminate Broker'.html_safe, employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-primary btn-br mtz" %>
-        <button type="button" class="btn btn-default btn-trans" data-dismiss="modal">Close</button>
+        <%= link_to 'Terminate Broker'.html_safe, employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-primary  mtz" %>
+        <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
 
@@ -152,10 +152,10 @@
   <div class="row">
   <br/>
   <% if current_user.can_change_broker? %>
-  <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-br", id: 'browse_brokers_link',
+  <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary ", id: 'browse_brokers_link',
     onclick: '$("#brokers-empty").hide(); $("#active_broker_tab").hide(); $("#browse_brokers_link").hide()' %>
   <% else %>
-    <%= link_to 'Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary btn-br disabled" %>
+    <%= link_to 'Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary  disabled" %>
   <% end %>
   </div>
 </div>

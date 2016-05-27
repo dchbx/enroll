@@ -32,9 +32,9 @@
         </div>
         <% if @enrollment.employee_role.present? %>
         <% else %>
-          <span class="btn btn-trans" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+          <span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
         <% end %>
-        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-trans interaction-click-control-print-purchase-confirmation" %>
+        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
       </div>
 
       <div id="how_to_pay" class="modal fade" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>

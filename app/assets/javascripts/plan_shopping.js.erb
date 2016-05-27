@@ -233,7 +233,7 @@ $(function() {
     applyPlanSort($(this).data('sort-by'));
   });
 
-  $(document).on('click', "#plans .plan-select.btn-trans.select", function(e){
+  $(document).on('click', "#plans .plan-select.btn-default.select", function(e){
     var url = $(this).data('url');
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();

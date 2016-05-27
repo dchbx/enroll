@@ -33,7 +33,7 @@
               <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
               <br>
               <div class="form-inline text-center">
-                <%= link_to "Add Member", new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-trans" %>
+                <%= link_to "Add Member", new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
                   &nbsp; &nbsp;
                 <a class="text-center btn btn-success">Continue</a>
               </div>
@@ -52,7 +52,7 @@
 
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
           <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-            <%= link_to 'Add Member'.html_safe, new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-trans" %>
+            <%= link_to 'Add Member'.html_safe, new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
 
             <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan) %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">

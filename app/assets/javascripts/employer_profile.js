@@ -1,73 +1,309 @@
-$(document).ready(function() {
-  if ('input.typeahead') {
-    var employers = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('legal_name'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      remote: {
-        prepare: function (query, settings) {
-          settings.type = "POST";
-          settings.data = { q: query };
-          return settings;
-        },
-        url: '/employers/search'
+var EmployerProfile = ( function( window, undefined ) {
+  function validateEditPlanYear() {
+    editbgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
+    editbgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
+    editselectedplan = $('input.ref-plan');
+
+    editbgtitles.each(function() {
+        editplantitle = $(this).val();
+        if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"editplantitle\"" + ']').size() < 2 ) {
+          editvalidatedbgtitles = true;
+          editvalidated = true;
+          var values = [];
+          editbgtitles.each(function() {
+              if ( $.inArray(this.value, values) >= 0 ) {
+                $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
+                editvalidatedbgtitles = false;
+                editvalidated = false;
+                return false; // <-- stops the loop
+              } else {
+                  values.push( this.value );
+                  editvalidatedbgtitles = true;
+                  editvalidated = true;
+              }
+          });
+        } else {
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
+          editvalidatedbgtitles = false;
+          editvalidated = false;
+          return false;
+        }
+
+    });
+    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+      editvalidatedbgemployeepremiums = true;
+      editvalidated = true;
+    } else {
+      editbgemployeepremiums.each(function() {
+        if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
+        } else {
+          if ( parseInt($(this).val() ) >= parseInt(50) ) {
+            editvalidatedbgemployeepremiums = true
+            editvalidated = true;
+          } else {
+            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+            editvalidatedbgemployeepremiums = false;
+            editvalidated = false;
+            return false;
+          }
+        }
+      });
+    }
+
+    if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
+      editvalidatedreferenceplanselections = true
+      editvalidated = true;
+    } else {
+      editbgemployeepremiums.each(function() {
+        if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
+        } else {
+        if ( parseInt($(this).val() ) >= parseInt(50) ) {
+          editvalidatedbgemployeepremiums = true
+          editvalidated = true;
+        } else {
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          editvalidatedbgemployeepremiums = false;
+          editvalidated = false;
+          return false;
+        }
       }
-    });
+      });
+    }
 
-    // initialize the bloodhound suggestion engine
-    employers.initialize();
-    // instantiate the typeahead UI
-    $('input.typeahead').typeahead({
-      hint: false,
-      minLength: 2
-    },{
-      display: 'legal_name',
-      name: 'employers',
-      source: employers.ttAdapter()
-    });
+    $('.benefit-group-fields').each(function() {
+      if ( $(this).hasClass('edit-additional') ) {
+        if ( $(this).find('.reference-steps:first').is(':visible') && $(this).find('.reference-steps:first').find('input:checked').length >= 4 ) {
+         editvalidatedreferenceplanselections = true
+          editvalidated = true;
+        } else if ( $(this).find('.reference-steps:first').is(':hidden')) {
+            editvalidatedreferenceplanselections = true
+            editvalidated = true;
+        }
+          else {
+            $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+            editvalidatedreferenceplanselections = false
+            editvalidated = false;
+            return false;
+        }
+      } else {
+      if ( $(this).find('.reference-steps').is(':first') ) {
+        if ( $(this).find('.reference-steps:first').is(':visible') && $(this).find('.reference-steps:first').find('input:checked').length >= 4 ) {
+         editvalidatedreferenceplanselections = true
+          editvalidated = true;
+        } else if ( $(this).find('.reference-steps:first').is(':hidden')) {
+            editvalidatedreferenceplanselections = true
+            editvalidated = true;
+        }
+          else {
+            $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+            editvalidatedreferenceplanselections = false
+            editvalidated = false;
+            return false;
+        }
+      } else {
+        if ( $(this).find('.reference-steps:last').find('.edit-add-dental').length ) {
+          if ( $('.edit-add-dental').is(':hidden') ) {
+            if ( $(this).find('.reference-steps:last').find('.plan-options').is(':hidden') && $(this).find('.reference-steps:last').find('.nav-tabs').is(':hidden') && $(this).find('.reference-steps:last').find('.dental-reference-plans').is(':hidden')) {
+              editvalidatedreferenceplanselections = true
+              editvalidated = true;
+            } else if ( $(this).find('.reference-steps:last').is(':hidden')) {
+                editvalidatedreferenceplanselections = true
+                editvalidated = true;
+            }
+              else {
+                $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+                editvalidatedreferenceplanselections = false
+                editvalidated = false;
+                return false;
+            }
+          }
 
-    $('input.typeahead').on('blur keyup', function(e) {
-      if (e.keyCode == 8 && $('input#organization_fein').val() != "") {
-        $('#office_locations_buttons a.btn').removeAttr('disabled');
-        $('input#employer_id').val("");
-        $('input#organization_dba').val("").removeAttr('readonly');
-        $('input#organization_fein').val("").removeAttr('readonly');
-        $('select#organization_entity_kind').val("").removeAttr('disabled').selectric('refresh');
-        $('select#organization_office_locations_attributes_0_address_attributes_kind').val("primary").removeAttr('disabled').selectric('refresh');
-        $('input#organization_office_locations_attributes_0_address_attributes_address_1').val("").removeAttr('readonly');
-        $('input#organization_office_locations_attributes_0_address_attributes_address_2').val("").removeAttr('readonly');
-        $('input#organization_office_locations_attributes_0_address_attributes_city').val("").removeAttr('readonly');
-        $('select#organization_office_locations_attributes_0_address_attributes_state').val("").removeAttr('disabled').selectric('refresh');
-        $('input#organization_office_locations_attributes_0_address_attributes_zip').val("").removeAttr('readonly');
-
-        $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val("").removeAttr('readonly');
-        $('input#organization_office_locations_attributes_0_phone_attributes_number').val("").removeAttr('readonly');
-        $('input#organization_office_locations_attributes_0_phone_attributes_extension').val("").removeAttr('readonly');
-      };
-    });
-
-    $('input.typeahead').bind('typeahead:select', function(e, suggestion) {
-
-      $('#office_locations_buttons a.btn').attr('disabled', 'disabled');
-      $('input#employer_id').val(suggestion._id);
-      $('input#organization_dba').val(suggestion.dba).attr('readonly', 'readonly');
-      $('input#organization_fein').val(suggestion.fein).attr('readonly', 'readonly');
-      $('select#organization_entity_kind').val(suggestion.employer_profile.entity_kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
-      var primary_office = suggestion.office_locations[0]
-      if (primary_office) {
-        $('select#organization_office_locations_attributes_0_address_attributes_kind').val(primary_office.address.kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
-        $('input#organization_office_locations_attributes_0_address_attributes_address_1').val(primary_office.address.address_1).attr('readonly', 'readonly');
-        $('input#organization_office_locations_attributes_0_address_attributes_address_2').val(primary_office.address.address_2).attr('readonly', 'readonly');
-        $('input#organization_office_locations_attributes_0_address_attributes_city').val(primary_office.address.city).attr('readonly', 'readonly');
-        $('select#organization_office_locations_attributes_0_address_attributes_state').val(primary_office.address.state).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
-        $('input#organization_office_locations_attributes_0_address_attributes_zip').val(primary_office.address.zip).attr('readonly', 'readonly');
-
-        $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val(primary_office.phone.area_code).attr('readonly', 'readonly');
-        $('input#organization_office_locations_attributes_0_phone_attributes_number').val(primary_office.phone.number).attr('readonly', 'readonly');
-        $('input#organization_office_locations_attributes_0_phone_attributes_extension').val(primary_office.phone.extension).attr('readonly', 'readonly');
+        } else {
+          if ( $(this).find('.reference-steps:last').find('.plan-options').is(':hidden') && $(this).find('.reference-steps:last').find('.nav-tabs').is(':hidden') && $(this).find('.reference-steps:last').find('.dental-reference-plans').is(':hidden')) {
+            editvalidatedreferenceplanselections = true
+            editvalidated = true;
+          }   else {
+                $('.interaction-click-control-save-plan-year').attr('data-original-title', "Before you can save, you must finish your plan year selection. Click 'Cancel' above to keep your existing selection");
+                editvalidatedreferenceplanselections = false
+                editvalidated = false;
+                return false;
+          }
+        }
       }
+    }
     });
+
+    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true ) {
+        $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
+        $('.interaction-click-control-save-plan-year').removeClass('disabled');
+        $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Click here to save your plan year');
+      } else {
+        $('.interaction-click-control-save-plan-year').addClass('disabled');
+      }
+      Freebies.tooltip();
   }
-});
+
+  function validatePlanYear() {
+    bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
+    bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    referenceplanselections = $('.reference-plan input[type=radio]:checked');
+
+    bgtitles.each(function() {
+      plantitle = $(this).val();
+      if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"plantitle\"" + ']').size() < 2 ) {
+        validatedbgtitles = true;
+        validated = true;
+        var values = [];
+        bgtitles.each(function() {
+            if ( $.inArray(this.value, values) >= 0 ) {
+
+              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
+              validatedbgtitles = false;
+              validated = false;
+              return false; // <-- stops the loop
+            } else {
+                values.push( this.value );
+                validatedbgtitles = true;
+                validated = true;
+            }
+        });
+      } else {
+        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Before you can save, each benefit group must have a unique title.');
+        validatedbgtitles = false;
+        validated = false;
+        return false;
+      }
+    });
+    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+      validatedbgemployeepremiums = true;
+      validated = true;
+    } else {
+      bgemployeepremiums.each(function() {
+        if ( parseInt($(this).val()) >= parseInt(50) ) {
+          validatedbgemployeepremiums = true;
+          validated = true;
+        } else {
+          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          validatedbgemployeepremiums = false;
+          validated = false;
+          return false;
+        }
+      });
+    }
+
+    dental_bgs = $('.select-dental-plan:visible').length
+    health_bgs = $('.benefit-group-fields > .health:visible').length
+    selected_reference_plans = dental_bgs + health_bgs;
+
+    if ( referenceplanselections.length != selected_reference_plans ) {
+      validatedreferenceplanselections = false;
+      validated = false;
+    } else {
+      referenceplanselections.each(function() {
+        if ( $(this).length && $(this).val() != 'undefined' ) {
+          validatedreferenceplanselections = true;
+          validated = true;
+        } else {
+          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Each benefit group is required to have a reference plan selection before it can be saved');
+          validatedreferenceplanselections = false
+          validated = false;
+          return false;
+        }
+      });
+    }
+
+    if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true ) {
+        $('.interaction-click-control-create-plan-year').removeClass('disabled');
+        $('.interaction-click-control-create-plan-year').removeAttr('data-original-title');
+        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Click here to create your plan year');
+        $('.interaction-click-control-create-plan-year').unbind('click');
+      } else {
+        $('.interaction-click-control-create-plan-year').addClass('disabled');
+        $('.interaction-click-control-create-plan-year').click(function(event){
+          event.preventDefault();
+        });
+      }
+      Freebies.tooltip();
+  }
+
+  return {
+      validateEditPlanYear : validateEditPlanYear,
+      validatePlanYear : validatePlanYear
+    };
+
+} )( window );
+
+// $(document).ready(function() {
+//   if ('input.typeahead') {
+//     var employers = new Bloodhound({
+//       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('legal_name'),
+//       queryTokenizer: Bloodhound.tokenizers.whitespace,
+//       remote: {
+//         prepare: function (query, settings) {
+//           settings.type = "POST";
+//           settings.data = { q: query };
+//           return settings;
+//         },
+//         url: '/employers/search'
+//       }
+//     });
+//
+//     // initialize the bloodhound suggestion engine
+//     employers.initialize();
+//     // instantiate the typeahead UI
+//     $('input.typeahead').typeahead({
+//       hint: false,
+//       minLength: 2
+//     },{
+//       display: 'legal_name',
+//       name: 'employers',
+//       source: employers.ttAdapter()
+//     });
+//
+//     $('input.typeahead').on('blur keyup', function(e) {
+//       if (e.keyCode == 8 && $('input#organization_fein').val() != "") {
+//         $('#office_locations_buttons a.btn').removeAttr('disabled');
+//         $('input#employer_id').val("");
+//         $('input#organization_dba').val("").removeAttr('readonly');
+//         $('input#organization_fein').val("").removeAttr('readonly');
+//         $('select#organization_entity_kind').val("").removeAttr('disabled').selectric('refresh');
+//         $('select#organization_office_locations_attributes_0_address_attributes_kind').val("primary").removeAttr('disabled').selectric('refresh');
+//         $('input#organization_office_locations_attributes_0_address_attributes_address_1').val("").removeAttr('readonly');
+//         $('input#organization_office_locations_attributes_0_address_attributes_address_2').val("").removeAttr('readonly');
+//         $('input#organization_office_locations_attributes_0_address_attributes_city').val("").removeAttr('readonly');
+//         $('select#organization_office_locations_attributes_0_address_attributes_state').val("").removeAttr('disabled').selectric('refresh');
+//         $('input#organization_office_locations_attributes_0_address_attributes_zip').val("").removeAttr('readonly');
+//
+//         $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val("").removeAttr('readonly');
+//         $('input#organization_office_locations_attributes_0_phone_attributes_number').val("").removeAttr('readonly');
+//         $('input#organization_office_locations_attributes_0_phone_attributes_extension').val("").removeAttr('readonly');
+//       };
+//     });
+//
+//     $('input.typeahead').bind('typeahead:select', function(e, suggestion) {
+//
+//       $('#office_locations_buttons a.btn').attr('disabled', 'disabled');
+//       $('input#employer_id').val(suggestion._id);
+//       $('input#organization_dba').val(suggestion.dba).attr('readonly', 'readonly');
+//       $('input#organization_fein').val(suggestion.fein).attr('readonly', 'readonly');
+//       $('select#organization_entity_kind').val(suggestion.employer_profile.entity_kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
+//       var primary_office = suggestion.office_locations[0]
+//       if (primary_office) {
+//         $('select#organization_office_locations_attributes_0_address_attributes_kind').val(primary_office.address.kind).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
+//         $('input#organization_office_locations_attributes_0_address_attributes_address_1').val(primary_office.address.address_1).attr('readonly', 'readonly');
+//         $('input#organization_office_locations_attributes_0_address_attributes_address_2').val(primary_office.address.address_2).attr('readonly', 'readonly');
+//         $('input#organization_office_locations_attributes_0_address_attributes_city').val(primary_office.address.city).attr('readonly', 'readonly');
+//         $('select#organization_office_locations_attributes_0_address_attributes_state').val(primary_office.address.state).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
+//         $('input#organization_office_locations_attributes_0_address_attributes_zip').val(primary_office.address.zip).attr('readonly', 'readonly');
+//
+//         $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val(primary_office.phone.area_code).attr('readonly', 'readonly');
+//         $('input#organization_office_locations_attributes_0_phone_attributes_number').val(primary_office.phone.number).attr('readonly', 'readonly');
+//         $('input#organization_office_locations_attributes_0_phone_attributes_extension').val(primary_office.phone.extension).attr('readonly', 'readonly');
+//       }
+//     });
+//   }
+// });
 
 $(function() {
   $('div[name=employee_family_tabs] > ').children().each( function() {
@@ -245,7 +481,6 @@ function checkAreaCode(textbox) {
   }
   return true;
 }
-
   //toggling of divs that show plan details (view details)
   $('.nav-toggle').click(function(){
     var collapse_content_selector = $(this).attr('href');

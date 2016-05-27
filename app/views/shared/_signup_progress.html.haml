@@ -35,23 +35,23 @@
     Complete
 
 - if step == 4 && defined? url
-  = link_to 'CONTINUE', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+  = link_to 'CONTINUE', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 2
-  %span.btn.btn-primary.btn-br.btn-block#btn-continue
+  %span.btn.btn-primary.btn-block#btn-continue
     CONTINUE
 - elsif step == 5 || step == 2
-  %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
+  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{disabled: true}
     CONTINUE
   - if step ==5
 
-    = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-trans' if @hbx_enrollment && @hbx_enrollment.employee_role.present?
+    = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if @hbx_enrollment && @hbx_enrollment.employee_role.present?
 - elsif step == 6
-  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
-  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn-waive btn btn-round btn-trans' if @enrollment && @enrollment.employee_role.present?
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
+  = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn-waive btn btn-round btn-default' if @enrollment && @enrollment.employee_role.present?
 - elsif step == 7
-  = link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+  = link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - else
-  %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{type: 'submit'}
+  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE
 
 -if step != 7

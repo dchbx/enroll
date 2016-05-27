@@ -1,0 +1,69 @@
+var Freebies = ( function( window, undefined ) {
+
+	function allFreebies() {
+		  // apply floatlabels
+			$('input.floatlabel').floatlabel({
+			  slideInput: false
+			});
+		  // apply selectric
+		  $("select[multiple!='multiple']").selectric();
+			// apply popover
+			$("[data-toggle=popover]").popover();
+			// apply tooltips
+			$('[data-toggle="tooltip"]').tooltip();
+			// apply datePicker
+			applyJQDatePickers();
+  }
+
+	function datePicker() {
+		// apply datepicker
+		applyJQDatePickers();
+	};
+
+	function tooltip() {
+		// apply tooltips
+		$('[data-toggle="tooltip"]').tooltip();
+	}
+
+	function popover() {
+		// apply tooltips
+		$("[data-toggle=popover]").popover();
+	}
+
+	function floatLabels() {
+		  // apply floatlabels
+			$('input.floatlabel').floatlabel({
+			  slideInput: false
+			});
+  }
+
+	function selectric() {
+		// apply selectric
+		$("select[multiple!='multiple']").selectric();
+	}
+
+	// disabled enter key submitting disabeld forms in firefox -- add this to any element in the page onKeyPress="return disableEnterKey(event)"
+	function disableEnterKey(e) {
+		var key;
+		if (window.event) {
+			key = window.event.keyCode;     //IE
+		} else {
+			key = e.which;     //firefox
+		}
+		if (key == 13) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	return {
+	    allFreebies : allFreebies,
+			floatlabels : floatLabels,
+			selectric : selectric,
+			disableEnterKey : disableEnterKey,
+			popover : popover,
+			tooltip : tooltip
+	  };
+
+} )( window );

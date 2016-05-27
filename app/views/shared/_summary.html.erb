@@ -1,6 +1,6 @@
 <% if @hbx_enrollment.shopping?%>
 <% else %>
-  <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-trans all-plans' %>
+  <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
   <br/>
   <br/>
 <% end %>
@@ -166,7 +166,7 @@
               <% if @hbx_enrollment.shopping?%>
                 <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
               <% else %>
-                <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-transparent all-plans' %>
+                <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
               <% end %>
             </td>
           </tr>
@@ -175,7 +175,7 @@
     </div>
   <% end %>
   <% if @hbx_enrollment.shopping? %>
-    <%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-trans all-plans' %>
+    <%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-default all-plans' %>
     <br/>
     <br/>
   <% end %>

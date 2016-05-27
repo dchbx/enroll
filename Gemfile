@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.3'
 
 # Use SCSS for stylesheets
-# gem 'sass-rails', '~> 5.0'
+gem 'sass-rails', '~> 5.0'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -58,7 +58,6 @@ gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
-gem 'sass', '3.4.21'
 # gem 'bh'
 
 # spreadsheet support

@@ -1,7 +1,4 @@
-<div class="col-md-2">
-  <br class="clear"/>
-</div>
-<nav class="row" style="position: fixed;">
+<nav class="row">
   <ul>
     <li <%= menu_tab_class(active_tab, "home") %>>
       <%= link_to "My #{Settings.site.short_name}", employers_employer_profile_path(@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>

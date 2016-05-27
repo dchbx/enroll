@@ -39,10 +39,10 @@
           <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
         </div>
         <%= link_to reference_plan_summary_employers_employer_profile_plan_years_path(@employer_profile, ref_plan_id: @reference_plan_id, hios_id: @hios_id, coverage_kind: @coverage_kind, start_on: @start_on, details: 'details'), remote: 'true' do %>
-          <span class="btn btn-trans btn-small btn-more-details">More Details</span>
+          <span class="btn btn-default btn-small btn-more-details">More Details</span>
         <% end %>
 
-        <span class="btn btn-trans btn-small" data-dismiss="modal">Close</span>
+        <span class="btn btn-default btn-small" data-dismiss="modal">Close</span>
       </div>
     </div>
   </div>

@@ -10,43 +10,16 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
+ *= require main
  *= require jquery-ui
  *= require font-awesome
- *= require bootstrap-theme
- *= require bootstrap.min
- *= require bootstrap-multiselect
- *= require jquery.autocomplete
- *= require component
- *= require custom
- *= require bootstrap-overrides
- *= require open_sans
- *= require selectric
- *= require responsive
- *= require new
- *= require text_styles
- *= require brokers
- *= require modules
- *= require insured
- *= require sprites
- *= require modules
- *= require modals
- *= require states
- *= require layouts
  *= require bootstrap-slider
- *= require datatable
- *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+ *= require bootstrap-multiselect
  *= require_self
  */
 
- .registrations {
+.registrations {
    .actions {
-     .btn {
-       margin-left: auto;
-       margin-right: auto;
-       margin: 0 auto;
-       display: block;
-       margin-bottom: 5px;
-     }
      span {
        display: block;
        text-align: center;
@@ -121,79 +94,10 @@ img {
      padding: 15px 0;
    }
  }
- .btn, button {
-   &.btn-trans {
-     border: solid 1px #b2b2b2;
-     font-weight: bold;
-     font-size: 16px;
-     color: #007bc4;
-     border-radius: 4px;
-     padding: 10px 20px;
-     &.btn-small {
-       font-size: 14px;
-       padding: 8px 14px;
-
-     }
-     &:last-of-type {
-       &.mz {
-         margin-right: 0;
-       }
-     }
-     &.mz {
-       margin: 0;
-       margin-right: 0;
-     }
-     &:hover {
-       background-color: #ffffff;
-       border: solid 1px #007bc4;
-     }
-   }
-   &.btn-right {
-     padding-right: 0;
-     margin-left: 5px;
-   }
-   &.btn-primary {
-       text-transform: uppercase;
-       padding: 10px 20px;
-       border-radius: 6px;
-       font-size: 16px;
-       letter-spacing: 1px;
-       border-top: none;
-       border-left: none;
-       border-right: none;
-       margin-top: 5px;
-       margin-right: 5px;
-       font-weight: 600;
-       &.mz {
-         margin: 0;
-       }
-       &.mtz {
-         margin-top: 0;
-       }
-       &.btn-right {
-         margin-left: 5px;
-       }
-       &.btn-small {
-         font-size: 14px;
-         padding: 8px 14px;
-
-       }
-
-     .fa {
-       color: #fff;
-     }
-
-   }
-   &.full-width {
-     padding: 10px 0;
-     width: 100%;
-     max-width: 100%;
-   }
- }
 // full width flash messenger style
 .container > .col-xs-12 > .row > .alert.alert-notice {
-  margin-top: 2.5%;
-  margin-bottom: 0;
+  margin-top: 1%;
+  margin-bottom: 1%;
 }
  .panel-border {
    border: solid 1px #d5d5d5;
@@ -248,106 +152,6 @@ img {
        }
      }
    }
- }
- #navbar {
-   >.col-xs-6 {
-     height: 70px;
-   }
-   .right-menu .dropdown {
-     display: inline;
-     .btn {
-       padding: 0;
-       border: none;
-       &:hover, &:focus, &:active {
-         background-color: transparent;
-         -webkit-box-shadow: none;
-         box-shadow: none;
-       }
-     }
-     .dropdown-menu {
-       padding: 10px 0;
-       a.g14 {
-         &:hover {
-           color: #007bc4;
-         }
-       }
-     }
-   }
-   .g14 {
-     text-transform: uppercase;
-     color: #b7b7b7;
-     font-size: 12px;
-     font-weight: 600;
-     letter-spacing: .7;
-   }
-   h4 {
-     font-weight: bold;
-     color: #5C5C5C;
-     padding: 0;
-     margin: 0;
-     display: inline-block;
-   }
-   .fa-phone {
-     color: #007bc4;
-
-   }
-
- }
- .navbar-header {
-
-   .navbar-brand {
-
-     img {
-      display: block;
-      max-width: 171px;
-      width: 100%;
-    }
-   }
- }
-
-
- .navbar-left {
-   padding-right: 0;
- }
-
- #navbar {
-   >.col-xs-6 {
-     height: 70px;
-   }
-
-   .g14 {
-     text-transform: uppercase;
-     color: #b7b7b7;
-     font-size: 12px;
-     font-weight: 600;
-     letter-spacing: .7;
-   }
-   h4 {
-     font-weight: bold;
-     color: #5C5C5C;
-     padding: 0;
-     margin: 0;
-     display: inline-block;
-   }
-   .fa-phone {
-     color: #007bc4;
-
-   }
-
- }
- .navbar-header {
-   padding-left: 0;
-   .navbar-brand {
-
-     img {
-      display: block;
-      max-width: 171px;
-      width: 100%;
-    }
-   }
- }
- .navbar-left {
-   padding-right: 0;
  }
 
 

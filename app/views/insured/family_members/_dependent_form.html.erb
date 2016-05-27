@@ -128,22 +128,20 @@
     <div class="clearfix"></div>
     <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
       <% if !dependent.persisted? %>
-      <a href="#" class="btn btn-trans remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\'. When you’re finished, select CONTINUE.')" data-target="#new_employee_dependent_form">
+      <a href="#" class="btn btn-default remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\'. When you’re finished, select CONTINUE.')" data-target="#new_employee_dependent_form">
         Cancel
       </a>
       <% else %>
       <%= link_to '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Cancel'.html_safe, insured_family_member_path(dependent), :remote => true %>
       <% end %>
-      <%= f.button(class: "btn btn-primary btn-br pull-right mz", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>Confirm Member<% end %>
+      <%= f.button(class: "btn btn-primary  pull-right mz", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>Confirm Member<% end %>
     </div>
     <% end %>
   </div>
 
   <script>
     $(document).ready(function() {
-      $('.floatlabel').floatlabel({
-        slideInput: false
-      });
+      Freebies.floatlabels();
       if($("input#dependent_same_with_primary").is(":checked")){
         $("#address_info .address_required").removeAttr('required');
       };

@@ -7,7 +7,7 @@
   <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
     <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary show_msg mz", remote: true %>
     <%- if @folder != 'Deleted' %>
-    <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-trans", remote: true, method: :delete %>
+    <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-default", remote: true, method: :delete %>
     <% end %>
   </td>
 </tr>

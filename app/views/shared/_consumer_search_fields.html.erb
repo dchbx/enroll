@@ -1,7 +1,7 @@
 <%= render "shared/person/consumer_information", f: f %>
 
 <script>
-	$(document).ready(function(){
-		$('input.floatlabel').floatlabel();
+	$(document).on('ready page:load', function () {
+		Freebies.allFreebies();
 	});
 </script>

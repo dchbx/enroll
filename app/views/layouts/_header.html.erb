@@ -1,75 +1,62 @@
 <div class='hide' id='dchbx_enroll_date_of_record'><%= TimeKeeper.date_of_record.iso8601 %></div>
-  <nav class="navbar navbar-white navbar-fixed-top">
+  <nav class="navbar navbar-default navbar-static-top">
     <div class="container">
-      <div id="navbar" class="collapse navbar-collapse">
-        <div class="col-xs-6">
-          <div class="row">
-            <div class="col-xs-12">
-              <div class="row">
-                <div class="navbar-header col-xs-4">
-                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                  </button>
-                  <span class="navbar-brand" href="<%= root_url %>"><%= image_tag 'logo.png' %></span>
-                </div>
-                <ul class="col-xs-8 nav navbar-nav nav-info navbar-left brd-left">
-                  <li class="header-text">
-                    <a>
-                      <%= get_header_text(controller_name) %>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-xs-6">
-          <div class="row">
-            <div class="col-xs-12">
-              <div class="row">
-                <% if current_user %>
-                  <div class="col-xs-5 ccs">
-                <% elsif current_page?('/') || controller.controller_name == 'registrations' || controller.controller_name == 'broker_roles' || controller.controller_name == 'sessions' %>
-                  <div class="col-xs-12 ccs">
-                <% else %>
-                  <div class="col-xs-5 ccs">
-                <% end %>
-                <div class="pull-right">
-                  <span class="g14">Call Customer Service</span><br/>
-                  <i class="fa fa-phone fa-lg"></i>
-                  <h4><%= Settings.contact_center.phone_number %></h4>
-                </div>
-              </div>
-              <div class="col-xs-7">
-                <div class="right-menu navbar-right">
-                  <% if signed_in? %>
-                    <ul class="navbar-nav top-menu pull-right">
-                      <%= render partial: "shared/my_portal_links"%>
-
-                      <li><a class="g14" href="https://dchealthlink.com/help" target="_blank">Help</a></li>
-                      <li class="hidden-xs">|</li>
-                      <li><%= link_to "LOGOUT", destroy_user_session_path, method: "delete", class: "g14" %></li><br/>
-
-                      <div class="bottom-row">
-                        <li class="">
-                          <% unless current_user.try(:person).try(:hbx_id).nil? %>
-                            <span class="dark-grey">My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %>&nbsp;&nbsp;</span>
-                          <% end %>
-                        </li>
-                        <h4><%= user_full_name.titleize %></h4>
-                      </div>
-                    </ul>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          <%= image_tag 'logo.png' %>
+        </a>
       </div>
-    </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><h4 class="no-buffer"><%= get_header_text(controller_name) %></h4></a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li><a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
+            <span class="header-text">
+              Call Customer Service
+            </span>
+            <br/>
+            <span>
+              <i class="fa fa-phone fa-lg"></i>
+              <strong>
+                <%= Settings.contact_center.phone_number %>
+              </strong>
+            </span>
+          </a>
+          </li>
+          <% if signed_in? %>
+            <li>
+              <span class="my-portal-links">
+                <%= render partial: "shared/my_portal_links"%>
+                <span>
+                  <a href="https://dchealthlink.com/help" target="_blank" class="header-text">Help</a>
+                </span>
+                <span> | </span>
+                <span>
+                  <%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %>
+                </span>
+                <br/>
+                <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
+                <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                  &nbsp;
+                  <span>My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
+                <% end %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
   </nav>
 </div>
 

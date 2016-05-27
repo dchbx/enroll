@@ -32,25 +32,25 @@
     .vertical-line-progress
     Complete
 - if step == 1 && search_page == true
-  = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary btn-br btn-block'
+  = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
 - elsif step == 1
-  %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue{type: 'submit'}
+  %button.btn.btn-lg.btn-primary.btn-block.interaction-click-control-continue{type: 'submit'}
     CONTINUE
 - elsif ridp == true && step == 2
-  = link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary btn-br btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
+  = link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
 - elsif step == 2
 - elsif defined? url
-  = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+  = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 4
-  %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
+  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{disabled: true}
     CONTINUE
   %br
 - elsif step == 5
-  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary  btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
 - elsif step == 6
-  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-primary btn-br', id: 'btn-continue', style: 'width: 100%;'
+  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-primary ', id: 'btn-continue', style: 'width: 100%;'
 - else
-  %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{type: 'submit'}
+  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE
 
 %ul.list-unstyled.list-right-section

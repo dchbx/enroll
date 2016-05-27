@@ -1,4 +1,4 @@
-<div class="container signin top-pd">
+<div class="container signin top-pd module">
   <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div class="col-md-6 col-sm-8 col-xs-12">
       <h1 class="darkblue">Create account</h1>
@@ -28,9 +28,8 @@
 	        </div>
       		<%= f.hidden_field :invitation_id %>
           <br/>
-	        <div class="actions">
-  	          <%= f.submit "Create account", class: "btn btn-primary btn-lg btn-br" %>
-              <br/>
+	        <div class="actions text-center">
+  	          <%= f.submit "Create account", class: "btn btn-primary btn-lg " %>
             <span>
               <%= link_to "Sign In Existing Account", new_user_session_path unless Rails.env.production?%>
             </span>

@@ -8,7 +8,7 @@
     <% end %>
     <li role="presentation"><a href="#family" aria-controls="family" role="tab" data-toggle="tab">Family Members</a></li>
     <li role="presentation"><a href="#contact" aria-controls="contact" role="tab" data-toggle="tab">Contact Information</a></li>
-    
+
   </ul>
 
 <%= form_for(@person) do |f| %>
@@ -18,9 +18,9 @@
        <%= render 'shared/name_fields', f: f %>
        <%= render 'shared/id_info_fields', f: f %>
     </div>
-  <% if @employer.present? %>  
+  <% if @employer.present? %>
     <div role="tabpanel" class="tab-pane" id="employer">
-      
+
       <p>
 		<span> Employer Information.</span>
 	</p>
@@ -34,13 +34,13 @@
         <% address = @employer.office_locations.first.address%>
         <% if address.present? %>
           <spa><%= address.full_address%></span>
-        <% end %> 
+        <% end %>
         </br>
         Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %>
        <% end %>
     </div>
   </div>
-      
+
     </div>
     <% end %>
     <div role="tabpanel" class="tab-pane" id="family">
@@ -100,12 +100,3 @@
   </div>
 <% end %>
 </div>
-
-<script>
-// $('#ProfileTab a').click(function (e) {
-//   e.preventDefault()
-//   $(this).tab('show');
-// });
-
-
-</script>

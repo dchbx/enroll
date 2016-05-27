@@ -3,7 +3,7 @@
   <%= render 'shared/census_dependent_fields', {f: dependent} %>
   <% end %>
 
-  <%= link_to_add_fields 'Add Family Member', f, :census_dependents, 'btn btn-trans pull-left' %>
-  <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'btn btn-trans return_to_employee_roster pull-left' %>
+  <%= link_to_add_fields 'Add Family Member', f, :census_dependents, 'btn btn-default pull-left' %>
+  <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'btn btn-default return_to_employee_roster pull-left' %>
 
 </div>

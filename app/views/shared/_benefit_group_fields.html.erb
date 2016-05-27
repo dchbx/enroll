@@ -1,4 +1,3 @@
-
 <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
 <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
 <a href="#" data-href="<%= calc_offered_plan_contributions_employers_employer_profile_plan_years_path %>" id='calc_offered_plan_contributions_link' style='display:none;'></a>
@@ -42,7 +41,7 @@
       <% if @plan_year.new_record? == false %>
       <span class="pull-right">
         <div id="edit_employer_cost_info_btn" style="bottom: 0; position:absolute; right: 15px;">
-          <div class="btn btn-trans btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
+          <div class="btn btn-default btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
             Employee Detail Costs
           </div>
           <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
@@ -87,7 +86,7 @@
           <div class="col-xs-10">
             <div class="row">
               <h4 class="di">Click "Add Dental Plans" to add one or more dental plans to this benefit package</h4>
-              <span class="btn btn-trans btn-small pull-right">Add Dental Plans</span>
+              <span class="btn btn-default btn-small pull-right">Add Dental Plans</span>
             </div>
           </div>
           <div class="col-xs-1">
@@ -108,7 +107,7 @@
           </span>
           <span class="pull-right" style="display: none;">
             <div id="edit_employer_cost_info_btn" style="padding-top: 10px;">
-              <div class="btn btn-trans btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
+              <div class="btn btn-default btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
                 Employee Detail Costs
               </div>
               <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
@@ -145,3 +144,30 @@
     </div>
   </div>
 </fieldset>
+
+<% if i < 50 %>
+  <script>
+  $(document).on('page:update', function() {
+    //validate plan year create for title, referencce plan, and premium Percentage
+    if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+        $('.interaction-click-control-save-plan-year').removeClass('disabled');
+        EmployerProfile.validateEditPlanYear();
+        //validate plan year create for title, referencce plan, and premium Percentage
+        $(document).on('change', '.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+            EmployerProfile.validateEditPlanYear();
+        });
+        $(document).on('change', '.reference-plan input', function() {
+            EmployerProfile.validateEditPlanYear();
+        });
+    } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
+        EmployerProfile.validatePlanYear();
+        $(document).on('change', '.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+            EmployerProfile.validatePlanYear();
+        });
+        $(document).on('change', '.reference-plan input', function() {
+            EmployerProfile.validatePlanYear();
+        });
+    } else {}
+  });
+  </script>
+<% end %>

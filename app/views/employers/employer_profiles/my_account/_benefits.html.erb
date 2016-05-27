@@ -5,7 +5,7 @@
     </div>
     <div class="col-xs-4">
       <% if @plan_years.present? && @employer_profile.published_plan_year.blank? %>
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-trans btn-br btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
       <% end %>
     </div>
 <% unless @employer_profile.plan_years.blank? || @employer_profile.published_plan_year.present? %>
@@ -414,14 +414,14 @@
     <div class="bottom-mgn-xs">
       <% if plan_year.draft? || plan_year.renewing_draft? %>
         <% if plan_year.overlapping_published_plan_years.empty? %>
-          <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
+          <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default" %>
         <% end %>
-        <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
+        <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default"%>
       <% end %>
 
       <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
-      <span class="btn btn-trans pull-right" data-toggle="modal" data-target="#revertPlanYear_<%= plan_year.id %>">Revert Application</span>
-      <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-trans pull-right"%> -->
+      <span class="btn btn-default pull-right" data-toggle="modal" data-target="#revertPlanYear_<%= plan_year.id %>">Revert Application</span>
+      <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right"%> -->
 
       <% end %>
 
@@ -439,7 +439,7 @@
     It's time to create a benefits package. Select 'Add Plan Year' to create your first one. Most employers only create one benefits package but you'll have the opportunity to create more than one if you want to offer different benefits to different groups of employees.
   </h4>
   <br/>
-  <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
+  <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary ", data: {loading_text: "Loading..."} %>
 
   <% end %>
 </div>

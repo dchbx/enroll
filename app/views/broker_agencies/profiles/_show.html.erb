@@ -2,7 +2,7 @@
 
  <h3>Broker Agency : <%= @broker_agency_profile.legal_name %></h3>
  <% if current_user.has_broker_agency_staff_role? %>
- <%= link_to "Edit Broker Agency Profile", edit_broker_agencies_profile_path(@broker_agency_profile.id), class: 'btn btn-primary btn-br' %>
+ <%= link_to "Edit Broker Agency Profile", edit_broker_agencies_profile_path(@broker_agency_profile.id), class: 'btn btn-primary ' %>
  <br/>
  <% end %>
 

@@ -1,7 +1,7 @@
 module ApplicationHelper
 
   def copyright_notice
-    raw("&copy; #{Settings.site.copyright_period} #{Settings.site.short_name}. All Rights Reserved.")
+    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period} #{Settings.site.short_name}. All Rights Reserved.</span>")
   end
 
   def menu_tab_class(a_tab, current_tab)
@@ -288,6 +288,12 @@ module ApplicationHelper
   def user_full_name
     if signed_in?
       current_user.person.try(:full_name) ? current_user.person.full_name : current_user.email
+    end
+  end
+
+  def user_first_name_last_name_and_suffix
+    if signed_in?
+      current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : (current_user.email).downcase
     end
   end
 

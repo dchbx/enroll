@@ -15,7 +15,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
   applyJQDatePickers()
 
   if $('#plan_year_start_on').length
-    validatePlanYear()
+    EmployerProfile.validatePlanYear
 
 
 
@@ -134,9 +134,9 @@ $(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
   if $('.benefit-group-fields').length == 1
     $('.remove_fields').hide();
   if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
-    validateEditPlanYear()
+    EmployerProfile.validateEditPlanYear
   else
-    validatePlanYear()
+    EmployerProfile.validatePlanYear
 
 @update_delete_buttons = ->
   nested_fields = $('.form-inputs')

@@ -188,8 +188,8 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
 
   find("#census_employee_is_business_owner").click
 
-  find(:xpath, "//div[@id='dependent_info']//div[@class='selectric']/p[@class='label']").click
-  find(:xpath, "//div[@id='dependent_info']//li[contains(., 'Child')]").click
+  find('.selectric-interaction-choice-control-census-employee-census-dependents-attributes-0-employee-relationship').click
+  find('.label', text: 'Child').click
 
   screenshot("update_census_employee_with_data")
   click_button 'Update Employee'

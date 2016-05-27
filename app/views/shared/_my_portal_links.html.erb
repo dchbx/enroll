@@ -1,37 +1,31 @@
-<!-- only if user has any of these roles then show "my account" dropdown. -->
-
 <% insured = (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false) || current_user.try(:has_employee_role?) %>
 <% employer =  current_user.try(:has_employer_staff_role?) %>
 <% broker =  current_user.try(:has_broker_agency_staff_role?) %>
-
 <% roles = [insured, employer, broker] %>
-
 <% portal_count = roles.select{|role|role}.count %>
 
-<% if portal_count == 1 %>
-  <li>
-    <%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'g14' if insured %>
-    <%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'g14' if employer %>
-    <%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'g14' if broker %>
-    <li class="hidden-xs">&nbsp;|</li>
-  </li>
-<% elsif portal_count > 1 %>
-  <div class="dropdown">
-    <button class="btn btn-default dropdown-toggle g14" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        My Portals
-      <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu b brz" aria-labelledby="dropdownMenu1">
-      <% if insured %>
-        <li><%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'g14' %></li>
-      <% end %>
-      <% if employer %>
-      <li><%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'g14' %></li>
-      <% end %>
-      <% if broker %>
-      <li><%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'g14' %></li>
-      <% end %>
-    </ul>
-    <li class="hidden-xs">|</li>
-  </div>
-<% end %>
+
+  <% if portal_count == 1 %>
+    <span>
+      <%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'header-text' if insured %>
+      <%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'header-text' if employer %>
+      <%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' if broker %>
+      <span> | </span>
+    </span>
+    <% elsif portal_count > 1 %>
+      <span class="dropdown">
+        <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <% if insured %>
+          <li><%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'header-text' %></li>
+          <% end %>
+          <% if employer %>
+          <li><%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'header-text' %></li>
+          <% end %>
+          <% if broker %>
+          <li><%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' %></li>
+          <% end %>
+        </ul>
+      <span> | </span>
+    </span>
+  <% end %>
