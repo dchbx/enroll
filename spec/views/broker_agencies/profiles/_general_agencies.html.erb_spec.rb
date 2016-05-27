@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb" do
+RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb", dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
 
@@ -9,7 +9,7 @@ RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb" do
       allow(broker_agency_profile).to receive(:default_general_agency_profile).and_return nil
       assign :general_agency_profiles, [general_agency_profile]
       assign :broker_agency_profile, broker_agency_profile
-      render template: "broker_agencies/profiles/_general_agencies.html.erb" 
+      render template: "broker_agencies/profiles/_general_agencies.html.erb"
     end
 
     it 'should have title' do
@@ -40,7 +40,7 @@ RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb" do
       assign :general_agency_profiles, [general_agency_profile]
       assign :broker_agency_profile, broker_agency_profile
       assign :notice, "Changing default general agencies may take a few minutes to update all employers."
-      render template: "broker_agencies/profiles/_general_agencies.html.erb" 
+      render template: "broker_agencies/profiles/_general_agencies.html.erb"
     end
 
     it 'should have title' do

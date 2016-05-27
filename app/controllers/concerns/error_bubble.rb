@@ -35,4 +35,16 @@ module ErrorBubble
       person.errors.delete(:consumer_role)
     end
   end
+
+  def bubble_address_errors_by_person(person)
+    addresses = person.addresses.select {|a| !a.valid?}
+    if person.errors.has_key?(:addresses) && addresses.present?
+      addresses.each do |address|
+        address.errors.each do |k, v|
+          person.errors.add("#{address.kind} address: #{k}", v)
+        end
+      end
+      person.errors.delete(:addresses)
+    end
+  end
 end

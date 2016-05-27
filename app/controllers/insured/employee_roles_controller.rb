@@ -2,6 +2,7 @@ class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :welcome, :search]
   before_action :check_employee_role_permissions_edit, only: [:edit]
   before_action :check_employee_role_permissions_update, only: [:update]
+  include ErrorBubble
 
   def welcome
   end
@@ -105,6 +106,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
+        bubble_address_errors_by_person(@person)
         build_nested_models
         respond_to do |format|
           format.html { render "edit" }

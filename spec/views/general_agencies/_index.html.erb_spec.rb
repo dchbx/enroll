@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe "general_agencies/profiles/_families.html.erb" do
+RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   before :each do
     assign :general_agency_profiles, Kaminari.paginate_array([general_agency_profile]).page(0)
-    render template: "general_agencies/profiles/_index.html.erb" 
+    render template: "general_agencies/profiles/_index.html.erb"
   end
 
   it 'should have title' do

@@ -262,7 +262,7 @@ describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :af
   end
 end
 
-describe Forms::GeneralAgencyProfile, ".find" do
+describe Forms::GeneralAgencyProfile, ".find", dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:organization) { general_agency_profile.organization }
 

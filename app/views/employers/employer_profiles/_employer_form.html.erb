@@ -58,6 +58,8 @@
                        approve
                      <% end %>
                   <% end %>
+                  <br/>
+                  <%= staff.user_id ? 'Linked' : 'Unlinked' %>
                 </td>
                 <td>
                   <%= link_to(employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), method: 'delete', id: 'delete_' + staff.id.to_s, data: {confirm: 'Delete this role?'}) do %>

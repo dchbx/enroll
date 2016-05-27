@@ -234,7 +234,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "show_default_ga?" do
+  describe "show_default_ga?", dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
 

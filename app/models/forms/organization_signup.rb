@@ -49,12 +49,20 @@ module Forms
         :last_name => last_name,
         :dob => dob
       })
-      matched_people = Person.where(
-        first_name: regex_for(first_name),
-        last_name: regex_for(last_name),
-        # TODO
-        # dob: new_person.dob
-      )
+      if  self.class.to_s == 'Forms::EmployerProfile'
+        matched_people = Person.where(
+          first_name: regex_for(first_name),
+          last_name: regex_for(last_name),
+          dob: new_person.dob
+          )
+      else
+        matched_people = Person.where(
+          first_name: regex_for(first_name),
+          last_name: regex_for(last_name),
+          # TODO
+          # dob: new_person.dob
+        )
+      end
       if matched_people.count > 1
         raise TooManyMatchingPeople.new
       end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe GeneralAgencies::ProfilesController do
+RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:general_agency_staff) { FactoryGirl.create(:general_agency_staff_role) }
   let(:person) { FactoryGirl.create(:person) }
@@ -147,8 +147,8 @@ RSpec.describe GeneralAgencies::ProfilesController do
         expect(assigns[:families]).to eq general_agency_profile.families
         expect(assigns[:families]).to eq [family,family2]
       end
-      
-      it "should assign uniq page_alphabets" do 
+
+      it "should assign uniq page_alphabets" do
         expect(assigns[:page_alphabets]).to eq ["S"]
       end
     end

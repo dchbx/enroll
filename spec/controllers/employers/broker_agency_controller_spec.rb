@@ -20,6 +20,10 @@ RSpec.describe Employers::BrokerAgencyController do
     @user = FactoryGirl.create(:user)
   end
 
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   describe ".index" do
 
     context 'with out search string' do

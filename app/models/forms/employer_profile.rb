@@ -27,8 +27,9 @@ module Forms
       if employer_ids.include? employer_profile.id
         pending = false
       else
-        person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: (existing_company ? 'is_applicant': 'is_active'))
-        pending = existing_company
+        pending = existing_company && Person.staff_for_employer(employer_profile).detect{|person|person.user_id}
+        role_state = pending ? 'is_applicant' : 'is_active' 
+        person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: role_state)
       end
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
       current_user.save!
@@ -50,15 +51,15 @@ module Forms
         return false
       end
       return false if person.errors.present?
-        existing_org, claimed = check_existing_organization
-        if existing_org
-          update_organization(existing_org) unless claimed
-          @employer_profile = existing_org.employer_profile
-        else
-          org = create_new_organization
-          org.save!
-          @employer_profile = org.employer_profile
-        end
+      existing_org, claimed = check_existing_organization
+      if existing_org
+        update_organization(existing_org) unless claimed
+        @employer_profile = existing_org.employer_profile
+      else
+        org = create_new_organization
+        org.save!
+        @employer_profile = org.employer_profile
+      end
       pending = create_employer_staff_role(current_user, @employer_profile, claimed)
       [true, pending]
     end

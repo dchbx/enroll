@@ -1,7 +1,7 @@
 Feature: Employer Profile
   In order for employers to manage their accounts
   Employer Staff should be able to add and delete employer staff roles
-  @wip
+  
   Scenario: An existing person asks for a staff role at an existing company
     Given Hannah is a person
     Given Hannah is the staff person for an employer
@@ -42,7 +42,7 @@ Feature: Employer Profile
     And Sarah decides to Update Business information
     Then Point of Contact count is 1
     Then Sarah logs out
-  @wip
+  
   Scenario: A new person asks for a staff role at an existing company
     Given Hannah is a person
     Given Hannah is the staff person for an employer
@@ -78,3 +78,43 @@ Scenario: A new person claims an existing unclaimed company
     When NewGuy decides to Update Business information
     Then Point of Contact count is 1
     And NewGuy logs out
+
+Scenario: A new person claims an existing company where the Conversion POC has never logged on
+   Given a FEIN for an existing company
+   Given Josh is a person who has not logged on
+   Given Josh is the staff person for an existing employer
+   Given NewGuy is a user with no person who goes to the Employer Portal
+    Given NewGuy enters first, last, dob and contact info
+    Given NewGuy enters Employer Information
+    Then NewGuy becomes an Employer
+    When NewGuy decides to Update Business information
+    Then Point of Contact count is 2
+    And NewGuy logs out 
+
+Scenario: A new person claims an existing company where the Conversion POC has never logged on and matches first, last, dob
+   Given a FEIN for an existing company
+   Given Josh is a person who has not logged on
+   And Josh also has a duplicate person with different DOB
+   Given Josh is the staff person for an existing employer
+   Given Josh is a user with no person who goes to the Employer Portal
+    Given Josh enters info matching the employer staff role
+    Given Josh enters Employer Information
+    Then Josh becomes an Employer
+    When Josh decides to Update Business information
+    Then Point of Contact count is 1
+    And Josh logs out  
+
+Scenario: A new person claims an existing company where the Conversion POC has never logged on and gives the wrong birthday
+   Given a FEIN for an existing company
+   Given Josh is a person who has not logged on
+   Given Josh is the staff person for an existing employer
+   Given Josh is a user with no person who goes to the Employer Portal
+    Given Josh matches with different DOB from employer staff role
+    Given Josh enters Employer Information
+    Then Josh becomes an Employer
+    When Josh decides to Update Business information
+    Then Point of Contact count is 2
+    Then there is a linked POC
+    Then there is an unlinked POC
+    And Josh logs out             
+

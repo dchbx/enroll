@@ -41,6 +41,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     elsif params['decertify']
       broker_role.decertify!
       flash[:notice] = "Broker applicant decertified."
+    elsif params['pending']
+      broker_role.pending!
+      flash[:notice] = "Broker applicant is now pending."
     else
       broker_role.approve!
       broker_role.reload
