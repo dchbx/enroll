@@ -62,8 +62,9 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       allow(benefit_group).to receive(:reference_plan).and_return(plan)
       allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])
       allow(benefit_group).to receive(:effective_on_offset).and_return 30
-      assign(:plan_years, [plan_year])
+      assign(:plan_years, [plan_year, published_plan_year])
       assign(:employer_profile, employer_profile)
+      plan_years = []
     end
 
     context "when overlapping published plan years present "do
@@ -77,6 +78,14 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
         expect(rendered).not_to have_selector("a", text: "Publish Plan Year")
         expect(rendered).to have_selector("a", text: "Edit Plan Year")
       end
+
+      it "should display one less delete benefit group button than plan years" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).to have_selector("a", text: "Delete Benefit Package", count: 1)
+        expect(rendered).to have_selector(".plan-year", count: 2)
+
+      end
+
     end
 
     context "when overlapping published plan years present "do

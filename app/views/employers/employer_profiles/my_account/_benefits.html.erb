@@ -439,8 +439,8 @@
         <br class="clear"/>
       </div>
       <div class="below clear">
-        <%= link_to "Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-trans' if plan_year.aasm_state == "draft" %>
-        <%= render partial: "employers/plan_years/delete_benefit_package_modal", locals: { plan_year: plan_year, bg: bg } if plan_year.aasm_state == "draft" %>
+        <%= link_to "Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-trans' if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
+        <%= render partial: "employers/plan_years/delete_benefit_package_modal", locals: { plan_year: plan_year, bg: bg } if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
       </div>
       <% end %>
     </div>
