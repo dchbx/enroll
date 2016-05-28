@@ -1,0 +1,8 @@
+{
+  "draw" : <%= @draw %>,
+  "recordsTotal" : <%= @total_records %>,
+  "recordsFiltered" : <%= @records_filtered %>,
+  "data" :
+  <%=  @payload.to_json.html_safe %>
+
+}

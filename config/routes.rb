@@ -27,6 +27,9 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employer_index
+        get :employer_invoice
+        post :employer_invoice_dt
+        post :generate_invoice
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index

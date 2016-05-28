@@ -1,0 +1,89 @@
+<!--<div>
+  <%= link_to "All", "#", class: "btn btn-default" %>
+  <%= link_to "Renewing", "#", class: "btn btn-default" %>
+  <%= link_to "Non-Renewing", "#", class: "btn btn-default" %>
+</div>-->
+
+
+      <%= form_for 'renewingER', {url: generate_invoice_exchanges_hbx_profiles_path, method: :post, :remote => true} do |f| %>
+
+<div class="btn-group" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="ERInvoiceFilter-Group">
+       <label class="btn btn-default active"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="All" checked="">All</label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_30_day.to_s %>"><%= @next_30_day.to_s %></label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_60_day.to_s %>"><%= @next_60_day.to_s %></label>
+       <label class="btn btn-default"><input name="ERInvoiceFilter"  type="radio" autocomplete="off" value="<%= @next_90_day.to_s %>"><%= @next_90_day.to_s %></label>
+</div>
+<br><br>
+<div class="module">
+  <table class="table table-striped" id="ER-invoices-dataTable">
+    <thead>
+    <tr>
+      <th><%= check_box_tag 'ER-Invoice-check-all' %></th>
+      <th>FEIN</th>
+      <th>Employer Name</th>
+      <th>ER State</th>
+      <th>Plan Year</th>
+      <th>Conversion</th>
+      <th>EE Enrolled</th>
+      <th>EE Remaining</th>
+      <th>EE Eligible</th>
+      <th>Participation %</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+
+<div class="pull-right">
+      <%= submit_tag "Generate Invoices", class: "btn btn-primary" %>
+      <% end %>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    $('#ER-invoices-dataTable').DataTable( {
+      "processing": true,
+      "serverSide": true,
+      "ordering" : false,
+      "paging": true,
+      "searchDelay": 800,
+      "lengthMenu": [ 25, 50, 100],
+      "ajax": {
+        url: "<%= employer_invoice_dt_exchanges_hbx_profiles_path(:format => :json) %>",
+        type: "POST",
+        data: function ( d ) {
+          console.log($('#ERInvoiceFilter-Group input:radio:checked').val());
+          d.criteria = $('#ERInvoiceFilter-Group input:radio:checked').val();
+        }
+      },
+      "columns": [
+        { data: 'invoice_id' },
+        { data: 'fein' },
+        { data: 'legal_name' },
+        { data: 'state' },
+        { data: 'plan_year' },
+        { data: 'is_conversion' },
+        { data: 'enrolled' },
+        { data: 'remaining' },
+        { data: 'eligible' },
+        { data: 'enrollment_ratio' }
+    ]
+    } );
+  });
+
+  $('#ERInvoiceFilter-Group').change(function() {
+      var table = $('#ER-invoices-dataTable').dataTable().api();
+      table.draw();
+  });
+
+  $('#ER-Invoice-check-all').click(function() {
+      var action = $(this).is(':checked') ? true : false;
+      var group = $('input[name="employerId[]"]');
+      group.each(function () {
+        $(this).prop("checked", action);
+      });
+  });
+
+
+</script>

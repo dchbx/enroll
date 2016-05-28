@@ -1,0 +1,23 @@
+<% all_employee = employer_invoice.employer_profile.try(:latest_plan_year).try(:eligible_to_enroll_count) %>
+<% enrolled_ee = employer_invoice.employer_profile.try(:latest_plan_year).try(:enrolled).try(:count) %>
+<% if all_employee %>
+  <% remaining_ee = all_employee - enrolled_ee %>
+<% end %>
+
+[
+  <% er_checkbox_field = capture do %>
+    <%= check_box_tag employer_invoice.id %>
+  <% end %>
+  <%= raw er_checkbox_field.to_json %>,
+  "<%= json_escape employer_invoice.fein %>",
+  "<%= json_escape employer_invoice.employer_profile.legal_name%>",
+  "<%= json_escape employer_invoice.employer_profile.aasm_state.humanize %>",
+  "<%= json_escape employer_invoice.employer_profile.published_plan_year.try(:effective_date) %>",
+  <% conversion_info = capture do %>
+    <%= '<i class="fa fa-check-square-o" aria-hidden="true"></i>'.html_safe if employer_invoice.employer_profile.is_conversion? %>
+  <% end %>
+  <%= raw conversion_info.to_json %>,
+  "<%= json_escape enrolled_ee %>",
+  "<%= json_escape remaining_ee %>"
+  <% raw "".to_json %>
+]
