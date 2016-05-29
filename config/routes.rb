@@ -184,6 +184,7 @@ Rails.application.routes.draw do
       get 'my_account'
       get 'show_profile'
       get 'consumer_override'
+      get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
       collection do
