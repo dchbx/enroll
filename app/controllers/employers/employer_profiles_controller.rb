@@ -155,8 +155,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15, "employer") do
         if pending
-          flash[:notice] = 'Your Employer Staff application is pending'
-          render action: 'new'
+          # flash[:notice] = 'Your Employer Staff application is pending'
+          render action: 'show_pending'
         else
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
@@ -164,6 +164,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     else
       render action: "new"
     end
+  end
+
+  def show_pending
   end
 
   def update
