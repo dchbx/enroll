@@ -118,3 +118,14 @@ Scenario: A new person claims an existing company where the Conversion POC has n
     Then there is an unlinked POC
     And Josh logs out             
 
+Scenario: A company  at least one active linked employer staff can delete pending applicant
+    Given a FEIN for an existing company
+    Given Fred is a person
+    Given Fred is the staff person for an existing employer
+    Given Sam is a person
+    Given Sam is applicant staff person for an existing employer
+    When Fred accesses the Employer Portal
+    And Fred decides to Update Business information
+    Then Point of Contact count is 2
+    When Fred removes EmployerStaffRole from Sam
+    Then Point of Contact count is 1

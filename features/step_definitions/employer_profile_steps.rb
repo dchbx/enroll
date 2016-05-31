@@ -82,6 +82,11 @@ Then(/(\w+) is the staff person for an existing employer$/) do |name|
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id)
 end
 
+Then(/(\w+) is applicant staff person for an existing employer$/) do |name|
+  person = Person.where(first_name: name).first
+  employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id, aasm_state: 'is_applicant')
+end
+
 When(/(\w+) accesses the Employer Portal/) do |name|
   person = Person.where(first_name: name).first
   visit '/'
@@ -99,9 +104,7 @@ end
 
 Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   person = Person.where(first_name: new_staff).first
-
   click_link 'Add Employer Staff Role'
-
   fill_in 'first_name', with: person.first_name
   fill_in 'last_name', with: person.last_name
   fill_in  'dob', with: person.dob
