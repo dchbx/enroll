@@ -204,6 +204,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
       it "should render the show template" do
         allow(user).to receive(:person).and_return(person)
+        allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
         get :show, id: employer_profile.id, tab: "home"
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")

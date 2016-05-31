@@ -63,6 +63,7 @@ class Organization
   embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :carrier_profile, cascade_callbacks: true, validate: true
   embeds_one :hbx_profile, cascade_callbacks: true, validate: true
+  embeds_many :documents, as: :documentable
 
   accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 
@@ -141,6 +142,10 @@ class Organization
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
   end
 
+  def invoices 
+    documents.select{ |document| document.subject == 'invoice' }
+  end
+
   # Strip non-numeric characters
   def fein=(new_fein)
     write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
@@ -201,6 +206,47 @@ class Organization
 
   def self.valid_carrier_names_for_options
     Organization.valid_carrier_names.invert.to_a
+  end
+
+  def self.upload_invoice(file_path)
+    invoice_date = invoice_date(file_path) rescue nil
+    org = by_invoice_filename(file_path) rescue nil
+    if invoice_date && org && !invoice_exist?(invoice_date,org)
+      doc_uri = Aws::S3Storage.save(file_path, "invoices")
+      if doc_uri
+        document = Document.new
+        document.identifier = doc_uri
+        document.date = invoice_date
+        document.format = 'application/pdf'
+        document.subject = 'invoice'
+        document.title = File.basename(file_path)
+        org.documents << document
+        logger.debug "associated file #{file_path} with the Organization"
+        return document
+      end
+    else
+      logger.warn("Unable to associate invoice #{file_path}")
+    end
+  end
+
+  # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
+  # Returns Organization
+  def self.by_invoice_filename(file_path)
+    hbx_id= File.basename(file_path).split("_")[0]
+    Organization.where(hbx_id: hbx_id).first
+  end
+
+  # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
+  # Returns Date
+  def self.invoice_date(file_path)
+    date_string= File.basename(file_path).split("_")[1]
+    Date.strptime(date_string, "%m%d%Y")
+  end
+
+  def self.invoice_exist?(invoice_date,org)
+    if org.documents.where("date" => invoice_date).count > 0
+      return true
+    end
   end
 
   def office_location_kinds

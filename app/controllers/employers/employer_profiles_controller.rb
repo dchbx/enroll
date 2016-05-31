@@ -1,12 +1,13 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form]
+                                       :bulk_employee_upload, :bulk_employee_upload_form,:download_invoice]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
   before_action :check_access_to_organization, only: [:edit]
+  before_action :check_and_download_invoice, only: [:download_invoice]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   layout "two_column", except: [:new]
 
@@ -101,6 +102,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
       else
         @current_plan_year = @employer_profile.show_plan_year
+        collect_and_sort_invoices(params[:sort_order])
+        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
         enrollments = @employer_profile.enrollments_for_billing
         @premium_amt_total   = enrollments.map(&:total_premium).sum
         @employee_cost_total = enrollments.map(&:total_employee_cost).sum
@@ -219,6 +222,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   end
 
+  def download_invoice
+    options={}
+    options[:content_type] = @invoice.type
+    options[:filename] = @invoice.title
+    send_data Aws::S3Storage.find(@invoice.identifier) , options
+  end
+
   def bulk_employee_upload
     file = params.require(:file)
     @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
@@ -242,6 +252,16 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   private
+
+  def collect_and_sort_invoices(sort_order='ASC')
+    @invoices = @employer_profile.organization.try(:documents)
+    sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
+  end
+
+  def check_and_download_invoice
+    @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
+  end
+
   def paginate_employees
     status_params = params.permit(:id, :status, :search)
     @status = status_params[:status] || 'active'

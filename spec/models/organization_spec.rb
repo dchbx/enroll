@@ -9,6 +9,10 @@ RSpec.describe Organization, dbclean: :after_each do
   let(:fein) {"065872626"}
   let(:bad_fein) {"123123"}
   let(:office_locations) {FactoryGirl.build(:office_locations)}
+  let(:invoice) { FactoryGirl.create(:document) }
+  let(:org) { FactoryGirl.create(:organization) }
+  let(:file_path){ "test/hbxid_01012001_invoice_R.pdf"}
+  let(:valid_file_names){ ["hbxid_01012001_invoice_R.pdf","hbxid_04012014_invoice_R.pdf","hbxid_10102001_invoice_R.pdf"] }
 
   let(:fein_error_message) {"#{bad_fein} is not a valid FEIN"}
 
@@ -343,6 +347,50 @@ RSpec.describe Organization, dbclean: :after_each do
     it "should save success with one primary office_location" do
       organization.office_locations = [office_location]
       expect(organization.save).to eq true
+    end
+  end
+
+  context "Invoice Upload" do
+    before do
+      allow(Aws::S3Storage).to receive(:save).and_return("urn:openhbx:terms:v1:file_storage:s3:bucket:invoices:asdds123123")
+      allow(Organization).to receive(:by_invoice_filename).and_return(org)
+    end
+
+    context "with valid arguments" do
+      before do
+        Organization.upload_invoice(file_path)
+      end
+       it "should upload invoice to the organization" do
+        expect(org.documents.count).to eq 1
+      end
+    end
+    context "with duplicate files" do
+      before do
+        Organization.upload_invoice(file_path)
+        Organization.upload_invoice(file_path)
+      end
+       it "should upload invoice to the organization only once" do
+        expect(org.documents.count).to eq 1
+      end
+    end
+
+    context "without date in file name" do
+      before do
+        Organization.upload_invoice('dummyfile.pdf')
+      end
+       it "should Not Upload invoice" do
+        expect(org.documents.count).to eq 0
+      end
+    end
+  end
+
+  context "invoice_date" do 
+    context "with valid date in the file name" do
+      it "should parse the date" do
+        valid_file_names.each do | file_name |
+          expect(Organization.invoice_date(file_name)).to be_an_instance_of(Date)
+        end
+      end
     end
   end
 end

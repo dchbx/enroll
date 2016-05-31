@@ -53,6 +53,15 @@ module Employers::EmployerHelper
     end
   end
 
+
+  def invoice_formated_date(date)
+    date.strftime("%m/%d/%Y")
+  end
+
+  def invoice_coverage_date(date)
+    "#{date.next_month.beginning_of_month.strftime('%b %Y')}" rescue nil
+  end
+
   def coverage_kind(census_employee=nil)
     return "" if census_employee.blank? || census_employee.employee_role.blank?
     enrolled = census_employee.active_benefit_group_assignment.try(:aasm_state)

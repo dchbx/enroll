@@ -186,6 +186,9 @@ Rails.application.routes.draw do
       get 'consumer_override'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+      member do 
+        get "download_invoice"
+      end
       collection do
         get 'welcome'
         get 'search'

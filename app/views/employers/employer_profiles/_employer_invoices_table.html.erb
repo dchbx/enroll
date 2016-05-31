@@ -1,0 +1,24 @@
+<% if @invoices.present? %>
+<div class="table-responsive module employer-invoices">
+  <table class="table table-striped table-hover table-sm panel panel-default">
+    <thead class="thead-default">
+      <tr>
+        <th>
+          <span class='sorter'><%= link_to "Statement Date <span class='fa-stack fa-lg'><i class='fa fa-caret-up fa-stack-1x' aria-hidden='true'></i><i class='fa fa-caret-down fa-stack-1x' aria-hidden='true'></i></i></span>".html_safe,employers_employer_profile_path(@employer_profile, :tab => 'billing', :sort_order =>@sort_order)%></span>
+        </th>
+        <th>Coverage Period</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <% @invoices.each do |invoice|%>
+        <td><%= link_to "#{invoice_formated_date(invoice.date)} <i class='fa fa-cloud-download' aria-hidden='true' title='Download' data-toggle='tooltip'></i>".html_safe, download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
+        <td><%=invoice_coverage_date(invoice.date)%></td>
+      <tr/>
+      <%end%>
+    </tbody>
+  </table>
+</div>
+<% else %>
+  <h4>You don't have any invoices. When you do, they will be displayed here.</h4>
+<% end %>
