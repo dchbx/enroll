@@ -105,9 +105,11 @@ module Insured::FamiliesHelper
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 
-  def display_aasm_state?(aasm_state)
-    if aasm_state == "coverage_selected" || aasm_state == "coverage_canceled" || aasm_state == "coverage_terminated"
-     true
-    end  
-  end  
+  def display_aasm_state?(enrollment)
+    if enrollment.is_shop?
+      true
+    else
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
+    end
+  end    
 end
