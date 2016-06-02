@@ -109,25 +109,36 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   end
 
   describe "display_aasm_state?" do
-    let(:aasm_state1) {"shopping"}
-    let(:aasm_state2) {"inactive"}
-    let(:aasm_state3) {"unverified"}
-    let(:aasm_state4) {"coverage_enrolled"}
-    let(:aasm_state5) {"coverage_selected"}
-    let(:aasm_state6) {"coverage_canceled"}
-    let(:aasm_state7) {"coverage_terminated"}
+    let(:person) { FactoryGirl.build_stubbed(:person)}
+    let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
+    let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
+    let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
+    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "any_state"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated"]
 
-    it "should return true" do
-      expect(helper.display_aasm_state?(aasm_state5)).to eq true
-      expect(helper.display_aasm_state?(aasm_state6)).to eq true
-      expect(helper.display_aasm_state?(aasm_state7)).to eq true
+    context "IVL market" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      end
+      states.each do |status|
+        it "returns #{show_for_ivl.include?(status)} for #{status}" do
+          hbx_enrollment.aasm_state = status
+          expect(helper.display_aasm_state?(hbx_enrollment)).to eq show_for_ivl.include?(status)
+        end
+      end
     end
 
-    it "should return false" do
-      expect(helper.display_aasm_state?(aasm_state1)).to be_falsey
-      expect(helper.display_aasm_state?(aasm_state2)).to be_falsey
-      expect(helper.display_aasm_state?(aasm_state3)).to be_falsey
-      expect(helper.display_aasm_state?(aasm_state4)).to be_falsey
-    end  
+    context "SHOP market" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      end
+      states.each do |status|
+        it "returns true for #{status}" do
+          hbx_enrollment.aasm_state = status
+          expect(helper.display_aasm_state?(hbx_enrollment)).to eq true
+        end
+      end
+    end
   end
 end
