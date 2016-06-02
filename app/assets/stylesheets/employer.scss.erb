@@ -1,0 +1,147 @@
+$primary-blue: #007bc4;
+$primay-active-button-text-color: #ffffff;
+$primary-bold: 600;
+$primary-green: #69A30D;
+
+.module {
+  &.home-tab {
+    .plan-details {
+      border-top: none !important;
+      padding-bottom: 15px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .benefit-packages {
+      .panel:first-of-type {
+        border-bottom: none !important;
+        padding: 15px;
+        .col-xs-6 .title {
+          font-size: 18px;
+        }
+      }
+    }
+    .fa {
+      margin: 0;
+    }
+    .referenceplan {
+    }
+    .title {
+      text-transform: uppercase;
+      color: $primary-green;
+      font-weight: bold;
+      span {
+        color: #333;
+        font-weight: normal;
+      }
+    }
+    .description {
+      text-transform: none;
+      font-weight: normal;
+      margin-bottom: 15px;
+    }
+    .health {
+      padding-top: 10px;
+    }
+    .dental {
+      padding-top: 15px;
+    }
+    .plan-year {
+      padding-bottom: 15px;
+    }
+  }
+  &#plan_year {
+    .fa {
+      color: $primary-blue;
+    }
+  }
+  &.plan-year {
+    .fa {
+     &.enrolling {
+       padding-bottom: 20px;
+     }
+    }
+    .btn {
+      .fa {
+        margin: 0;
+      }
+    }
+    .above {
+      z-index: 100;
+      .btn {
+        margin: 0 0px 10px 10px;
+      }
+    }
+    .below {
+      z-index: 100;
+      .btn {
+        margin: 0 10px 25px 0;
+      }
+    }
+    .benefit-group {
+      .benefit-package {
+        margin-bottom: 15px;
+        .col-xs-2 {
+          button {
+            margin-top: 12px;
+          }
+        }
+
+        .benefitgroup:first-of-type {
+          padding-bottom: 0;
+        }
+        .benefitgroup:last-of-type {
+          padding-top: 0;
+          padding-bottom: 35px;
+        }
+        .panel {
+          padding: 15px 15px;
+        }
+      }
+      .title {
+        text-transform: uppercase;
+        color: $primary-green;
+        font-weight: bold;
+        span {
+          color: #333;
+          font-weight: normal;
+        }
+      }
+      .description {
+        text-transform: none;
+        font-weight: normal;
+        margin-bottom: 15px;
+      }
+      .health {
+        padding-top: 10px;
+        .fa {
+          margin: 0;
+        }
+      }
+      .dental {
+        padding-top: 15px;
+        .fa {
+          margin: 0;
+        }
+      }
+    }
+  }
+  &.controls {
+    .above {
+      z-index: 100;
+      .btn {
+        margin: 0 0px 10px 10px;
+      }
+    }
+    .below {
+      z-index: 100;
+      .btn {
+        margin: 0 10px 25px 0;
+      }
+    }
+  }
+  &.benefit-properties {
+    .description {
+      border-bottom: none;
+    }
+  }
+}

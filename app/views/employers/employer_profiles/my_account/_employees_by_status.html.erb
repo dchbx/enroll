@@ -38,7 +38,6 @@
           <td><%= format_date census_employee.dob %></td>
           <td><%= format_date census_employee.hired_on %></td>
           <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
-
           <td>
           <% if census_employee.active_benefit_group_assignment.present? %>
             <%= census_employee.active_benefit_group_assignment.benefit_group.title.capitalize %>
@@ -65,8 +64,8 @@
               <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;"onclick="$(this).closest('tr').next().show();">Rehire</span>
             </a>
           <% else %>
-          <%= link_to raw('<i class="fa fa-pencil fa-lg" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
-            <i class="fa fa-trash-o fa-lg" data-toggle="tooltip" title="Terminate"></i>
+          <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
+            <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
           <% end %>
           </td>
         </tr>

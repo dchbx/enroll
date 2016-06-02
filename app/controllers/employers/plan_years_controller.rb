@@ -76,6 +76,30 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def delete_benefit_group
+    plan_year = params[:plan_year_id]
+    plan_year = PlanYear.find(plan_year)
+    benefit_group_id = params[:benefit_group_id]
+    benefit_groups = plan_year.benefit_groups
+    if benefit_groups.count > 1
+      bg = benefit_groups.find(benefit_group_id)
+      bg_title = bg.title
+      invalid_benefit_group_assignments = @employer_profile.benefit_group_assignments.select { |bga| bga.benefit_group_id.to_s == benefit_group_id }
+      invalid_benefit_group_assignments.each do |invalid_benefit_group_assignment|
+        census_employee = invalid_benefit_group_assignment.census_employee
+        invalid_benefit_group_assignment.delete
+        census_employee.save
+      end
+      bg.delete
+      if plan_year.save
+        flash[:notice] = "Benefit Group: #{bg.title} successfully deleted."
+      end
+    else
+      flash[:error] = "Benefit package can not be deleted because it is the only benefit package remaining in the plan year."
+    end
+    render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
+  end
+
   def make_default_benefit_group
     plan_year = @employer_profile.plan_years.where(_id: params[:plan_year_id]).first
     if plan_year && benefit_group = plan_year.benefit_groups.where(_id: params[:benefit_group_id]).first
@@ -337,7 +361,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
- 
+
     @benefit_group = @plan_year.benefit_groups[0]
 
     if @coverage_type == '.dental'
@@ -383,7 +407,7 @@ class Employers::PlanYearsController < ApplicationController
 
     employee_costs = @plan_year.employer_profile.census_employees.active.inject({}) do |census_employees, employee|
 
-     
+
       costs = {
         ref_plan_cost: @benefit_group.employee_cost_for_plan(employee, plan)
       }
@@ -430,7 +454,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year_params = params.require(:plan_year).permit(
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
-      :benefit_groups_attributes => [ :id, :title, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
+      :benefit_groups_attributes => [ :id, :title, :description, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
                                       :carrier_for_elected_plan, :carrier_for_elected_dental_plan, :metal_level_for_elected_plan,
                                       :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy, :dental_relationship_benefits_attributes_time,
                                       :relationship_benefits_attributes => [
