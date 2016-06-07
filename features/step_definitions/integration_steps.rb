@@ -642,7 +642,7 @@ When(/^I select a future qle date$/) do
 end
 
 Then(/^I should see not qualify message$/) do
-  expect(page).to have_content "The date you submitted does not qualify for special enrollment"
+  expect(page).to have_content "If you are trying to report a future event, please come back on or after the actual date of the event."
   screenshot("not_qualify")
 end
 
