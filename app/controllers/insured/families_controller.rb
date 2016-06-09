@@ -137,6 +137,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
   end
 
   def purchase

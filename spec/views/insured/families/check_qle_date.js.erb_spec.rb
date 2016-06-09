@@ -79,4 +79,17 @@ describe "insured/families/check_qle_date.js.erb" do
       expect(render).to match /Please double check the date or contact DC Health Link's Customer Care Center: #{Settings.contact_center.phone_number}/
     end
   end
+
+  context "For event which happens in future" do
+    before :each do
+     assign :qualified_date, false
+     assign :future_qualified_date, true
+     assign :qle, qle
+     render file: "insured/families/check_qle_date.js.erb"
+    end
+
+    it "should match error notice " do
+      expect(render).to match /The date you submitted does not qualify for a special enrollment period. Qualifying life events may be reported up to 30 days after the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. For further assistance, please contact DC Health Link Customer Service at #{Settings.contact_center.phone_number}/
+    end
+  end
 end
