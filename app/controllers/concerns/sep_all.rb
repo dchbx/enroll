@@ -16,13 +16,12 @@ module SepAll
     end
 
     @draw = dt_query.draw
-    @total_records = all_families.count
-    @records_filtered = families_dt.count
-    @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
     @state = 'both'
-    
+    @total_records = sortData(all_families, @state, 'no')
+    @records_filtered = sortData(families_dt, @state, 'no')
+    @families = sortData(families_dt.skip(dt_query.skip).limit(dt_query.take), @state, 'yes')
   end
-
+ 
   def includeIVL
 
     if QualifyingLifeEventKind.where(:market_kind => 'individual').present?
@@ -42,10 +41,10 @@ module SepAll
       end
 
       @draw = dt_query.draw
-      @total_records = all_families_in_ivl.count
-      @records_filtered = families_dt.count
-      @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
       @state = 'ivl'
+      @total_records = sortData(all_families_in_ivl, @state, 'no')
+      @records_filtered = sortData(families_dt, @state, 'no')
+      @families = sortData(families_dt.skip(dt_query.skip).limit(dt_query.take), @state, 'yes')
     end
 
   end
@@ -69,11 +68,10 @@ module SepAll
       end
 
       @draw = dt_query.draw
-      @total_records = all_families_in_shop.count
-      @records_filtered = families_dt.count
-      @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
       @state = 'shop'
-
+      @total_records = sortData(all_families_in_shop, @state, 'no')
+      @records_filtered = sortData(families_dt, @state, 'no')
+      @families = sortData(families_dt.skip(dt_query.skip).limit(dt_query.take), @state, 'yes')
     end
 
   end
@@ -102,4 +100,44 @@ module SepAll
         flash[:error] = "Not saved"
       end
   end
+
+  def sortData(families, state, condition)
+    init_arr = []
+
+    if (state == 'both')
+      families.each do|f| if families.present?
+
+        if f.primary_applicant.person.consumer_role.present? && f.primary_applicant.person.active_employee_roles.present?     
+          init_arr.push(f)
+        end
+
+       end
+      end
+
+    elsif (state == 'ivl')
+      families.each do|f| if families.present?
+
+        if f.primary_applicant.person.consumer_role.present? 
+          init_arr.push(f)
+        end
+
+       end
+      end
+
+    else
+      families.each do|f| if families.present?
+
+        if f.primary_applicant.person.active_employee_roles.present?    
+          init_arr.push(f)
+        end
+
+       end
+      end
+
+    end
+
+   condition == 'yes' ? init_arr : init_arr.length;
+    
+  end
+
 end

@@ -1,55 +1,7 @@
 
+<% fam.each do|family| if fam.present? %>
 
-<% init_arr = [] %>
-
-
-<% if state == 'both'%>
-
-	<% fam.each do|f| if fam.present? %>
-			
-			<% if f.primary_applicant.person.consumer_role.present? && f.primary_applicant.person.active_employee_roles.present? %>
-					
-				<% init_arr.push(f) %>
-
-			<% end %>
-
-		<% end %>
-
-	<% end %>
-
-<% elsif state == 'ivl' %>
-	 	
-   <% fam.each do|f| if fam.present? %>
-
-		  <% if f.primary_applicant.person.consumer_role.present? %>
-			
-				<% init_arr.push(f) %>
-
-			<% end %>	
-
-	  <% end %>
-
-   	<% end %>
-
-<% else %>
- 	 
-   <% fam.each do|f| if fam.present? %>
-
-		  <% if f.primary_applicant.person.active_employee_roles.present? %>
-
-				<% init_arr.push(f) %>
-
-		  <% end %>
-
-	   <% end %>
-
-	<% end %>
-
-<% end %>
-
-<% init_arr.each do|family| if init_arr.present? %>
-
-	<% if family == init_arr.last %>
+	<% if family == fam.last %>
 
 		[
 			"<%= family.primary_applicant.person.hbx_id.to_json %>",
@@ -104,5 +56,3 @@
   <% end %>
 
 <% end %>
-
-

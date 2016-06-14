@@ -10,7 +10,6 @@
               <thead>              
                 <tr>
                   <th>SEP REASON</th>
-                  <th>MARKET KIND</th>
                   <th>EFFECTIVE DATE RULE</th> 
                   <th>EVENT DATE</th>
                   <th>SEP START DATE</th>
@@ -26,12 +25,7 @@
               <tbody>
                 <tr>
                   <td><%=f.title %></td>
-
-                  <% if f.market_kind.present? %>
-                    <td><%=f.market_kind.upcase%></td>
-                  <% else %>
-                    <td>N/A</td>
-                  <% end %>
+                 
 
                   <% if f.effective_on_kind.present? %>
                     <td><%=f.effective_on_kind.humanize %></td>
@@ -91,4 +85,15 @@
        </table>
       
     </div>
+
+    <div class="col-md-2 col-md-offset-11 col-sm-2 col-xs-12">
+      <%= link_to 'Back', 'javascript:void(0);', :onclick => 'history.go(-1)', :class => 'btn btn-primary' %>
+    </div>
+
 </div>
+
+
+
+
+
+ 
