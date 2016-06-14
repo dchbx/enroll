@@ -13,7 +13,7 @@
       <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :prompt => 'SUFFIX', class: "floatlabel form-control" %>
+      <%= f.select :name_sfx, [ 'N/A', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :prompt => 'SELECT SUFFIX IF APPLICABLE', class: "floatlabel form-control" %>
     </div>
   </div>
 

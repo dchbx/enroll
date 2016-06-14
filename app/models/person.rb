@@ -342,6 +342,8 @@ class Person
     case name_sfx
       when "ii" ||"iii" || "iv" || "v"
         [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+      when "N/A"
+        [first_name.capitalize, last_name.capitalize].compact.join(" ")
       else
         [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
       end
