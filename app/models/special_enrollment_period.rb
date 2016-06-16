@@ -55,7 +55,7 @@ class SpecialEnrollmentPeriod
   field :market_kind, type:String
 
   validates :csl_num,
-    length: { minimum: 10, maximum: 10, message: "CSL NUM must be 10 digits" },
+    length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
     allow_blank: true,
     numericality: true
 
@@ -233,9 +233,4 @@ private
     errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
   end
 
-  def csl_validates
-    if csl_num.present?
-      errors.add(:base, "csl_num cannot be less than 10 digits") if self.csl_num.length < 10
-    end
-  end
 end

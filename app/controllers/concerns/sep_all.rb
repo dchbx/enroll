@@ -95,10 +95,12 @@ module SepAll
     special_enrollment_period.market_kind = params.permit(:market_kind)[:market_kind] if params[:market_kind].present?
   
     if special_enrollment_period.save
-        flash[:notice] = 'SEP added for ' + @name
-      else
-        flash[:error] = "Not saved"
+      flash[:notice] = 'SEP added for ' + @name
+    else
+      special_enrollment_period.errors.full_messages.each do |message|
+      flash[:error] = "SEP not saved. " + message
       end
+    end
   end
 
   def sortData(families, state, condition)

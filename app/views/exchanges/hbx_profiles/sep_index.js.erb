@@ -57,11 +57,10 @@ function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_d
   };
 
  
-var getObj;
+
 var self_attested;
 
 $(document).on('change','.admin_selected_sep_reason select',function(){  
-
 
   if($(this).val() == '') {
    $('.init_event_date').hide();    
@@ -73,16 +72,15 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
    $('.init_event_date').show();
    $('.admin_effective_on_kind_options').hide();
    $('.start_end_date').hide();
-   
+
    var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
-   getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
+   var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
 
    self_attested = getObj.data('is-self-attested');
 
    //init_datepicker_for_qle_date(getObj.data('pre-event-sep-in-days'), getObj.data('post-event-sep-in-days'), getObj.data('current-date'));
    init_datepicker_for_qle_date(getObj.data('pre-event-sep-in-days'), getObj.data('post-event-sep-in-days'), getDate());
 
-   
    self_attested == true ? $('#start_on, #end_on').addClass("disabled-input") : $('#start_on').removeClass("disabled-input");
 
 
@@ -215,6 +213,7 @@ $(document).on('change','.radio_option input', function(){
 
 
 $(document).on('change','.init_event_date input', function(){
+
   if($(this).val() == ''){
    $('.admin_effective_on_kind_options').hide(); 
    $('.start_end_date').hide();
@@ -265,12 +264,16 @@ $(document).on('change','.start_end_date .start_btn input', function(){
 });
 
 
-$('#tab_datatables a[data-toggle="tab"]').on("click", function(){
+$('#tab_datatables a[data-toggle="tab"]').on("mousedown", function(){
 
   if(add_btn_counter > 0){
     add_btn_state = false;
-    $(idTable + 'span.add-control').trigger('click');
+    $(idTable + " span.add-control").trigger('click');
   }
+});
+
+
+$('#tab_datatables a[data-toggle="tab"]').on("click", function(){
 
   if(history_btn_counter > 0){
     history_btn_state = false;
@@ -358,7 +361,7 @@ $('.sep_table tbody').on('click', 'span.add-control', function () {
     $(this).find('i').addClass('fa fa-plus-square');
     
     add_btn_counter == 0 ? resetButtons($('td.history-control')) : add_btn_counter;
-    
+
     $('div.add_sep_datatable_slider', row.child()).slideUp( function () {
     row.child.hide();
    });
