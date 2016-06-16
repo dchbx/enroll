@@ -1,0 +1,8 @@
+{
+  "draw" : "<%= @draw %>",
+  "recordsTotal" : "<%= @total_records %>",
+  "recordsFiltered" : "<%= @records_filtered %>",
+  "data" : [
+    <%= render partial: "filtered_employers", collection: @organizations, spacer_template: "shared/json_array_spacer" %>
+  ]
+}

@@ -10,6 +10,30 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#format_time_display" do
+    let(:timestamp){ Time.now.utc }
+    it "should display the time in proper format" do
+      expect(helper.format_time_display(timestamp)).to eq timestamp.in_time_zone('Eastern Time (US & Canada)')
+    end
+
+    it "should return empty if no timestamp is present" do
+      expect(helper.format_time_display(nil)).to eq ""
+    end
+  end
+
+  describe "#group_xml_transmitted_message" do
+    let(:employer_profile_1){ double("EmployerProfile", xml_transmitted_timestamp: Time.now.utc, legal_name: "example1 llc.") }
+    let(:employer_profile_2){ double("EmployerProfile", xml_transmitted_timestamp: nil, legal_name: "example2 llc.") }
+
+    it "should display re-submit message if xml is being transmitted again" do
+      expect(helper.group_xml_transmitted_message(employer_profile_1)).to eq  "The group xml for employer #{employer_profile_1.legal_name} was transmitted on #{format_time_display(employer_profile_1.xml_transmitted_timestamp)}. Are you sure you want to transmit again?"
+    end
+
+    it "should display first time message if xml is being transmitted first time" do
+      expect(helper.group_xml_transmitted_message(employer_profile_2)).to eq  "Are you sure you want to transmit the group xml for employer #{employer_profile_2.legal_name}?"
+    end
+  end
+
   describe "#display_dental_metal_level" do
     let(:dental_plan_2015){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2015)}
     let(:dental_plan_2016){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2016)}
@@ -21,6 +45,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should display metal level if its a 2016 plan" do
       expect(display_dental_metal_level(dental_plan_2016)).to eq dental_plan_2016.dental_level.titleize
     end
+  end
+
+  describe "#participation_rule" do
+    let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
+
+    it "should return correct eligibility criteria" do
+      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer"
+    end
+
   end
 
   describe "#enrollment_progress_bar" do

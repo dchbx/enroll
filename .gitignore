@@ -30,6 +30,8 @@ db/seedfiles/**/*.bson
 db/seedfiles/**/*.json
 # db/seedfiles/*.csv
 db/seedfiles/*.yml
+db/seedfiles/cms/**/*.csv
+db/seedfiles/cms/**/*.zip
 
 # Ignore Mongoid connection file
 # config/mongoid.yml
@@ -50,6 +52,9 @@ tags
 
 spec/vocabularies
 plan_xmls.zip
+
+# Ignore byebug history
+.byebug_history
 
 # Ignore .idea
 .idea

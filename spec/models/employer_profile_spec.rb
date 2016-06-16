@@ -102,6 +102,32 @@ describe EmployerProfile, dbclean: :after_each do
     end
   end
 
+  context "can_transmit_xml?" do
+    context "for new employer" do
+      let(:new_plan_year){ FactoryGirl.build(:plan_year) }
+      let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
+
+      it "should return true if its new employer and does not have binder paid status" do
+        expect(employer_profile.can_transmit_xml?).to be_truthy
+      end
+
+      it "should return false if employer has binder paid status" do
+        employer_profile.aasm_state = "binder_paid"
+        employer_profile.save
+        expect(employer_profile.can_transmit_xml?).to be_falsey
+      end
+    end
+
+    context "for renewing employer" do
+      let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
+      let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year]) }
+
+      it "should return false if its renewing employer" do
+        expect(employer_profile.can_transmit_xml?).to be_falsey
+      end
+    end
+  end
+
   context "has registered and enters initial application process" do
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
@@ -203,6 +229,30 @@ describe EmployerProfile, dbclean: :after_each do
     end
 
   end
+
+   context "binder paid methods" do
+       let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
+       let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'enrolling') }
+       let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
+       let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
+
+       before do
+         renewing_employer.save!
+         new_employer.save!
+       end
+
+       it "#instance methods" do
+         expect(new_employer.is_new_employer?).to eq true
+         expect(renewing_employer.is_renewing_employer?).to eq true
+         expect(renewing_employer.plan_years.renewing).to eq renewing_plan_year.to_a
+         expect(new_employer.has_next_month_plan_year?).to eq true
+       end
+
+       it "#class method" do
+         expect(EmployerProfile.filter_employers_for_binder_paid.size).to eq 1
+       end
+
+     end
 
   context ".billing_plan_year" do
     let(:active_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'published') }

@@ -3,6 +3,7 @@ class HbxProfile
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  extend Acapi::Notifiers
 
   embedded_in :organization
 
@@ -70,6 +71,7 @@ class HbxProfile
     BrokerRole.inactive
   end
 
+
   class << self
     def find(id)
       org = Organization.where("hbx_profile._id" => BSON::ObjectId.from_string(id)).first
@@ -92,6 +94,16 @@ class HbxProfile
 
     def current_hbx
       find_by_state_abbreviation("DC")
+    end
+
+    def transmit_group_xml(employer_profile_ids)
+      hbx_ids = []
+      employer_profile_ids.each do |empr_id|
+        empr = EmployerProfile.find(empr_id)
+        hbx_ids << empr.hbx_id
+        empr.update_attribute(:xml_transmitted_timestamp, Time.now.utc)
+      end
+      notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids } )
     end
   end
 

@@ -27,6 +27,7 @@ class EmployerProfile
 
   field :profile_source, type: String, default: "self_serve"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+  field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -74,6 +75,10 @@ class EmployerProfile
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
 
   alias_method :is_active?, :is_active
+
+  # def self.all_with_next_month_effective_date
+    # Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
+  # end
 
   def parent
     raise "undefined parent Organization" unless organization?
@@ -295,6 +300,10 @@ class EmployerProfile
     plan_years.renewing.first
   end
 
+  def can_transmit_xml?
+    !self.renewing_plan_year.present? && !self.binder_paid?
+  end
+
   def renewing_plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
   end
@@ -305,6 +314,7 @@ class EmployerProfile
 
   ## Class methods
   class << self
+
     def list_embedded(parent_list)
       parent_list.reduce([]) { |list, parent_instance| list << parent_instance.employer_profile }
     end
@@ -658,6 +668,30 @@ class EmployerProfile
   # def is_eligible_to_shop?
   #   registered? or published_plan_year.enrolling?
   # end
+
+  def self.update_status_to_binder_paid(employer_profile_ids)
+    employer_profile_ids.each do |id|
+      empr = self.find(id)
+      empr.update_attribute(:aasm_state, "binder_paid")
+    end
+  end
+
+  def is_new_employer?
+    !renewing_plan_year.present? #&& TimeKeeper.date_of_record > 10
+  end
+
+  def is_renewing_employer?
+     renewing_plan_year.present? #&& TimeKeeper.date_of_record.day > 13
+  end
+
+  def has_next_month_plan_year?
+    show_plan_year.present? && (show_plan_year.start_on == (TimeKeeper.date_of_record.next_month).beginning_of_month)
+  end
+
+  def self.filter_employers_for_binder_paid
+    # filter employers that have next month plan year
+    orgs = Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
+  end
 
   def is_eligible_to_enroll?
     published_plan_year.enrolling?
