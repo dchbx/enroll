@@ -52,7 +52,6 @@ FactoryGirl.define do
       user.save
       end
     end
-
   end
 
   trait :consumer do

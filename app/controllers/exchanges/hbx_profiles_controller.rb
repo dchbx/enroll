@@ -246,7 +246,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def add_new_sep
     if params[:qle_id].present?
-      createSep 
+      createSep
     end
     redirect_to exchanges_hbx_profiles_root_path
   end
