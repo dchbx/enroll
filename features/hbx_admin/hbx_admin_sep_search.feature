@@ -18,6 +18,10 @@ Feature: search IVL enrollment for SEP information
 	#TODO create scenario to verify social security number appears in the form xxx-xx-1111
 
 
+	Scenario: successfully view history page
+		When I click the history button
+		Then I see the Back button
+
 	Scenario: primary subscriber is registered only as a consumer
 		Given I have a primary subscriber who is registered only as a consumer
 		When I click the IVL tab

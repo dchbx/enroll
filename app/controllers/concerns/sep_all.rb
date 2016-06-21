@@ -17,9 +17,10 @@ module SepAll
 
     @draw = dt_query.draw
     @state = 'both'
-    @total_records = sortData(all_families, @state, 'no')
-    @records_filtered = sortData(families_dt, @state, 'no')
-    @families = sortData(families_dt.skip(dt_query.skip).limit(dt_query.take), @state, 'yes')
+    @total_records = sortData(all_families, @state)
+    @records_filtered = sortData(families_dt, @state)
+    @dataArray = sortData(families_dt, @state, 'yes')
+    @families = @dataArray.slice(dt_query.skip.to_i, dt_query.take.to_i)
   end
  
   def includeIVL
@@ -42,9 +43,10 @@ module SepAll
 
       @draw = dt_query.draw
       @state = 'ivl'
-      @total_records = sortData(all_families_in_ivl, @state, 'no')
-      @records_filtered = sortData(families_dt, @state, 'no')
-      @families = sortData(families_dt.skip(dt_query.skip).limit(dt_query.take), @state, 'yes')
+      @total_records = sortData(all_families_in_ivl, @state)
+      @records_filtered = sortData(families_dt, @state)
+      @dataArray = sortData(families_dt, @state, 'yes')
+      @families = @dataArray.slice(dt_query.skip.to_i, dt_query.take.to_i)
     end
 
   end
@@ -69,9 +71,10 @@ module SepAll
 
       @draw = dt_query.draw
       @state = 'shop'
-      @total_records = sortData(all_families_in_shop, @state, 'no')
-      @records_filtered = sortData(families_dt, @state, 'no')
-      @families = sortData(families_dt.skip(dt_query.skip).limit(dt_query.take), @state, 'yes')
+      @total_records = sortData(all_families_in_shop, @state)
+      @records_filtered = sortData(families_dt, @state)
+      @dataArray = sortData(families_dt, @state, 'yes')
+      @families = @dataArray.slice(dt_query.skip.to_i, dt_query.take.to_i)
     end
 
   end
@@ -103,7 +106,8 @@ module SepAll
     end
   end
 
-  def sortData(families, state, condition)
+  def sortData(families, state, returnData=nil)
+
     init_arr = []
 
     if (state == 'both')
@@ -138,7 +142,7 @@ module SepAll
 
     end
 
-   condition == 'yes' ? init_arr : init_arr.length;
+   returnData == 'yes' ? init_arr : init_arr.length;
     
   end
 
