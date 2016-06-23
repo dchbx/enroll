@@ -111,7 +111,6 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  #TODO add AJAX handling
   #wait_for_ajax(3)
   expect(page).to have_content('Broker Agencies')
 end
