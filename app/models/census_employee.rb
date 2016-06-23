@@ -414,10 +414,19 @@ class CensusEmployee < CensusMember
     state :eligible, initial: true
     state :employee_role_linked
     state :employment_terminated
+    state :cobra_employee
     state :rehired
 
     event :rehire_employee_role, :after => :record_transition do
       transitions from: [:employment_terminated], to: :rehired
+    end
+
+    event :cobra_rehire, :after => :record_transition do
+      transitions from: [:cobra_employee], to: :rehired
+    end
+
+    event :cobra_employee, :after => :record_transition do
+      transitions from: [:employment_terminated], to: :cobra_employee
     end
 
     event :link_employee_role, :after => :record_transition do
