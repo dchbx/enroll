@@ -1,7 +1,11 @@
 .module {
   &#employers_dataTable_wrapper,
   #families_dataTable_wrapper,
-  #verification-dataTable_wrapper {
+  #verification-dataTable_wrapper,
+  #sepAdmin_wrapper,
+  #sepAdmin1_wrapper,
+  #sepAdmin2_wrapper
+   {
     .small-6 {
       width: 50%;
       &:first-of-type {
@@ -16,7 +20,6 @@
               height: auto !important;
               line-height: normal !important;
             }
-          }
           .button {
             top: -6px;
           }
@@ -73,6 +76,7 @@
       white-space: nowrap;
     }
   }
+ }
 }
 .dataTables_info {
   text-align: right;
@@ -80,4 +84,17 @@
 
 .dataTables_paginate {
   text-align: center !important;
+}
+
+.dn-1 {
+  display: block !important;
+  opacity: 100 !important;
+}
+
+#sepAdmin_wrapper, #sepAdmin1_wrapper, #sepAdmin2_wrapper {
+  .header {
+    .small-6:first-of-type {
+      display: none;
+    }
+  }
 }

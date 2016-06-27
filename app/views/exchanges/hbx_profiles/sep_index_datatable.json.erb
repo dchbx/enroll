@@ -1,0 +1,12 @@
+
+{
+  "draw" : <%= @draw %>,
+  "recordsTotal" : <%= @total_records %>,
+  "recordsFiltered" : <%= @records_filtered %>,
+  "data" : [
+  	
+    <%= render partial: "sep_datatable_family", locals: {fam: @families, state: @state} %>
+  ]
+}
+
+

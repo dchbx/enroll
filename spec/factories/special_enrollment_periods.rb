@@ -6,7 +6,7 @@ FactoryGirl.define do
     end_on  { qle_on + 30.days }
     effective_on  { qle_on.end_of_month + 1 }
     submitted_at  { Time.now }
-    
+
 
     trait :expired do
       qle_on  { 1.year.ago.to_date }
@@ -16,6 +16,13 @@ FactoryGirl.define do
       # effective_on  { qle_on.end_of_month + 1 }
       # submitted_at  { Time.now }
     end
+
+    trait :with_admin_permitted_sep_effective_dates do
+      option1_date { TimeKeeper.date_of_record + 1.day }
+      option2_date { TimeKeeper.date_of_record + 2.day }
+      option3_date { TimeKeeper.date_of_record + 3.day }
+    end
+
   end
 
 end

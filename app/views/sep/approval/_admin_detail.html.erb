@@ -1,0 +1,143 @@
+
+<br/><br/>
+
+<div class = 'radio_option'>
+
+	<div class="col-md-2 col-md-offset-1 col-sm-4 content-bottom">
+			<div class="col-md-8 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+				<div class="radio skinned-form-controls skinned-form-controls-mac">
+						<%= radio_button_tag :market, "shop", value: false, class: "required floatlabel"  %>
+							<label><span>MARKET</span></label>
+				</div>
+			</div>
+			<div class="col-md-4 col-sm-4 col-xs-4 form-group form-group-lg no-pd">
+				<div class="radio skinned-form-controls skinned-form-controls-mac">
+						<%= radio_button_tag :market, "ivl", value: false, class: "required floatlabel"  %>
+							 <label><span>IVL</span></label>
+				</div>
+			</div>
+		
+	</div>
+
+</div>
+
+
+<div class = 'add_sep_form'>
+
+	<div class="col-md-10 col-md-offset-1 col-sm-12 content-bottom">
+
+	 	<div class="row no-buffer"> 
+	 		<div id="personal_info">
+	 			<h3 class='title-inline'>Add SEP</h3>
+	  			<div class="col-md-12 no-pd col-sm-12 col-xs-12">
+
+	 				<% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
+	 				<%= form_tag url, method: http_method, class: 'input' do %> 
+				
+					<div class="row row-form-wrapper no-buffer">
+						<%= hidden_field_tag "person", f.id %>
+
+						<div class = "kind">
+							<%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
+						</div>
+
+					
+	           			<div class='admin_selected_sep_reason'>
+
+		         	   		<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd"> 
+		            				<%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'selectric form-control', required: true, prompt: "SEP REASON" %>
+		         	    	</div>
+
+	         	    	</div>
+
+	         	    	<div class='init_event_date'>
+	         	    		<div class="col-md-3 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+			      				<%= text_field_tag :event_date, "", :'data-date-max'=> "+0d", :'data-date-min'=> "-60d", class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE"%>
+			 				</div>
+			 			</div>
+
+	         	    	<div class='admin_effective_on_kind_options'>
+							<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+		            			<%= select_tag :effective_on_date, options_for_select(eventKind), class: "selectric form-control qle-date-kind", required: true,  prompt: "EFFECTIVE DATE RULE" %>
+		          			</div>
+		          		</div>
+			    
+			    		<div class='csl_num_options'>
+							<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+		            			<%=text_field_tag :csl_num, "", maxlength: 10, class: "floatlabel form-control", placeholder: "CSL#"%>
+		          			</div>
+	          			</div>
+
+			 		</div>
+
+			 		<div class='row row-form-wrapper no-buffer'>
+
+			 			<div class = "start_end_date">
+
+			 				<div class = "start_btn">
+						 		<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd start_input">
+						      		<%= text_field_tag :start_on, "", :'data-date-max'=> "+0d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-startDate form-control", required: true, placeholder: "SEP START DATE", value: Date.current %>
+						 		</div>
+						 	</div>
+
+						 	<div class = "end_btn">
+						 		<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd end_input">
+						      		<%= text_field_tag :end_on, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-endDate form-control disabled-input", required: true, placeholder: "SEP END DATE", value: Date.current + 60%>
+								</div>
+							</div>
+						
+						</div>
+
+						
+						<div class='init_effective_date'>
+							
+							<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+						    	<%= text_field_tag :next_poss_effective_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "disabled-input floatlabel required date-picker form-control", required: true, placeholder: "NEXT POSSIBLE EFFECTIVE DATE"%>
+							</div>
+
+						</div>
+
+					</div>
+
+					<div class='row row-form-wrapper no-buffer'>
+						
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+						    <%= text_field_tag :option1_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control", placeholder: "DATE 1 OPTION" %>
+						</div>
+
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+						    <%= text_field_tag :option2_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control", placeholder: "DATE 2 OPTION" %>
+						</div>
+
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+						    <%= text_field_tag :option3_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control", placeholder: "DATE 3 OPTION" %>
+						</div>
+					</div>
+
+					<div class='row row-form-wrapper no-buffer'>
+
+						<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+			    			<%= text_area_tag :admin_comment, "", class: "floatlabel form-control interaction-control-broker-message-body", rows: 2, placeholder: "Enter Comments Here" %>
+						</div>
+
+					
+
+					</div>
+
+					<div class="col-md-8 col-md-offset-5 col-sm-6 col-xs-12 form-group form-group-lg no-pd" style="margin-top:10px;">
+			 			<%= submit_tag "Submit",  class: "btn btn-primary" %>
+			 		</div>
+					<% end %>
+				</div>
+			 </div>
+		</div>    
+	</div>
+</div>
+
+
+
+
+
+
+
+

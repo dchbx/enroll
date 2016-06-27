@@ -57,6 +57,30 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
+  describe "#admin_permitted_sep_effective_dates" do
+    let(:family) { FactoryGirl.build(:family, :with_primary_family_member) }
+
+    it "it should return an array of effective dates" do
+      sep = FactoryGirl.build(:special_enrollment_period, :with_admin_permitted_sep_effective_dates)
+      qle = FactoryGirl.build(:qualifying_life_event_kind, _id: sep.qualifying_life_event_kind_id )
+      family.special_enrollment_periods << sep
+      person = family.person
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:special_enrollment_periods).and_return(family.special_enrollment_periods)
+      expect(helper.admin_permitted_sep_effective_dates(person, qle)).to eq [sep.option1_date, sep.option2_date, sep.option3_date]
+    end
+
+    it "it should return a blank array" do
+      sep = FactoryGirl.build(:special_enrollment_period, :with_admin_permitted_sep_effective_dates)
+      qle = FactoryGirl.build(:qualifying_life_event_kind )
+      family.special_enrollment_periods << sep
+      person = family.person
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:special_enrollment_periods).and_return(family.special_enrollment_periods)
+      expect(helper.admin_permitted_sep_effective_dates(person, qle)).to eq []
+    end
+  end
+
   describe "#show_employer_panel" do
     let(:person) {FactoryGirl.build(:person)}
     let(:employee_role) {FactoryGirl.build(:employee_role)}

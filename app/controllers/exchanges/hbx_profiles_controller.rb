@@ -1,5 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include SepAll
 
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -9,8 +10,9 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
+
   layout 'single_column'
-  
+
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
@@ -216,6 +218,32 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def sep_index
+
+    setEventKinds
+
+    respond_to do |format|
+      format.html { render "sep/approval/sep_index" }
+      format.js {}
+    end
+  end
+
+  def sep_index_datatable
+
+    if Family.exists(special_enrollment_periods: true).present?
+      if(params[:q] == 'both')
+        includeBothMarkets
+      elsif(params[:q] == 'ivl')
+        includeIVL
+      else
+        includeShop
+      end
+    end
+
+    setEventKinds
+    render
+  end
+
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
 
@@ -294,6 +322,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
+
     if current_user.has_csr_role? || current_user.try(:has_assister_role?)
       redirect_to home_exchanges_agents_path
       return
@@ -306,6 +335,15 @@ class Exchanges::HbxProfilesController < ApplicationController
     session[:person_id] = nil
     session[:dismiss_announcements] = nil
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
+
+  end
+
+
+  def add_new_sep
+    if params[:qle_id].present?
+      createSep
+    end
+    redirect_to exchanges_hbx_profiles_root_path
   end
 
   # GET /exchanges/hbx_profiles/new
@@ -455,4 +493,12 @@ private
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
   end
+
+  def setEventKinds
+    @event_kinds_all = ['first_of_next_month', '15th_day_rule'];
+    @event_kinds_default = ['first_of_next_month'];
+    @qualifying_life_events_shop = QualifyingLifeEventKind.shop_market_events
+    @qualifying_life_events_individual = QualifyingLifeEventKind.individual_market_events
+  end
+
 end

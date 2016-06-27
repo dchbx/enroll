@@ -1,0 +1,37 @@
+
+
+<% @sep_reasons = [] %>
+<% @admin_comment = [] %>
+
+<%family.special_enrollment_periods.to_a.each do |f| %>
+	<% @sep_reasons.push(f.title) %>
+<% end %>
+
+  <% @sep_reasons.each do |sep| %>
+      <thead> 
+      	<tr>
+       	  <th>SEP REASON</th>
+       	  <th>Selected Date</th>
+       	  <th>Effective Date</th>
+          <th>Selected Date</th>
+          <th>Effective Date</th>
+          <th style="text-align:center";>Review Status</th>
+        </tr>
+      </thead>
+              
+      <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="text-align:center";><i class="fa fa-spinner fa-spin" style="color:grey"></i></td>
+          </tr>
+
+          <tr>
+            <td></td>
+          </tr>
+      </tbody>
+
+    <% end %>

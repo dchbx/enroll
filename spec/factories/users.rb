@@ -22,8 +22,30 @@ FactoryGirl.define do
     password_confirmation ' '
   end
 
+  
+  trait :hbx_staff_sep do
+    roles ["hbx_staff"]
+
+    after :create do |user|
+      FactoryGirl.create :person, :with_hbx_staff_role, :with_family, :user => user
+    end
+  
+  end  
+
   trait :hbx_staff do
     roles ["hbx_staff"]
+
+    ######################
+    # this is our code #
+    ####################
+    #after :create do |user|
+      #FactoryGirl.create :person, :with_hbx_staff_role, :with_family, :user => user
+      #end
+  
+
+    ######################
+    # below is master code #
+    ####################
 
     after :create do |user, evaluator|
       if user.person.present?

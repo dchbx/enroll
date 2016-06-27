@@ -44,6 +44,10 @@ Rails.application.routes.draw do
         get :request_help
         get :verification_index
         get :verifications_index_datatable
+        get :sep_index
+        post :sep_index_datatable
+        post :add_new_sep
+
       end
 
       member do
@@ -394,6 +398,10 @@ Rails.application.routes.draw do
       get :fed_hub_request
     end
   end
+
+
+
+  resources :sep_history, only: [:index]
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

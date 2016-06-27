@@ -2,7 +2,7 @@
   <div class="alert alert-danger" id='qle_effective_on_kind_alert' role="alert" style='display:none'>Please Select Effective Date</div>
   <div style='margin: 0 auto;max-width:250px;'>
     <% if @qle.reason == 'birth' || @qle.reason == 'adoption' %>
-      <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle.effective_on_kinds, @qle_date)), include_blank: 'SELECT EFFECTIVE DATE *' %>
+      <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle.effective_on_kinds, @qle_date) + admin_permitted_sep_effective_dates(@person, @qle)), include_blank: 'SELECT EFFECTIVE DATE *' %>
     <% else %>
       <%= select_tag 'effective_on_kind', options_for_select(@qle.effective_on_kinds.map{|k| [k.humanize, k]}), include_blank: 'SELECT EFFECTIVE DATE *' %>
     <% end %>

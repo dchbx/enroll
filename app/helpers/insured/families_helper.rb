@@ -109,6 +109,28 @@ module Insured::FamiliesHelper
     employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
   end
 
+  def admin_permitted_sep_effective_dates(person, qle)
+    additional_options = []
+    sep = person.primary_family.special_enrollment_periods.detect { |sep| sep.qualifying_life_event_kind_id.to_s == qle.id.to_s }
+    if sep.present?
+      additional_options << sep.option1_date if sep.option1_date.present?
+      additional_options << sep.option2_date if sep.option2_date.present?
+      additional_options << sep.option3_date if sep.option3_date.present?
+    end
+    return additional_options
+  end
+
+  def show_employer_panel?(person, hbx_enrollments)
+    return false if person.blank? or !person.has_active_employee_role?
+    return true if hbx_enrollments.blank? or hbx_enrollments.shop_market.blank?
+
+    if hbx_enrollments.shop_market.entries.map(&:employee_role_id).include? person.active_employee_roles.first.id
+      false
+    else
+      true
+    end
+  end
+
   def has_writing_agent?(employee_role)
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
