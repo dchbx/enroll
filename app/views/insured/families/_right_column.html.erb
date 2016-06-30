@@ -1,13 +1,13 @@
 <div>
-    <% if @person.has_consumer_role? %>
-    <%= render 'help_signup' %>
+  <div class="module brokers-widget">
+    <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
+    <%= render 'employee_brokers_widget' %>
+    <% elsif @person.has_consumer_role? %>
+    <%= render 'consumer_brokers_widget' %>
+    <% end %>
+  </div>
+  <% if @person.has_consumer_role? %>
+  <%= render 'help_signup' %>
   <% end %>
-    <div class="module brokers-widget">
-      <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
-        <%= render 'employee_brokers_widget' %>
-      <% elsif @person.has_consumer_role? %>
-      <%= render 'consumer_brokers_widget' %>
-      <% end %>
-    </div>
   <%= render 'qles_panel' %>
 </div>
