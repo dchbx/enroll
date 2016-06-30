@@ -1,0 +1,23 @@
+<div class="container module employee-welcome">
+  <h1 class="darkblue">
+    Your Information
+  </h1>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+      <p>
+        <strong>
+          Please read the information below and click the "CONTINUE" button to show you agree before proceeding.
+        </strong>
+      </p>
+      <p>
+        Your answers on this application will only be used to determine if you qualify for employer-sponsored health insurance through DC Health Link and to help you enroll. We will keep your information private as required by law. <%= link_to "View Privacy Act Statement", "https://dchealthlink.com/privacy-operations", target: "_blank" %>
+      </p>
+    </div>
+  </div>
+  <br/>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+      <%= link_to 'CONTINUE', search_insured_employee_index_path, class: 'btn btn-primary btn-block btn-lg' %>
+    </div>
+  </div>
+</div>

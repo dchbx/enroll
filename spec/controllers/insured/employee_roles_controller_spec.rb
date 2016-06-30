@@ -316,7 +316,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
   end
 
-  describe "GET welcome" do
+  describe "GET privacy" do
     let(:user) { double("user") }
     let(:person) { double("person")}
     let(:employee_role) {FactoryGirl.create(:employee_role)}
@@ -329,9 +329,9 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(user).to receive(:save!).and_return(true)
       sign_in(user)
       allow(user).to receive(:person).and_return(person)
-      get :welcome
+      get :privacy
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("welcome")
+      expect(response).to render_template("privacy")
     end
 
     it "renders the 'my account' template when user has employee role" do
@@ -343,7 +343,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url).and_return(family_account_path)
       sign_in(user)
-      get :welcome
+      get :privacy
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(family_account_path)
     end

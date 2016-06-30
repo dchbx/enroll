@@ -338,7 +338,11 @@ Then(/^.+ should see the employee search page$/) do
 end
 
 Given(/^(.*) visits the employee portal$/) do |named_person|
-  visit "/insured/employee/search"
+  visit "/insured/employee/privacy"
+end
+
+Then(/^.+ should see the employee privacy text$/) do
+  click_link "CONTINUE"
 end
 
 When(/^(.*) creates an HBX account$/) do |named_person|

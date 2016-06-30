@@ -149,8 +149,8 @@ Rails.application.routes.draw do
         get 'new_message_to_broker'
         post 'send_message_to_broker'
         post :match
-        get 'welcome'
         get 'search'
+        get 'privacy'
       end
     end
 
