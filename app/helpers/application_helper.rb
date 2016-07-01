@@ -417,7 +417,7 @@ module ApplicationHelper
 
     content_tag(:div, class: 'progress-wrapper employer-dummy') do
       content_tag(:div, class: 'progress') do
-        concat(content_tag(:div, class: "progress-bar #{progress_bar_class}", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
+        concat(content_tag(:div, class: "progress-bar #{progress_bar_class} progress-bar-striped", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
           concat content_tag(:span, '', class: 'sr-only')
         end)
 
