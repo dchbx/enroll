@@ -269,7 +269,7 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
-  find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[2]').click
+  click_link "Get Help Signing Up"
   sleep 1
   click_link "Help from a Customer Service Representative"
   sleep 1

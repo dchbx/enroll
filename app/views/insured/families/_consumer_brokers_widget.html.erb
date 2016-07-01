@@ -1,28 +1,46 @@
-<% if @person && @person.primary_family && @person.primary_family.current_broker_agency.present? %>
+<% broker_and_agency_present = true if @person && @person.primary_family && @person.primary_family.current_broker_agency.present? %>
 <div class="panel panel-default module consumer-broker-widget">
   <div class="panel-heading">
     <h3 class="panel-title">
       <strong>
+        <% if broker_and_agency_present %>
         Your Broker or Assister
+        <% else %>
+        Select a Broker or Assister
+        <% end %>
       </strong>
     </h3>
   </div>
   <div class="panel-body">
     <div class="text-center">
-      <i class="fa fa-user fa-3x" aria-hidden="true"></i>
+      <i aria-hidden="true" class="fa fa-user fa-3x"></i>
+      <% if broker_and_agency_present %>
       <br/>
       <%=  @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+      <% else %>
+      <br/>
+      No Selection
+      <% end %>
     </div>
     <div class="text-left">
-        <div class="broker-information">
-          <%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %>
-          <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %>
-          <br/>
-          <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1 <%= @person.primary_family.current_broker_agency.writing_agent.phone %></a>
-          <br/>
-          <%= mail_to @person.primary_family.current_broker_agency.writing_agent.email.address, @person.primary_family.current_broker_agency.writing_agent.email.address %><br>
-        </div>
+      <% if broker_and_agency_present %>
+      <div class="broker-information">
+        <%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %>
+        <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %>
+        <br/>
+        <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1
+          <%= @person.primary_family.current_broker_agency.writing_agent.phone %></a>
+        <br/>
+        <%= mail_to @person.primary_family.current_broker_agency.writing_agent.email.address, @person.primary_family.current_broker_agency.writing_agent.email.address %><br>
+      </div>
+      <% else %>
+      You can add a broker for free
+      <%= link_to "Get Help Signing Up", '', class: 'btn btn-default btn-block', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
+      <% end %>
+      <% if broker_and_agency_present %>
+      <small>
+        <%= link_to "Find Assistance Another Way", '', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
+      </small>
+      <% end %>
     </div>
   </div>
-</div>
-<% end %>
