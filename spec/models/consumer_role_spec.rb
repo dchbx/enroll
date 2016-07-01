@@ -27,7 +27,8 @@ describe ConsumerRole, dbclean: :after_each do
     let(:valid_params) do
       {
         is_applicant: is_applicant,
-        person: saved_person
+        person: saved_person,
+        bookmark_url: Settings.site.enroll_url + "/somewhere"
       }
     end
 
@@ -44,6 +45,7 @@ describe ConsumerRole, dbclean: :after_each do
 
       it "should save" do
         expect(consumer_role.save).to be_truthy
+        expect(consumer_role.bookmark_url).not_to include Settings.site.enroll_url
       end
 
       context "and it is saved" do

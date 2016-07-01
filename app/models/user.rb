@@ -132,6 +132,7 @@ class User
 
 
   before_save :strip_empty_fields
+  before_save :remove_absolute_url, if: :last_portal_visited
 
   ROLES = {
     employee: "employee",
@@ -419,6 +420,10 @@ class User
   def strip_empty_fields
     unset("email") if email.blank?
     unset("oim_id") if oim_id.blank?
+  end
+
+  def remove_absolute_url
+    self.last_portal_visited = self.last_portal_visited.gsub(Settings.site.enroll_url, '')
   end
 
   def generate_authentication_token

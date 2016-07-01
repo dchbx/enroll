@@ -120,6 +120,8 @@ class ConsumerRole
 
   before_validation :ensure_ssn_validation_status
 
+  before_save :remove_absolute_url, if: :bookmark_url
+
   def ensure_ssn_validation_status
     if self.person
       if self.person.ssn.blank?
@@ -552,4 +554,7 @@ class ConsumerRole
     )
   end
 
+  def remove_absolute_url
+    self.bookmark_url = self.bookmark_url.gsub(Settings.site.enroll_url, '')
+  end
 end

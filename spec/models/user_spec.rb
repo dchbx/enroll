@@ -11,12 +11,12 @@ RSpec.describe User, :type => :model do
       password: gen_pass,
       password_confirmation: gen_pass,
       approved: true,
+      last_portal_visited: Settings.site.enroll_url + "/somewhere",
       person: {first_name: "john", last_name: "doe", ssn: "123456789"}
     }
   end
 
   describe 'user' do
-
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "user+name"})}
       it 'contains invalid characters' do
@@ -120,11 +120,13 @@ RSpec.describe User, :type => :model do
     end
 
     context "when all params are valid" do
-      let(:params){valid_params}
+      let(:params) { valid_params }
+      let(:record) { User.create(**params) }
+
       it "should not have errors on create" do
-        record = User.create(**params)
         expect(record).to be_truthy
         expect(record.errors.messages.size).to eq 0
+        expect(record.last_portal_visited).not_to include Settings.site.enroll_url
       end
     end
 
