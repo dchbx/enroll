@@ -11,7 +11,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:coverage_household) { double("coverage household", coverage_household_members: coverage_household_members) }
     let(:coverage_household_members) {[double("coverage household member 1", family_member: family_member1), double("coverage household member 2", family_member: family_member2), double("coverage household member 3", family_member: family_member3)]}
     # let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
-    let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role)}
+    let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false)}
     let(:current_user) {FactoryGirl.create(:user)}
 
     before(:each) do
@@ -303,7 +303,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
@@ -415,7 +415,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
@@ -459,7 +459,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
@@ -495,7 +495,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group)}
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
     before :each do
       allow(person).to receive(:has_active_employee_role?).and_return(true)

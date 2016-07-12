@@ -136,7 +136,13 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
 
   context "show_keep_existing_plan" do
     let(:date) { TimeKeeper.date_of_record }
-    let(:hbx_enrollment) {double(effective_on: date)}
+    let(:hbx_enrollment) {HbxEnrollment.new(effective_on: date, kind: 'individual')}
+    let(:shop_hbx) {HbxEnrollment.new(effective_on: date, kind: 'employer_sponsored')}
+
+    it "should return true when hbx_enrollment is shop" do
+      expect(helper.show_keep_existing_plan("shop_for_plans", shop_hbx, date)).to eq true
+      expect(helper.show_keep_existing_plan("", shop_hbx, date)).to eq true
+    end
 
     it "should return false with shop_for_plans" do
       expect(helper.show_keep_existing_plan("shop_for_plans", hbx_enrollment, date)).to eq false

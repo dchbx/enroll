@@ -31,9 +31,8 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
       @benefit = benefit_package.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
-    elsif @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
-      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.active.detect { |hbx| hbx.may_terminate_coverage? } unless @hbx_enrollment.present?
     end
+    insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
       market_kind:@market_kind,
@@ -56,7 +55,11 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     hbx_enrollment = build_hbx_enrollment
-    hbx_enrollment.plan = @hbx_enrollment.plan if (keep_existing_plan && @hbx_enrollment.present?)
+    if (keep_existing_plan && @hbx_enrollment.present?)
+      sep_id = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep.id : @hbx_enrollment.family.earliest_effective_ivl_sep.id
+      hbx_enrollment.special_enrollment_period_id = sep_id
+      hbx_enrollment.plan = @hbx_enrollment.plan
+    end
 
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
@@ -161,6 +164,12 @@ class Insured::GroupSelectionController < ApplicationController
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
+  end
+
+  def insure_hbx_enrollment_for_shop_qle_flow
+    if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
+      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_asc.detect { |hbx| hbx.may_terminate_coverage? }
+    end
   end
 
   private

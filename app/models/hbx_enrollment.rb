@@ -126,6 +126,8 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
+  scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
+  scope :effective_asc,      -> { order(effective_on: :asc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
   scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled"] )}
   scope :changing,            ->{ where(changing: true) }
@@ -1132,6 +1134,7 @@ class HbxEnrollment
     if plan_year.present? && benefit_group_assignment.plan_year == plan_year
       true
     else
+      self.errors.add(:base, "You can not keep an existing plan which belongs to previous plan year")
       false
     end
   end

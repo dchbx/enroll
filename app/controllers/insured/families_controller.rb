@@ -145,7 +145,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def purchase
+    if params[:hbx_enrollment_id].present?
+      @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+    else
     @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+    end
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)

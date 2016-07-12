@@ -22,6 +22,9 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     if !plan_selection.may_select_coverage?
+      if plan_selection.hbx_enrollment.errors.present?
+        flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
+      end
       redirect_to :back
       return
     end

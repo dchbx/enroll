@@ -627,3 +627,26 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 end
+
+RSpec.describe Insured::FamiliesController do
+  describe "GET purchase" do
+    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    before :each do
+      allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+      allow(person).to receive(:primary_family).and_return(family)
+      sign_in(user)
+      get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
+    end
+
+    it "should get hbx_enrollment" do
+      expect(assigns(:enrollment)).to eq hbx_enrollment
+    end
+
+    it "should get terminate" do
+      expect(assigns(:terminate)).to eq 'terminate'
+    end
+  end
+end
