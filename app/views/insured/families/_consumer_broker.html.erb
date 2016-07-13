@@ -1,11 +1,8 @@
-
-
   <div class="my-broker">
-    <h1>Your Broker</h1>
     <div class="panel benefitgroup col-xs-12">
       <section class="col-xs-6">
         <header class="row">
-          <h5 class="bg-title">Your Broker:<span>
+          <h5 class="bg-title"><%= title.present? ? title : "Your Broker" %>:<span>
 <%= @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
 </span></h5>
         </header>
@@ -55,8 +52,6 @@
     <div class="col-xs-12">
       <div class="row">
       <br/>
-
-      <%= link_to "Back", :back, class: 'btn btn-default' %>
       <%= link_to "Delete broker", delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: "Are you sure you want to delete?" }, class: 'btn btn-default' %>
     </div>
     </div>

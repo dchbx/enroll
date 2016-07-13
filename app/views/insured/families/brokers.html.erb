@@ -2,9 +2,18 @@
   <%= render 'navigation' %>
 <% end %>
 
+<% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? %>
+<h1 class="darkblue no-buffer">Your Brokers</h1>
 
-<% if @person.has_active_employee_role? %>
+<%= render 'employee_broker', title: "Employer Assigned Broker" %>
+<%= render 'consumer_broker', title: "Your Broker or Assister" %>
+
+<% elsif @person.has_active_employee_role? %>
+<h1 class="darkblue no-buffer">Your Broker</h1>
   <%= render 'employee_broker' %>
 <% elsif @person.has_consumer_role? %>
+<h1 class="darkblue no-buffer">Your Broker</h1>
+
   <%= render 'consumer_broker' %>
 <% end %>
+<%= link_to "Back", :back, class: 'btn btn-default' %>

@@ -3,7 +3,7 @@
   <div class="panel-heading">
     <h3 class="panel-title">
       <strong>
-        Your Broker
+        <%= title.present? ? title : "Your Broker" %>
       </strong>
     </h3>
   </div>
@@ -29,3 +29,4 @@
       <% end %>
     </div>
   </div>
+</div>
