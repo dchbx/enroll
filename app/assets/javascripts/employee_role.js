@@ -100,3 +100,11 @@ $(function () {
 		match_person();
 	});
 });
+
+$(document).on('change', '.terminate_confirm select#terminate_reason', function() {
+  if($(this).val() == undefined || $(this).val() == ""){
+    $(this).parents('.terminate_confirm').find('.terminate_reason_submit').attr("disabled",true);
+  }else{
+    $(this).parents('.terminate_confirm').find('.terminate_reason_submit').attr("disabled",false);
+  }
+});

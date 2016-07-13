@@ -172,6 +172,7 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
+      @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
       redirect_to :back
