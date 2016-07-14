@@ -16,7 +16,9 @@
       <i aria-hidden="true" class="fa fa-user fa-3x"></i>
       <% if broker_and_agency_present %>
       <br/>
-      <%=  @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+      <span class="word-break">
+        <%=  @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+      </span>
       <% else %>
       <br/>
       No Selection
@@ -28,7 +30,7 @@
         <span class="word-break">
           <%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %>
           <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %>
-        </div>
+        </span>
         <br/>
         <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1
           <%= @person.primary_family.current_broker_agency.writing_agent.phone %></a>
@@ -47,6 +49,8 @@
         <%= link_to "Find Assistance Another Way", '', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
       </small>
       <% end %>
+    </div>
+
     </div>
   </div>
 </div>

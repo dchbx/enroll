@@ -26,6 +26,9 @@
     .panel-body {
       display: table;
       width: 100%;
+      .fa {
+        color: $primary-blue;
+      }
       > * {
         display: table-cell;
         vertical-align: middle;
@@ -66,39 +69,6 @@
       }
     }
   }
-}
-.brokers-widget {
-    h4 {
-      padding: 15px 0 0 0;
-      margin: 0;
-      font-weight: 600;
-    }
-
-  h4, .fa {
-    color: $primary-blue;
-  }
-
-    .col-xs-4 {
-      cursor: pointer;
-      &:hover {
-        * {
-          color: #23527c;
-        }
-      }
-      h2 {
-        margin-bottom: 0;
-        margin-top: 25px;
-        img {
-          width: 85%;
-        }
-      }
-      span {
-        color: #007bc4;
-      }
-    }
-    span {
-      color: $primary-blue;
-    }
 }
 .help-signup {
   h4 {
