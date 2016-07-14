@@ -225,7 +225,7 @@ end
 
 Then /^the employer should see Acarehouse broker active for the employer$/ do
   expect(page).to have_content('Acarehouse')
-  expect(page).to have_content('Active Broker')
+  expect(page).to have_content(/active broker/i)
 end
 
 When /^the broker login in$/ do

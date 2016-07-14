@@ -18,7 +18,7 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
       assign(:person, person)
       assign(:employee_role, employee_role)
       # assign :family_members, [family_member]
-      render 'insured/families/employee_brokers_widget'
+      render 'insured/families/employee_brokers_widget', title: nil
     end
 
     it "should display broker widget for consumer" do
@@ -51,7 +51,7 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
     end
 
     it "should not display brokers email or widget" do
-      render 'insured/families/employee_brokers_widget'
+      render 'insured/families/employee_brokers_widget', title: nil
       expect(rendered).to_not match("mailto")
     end
 

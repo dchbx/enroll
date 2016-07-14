@@ -1,5 +1,6 @@
 @import "variables";
 .module, .modal {
+
   &.flash {
     .col-xs-12 {
       max-width: 1170px;
@@ -8,6 +9,9 @@
       display: block;
       float: none;
     }
+  }
+  .word-break {
+    word-break: break-all;
   }
   .no-vertical-padding {
     padding-top: 0;
@@ -42,4 +46,19 @@
       display: inline-block;
     }
   }
+  .vertically-aligned-row {
+     display: table;
+     width: 100%;
+     &.auto-width {
+       width: auto !important;
+     }
+     >* {
+       display: table-cell;
+       float: none;
+       vertical-align: middle;
+       &.vertical-align-top {
+         vertical-align: top !important;
+       }
+     }
+   }
 }
