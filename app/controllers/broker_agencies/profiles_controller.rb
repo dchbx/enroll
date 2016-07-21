@@ -47,6 +47,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def edit
     @organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+    @id = params[:id]
   end
 
   def update
@@ -107,7 +108,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @q.nil?
       @staff = @staff.where(last_name: /^#{page_no}/i)
     else
-      @staff = @staff.where(last_name: @q)
+      @staff = @staff.where(last_name: /^#{@q}/i)
     end
   end
 

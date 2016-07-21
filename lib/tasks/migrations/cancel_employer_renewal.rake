@@ -47,7 +47,7 @@ namespace :migrations do
     if plan_year = employer_profile.plan_years.where(:start_on => plan_year_start_on).published.first
       enrollments = enrollments_for_plan_year(plan_year)
       if enrollments.any?
-        puts "Canceling employees coverage for employer #{organization.legal_name}"
+        puts "Canceling employees coverage for employer #{employer_profile.legal_name}"
       end
 
       enrollments.each do |hbx_enrollment|

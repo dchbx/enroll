@@ -108,7 +108,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       context 'when application is pending' do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
-          put :update, id: broker_role.person.id, pending: true, format: :js
+          put :update, id: broker_role.person.id, pending: true, person:  { broker_role_attributes: { training: true , carrier_appointments: {}} } , format: :js
           broker_role.reload
         end
 

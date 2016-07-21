@@ -1,13 +1,20 @@
+<thead>
+  <tr class='row'>
+    <th class='col-sm-4'>Broker Name</th>
+    <th class='col-sm-3'>Agency Name</th>
+    <th class='col-sm-3'>Market Kind</th>
+    <th class='col-sm-2'></th>
+  </tr>
+</thead>
 
-
-<tbody style="max-height: 430px; overflow:auto; display: block;">
+<tbody>
   <% @staff.each do |staff| %>
-    <tr style='display: table; width: 600px; table-layout:fixed;'>
-      <td style="padding: 3px"><%= staff.first_name + ' ' + staff.last_name %></td>
-      <td style="padding: 3px"><%= BrokerAgencyProfile.find(staff.broker_role.broker_agency_profile_id).legal_name %></td>
-      <td style="padding: 3px"><% market_kind = staff.broker_role.market_kind %>
+    <tr class='row'>
+      <td class='col-sm-4'><%= staff.first_name + ' ' + staff.last_name %></td>
+      <td class='col-sm-3'><%= BrokerAgencyProfile.find(staff.broker_role.broker_agency_profile_id).legal_name %></td>
+      <td class='col-sm-3'><% market_kind = staff.broker_role.market_kind %>
         <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %> Market</td>
-      <td style="padding: 3px; width:35px"><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'> Help </a></td>
+      <td class='col-sm-2'><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'>Select</a></td>
    </tr>
   <% end %>
 </tbody>

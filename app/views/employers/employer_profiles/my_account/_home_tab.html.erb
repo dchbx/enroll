@@ -109,7 +109,9 @@
           </td>
           <td>
             <p>
-              <% if bg.effective_on_offset == 0 %>
+              <% if bg.effective_on_kind == 'date_of_hire' && bg.effective_on_offset == 0 %>
+                <%= "#{bg.effective_on_kind.humanize}" %>
+              <% elsif bg.effective_on_kind == 'first_of_month' && bg.effective_on_offset == 0 %>
                 First of the month following or coinciding with date of hire
               <% elsif bg.effective_on_offset == 1 %>
                 First of the month following date of hire

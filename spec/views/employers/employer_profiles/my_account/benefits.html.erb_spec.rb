@@ -96,7 +96,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
         allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
       end
 
-      it "should display terminated on date" do 
+      it "should display terminated on date" do
         render "employers/employer_profiles/my_account/benefits"
         expect(rendered).to have_content("Terminated On")
       end
@@ -109,6 +109,46 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
 
       it "should display publish button" do
         render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).to have_selector("a", text: "Publish Plan Year")
+        expect(rendered).to have_selector("a", text: "Edit Plan Year")
+      end
+    end
+    it "should display 'date of hire' for 2015 renewals with date of hire effective_on_kind" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'date_of_hire'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 0
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /date of hire/i
+    end
+
+    it "should display first of the month following or coinciding with date of hire" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'first_of_month'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 0
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /first of the month following or coinciding with date of hire/i
+    end
+
+    it "should display 'first of month following 30 days'" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'first_of_month'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 30
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /first of month/i
+    end
+
+    it "should display 'first of month following 60 days'" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'first_of_month'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 60
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /first of month/i
+    end
+
+    context "when draft plan year present "do
+      before do
+        allow(employer_profile).to receive(:draft_plan_year).and_return([plan_year])
+      end
+
+      it "should not display add plan year button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).not_to have_selector("a", text: "Add Plan Year")
         expect(rendered).to have_selector("a", text: "Publish Plan Year")
         expect(rendered).to have_selector("a", text: "Edit Plan Year")
       end

@@ -85,10 +85,32 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def broker_application_confirmation(person)
+    if person.emails.find_by(kind: 'work').address.present?
+      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: "Thank you for submitting your broker application to #{Settings.site.short_name}"}) do |format|
+        format.html { render "broker_application_confirmation", :locals => { :person => person }}
+      end
+    end
+  end
+
   def notice_uploaded_notification(person)
     mail({to: person.user.email, subject: "New Notice Uploaded"}) do |format|
       format.html { render "notice_uploaded", :locals => { :person_name => person.full_name }}
     end
   end
 
+  def broker_pending_notification(broker_role,unchecked_carriers)
+    subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
+    subject_prefix = broker_role.training || broker_role.training == true ? "Completed NAHU Training" : "Needs to Complete NAHU training"
+    subject="#{subject_prefix}#{subject_sufix}"
+    mail({to: broker_role.email_address, subject: subject}) do |format|
+      if broker_role.training && unchecked_carriers.present?
+        format.html { render "broker_pending_completed_training_missing_carrier", :locals => { :applicant_name => broker_role.person.full_name ,:unchecked_carriers => unchecked_carriers}}
+      elsif !broker_role.training && !unchecked_carriers.present?
+        format.html { render "broker_pending_missing_training_completed_carrier", :locals => { :applicant_name => broker_role.person.full_name , :unchecked_carriers => unchecked_carriers}}
+      elsif !broker_role.training && unchecked_carriers.present?
+        format.html { render "broker_pending_missing_training_and_carrier", :locals => { :applicant_name => broker_role.person.full_name , :unchecked_carriers => unchecked_carriers}}
+      end
+    end
+  end
 end

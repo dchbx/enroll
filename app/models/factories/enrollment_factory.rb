@@ -170,8 +170,14 @@ module Factories
     end
     
     def self.migrate_census_employee_contact_to_person(census_employee, person)
-      person.addresses.create!(census_employee.address.attributes) if person.addresses.blank?
-      person.emails.create!(census_employee.email.attributes) if person.emails.blank?
+      if census_employee
+        if census_employee.address
+          person.addresses.create!(census_employee.address.attributes) if person.addresses.blank?
+        end
+        if census_employee.email
+          person.emails.create!(census_employee.email.attributes) if person.emails.blank?
+        end
+      end
     end
 
     def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)

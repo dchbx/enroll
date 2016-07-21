@@ -35,4 +35,14 @@ RSpec.describe WelcomeController, :type => :controller do
       expect( response ).to have_http_status(:success)
     end
   end
+
+  describe "POST show_hints" do
+    let(:user) { FactoryGirl.build(:user) }
+    it "should return to a http status success" do
+      sign_in user
+      xhr :post, "show_hints", :format => "js"
+      expect( response ).to have_http_status(:success)
+    end
+  end
+
 end

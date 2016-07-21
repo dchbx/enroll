@@ -44,6 +44,10 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.decertify!
       flash[:notice] = "Broker applicant decertified."
     elsif params['pending']
+      all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
+      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
+      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else

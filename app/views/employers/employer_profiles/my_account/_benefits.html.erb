@@ -4,7 +4,7 @@
       <h1>Benefits - Coverage You Offer</h1>
     </div>
     <div class="col-xs-4">
-      <% if @plan_years.present? && @employer_profile.published_plan_year.blank? %>
+      <% if @plan_years.present? && @employer_profile.published_plan_year.blank? && !@employer_profile.draft_plan_year.present? %>
         <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
       <% end %>
     </div>
@@ -12,7 +12,7 @@
     <% if @employer_profile.renewing_plan_year.blank? || @employer_profile.active_plan_year.blank? %>
     <div class="col-xs-12">
       <h4>Carefully review the plan information and pricing below. If you haven't added employees to your plan yet, select 'Employees' in the blue menu bar to the left and edit each of your employees to add them to your benefit package. If you want to
-        create more than one benefit package and offer different benefits to different employees, select 'Add Plan Year'. When you're satisfied with your benefit package(s), select 'Publish Plan Year'.</h4>
+        create more than one benefit package and offer different benefits to different employees, select 'Edit Plan Year' and then select 'Add Benefit Group' at bottom of the page. When you're satisfied with your benefit package(s), select 'Publish Plan Year'.</h4>
       <h4>
         <strong>
           IMPORTANT
@@ -117,10 +117,10 @@
                 </td>
                 <td>
                   <p>
-                    <% if bg.effective_on_offset == 0 %>
+                    <% if bg.effective_on_kind == 'date_of_hire' && bg.effective_on_offset == 0 %>
+                      <%= "#{bg.effective_on_kind.humanize}" %>
+                    <% elsif bg.effective_on_kind == 'first_of_month' && bg.effective_on_offset == 0 %>
                       First of the month following or coinciding with date of hire
-                    <% elsif bg.effective_on_offset == 1 %>
-                      First of the month following date of hire
                     <% else %>
                       <%= "#{bg.effective_on_kind.humanize} following #{bg.effective_on_offset} days" %>
                     <% end %>

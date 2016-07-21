@@ -202,6 +202,15 @@ describe EmployerProfile, dbclean: :after_each do
       end
     end
 
+    context 'when draft plan year present' do
+
+      let(:draft_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day, end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year, aasm_state: 'draft') }
+      let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [draft_plan_year]) }
+
+      it 'should return draft plan year' do
+        expect(employer_profile.draft_plan_year).to eq [draft_plan_year]
+      end
+    end
   end
 
   context ".billing_plan_year" do

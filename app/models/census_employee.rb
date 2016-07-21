@@ -451,16 +451,23 @@ class CensusEmployee < CensusMember
       csv << attributes
 
       all.each do |census_employee|
-        csv << [
+        data = [
           "#{census_employee.first_name} #{census_employee.middle_name} #{census_employee.last_name} ",
           census_employee.dob,
           census_employee.hired_on,
-          census_employee.aasm_state.try(:humanize).try(:downcase),
-          census_employee.try(:renewal_benefit_group_assignment).try(:benefit_group).try(:title),
-          census_employee.active_benefit_group_assignment.benefit_group.title,
-          "dental: #{ d = census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental'}.try(:aasm_state).try(:humanize).try(:downcase)} health: #{ census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health'}.try(:aasm_state).try(:humanize).try(:downcase)}",
-          census_employee.coverage_terminated_on
+          census_employee.aasm_state.humanize.downcase,
+          census_employee.renewal_benefit_group_assignment.try(:benefit_group).try(:title)
         ]
+
+        if active_assignment = census_employee.active_benefit_group_assignment
+          data += [
+            active_assignment.benefit_group.title,
+            "dental: #{ d = active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'dental'}.try(:aasm_state).try(:humanize).try(:downcase)} health: #{ active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'health'}.try(:aasm_state).try(:humanize).try(:downcase)}"
+          ]
+        else
+          data += [nil, nil]
+        end
+        csv << (data + [census_employee.coverage_terminated_on])
       end
     end
   end

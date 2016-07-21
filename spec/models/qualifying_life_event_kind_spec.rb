@@ -42,6 +42,29 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
         expect(QualifyingLifeEventKind.individual_market_events.first).to be_instance_of QualifyingLifeEventKind
       end
     end
+
+
+    context "should only display self-attested QLEs" do
+
+      it "should display self-attested QLEs for shop market" do
+        expect(QualifyingLifeEventKind.shop_market_events.first.is_self_attested == true)
+      end
+
+      it "should display self-attested QLEs for individual market" do
+        expect(QualifyingLifeEventKind.individual_market_events.first.is_self_attested == true)
+      end
+
+      it "should not display non-self-attested QLEs for shop market" do
+        expect(QualifyingLifeEventKind.shop_market_events.first.is_self_attested == false)
+      end
+
+      it "should not display non-self-attested QLEs for individual market" do
+        expect(QualifyingLifeEventKind.individual_market_events.first.is_self_attested == false)
+      end
+
+    end
+
+
   end
 
   describe "instance methods" do

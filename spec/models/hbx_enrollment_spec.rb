@@ -554,6 +554,7 @@ describe HbxEnrollment, dbclean: :after_all do
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
           expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
+          expect(enrollment.created_at).not_to be_nil
         end
       end
     end

@@ -1,36 +1,38 @@
 <div class="row row-form-wrapper no-buffer">
-<fieldset style="<%= 'display: none;' if f.object.relationship == 'child_26_and_over' %>">
-  <div class="col-xs-6 form-group form-group-lg">
-    <div class="checkbox">
-      <label>
-        <%= f.check_box :offered, {class: "contribution_handler", disabled: (f.object.relationship == 'employee' ? true:false)}, "true", "false" %>
-        <%= f.label :offered do %>
+  <fieldset style="<%= 'display: none;' if f.object.relationship == 'child_26_and_over' %>">
+    <div class="col-xs-6 form-group form-group-lg">
+      <div class="checkbox">
+        <label>
+          <%= f.check_box :offered, {class: "contribution_handler", disabled: (f.object.relationship == 'employee' ? true:false)}, "true", "false" %>
+          <%= f.label :offered do %>
 
-        <i class="fa fa-check-square-o fa-2x"></i>
-        <i class="fa fa-square-o fa-2x"></i>
+          <i class="fa fa-check-square-o fa-2x"></i>
+          <i class="fa fa-square-o fa-2x"></i>
 
-        <% end %>
+          <% end %>
 
-        <span>
-          <%= f.hidden_field :relationship, value: f.object.relationship %>
-          <p><%= f.object.relationship.try(:humanize) %></p>
-        </span>
-      </label>
+          <span>
+            <%= f.hidden_field :relationship, value: f.object.relationship %>
+            <p><%= f.object.relationship.try(:humanize) %></p>
+          </span>
+        </label>
+      </div>
     </div>
-  </div>
 
-      <div class="col-xs-6 form-group form-group-lg">
-        <div class="col-xs-12 row">
-          <div class="col-xs-3">
-            <%= f.number_field :premium_pct, class: "hidden-param contribution_handler premium-storage-input", value: f.object.premium_pct.try(:to_i) %>
+    <div class="col-xs-6 form-group form-group-lg">
+      <div class="col-xs-12 row">
+        <div class="col-xs-3">
+          <%= f.number_field :premium_pct, class: "hidden-param contribution_handler premium-storage-input", value: f.object.premium_pct.try(:to_i) %>
 
-          </div>
-          <div class="col-xs-9" style="padding-top: 10px;">
-            <input type="number" class="contribution_slide_handler slider premium-storage-input" value="<%=f.object.premium_pct.try(:to_i)%>" data-slider-min="0" data-slider-max="100" data-slider-value="0" data-slider-step="5"/>
-&nbsp;&nbsp;&nbsp;<span class="slide-label pull-right">0%</span><!--<i class="fa fa-question-circle fa-lg"></i>-->
-  </div>
+        </div>
+        <div class="col-xs-9" style="padding-top: 10px;">
+          <input class="contribution_slide_handler slider premium-storage-input" data-slider-max="100" data-slider-min="0" data-slider-step="5" data-slider-value="0" type="number" value="<%=f.object.premium_pct.try(:to_i)%>"/>
+          &nbsp;&nbsp;&nbsp;
+          <span class="slide-label pull-right">0%</span>
+          <!--<i class="fa fa-question-circle fa-lg"></i>-->
+        </div>
 
-  </div>
-</div>
-</fieldset>
+      </div>
+    </div>
+  </fieldset>
 </div>

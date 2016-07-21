@@ -172,10 +172,18 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      where(:market_kind => "shop").active.to_a
+      where(:market_kind => "shop").and(:is_self_attested.ne => false).active.to_a
     end
 
     def individual_market_events
+      where(:market_kind => "individual").and(:is_self_attested.ne => false).active.to_a
+    end
+
+    def shop_market_events_admin
+      where(:market_kind => "shop").active.to_a
+    end
+
+    def individual_market_events_admin
       where(:market_kind => "individual").active.to_a
     end
   end

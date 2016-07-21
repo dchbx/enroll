@@ -92,6 +92,7 @@ class User
     end
   end
 
+  field :hints, type: Boolean, default: true
   # for i18L
   field :preferred_language, type: String, default: "en"
 

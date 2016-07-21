@@ -13,7 +13,7 @@
       <span> | </span>
     </span>
     <% elsif portal_count > 1 %>
-      <span class="dropdown">
+      <span class="dropdown" <% if current_user.hints == true %>title='<i class="fa fa-question-circle fa-3x text-center" aria-hidden="true" style="display: block;"></i><h3 class="darkblue no-buffer text-center">Did You Know?</h3>' data-html="true" data-toggle='popover' data-placement='bottom' data-content="You can move between your <%= get_portals_text(insured, employer, broker) %> accounts using this &quot;My Portals&quot; link."<% end %>>
         <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
         <ul class="dropdown-menu">
           <% if insured %>
@@ -28,4 +28,12 @@
         </ul>
       <span> | </span>
     </span>
+  <% end %>
+
+  <% if current_user.hints == true %>
+    <script>
+      $(document).on('ready page:load', function() {
+        Hints.myPortalsLinkReminder();
+      });
+    </script>
   <% end %>

@@ -377,6 +377,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_active_consumer_role?).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end

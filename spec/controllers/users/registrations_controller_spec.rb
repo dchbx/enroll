@@ -11,7 +11,7 @@ RSpec.describe Users::RegistrationsController do
 
       before(:each) do
         @request.env["devise.mapping"] = Devise.mappings[:user]
-        allow(CuramUser).to receive(:match_username).with(email).and_return([curam_user])
+        allow(CuramUser).to receive(:match_unique_login).with(email).and_return([curam_user])
       end
 
       it "should redirect to saml recovery page if user matches" do
@@ -26,7 +26,7 @@ RSpec.describe Users::RegistrationsController do
 
       before(:each) do
         @request.env["devise.mapping"] = Devise.mappings[:user]
-        allow(CuramUser).to receive(:match_username).with("test@example.com").and_return([])
+        allow(CuramUser).to receive(:match_unique_login).with("test@example.com").and_return([])
       end
 
       it "should not redirect to saml recovery page if user matches" do

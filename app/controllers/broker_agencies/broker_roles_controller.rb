@@ -55,11 +55,12 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def create
     # failed_recaptcha_message = "We were unable to verify your reCAPTCHA.  Please try again."
+    notice = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
     if params[:person].present?
       @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
       # if verify_recaptcha(model: @broker_candidate, message: failed_recaptcha_message) && @broker_candidate.save
       if @broker_candidate.save
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        flash[:notice] = notice
         redirect_to broker_registration_path
       else
         @filter = params[:person][:broker_applicant_type]
@@ -70,7 +71,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
       # if verify_recaptcha(model: @organization, message: failed_recaptcha_message) && @organization.save
       if @organization.save
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        flash[:notice] = notice
         redirect_to broker_registration_path
       else
         @agency_type = 'new'

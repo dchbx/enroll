@@ -141,7 +141,7 @@ When(/^.+ registers with valid information for ga flow$/) do
 end
 
 Then(/^.+ should receive an invitation email for ga flow$/) do
-  open_email("broker.martin@example.com")
+  open_email("broker.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name} ")
   expect(current_email.to).to eq(["broker.martin@example.com"])
 end
 

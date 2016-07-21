@@ -16,7 +16,7 @@ RSpec.describe "broker_agencies/profiles/staff_table.html.erb" do
   end
 
   it "should offer have Help" do
-    expect(rendered).to have_selector('.broker_select_button', text: 'Help')
+    expect(rendered).to have_selector('.broker_select_button', text: 'Select')
     expect(rendered).to have_selector('td', text: person1.full_name)
   end
 end

@@ -228,6 +228,10 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
+  def draft_plan_year
+    plan_years.select{ |py| py.aasm_state == "draft" }
+  end
+
   def published_plan_year
     plan_years.published.first
   end
@@ -273,7 +277,7 @@ class EmployerProfile
         end
       end
 
-      if plan_year.blank? 
+      if plan_year.blank?
         if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
           billing_report_date = plan_year.start_on
         end
@@ -421,9 +425,9 @@ class EmployerProfile
 
     def organizations_for_force_publish(new_date)
       Organization.where({
-        :'employer_profile.plan_years' => 
+        :'employer_profile.plan_years' =>
         { :$elemMatch => {
-          :start_on => new_date.next_month.beginning_of_month, 
+          :start_on => new_date.next_month.beginning_of_month,
           :aasm_state => 'renewing_draft'
           }}
       })
