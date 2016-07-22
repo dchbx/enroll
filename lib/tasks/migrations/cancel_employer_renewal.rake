@@ -1,34 +1,43 @@
 namespace :migrations do
 
   desc "Cancel renewal for employer"
-  task :cancel_employer_renewal, [:fein] => [:environment] do |task, args|
+  task :cancel_employer_renewal => :environment do
 
-    employer_profile = EmployerProfile.find_by_fein(args[:fein])
+    feins = ["520743373","530026395","550825492","453987501","530164970","237256856",
+     "611595539","591640708","521442741","521766561","522167254","521826441",
+     "530176859","521991811","522153746","521967581","147381250","520968193",
+     "521143054","521943790","520954741","462199955","205862174","521343924",
+     "521465311","521816954","020614142","521132764","521246872","307607552",
+     "522357359","520978073","356007147","522315929","521989454","942437024",
+     "133535334","462612890","541873351","521145355","530071995","521449994"]
 
-    if employer_profile.blank?
-      raise 'unable to find employer'
-    end
+    feins.each do |fein|
+
+      employer_profile = EmployerProfile.find_by_fein(fein)
+
+      if employer_profile.blank?
+        raise 'unable to find employer'
+      end
     
-    employer_profile.census_employees.each do |census_employee|    
-      census_employee.aasm_state = "eligible" if census_employee.aasm_state = "employee_role_linked"    
-      census_employee.save    
-      puts "De-linking #{census_employee}"    
-    end
+      # employer_profile.census_employees.each do |census_employee|    
+      #   census_employee.aasm_state = "eligible" if census_employee.aasm_state = "employee_role_linked"    
+      #   census_employee.save
+      #   puts "De-linking #{census_employee}"    
+      # end
 
-    puts "Processing #{employer_profile.legal_name}"
-    organizations = Organization.where(fein: args[:fein])
-    organizations.each do |organization|
-      renewing_plan_year = organization.employer_profile.plan_years.renewing.first
+      puts "Processing #{employer_profile.legal_name}"
+  
+      renewing_plan_year = employer_profile.plan_years.renewing.first
       if renewing_plan_year.present?
         enrollments = enrollments_for_plan_year(renewing_plan_year)
         enrollments.each do |enrollment|
-          enrollment.cancel_coverage!
+          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
         end
 
-        puts "found renewing plan year for #{organization.legal_name}---#{renewing_plan_year.start_on}"
         renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
       end
-      organization.employer_profile.revert_application! if organization.employer_profile.may_revert_application?
+
+      employer_profile.revert_application! if employer_profile.may_revert_application?
     end
   end
 
@@ -70,6 +79,6 @@ def enrollments_for_plan_year(plan_year)
   id_list = plan_year.benefit_groups.map(&:id)
   families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
   enrollments = families.inject([]) do |enrollments, family|
-    enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
+    enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector]).to_a
   end
 end
