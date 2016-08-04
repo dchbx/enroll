@@ -1,0 +1,19 @@
+var DataTablesFilterMap = ( function( window, undefined ) {
+
+  return {
+    Employer : {
+      all: [ "all_employer_profiles", "invoice_view_all" ],
+      initial: {
+        "<%= TimeKeeper.date_of_record.next_month.beginning_of_month %>": [ "employer_profile_initial_starting_on(TimeKeeper.date_of_record.next_month.beginning_of_month)" ],
+        "<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month %>": [ "employer_profile_initial_starting_on(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month)" ],
+        "<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month %>": [ "employer_profile_initial_starting_on(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month)" ]
+      },
+      renewing: {
+        "<%= TimeKeeper.date_of_record.next_month.beginning_of_month %>": [ "employer_profile_renewing_starting_on(TimeKeeper.date_of_record.next_month.beginning_of_month)" ],
+        "<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month %>": [ "employer_profile_renewing_starting_on(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month)" ],
+        "<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month %>": [ "employer_profile_renewing_starting_on(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month)" ]
+      }
+    }
+  };
+
+} )( window );

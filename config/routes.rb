@@ -46,7 +46,7 @@ Rails.application.routes.draw do
         get :binder_index_datatable
         post :binder_paid
         get :verification_index
-        get :verifications_index_datatable
+        post :verifications_index_datatable
       end
 
       member do
