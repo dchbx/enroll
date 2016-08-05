@@ -1,0 +1,83 @@
+<div class="container-fluid">
+  <h3 style='text-align:center'>Plan Comparison Chart</h3>
+  <div class="mygrid-wrapper-div">
+   <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
+        <tr>
+          <th class="row-title">Plans</th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'><%= display_carrier_logo(qhp.plan.carrier_profile.organization.legal_name, { width: 80, pdf: true }) %></th>
+          <% end %>
+        </tr>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.plan.name %></th>
+          <% end %>
+        </tr>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+            <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
+            <%= qhp.plan.plan_type.upcase %>
+            </th>
+          <% end %>
+        </tr>
+        <tr>
+          <th>Provider Network</th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
+          <% end %>
+        </tr>
+
+        <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
+          <tr>
+            <th></th>
+            <% qhps.each do |qhp|%>
+              <th colspan="2">
+                <% if qhp.plan.nationwide %>
+                  <%= link_to "PROVIDER DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
+                <% end %>
+              </th>
+            <% end %>
+          </tr>
+        <% end %>
+
+        <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
+          <tr>
+            <th></th>
+            <% qhps.each do |qhp|%>
+              <th colspan="2">
+                <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
+                  <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
+                <% end %>
+              </th>
+            <% end %>
+          </tr>
+        <% end %>
+        <tr>
+          <th>PLAN BENEFITS <br> (In Network)</th>
+          <% qhps.each do |qhp|%>
+            <th colspan="1"> CO-PAY </th>
+            <th colspan="1"> COINSURANCE </th>
+          <% end %>
+        </tr>
+        <%= render partial: "plan_visit_types", locals: {qhps: qhps} %>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+           <% if qhp.plan.sbc_document.present? %>
+            <th colspan="2">
+              <div class="plan_comparison">
+                <% key, bucket = get_key_and_bucket(qhp.plan.sbc_document.identifier) %>
+                <% link_text = qhp.plan.coverage_kind == 'health' ? "Summary of Benefits and Coverage" : 'Plan Summary' %>
+                <%= link_to link_text, root_url + document_download_path(bucket, key) + 
+                                                  "?content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
+                                                  pdf&disposition=inline" %>
+              </div>
+            </th>
+            <%end%>
+          <% end %>
+        </tr>
+    </table>
+  </div>
+</div>

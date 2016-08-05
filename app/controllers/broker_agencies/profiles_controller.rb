@@ -1,3 +1,5 @@
+require 'csv'
+
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
 
@@ -294,6 +296,28 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   private
+
+  # def parse_employee_roster_file
+  #   begin
+  #     CSV.parse(params[:employee_roster_file].read) if params[:employee_roster_file].present?
+  #   rescue Exception => e
+  #     redirect_to build_employee_roster_broker_agencies_profiles_path, :flash => { :error => "Unable to parse the csv file" }
+  #   end
+  # end
+
+  # def csv_for(employee_roster)
+  #   (output = "").tap do
+  #     CSV.generate(output) do |csv|
+  #       csv << ["FamilyID", "Relationship", "DOB"]
+  #       employee_roster.each do |id,employee|
+  #         csv << [  employee[:family_id],
+  #                   employee[:relationship],
+  #                   employee[:dob]
+  #                 ]
+  #       end
+  #     end
+  #   end
+  # end
 
   def find_hbx_profile
     @profile = current_user.person.hbx_staff_role.hbx_profile

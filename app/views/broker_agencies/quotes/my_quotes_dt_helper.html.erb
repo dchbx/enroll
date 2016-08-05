@@ -1,0 +1,139 @@
+<div class="module container broker_quote_tool">
+  <div class="row" class="col-md-12">
+
+    <div class="module">
+      <%= render partial: "shared/data_table", locals:  {
+        page_header:  ["Quote Management", "url", ""],
+        directions:  "",
+        # new_button:  ["Add Verification", "url", "request_type"],
+      	new_button:  ["New Quote", new_broker_agencies_quote_path, false],
+    	  filters:  [
+      		# ["all", "", true, []],
+      		# ["some", "", true, [
+      		# 	["COBRA", "url", "request_type"],
+      		# 	["Termed", "url", "request_type"],
+      		# 	["Corn", "url", "request_type"]
+      		# ]],
+      		# ["the best ones", "", false, []],
+          # ["Dad", "", true, [
+          #   ["ZZZ", "url", "request_type"],
+      		# 	["Apples", "url", "request_type"],
+      		# 	["Corn", "url", "request_type"]
+          #   ]
+          # ]
+      	],
+      	bulk_actions:  [
+      		#["Send Secure Message", "", true],
+      		#["Delete", "", false]
+      	],
+      	row_functions:  false,
+      	row_actions:  [
+      		["asterisk", "url", "request_type", "tooltip"],
+      		["bomb", "url", "request_type", "tooltip"],
+      		["asterisk", "url", "request_type", "tooltip"],
+      		["bomb", "url", "request_type", "tooltip"],
+          ["caret-down", "url", "request_type", "View Details"]
+      	],
+      	buttons_below_table:  [
+      		# ['Export CSV', 'url', 'request_type'],
+      		# ['Print', 'url', 'request_type']
+      	],
+        child_rows:  [false, "datatables/child_row"],
+        responsive:  true,
+      	checkboxes:  false,
+      	pagination:  true,
+      	ordering:  false,
+      	info:  true,
+      	table_id:  "Quote-index-dataTable",
+      	data_url:  quote_index_datatable_broker_agencies_quotes_path(:format => :json),
+      	columns:  [
+          ["Quote Name", "quote_name","dt-right"],
+          ["Family Count", "family_count","dt-body-right"],
+          ["Benfit Group Count", "benefit_group_count","dt-body-right"],
+          ["Claim Code", "claim_code","dt-right"],
+          ["State", "quote_state","dt-right"],
+      	  ["Roster", "quote_roster","dt-body-right"],
+          ["","quote_delete","dt-right"]
+      	]
+      } %>
+    </div>
+
+
+    <% '' #link_to "New Quote" , new_broker_agencies_quote_path , method: :get, class: "btn btn-default", id: "new_quote" %>
+
+  </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+
+  /*$("#Quote-index-dataTable").dataTable().fnDestroy();
+  // datatables setup
+  $(document).ready(function() {
+    var dt = $('#Quote-index-dataTable').DataTable( {
+      "processing": true,
+      "serverSide": true,
+      "ordering" : false,
+      "paging": true,
+      "lengthMenu": [ 10, 25],
+      "destroy": true,
+      "ajax": {
+        url: "<%= quote_index_datatable_broker_agencies_quotes_path(:format => :json) %>",
+        type: "POST",
+        data: function ( d ) {
+          console.log('Quote Index Datatable');
+        }
+      },
+      "columns": [
+        { data: 'quote_name', className: "dt-right" },
+        { data: 'family_count'},
+        { data: 'benefit_group_count'},
+        { data: 'claim_code'},
+        { data: 'quote_state'},
+        { data: 'quote_roster'},
+        { data: 'quote_delete'}
+    ]
+  });
+
+
+    $('#Quote-index-dataTable').on('click', 'tr', function () {
+      var tr = $(this).closest('tr');
+      var row = dt.row( tr );
+      if ( row.child.isShown() ) {
+        row.child.hide();
+        tr.removeClass('shown');
+      }
+      else {
+        row.child( "<div>Benefit Group 1</div><div>Benefit Group 2</div>" ).show();
+        tr.addClass('shown');
+      }
+    });
+
+  });
+    */
+
+  $('#Quote-index-dataTable').on( 'draw.dt', function () {
+    console.log( 'Redraw occurred at: '+new Date().getTime() );
+    $("button#close_button").click(delete_quote_handler);
+  } );
+
+
+
+
+  var delete_quote_handler = function(){
+
+    $.ajax({
+        type: "POST",
+        url: "/broker_agencies/quotes/" + this.getAttribute("data-quote-id"),
+        dataType: "js",
+        data: {"_method":"delete"},
+        success: function(){
+          console.log("Deleted successfully");
+
+        }
+    });
+    $(this).parent().parent().remove();
+    event.preventDefault();
+  };
+
+
+</script>

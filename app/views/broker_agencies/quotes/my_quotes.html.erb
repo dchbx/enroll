@@ -1,0 +1,58 @@
+<div class="container">
+  <br/>
+  <div class="module broker-quotes-table" data-broker-id="<%= @broker.id %>" data-current-user-person-id="<%= current_user.person.id %>">
+    <%= render partial: "shared/data_table", locals:  {
+      page_header:  ["Quote Management", ""],
+      directions:  "",
+      new_button:  ["New Quote", new_broker_agencies_quote_path(@broker.id), false],
+  	  filters:  [
+    		["All", "", true, []],
+    		["Draft", "", true, []],
+    		["Published", "", true, []],
+        ["Claimed", "", true, []]
+    	],
+    	bulk_actions:  [
+    		# ["Send Secure Message", "", true],
+    		# ["Delete", "", false]
+    	],
+    	row_functions:  true,
+      row_actions:  [
+        ["Edit Quote/Roster", "replace_url_edit_quote", false ],
+        #["View Published Quote", "replace_url_view_published_quote", false ],
+        ["View Quote PDF", "replace_url_download_quote", false ],
+        ["Delete", "replace_url_delete_quote", true ]
+
+        # ["Delete", "replace_with_modal_delete_quote", false ]
+      ],
+    	buttons_below_table: [
+    		# ['Export CSV', 'url', 'request_type'],
+    		# ['Print', 'url', 'request_type']
+    	],
+      custom_handlers: [
+        "EmployerInvoicesDatatable.callAllFilter",
+        "EmployerInvoicesDatatable.callDraftFilter",
+        "EmployerInvoicesDatatable.callPublishedFilter",
+        "EmployerInvoicesDatatable.callClaimedFilter"
+      ],
+      child_rows: [false, "datatables/child_row"],
+      destroy: true,
+      processing_text: "Loading Quotes...",
+      responsive: true,
+    	checkboxes: false,
+    	pagination: true,
+    	ordering: false,
+    	info: true,
+    	table_id: "quotes-dataTable",
+    	data_url: quotes_index_datatable_broker_agencies_quotes_path(:format => :json),
+    	columns: [
+        ["Quote", "quote_name", "", [false, ""]],
+        ["Claim Code", "claim_code", "dt-center", [false, ""]],
+        ["Family Count", "family_count", "dt-center", [false, ""]],
+        ["State", "quote_state", "dt-center", [false, ""]],
+        # ["Benefit Group Count", "benefit_group_count", "dt-center", [false, ""]],
+        # ["Roster", "quote_roster", "dt-center", [false, ""]],
+    	  # ["Download", "quote_download", "dt-center", [false, ""]]
+    	]
+    } %>
+  </div>
+</div>

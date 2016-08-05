@@ -603,4 +603,15 @@ RSpec.describe Employers::EmployerProfilesController do
    end
 
   end
+
+
+  describe "GET link_from_quote" do
+    let(:user) { FactoryGirl.create(:user) }
+
+   it "should redirect" do
+     sign_in(user)
+     expect(response).to have_http_status(:success)
+   end
+
+  end
 end

@@ -1,0 +1,66 @@
+var EmployerInvoicesDatatable = ( function( window, undefined ) {
+
+  function setBaseModel() {
+    var base_model = "quote";
+    return base_model;
+  }
+
+  function callAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $all_filter = $table.closest('.module').find('.first-level a:contains("All")');
+    $all_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {});
+      $table.DataTable().draw();
+    });
+  }
+
+  function callDraftFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $draft_filter = $table.closest('.module').find('.first-level a:contains("Draft")');
+    var $broker_id =  $('.broker-quotes-table').data('broker-id');
+    $draft_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        filters: [
+        "all_broker_quotes('"+$broker_id+"')",
+        "draft_quotes"
+      ]});
+    });
+  }
+
+  function callPublishedFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $published_filter = $table.closest('.module').find('.first-level a:contains("Published")');
+    var $broker_id = $('.broker-quotes-table').data('broker-id');
+    $published_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        filters: [
+        "all_broker_quotes('"+$broker_id+"')",
+        "published_quotes"
+      ]});
+    });
+  }
+
+  function callClaimedFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $claimed_filter = $table.closest('.module').find('.first-level a:contains("Claimed")');
+    var $broker_id = $('.broker-quotes-table').data('broker-id');
+    $claimed_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        filters: [
+        "all_broker_quotes('"+$broker_id+"')",
+        "claimed_quotes"
+      ]});
+    });
+  }
+
+  return {
+    callAllFilter: callAllFilter,
+    callDraftFilter : callDraftFilter,
+    callPublishedFilter : callPublishedFilter,
+    callClaimedFilter : callClaimedFilter
+  };
+
+} )( window );

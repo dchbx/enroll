@@ -1,0 +1,96 @@
+<div class="container-fluid">
+  <div class="health">
+    <div class="row" style='margin-top:2%;'>
+      <div class="col-sm-2 text-right">
+          % for Employee:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'employee_slide_input', '', {  class: "slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="pct_employee" class='slider' data-slider-id='pct_employeeSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="50" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='employee_slide_label' class="slide-label pull-right">0%</span>
+      </div>
+      <div class="col-sm-2 text-right">
+          % for Spouse:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'spouse_input', '', {  class: "slider_input right_slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="pct_spouse" class='slider right-slider' data-slider-id='pct_spouseSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='spouse_label' class="slide-label pull-right">0%</span>
+      </div>
+    </div>
+    <div class="row" style='margin-top:5%;'>
+      <div class="col-sm-2 text-right">
+          % for Domestic Partner:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'domestic_input', '', {  class: "slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="pct_domestic_partner" class='slider' data-slider-id='pct_domestic_partnerSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='domestic_label' class="slide-label pull-right">0%</span>
+      </div>
+      <div class="col-sm-2 text-right">
+          % for Child:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'child_input', '', {  class: "slider_input right_slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="pct_child_under_26" class='slider right-slider' data-slider-id='pct_child_under_26Slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='child_label' class="slide-label pull-right">0%</span>
+      </div>
+    </div>
+    <!--<div style='float: left; width: 255px;  margin-left: 30px'>
+    Contribution % for Employee:
+    <input id="pct_employee" class='slider' data-slider-id='pct_employeeSlider' type="text" data-slider-min="0" data-slider-max="101" data-slider-step="5" data-slider-value="50"
+       style='width:225px'
+       data-slider-ticks="[0, 50, 100]"
+       data-slider-min="50"
+       data-slider-ticks-labels='["0", "50", "100"]'
+    />
+  </div>-->
+  <!--  <div style='float: left; width: 255px; margin-left: 30px;'>
+    Contribution % for Spouse:
+    <input id="pct_spouse" class='slider' data-slider-id='pct_spouseSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:225px'
+        data-slider-ticks="[0, 50, 100]"
+        data-slider-ticks-labels='["0", "50", "100"]'
+    />
+  </div>
+    <div style='float: left; width: 255px; margin-left:30px'>
+    Contribution % for Domestic Partner:
+    <input id="pct_domestic_partner" class='slider' data-slider-id='pct_domestic_partnerSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:225px'
+       data-slider-ticks="[0, 50, 100]"
+       data-slider-ticks-labels='["0", "50", "100"]'
+    />
+    </div>
+    <div style='float: left; width: 255px; margin-left:30px'>
+    Contribution % for Child:
+    <input id="pct_child_under_26" class='slider' data-slider-id='pct_child_under_26Slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:225px'
+        data-slider-ticks="[0, 50, 100]"
+        data-slider-ticks-labels='["0", "50", "100"]'
+    />
+    </div>
+    -->
+
+    <!--<div class='col-12' style='width: 100%; float: left; margin-left: 30px; margin-top: 10px; display: block'>
+        <div style='display: inline; margin-right 20px; font-size: 120%; font-weight: 700'><b>Total cost to Employer:</b>&nbsp;&nbsp;&nbsp; &nbsp;</div>
+        <input id="total_plan_cost" class='slider' data-slider-id='total_plan_costSlider' type="text" data-slider-min="0" data-slider-max="20000" data-slider-step="1" data-slider-value="5000" style='width:600px'
+        data-slider-ticks="[0, 5000, 10000]"
+        data-slider-ticks-labels='["0", "5000", "10000"]'
+        />
+    </div>-->
+
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="modal fade" id="deleteQuote_<%= @quote.id %>" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal" type="button">&times;</button>
+        <h4 class="modal-title">Delete Quote</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete <%= @quote.quote_name %>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <div class="vertically-aligned-row">
+          <div class="text-right">
+            <div class="btn btn-default" data-dismiss="modal">Close</div>
+            <%= link_to "Delete Quote", delete_quote_broker_agencies_quote_path(@quote.id), class: "btn btn-primary", data: { method: 'post', dismiss: "modal"} %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

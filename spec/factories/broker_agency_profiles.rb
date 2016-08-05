@@ -13,6 +13,9 @@ FactoryGirl.define do
     # before(:create) do |broker_agency|
     #   FactoryGirl.create(:organization, broker_agency_profile: broker_agency)
     # end
+    trait :with_aasm_state_approved do 
+        aasm_state "is_approved"
+    end
   end
 end
 

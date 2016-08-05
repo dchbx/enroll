@@ -24,6 +24,7 @@ class BrokerRole
      :united_health_care_mid_atlantic => nil}
 
   embedded_in :person
+  has_many :quotes
 
   field :aasm_state, type: String
 

@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :benefit_group do
+  factory :benefit_group do |b|
     plan_year
     relationship_benefits { [
       FactoryGirl.build(:relationship_benefit, benefit_group: self, relationship: :employee,                   premium_pct: 80, employer_max_amt: 1000.00),

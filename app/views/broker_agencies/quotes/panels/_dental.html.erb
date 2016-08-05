@@ -1,0 +1,17 @@
+ <div class="panel panel-default">
+   <div class="panel-heading" role="tab" id="dental-feature-mgmt-header">
+       <a role="button" data-toggle="collapse" data-parent="#accordion" href="#dental-feature-mgmt" aria-expanded="false" aria-controls="dental-feature-mgmt">
+
+         <b>Dental Features and cost criteria</b>
+         <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+         <span style='margin-left: 50px; font-size: 120%;'  id='show_dental_plan_criteria_count'>Plan count</span>
+          <label class='btn btn-normal hide' id='reset_criteria'> Reset Criteria</label>
+       </a>
+   </div>
+   <div id="dental-feature-mgmt" class="panel-collapse collapse" role="tabpanel" aria-labelledby="">
+
+     <%= render partial: 'my_dental_features' %>
+
+     <div id='dental_plan_container'><%= render partial: 'my_dental_plans' %></div>
+   </div>
+ </div>

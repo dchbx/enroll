@@ -1,32 +1,56 @@
 <div class="module">
-  <table class="table table-striped" id="verification-dataTable">
-    <thead>
-    <tr>
-      <th>HBX ID</th>
-      <th>First name</th>
-      <th>Last name</th>
-      <th>Documents</th>
-      <th>Due date</th>
-      <th>Status</th>
-      <th>Review</th>
-      <th>FedHub</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
+  <%= render partial: "shared/data_table", locals:  {
+    page_header:  ["Verifications", ""],
+    directions:  "",
+    new_button:  [],
+	  filters:  [
+  		# ["all", "", true, []],
+  		# ["some", "", true, [
+  		# 	["COBRA", "url", "request_type"],
+  		# 	["Termed", "url", "request_type"],
+  		# 	["Corn", "url", "request_type"]
+  		# ]],
+  		# ["the best ones", "", false, []],
+      # ["Dad", "", true, [
+      #   ["ZZZ", "url", "request_type"],
+  		# 	["Apples", "url", "request_type"],
+  		# 	["Corn", "url", "request_type"]
+      #   ]
+      # ]
+  	],
+  	bulk_actions:  [
+  		# ["Send Secure Message", "", true],
+  		# ["Delete", "", false]
+  	],
+  	row_functions:  false,
+    row_actions:  [
+      ["Cancel", "asd", true ]
+    ],
+  	buttons_below_table: [
+  		# ['Export CSV', 'url', 'request_type'],
+  		# ['Print', 'url', 'request_type']
+  	],
+    custom_handlers: [
+    ],
+    child_rows: [false, "datatables/child_row"],
+    destroy: false,
+    processing_text: "Loading Verifications...",
+    responsive: true,
+  	checkboxes: true,
+  	pagination: true,
+  	ordering: false,
+  	info: false,
+  	table_id: "verification-dataTable",
+  	data_url: verifications_index_datatable_exchanges_hbx_profiles_path(:format => :json),
+  	columns: [
+      ["HBX ID", "hbx_id", "", [false, ""]],
+      ["First name", "first_name", "", [false, ""]],
+      ["Last name", "last_name", "", [false, ""]],
+      ["Documents", "documents", "", [false, ""]],
+      ["Due date", "due_date", "", [false, ""]],
+  	  ["Status", "review_status", "", [false, ""]],
+  	  ["Review", "review", "", [false, ""]],
+  	  ["FedHub", "fed_hub", "", [false, ""]]
+  	]
+  } %>
 </div>
-
-<script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-    $('#verification-dataTable').DataTable( {
-      "processing": true,
-      "serverSide": true,
-      "ordering" : false,
-      "ajax": {
-        url: "<%= verifications_index_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
-        type: "GET"
-      }
-    } );
-  });
-</script>

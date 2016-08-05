@@ -64,6 +64,40 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
+  # describe "GET build employee roster " do
+  #   let(:user) { double(has_broker_role?: true)}
+
+  #   before :each do
+  #     sign_in user
+  #     get :build_employee_roster, id: broker_agency_profile.id
+  #   end
+
+  #   it "returns http success" do
+  #     expect(response).to have_http_status(:success)
+  #   end
+
+  #   it "should render the build employee roster template" do
+  #     expect(response).to render_template("build_employee_roster")
+  #   end
+  # end
+
+  # describe "POST build plan year " do
+  #   let(:user) { double(has_broker_role?: true)}
+
+  #   before :each do
+  #     sign_in user
+  #     post :build_plan_year , employee_roster:{ "1": {family_id: "123" , relationship: "employee" , dob: "1/1/1999" }}
+  #   end
+
+  #   it "returns http success" do
+  #     expect(response).to have_http_status(:success)
+  #   end
+
+  #   it "should render the csv file" do
+  #     expect(response.headers['Content-Type']).to have_content 'text/csv'
+  #   end
+  # end
+
   describe "patch update" do
     let(:user) { double(has_broker_role?: true)}
     #let(:org) { double }

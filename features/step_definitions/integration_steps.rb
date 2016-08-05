@@ -445,7 +445,9 @@ Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link "Add Member"
+  within("#dependent_buttons") do 
+    click_link "Add Member"
+  end
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -504,7 +506,7 @@ Then(/^.+ should see the plan shopping page with no dependent$/) do
 end
 
 Then(/^.+ should see the plan shopping page with one dependent$/) do
-  expect(page).to have_content("Soren White + 1 Dependent")
+  expect(page).to have_content("Soren White + 1 dependent")
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do

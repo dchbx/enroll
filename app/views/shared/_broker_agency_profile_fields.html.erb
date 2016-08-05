@@ -3,7 +3,9 @@
 </div>
 <div class="col-md-3  col-xs-12 form-group-lg form-group no-pd broker-agency-info">
   <div class="language_multi_select">
-    <%= f.select(:languages_spoken, options_from_collection_for_select(LanguageList::COMMON_LANGUAGES.sort_by {|lan| lan.common_name}, "iso_639_1", "common_name", f.object.try(:languages_spoken)), { }, { id: 'broker_agency_language_select', multiple: "multiple", class: "floatlabel form-control interaction-field-control-broker-agency-languages-spoken" } ) %>
+    <%= f.select(:languages_spoken,
+    options_from_collection_for_select(LanguageList::COMMON_LANGUAGES.sort_by {|lan| lan.common_name}, "iso_639_1", "common_name",
+    f.object.try(:languages_spoken)), { }, { id: 'broker_agency_language_select', multiple: "multiple", class: "floatlabel form-control interaction-field-control-broker-agency-languages-spoken" } ) %>
   </div>
 
 </div>

@@ -1,0 +1,3 @@
+class QuoteMemberDependent
+
+end

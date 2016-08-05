@@ -1,0 +1,56 @@
+<div class="container-fluid">
+  <div class="dental">
+    <div class="row" style='margin-top:2%;'>
+      <div class="col-sm-2 text-right">
+          % for Employee:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'employee_slide_input', '', {  class: "slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="dental_pct_employee" class='slider' data-slider-id='pct_employeeSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="50" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='employee_slide_label' class="slide-label pull-right">0%</span>
+      </div>
+      <div class="col-sm-2 text-right">
+          % for Spouse:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'spouse_input', '', {  class: "slider_input right_slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="dental_pct_spouse" class='slider right-slider' data-slider-id='pct_spouseSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='spouse_label' class="slide-label pull-right">0%</span>
+      </div>
+    </div>
+    <div class="row" style='margin-top:5%;'>
+      <div class="col-sm-2 text-right">
+          % for Domestic Partner:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'domestic_input', '', {  class: "slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="dental_pct_domestic_partner" class='slider' data-slider-id='pct_domestic_partnerSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='domestic_label' class="slide-label pull-right">0%</span>
+      </div>
+      <div class="col-sm-2 text-right">
+          % for Child:
+      </div>
+      <div class='col-sm-1'>
+        <%= number_field_tag 'child_input', '', {  class: "slider_input right_slider_input hidden-param" } %>
+      </div>
+      <div class="col-sm-2">
+        <input id="dental_pct_child_under_26" class='slider right-slider' data-slider-id='pct_child_under_26Slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:200px'/>
+      </div>
+      <div class="col-sm-1">
+        <span id='child_label' class="slide-label pull-right">0%</span>
+      </div>
+    </div>
+  </div>
+</div>

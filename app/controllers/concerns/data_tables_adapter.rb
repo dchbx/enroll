@@ -11,4 +11,18 @@ module DataTablesAdapter
     end
     DataTablesInQuery.new(draws, start_idx, window_size, search_string)
   end
+
+  def apply_sort_or_filter(collection, offset, limit)
+    base_model = params[:base_model]
+    order_by = params[:order_by] if params[:order_by].present?
+    scopes = params[:scopes] if params[:scopes].present?
+    scopes = [] if params[:scopes].blank?
+    sort_direction = set_sort_direction if order_by.present?
+    collection = apply_sort(collection, sort_direction, offset, limit, base_model, scopes, order_by) if sort_direction.present?
+    filters = params[:filters] if params[:filters].present?
+    filter = set_filter if filters.present?
+    collection = apply_filter(collection, sort_direction, offset, limit, base_model, filters) if filter.present?
+    return collection
+  end
+
 end

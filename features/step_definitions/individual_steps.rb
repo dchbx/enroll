@@ -75,8 +75,8 @@ Then(/Individual should see a form to enter personal information$/) do
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').click
+  find(:xpath, "//p[@class='label'][. ='SELECT STATE ']").trigger('click')
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]').trigger('click')
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
   screenshot("personal_form")
@@ -208,7 +208,9 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual edits a dependents address$/) do
-  click_link 'Add Member'
+  within("#dependent_buttons") do
+    click_link 'Add Member'
+  end
 end
 
 Then(/^Individual fills in the form$/) do
@@ -216,8 +218,8 @@ Then(/^Individual fills in the form$/) do
   fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find('.house .selectric p.label').trigger 'click'
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
+  find('.house #naturalization_doc_type_select .selectric p.label').trigger 'click' 
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").trigger('click')
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -229,8 +231,8 @@ Then(/^Individual ads address for dependent$/) do
   find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
   fill_in 'dependent[addresses][0][city]', :with => 'Washington'
-  find('#address_info .selectric p.label').trigger 'click'
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
+  first('div#address_info .selectric p.label').trigger 'click'
+  first(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in 'dependent[addresses][0][zip]', :with => "20002"
   all(:css, ".mz").last.click
   find('#btn-continue').click

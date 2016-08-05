@@ -136,9 +136,7 @@ Then(/^.+ should see confirm modal dialog box$/) do
 end
 
 Then(/^.+ confirms? broker selection$/) do
-  within '.modal-dialog' do
-    find('input.btn-primary').click
-  end
+  find(:xpath, "//div[@class='modal fade in']//div[@class='modal-dialog']//input[@value='Confirm']").click
 end
 
 Then(/^.+ should see broker selected successful message$/) do

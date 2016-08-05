@@ -943,6 +943,27 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end
+
+  describe EmployerProfile, "Claim Quote", dbclean: :after_each do
+    let!(:quote) { FactoryGirl.create(:quote, :with_two_households_and_members, claim_code: "1234-1234", aasm_state: "published") }
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:quote_claim_code) { "1234-1234"}
+    let(:invalid_quote_claim_code) { "1234-5678"}
+
+    context "Claim code is valid" do
+      it "should create new plan year" do
+        expect(employer_profile.build_plan_year_from_quote(quote_claim_code,false)).to eq true
+      end
+    end
+
+    context "Claim code is invalid valid" do
+      it "should return false indicating claim was not found" do
+        expect(employer_profile.build_plan_year_from_quote(invalid_quote_claim_code,false)).to eq false
+      end
+    end
+  end
+
+
 end
 
 # describe "#advance_day" do
