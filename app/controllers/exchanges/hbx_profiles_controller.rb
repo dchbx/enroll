@@ -1,6 +1,10 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
-
+  include SepAll
+  include DataTablesSorts
+  include DataTablesSorts::VerificationsIndexSorts
+  include DataTablesFilters
+  include DataTablesFilters::EmployerInvoicesIndexFilters
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
@@ -10,7 +14,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
-  
+
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
@@ -228,6 +232,42 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def sep_index
+    setEventKinds
+    respond_to do |format|
+      format.html { render "sep/approval/sep_index" }
+      format.js {}
+    end
+  end
+
+  def sep_index_datatable
+    if Family.exists(special_enrollment_periods: true).present?
+      if(params[:q] == 'both')
+        includeBothMarkets
+      elsif(params[:q] == 'ivl')
+        includeIVL
+      else
+        includeShop
+      end
+    end
+    setEventKinds
+    render
+  end
+
+  def update_effective_date
+    chooseMarket
+    respond_to do |format|
+      format.js {} 
+    end
+  end
+
+  def calculate_sep_dates
+    calculateDates
+    respond_to do |format|
+      format.js {} 
+    end
+  end
+
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
 
@@ -313,11 +353,17 @@ class Exchanges::HbxProfilesController < ApplicationController
         "family_members.person_id" => {"$in" => person_ids}
       })
     end
+
+    sort_direction = set_sort_direction
+    families = sort_verifications_index_columns(families, sort_direction) if sort_direction.present?
+    filter = set_filter
+    employers = filter_employers(employers, filter) if filter.present?
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
     @families = families.skip(dt_query.skip).limit(dt_query.take)
-    render
+    render "datatables/verifications_index_datatable"
   end
 
   def product_index
@@ -351,6 +397,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     session[:person_id] = nil
     session[:dismiss_announcements] = nil
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
+  end
+
+  def add_new_sep
+    if params[:qle_id].present?
+      createSep
+    end
+    redirect_to exchanges_hbx_profiles_root_path
   end
 
   # GET /exchanges/hbx_profiles/new
@@ -422,7 +475,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
-private
+  private
 
   def agent_assistance_messages(params, agent, role)
     if params[:person].present?
@@ -499,5 +552,34 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
+  end
+
+  def setEventKinds
+    @event_kinds_all = ['first_of_next_month', '15th_day_rule'];
+    @event_kinds_default = ['first_of_next_month'];
+    @qualifying_life_events_shop = QualifyingLifeEventKind.shop_market_events_admin
+    @qualifying_life_events_individual = QualifyingLifeEventKind.individual_market_events_admin
+  end
+
+  def chooseMarket
+    if params[:market] == 'ivl' 
+      @qle = QualifyingLifeEventKind.individual_market_events_admin.detect{ |x| x.id.to_s == params[:id]}
+    else
+      @qle = QualifyingLifeEventKind.shop_market_events_admin.detect{ |x| x.id.to_s == params[:id]}    
+    end
+  end
+
+  def calculateDates
+    if params[:person].present?
+      @family = Family.find(params[:person])
+      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_kind])
+      if params[:id].present?
+        qle = QualifyingLifeEventKind.find(params[:id])
+        special_enrollment_period.qualifying_life_event_kind = qle
+        special_enrollment_period.qle_on = Date.strptime(params[:eventDate], "%m/%d/%Y")
+      end
+    end
+    @start_on = special_enrollment_period.start_on
+    @end_on = special_enrollment_period.end_on
   end
 end

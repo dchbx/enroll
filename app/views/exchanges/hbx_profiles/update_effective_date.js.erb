@@ -1,0 +1,3 @@
+$('.admin_effective_on_kind_options').show();
+$('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DATE RULE', '']]) + options_for_select(@qle.effective_on_kinds)%>").selectric("refresh");
+

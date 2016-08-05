@@ -1,0 +1,362 @@
+<div class='sep_table'>
+  <div id= 'message_form'></div>
+    <div id="inbox_provider_form" class="table-responsive">
+      <ul class="nav nav-tabs" id="tab_datatables">
+          <li><a data-toggle="tab" data-target="#ivl_shop_Table">All</a></li>
+          <li><a data-toggle="tab" data-target="#ivlTable">IVL</a></li>
+          <li><a data-toggle="tab" data-target="#shopTable">EE</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="ivl_shop_Table">
+          <table id='sepAdmin' class="table table-striped table-bordered dataTable module">
+            <thead>
+              <tr>
+                <th>HBX ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>SSN</th>
+                <th>Consumer?</th>
+                <th>Employee?</th>
+                <th></th>
+                <th></th>
+                <th>CONSUMER SEP REASON</th>
+                <th>ADMIN COMMENTS</th>
+                <th>N/A</th>
+                <th>CSL#</th>
+                <th>EFFECTIVE DATE RULE</th>
+                <th>START ON</th>
+                <th>END ON</th>
+                <th>EVENT DATE</th>
+                <th>NEXT POSSIBLE EFFECTIVE DATE</th>
+                <th>OPTION DATE 1</th>
+                <th>OPTION DATE 2</th>
+                <th>OPTION DATE 3</th>
+              </tr>
+            </thead>
+          
+            <% if @families.present? %>
+
+              <tbody>
+                <% @families.each do |family| %>
+                <% if family.primary_applicant.person.consumer_role.present? && family.primary_applicant.person.active_employee_roles.present?%>
+                  <tr>
+                    <td><%=family.primary_applicant.person.hbx_id%></td>
+                    <td><%=family.primary_applicant.person.first_name%></td>
+                    <td><%=family.primary_applicant.person.last_name%></td>
+                    <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
+                    <td class='consumer_role_present'><%= family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %></td>
+                    <td class='employee_roles_present'><%= family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %></td>
+                    <td class='add-control' data><i class="fa fa-plus-square"></i></td>
+                    <td> <%= link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default" %> </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.title %>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%=f.admin_comment%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.csl_num.present? ? f.csl_num + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.effective_on_kind.present? ? f.effective_on_kind + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.start_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.end_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.qle_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option1_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option2_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option3_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                  </tr>
+                  <% end %>
+                <% end %>
+              </tbody>
+           <% end %> 
+         </table>
+     </div>
+
+     <div class="tab-pane active" id="ivlTable">
+          <table id='sepAdmin1' class="table table-striped table-bordered dataTable module">
+            <thead>
+              <tr>
+                <th>HBX ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>SSN</th>
+                <th>Consumer?</th>
+                <th>Employee?</th>
+                <th></th>
+                <th></th>
+                <th>CONSUMER SEP REASON</th>
+                <th>ADMIN_COMMENTS</th>
+                <th>N/A</th>
+                <th>CSL#</th>
+                <th>EFFECTIVE DATE RULE</th>
+                <th>START ON</th>
+                <th>END ON</th>
+                <th>EVENT DATE</th>
+                <th>NEXT POSSIBLE EFFECTIVE DATE</th>
+                <th>OPTION DATE 1</th>
+                <th>OPTION DATE 2</th>
+                <th>OPTION DATE 3</th>
+              </tr>
+            </thead>
+          
+            <% if @families.present? && @families_in_ivl.present? %>
+              <tbody>
+                <% @families.each do |family| %>
+                <% if family.primary_applicant.person.consumer_role.present?%>
+                 <% unless family.primary_applicant.person.active_employee_roles.present? %>
+                  <tr>
+                    <td><%=family.primary_applicant.person.hbx_id%></td>
+                    <td><%=family.primary_applicant.person.first_name%></td>
+                    <td><%=family.primary_applicant.person.last_name%></td>
+                    <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
+                    <td class='consumer_role_present'><%= family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %></td>
+                    <td class='employee_roles_present'><%= family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %></td>
+                    <td class='add-control' data><i class="fa fa-plus-square"></i></td>
+                    <td> <%= link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default" %> </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.title %>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%=f.admin_comment%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, eventKind: @event_kinds_all %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.csl_num.present? ? f.csl_num + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.effective_on_kind.present? ? f.effective_on_kind + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.start_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.end_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.qle_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date  : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option1_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option2_date.present? ? f.option2_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td> 
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option3_date.present? ? f.option3_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td> 
+                  </tr>
+                  <% end %>
+                  <% end %>
+                <% end %>
+              </tbody>
+           <% end %> 
+         </table>
+     </div>
+
+     <div class="tab-pane active" id="shopTable">
+     <table id='sepAdmin2' class="table table-striped table-bordered dataTable module">
+        <thead>
+          <tr>
+            <th>HBX ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>SSN</th>
+            <th>Consumer?</th>
+            <th>Employee?</th>
+            <th></th>
+            <th></th>
+            <th>CONSUMER SEP REASON</th>
+            <th>ADMIN_COMMENTS</th>
+            <th>N/A</th>
+            <th>CSL#</th>
+            <th>EFFECTIVE DATE RULE</th>
+            <th>START ON</th>
+            <th>END ON</th>
+            <th>EVENT DATE</th>
+            <th>NEXT POSSIBLE EFFECTIVE DATE</th> 
+            <th>OPTION DATE 1</th>
+            <th>OPTION DATE 2</th>
+            <th>OPTION DATE 3</th>
+          </tr>
+        </thead>
+
+        <% if @families.present? && @families_in_shop.present? %>
+
+              <tbody>
+                <% @families_in_shop.each do |family| %>
+                <% if family.primary_applicant.person.active_employee_roles.present? %>
+                 <% unless family.primary_applicant.person.consumer_role.present? %>
+                  <tr>
+                    <td><%=family.primary_applicant.person.hbx_id%></td>
+                    <td><%=family.primary_applicant.person.first_name%></td>
+                    <td><%=family.primary_applicant.person.last_name%></td>
+                    <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
+                    <td class='consumer_role_present'><%= family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %></td>
+                    <td class='employee_roles_present'><%= family.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No" %></td>
+                    <td class='add-control' data><i class="fa fa-plus-square"></i></td>
+                    <td> <%= link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default" %> </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.title %>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%=f.admin_comment%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_shop, eventKind: @event_kinds_default %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.csl_num.present? ? f.csl_num + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.effective_on_kind.present? ? f.effective_on_kind + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.start_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.end_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.qle_on%>?dummyData
+                        <% end %>
+                    </td>
+                    <td>
+                       <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date  : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option1_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option2_date.present? ? f.option2_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option3_date.present? ? f.option3_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                  </tr>
+                  <% end %>
+                  <% end %>
+                <% end %>
+              </tbody>
+           <% end %> 
+     </table>
+   </div>
+     </div>
+</div>
+
+
+
+
+<style type="text/css">
+  table.dataTable.select tbody tr,
+  table.dataTable thead th:first-child {
+     cursor: pointer;
+  }
+
+  td.add-control, td.history-control {
+    cursor: pointer;
+  }
+ 
+  div.slider {
+    display: none;
+  }
+ 
+  table.dataTable tbody td.no-padding {
+    padding: 0;
+  }
+  
+  table.dataTable .hiddenRow {
+    padding: 0 !important;
+  }
+}
+</style>

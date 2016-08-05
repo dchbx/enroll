@@ -38,7 +38,10 @@
 //= require bootstrap-hooks
 //= require general_agency
 //= require dataTables/jquery.dataTables
+//= require enrolldatatables
+//= require dataTables/dataTables.select.min.js
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require enroll_datatables_initializer
 //= require freebies
 //= require responsive
 //= require_tree .
@@ -529,6 +532,7 @@ $(document).ready(function () {
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
+  $(".mask-csl").mask("9999999999");
 
   $(document).on('focusout', "#person_ssn, .mask-ssn", function(){
     var ssn_val = $(this).val();

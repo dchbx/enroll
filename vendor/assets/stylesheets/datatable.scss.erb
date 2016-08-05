@@ -1,84 +1,225 @@
 .module {
-  &#employers_dataTable_wrapper,
-  #families_dataTable_wrapper,
-  #binder-transition-dataTable_wrapper,
-  #verification-dataTable_wrapper {
-    .small-6 {
-      width: 50%;
-      &:first-of-type {
-        float: left;
-        .selectric {
-          height: 30px;
-          position: relative;
-          p {
-            position: relative;
-            &.label {
-              top: 4px;
-              height: auto !important;
-              line-height: normal !important;
+  .datatable {
+    .datatable-header {
+      &.vertically-aligned-row {
+        h1 {
+          width: 25%;
+        }
+        .search {
+          width: 40%;
+          .input-group > input {
+            box-sizing: border-box;
+          }
+        }
+      }
+    }
+    .first-level {
+      margin: 0 0 0.675%;
+    }
+    .btn-group-second {
+      margin: 0 0 0.75%;
+    }
+    .select-all {
+      padding-left: 6px;
+    }
+    .even {
+      background-color: $primary-white;
+    }
+    th,
+    tr {
+      background-color: $primary-white;
+    }
+    .table {
+      margin-top: 0.675%;
+      margin-bottom: 0;
+    }
+    .table-responsive + .footer {
+      margin-top: 1.5%;
+    }
+    .table > tbody > tr {
+      &.odd {
+        &.shown {
+          + tr {
+            background-color: $primary-white;
+            table,
+            table tr {
+              background-color: $primary-white;
             }
           }
-          .button {
-            top: -6px;
+          + tr:hover {
+            table,
+            table tr {
+              background-color: $primary-white;
+            }
           }
         }
-        span {
-          position: relative;
-          top: 5px;
-          left: 8px;
+      }
+      &.even {
+        &.shown {
+          + tr {
+            background-color: #f9f9f9;
+            table,
+            table tr {
+              background-color: #f9f9f9;
+            }
+          }
+          + tr:hover {
+            table,
+            table tr {
+              background-color: #f9f9f9;
+            }
+          }
         }
       }
-      &:last-of-type {
-        float: right;
-        input.form-control {
-          padding-top: 5px !important;
+    }
+    .table > tbody > tr > td {
+      vertical-align: middle;
+      &.dt-right {
+        text-align: right;
+      }
+      &.dt-left {
+        text-align: left;
+      }
+      &.dt-center {
+        text-align: center;
+      }
+    }
+    .table > thead > tr > th {
+      vertical-align: middle;
+      text-transform: uppercase;
+      text-align: center;
+      &:focus {
+        outline-color: transparent;
+        outline-style: none;
+      }
+      .fa-caret-up,
+      .fa-caret-down {
+        color: $primary-gray;
+        display: block;
+      }
+      &.sorting {
+        cursor: pointer;
+        &:hover {
+          .fa {
+            color: $primary-blue;
+          }
         }
-        span.search {
-          position: relative;
-          top: 3px;
+      }
+      &.sorting_asc {
+        .fa-caret-up {
+          color: $primary-blue;
+        }
+        cursor: pointer;
+      }
+      &.sorting_desc {
+        .fa-caret-down {
+          color: $primary-blue;
+        }
+        cursor: pointer;
+      }
+      &.dt-right {
+        text-align: right;
+      }
+      &.dt-left {
+        text-align: left;
+      }
+      &.dt-center {
+        text-align: center;
+      }
+    }
+    .vertically-aligned-row > .vertically-aligned-row {
+      width: 50%;
+    }
+    .vertically-aligned-row.header {
+      .select-all {
+        width: 25%;
+      }
+      .dropdown {
+        width: 40%;
+      }
+      > .vertically-aligned-row {
+        width: 75%;
+      }
+      .col-xs-2 {
+        width: 10%;
+      }
+    }
+    .table-length,
+    .dataTables_length {
+      display: inline;
+      font-size: 14px;
+      > label {
+        margin-bottom: 0;
+        width: 8.75%;
+        min-width: 60px;
+        padding-left: 1.5%;
+        .selectric {
+          background-color: transparent !important;
+          height: auto;
+          p.label {
+            padding: 0;
+            margin-bottom: 0;
+          }
+          b.button {
+            top: 6px;
+          }
+          p.label,
+          b.button {
+            line-height: 1;
+            height: auto;
+          }
         }
       }
     }
-    div.dataTables_length label {
-      font-weight: normal;
-      text-align: left;
-      white-space: nowrap;
+    .dataTables_length {
+      background-color: $primary-white;
+      margin: 0 2.5%;
+      padding: 0.675%;
+      border-radius: 4px;
+      width: 100%;
     }
-    ​ div.dataTables_length select {
-      width: 75px;
-      display: inline-block;
+    .dataTables_filter {
+      input {
+        padding: 0 10px;
+        margin-left: 2.5%;
+        width: 50%;
+      }
+      label {
+        width: 100%;
+        font-size: 14px;
+        font-weight: normal;
+      }
     }
-    ​ div.dataTables_filter input {
-      height: 30px;
+    .row-actions {
+      display: table-cell;
+      vertical-align: middle;
+      .fa {
+        color: $primary-blue;
+      }
+      & > * {
+        display: table-cell;
+      }
     }
-    ​ div.dataTables_filter {
-      text-align: right;
-    }
-    ​ div.dataTables_filter label {
-      font-weight: normal;
-      white-space: nowrap;
-      text-align: left;
-    }
-    ​ div.dataTables_filter input {
-      margin-left: 0.5em;
-      display: inline-block;
-      width: auto;
-    }
-    ​ div.dataTables_info {
-      padding-top: 8px;
-      white-space: nowrap;
-      text-align: right;
-    }
-    ​ div.dataTables_paginate {
-      margin: 20px;
-      white-space: nowrap;
+    .footer {
+      margin-top: 1.5%;
+      .combined-length-info.vertically-aligned-row {
+        display: table;
+        width: 100%;
+      }
+      .dataTables_paginate {
+        display: none;
+      }
+      .select-all.vertically-aligned-row {
+        display: table;
+        width: 100%;
+        margin-bottom: 0.675%;
+      }
+      .dataTables_info {
+        text-align: right;
+      }
+      .dataTables_paginate {
+        text-align: center !important;
+      }
     }
   }
-}
-.dataTables_info {
-  text-align: right;
-}
-
-.dataTables_paginate {
-  text-align: center !important;
 }

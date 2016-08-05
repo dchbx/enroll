@@ -1,0 +1,272 @@
+<div class="datatable">
+  <div class="datatable-header vertically-aligned-row">
+    <% if page_header.present? %>
+      <div>
+        <div>
+          <% if page_header[1] == 'admin' %>
+            <h3><%=page_header[0]%></h3>
+          <% else %>
+            <h1 class="darkblue no-buffer"><%=page_header[0]%></h1>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <% if new_button.present? %>
+      <div class="col-xs-2 hidden">
+        <div class="row">
+          <%= link_to new_button[0], new_button[1], remote: new_button[2], class: 'btn btn-primary btn-block' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <% if directions.present? %>
+    <h4><%= directions %></h4>
+    <br/>
+  <% end %>
+  <% if filters.present? %>
+    <div>
+      <div class="btn-group first-level" role="group" aria-label="...">
+        <% filters.each do |filter, url, request_type, second_level| %>
+          <% if second_level.present? %>
+              <div class="btn-group btn-group-second <%=filter%>-second-level hidden">
+            <% second_level.each do |filter, url, request_type| %>
+              <%= link_to "#{filter}", "#{url}", remote: request_type, class: 'second-level btn btn-default', name: "#{filter}" %>
+            <% end %>
+          </div>
+          <%= link_to "#{filter}", "javascript:;", class: 'second-level btn btn-default', onclick: 'EnrollDataTableInitializer.showSecondLevel($(this))', name: "#{filter}" %>
+          <% else %>
+            <%= link_to "#{filter}", "#{url}", remote: request_type, class: 'btn btn-default' %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  <% if bulk_actions.present? && checkboxes == true %>
+    <div class="dropdown hidden">
+      <button aria-expanded="true" aria-haspopup="true" class="btn btn-default dropdown-toggle disabled" data-toggle="dropdown" id="<%= table_id %>-bulk-actions" type="button">
+        Bulk Actions
+        <span class="caret"></span>
+      </button>
+      <ul aria-labelledby="<%= table_id %>-bulk-actions" class="dropdown-menu">
+        <% bulk_actions.each do |bulk_action, url, request_type | %>
+        <li><%= link_to "#{bulk_action}", "#{url}", remote: request_type %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <table class="table table-striped table-hover table-condensed panel panel-default" id="<%= table_id %>"></table>
+  <% if buttons_below_table.present? %>
+    <span class="buttons-below-table hidden">
+      <% buttons_below_table.each do |button, url, request_type | %>
+          <%= link_to button, url, remote: request_type, class: 'btn btn-default' %>
+      <% end %>
+    </span>
+  <% end %>
+</div>
+<script charset="utf-8" defer="defer" type="text/javascript">
+  $(document).ready(function () {
+    var enroll_datatable = $('#<%= table_id %>').EnrollDataTable({
+      "destroy": <%= destroy || false %>,
+      "processing": true,
+      <% if processing_text.present? %>
+      "language": {
+         "processing": "<i class='fa fa-spinner fa-2x' aria-hidden='true'></i><h4><%= processing_text %></h4>"
+      },
+      <% end %>
+      "serverSide": true,
+      "ordering": <%= ordering || false %>,
+      "paging": <%= pagination || false %>,
+      "info": <%= info || false %>,
+      "ajax": {
+        url: "<%= data_url %>",
+        type: "POST",
+        data: function ( d ) {
+          var dt_params = $('#<%= table_id %>').data('dt_params');
+          if ( dt_params ) {
+            $.extend(d, dt_params);
+          }
+       }
+      },
+      'order': [
+        [1, 'asc']
+      ],
+      "language": {
+        "lengthMenu": "_MENU_"
+      },
+      "initComplete": function() {
+        <% if responsive == true %>
+          EnrollDataTableInitializer.makeResponsiveTable('<%= table_id %>');
+        <% end %>
+        <% if filters.present? %>
+          EnrollDataTableInitializer.initializeFilters('<%= table_id %>');
+        <% end %>
+        <% if checkboxes == true %>
+          EnrollDataTableInitializer.addSelectAll('<%= table_id %>');
+        <% end %>
+        <% if bulk_actions.present? && checkboxes == true %>
+          EnrollDataTableInitializer.addBulkActions('<%= table_id %>');
+        <% end %>
+        <% if checkboxes == true %>
+          EnrollDataTableInitializer.addCheckboxHandlers('<%= table_id %>');
+        <% end %>
+        <% if buttons_below_table.present? %>
+          EnrollDataTableInitializer.addButtonsBelowTable('<%= table_id %>');
+        <% end %>
+        <% if info == true %>
+          EnrollDataTableInitializer.moveInfo('<%= table_id %>');
+        <% end %>
+        <% if pagination == true %>
+          EnrollDataTableInitializer.showPagination('<%= table_id %>');
+        <% end %>
+        <% if row_actions.present? %>
+          Freebies.popover();
+        <% end %>
+        EnrollDataTableInitializer.swapSearchAndNewButton('<%= table_id %>');
+        EnrollDataTableInitializer.moveTableLength('<%= table_id %>');
+        EnrollDataTableInitializer.wrapSearchInBootstrap('<%= table_id %>');
+        EnrollDataTableInitializer.addRowIndexToRowFunctionLinks('<%= table_id %>');
+        EnrollDataTableInitializer.addRowDataToParams('<%= table_id %>');
+        EnrollDataTableInitializer.attachPostDrawHandlers('<%= table_id %>');
+        <% if custom_handlers.present? %>
+          <% custom_handlers.each do |custom_handler| %>
+            <%= custom_handler %>('<%= table_id %>');
+          <% end %>
+        <% end %>
+      },
+      "drawCallback": function( settings ) {
+        EnrollDataTableInitializer.moveInfo('<%= table_id %>');
+        EnrollDataTableInitializer.moveTableLength('<%= table_id %>');
+      },
+      "columns": [
+        <% if checkboxes == true %>
+          <% columns.unshift(["","checkbox_column", "", ["false", ""]])%>
+        <% end %>
+        <% if row_functions == true %>
+          <% columns << (["","row_functions", "", ["false", ""]])%>
+        <% end %>
+        <% columns << (["","row_data", "", ["false", ""]])%>
+        <% column_count = columns.length %>
+        <% columns.each_with_index do |col, idx| %> {
+          <% if col[3].first == true %>
+            title: "<div class='vertically-aligned-row'><div><%= j col[0] %></div><div><i class='fa fa-caret-up' aria-hidden='true'></i><i class='fa fa-caret-down' aria-hidden='true'></i></div></div>",
+          <% else %>
+            title: "<%= j col[0] %>",
+          <% end %>
+          data: "<%= j col[1] %>",
+          className: "<%= j col[2] %>"
+        }
+        <%= (idx < (column_count - 1)) ? "," : ""  %>
+
+        <% end %>
+      ]
+      <% if checkboxes == true && row_functions == true %>,
+        'columnDefs': [
+          <% columns[1..(columns.length-3)].each_with_index do |col, idx| %>
+            {
+              'targets': <%= idx + 1 %>,
+              'orderable': <%= col[3].first %>,
+            },
+          <% end %>
+          {
+            'targets': 0,
+            'searchable': false,
+            'orderable': false,
+            'className': 'dt-center',
+            'render': function (data, type, full, meta) {
+              return '<span data-index="'+meta.row+'" class="enroll-checkbox"><div class="checkbox"><label><input id="input_'+meta.row+'" type="checkbox" name="id['+meta.row+']" value="input_'+meta.row+'' + $('<div/>').text(data).html() + '"><label for="input_'+meta.row+'"><i class="fa fa-check-square-o fa-2x"></i><i class="fa fa-square-o fa-2x"></i></label></label></div></span>';
+            }
+          }, {
+            'targets': <%= columns.length - 2 %>,
+            'searchable': false,
+            'orderable': false,
+            'className': 'row-actions',
+            'render': function (data, type, full, meta) {
+              // return '<% row_actions.each do |fa_icon, url, request_type, tooltip, popover_title, popover| %><% if popover.present? %><span title="<%= popover_title %>" data-toggle="popover" data-placement="top" data-html="true" data-content=\'<% popover.each do |popover_link| %><%= link_to "#{popover_link[0]}", "#{popover_link[1]}", remote: "#{popover_link[2]}" %><br/><% end %>\'><%="<i class=\"fa fa-#{fa_icon}\" data-toggle=\"tooltip\" title=\"#{popover_title}\" aria-hidden=\"true\"></i>".html_safe %></span><% else %><span><%= link_to j("<i class='fa fa-#{fa_icon}' aria-hidden='true'></i>".html_safe), "#{url}", remote: request_type, title: "#{tooltip}", data: {'toggle': 'tooltip'} %></span>&#10;<% end %><% end %>';
+                return '<div class="dropdown"><button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions <span class="caret"></span></button><ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1"><% row_actions.each do |row_action| %><li><%= link_to "#{row_action[0]}", "#{row_action[1]}", remote: "#{row_action[2]}" %></li><% end %></ul></div>';
+            }
+          }, {
+            'targets': <%= columns.length - 1 %>,
+            'searchable': false,
+            'orderable': false,
+            'className': 'row-data hidden'
+          }
+        ]
+      <% elsif checkboxes == true %>, 'columnDefs': [
+        <% columns[1..columns.length-1].each_with_index do |col, idx| %>
+          {
+            'targets': <%= idx + 1 %>,
+            'orderable': <%= col[3].first %>,
+          },
+        <% end %>
+          {
+            'targets': 0,
+            'searchable': false,
+            'orderable': false,
+            'className': 'dt-center',
+            'render': function (data, type, full, meta) {
+              return '<span class="enroll-checkbox"><div class="checkbox"><label><input id="input_'+meta.row+'" type="checkbox" name="id['+meta.row+']" value="input_'+meta.row+'' + $('<div/>').text(data).html() + '"><label for="input_'+meta.row+'"><i class="fa fa-check-square-o fa-2x"></i><i class="fa fa-square-o fa-2x"></i></label></label></div></span>';
+            }
+          }, {
+            'targets': <%= columns.length-1 %>,
+            'searchable': false,
+            'orderable': false,
+            'className': 'row-data hidden'
+          }
+        ]
+      <% elsif row_functions == true %>, 'columnDefs': [
+        <% columns[0..columns.length-2].each_with_index do |col, idx| %>
+          {
+            'targets': <%= idx %>,
+            'orderable': <%= col[3].first %>,
+          },
+        <% end %>
+          {
+            'targets': <%= columns.length - 2 %>,
+            'searchable': false,
+            'orderable': false,
+            'className': 'row-actions',
+            'render': function (data, type, full, meta) {
+              return '<div class="dropdown"><button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions <span class="caret"></span></button><ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1"><% row_actions.each do |row_action| %><li><%= link_to "#{row_action[0]}", "#{row_action[1]}", remote: "#{row_action[2]}" %></li><% end %></ul></div>';
+            }
+          }, {
+            'targets': <%= columns.length-1 %>,
+            'searchable': false,
+            'orderable': false,
+            'className': 'row-data hidden'
+          }
+        ],
+      <% else %>, 'columnDefs': [
+        <% columns.each_with_index do |col, idx| %>
+          {
+            'targets': <%= idx %>,
+            'orderable': <%= col[3].first %>,
+          },
+        <% end %>
+        {
+          'targets': <%= columns.length-1 %>,
+          'searchable': false,
+          'orderable': false,
+          'className': 'row-data hidden'
+        }
+      ]
+      <% end %>
+      });
+      <% if child_rows[0] == true %>
+        function format ( d ) {
+          return '<%= j render("#{child_rows[1]}", columns_count: column_count) %>';
+        }
+        $('#<%= table_id %>').on('click', 'tr', function () {
+          var tr = $(this).closest('tr');
+          var row = enroll_datatable.row( tr );
+          if ( row.child.isShown() ) {
+            row.child.hide();
+            tr.removeClass('shown');
+          }
+          else {
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+          }
+        });
+      <% end %>
+  });
+</script>

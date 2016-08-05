@@ -1,0 +1,235 @@
+var EnrollDataTableInitializer = ( function( window, undefined ) {
+
+  function findTable(table_id) {
+    $table = $('#'+table_id);
+    return $table;
+  }
+
+  function makeResponsiveTable(table_id) {
+    findTable(table_id);
+    $table.wrap('<div class="table-responsive"></div>');
+  }
+
+  function moveInfo(table_id) {
+    findTable(table_id)
+    var $info = $table.closest('.module').find('.dataTables_info').detach();
+    var $buttons_below_table = $table.closest('.module').find('.footer').find('.buttons-below-table');
+    if ( $buttons_below_table.length ) {
+      $table.closest('.module').find('.footer').find('.buttons-below-table').after($info);
+    } else {
+      $table.closest('.module').find('.footer .vertically-aligned-row').append($info);
+    }
+    $info.show();
+  }
+
+  function showPagination(table_id) {
+    findTable(table_id)
+    var $pagination = $table.closest('.module').find('.dataTables_paginate')
+    if ( $pagination.find('.paginate_button').length >= 4 ) {
+      $pagination.show();
+    }
+  }
+
+  function moveTableLength(table_id) {
+    findTable(table_id)
+    $table_length = $table.closest('.dataTables_wrapper').find('.header .table-length').detach();
+    $dataTables_info = $table.closest('.module').find('.dataTables_info');
+    if ( $dataTables_info.length ) {
+      $dataTables_info_text = $dataTables_info.text();
+      $dataTables_info.after($table_length);
+      $dataTables_info.remove();
+      $table_length.find('.dataTables_length').before($dataTables_info_text);
+    } else {
+      $table.closest('.module').find('.footer .vertically-aligned-row').append($table_length);
+      $table_length.prepend('Showing ');
+    }
+    $table.closest('.module').find('.table-length').css({'white-space': 'nowrap'});
+    $table_length.wrap('<div class="table-length-wrapper text-right"></div>')
+    // $table_length.closest('div').prepend("Showing");
+    $table_length.removeClass('hidden');
+    $table_length.closest('div').append("per page");
+  }
+
+  function initializeFilters(table_id) {
+    findTable(table_id)
+    var $filters_first_level = $table.closest('.module').find('.btn-group.first-level');
+    $filters_first_level.find('a:first').addClass('active');
+    $filters_first_level.find('> a').on('click', function() {
+      if ( !$(this).hasClass('active') ) {
+        $('.btn-group-second').find('.active').removeClass('active');
+      }
+
+      var $active_second_level_name = $filters_first_level.find('a.active').attr('name');
+      if ( !$(this).hasClass('active') && $('.'+$active_second_level_name+'-second-level').is(':visible') ) {
+        $('.'+$active_second_level_name+'-second-level').addClass('hidden');
+      }
+      $filters_first_level.find('a').removeClass('active');
+      $(this).addClass('active');
+      $('.second-level').on('click', function() {
+        $(this).closest('.btn-group-second').find('a').removeClass('active');
+        $(this).addClass('active');
+      });
+    });
+    $('.dataTables_filter').addClass('vertically-aligned-row');
+  }
+
+  function showSecondLevel($thisObj) {
+      var $button = $thisObj.attr('name');
+      var $second_level = $('.'+$button+'-second-level');
+      if ( $thisObj.hasClass('active') == false && $('.'+$button+'-second-level').is(':visible') ) {
+        $second_level.addClass('hidden');
+      }
+      $second_level.detach();
+      $('.btn-group.first-level').parent().after($second_level);
+      $second_level.wrap("<div></div>")
+      $second_level.removeClass('hidden');
+  }
+
+
+  function addSelectAll(table_id) {
+    findTable(table_id)
+    $first_th = $table.find('thead>tr>th:first');
+    $first_th.html('<span class="enroll-checkbox"><div class="checkbox"><label><input type="checkbox" class="select-all" id="select-all" name="id[]" value=""><label for="select-all"><i class="fa fa-check-square-o fa-2x"></i><i class="fa fa-square-o fa-2x"></i></label></label></div></span>');
+  }
+
+  function addBulkActions(table_id) {
+    findTable(table_id)
+    var $header = $table.closest('.module').find('.header ');
+    var $dropdown = $('#'+table_id+'-bulk-actions').closest('.dropdown').detach();
+    $header.prepend($dropdown);
+    $dropdown.removeClass('hidden');
+  }
+
+  function addCheckboxHandlers(table_id) {
+    var $dropdown = $('#'+table_id+'-bulk-actions').closest('.dropdown')
+    $(document).on('change', '#'+table_id+' .enroll-checkbox input', function() {
+      if ( $dropdown.find('.disabled').length && $('#'+table_id+' .enroll-checkbox input:checked').length > 0 ) {
+        $dropdown.find('.dropdown-toggle').removeClass('disabled');
+      } else {
+        if ( !$dropdown.find('.dropdown-toggle').hasClass('disabled') && $('#'+table_id+' .enroll-checkbox input:checked').length == 0 ) {
+          $dropdown.find('.dropdown-toggle').addClass('disabled');
+          $('#'+table_id).closest('.module').find('.select-all').removeProp('checked');
+        }
+      }
+    });
+    $(document).on('change', '.select-all', function() {
+      $('#'+table_id).closest('.module').find('.select-all').prop('checked', $(this).prop('checked'));
+      if ( $('#'+table_id+' .enroll-checkbox input:checked').length + 1 == $('#'+table_id+' .enroll-checkbox input').length ) {
+        $(this).closest('.module').find('#'+table_id+' .enroll-checkbox input').removeProp("checked");
+        $('#'+table_id).closest('.module').find('.select-all').removeProp('checked');
+        $dropdown.find('.dropdown-toggle').addClass('disabled');
+      } else {
+        $(this).closest('.module').find('#'+table_id+' .enroll-checkbox input').prop("checked", "checked");
+        $dropdown.find('.dropdown-toggle').removeClass('disabled');
+      }
+    });
+  }
+
+  function addButtonsBelowTable(table_id) {
+    findTable(table_id)
+    var $buttons_below_table = $table.closest('.module').find('.buttons-below-table').detach();
+    $table.closest('.module').find('.footer .vertically-aligned-row').prepend($buttons_below_table);
+    $buttons_below_table.removeClass('hidden');
+  }
+
+  function swapSearchAndNewButton(table_id) {
+    findTable(table_id);
+    var $search = $table.closest('.module').find('.search input').detach();
+    var $new_button = $table.closest('.module').find('.datatable-header').find('.btn').closest('.col-xs-2').detach();
+    $table.closest('.module').find('.header').append($new_button);
+    $search.removeClass('form-control');
+    $table.closest('.module').find('.datatable-header').append($search);
+    $search.wrap('<div class="search text-right"></div>');
+    $table.closest('.module').find('.datatable-header .search').prepend('<label>Search&nbsp;</label>')
+    $new_button.removeClass('hidden');
+    $search.removeClass('hidden');
+  }
+
+  function showButtonsBelow(table_id) {
+    findTable(table_id);
+    var $buttons_below_table = $table.closest('.module').find('.buttons-below-table').detach();
+    var $select_all = $table.closest('.module').find('.select-all');
+    $select_all.find('.vertically-aligned-row').html($buttons_below_table);
+    buttons_below_table.removeClass('hidden');
+  }
+
+  function wrapSearchInBootstrap(table_id) {
+    findTable(table_id);
+    var $search_input = $table.closest('.module').find('.search input');
+    $table.closest('.module').find('.search label:first').remove();
+    $search_input.addClass('form-control');
+    $search_input.wrap('<div class="input-group"></div>');
+    $search_input.after('<div class=\"input-group-btn\"><div class=\"btn btn-default\" id=\"census_employee_search_clear\"><span aria-hidden=\"true\" class=\"glyphicon glyphicon-remove\"></span></div><input type=\"submit\" name=\"commit\" value=\"Search\" class="btn btn-default interaction-click-control-search\"></div>');
+    $table.closest('.module').find('.input-group').wrap('<div class="input-no-pd"></div>');
+  }
+
+  function addRowIndexToRowFunctionLinks(table_id) {
+    findTable(table_id);
+    $remote_links = $table.find('.row-actions .dropdown a[data-remote="true"]');
+    $remote_links.each(function() {
+      $row_index = $(this).closest('tr').find('td:first span').data('index');
+      $existing_href = $(this).attr('href');
+      $(this).attr('href', $existing_href+"?row="+$row_index);
+    });
+  }
+
+  function addRowDataToParams(table_id) {
+    findTable(table_id);
+      $table.find('.row-actions .dropdown a[data-remote="true"]').each(function() {
+        var $link = $(this);
+        var $row = $(this).closest('tr');
+        $row.find('.row-data span.for-remote').each(function(index, $link) {
+          var data_attributes = [];
+          $.each($(this).data(), function(k,v) {
+            k = k.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "")
+            data_attributes.push(k+"="+v);
+          });
+          $.each(data_attributes, function(index,value) {
+            var $link = $row.find('.row-actions .dropdown a[data-remote="true"]').eq(index);
+            var $existing_href = $link.attr('href');
+            $link.attr('href', $existing_href+"&"+value);
+          });
+        });
+      });
+  }
+
+  function attachPostDrawHandlers(table_id) {
+    findTable(table_id);
+    $table.on( 'draw.dt', function () {
+      EnrollDataTableInitializer.addRowIndexToRowFunctionLinks(table_id);
+      EnrollDataTableInitializer.addRowDataToParams(table_id);
+    });
+  }
+
+  function AddParamsBeforeDraw(table_id, params) {
+    findTable(table_id);
+    var additional_params = {};
+    $.each(params, function(k,v) {
+      additional_params[k] = v;
+    });
+    $table.data('dt_params', additional_params );
+    $table.DataTable().draw();
+  }
+
+  return {
+    addRowIndexToRowFunctionLinks : addRowIndexToRowFunctionLinks,
+    wrapSearchInBootstrap : wrapSearchInBootstrap,
+    moveInfo : moveInfo,
+    findTable: findTable,
+    moveTableLength : moveTableLength,
+    initializeFilters : initializeFilters,
+    showSecondLevel : showSecondLevel,
+    addSelectAll : addSelectAll,
+    addBulkActions : addBulkActions,
+    addButtonsBelowTable : addButtonsBelowTable,
+    showPagination : showPagination,
+    makeResponsiveTable : makeResponsiveTable,
+    swapSearchAndNewButton : swapSearchAndNewButton,
+    showButtonsBelow : showButtonsBelow,
+    addRowDataToParams : addRowDataToParams,
+    addCheckboxHandlers : addCheckboxHandlers,
+    attachPostDrawHandlers : attachPostDrawHandlers,
+    AddParamsBeforeDraw : AddParamsBeforeDraw
+  };
+
+} )( window );

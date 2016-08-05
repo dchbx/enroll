@@ -1,0 +1,81 @@
+<div class="container">
+  <h3> <%= @person.full_name + " - SEP HISTORY" %></h3>
+    <div class = "table-responsive"> 
+      <table class = "table table-striped table-bordered table-history">
+        <div class="row">        
+            <% @family.special_enrollment_periods.to_a.reverse_each do |f| %>
+              <thead>              
+                <tr>
+                  <th>SEP REASON</th>
+                  <th>EFFECTIVE DATE RULE</th> 
+                  <th>EVENT DATE</th>
+                  <th>SEP START DATE</th>
+                  <th>SEP END DATE</th>
+                  <th>NEXT POSSIBLE EVENT DATE</th>
+                  <th>CHOICE DATE 1</th>
+                  <th>CHOICE DATE 2</th>
+                  <th>CHOICE DATE 3</th>
+                  <th>CSL#</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><%=f.title %></td>
+
+                  <% if f.effective_on_kind.present? %>
+                    <td><%=f.effective_on_kind.humanize %></td>
+                  <% else %>
+                    <td>N/A</td>
+                  <% end %>
+                  
+                  <td><%=f.qle_on%></td>
+                  <td><%=f.start_on%></td>
+                  <td><%=f.end_on%></td>
+                  
+                  <% if f.next_poss_effective_date.present? %>
+                    <td><%=f.next_poss_effective_date %></td>
+                  <% else %>
+                    <td>N/A</td>
+                  <% end %>
+
+                  <% if f.option1_date.present? %>
+                    <td><%=f.option1_date %></td>
+                  <% else %>
+                    <td>N/A</td>
+                  <% end %>
+
+                  <% if f.option2_date.present? %>
+                    <td><%=f.option2_date %></td>
+                  <% else %>
+                    <td>N/A</td>
+                  <% end %>
+
+                  <% if f.option3_date.present? %>
+                    <td><%=f.option3_date %></td>
+                  <% else %>
+                    <td>N/A</td>
+                  <% end %>
+
+                  <% if f.csl_num.present? %>
+                    <td><%=f.csl_num %></td>
+                  <% else %>
+                    <td>N/A</td>
+                  <% end %>
+                </tr>            
+                <tr>
+                  <% if f.admin_comment.present? %>
+                    <td><%="Admin Comment: " + f.admin_comment %></td>
+                  <% else %>
+                    <td>&nbsp;&nbsp;Admin: N/A</td>
+                  <% end %>
+                </tr>
+            </tbody>
+          <% end %>
+          </div>
+       </table>
+      </div>
+    <br/>
+    <div class="col-md-2 col-md-offset-11 col-sm-2 col-xs-12">
+        <%= link_to 'Back', 'javascript:void(0);', :onclick => 'history.go(-1)', :class => 'btn btn-primary' %>
+    </div>
+</div>

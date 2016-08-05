@@ -13,6 +13,9 @@ class SpecialEnrollmentPeriod
   # Date Qualifying Life Event occurred
   field :qle_on, type: Date
 
+  # Comments made by admin
+  field :admin_comment, type: String
+
   # Date coverage starts
   field :effective_on_kind, type: String
 
@@ -30,14 +33,38 @@ class SpecialEnrollmentPeriod
   # Date Enrollment Period ends
   field :end_on, type: Date
 
+  # Next Possible Event Date
+  field :next_poss_event_date, type: Date
+
+  # Next Possible Event Date
+  field :next_poss_effective_date, type: Date
+
+  # Date Option 1
+  field :option1_date, type: Date
+
+  # Date Option 2
+  field :option2_date, type: Date
+
+  # Date Option 3
+  field :option3_date, type: Date
+
+  # CSL#
+  field :csl_num, type: String
+
+  # MARKET KIND
+  field :market_kind, type:String
+
+  validates :csl_num,
+    length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
+    allow_blank: true,
+    numericality: true
+
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
   validate :end_date_follows_start_date
 
-
   scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id)) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id)) }
-
 
   after_initialize :set_submitted_at
 
