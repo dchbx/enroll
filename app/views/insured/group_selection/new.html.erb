@@ -34,7 +34,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+              <% if @employee_role.census_employee.active_benefit_group && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -103,7 +103,7 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>">
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) &&  @employee_role.census_employee.active_benefit_group && !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>">
                   <label class="n-radio" for="coverage_kind_dental">
                     <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
@@ -203,7 +203,7 @@ function setGroupSelectionHandlers(){
   <% end %>
 
   $('#market_kind_shop').on('change', function() {
-    <% if !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+    <% if @employee_role.census_employee.active_benefit_group  && !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
       $('#dental-radio-button').slideUp();
     <% end %>
     $('#shop-coverage-household').show();
@@ -227,7 +227,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();
