@@ -33,7 +33,7 @@ namespace :employers do
 
     CSV.open(FILE_PATH, "w") do |csv|
 
-      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code employer_profile.profile_source employer.status
+      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code employer_profile.profile_source employer.status ga_fein ga_agency_name ga_start_on
                                 office_location.is_primary office_location.address.address_1 office_location.address.address_2
                                 office_location.address.city office_location.address.state office_location.address.zip mailing_location.address_1 mailing_location.address_2 mailing_location.city mailing_location.state mailing_location.zip
                                 office_location.phone.full_phone_number staff.name staff.phone staff.email
@@ -43,13 +43,13 @@ namespace :employers do
                                 benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
                                 plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on
                                 plan_year.fte_count plan_year.pte_count plan_year.msp_count plan_year.status plan_year.publish_date broker_agency_account.corporate_npn broker_agency_account.legal_name
-                                broker.name broker.npn)
+                                broker.name broker.npn broker.assigned_on)
       csv << headers
 
       employers.each do |employer| 
         begin
           employer_attributes = []
-          employer_attributes += [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state]
+          employer_attributes += [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state, employer.general_agency_profile.fein, employer.general_agency_profile.legal_name, employer.active_general_agency_account.start_on]
           office_location = get_primary_office_location(employer.organization)
           employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
                                   office_location.address.state, office_location.address.zip]
@@ -78,6 +78,8 @@ namespace :employers do
           else
             employer_attributes += ["", "", ""]
           end
+          
+            employer_attributes += []
 
           employer.plan_years.each_with_index do |plan_year, i|
 
@@ -101,7 +103,7 @@ namespace :employers do
                     row += [broker_agency_account.broker_agency_profile.corporate_npn, broker_agency_account.broker_agency_profile.legal_name]
                     if broker_agency_account.broker_agency_profile.primary_broker_role.present?
                       row += [broker_agency_account.broker_agency_profile.primary_broker_role.person.first_name + " " + broker_agency_account.broker_agency_profile.primary_broker_role.person.last_name]
-                      row += [broker_agency_account.broker_agency_profile.primary_broker_role.npn]
+                      row += [broker_agency_account.broker_agency_profile.primary_broker_role.npn, broker_agency_account.start_on]
                     else
                       row += ["",""]
                     end
@@ -112,8 +114,8 @@ namespace :employers do
                   puts "ERROR: #{employer.legal_name} " + e.message
                   next
                 end
-                  csv << employer_attributes + row if i == 0
-                  csv << ['','','','','','','','','','','','','','','','', '', '', '','','','',''] + row if i >0 
+                  csv << employer_attributes + row
+                  csv << ['','','','','','','','','','','','','','','','', '', '', '','','','','', '', '', ''] + row if i >0 
                 #end
             end
           end
