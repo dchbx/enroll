@@ -167,9 +167,11 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
       $second_level.wrap("<div></div>");
     }
     $second_level.removeClass('hidden');
-    $dropdown.find('a').on('click', function() {
-      $second_level.find('a.active').removeClass('active');
-    });
+    if ( $dropdown != undefined ) {
+      $dropdown.find('a').on('click', function() {
+        $second_level.find('a.active').removeClass('active');
+      });
+    }
   }
 
   function lastRowSpacing(table_id) {
@@ -319,7 +321,8 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
     $remote_links.each(function() {
       $row_index = $(this).closest('tr').find('td:first span').data('index');
       $existing_href = $(this).attr('href');
-      if ( $existing_href.indexOf('?') >= 0 ) {
+      console.log($existing_href.indexOf('?') + " " + $existing_href);
+      if ( $existing_href.indexOf('?') == -1 ) {
         $(this).attr('href', $existing_href+"?row="+$row_index);
       } else {
         $(this).attr('href', $existing_href+"&row="+$row_index);

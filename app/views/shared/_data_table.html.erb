@@ -9,34 +9,21 @@
     <% if page_header.present? %>
       <div>
         <div>
-          <div>
-            <% if page_header[1] == 'admin' %>
-              <h3><%=page_header[0]%></h3>
-            <% else %>
-              <h1 class="darkblue no-buffer"><%=page_header[0]%></h1>
-            <% end %>
-          </div>
+          <% if page_header[1] == 'admin' %>
+            <h3><%=page_header[0]%></h3>
+          <% else %>
+            <h1 class="darkblue no-buffer"><%=page_header[0]%></h1>
+          <% end %>
         </div>
       </div>
       <% if sibling_pages.present? %>
         <% render partial: 'datatables/sibling_pages_filter', locals: { sibling_pages: sibling_pages } %>
       <% end %>
     <% end %>
-    <% if filters.present? %>
-      <div>
-        <div class="btn-group first-level" role="group" aria-label="...">
-          <% filters.each do |filter_name, url, request_type, second_level| %>
-            <% if second_level.present? %>
-                <div class="btn-group btn-group-second <%= filter_name.downcase %> <%=filter_name%>-second-level hidden">
-              <% second_level.each do |filter, url, request_type| %>
-                <%= link_to "#{filter}", "#{url}", remote: request_type, class: 'second-level btn btn-default', data: {'children-of': "#{filter_name.downcase}"}, name: "#{filter}" %>
-              <% end %>
-            </div>
-            <%= link_to "#{filter_name}", "javascript:;", class: "second-level btn btn-default", onclick: 'EnrollDataTableInitializer.showSecondLevel($(this))', name: "#{filter_name}" %>
-            <% else %>
-              <%= link_to "#{filter_name}", "#{url}", remote: request_type, class: 'btn btn-default' %>
-            <% end %>
-          <% end %>
+    <% if new_button.present? %>
+      <div class="col-xs-2 hidden">
+        <div class="row">
+          <%= link_to new_button[0], new_button[1], remote: new_button[2], class: 'btn btn-primary btn-block' %>
         </div>
       </div>
     <% end %>
@@ -72,7 +59,7 @@
           <% else %>
             <%= link_to "#{filter_name}", "#{url}", remote: request_type, class: 'btn btn-default' %>
           <% end %>
-        </ul>
+        <% end %>
       </div>
     </div>
   <% end %>
@@ -107,11 +94,6 @@
     var enroll_datatable = $('#<%= table_id %>').EnrollDataTable({
       "destroy": <%= destroy || false %>,
       "processing": true,
-      <% if processing_text.present? %>
-      "language": {
-         "processing": "<i class='fa fa-spinner fa-2x' aria-hidden='true'></i><h4><%= processing_text %></h4>"
-      },
-      <% end %>
       "serverSide": true,
       "ordering": <%= ordering || false %>,
       "paging": <%= pagination || false %>,
