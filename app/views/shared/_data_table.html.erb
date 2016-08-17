@@ -1,7 +1,13 @@
-<div class="module">
-  <div class="datatable">
-    <div class="datatable-header vertically-aligned-row">
-      <% if page_header.present? %>
+<% initial_column_set = [] %>
+<% columns.each_with_index do |column, index| %>
+  <% initial_column_set << column[1] %>
+<% end %>
+
+
+<div class="datatable">
+  <div class="datatable-header vertically-aligned-row">
+    <% if page_header.present? %>
+      <div>
         <div>
           <div>
             <% if page_header[1] == 'admin' %>
@@ -11,21 +17,10 @@
             <% end %>
           </div>
         </div>
-        <% if sibling_pages.present? %>
-          <% render partial: 'datatables/sibling_pages_filter', locals: { sibling_pages: sibling_pages } %>
-        <% end %>
+      </div>
+      <% if sibling_pages.present? %>
+        <% render partial: 'datatables/sibling_pages_filter', locals: { sibling_pages: sibling_pages } %>
       <% end %>
-      <% if new_button.present? %>
-        <div class="col-xs-2 hidden">
-          <div class="row">
-            <%= link_to new_button[0], new_button[1], remote: new_button[2], class: 'btn btn-primary btn-block' %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-    <% if directions.present? %>
-      <h4><%= directions %></h4>
-      <br/>
     <% end %>
     <% if filters.present? %>
       <div>
@@ -45,28 +40,66 @@
         </div>
       </div>
     <% end %>
-    <% if bulk_actions.present? && checkboxes == true %>
-      <div class="dropdown hidden">
-        <button aria-expanded="true" aria-haspopup="true" class="btn btn-default dropdown-toggle disabled" data-toggle="dropdown" id="<%= table_id %>-bulk-actions" type="button">
-          Bulk Actions
-          <span class="caret"></span>
-        </button>
-        <ul aria-labelledby="<%= table_id %>-bulk-actions" class="dropdown-menu">
-          <% bulk_actions.each do |bulk_action, url, request_type | %>
-          <li><%= link_to "#{bulk_action}", "#{url}", remote: request_type %></li>
+  </div>
+  <% if directions.present? %>
+    <h4><%= directions %></h4>
+    <br/>
+  <% end %>
+  <% if filters.present? %>
+    <div>
+      <div class="btn-group first-level" role="group" aria-label="..." data-base-model="<%= base_model if base_model.present? %>" data-tab="<%= tab if tab.present? %>">
+        <% filters.each do |filter_name, url, request_type, second_level, dropdown_filters| %>
+          <% if second_level.present? %>
+              <div class="btn-group btn-group-second <%= filter_name.downcase %> <%=filter_name%>-second-level hidden">
+                <% second_level.each do |filter, url, request_type| %>
+                  <%= link_to "#{filter}", "#{url}", remote: request_type, class: 'second-level btn btn-default', data: {'children-of': "#{filter_name.downcase}"}, name: "#{filter}" %>
+                <% end %>
+                <% if dropdown_filters.present? %>
+                  <div class="dropdown hidden second-level-dropdown" data-children-of="<%= filter_name.downcase %>">
+                    <button aria-expanded="true" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="<%= table_id %>-dropdown-filters" type="button">
+                      Date Filters
+                      <span class="caret"></span>
+                    </button>
+                    <ul aria-labelledby="<%= table_id %>-date-filters" class="dropdown-menu">
+                      <% dropdown_filters.each do |filter, url, request_type | %>
+                      <li><%= link_to "#{filter}", "#{url}", remote: request_type %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+              </div>
+          <%= link_to "#{filter_name}", "javascript:;", class: "second-level btn btn-default", onclick: 'EnrollDataTableInitializer.showSecondLevel($(this))', name: "#{filter_name}" %>
+          <% else %>
+            <%= link_to "#{filter_name}", "#{url}", remote: request_type, class: 'btn btn-default' %>
           <% end %>
         </ul>
       </div>
-    <% end %>
-    <table class="table table-striped table-hover table-condensed panel panel-default" id="<%= table_id %>"></table>
-    <% if buttons_below_table.present? %>
-      <span class="buttons-below-table hidden">
-        <% buttons_below_table.each do |button, url, request_type | %>
-            <%= link_to button, url, remote: request_type, class: 'btn btn-default' %>
-        <% end %>
-      </span>
-    <% end %>
+    </div>
+  <% end %>
+  <div class="injected-custom-filter">
   </div>
+  <% if bulk_actions.present? && checkboxes == true %>
+    <div class="dropdown hidden">
+      <button aria-expanded="true" aria-haspopup="true" class="btn btn-default dropdown-toggle disabled" data-toggle="dropdown" id="<%= table_id %>-bulk-actions" type="button">
+        Bulk Actions
+        <span class="caret"></span>
+      </button>
+      <ul aria-labelledby="<%= table_id %>-bulk-actions" class="dropdown-menu">
+        <% bulk_actions.each do |bulk_action, url, request_type | %>
+        <li><%= link_to "#{bulk_action}", "#{url}", remote: request_type %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <table class="table table-striped table-hover table-condensed panel panel-default" id="<%= table_id %>"></table>
+  <% if buttons_below_table.present? %>
+    <span class="buttons-below-table hidden">
+      <% buttons_below_table.each do |button, url, request_type, export_csv_boolean | %>
+        <%= link_to "#{button}", "#{url}", remote: request_type, class: 'btn btn-default' unless export_csv_boolean == true %>
+        <%= link_to "#{button}", "#{url}", remote: request_type, class: 'btn btn-default' if export_csv_boolean == true %>
+      <% end %>
+    </span>
+  <% end %>
 </div>
 <script charset="utf-8" defer="defer" type="text/javascript">
   initial_column_set = [<%= raw initial_column_set.to_json %>];
@@ -97,6 +130,9 @@
         [1, 'asc']
       ],
       "language": {
+        <% if processing_text.present? %>
+        "processing": "<div class='panel panel-default'><i class='fa fa-spinner fa-2x fa-spin' aria-hidden='true'></i><h4><%= processing_text %></h4></div>",
+        <% end %>
         "lengthMenu": "_MENU_"
       },
       "initComplete": function() {
@@ -135,6 +171,7 @@
         EnrollDataTableInitializer.addRowIndexToRowFunctionLinks('<%= table_id %>');
         EnrollDataTableInitializer.addRowDataToParams('<%= table_id %>');
         EnrollDataTableInitializer.attachPostDrawHandlers('<%= table_id %>');
+        EnrollDataTableInitializer.showProcessing('<%= table_id %>');
         <% if custom_handlers.present? %>
           <% custom_handlers.each do |custom_handler| %>
             <%= custom_handler %>('<%= table_id %>');
@@ -143,9 +180,10 @@
       },
       "drawCallback": function( settings ) {
         EnrollDataTableInitializer.replaceRowActionUrls('<%= table_id %>');
+        EnrollDataTableInitializer.clickRowDataLink('<%= table_id %>');
         EnrollDataTableInitializer.moveInfo('<%= table_id %>');
         EnrollDataTableInitializer.moveTableLength('<%= table_id %>');
-        EnrollDataTableInitializer.lastRowSpacing('<%= table_id %>');
+        EnrollDataTableInitializer.exportPageAsCSV('<%= table_id %>', enroll_datatable.data(), initial_column_set );
       },
       "columns": [
         <% if checkboxes == true %>

@@ -1,6 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
-  include SepAll
   include DataTablesSorts
   include DataTablesFilters
 
@@ -31,7 +30,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   def binder_paid
     EmployerProfile.update_status_to_binder_paid(params[:employer_profile_ids])
     flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
-    redirect_to exchanges_hbx_profiles_root_path
+    respond_to do |format|
+      format.js {
+        flash.keep(:notice)
+        render js: "window.location = '#{exchanges_hbx_profiles_root_path}'"
+      }
+    end
   end
 
   def transmit_group_xml
@@ -553,12 +557,27 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :modify_admin_tabs?
   end
 
+  def modify_admin_tabs?
+    authorize HbxProfile, :modify_admin_tabs?
+  end
+
   def view_admin_tabs?
     authorize HbxProfile, :view_admin_tabs?
   end
 
   def setting_params
     params.require(:setting).permit(:name, :value)
+  end
+
+  def find_mailbox_provider
+    hbx_staff = current_user.person.hbx_staff_role
+    if hbx_staff
+      profile = current_user.person.hbx_staff_role.hbx_profile
+    else
+      broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
+      profile = BrokerAgencyProfile.find(broker_id)
+    end
+    return profile
   end
 
   def agent_assistance_messages(params, agent, role)

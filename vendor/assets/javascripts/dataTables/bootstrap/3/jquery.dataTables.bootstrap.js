@@ -47,7 +47,7 @@ var DataTable = $.fn.dataTable;
 $.extend( true, DataTable.defaults, {
 	dom:
 		"<'vertically-aligned-row header'<'table-length hidden'l><'search text-right hidden'f>>"+
-		"t"+
+		"<'hidden'r>t"+
 		"<'footer'<'vertically-aligned-row'i><'col-xs-12'p>>",
 	renderer: 'bootstrap'
 } );

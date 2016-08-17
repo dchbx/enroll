@@ -51,7 +51,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
 
     it "should return correct eligibility criteria" do
-      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer"
+      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer'></i>".html_safe
     end
 
   end

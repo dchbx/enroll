@@ -181,7 +181,7 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
       if ((spacer_count==0) && (rows < row +4 )) {
         $('.table-responsive').append('<div id="datatable_tr_spacer" <br/>&nbsp;<br/>&nbsp; <br/> &nbsp;<br/>&nbsp;</div>')
       }
-      console.log(row, rows, spacer_count, table_id);
+      // console.log(row, rows, spacer_count, table_id);
     });
   }
 
@@ -299,6 +299,20 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
     });
   }
 
+  function clickRowDataLink(table_id) {
+    findTable(table_id);
+    $table.find('.row-actions .dropdown a[href="click_row_data_link"]').each(function() {
+      var $clicked_link_text = $(this).text();
+      var $row_data_link = $(this).closest('tr').find('.row-data a:contains('+$clicked_link_text+')');
+      if ( $row_data_link.hasClass('disabled') ) {
+        $(this).addClass('disabled');
+      }
+      $(this).on('click', function() {
+        $row_data_link.trigger('click');
+      });
+    });
+  }
+
   function addRowIndexToRowFunctionLinks(table_id) {
     findTable(table_id);
     $remote_links = $table.find('.row-actions .dropdown a');
@@ -306,9 +320,9 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
       $row_index = $(this).closest('tr').find('td:first span').data('index');
       $existing_href = $(this).attr('href');
       if ( $existing_href.indexOf('?') >= 0 ) {
-        $(this).attr('href', $existing_href+"&row="+$row_index);
-      } else {
         $(this).attr('href', $existing_href+"?row="+$row_index);
+      } else {
+        $(this).attr('href', $existing_href+"&row="+$row_index);
       }
     });
   }
@@ -384,10 +398,33 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
     })
   }
 
+  function showProcessing(table_id) {
+    findTable(table_id);
+    $table.closest('.module').find('.dataTables_processing').parent().removeClass('hidden');
+  }
+
+  // function addProcessingOverlay(table_id) {
+  //   findTable(table_id);
+  //   if ( !$table.closest('.module').find('.processing-overlay').length ) {
+  //   $table.on( 'processing.dt', function ( e, settings, processing ) {
+  //       $table.closest('.module').find('.table-responsive').append('<div class="processing-overlay"></div>');
+  //     })
+  //   }
+  // }
+  //
+  // function removeProcessingOverlay(table_id) {
+  //   findTable(table_id);
+  //   console.log($table.closest('.module').find('.processing-overlay').length);
+  //   console.log($('.processing-overlay').length);
+  //
+  //   $table.closest('.module').find('.processing-overlay').remove();
+  // }
+
   function exportPageAsCSV(table_id, table_data, columns) {
     findTable(table_id);
     var $url = $table.closest('.module').data('export-csv-url');
     var $export_csv_link = $('.dropdown-menu').find('a:contains("Export CSV")');
+    $('#export-csv-injected-form').html("");
     $export_csv_link.on('click', function() {
       row_indexes_for_export = [];
       rows_for_export = [];
@@ -401,34 +438,17 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
         });
         rows_for_export.push(row);
       });
-      var myAjaxVariable = null;
-      console.log(columns);
-      $.ajax({
-        type: "POST",
-        url: $url,
-        data: {
-          rows: rows_for_export,
-          columns: columns["0"],
-          format: 'csv',
-        },
-        async : false,
-        success : function(response) {
-            // var csv = response;
-            // if (csv == null) return;
-            // filename = 'export.csv';
-            // if (!csv.match(/^data:text\/csv/i)) {
-            //     csv = 'data:text/csv;charset=utf-8,' + csv;
-            // }
-            // data = encodeURI(csv);
-            // link = document.createElement('a');
-            // link.setAttribute('href', data);
-            // link.setAttribute('download', filename);
-            // link.click();
-        },
-        error : function (request, status, error) {
-          alert("CSV Export Failed...");
-        }
+      $(rows_for_export).each(function(row_index, row) {
+        $(columns["0"]).each(function(index, column_name) {
+          $('#export-csv-injected-form').prepend('<input type="hidden" type="hidden" name="rows['+row_index+']['+column_name+']" value="'+escape(row[index])+'">');
+        });
       });
+      $(columns["0"]).each(function(index, column_name) {
+        $('#export-csv-injected-form').prepend('<input type="hidden" type="hidden" name="columns[]" value="'+escape(column_name)+'">');
+      });
+      var authenticity_token = $("meta[name='csrf-token']").attr("content");
+      $('#export-csv-injected-form').prepend('<input name="authenticity_token" type="hidden" value="'+authenticity_token+'">');
+      $('#export-csv-injected-form').submit();
     });
   }
 
@@ -452,6 +472,8 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
   return {
     removeRow: removeRow,
     setTab: setTab,
+    showProcessing: showProcessing,
+    clickRowDataLink: clickRowDataLink,
     exportPageAsCSV: exportPageAsCSV,
     setFirstLevel: setFirstLevel,
     setSecondLevel: setSecondLevel,

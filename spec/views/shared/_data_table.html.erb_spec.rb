@@ -43,7 +43,7 @@ describe "shared/_data_table.html.erb" do
       		['Export CSV', 'url', 'request_type'],
       		['Print', 'url', 'request_type']
       	],
-        custom_handlers: [""],
+        custom_handlers: [],
         child_rows: [true, "datatables/child_row"],
         responsive: true,
       	checkboxes: true,
@@ -126,8 +126,7 @@ describe "shared/_data_table.html.erb" do
         page_header: "",
         new_button: "",
         directions: "",
-        processing_text: "Loading Stuff...",
-        initial_column_set: "",
+        processing_text: "Loading Plans...",
         sibling_pages: [],
     	  filters: [
       		["all", "", true, []],
@@ -160,7 +159,7 @@ describe "shared/_data_table.html.erb" do
       		['Export CSV', 'url', 'request_type'],
       		['Print', 'url', 'request_type']
       	],
-        custom_handlers: [""],
+        custom_handlers: [],
         child_rows: [false, "datatables/child_row"],
         responsive: false,
       	checkboxes: false,

@@ -8,6 +8,11 @@
       background-color: #e72b2d;
     }
   }
+  a.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    color: $primary-gray;
+  }
   &.flash {
     .col-xs-12 {
       max-width: 1170px;
@@ -30,11 +35,6 @@
   }
   .no-bottom-padding {
     padding-bottom: 0;
-  }
-  a.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-    color: $primary-gray;
   }
   .enroll-checkbox {
     input[type=checkbox] {

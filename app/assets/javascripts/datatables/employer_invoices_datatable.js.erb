@@ -123,15 +123,187 @@ var EmployerInvoicesDatatable = ( function( window, undefined ) {
     EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
   }
 
-  function addScopesBeforeSorting(table_id) {
+  function addInvoicedScopesBeforeSorting(table_id) {
     EnrollDataTableInitializer.findTable(table_id);
-    var $invoiced_sort = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Invoiced?")');
-    $invoiced_sort.on('click', function() {
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Invoiced?")');
+    $sort_column.on('click', function() {
       var tab = setTab();
       EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
         base_model: setBaseModel(),
         custom_sort: true,
+        boolean_sort: true,
         order_by: "current_month_invoice.present?",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addStatusScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Status")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_profile_aasm",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addHbxIdScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting_asc .vertically-aligned-row').find('div:contains("Hbx Id")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "id",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addFeinScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("FEIN")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "fein",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addLegalNameScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Legal name")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "legal_name",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addEmployerStatusScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Employer Status")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        boolean_sort: true,
+        order_by: "employer_profile.renewing_plan_year.present?",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addEligibilityScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Eligibility")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        boolean_sort: true,
+        order_by: "employer_profile.show_plan_year.present?",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addBrokerScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Broker")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "broker_agency_profile_legal_name",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addConversionScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("CNVRSN?")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        boolean_sort: true,
+        order_by: "employer_profile.is_conversion?",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addEffectiveDateScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("EFF Date")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "latest_plan_year_effective_date",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addEnrolledWaivedScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Enrolled/Waived")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "enrolled_waived_count",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addPercentageScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("PCT")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "enrolled_as_percentage",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function addSubmittedAtScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Submitted At")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_xml_transmitted_at",
         scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
       });
     });
@@ -158,6 +330,37 @@ var EmployerInvoicesDatatable = ( function( window, undefined ) {
     });
   }
 
+  function markBinderPaid(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $url = $table.closest('.module').data('binder-paid-url');
+    var $binder_paid_link = $('.dropdown-menu').find('a:contains("Mark Binder Paid")');
+    $binder_paid_link.on('click', function() {
+      var $employer_ids = []
+      $table.find('tbody .enroll-checkbox input:checked').closest('tr').find('.row-data').find('span').each( function() {
+        if ( $(this).data('employer-profile-id') !== undefined ) {
+          if ( $(this).closest('tr').find('.fa-info-circle').length ) {
+            $(this).closest('tr').find('.enroll-checkbox label > input').removeProp('checked');
+            alert("You can not mark ineligible employers as binder paid.");
+            return false;
+          } else {
+            $employer_ids.push($(this).data('employer-profile-id'));
+          }
+        }
+      })
+      if ( $employer_ids.length ) {
+        $.ajax({
+          context: this,
+          type: "post",
+          url: $url,
+          dataType: 'script',
+          data: {
+            employer_profile_ids: $employer_ids
+          },
+        })
+      }
+    });
+  }
+
   return {
     callEnrollingAllFilter : callEnrollingAllFilter,
     callEnrollingInitialEligibleFilter: callEnrollingInitialEligibleFilter,
@@ -174,7 +377,20 @@ var EmployerInvoicesDatatable = ( function( window, undefined ) {
     callApplicantsAllFilter : callApplicantsAllFilter,
     callApplicantsInitialIneligibleFilter: callApplicantsInitialIneligibleFilter,
     generateInvoicesForSelection : generateInvoicesForSelection,
-    addScopesBeforeSorting : addScopesBeforeSorting,
+    markBinderPaid : markBinderPaid,
+    addInvoicedScopesBeforeSorting : addInvoicedScopesBeforeSorting,
+    addStatusScopesBeforeSorting: addStatusScopesBeforeSorting,
+    addHbxIdScopesBeforeSorting: addHbxIdScopesBeforeSorting,
+    addFeinScopesBeforeSorting: addFeinScopesBeforeSorting,
+    addLegalNameScopesBeforeSorting: addLegalNameScopesBeforeSorting,
+    addEmployerStatusScopesBeforeSorting: addEmployerStatusScopesBeforeSorting,
+    addEligibilityScopesBeforeSorting: addEligibilityScopesBeforeSorting,
+    addBrokerScopesBeforeSorting: addBrokerScopesBeforeSorting,
+    addConversionScopesBeforeSorting: addConversionScopesBeforeSorting,
+    addEffectiveDateScopesBeforeSorting: addEffectiveDateScopesBeforeSorting,
+    addEnrolledWaivedScopesBeforeSorting: addEnrolledWaivedScopesBeforeSorting,
+    addPercentageScopesBeforeSorting: addPercentageScopesBeforeSorting,
+    addSubmittedAtScopesBeforeSorting: addSubmittedAtScopesBeforeSorting,
     callAllFilter: callAllFilter
   };
 

@@ -15,9 +15,17 @@ module DataTablesSorts
       if scopes.blank?
         if params[:custom_sort].present?
           if sort == "asc"
-            sorted_collection = "#{base_model.capitalize}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 0 : 1}"
+            if params[:boolean_sort] == "true"
+              sorted_collection = "#{base_model.capitalize}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 0 : 1}"
+            else
+              sorted_collection = "#{base_model.capitalize}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by}}"
+            end
           else
-            sorted_collection = "#{base_model.capitalize}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 1 : 0}"
+            if params[:boolean_sort] == "true"
+              sorted_collection = "#{base_model.capitalize}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 1 : 0}"
+            else
+              sorted_collection = "#{base_model.capitalize}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by}}.reverse"
+            end
           end
         else
           sorted_collection = "#{base_model.capitalize}.offset(cursor).limit(limit).order_by('#{order_by} #{sort.upcase}')"
@@ -25,9 +33,17 @@ module DataTablesSorts
       else
         if params[:custom_sort].present?
           if sort == "asc"
-            sorted_collection = "#{base_model.capitalize}.#{scopes.join(".")}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 0 : 1}"
+            if params[:boolean_sort] == "true"
+              sorted_collection = "#{base_model.capitalize}.#{scopes.join(".")}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 0 : 1}"
+            else
+              sorted_collection = "#{base_model.capitalize}.#{scopes.join(".")}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by}}"
+            end
           else
-            sorted_collection = "#{base_model.capitalize}.#{scopes.join(".")}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 1 : 0}"
+            if params[:boolean_sort] == "true"
+              sorted_collection = "#{base_model.capitalize}.#{scopes.join(".")}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by} ? 1 : 0}"
+            else
+              sorted_collection = "#{base_model.capitalize}.#{scopes.join(".")}.offset(cursor).limit(limit).to_a.sort_by{|p| p.#{order_by}}.reverse"
+            end
           end
         else
           sorted_collection = "#{base_model.capitalize}.#{scopes.join(".")}.offset(cursor).limit(limit).order_by('#{order_by} #{sort.upcase}')"
