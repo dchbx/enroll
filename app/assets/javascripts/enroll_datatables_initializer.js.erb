@@ -20,6 +20,13 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
     return tab;
   }
 
+  function showTable(table_id) {
+    findTable(table_id);
+    $table.closest('.datatable').fadeIn();
+    $table.closest('.datatable').prev().hide();
+    // page-loading
+  }
+
   function setFirstLevel($active_tab) {
     if ( $active_tab.hasClass('btn') ) {
       var first_level = $active_tab.data('children-of');
@@ -491,6 +498,7 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
     wrapSearchInBootstrap : wrapSearchInBootstrap,
     moveInfo : moveInfo,
     findTable: findTable,
+    showTable: showTable,
     handleCustomDates: handleCustomDates,
     moveTableLength : moveTableLength,
     initializeFilters : initializeFilters,
