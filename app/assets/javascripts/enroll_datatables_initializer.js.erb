@@ -74,8 +74,8 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
   }
 
   function clickActiveFilter(table_id, $active_filter, filter_criteria, base_model) {
-    filters = EnrollDataTableInitializer.setFiltersFromScopeMap(table_id, filter_criteria.tab, filter_criteria.first_level, filter_criteria.second_level);
     $active_filter.on('click', function() {
+      filters = EnrollDataTableInitializer.setFiltersFromScopeMap(table_id, filter_criteria.tab, filter_criteria.first_level, filter_criteria.second_level);
       EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
         base_model: setBaseModel(base_model),
         filters: filters
