@@ -212,6 +212,18 @@ When(/^.+ clicks on terminate button for a census family$/) do
   @browser.a(text: /Submit/).click
 end
 
+When(/^.+ clicks on terminate button for a census family for invalid case$/) do
+ wait_for_ajax
+ find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[7]/i').click
+ find(".date-picker").set(TimeKeeper.date_of_record - 75.days)
+ # fill_in ".date-picker", :with => TimeKeeper.date_of_record - 75.days
+ find(".delete_confirm").click
+ expect(find('.alert')).to have_content('Census Employee could not be terminated: Termination date must be within the past 60 days.')
+ expect(page).to have_content("John")
+
+end
+
+
 When(/^.+ clicks on terminate button for rehired census employee$/) do
   @browser.a(text: /Terminate/).wait_until_present
   @browser.execute_script("$('.interaction-click-control-terminate').last().trigger('click')")

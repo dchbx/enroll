@@ -10,6 +10,7 @@ RSpec.describe Employers::CensusEmployeesController do
   let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 45.days,  hired_on: "2014-11-11") }
+  let(:census_employee_two) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, hired_on: "2014-11-11")}
   let(:census_employee_params) {
     {"first_name" => "aqzz",
      "middle_name" => "",
@@ -273,8 +274,8 @@ RSpec.describe Employers::CensusEmployeesController do
       get :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(flash[:notice]).to eq "Successfully terminated Census Employee."
       expect(response).to be_redirect
-    end
 
+    end
     context "with termination date" do
       it "should terminate census employee" do
         xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
@@ -288,6 +289,19 @@ RSpec.describe Employers::CensusEmployeesController do
         xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: "", :format => :js
         expect(response).to have_http_status(:success)
         expect(assigns[:fa]).to eq nil
+      end
+    end
+
+    context "with invalid termination date" do
+      before do
+        allow(CensusEmployee).to receive(:find).and_return(census_employee_two)
+      end
+      it "should throw error" do
+        xhr :get, :terminate, :census_employee_id => census_employee_two.id, :employer_profile_id => employer_profile_id, termination_date: (TimeKeeper.date_of_record - 75.days).to_s, :format => :js
+        expect(flash[:error]).to eq "Census Employee could not be terminated: Termination date must be within the past 60 days."
+        expect(response).to have_http_status(:success)
+        expect(assigns[:fa]).to eq nil
+        expect(assigns[:census_employee].employment_terminated_on).to eq nil
       end
     end
   end
