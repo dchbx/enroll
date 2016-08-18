@@ -1,0 +1,8 @@
+{
+  "draw" : <%= @draw %>,
+  "recordsTotal" : <%= @total_records %>,
+  "recordsFiltered" : <%= @records_filtered %>,
+  "data" : [
+    <%= render partial: "datatables/invoices_employers", collection: @employers, as: "employer", locals: { profile: @profile }, spacer_template: "shared/json_array_spacer" %>
+  ]
+}

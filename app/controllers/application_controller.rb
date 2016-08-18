@@ -76,7 +76,37 @@ class ApplicationController < ActionController::Base
     yield
   end
 
+  DataTablesCSV = Struct.new(:rows, :columns) do
+    def to_csv
+      attributes = columns
+      column_count = columns.size
+      CSV.generate(headers: true) do |csv|
+        csv << attributes
+        rows.each_with_index do |(key,row), index|
+          data = [
+            row.each do |row|
+              if index+1 == column_count
+                row.last
+              else
+                row.last+","
+              end
+            end
+          ]
+          csv << data
+        end
+      end
+    end
+  end
+
+  def export_datatable_csv
+    collection_for_csv = DataTablesCSV.new(params[:rows], params[:columns])
+    respond_to do |format|
+      format.csv { send_data collection_for_csv.to_csv, filename: "users-#{Date.today}.csv" }
+    end
+  end
+
   private
+
     def secure_message(from_provider, to_provider, subject, body)
       message_params = {
         sender_id: from_provider.id,

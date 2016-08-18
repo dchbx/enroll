@@ -47,6 +47,35 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
   end
 
+  context "is_age_range_satisfied_for_catastrophic?" do
+    let(:consumer_role) {double(dob: (TimeKeeper.date_of_record - 20.years))}
+    let(:benefit_package) {double}
+
+    it "should return true when not catastrophic" do
+      allow(benefit_package).to receive(:age_range).and_return (0..0)
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+      expect(rule.is_age_range_satisfied_for_catastrophic?).to eq true
+    end
+
+    context "when benefit_package is catastrophic" do
+      before :each do
+        allow(benefit_package).to receive(:age_range).and_return (0..30)
+      end
+
+      it "should return true when in the age range" do
+        allow(benefit_package).to receive(:benefit_coverage_period).and_return(double(end_on: TimeKeeper.date_of_record))
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        expect(rule.is_age_range_satisfied_for_catastrophic?).to eq true
+      end
+
+      it "should return false when out of the age range" do
+        allow(benefit_package).to receive(:benefit_coverage_period).and_return(double(end_on: (TimeKeeper.date_of_record + 20.years)))
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)
+        expect(rule.is_age_range_satisfied_for_catastrophic?).to eq false
+      end
+    end
+  end
+
   context "is_cost_sharing_satisfied?" do
     include_context "BradyBunchAfterAll"
     before :all do

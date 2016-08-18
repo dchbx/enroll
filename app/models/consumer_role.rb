@@ -424,6 +424,26 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :verification_period_ended, to: :ssa_pending, :guard => [:call_ssa?]
     end
+
+    event :verifications_backlog, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :first_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :second_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :third_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :fourth_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
   end
 
   def invoke_verification!(*args)

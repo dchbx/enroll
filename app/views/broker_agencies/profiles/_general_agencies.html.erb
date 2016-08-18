@@ -4,7 +4,7 @@
       <h3 class="title-inline">General Agencies</h3>
       <%=pundit_span HbxProfile, :modify_admin_tabs? %>
         <%= link_to 'Clear Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
-      </span>  
+      </span>
     </div>
     <div class="col-md-12">
       <% if @notice.present? %>

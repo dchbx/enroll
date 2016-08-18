@@ -1,0 +1,6 @@
+$('.sep_dates_filter').show();
+$('.start_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @start_on %>");
+$('.end_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @end_on %>");
+$('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @effective_on %>");
+$('.kind input').val("<%= @eff_kind %>")
+"<%= @self_attested %>" == 'true'? $('.optional_date').hide() : $('.optional_date').show();

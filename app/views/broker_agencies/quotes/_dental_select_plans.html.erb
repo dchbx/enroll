@@ -1,0 +1,39 @@
+<div class="container-fluid" style='margin-bottom:0%'>
+    <div class='dental_plan_selectors'>
+
+        <div id='dental-carriers' style='width: 148px;'>
+            <b id='dental_carriers_header'>Carriers</b><br/>
+            <%- @dental_selectors[:carriers].each do |carrier| %>
+              <div id="<%=carrier[1] %>" data-carrier='<%= carrier[2] %>' class="dental_carrier" style='width: 148px;'><%=carrier[0] %> </div>
+             <% end %>
+        </div>
+
+        <div id='dental-metals'>
+            <b>Coverage Level</b> </br>
+            <%- @dental_selectors[:dental_levels].each do |dental_level| %>
+                <div id="<%=dental_level%>" class="dental_metal"> <%= dental_level %> </div>
+            <% end %>
+        </div>
+
+        <div id='dental-plan_types'>
+            <b>Plan Types</b> <br>
+            <%- @dental_selectors[:plan_types].each do |plan_type| %>
+            <div id="<%=plan_type%>" class="dental_plan_type"> <%= plan_type %> </div>
+            <% end %>
+        </div>
+
+        <div id='dental-dc_in_network'>
+             <b>DC Network</b> <br>
+          <%- @dental_selectors[:dc_network].each do |dc_network| %>
+            <div id="<%=dc_network%>" class="dc_network"> <%= dc_network %> </div>
+          <% end %>
+        </div>
+
+        <div id='dental-nationwide'>
+            <b>Nationwide</b> <br>
+          <%- @dental_selectors[:nationwide].each do |nationwide| %>
+            <div id="<%=nationwide%>" class="nationwide"> <%= nationwide %> </div>
+          <% end %>
+        </div>
+    </div>
+</div>

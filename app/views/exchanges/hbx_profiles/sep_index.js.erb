@@ -1,0 +1,50 @@
+set_tab_content("<%= j render partial: "shared/data_table", locals:  {
+    page_header:  ["SEP", ""],
+    directions:  "",
+    base_model: "",
+    tab: "",
+    new_button:  [],
+    sibling_pages: [],
+    filters:  [
+       ["All", "javascript:;", false, []],
+       ["Individual", "javascript:;", false, []],
+       ["Employer Sponsored", "javascript:;", false, []]
+    ],
+    bulk_actions:  [
+      # ["Send Secure Message", "", true],
+      # ["Delete", "", false]
+    ],
+    row_functions:  true,
+    row_actions:  [
+      ["Add SEP", "replace_url_add_sep_form", true ],
+      ["SEP History", "replace_url_show_sep_history", true ]
+    ],
+    buttons_below_table: [
+      # ['Export CSV', 'url', 'request_type'],
+      # ['Print', 'url', 'request_type']
+    ],
+    custom_handlers: [
+      "SEPDatatable.callAllFilter",
+      "SEPDatatable.callEmployerSponsoredFilter",
+      "SEPDatatable.callIndividualFilter",
+      "SEPDatatable.addScopesBeforeSorting"
+    ],
+    child_rows: [false, "datatables/child_row"],
+    destroy: false,
+    processing_text: "Loading Families...",
+    responsive: true,
+    checkboxes: false,
+    pagination: true,
+    ordering: false,
+    info: true,
+    table_id: "SEP_dataTable",
+    data_url: sep_index_datatable_exchanges_hbx_profiles_path(:format => :json),
+    columns: [
+      ["HBX ID", "hbx_id", "", [false, ""]],
+      ["Last Name", "last_name", "", [false, ""]],
+      ["First Name", "first_name", "", [false, ""]],
+      ["SSN", "ssn", "", [false, ""]],
+      ["Consumer?", "consumer", "", [false, ""]],
+      ["Employee?", "employee", "", [false, ""]]
+    ]
+  } %>")

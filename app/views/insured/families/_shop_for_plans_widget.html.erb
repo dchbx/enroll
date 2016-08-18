@@ -51,7 +51,6 @@
                 <% end %>
                 <% end %>
 
-
         <div aria-labelledby="myModalLabel" class="modal fade" id="choose_flow" role="dialog" tabindex="-1">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -62,23 +61,28 @@
                 <div class="row">
                   <div class="col-sm-12">
                     <% if @person.consumer_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? %>
-                    <% options = {shop_for_plan: 'shop_for_plan'}
-              options.merge!(person_id: @person.id) if @person.present?
-              options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
-              options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
-            %>
-                    <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
-                    You are not under open enrollment period.
-                    <% else %>
-                    <p>If you enroll today, coverage will begin
-                      <%= format_date ivl_enrollment_effective_date %>. You can
-                      <%= link_to 'click here', new_insured_group_selection_path(options) %>
-                      for Open Enrollment Period.</p>
-                    <% end %>
-                    <br/>
+											<% options = {shop_for_plan: 'shop_for_plan'}
+								options.merge!(person_id: @person.id) if @person.present?
+								options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
+								options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
+							%>
+											<% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
+												You are not under open enrollment period.
+											<% else %>
+												<p>If you enroll today, coverage will begin
+													<%= format_date ivl_enrollment_effective_date %>. You can
+													<%= link_to 'click here', new_insured_group_selection_path(options) %>
+													for Open Enrollment Period.</p>
+											<% end %>
+											<br/>
 
-                    <p>Do you need coverage earlier? See if you qualify for a
-                      <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
+											<% if existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first %>
+												<p>Would you like to use your existing special enrollment period? "<%= existing_sep.qualifying_life_event_kind.title %>"</p>
+												<p><%= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %></p>
+												<p><%= link_to 'Qualify for new SEP', find_sep_insured_families_path(options) %></p>
+											<% else %>
+												<p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
+											<% end %>
                     <% else %>
                     You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
                     <div id="shop-for-plans-widget">

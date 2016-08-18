@@ -1,3 +1,9 @@
+
+Person.where(
+    "consumer_role" => {"$exists" => true, "$ne" => nil},
+    "consumer_role.lawful_presence_determination.vlp_authority" => {"$in" => ["curam"]}
+).update_all("$set" => {"consumer_role.lawful_presence_determination.aasm_state" => "verification_successful"})
+​
 # Set to NA for people with no SSN
 Person.where(
     "consumer_role" => {"$exists" => true, "$ne" => nil},

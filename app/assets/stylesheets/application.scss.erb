@@ -15,9 +15,9 @@
  *= require font-awesome
  *= require bootstrap-slider
  *= require bootstrap-multiselect
+ *= require dragtable
  *= require_self
  */
-
 
 .module {
   .flex {
@@ -27,7 +27,7 @@
   }
 }
 
- .registrations {
+.registrations {
    .actions {
      span {
        display: block;
@@ -44,8 +44,23 @@
 .clear {
   clear: both;
 }
+.cna {
+  cursor: not-allowed;
+  display: none;
+}
+
+.disabled-input {
+  background-color: #eee !important;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 .dn {
   display: none;
+}
+.dn-1 {
+  display: block !important;
+  opacity: 1 !important;
 }
  .starter {
    max-width: 660px;
@@ -103,7 +118,6 @@ img {
      padding: 15px 0;
    }
  }
-// full width flash messenger style
 .container > .col-xs-12 > .row > .alert.alert-notice {
   margin-top: 1%;
   margin-bottom: 1%;
@@ -243,6 +257,18 @@ img {
   display: none;
 }
 
+#save_error_msg {
+  align: center;
+  color:#b94a48;
+  text-align: center;
+  background: #f2dede;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border: none;
+  margin: 0;
+}
+
 #showhidebutton {
   font-family: 'Open Sans', sans-serif;
   background: none!important;
@@ -253,6 +279,8 @@ img {
   outline:0;
   float: right;
 }
+
+.gi-2x{font-size: 2.0em;}
 
 // disables the click action on any element; more general than :disabled
 // Used to implement readonly permissions for admin

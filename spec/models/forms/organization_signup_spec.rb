@@ -55,7 +55,7 @@ describe Forms::OrganizationSignup, "fein validation" do
                                                                           :address => FactoryGirl.build(:address, :kind => "primary"), phone: FactoryGirl.build(:phone)) }
   subject { Forms::OrganizationSignup.new( :office_locations => [office_location_1]) }
 
-  before :each do
+  around :each do
     DatabaseCleaner.clean
   end
 

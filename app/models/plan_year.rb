@@ -10,7 +10,16 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
+  OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
+  INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
+  INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
+
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled migration_expired)
+
+  OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
+  INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
+  INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
+
 
   # Plan Year time period
   field :start_on, type: Date
@@ -93,7 +102,7 @@ class PlanYear
 
       coverage_filter = lambda do |enrollments, date|
         enrollments = enrollments.select{|e| e.terminated_on.blank? || e.terminated_on >= date}
-        
+
         if enrollments.size > 1
           enrollment = enrollments.detect{|e| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(e.aasm_state.to_s)}
           enrollment || enrollments.detect{|e| HbxEnrollment::RENEWAL_STATUSES.include?(e.aasm_state.to_s)}
@@ -255,7 +264,7 @@ class PlanYear
       errors.merge!({publish: "You may only have one published plan year at a time"})
     end
 
-    if !is_publish_date_valid? 
+    if !is_publish_date_valid?
       errors.merge!({publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"})
     end
 
@@ -542,7 +551,6 @@ class PlanYear
     end
   end
 
-
   aasm do
     state :draft, initial: true
 
@@ -553,7 +561,8 @@ class PlanYear
 
     state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     state :enrolled, :after_enter => :ratify_enrollment   # Published plan open enrollment has ended and is eligible for coverage,
-                                                          #   but effective date is in future
+    state :invoice_generated                              # Invoice created for initial enrollment
+
     state :canceled                                       # Published plan open enrollment has ended and is ineligible for coverage
 
     state :active         # Published plan year is in-force
@@ -872,11 +881,15 @@ private
     if open_enrollment_end_on < open_enrollment_start_on
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
-    
+
 
     if open_enrollment_start_on < (start_on - 2.months)
       errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
-    end    
+    end
+
+    if open_enrollment_start_on < (start_on - 2.months)
+      errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
+    end
 
     if (open_enrollment_end_on - open_enrollment_start_on).to_i < (Settings.aca.shop_market.open_enrollment.minimum_length.days - 1)
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{Settings.aca.shop_market.open_enrollment.minimum_length.days} days")

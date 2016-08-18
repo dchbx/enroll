@@ -1,0 +1,46 @@
+<% fam.each do|family| if fam.present? %>
+	<% if family == fam.last %>
+		[
+			"<%= family.primary_applicant.person.hbx_id.to_s %>",
+			"<%= family.primary_applicant.person.last_name.to_s%>",
+			"<%= family.primary_applicant.person.first_name.to_s%>",
+			"<%= json_escape begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %>",
+			"<%= json_escape family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %>",
+			"<%= json_escape family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %>",
+			<%= raw ("<span class='add-control'><i class='fa fa-plus-square add-control'></i></span>").to_json %>,
+			<%= raw (link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.   id, family_id: family), class: "btn btn-default").to_json%>,
+			<%= raw (render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all, formats: [:html]).to_json %>,
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			""
+		]
+	<% else %>
+		[
+			"<%= family.primary_applicant.person.hbx_id.to_s %>",
+			"<%= family.primary_applicant.person.last_name.to_s%>",
+			"<%= family.primary_applicant.person.first_name.to_s%>",
+			"<%= json_escape begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %>",
+			"<%= json_escape family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %>",
+			"<%= json_escape family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %>",
+			<%= raw ("<span class='add-control'><i class='fa fa-plus-square add-control'></i></span>").to_json %>,
+			<%= raw (link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.   id, family_id: family), class: "btn btn-default").to_json%>,
+			<%= raw (render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all, formats: [:html]).to_json %>,
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			""
+		],
+	<% end %>
+  <% end %>
+<% end %>

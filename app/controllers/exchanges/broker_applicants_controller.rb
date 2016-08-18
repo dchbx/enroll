@@ -59,7 +59,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
         staff_role = broker_role.person.broker_agency_staff_roles[0]
         staff_role.broker_agency_accept! if staff_role
       end
-      
+
       if broker_role.agency_pending?
         send_secure_message_to_broker_agency(broker_role) if broker_role.broker_agency_profile
       end

@@ -2416,8 +2416,6 @@ ul.list-qle li a:hover {
 #qle-details a.close-popup {
     color: #aaaaaa;
     font-size: 17px;
-    position: absolute;
-    right: 30px;
     z-index: 3000;
 }
 
@@ -3064,36 +3062,6 @@ p.success-text {
     font-size: 16px;
 }
 
-/* END OF STYLE FOR ACCORDION - QLE flow */
-
-.pagination-wrapper {
-    margin: 0 auto;
-}
-.pagination>li>a, .pagination>li>span {
-    background: #73b9ff;
-    border: none;
-    color: #fff;
-    padding: 6px 10px;
-    min-height: 32px;
-}
-.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
-    color: #fff;
-    font-weight: bold;
-    background: #73b9ff;
-}
-.pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover {
-    background: #0080ff;
-    color: #fff;
-    border: none;
-}
-ul.pagination {
-    padding: 0px 5px;
-    border-radius: 2px;
-    background: #73b9ff;
-}
-.pagination>li:last-child>a, .pagination>li:last-child>span, .pagination>li:first-child>a, .pagination>li:first-child>span{
-    border-radius: 0px;
-}
 .bg-white {
     background: #fff;
 }
@@ -3707,23 +3675,7 @@ ul.list-right-section li a img {
     padding-right: 0;
     margin-bottom: 0;
 }
-.hbx-enrollment-panel .panel-body .family-plan-selection .status h4{
-    margin-bottom: 0;
-    font-size: 22px;
-    font-weight: 600 !important;
-    float: right;
-}
-
-
-.hbx-enrollment-panel .family-members p{
-    color: #007BC4;
-}
-
-.hbx-enrollment-panel .alert{
-  margin-bottom: 0;
-}
-
-.hbx-enrollment-panel .panel-heading, .qles-panel .panel-heading, .seps-panel .panel-heading{
+.qles-panel .panel-heading, .seps-panel .panel-heading{
   background-image: none;
   padding-bottom: 0;
   border-bottom: 0;
@@ -3739,7 +3691,7 @@ ul.list-right-section li a img {
   }
 }
 
-.hbx-enrollment-panel .panel-heading hr, .qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
+.qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
   margin-bottom: 0;
   margin-top: 0;
 }
@@ -3759,23 +3711,6 @@ ul.list-right-section li a img {
 }
 
 
-.hbx-enrollment-panel .separator:before{
-  content:'\2022 \2003';
-}
-
-.hbx-enrollment-panel .panel-body{
-  padding-top: 0;
-}
-
-.hbx-enrollment-panel label{
-    color: #909090;
-    font-family: Open Sans;
-    font-size: 9pt;
-    font-weight: 600 !important;
-    padding-right: 5px;
-    text-transform: uppercase;
-}
-
 .my-account-page h1{
     color: #003260;
     font-size: 36px;
@@ -3783,66 +3718,9 @@ ul.list-right-section li a img {
     margin-top: 0;
 }
 
-.hbx-enrollment-panel h2{
-    font-family: Open Sans;
-    color: #414141;
-    font-size: 24pt;
-    font-weight: Regular !important;
-}
-
-
-.hbx-enrollment-panel h3{
-    color: #7b7b7b;
-    font-family: Open Sans;
-    font-size: 18pt;
-    font-weight: 600 !important;
-}
-
-.hbx-enrollment-panel h4{
-    font-family: Open Sans;
-    font-size: 13pt;
-}
-
-.hbx-enrollment-panel .panel-heading h4{
-    font-variant: super;
-    margin-top: 0;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.hbx-enrollment-panel p{
-    font-family: Open Sans;
-    color: #414141;
-}
-
-.hbx-enrollment-panel p strong{
-    font-weight: 600 !important;
-}
-
-.hbx-enrollment-panel .icons p{
-  margin-left: 20px;
-}
-
-.hbx-enrollment-panel .options .fa {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.hbx-enrollment-panel .options span p {
-    display: inline-block;
-}
-
-.hbx-enrollment-panel .options span{
-    width: 50px;
-}
-
-.hbx-enrollment-panel #qle-date-chose {
-    text-align: center;
-}
-
 /* Form Elements */
-.row-form-wrapper {border: 1px solid #b7b7b7;border-top: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
-.row-form-wrapper-top, .row-form-wrapper:first-of-type, #email_info, #phone_info, #dependent_ul li {border-top: 1px solid #b7b7b7;}
+.row-form-wrapper {border: 1px solid #ddd; border-top: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
+.row-form-wrapper-top, .row-form-wrapper:first-of-type, #email_info, #phone_info, #dependent_ul li {border-top: 1px solid #ddd;}
 .remove-top-bdr {border-top: none !important;}
 .alert, .alert li {border: none;}
 .row-form-wrapper .form-group {
@@ -4841,6 +4719,7 @@ input:required:valid {
   }
   .footer-wrapper {
     display: none;
+    z-index: 100;
   }
 }
 
@@ -4918,6 +4797,20 @@ input:required:valid {
   width: 150px;
 }
 
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px)
+{
+  .fa-phone.broker_media {
+    float:left;
+    display:none;
+  }
+  h4.broker_media {
+    font-size: 95% !important;
+    float:left;
+    white-space: nowrap;
+  }
+}
 .general-agency-info .checkbox label {
   font-size: 12px;
 }
@@ -4928,4 +4821,26 @@ input:required:valid {
 
 #new_announcement .form-group {
   margin-bottom: 10px;
+}
+
+.ga_status {
+  padding: 6px 12px;
+}
+
+.icon_enabled {
+  opacity:1.0;
+}
+
+.icon_disabled {
+  opacity:0.5;
+}
+
+.sep_filter_bg_color{
+  background-color:#aaaaaa;
+  margin-top: 15px;
+  color: white !important;
+}
+
+.table-history th{
+  text-align: center;
 }

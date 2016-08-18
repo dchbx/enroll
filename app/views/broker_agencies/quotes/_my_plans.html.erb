@@ -1,0 +1,43 @@
+<div class="panel panel-default">
+  <div class="panel-heading" role="tab" id="plan-selection-mgmt-header">
+     <a role="button">
+          <div data-toggle="collapse" data-parent="#accordion" href="#plan-selection-mgmt"
+            aria-expanded="true" aria-controls="plan-selection-mgmt" style='display: inline; float_left'>
+              <b>Health Plan Selection</b><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></div></a>
+              <span style='margin-left: 50px; font-size: 120%;'  id='show_plan_selected_count'>Plan count</span>
+      <label class='btn btn-normal' id='reset_selected'> Reset Selections</label>
+
+              </div>
+        <div id="plan-selection-mgmt" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="">
+
+
+    <div class="container-fluid">
+        <div>
+          <h4>Step 4 - Select reference plans for comparison using Roster Cost to Employer</h5>
+
+          <h5>Showing <strong id="x-of-plans"><%= @health_plans.count %></strong> of <strong><%= @health_plans.count %></strong>  plans based on your selection criteria</h5>
+          <div class="btn-group plan_buttons" data-toggle="buttons" style='max-height: 300px; overflow-y: scroll' id="quote-plan-list">
+            <% @health_plans.each_with_index do |p,index| %>
+            <label class="btn <%= "active" if params['plans'].try(:include?, p.id.to_s) %>" >
+              <input name="plans[]" <%= "checked" if params['plans'].try(:include?, p.id.to_s) %> type="checkbox" autocomplete="off" value="<%= p.id %>">
+              <%= p.name  + ' $'%><span class='employer_cost'>0</span></label>
+            <% end %>
+          </div>
+        </div>
+
+          <br>
+          <% submit_tag "Compare Costs", class: 'btn btn-primary', id: 'QuoteCalculation' %>
+          <div class='btn btn-primary' id='CostComparison'>Compare Costs / Select Plan</div>
+          <div class='btn btn-primary' id='PlanComparison'>Compare Plans</div>
+          <br><br>
+
+    </div>
+
+    <div class="panel panel-default">
+  <div class="panel-collapse collapse in" role="tabpanel" aria-labelledby="compare_benefits"  id="plan_comparison_frame">
+    <%= (render "quote_comparision" , quote_results: @quote_results) if @quote_results %>
+  </div>
+</div>
+
+</div>
+</div>

@@ -103,6 +103,10 @@ class EmployeeRole
     census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
   end
 
+  def hired_on
+    census_employee.try(:hired_on) || (read_attribute(:hired_on).present? ? Date.parse(read_attribute(:hired_on).strftime('%Y/%m/%d')) : nil)
+  end
+
   def is_active?
     census_employee && census_employee.is_active?
   end

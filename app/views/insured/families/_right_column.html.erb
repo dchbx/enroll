@@ -1,13 +1,20 @@
 <div>
-    <% if @person.has_consumer_role? %>
-    <%= render 'help_signup' %>
-  <% end %>
+  <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? %>
     <div class="module brokers-widget">
-      <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
-        <%= render 'employee_brokers_widget' %>
-      <% elsif @person.has_consumer_role? %>
-      <%= render 'consumer_brokers_widget' %>
-      <% end %>
+      <%= render 'employee_brokers_widget', title: "Employer Assigned Broker" %>
     </div>
+    <div class="module brokers-widget">
+      <%= render 'consumer_brokers_widget', title: nil %>
+    </div>
+
+  <% elsif @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
+    <div class="module brokers-widget">
+      <%= render 'employee_brokers_widget', title: nil %>
+    </div>
+  <% elsif @person.has_consumer_role? %>
+    <div class="module brokers-widget">
+      <%= render 'consumer_brokers_widget', title: nil %>
+    </div>
+  <% end %>
   <%= render 'qles_panel' %>
 </div>

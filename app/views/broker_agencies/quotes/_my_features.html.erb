@@ -1,0 +1,31 @@
+<div class="panel panel-default">
+	<div class="panel-heading" role="tab" id="feature-mgmt-header">
+		<a role="button" data-toggle="collapse" data-parent="#accordion" href="#feature-mgmt" aria-expanded="true" aria-controls="feature-mgmt">
+			<b>Health Features and cost criteria</b>
+			<span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></a>
+			<span style='margin-left: 50px; font-size: 120%;'  id='show_plan_criteria_count'>Plan count</span>
+			 <label class='btn btn-normal hide' id='reset_criteria'> Reset Criteria</label>
+	</div>
+	<div id="feature-mgmt" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="">
+		<div class="container-fluid">
+			<div class='row-fluid'>
+				<h4>Step 1 - Select the Quote - Benefit Group to compare costs or plan information</h4>
+			</div>
+			<div class='row-fluid'>
+			  <%=	select_tag "benefit_group_select", options_from_collection_for_select(@benefit_groups, "id", "title", @q.try(:id).try(:to_s)), { } %>
+			</div>
+			<div class='row-fluid'>
+			  <h4> Step 2 - Define employer contribution percentages</h4>
+			</div>
+			<div class='row-fluid'>
+			  <%= render partial: 'benefit_sliders'%>
+			</div>
+			<div class='row-fluid'>
+				<h4>Step 3 - Filter your plans / Selection criteria</h4>
+			</div>
+			<div class='row-fluid'>
+				<%= render partial: 'select_plans' %>
+			</div>
+		</div>
+	</div>
+</div>

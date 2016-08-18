@@ -43,7 +43,7 @@ module AccessPolicies
     end
 
     def authorize_edit(employer_profile, controller)
-      return true if @user.has_hbx_staff_role? || is_broker_for_employer?(employer_profile.id)
+      return true if @user.has_hbx_staff_role? || is_broker_for_employer?(employer_profile.id) || is_general_agency_staff_for_employer?(employer_profile.id)
       return true if Person.staff_for_employer(employer_profile).include?(@user.person)
       controller.redirect_to_new and return
     end

@@ -39,4 +39,24 @@ RSpec.describe "insured/families/_qle_detail.html.erb" do
   it "should have two qle-details-title" do
     expect(rendered).to have_selector(".qle-details-title", count: 2)
   end
+
+  context 'with an existing special enrollment period' do
+    let(:current_user) { FactoryGirl.create :user, :with_family }
+
+    let!(:sep) do
+      current_user.primary_family.special_enrollment_periods[0] = FactoryGirl.build(:special_enrollment_period, effective_on_kind: ['first_of_next_month']).tap do |sep|
+        current_user.primary_family.special_enrollment_periods.push sep
+      end
+    end
+
+    before do
+      sign_in current_user
+      assign :existing_sep, sep
+      render "insured/families/qle_detail"
+    end
+
+    it 'has a value for the input' do
+      expect(rendered).to have_xpath("//input[@value='#{sep.qle_on.strftime('%m/%d/%Y')}']")
+    end
+  end
 end

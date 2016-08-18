@@ -434,6 +434,7 @@ class Employers::PlanYearsController < ApplicationController
       lowest_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount(@benefit_group.lowest_cost_plan),
       highest_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount(@benefit_group.highest_cost_plan)
       })
+
   end
 
   def find_employer

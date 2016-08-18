@@ -11,6 +11,14 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
+  def update_individual
+    @person.consumer_role.authorize_residency! verification_attr
+    @person.consumer_role.authorize_lawful_presence! verification_attr
+      respond_to do |format|
+      format.html { redirect_to :back }
+    end
+  end
+
   def authorized_download
     begin
       model = params[:model].camelize
@@ -93,9 +101,20 @@ class DocumentsController < ApplicationController
     if current_user.has_hbx_staff_role?
       session[:person_id] = params[:person_id]
       set_current_person
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:status])
+      if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
+        @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:status])
+      end
     end
     redirect_to verification_insured_families_path
+  end
+
+  def change_person_aasm_state
+    @doc_owner.consumer_role.import!
+    @doc_owner.consumer_role.save
+    respond_to do |format|
+           format.html {redirect_to exchanges_hbx_profiles_root_path, notice: "Person Verification Status Updated"}
+           end
+
   end
 
   def extend_due_date

@@ -2,7 +2,7 @@
   "draw" : <%= @draw %>,
   "recordsTotal" : <%= @total_records %>,
   "recordsFiltered" : <%= @records_filtered %>,
-  "data" :
-  <%=  @payload.to_json.html_safe %>
-
+  "data" : [
+    <%= render partial: "sep_datatable_family", locals: {fam: @families, state: @state} %>
+  ]
 }

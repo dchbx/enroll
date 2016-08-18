@@ -37,7 +37,7 @@
           </td>
           <td><%= format_date census_employee.dob %></td>
           <td><%= format_date census_employee.hired_on %></td>
-          <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
+          <td style="text-transform: capitalize;"><%= employee_state_format(census_employee.aasm_state, census_employee.employment_terminated_on) %></td>
           <td>
           <% if census_employee.active_benefit_group_assignment.present? %>
             <%= census_employee.active_benefit_group_assignment.benefit_group.title.capitalize %>

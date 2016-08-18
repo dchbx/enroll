@@ -1,5 +1,5 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-# before_filter :configure_sign_up_params, only: [:create]
+before_filter :configure_sign_up_params, only: [:create]
 # before_filter :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -11,8 +11,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def create
     build_resource(sign_up_params)
 #   Check for curam user email, if present then restrict the user.
-    if CuramUser.match_unique_login(resource.email).first.present?
-      flash[:alert] = "An account with this email address ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
+    if CuramUser.match_unique_login(resource.oim_id).first.present?
+      flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
       render :new and return
     end
 
@@ -21,10 +21,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if headless.present? && !headless.person.present?
       headless.destroy
     end
-
-    resource.oim_id = resource.email
-
-    resource.email = nil unless resource.email =~ Devise.email_regexp
+    
+    resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
 
     headless = User.where(oim_id: /^#{Regexp.quote(resource.oim_id)}$/i).first
 
@@ -85,12 +83,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super
   # end
 
-  # protected
+  protected
 
   # You can put the params you want to permit in the empty array.
-  # def configure_sign_up_params
-  #   devise_parameter_sanitizer.for(:sign_up) << :attribute
-  # end
+  def configure_sign_up_params
+    devise_parameter_sanitizer.for(:sign_up) << :oim_id
+  end
 
   # You can put the params you want to permit in the empty array.
   # def configure_account_update_params

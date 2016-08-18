@@ -1,0 +1,38 @@
+<div class="module container broker_quote_tool">
+  <div class="row" class="col-md-12">
+   <input name='employee' value='50' type='hidden'>
+   <input name='spouse' value='0' type='hidden'>
+   <input name='domestic_partner' value='0' type='hidden'>
+   <input name='child_under_26' value='0' type='hidden'>
+    <%= form_tag(broker_agencies_broker_role_quote_path, method: :get) do  %>
+
+    <h2>Quote Calculator</h2>   
+    
+             <input type="hidden" id="quote_id" value="<%= params[:id] %>">
+      <input type="hidden" id="broker_role_id" value="<%= @broker.id %>">
+
+
+      <%= render partial: 'my_features' if @q.can_edit? %>
+
+      <%= render partial: 'my_plans' if @q.can_edit? %>
+
+      <% end %>
+      <%= render partial: 'broker_agencies/quotes/panels/dental'  if @q.can_edit? %>
+      <%= render partial: 'broker_agencies/quotes/panels/quote' %>
+      <%= link_to "Back to Quotes", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+$(document).on('ready page:load', function () {
+    QuotePageLoad.set_select_health_plans(<%=raw @health_plan_quote_criteria %>)
+    Quote.show_benefit_group("<%= @q.id%>", "<%= @quote_on_page.id%>")
+
+    window.dental_relationship_benefits =  <%= raw @benefit_pcts_json %>
+    window.dental_roster_premiums = <%= raw @dental_roster_premiums %>
+
+});
+</script>

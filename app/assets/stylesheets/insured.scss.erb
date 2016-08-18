@@ -1,5 +1,20 @@
 @import "variables";
 .module {
+  &.broker {
+    .panel-heading {
+      background-image: none;
+      background-color: $primary-white;
+      h3 {
+        color: $primary-green;
+        font-weight: $primary-bold;
+        text-transform: uppercase;
+        font-size: 18px;
+      }
+    }
+    .panel-footer {
+      background-color: $primary-white;
+    }
+  }
   &.consumer-broker-widget, &.employee-broker-widget {
     .panel-heading {
       background-image: none;
@@ -11,6 +26,9 @@
     .panel-body {
       display: table;
       width: 100%;
+      .fa {
+        color: $primary-blue;
+      }
       > * {
         display: table-cell;
         vertical-align: middle;
@@ -19,10 +37,65 @@
         }
         &.text-left {
           padding-left: 7.5%;
-          .broker-information {
-            word-break: break-all;
+        }
+      }
+      small {
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-top: 10%;
+        a {
+          color: $primary-gray;
+
+        }
+      }
+      small {
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-top: 10%;
+        a {
+          color: $primary-gray;
+
+        }
+      }
+    }
+  }
+  &.hbx-enrollment-panel {
+    .panel-heading {
+      background-color: transparent;
+      background-image: none;
+      h3 {
+        color: $primary-green;
+        font-weight: $primary-bold;
+        text-transform: uppercase;
+        font-size: 18px;
+      }
+    }
+    .panel-body {
+      padding-bottom: 0;
+      .vertically-aligned-row:first-of-type {
+        margin-bottom: 2.5%;
+        table-layout: auto;
+        vertical-align: middle;
+        div {
+          img {
           }
         }
+        h3 {
+          width: 77.5%;
+          line-height: 1.2;
+        }
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        vertical-align: top;
+      }
+    }
+    .panel-footer {
+      padding-top: 0;
+      background-color: transparent;
+      border-top: 0;
+      > .vertically-aligned-row {
+        table-layout: fixed;
       }
     }
   }
@@ -45,18 +118,20 @@
       }
     }
   }
-}
-.brokers-widget {
-    h4 {
-      padding: 15px 0 0 0;
-      margin: 0;
-      font-weight: 600;
+  &.brokers-widget {
+    word-break: break-all;
+    .col-xs-8 {
+      padding-right: 10px;
+      padding-left: 0;
+      h4 {
+        padding: 15px 0 0;
+        margin: 0;
+        font-weight: 600;
+      }
     }
-
-  h4, .fa {
-    color: $primary-blue;
-  }
-
+    h4, .fa {
+      color: $primary-blue;
+    }
     .col-xs-4 {
       cursor: pointer;
       &:hover {
@@ -72,12 +147,19 @@
         }
       }
       span {
-        color: #007bc4;
+        color: $primary-blue;
       }
     }
     span {
       color: $primary-blue;
     }
+  }
+
+  &#qle-details {
+    .error-info {
+      margin-top: 0;
+    }
+  }
 }
 .help-signup {
   h4 {
@@ -91,10 +173,10 @@
   }
 }
 #profile-content #address_info .mailing-div {
- display: block;
- &>.col-lg-3>* {
-   display: none;
- }
+  display: block;
+  &>.col-lg-3>* {
+    display: none;
+  }
 }
 .carrier-contact {
   padding-bottom: 20px;
@@ -112,10 +194,8 @@
   }
   .carrier-numbers {
     text-align: center;
-
   }
 }
-
 .fa-icon-link {
   padding-top: 4.45%;
 }
@@ -131,62 +211,54 @@
   color: #595959;
   font-size: 12px;
 }
-
-  .benefits-tab, .home-tab, .hbx-enrollment-panel {
-    .fa {
-      color: $primary-blue;
-      margin: 0 10px 0 5px;
-      &.published, &.enrolling {
-        color: #FFD700;
-      }
-    }
-    .bg-title {
-      margin-bottom: 10px;
-      display: inline-block;
-      color: #69A30D;
-      font-size: 18px;
+.benefits-tab, .home-tab, .hbx-enrollment-panel {
+  .fa {
+    color: $primary-blue;
+    margin: 0 10px 0 5px;
+    &.published, &.enrolling {
+      color: #FFD700;
     }
   }
-  .hbx-enrollment-panel {
-    table {
-      tr {
-        td {
-          vertical-align: top;
-          .enrollment-created-at {
-            white-space: nowrap;
-          }
+  .bg-title {
+    margin-bottom: 10px;
+    display: inline-block;
+    color: #69A30D;
+    font-size: 18px;
+  }
+}
+.hbx-enrollment-panel {
+  table {
+    tr {
+      td {
+        vertical-align: top;
+        .enrollment-created-at {
+          white-space: nowrap;
         }
       }
     }
-    .alert {
-      padding: 15px 40px 15px 15px;
-    }
-        .bg-title {
-          font-weight: bold;
-        }
-        .panel-body {
-          h4 {
-            margin-top: 5px;
-            font-weight: 400;
-            font-size: 18px;
-          }
-          .info p {
-            margin: 0;
-          }
-        }
-        &.waived-coverage {
-          .status {
-            color: $primary-gray;
-          }
-          table {
-            width: 100%;
-          }
-        }
   }
+  .alert {
+    padding: 15px 40px 15px 15px;
+  }
+      .bg-title {
+        font-weight: bold;
+      }
+      .panel-body {
+        h4 {
+          margin-top: 5px;
+          font-weight: 400;
+          font-size: 18px;
+        }
+        .info p {
+          margin: 0;
+        }
+      }
+}
 
 .compare-table {
   tr {
-    td:first-of-type, th:first-of-type {
+    td:first-of-type,
+    th:first-of-type {
       background-color: #E8E8E8;
       border: none;
       text-align: left;
@@ -198,20 +270,22 @@
         font-weight: 600;
       }
     }
-    th, td {
+    th,
+    td {
       text-align: center;
       vertical-align: center;
       img {
+
       }
     }
-    td, th {
+    td,
+    th {
       border-left: 1px solid #ddd;
       border-right: none;
       &:first-of-type {
 
       }
     }
-
   }
   .row-title {
     font-size: 24px;
@@ -229,10 +303,9 @@
       width: 150px;
       text-overflow: "";
       border-radius: 15px;
-      padding: 0px;
-      margin: 0px;
+      padding: 0;
+      margin: 0;
     }
-
     #verification-reason {
       padding-left: 0;
       list-style-type: none;
@@ -252,28 +325,25 @@
         cursor: pointer;
       }
     }
-
-
     &.verif-type {
       margin-right: 20px;
     }
-
-  	&.modal-footer {
-  		.modal-sbc-link {
-  			text-align: left;
-  			position: relative;
-  			.fa.fa-file-pdf-o {
-  				margin: 2px auto auto 5px;
-  			}
-  			.sbc-text {
-  				font-size: 14px;
-  				margin-left: 10px;
-  				position: absolute;
-  				white-space: nowrap;
-  				top: 10px;
-  			}
-  		}
-  	}
+    &.modal-footer {
+      .modal-sbc-link {
+        text-align: left;
+        position: relative;
+        .fa.fa-file-pdf-o {
+          margin: 2px auto auto 5px;
+        }
+        .sbc-text {
+          font-size: 14px;
+          margin-left: 10px;
+          position: absolute;
+          white-space: nowrap;
+          top: 10px;
+        }
+      }
+    }
     .table {
       width: 100%;
       table-layout: fixed;
@@ -310,12 +380,12 @@
               background-color: transparent;
             }
             td.td-container {
-              padding: 0px 12px;
+              padding: 0 12px;
               .table-responsive {
                 overflow: visible;
-								.table {
-									margin-bottom: 0;
-								}
+                .table {
+                  margin-bottom: 0;
+                }
               }
             }
             table {
@@ -353,7 +423,6 @@
                   }
                 }
                 .upload {
-
                   td.td-container {
                     padding: 6px 12px 30px;
                   }
@@ -363,49 +432,47 @@
           }
           td {
             vertical-align: middle;
-						.sub-table {
-							width: 100%;
-							table-layout: fixed;
-
-							td {
-								padding: 0.5% 1.25%;
-							}
-							.select-upload {
-								float: left;
-							}
+            .sub-table {
+              width: 100%;
+              table-layout: fixed;
+              td {
+                padding: 0.5% 1.25%;
+              }
+              .select-upload {
+                float: left;
+              }
               .btn-group {
                 width: 100%;
                 .button {
                   overflow: hidden;
-                  width:74%;
-                  position:relative;
+                  width: 62.5%;
+                  position: relative;
                 }
                 input[type=submit] {
                   width: 25%;
                   &:hover {
                     background-color: $primary-blue;
-                    border: none;
                     color: #fff;
-                    padding:2px;
+                    padding: 2px;
                   }
                 }
               }
-							.doc-upload-file {
-							  font-size: 10px;
-								padding: 0;
-								width:170px;
+              .doc-upload-file {
+                font-size: 10px;
+                padding: 0;
+                width: 170px;
                 top: 0;
                 width: 100%;
                 height: 100%;
                 position: absolute;
                 opacity: 0;
-							}
-							.selectric {
-								border-radius: 5px;
-								max-width: 140px;
-								width: 140px;
-							}
-						}
+              }
+              .selectric {
+                border-radius: 5px;
+                max-width: 140px;
+                width: 140px;
+              }
+            }
             &.table-functions {
               .fa-trash-o {
                 margin-top: 4px;
@@ -414,26 +481,26 @@
               .btn {
                 margin-right: 5px;
               }
-							a {
-								&:hover {
-								}
-								span {
-									text-align: center !important;
-									float: none !important;
-									white-space: nowrap;
+              a {
+                &:hover {
 
-									&.function-text {
-										font-size: 12px;
-										color: #b7b7b7;
-										&:hover {
-											color: #007bc4;
-											* {
-												color: #007bc4;
-											}
-										}
-									}
-								}
-							}
+                }
+                span {
+                  text-align: center !important;
+                  float: none !important;
+                  white-space: nowrap;
+                  &.function-text {
+                    font-size: 12px;
+                    color: #b7b7b7;
+                    &:hover {
+                      color: #007bc4;
+                      * {
+                        color: #007bc4;
+                      }
+                    }
+                  }
+                }
+              }
               .fa {
                 cursor: pointer;
                 display: inline-block;
@@ -453,22 +520,6 @@
             }
           }
         }
-      }
-    }
-  }
-  &.plan-row {
-    .sbc_link {
-      margin-top: 6px;
-    }
-  }
-  .sbc_link {
-    display: inline-block;
-    &.dental {
-      position: relative;
-      span {
-        position: absolute;
-        margin-top: 10px !important;
-        white-space: nowrap;
       }
     }
   }

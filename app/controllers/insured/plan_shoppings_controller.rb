@@ -186,14 +186,15 @@ class Insured::PlanShoppingsController < ApplicationController
   def plans
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    @plans = @plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
     if @person.primary_family.active_household.latest_active_tax_household.present?
       if is_eligibility_determined_and_not_csr_100?(@person)
         sort_for_csr(@plans)
       else
+        sort_by_standard_plans(@plans)
         @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
       end
     else
+      sort_by_standard_plans(@plans)
       @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
     end
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
@@ -202,6 +203,13 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  def sort_by_standard_plans(plans)
+    standard_plans, other_plans = plans.partition{|p| p.is_standard_plan? == true}
+    standard_plans = standard_plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
+    other_plans = other_plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
+    @plans = standard_plans + other_plans
+  end
 
   def sort_for_csr(plans)
     silver_plans, non_silver_plans = plans.partition{|a| a.metal_level == "silver"}

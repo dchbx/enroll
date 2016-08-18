@@ -1,0 +1,180 @@
+<div class="wrapper">
+	<div>&nbsp;</div>
+	<!--<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">-->
+		<div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingOne">
+				<h3 class="panel-title">
+					<a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-group" aria-expanded="true" aria-controls="quote-group">
+						Quote Information
+					</a>
+				</h3>
+			</div>
+			<div id="quote-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
+				<div class="panel-body" id="quote-info">
+					<div class="row form-inline">
+						<div class="form-group col-sm-6">Quote Name: <%= f.text_field :quote_name, {required: true, :placeholder => 'Quote Name'}%></div>
+						<div class="form-group col-sm-6">Quote Effective Date:
+							<% plan_year_start_dates = PlanYear.calculate_start_on_options %>
+							<% if f.object.start_on.present? && !plan_year_start_dates.any?{|set| set[1] == f.object.start_on.try(:to_s, :db) } %>
+								<% plan_year_start_dates << [f.object.start_on.strftime("%m/%d/%Y"), f.object.start_on.try(:to_s, :db)]%>
+							<% end %>
+							<%= f.select(:start_on, options_for_select(plan_year_start_dates, selected: f.object.start_on.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, {:class => "floatlabel custom_selectric", :prompt => true, required: true}) %>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingTwo">
+				<h3 class="panel-title">
+					<a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group" aria-expanded="true" aria-controls="quote-benefit-group">
+						Quote Benefit Groups
+					</a>
+				</h3>
+			</div>
+			<div id="quote-benefit-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
+				<div class="panel-body" id="quote-info">
+					<%= f.fields_for :quote_benefit_groups do |benefit_group| %>
+					<div class="row form-inline">
+						<div class="form-group col-sm-12">Benefit Group: <%= benefit_group.text_field :title , {size: 40, placeholder: 'Enter Benefit Group Name'} %>
+							<button type="button" data-quote-id="<%=@quote.id%>" data-benefit-group-id="<%=benefit_group.object.id%>" id="remove_benefit_group_button"  class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						</div>
+						<div>&nbsp;</div>
+					</div>
+					<% end %>
+				</div>
+			</div>
+		</div>
+
+		<div>&nbsp;</div>
+
+    <h3>Quote Roster</h3>
+
+    <p>The roster you build below will be used to estimate employee and employer costs for each benefit group.</p>
+
+		<div id="family-container">
+		<%= f.fields_for :quote_households do |qhh| %>
+			<%= render "quote_household", qhh:qhh %>
+		<% end %>
+		</div>
+</div>
+<script>
+
+disableSelectric = true;
+
+var counter= 1000;
+$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true});
+var date_handler = function() {
+	    $(this).datepicker();
+			$(this).datepicker({ dateFormat: 'dd/mm/yyyy' , maxDate: "-1D" });
+	    $(this).datepicker("show");
+	};
+
+var remove_member_handler = function(){
+	var $quote_member_id = $(this);
+	if(this.getAttribute("data-member-id") != undefined){
+
+	 $.ajax({
+        type: "POST",
+        url: "/broker_agencies/quotes/" + this.getAttribute("data-quote-id")  +"/delete_member/?member_id=" +this.getAttribute("data-member-id")+"&household_id="+this.getAttribute("data-household-id"),
+        dataType: "js",
+        data: {"_method":"post"},
+        complete: function(data){
+					if (data.responseText != "false") {
+						console.log("Deleted successfully id " + $quote_member_id.attr("data-member-id") );
+						console.log(data)
+						$quote_member_id.parent().parent().remove();
+						// Remeve the rails generated hiddent field.
+						$('[type="hidden"][value="' + $quote_member_id.attr("data-member-id") + '"]').remove();
+					}
+					else {
+						console.log("User could not be deleted.")
+					}
+        }
+    });
+		}	else{
+				$quote_member_id.parent().parent().remove();
+		}
+};
+
+$('button#remove_member_button').click(remove_member_handler);
+
+var remove_household_handler = function(){
+	if(this.getAttribute("data-household-id") != undefined){
+	 $.ajax({
+        type: "POST",
+        url: "/broker_agencies/quotes/" + this.getAttribute("data-quote-id")  +"/delete_household/?household_id=" +this.getAttribute("data-household-id"),
+        dataType: "js",
+        data: {"_method":"delete"},
+        success: function(){
+          console.log("Deleted successfully");
+        }
+    });
+	}
+  $(this).parent().parent().parent().parent().remove();
+};
+
+$('button#remove_household_button').click(remove_household_handler);
+
+
+var remove_benefit_group_handler = function(){
+	var $quote_benefit_group_id = $(this);
+	if(this.getAttribute("data-benefit-group-id") != undefined){
+	 $.ajax({
+        type: "POST",
+        url: "/broker_agencies/quotes/" + this.getAttribute("data-quote-id")  +"/delete_benefit_group/?quote_benefit_group_id=" +this.getAttribute("data-benefit-group-id"),
+        dataType: "js",
+         complete: function(data){
+					if (data.responseText != "false") {
+          	console.log("Deleted successfully");
+						$quote_benefit_group_id.parent().parent().remove();
+					}
+					else {
+						console.log("Error deleting this quote benefit group");
+					}
+        }
+    });
+	  //$(this).parent().parent().remove();
+	}
+
+};
+
+$('button#remove_benefit_group_button').click(remove_benefit_group_handler);
+
+
+function addEmployeeRowToFamily(family, idx) {
+	var relation_options = '<select class="custom_selectric" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][employee_relationship]"><option value="employee">Employee</option><option value="spouse">Spouse</option><option value="domestic_partner">Domestic partner</option><option value="child_under_26">Child</option></select>';
+	table_row = $('<div class="row form-inline">'
+								+ '<div class="form-group col-sm-3">DOB: <input type="text" class="uidatepicker" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][dob]" placeholder="Date of Birth (DOB)"/></div><div class="form-group col-sm-5">Name: <input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][first_name]" placeholder="First Name"/>&nbsp;<input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][last_name]" placeholder="Last Name"/></div><div class="form-group col-sm-3">' + relation_options + '</div>' +
+									'<div class="form-group col-sm-1"><button type="button" id="remove_member_button" data-quote-id="" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+								   + '</div>');
+									counter += 1 ;
+									$('#family-' + family).append(table_row);
+									$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true});
+									$(".uidatepicker").focus(date_handler);
+									$('button#remove_member_button').click(remove_member_handler);
+									//$('select').selectric('refresh');
+}
+
+
+var duplicate_household = function() {
+	var url = '<%= Rails.application.routes.url_helpers.edit_broker_agencies_broker_role_quote_path(@broker.id, @quote.id) %>';
+	if(confirm("Duplicate this family?")) {
+
+		url = url + "?duplicate_household=" + this.getAttribute("data-household-id") + "&num_of_dup=" + $(this).find("option").filter(":selected").text();
+		console.log(url);
+		window.location.href= url;
+	}
+};
+
+$("[id^=duplicate-family-id]").change(duplicate_household);
+
+<% if @scrollTo == 1 %>
+$(document).ready(function() {
+	$('body').scrollTop(1000);
+});
+<% end %>
+
+</script>

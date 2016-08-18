@@ -97,7 +97,7 @@ When(/^.+ visits? invitation url in email for staff$/) do
 end
 
 When(/^.+ registers? with valid information for staff$/) do
-  fill_in "user[email]", with: "jack.martin@example.com"
+  fill_in "user[oim_id]", with: "jack.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'
@@ -134,7 +134,7 @@ And(/^.+ enters broker agency information for ga flow$/) do
 end
 
 When(/^.+ registers with valid information for ga flow$/) do
-  fill_in "user[email]", with: "broker.martin@example.com"
+  fill_in "user[oim_id]", with: "broker.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'

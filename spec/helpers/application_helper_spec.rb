@@ -51,7 +51,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
 
     it "should return correct eligibility criteria" do
-      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer"
+      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer'></i>".html_safe
     end
 
   end
@@ -288,4 +288,41 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq false
     end
   end
+
+
+
+  describe "find_plan_name", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:shop_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                                        household: family.active_household,
+                                        kind: "employer_sponsored",
+                                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
+                                        created_at: TimeKeeper.datetime_of_record - 3.days
+                                )}
+    let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment,
+                                        household: family.latest_household,
+                                        coverage_kind: "health",
+                                        effective_on: TimeKeeper.datetime_of_record - 10.days,
+                                        enrollment_kind: "open_enrollment",
+                                        kind: "individual",
+                                        submitted_at: TimeKeeper.datetime_of_record - 20.days
+                            )}
+    let(:valid_shop_enrollment_id)  { shop_enrollment.id }
+    let(:valid_ivl_enrollment_id)   { ivl_enrollment.id }
+    let(:invalid_enrollment_id)     {  }
+
+    it "should return the plan name given a valid SHOP enrollment ID" do
+      expect(helper.find_plan_name(valid_shop_enrollment_id)).to eq shop_enrollment.plan.name
+    end
+
+    it "should return the plan name given a valid INDIVIDUAL enrollment ID" do
+      expect(helper.find_plan_name(valid_ivl_enrollment_id)).to eq  ivl_enrollment.plan.name
+    end
+
+    it "should return nil given an invalid enrollment ID" do
+      expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
+    end
+
+  end
+
 end

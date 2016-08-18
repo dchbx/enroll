@@ -18,9 +18,12 @@ class User
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
   validate :oim_id_rules
+  validates_uniqueness_of :email,:case_sensitive => false
   validates_presence_of     :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
+  validates_format_of :email, with: Devise::email_regexp , allow_blank: true
+  
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)

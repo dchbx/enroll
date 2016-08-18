@@ -7,3 +7,5 @@ else {
   set_tab_content("<%= escape_javascript(render "shared/brokers/applicants_index", url: exchanges_broker_applicants_path, index_url: exchanges_broker_applicants_path(status: @status)) %>");
   enableBrokerApplicantFilters();
 }
+
+$('.sep_link').hide();

@@ -1,94 +1,173 @@
 <% content_for :navigation do %>
 <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<% dependents = @census_employee.try(:employee_role).try(:person).try(:primary_family).try(:active_family_members) || @census_employee.census_dependents %>
-<% address =  @census_employee.try(:employee_role).try(:person).try(:addresses).try(:last) || @census_employee.address %>
-<div id="add_employee_action">
-  <div class="col-xs-12">
-    <h1>Census Employee Details</h1>
-    <div class="row">
-      <div class="col-xs-6">
-        <h4><%= name_to_listing(@census_employee) %>'s Details</h4>
-        <div class="form-border">
-          <p>
-            Name: <%= name_to_listing(@census_employee) %><br/>
-            DOB:  <%= format_date @census_employee.dob %><br/>
-            SSN: <%= number_to_obscured_ssn @census_employee.ssn %><br/>
-            Hired On: <%= format_date @census_employee.hired_on %><br/>
-            Date Added to Roster: <%= format_date @census_employee.created_at %><br/>
-            Owner: <%= @census_employee.try(:is_business_owner) ? "Yes" : "No" %>
-          </p>
+<%= form_for @census_employee, url: employers_employer_profile_census_employee_path(@employer_profile, @census_employee.id), method: :put do |f| %>
+<% if @census_employee.errors.any? %>
+<div class="alert alert-error">
+  <h4>
+    <%= "#{pluralize(@census_employee.errors.size, "error")} prohibited this person from being saved:" %>
+  </h4>
+  <ul>
+    <% @census_employee.errors.delete(:address) %>
+    <% @census_employee.errors.full_messages.each do |msg| %>
+    <li>
+      <%= msg %>
+    </li>
+    <% end %>
+    <% @census_employee.census_dependents.each do |dep| %>
+    <% dep.errors.full_messages.each do |msg| %>
+    <li>
+      <%= msg %>
+    </li>
+    <% end %>
+    <% end %>
+    <% if @census_employee.address.present? %>
+    <% @census_employee.address.errors.full_messages.each do |msg| %>
+    <li>
+      <%= msg %>
+    </li>
+    <% end %>
+    <% end %>
+    <% @census_employee.benefit_group_assignments.each do |bg| %>
+    <% bg.errors.full_messages.each do |msg| %>
+    <li>
+      <%= msg %>
+    </li>
+    <% end %>
+    <% end %>
+  </ul>
+</div>
+<% end %>
+<div class="census-employee module content-bottom">
+  <div class="vertically-aligned-row">
+    <h1 class="darkblue no-buffer col-xs-6">
+      <div class="row">
+        <%= @census_employee.first_name.capitalize %>
+        <%= @census_employee.last_name.capitalize %>
+      </div>
+    </h1>
+    <div class="vertically-aligned-row auto-width">
+      <div class="text-right col-xs-6">
+        <div class="row">
+          <span>Added to Roster:
+            <%= format_date @census_employee.created_at %></span>&nbsp;
+          <h5 class="label label-success census-employee-aasm <%= @census_employee.aasm_state %>">
+            <%= @census_employee.aasm_state.titleize %>
+          </h5>
         </div>
       </div>
-
-      <% if address.present? %>
-        <div class="col-xs-6">
-          <h4>Address</h4>
-          <div class="form-border">
-            <%= address.to_html %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>
+        Details
+      </h3>
+      <div class="panel panel-default module census-employee-details">
+        <div class="panel-body">
+          <div class="details">
+            <%= render 'member_fields', f: f %>
+            <%= render 'shared/census_employee_fields', {f: f} %>
           </div>
         </div>
-      <% end %>
-
-    </div>
-    <% if @hbx_enrollments.present? %>
-    <div class="row">
-      <div class="col-xs-6">
-        <% health_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health' && !enrollment.external_enrollment } %>
-        <%= render 'enrollment_details', enrollment: health_coverage if health_coverage %>
-      </div>
-      <div class="col-xs-6">
-        <% dental_coverage = @hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental' && !enrollment.external_enrollment } %>
-        <%= render 'enrollment_details', enrollment: dental_coverage if dental_coverage %>
       </div>
     </div>
-    <% end %>
-    <div class="row">
-      <div class="col-xs-6">
-        <h4>Dependents</h4>
-        <div class="form-border">
-          <% if dependents.present? %>
-          <table style='width:100%;'>
-
-            <% dependents.each do |dependent|
-              relationship = dependent.try(:relationship) || dependent.try(:employee_relationship)
-              if relationship == "self"%>
-            <% else %>
-              <tr>
-                <th>Name</th>
-                <th>DOB</th>
-                <th>Relationship</th>
-                <th>Gender</th>
-              </tr>
-            <tr>
-              <td>
-                <%= dependent.first_name + " " + dependent.last_name %>
-              </td>
-              <td>
-                <%= format_date dependent.dob %>
-              </td>
-              <td>
-                <%= relationship == "child_under_26" ? "child" : relationship %>
-              </td>
-              <td>
-                <%= dependent.gender %>
-              </td>
-            </tr>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-sm-12">
+      <h3>
+        <%= @census_employee.address.kind.capitalize if @census_employee.address.present?  %>
+        Address
+      </h3>
+      <div class="panel panel-default module census-employee-address">
+        <div class="panel-body">
+          <div class="address">
+            <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
+            <%= render 'address_fields', f: address %>
             <% end %>
-            <% end %>
-          </table>
-
-          <% else %>
-            <h4>You currently have no dependents.</h4>
-          <% end %>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="col-xs-12 row">
-      <br/>
-      <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), class: 'btn btn-default return_to_employee_roster', "aria-expanded" => "true" %>
+    <div class="col-md-6 col-sm-12">
+      <h3>
+        Email
+      </h3>
+      <div class="panel panel-default module census-employee-email">
+        <div class="panel-body">
+          <div class="email">
+            <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
+            <%= render 'email_fields', f: email %>
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>
+        <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
+      </h3>
+      <% if @census_employee.census_dependents.present? && @census_employee.census_dependents.all?(&:valid?) %>
+        <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
+          <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
+        <% end %>
+      <% else %>
+      <div class="vertically-aligned-row">
+        <h4 class="add-dependent-text">Click "Add Dependent" to add a dependent</h4>
+        <%= render 'shared/add_dependents', { f: f } %>
+      </div>
+      <% end %>
     </div>
-    <span class="clear-fix">&nbsp;</span>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>
+        Health Enrollment
+      </h3>
+      <% if @census_employee.active_benefit_group_assignment.present? %>
+      <% if (@census_employee.active_benefit_group_assignment.hbx_enrollments.detect{ |enrollment| enrollment.coverage_kind == 'health' }) %>
+      <%= render partial: "insured/families/enrollment", locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health'}} %>
+      <% else %>
+      <h4>
+        <%= @census_employee.first_name.capitalize %>
+        <%= @census_employee.last_name.capitalize %>
+        hasn't enrolled in health coverage
+      </h4>
+      <% end %>
+      <% end %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>
+        Dental Enrollment
+      </h3>
+      <% if @census_employee.active_benefit_group_assignment.present? %>
+      <% if (@census_employee.active_benefit_group_assignment.hbx_enrollments.detect{ |enrollment| enrollment.coverage_kind == 'dental' }).present? %>
+      <%= render partial: "insured/families/enrollment", locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental'}} %>
+      <% else %>
+      <h4>
+        <%= @census_employee.first_name.capitalize %>
+        <%= @census_employee.last_name.capitalize %>
+        hasn't enrolled in dental coverage
+      </h4>
+      <% end %>
+      <% end %>
+    </div>
+  </div>
+  <br/>
+  <br/>
+  <div class="vertically-aligned-row">
+    <div class="text-left">
+      <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), class: 'btn btn-default btn-lg return_to_employee_roster', "aria-expanded" => "true" %>
+    </div>
+    <div class="text-right">
+      <button class="btn btn-primary btn-lg" type="submit">
+        <%= "Update Employee".html_safe %>
+      </button>
+    </div>
+  </div>
+  <% end %>
 </div>

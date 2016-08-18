@@ -1,0 +1,5 @@
+$('.injected-custom-filter').html("<%= escape_javascript(render partial: 'datatables/custom_dates') %>");
+$('.injected-custom-filter').slideDown();
+$('.btn-group.first-level a, .btn-group.btn-group-second a').on('click', function() {
+  $(this).closest('.module').find('.injected-custom-filter').html("");
+});

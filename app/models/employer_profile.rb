@@ -16,11 +16,12 @@ class EmployerProfile
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
+  ENROLLED_STATE = %w(enrolled suspended)
+
   PROFILE_SOURCE_KINDS  = ["self_serve", "conversion"]
 
   INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
   INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
-
 
   field :entity_kind, type: String
   field :sic_code, type: String
@@ -75,7 +76,7 @@ class EmployerProfile
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
-  scope :all_renewing, ->{ Organization.all_employers_renewing }
+  scope :all_renewing, ->{ Organization.employer_profiles_renewing }
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
 
   alias_method :is_active?, :is_active
@@ -194,7 +195,6 @@ class EmployerProfile
   end
 
   def hire_general_agency(new_general_agency, broker_role_id = nil, start_on = TimeKeeper.datetime_of_record)
-
     # commented out the start_on and terminate_on
     # which is same as broker calculation, However it will cause problem
     # start_on later than end_on
@@ -330,6 +330,68 @@ class EmployerProfile
 
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
+  end
+
+  def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
+    quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
+
+    # Perform quote link if claim_code is valid
+    if quote.present? && !quote_claim_code.blank? && quote.published?
+
+      plan_year = self.plan_years.build({
+        start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, end_on: ((TimeKeeper.date_of_record + 2.months).beginning_of_month + 1.year) - 1.day,
+        open_enrollment_start_on: TimeKeeper.date_of_record, open_enrollment_end_on: (TimeKeeper.date_of_record + 1.month).beginning_of_month + 9.days,
+        fte_count: quote.member_count
+        })
+
+      benefit_group_mapping = Hash.new
+
+      # Build each quote benefit group
+      quote.quote_benefit_groups.each do |quote_benefit_group|
+        benefit_group = plan_year.benefit_groups.build({plan_option_kind: quote_benefit_group.plan_option_kind, title: quote_benefit_group.title, description: "Linked from claim code " + quote_claim_code })
+
+        # map quote benefit group to newly created plan year benefit group so it can be assigned to census employees if imported
+        benefit_group_mapping[quote_benefit_group.id.to_s] = benefit_group.id
+
+        # Assign benefit group plan information
+        benefit_group.lowest_cost_plan_id = quote_benefit_group.published_lowest_cost_plan
+        benefit_group.reference_plan_id = quote_benefit_group.published_reference_plan
+        benefit_group.highest_cost_plan_id = quote_benefit_group.published_highest_cost_plan
+        benefit_group.elected_plan_ids.push(quote_benefit_group.published_reference_plan)
+
+        benefit_group.relationship_benefits = quote_benefit_group.quote_relationship_benefits.map{|x| x.attributes.slice(:offered,:relationship, :premium_pct)}
+      end
+
+      if plan_year.save!
+
+        quote.claim!
+
+        if import_census_employee == true
+          quote.quote_households.each do |qhh|
+            qhh_employee = qhh.employee
+            if qhh.employee.present?
+                quote_employee = qhh.employee
+                ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
+                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s))
+
+                qhh.dependents.each do |qhh_dependent|
+                  ce.census_dependents << CensusDependent.new(
+                    last_name: qhh_dependent.last_name, first_name: qhh_dependent.first_name, dob: qhh_dependent.dob, employee_relationship: qhh_dependent.employee_relationship
+                    )
+                end
+                ce.save(:validate => false)
+            end
+          end
+        end
+
+        return true
+
+      end
+
+    end
+
+    return false
+
   end
 
   ## Class methods
@@ -469,13 +531,13 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
-        employer_enroll_factory = Factories::EmployerEnrollFactory.new
-        employer_enroll_factory.date = new_date
+        # employer_enroll_factory = Factories::EmployerEnrollFactory.new
+        # employer_enroll_factory.date = new_date
 
-        organizations_for_plan_year_begin(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.begin
-        end
+        # organizations_for_plan_year_begin(new_date).each do |organization|
+        #   employer_enroll_factory.employer_profile = organization.employer_profile
+        #   employer_enroll_factory.begin
+        # end
 
         organizations_for_plan_year_end(new_date).each do |organization|
           employer_enroll_factory.employer_profile = organization.employer_profile
@@ -576,7 +638,7 @@ class EmployerProfile
     state :binder_paid, :after_enter => :notify_binder_paid
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
-  state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
+    state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
     state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
 
     event :advance_date do

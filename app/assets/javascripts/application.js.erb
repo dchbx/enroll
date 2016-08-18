@@ -34,14 +34,24 @@
 //= require consumer_role
 //= require plan_year_selection
 //= require bootstrap-slider
+//= require aptc
+//= require hints
 //= require announcement
 //= require bootstrap-hooks
 //= require general_agency
+//= require datatables_scope_map
 //= require dataTables/jquery.dataTables
+//= require enrolldatatables
+//= require dataTables/dataTables.select.min.js
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require enroll_datatables_initializer
 //= require freebies
 //= require responsive
+//= require react
+//= require react_ujs
 //= require_tree .
+
+var disableSelectric = false;
 
 $(document).on('ready page:load', function () {
 	Freebies.allFreebies();
@@ -50,12 +60,12 @@ $(document).on('ready page:load', function () {
 
 function applyMultiLanguageSelect() {
   $('#broker_agency_language_select').multiselect({
-    nonSelectedText: 'Select Language',
+    nonSelectedText: 'Select Plans',
     maxHeight: 300
   });
   $('#broker_agency_language_select').multiselect('select', 'en', true);
   $('#broker_agency_language_select').on('selectric-init', function(element){
-    $('.language_multi_select .selectric-interaction-field-control-broker-agency-languages-spoken').hide();
+    $('.selectric-interaction-field-control-broker-agency-languages-spoken').hide();
   });
 };
 
@@ -195,7 +205,7 @@ $(document).ready(function () {
   });
 
   // details toggler
-  $('.details').toggleClick(function () {
+  $('.benefitgroup .details').toggleClick(function () {
     $(this).closest('.referenceplan').find('.plan-details').slideDown();
     $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
   }, function () {
@@ -529,6 +539,7 @@ $(document).ready(function () {
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
+  $(".mask-csl").mask("9999999999");
 
   $(document).on('focusout', "#person_ssn, .mask-ssn", function(){
     var ssn_val = $(this).val();
@@ -775,3 +786,22 @@ $(document).on('click', '#address_info + span.form-action', function(){
     $('.mailing-div .label-floatlabel').hide();
   }
 });
+
+
+  //toggling of divs that show APTC Enrollments
+  $('.nav-toggle').click(function(){
+    //get collapse content selector
+    var collapse_content_selector = $(this).attr('href');
+
+    //make the collapse content to be shown or hide
+    var toggle_switch = $(this);
+    $(collapse_content_selector).slideToggle('fast', function(){
+      if($(this).css('display')=='none'){
+        toggle_switch.html('View Enrollment(s) <i class="fa fa-chevron-down fa-lg">');
+        //$(collapse_content_selector).animate({top: "0px"}, 500);
+      }else{
+        toggle_switch.html('Hide Enrollment(s) <i class="fa fa-chevron-up fa-lg">');
+        //$(collapse_content_selector).animate({top: "0px"}, 500);
+      }
+    });
+  });

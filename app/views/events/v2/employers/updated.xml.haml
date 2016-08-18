@@ -24,7 +24,7 @@
       %sic_code= employer.sic_code
     - if employer.broker_agency_accounts.present?
       %brokers
-        = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts
+        = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts, :locals => { :employer_profile => employer }
     - plan_years = employer.plan_years.select(&:eligible_for_export?)
     - if plan_years
       %plan_years

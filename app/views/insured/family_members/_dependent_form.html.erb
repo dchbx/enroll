@@ -80,7 +80,6 @@
             <div class="col-xs-2">
             </div>
         </div>
-
         <div class="col-md-3 col-sm-3 no-pd">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
             <div class="radio">
@@ -96,13 +95,11 @@
           </div>
         </div>
       </div>
-
-        <div class="row row-form-wrapper no-buffer">
-          <div class="form-group form-group-lg">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *"} %>
-          </div>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="form-group form-group-lg">
+          <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *"} %>
         </div>
-
+      </div>
       <% if @person.has_active_consumer_role? %>
       <br>
         <%= render 'shared/consumer_fields', f: f %>

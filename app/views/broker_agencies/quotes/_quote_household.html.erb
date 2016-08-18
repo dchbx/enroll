@@ -1,0 +1,33 @@
+<div id="family-panel">
+  <div class="panel panel-default">
+		<div class="panel-heading">
+      <div class="row">
+				<div class="col-md-3">Family Id: <%= qhh.text_field :family_id, { size: 2} %></div>
+        <div class="col-md-3"><%= qhh.collection_select :quote_benefit_group_id, @quote_benefit_group_dropdown, :id, :title, {}, {:class => "floatlabel custom_selectric", :prompt => true}   %></div>
+				<div class="col-md-3"><button type="button" class="btn btn-default" aria-label="Left Align" onclick="addEmployeeRowToFamily('<%=qhh.object.id.to_s%>','<%= qhh.index %>')">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span> Add member to this family
+				</button>
+			</div>
+			<div class="col-md-2">
+				<% if qhh.object.persisted? %><select id="duplicate-family-id-<%=qhh.object.id%>" data-household-id="<%= qhh.object.id %>" class="custom_selectric"><option>Duplicate this family by:</option><option value="3">3</option><option value="5">5</option><option value="10">10</option></select><% end %>
+			</div>
+			<div class="col-md-1">
+				<button type="button" data-household-id="<%=qhh.object.id%>" data-quote-id="<%=@quote.id%>" id="remove_household_button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+    </div>
+		</div>
+		<div id="col<%= qhh.object.id.to_s %>" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading<%= qhh.object.id.to_s %>">
+			<div class="panel-body" id="family-<%= qhh.object.id.to_s %>">
+				<%= qhh.fields_for :quote_members do |qm| %>
+				<div class="row form-inline">
+					<div class="form-group col-sm-3">DOB: <%= qm.text_field :dob , {:class => "uidatepicker", placeholder: "Date of Birth (DOB)" } %></div>
+					<div class="form-group col-sm-5">Name: <%= qm.text_field :first_name, {size: 20, placeholder: 'First Name'} %>&nbsp;<%= qm.text_field :last_name, {size: 20, placeholder: 'Last Name'} %></div>
+					<div class="form-group col-sm-3"><%= qm.select(:employee_relationship, [['Employee','employee'], ['Spouse','spouse'], ['Domestic partner','domestic_partner'],['Child','child_under_26']], {}, {:class => "floatlabel custom_selectric"})  %></div>
+					<div class="form-group col-sm-1"><button type="button" data-household-id="<%=qhh.object.id%>" data-quote-id="<%=@quote.id%>" data-member-id="<%=qm.object.id%>" id="remove_member_button"  class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+				</div>
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>
+<div>&nbsp;</div>

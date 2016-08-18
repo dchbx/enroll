@@ -4,6 +4,7 @@ require 'spec_helper'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
+require 'faker'
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

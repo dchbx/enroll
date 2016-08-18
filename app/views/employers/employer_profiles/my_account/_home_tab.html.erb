@@ -1,4 +1,4 @@
-<div class="module home-tab content-bottom">
+<div class="module home-tab">
   <h1>My Health Benefits Program</h1>
   <% if @current_plan_year.present? %>
 <!--<div class="panel panel-default alert" id="panelOne">
@@ -16,7 +16,7 @@
   </div>
 -->
 <% end %>
-<div class="col-md-8">
+<div class="col-md-8 content-bottom">
   <div class="row">
     <% if @current_plan_year.present? %>
     <div class="panel panel-default alert" id="panelOne">
@@ -406,3 +406,10 @@
     <% end %>
   </div>
 </div>
+<% if !@current_plan_year.present? %>
+<div class="row">
+  <div class="col-xs-4">
+    <%= render partial: 'employers/employer_profiles/employer_broker_widget' %>
+  </div>
+</div>
+<% end %>

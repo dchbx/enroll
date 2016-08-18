@@ -12,10 +12,10 @@ module Factories
       # excluded_states = %w(coverage_canceled, coverage_terminated unverified renewing_passive
       #                       renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
       #                     )
-      # shop_enrollments = @family.enrollments.shop_market.reduce([]) { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e } 
+      # shop_enrollments = @family.enrollments.shop_market.reduce([]) { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e }
 
-      ## Works only for data migrated into Enroll 
-      ## FIXME add logic to support Enroll native renewals 
+      ## Works only for data migrated into Enroll
+      ## FIXME add logic to support Enroll native renewals
 
       return true if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
 
@@ -42,7 +42,7 @@ module Factories
           save_renewal_enrollment(renewal_enrollment, active_enrollment)
         end
       end
-     
+
       return @family
     end
 
@@ -79,7 +79,6 @@ module Factories
       renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
       renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
-  
       renewal_enrollment.waiver_reason = waived_enrollment.try(:waiver_reason) || "I do not have other coverage"
       renewal_enrollment.renew_waived
 
@@ -126,7 +125,7 @@ module Factories
     end
 
     def assign_common_attributes(active_enrollment, renewal_enrollment)
-      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id 
+      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id
           writing_agent_id original_application_type kind special_enrollment_period_id
         )
       common_attributes.each do |attr|
@@ -172,15 +171,15 @@ module Factories
       # Set the HbxEnrollment to proper state
 
       # Renew waiver status
-      if active_enrollment.is_coverage_waived? 
+      if active_enrollment.is_coverage_waived?
         renewal_enrollment.waiver_reason = active_enrollment.waiver_reason
-        renewal_enrollment.waive_coverage 
+        renewal_enrollment.waive_coverage
       end
 
       renewal_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment)
       renewal_enrollment
     end
-      
+
     def clone_enrollment_members(active_enrollment)
       hbx_enrollment_members = active_enrollment.hbx_enrollment_members
       hbx_enrollment_members.reject!{|hbx_enrollment_member| !hbx_enrollment_member.is_covered_on?(@plan_year_start_on - 1.day)  }
@@ -208,7 +207,7 @@ module Factories
     end
 
   end
-  
+
   class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
 

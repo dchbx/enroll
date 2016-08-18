@@ -8,6 +8,13 @@
 
   <style type="text/css">
 
+  @font-face {
+    font-family: 'NimbusTimesRoman';
+    font-style: normal;
+    font-weight: 300;
+    src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype')
+  }
+
   body {
     width:100%!important;
     -webkit-text-size-adjust:100%;
@@ -17,14 +24,14 @@
     mso-line-height-rule:exactly
     font-size:10px;
     color:rgb(0,0,0);
-    font-family: "Times New Roman", Times, serif;
+    font-family: "NimbusTimesRoman", Times, serif;
     margin-top: 17px;
   }
 
   table td {
     border-collapse:collapse;
     font-size:10px;
-    font-family: "Times New Roman", Times, serif;
+    font-family: "NimbusTimesRoman", Times, serif;
   }
   table {
     border-collapse: collapse;

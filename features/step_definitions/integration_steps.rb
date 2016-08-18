@@ -354,7 +354,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
 
   person = people[named_person]
 
-  fill_in "user[email]", :with => person[:email]
+  fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
   screenshot("create_account")
@@ -448,7 +448,9 @@ Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link "Add Member"
+  within("#dependent_buttons") do
+    click_link "Add Member"
+  end
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -456,7 +458,7 @@ Then(/^.+ should see the new dependent form$/) do
   expect(page).to have_content('Confirm Member')
 end
 
-When(/^.+ enters? the dependent info of Sorens daughter$/) do 
+When(/^.+ enters? the dependent info of Sorens daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
@@ -507,7 +509,7 @@ Then(/^.+ should see the plan shopping page with no dependent$/) do
 end
 
 Then(/^.+ should see the plan shopping page with one dependent$/) do
-  expect(page).to have_content("Soren White + 1 Dependent")
+  expect(page).to have_content("Soren White + 1")
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
@@ -666,7 +668,7 @@ end
 Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+  click_button "Continue"
 end
 
 Then(/^I should see the dependents and group selection page$/) do

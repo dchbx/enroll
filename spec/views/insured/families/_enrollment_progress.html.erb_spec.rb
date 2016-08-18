@@ -20,8 +20,4 @@ RSpec.describe "insured/families/_enrollment_progress.html.erb" do
     #expect(rendered).to have_selector("label", text:"66% Complete")
   end
 
-  it "should not display title" do
-    #expect(rendered).to have_selector('h4', text: /coverage selected/i )
-    expect(rendered).to have_selector('h4', text: "")
-  end
 end

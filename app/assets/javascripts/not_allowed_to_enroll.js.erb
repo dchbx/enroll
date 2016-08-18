@@ -22,8 +22,14 @@ function ineligible_alert(){
       var ending = " is not eligible to purchase a plan on <%= Settings.site.short_name %>. Other family members may still be eligible to enroll."
       alert("Since " + name + beginning + pronoun + ending)
 }
+function is_non_dc_resident_and_checked(){
+  if(!$("#no_dc_address").is(':checked') && $('#state_id').val() != 'DC'){
+    alert('You have selected a Non DC state, please check No DC Address');
+  }
+}
 
 $(document).on('click', '.consumer_roles .edit_person .right-section .btn', function(){
+  is_non_dc_resident_and_checked();
   var valid_form = $('form')[0].checkValidity()
   if (valid_form) {
     if (ineligible_immigration() || ineligible_incarcerated())  ineligible_alert()

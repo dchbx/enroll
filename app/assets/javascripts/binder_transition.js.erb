@@ -1,7 +1,7 @@
 var binderTransition = ( function( window, undefined ) {
 
 function binder_transition_checkboxes () {
-  var table = $('#binder-transition-dataTable').DataTable();
+  var table = $('#binder-transition-dataTable').EnrollDataTable();
   var rowCount = $("#binder-transition-dataTable > tbody > tr").length;
   //checking with one because, we display a row with text "no data available" if there are no rows
   if(rowCount == 1){

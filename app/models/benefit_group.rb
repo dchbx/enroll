@@ -350,6 +350,7 @@ class BenefitGroup
   def monthly_min_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
+
       if coverage_kind == 'dental'
         pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
       else
@@ -441,7 +442,7 @@ class BenefitGroup
   end
 
   ## Conversion employees are not allowed to buy coverage through off-exchange plan year
-  def valid_plan_year    
+  def valid_plan_year
     if employer_profile.is_coversion_employer?
       plan_year.coverage_period_contains?(employer_profile.registered_on) ? plan_year.employer_profile.renewing_plan_year : plan_year
     else

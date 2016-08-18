@@ -3,6 +3,6 @@
   "recordsTotal" : <%= @total_records %>,
   "recordsFiltered" : <%= @records_filtered %>,
   "data" : [
-    <%= render partial: "outstanding_verification_family", collection: @families, spacer_template: "shared/json_array_spacer" %>
+    <%= render partial: "datatables/quotes", collection: @quotes, as: 'quote', spacer_template: "shared/json_array_spacer" %>
   ]
 }

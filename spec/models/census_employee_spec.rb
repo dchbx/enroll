@@ -296,6 +296,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                             end
                           end
 
+                          context "and the termination date is in the future" do
+                              before { initial_census_employee.terminate_employment!(TimeKeeper.date_of_record + 10.days) }
+                              it "is in termination pending state" do
+                                expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
+                              end
+                          end
+
                           context "and the termination date is within the retroactive reporting time period" do
                             before { initial_census_employee.terminate_employment!(earliest_valid_employment_termination_date) }
 
@@ -542,7 +549,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
               context "and existing employee instance is terminated" do
                 before do
-                  saved_census_employee.terminate_employment(TimeKeeper.date_of_record)
+                  saved_census_employee.terminate_employment(TimeKeeper.date_of_record-1.day)
                   saved_census_employee.save
                 end
 
@@ -1065,4 +1072,38 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
   end
+
+
+  context 'editing a CensusEmployee SSN/DOB that is in a linked status' do
+    let(:census_employee)     { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1977-01-01'.to_date, ssn: '123456789') }
+    let(:person)              { FactoryGirl.create(:person,          first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '314159265') }
+
+    let(:user)          { double("user") }
+    let(:employee_role) {FactoryGirl.create(:employee_role)}
+
+
+    it 'should allow Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
+      allow(user).to receive(:has_hbx_staff_role?).and_return true # Admin
+      allow(person).to receive(:employee_roles).and_return [employee_role]
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(census_employee).to receive(:aasm_state).and_return "employee_role_linked"
+      CensusEmployee.update_census_employee_records(person, user)
+      expect(census_employee.ssn).to eq person.ssn
+      expect(census_employee.dob).to eq person.dob
+    end
+
+    it 'should NOT allow Non-Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
+      allow(user).to receive(:has_hbx_staff_role?).and_return false # Non-Admin
+      allow(person).to receive(:employee_roles).and_return [employee_role]
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(census_employee).to receive(:aasm_state).and_return "employee_role_linked"
+      CensusEmployee.update_census_employee_records(person, user)
+      expect(census_employee.ssn).not_to eq person.ssn
+      expect(census_employee.dob).not_to eq person.dob
+    end
+
+  end
+
+
+
 end

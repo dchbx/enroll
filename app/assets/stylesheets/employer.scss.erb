@@ -1,5 +1,137 @@
 @import "variables";
+.census-employee-add {
+  .module {
+    &.census-employee-dependents {
+      .panel-body {
+        padding: 0;
+        .row-form-wrapper:first-of-type {
+          border-top: 0;
+        }
+        .row-form-wrapper:last-of-type {
+          border-bottom: 0;
+        }
+        * {
+          border-left: 0;
+          border-right: 0;
+        }
+      }
+    }
+    &.census-employee-fields {
+      .row-form-wrapper:first-of-type {
+        border-top: 0;
+      }
+    }
+  }
+}
+.census-employee {
+  .vertically-aligned-row:first-of-type {
+    .vertically-aligned-row {
+      h4, h5 {
+        display: inline;
+      }
+    }
+  }
+  .census-employee-aasm {
+    font-size: 100%;
+  }
+  .module {
+    .panel-body {
+      border: 0;
+      .row-form-wrapper {
+        border-left: 0;
+        border-right: 0;
+      }
+      .row-form-wrapper:last-of-type {
+      }
+      .row-form-wrapper:first-of-type, #email_info {
+        border-top: 0;
+      }
+    }
+    &.census-employee-details {
+      .panel-body {
+        padding: 0;
+      }
+      .panel-heading {
+        background-image: none;
+        background-color: transparent;
+        .panel-title {
+          color: $primary-blue;
+        }
+      }
+    }
+    &.census-employee-fields {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper {
+        border-bottom: 0;
+      }
+    }
+    &.census-employee-address {
+      .panel-body {
+        padding: 0;
+      }
+      .address {
+        .row-form-wrapper:first-of-type {
+          display: none;
+        }
+        .row-form-wrapper:last-of-type {
+          border-bottom: none;
+        }
+      }
+    }
+    &.census-employee-email {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper:last-of-type {
+        border-bottom: none;
+      }
+    }
+    &.census-employee-dependents {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper:last-of-type {
+        border-bottom: none;
+      }
+    }
+    &.hbx-enrollment-panel {
+      .panel-body {
+        padding-bottom: 15px;
+      }
+      .panel-footer {
+        padding-bottom: 15px;
+      }
+    }
+  }
+  .form-inputs {
+    display: block;
+    .add_fields {
+      float: right;
+    }
+    .btn-default.return_to_employee_roster {
+      display: none;
+    }
+    span {
+      clear: both;
+    }
+  }
+}
 .module {
+  &.broker {
+    .panel-body, .panel-footer {
+      .fa {
+        color: $primary-blue;
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        > * {
+          vertical-align: top;
+        }
+      }
+    }
+  }
   &.home-tab {
     .plan-details {
       border-top: none !important;
@@ -11,6 +143,8 @@
       .panel:first-of-type {
         border-bottom: none !important;
         padding: 15px;
+        padding-bottom: 0;
+        margin-bottom: -10px !important;
         .col-xs-6 .title {
           font-size: 18px;
         }
@@ -108,13 +242,12 @@
         margin-bottom: 15px;
       }
       .health {
-        padding-top: 10px;
         .fa {
           margin: 0;
         }
       }
       .dental {
-        padding-top: 15px;
+        padding-top: 10px;
         .fa {
           margin: 0;
         }

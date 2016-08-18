@@ -15,6 +15,8 @@ class EligibilityDetermination
       "csr_94"  => "06",
       "csr_87"  => "05",
       "csr_73"  => "04",
+      "csr_0"   => "02",
+      "limited" => "03"
     }
   CSR_KIND_TO_PLAN_VARIANT_MAP.default = "01"
 
@@ -36,6 +38,9 @@ class EligibilityDetermination
 
   # DEPRECATED - use determined_at
   field :determined_on, type: DateTime
+
+  # Source will tell who determined / redetermined eligibility. Eg: Curam or Admin
+  field :source, type: String
 
   before_validation :set_premium_credit_strategy, :set_determined_at
 

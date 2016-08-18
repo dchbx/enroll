@@ -72,6 +72,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
+    vlp_docs_clean(@docs_owner)
   end
 
   def get_document(key)

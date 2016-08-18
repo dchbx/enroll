@@ -1,84 +1,284 @@
 .module {
-  &#employers_dataTable_wrapper,
-  #families_dataTable_wrapper,
-  #binder-transition-dataTable_wrapper,
-  #verification-dataTable_wrapper {
-    .small-6 {
-      width: 50%;
-      &:first-of-type {
-        float: left;
-        .selectric {
-          height: 30px;
-          position: relative;
-          p {
-            position: relative;
-            &.label {
-              top: 4px;
-              height: auto !important;
-              line-height: normal !important;
-            }
-          }
-          .button {
-            top: -6px;
-          }
-        }
-        span {
-          position: relative;
-          top: 5px;
-          left: 8px;
-        }
-      }
-      &:last-of-type {
-        float: right;
-        input.form-control {
-          padding-top: 5px !important;
-        }
-        span.search {
-          position: relative;
-          top: 3px;
-        }
-      }
-    }
-    div.dataTables_length label {
-      font-weight: normal;
-      text-align: left;
-      white-space: nowrap;
-    }
-    ​ div.dataTables_length select {
-      width: 75px;
-      display: inline-block;
-    }
-    ​ div.dataTables_filter input {
-      height: 30px;
-    }
-    ​ div.dataTables_filter {
-      text-align: right;
-    }
-    ​ div.dataTables_filter label {
-      font-weight: normal;
-      white-space: nowrap;
-      text-align: left;
-    }
-    ​ div.dataTables_filter input {
-      margin-left: 0.5em;
-      display: inline-block;
-      width: auto;
-    }
-    ​ div.dataTables_info {
-      padding-top: 8px;
-      white-space: nowrap;
-      text-align: right;
-    }
-    ​ div.dataTables_paginate {
-      margin: 20px;
-      white-space: nowrap;
+  .page-loading {
+    padding-top: 5%;
+    width: 100%;
+    text-align: center;
+    .fa {
+      color: $primary-blue;
     }
   }
-}
-.dataTables_info {
-  text-align: right;
-}
-
-.dataTables_paginate {
-  text-align: center !important;
+  .datatable {
+    opacity: 0;
+    .datatable-header {
+      &.vertically-aligned-row {
+        h1 {
+          width: 50%;
+        }
+        .search {
+          width: 40%;
+          .input-group > input {
+            box-sizing: border-box;
+          }
+        }
+      }
+    }
+    .dataTables_processing {
+      width: 100%;
+      text-align: center;
+      position: absolute;
+      display: none;
+      top: 40%;
+      border: none;
+      background-color: transparent;
+      z-index: 55555;
+      div {
+        background-color: $primary-white;
+        padding: 5%;
+        width: 50%;
+        margin: auto;
+      }
+      .fa {
+        color: $primary-blue;
+      }
+    }
+    .first-level {
+      margin: 0 0 0.675%;
+    }
+    .btn-group-second {
+      margin: 0 0 0.75%;
+      a.second-level {
+        font-size: 12px;
+      }
+    }
+    .second-level-dropdown button {
+      font-size: 12px;
+    }
+    .injected-custom-filter {
+      display: none;
+      .date-picker {
+        font-family: FontAwesome;
+        font-size: 14px !important;
+        color: #555555;
+        border: solid 1px #b7b7b7;
+        border-radius: 4px;
+      }
+      .btn-primary {
+        margin-top: -2px;
+      }
+      h4 {
+        margin-bottom: 0.675%;
+      }
+    }
+    .select-all {
+      padding-left: 6px;
+    }
+    .even {
+      background-color: $primary-white;
+    }
+    th,
+    tr {
+      background-color: $primary-white;
+    }
+    .table {
+      margin-top: 0.675%;
+      margin-bottom: 0;
+    }
+    .table-responsive {
+      position: relative;
+    }
+    .table-responsive + .footer {
+      margin-top: 1.5%;
+    }
+    .table > tbody > tr {
+      &.odd {
+        &.shown {
+          + tr {
+            background-color: $primary-white;
+            table,
+            table tr {
+              background-color: $primary-white;
+            }
+          }
+          + tr:hover {
+            table,
+            table tr {
+              background-color: $primary-white;
+            }
+          }
+        }
+      }
+      &.even {
+        &.shown {
+          + tr {
+            background-color: #f9f9f9;
+            table,
+            table tr {
+              background-color: #f9f9f9;
+            }
+          }
+          + tr:hover {
+            table,
+            table tr {
+              background-color: #f9f9f9;
+            }
+          }
+        }
+      }
+      &.child-row {
+        background-color: $primary-white;
+      }
+    }
+    .table > tbody > tr > td {
+      vertical-align: middle;
+      &.dt-right {
+        text-align: right;
+      }
+      &.dt-left {
+        text-align: left;
+      }
+      &.dt-center {
+        text-align: center;
+      }
+      .fa-info-circle {
+        cursor: pointer;
+      }
+    }
+    .table > thead > tr > th {
+      vertical-align: middle;
+      text-transform: uppercase;
+      text-align: center;
+      &:focus {
+        outline-color: transparent;
+        outline-style: none;
+      }
+      .fa-caret-up,
+      .fa-caret-down {
+        color: $primary-gray;
+        display: block;
+      }
+      &.sorting {
+        cursor: pointer;
+        &:hover {
+          .fa {
+            color: $primary-blue;
+          }
+        }
+      }
+      &.sorting_asc {
+        .fa-caret-up {
+          color: $primary-blue;
+        }
+        cursor: pointer;
+      }
+      &.sorting_desc {
+        .fa-caret-down {
+          color: $primary-blue;
+        }
+        cursor: pointer;
+      }
+      &.dt-right {
+        text-align: right;
+      }
+      &.dt-left {
+        text-align: left;
+      }
+      &.dt-center {
+        text-align: center;
+      }
+    }
+    .vertically-aligned-row > .vertically-aligned-row {
+      width: 50%;
+    }
+    .vertically-aligned-row.header {
+      .select-all {
+        width: 25%;
+      }
+      .dropdown {
+        width: 40%;
+      }
+      > .vertically-aligned-row {
+        width: 75%;
+      }
+      .col-xs-2 {
+        width: 10%;
+      }
+    }
+    .table-length,
+    .dataTables_length {
+      display: inline;
+      font-size: 14px;
+      > label {
+        margin-bottom: 0;
+        width: 8.75%;
+        min-width: 60px;
+        padding-left: 1.5%;
+        .selectric {
+          background-color: transparent !important;
+          height: auto;
+          p.label {
+            padding: 0;
+            margin-bottom: 0;
+          }
+          b.button {
+            top: 6px;
+          }
+          p.label,
+          b.button {
+            line-height: 1;
+            height: auto;
+          }
+        }
+      }
+    }
+    .dataTables_length {
+      background-color: $primary-white;
+      margin: 0 2.5%;
+      padding: 0.675%;
+      border-radius: 4px;
+      width: 100%;
+    }
+    .dataTables_filter {
+      input {
+        padding: 0 10px;
+        margin-left: 2.5%;
+        width: 50%;
+      }
+      label {
+        width: 100%;
+        font-size: 14px;
+        font-weight: normal;
+      }
+    }
+    .row-actions {
+      display: table-cell;
+      vertical-align: middle;
+      .fa {
+        color: $primary-blue;
+      }
+      & > * {
+        display: table-cell;
+      }
+    }
+    .footer {
+      margin-top: 1.5%;
+      .combined-length-info.vertically-aligned-row {
+        display: table;
+        width: 100%;
+      }
+      .dataTables_paginate {
+        display: none;
+      }
+      .select-all.vertically-aligned-row {
+        display: table;
+        width: 100%;
+        margin-bottom: 0.675%;
+      }
+      .dataTables_info {
+        text-align: right;
+      }
+      .dataTables_paginate {
+        text-align: center !important;
+      }
+    }
+  }
 }

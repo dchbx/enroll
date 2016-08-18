@@ -1,56 +1,49 @@
-  <h4><%= enrollment.coverage_kind.capitalize %> Plan</h4>
-  <div class="form-border">
-    <p>Benefit Group: <%= @benefit_group.try(:title) %></p>
-    <% if enrollment.is_coverage_waived? %>
-    <p>Enrollment Status: Coverage Waived</p>
-    <p>Waiver Reason: <%= enrollment.waiver_reason %></p>
-    <% else %>
-      <p>Plan Name: <%= enrollment.try(:plan).try(:name) %></p>
-      <p>Plan Start: <%= enrollment.try(:effective_on) %></p>
-      <% if @census_employee.employee_role.present? && employee_role = @census_employee.employee_role %>
-        <p>Hired: <%= @census_employee.employee_role.try(:hired_on) %></p>
-      <% end %>
-  </div>
-
-  <div class="table-border table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Relationship</th>
-          <th>Age</th>
-          <th>Premium</th>
-          <th>Employer Contribution</th>
-          <th>You Pay</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @plan = enrollment.decorated_hbx_enrollment %>
-        <% enrollment.hbx_enrollment_members.each do |member| %>
-        <tr>
-          <td><%= member.person.full_name %></td>
-          <td><%= member.primary_relationship %></td>
-          <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-          <% if @plan.is_a? OpenStruct %>
-          <td><%= number_to_currency(@plan.total_premium) %></td>
-          <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
-          <td><%= number_to_currency(@plan.total_employee_cost) %></td>
-          <% else %>
-          <td><%= number_to_currency(@plan.premium_for(member)) %></td>
-          <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
-          <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
-          <% end %>
-        </tr>
+<div class="table-responsive">
+  <table class="table table-striped table-hover table-sm">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Relationship</th>
+        <th>Age</th>
+        <th>Premium</th>
+        <th>Employer Contribution</th>
+        <th>You Pay</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @plan = enrollment.decorated_hbx_enrollment %>
+      <% enrollment.hbx_enrollment_members.each do |member| %>
+      <tr>
+        <td><%= member.person.full_name %></td>
+        <td><%= member.primary_relationship %></td>
+        <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
+        <% if @plan.is_a? OpenStruct %>
+        <td><%= number_to_currency(@plan.total_premium) %></td>
+        <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+        <td><%= number_to_currency(@plan.total_employee_cost) %></td>
+        <% else %>
+        <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+        <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
+        <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
         <% end %>
-        <tr class="gray-row">
-          <td class="capital"><strong>Totals</strong></td>
-          <td></td>
-          <td></td>
-          <td><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
-          <td><strong><%= number_to_currency(@plan.total_employer_contribution) %></strong></td>
-          <td><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
-        </tr>
-      </tbody>
-    </table>
-  <% end %>
+      </tr>
+      <% end %>
+      <tr class="gray-row">
+        <td class="capital">
+          <strong>Totals</strong>
+        </td>
+        <td></td>
+        <td></td>
+        <td>
+          <strong><%= number_to_currency(@plan.total_premium) %></strong>
+        </td>
+        <td>
+          <strong><%= number_to_currency(@plan.total_employer_contribution) %></strong>
+        </td>
+        <td>
+          <strong><%= number_to_currency(@plan.total_employee_cost) %></strong>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

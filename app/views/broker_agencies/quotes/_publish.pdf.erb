@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>
+      <%= content_for?(:title) ? yield(:title) : @q.quote_name %>
+    </title>
+  </head>
+  <%= wicked_pdf_stylesheet_link_tag "application", media: "all", "data-turbolinks-track" => true %>
+  <div class="module broker_quote_tool">
+    <div class="pdf-body">
+      <div class="row">
+        <div class="col-md-12">
+          <h3>Quote Name: <%=@q.quote_name %></h3>
+
+          <h4> Employer Claim Code: &nbsp;<b><%=@q.claim_code%></b></h4>
+
+          <p>Effective Date is <b><%=@q.start_on %></b></p>
+
+          <p>Costs are based on the roster associated with this quote of  <b><%= @q.quote_households.count %></b> families:</p>
+          <% @q.quote_benefit_groups.each do |benefit_group| %>
+            <div class="panel-body">
+              <h3 class="title no-buffer">
+                <%= "Quote for Benefit Group: #{benefit_group.title}" %>
+              </h3>
+              <table class="table table-striped table-hover table-sm panel panel-default">
+                <thead class="thead-default">
+                  <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Relationship</th>
+                    <th>DOB</th>
+                  </tr>
+                </thead>
+                <% @q.quote_households.each do |quote_household| %>
+                  <% if quote_household.quote_benefit_group_id == benefit_group.id %>
+                    <% quote_household.quote_members.each do |member| %>
+                      <tr>
+                        <td><%= member.first_name%></td>
+                        <td><%= member.last_name%></td>
+                        <td><%= member.employee_relationship.humanize%></td>
+                        <td><%= member.dob%></td>
+                      </tr>
+                    <% end %>
+                    <tr>
+                      <td colspan="4">&nbsp;</td>
+                    </tr>
+                  <% end %>
+                <% end %>
+              </table>
+              <div class="quote-benefit-group">
+                <div class="benefit-package">
+                  <p>
+                    <b>Coverage Year:</b> <%= @q.start_on.strftime("%m/%d/%Y") %> - <%= (@q.start_on.next_year - 1.day).strftime("%m/%d/%Y") %>
+                  </p>
+                  <table class="table table-striped table-hover table-sm panel panel-default">
+                    <thead class="thead-default">
+                      <tr>
+                        <th>Reference Plan</th>
+                        <th>Carrier</th>
+                        <th>Type</th>
+                        <th>Metal Level</th>
+                        <th>Plans By</th>
+                      </tr>
+                    </thead>
+                      <tr>
+                        <td><%= benefit_group.plan.name %></td>
+                        <td><%= benefit_group.plan.carrier_profile.abbrev.upcase %></td>
+                        <td><%= benefit_group.plan.plan_type.upcase%></td>
+                        <td><%= benefit_group.plan.metal_level.capitalize%></td>
+                        <td><%= benefit_group.plan_option_kind.titleize%></td>
+                      </tr>
+                  </table>
+                </div>
+                <p>Below is your Employer's Plan offering Spectrum. Your offerings are based on <%= benefit_group.plan_option_kind.titleize.titleize %>.</p>
+                <div class="col-xs-12 quote-details">
+                  <div class="col-xs-12">
+                    <table class = "employer-health-contribution">
+                      <tr>
+                        <th>Offered</th>
+                        <th>Employer Contribution</th>
+                      </tr>
+                      <% benefit_group.quote_relationship_benefits.each do|rb| %>
+                        <tr>
+                          <td><%=rb.relationship.humanize %></td>
+                          <td>
+                            <strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </table>
+                  </div>
+                  <div class="col-xs-12">
+                    <div class="quote-est-month col-xs-11">
+                      <div class="row">
+                        <div class="col-xs-4">
+                          <div class="row">
+                            <span>Employer Estimated Maximum Monthly Cost</span>
+                            <h2><%= number_to_currency(benefit_group.published_employer_cost)%></h2>
+                          </div>
+                        </div>
+                        <div class="col-xs-8">
+                          <div class="row">
+                            <table>
+                              <tr>
+                                <th colspan ="2" ></th>
+                                <th>Min</th>
+                                <th>Max</th>
+                              </tr>
+                              <tr>
+                                <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                                <td><%= number_to_currency(385)%></td>
+                                <td><%= number_to_currency(372)%></td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+          <% end%>
+          <p>**Actual costs may vary.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <body style="background-color: white;">
+  </body>
+</html>

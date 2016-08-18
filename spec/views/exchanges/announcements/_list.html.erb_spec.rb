@@ -22,5 +22,4 @@ describe "exchanges/announcements/_list.html.erb" do
   it "display detail of announcement" do
     expect(rendered).to have_text(/#{announcement.content}/)
   end
-end    
-
+end

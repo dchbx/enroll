@@ -1,0 +1,66 @@
+<div class='sep_table'>
+  <div id= 'message_form'></div>
+    <div id="inbox_provider_form" class="table-responsive">
+      <table id='sepAdmin' class="table table-striped table-bordered dataTable module">
+        <thead>
+          <tr>
+            <th>HBX ID</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>SSN</th>
+            <th></th>
+          </tr>
+        </thead>
+      
+        <tbody>
+          <% @families.each do |family| %>
+            <tr data-toggle="collapse" data-target="#demo<%=family.primary_applicant.person.hbx_id%>" class="accordion-toggle">
+              <td><%=family.primary_applicant.person.hbx_id%></td>
+              <td><%=family.primary_applicant.person.last_name%></td>
+              <td><%=family.primary_applicant.person.first_name%></td>
+              <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
+              <td class='details-control' data><i class="fa fa-plus-square"></i>
+              </td>
+            </tr>
+
+            <tr class="accordian-body collapse" id="demo<%=family.primary_applicant.person.hbx_id%>">
+              <td> 
+                <%=family.primary_applicant.person.hbx_id%>
+              </td>
+                            <td> 
+                <%=family.primary_applicant.person.hbx_id%>
+              </td>
+                            <td> 
+               <%=family.primary_applicant.person.hbx_id%>
+              </td>
+            </tr>
+          
+          <% end %>
+        </tbody>
+     </table>
+    </div>
+</div>
+
+<style type="text/css">
+  table.dataTable.select tbody tr,
+  table.dataTable thead th:first-child {
+     cursor: pointer;
+  }
+
+  td.details-control {
+    cursor: pointer;
+  }
+ 
+  div.slider {
+    display: none;
+  }
+ 
+  table.dataTable tbody td.no-padding {
+    padding: 0;
+  }
+  
+  table.dataTable .hiddenRow {
+    padding: 0 !important;
+  }
+}
+</style>

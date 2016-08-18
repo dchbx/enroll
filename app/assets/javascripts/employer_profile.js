@@ -1,4 +1,5 @@
 var EmployerProfile = ( function( window, undefined ) {
+
   function viewDetails($thisObj) {
     if ( $thisObj.hasClass('view') ) {
       $thisObj.closest('.benefit-package').find('.health-offering, .dental-offering').slideDown();
@@ -271,6 +272,7 @@ var EmployerProfile = ( function( window, undefined ) {
       viewDetails : viewDetails
     };
 
+
 } )( window );
 
 // $(document).ready(function() {
@@ -287,7 +289,7 @@ var EmployerProfile = ( function( window, undefined ) {
 //         url: '/employers/search'
 //       }
 //     });
-//
+
 //     // initialize the bloodhound suggestion engine
 //     employers.initialize();
 //     // instantiate the typeahead UI
@@ -299,7 +301,7 @@ var EmployerProfile = ( function( window, undefined ) {
 //       name: 'employers',
 //       source: employers.ttAdapter()
 //     });
-//
+
 //     $('input.typeahead').on('blur keyup', function(e) {
 //       if (e.keyCode == 8 && $('input#organization_fein').val() != "") {
 //         $('#office_locations_buttons a.btn').removeAttr('disabled');
@@ -313,15 +315,15 @@ var EmployerProfile = ( function( window, undefined ) {
 //         $('input#organization_office_locations_attributes_0_address_attributes_city').val("").removeAttr('readonly');
 //         $('select#organization_office_locations_attributes_0_address_attributes_state').val("").removeAttr('disabled').selectric('refresh');
 //         $('input#organization_office_locations_attributes_0_address_attributes_zip').val("").removeAttr('readonly');
-//
+
 //         $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val("").removeAttr('readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_number').val("").removeAttr('readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_extension').val("").removeAttr('readonly');
 //       };
 //     });
-//
+
 //     $('input.typeahead').bind('typeahead:select', function(e, suggestion) {
-//
+
 //       $('#office_locations_buttons a.btn').attr('disabled', 'disabled');
 //       $('input#employer_id').val(suggestion._id);
 //       $('input#organization_dba').val(suggestion.dba).attr('readonly', 'readonly');
@@ -335,7 +337,7 @@ var EmployerProfile = ( function( window, undefined ) {
 //         $('input#organization_office_locations_attributes_0_address_attributes_city').val(primary_office.address.city).attr('readonly', 'readonly');
 //         $('select#organization_office_locations_attributes_0_address_attributes_state').val(primary_office.address.state).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
 //         $('input#organization_office_locations_attributes_0_address_attributes_zip').val(primary_office.address.zip).attr('readonly', 'readonly');
-//
+
 //         $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val(primary_office.phone.area_code).attr('readonly', 'readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_number').val(primary_office.phone.number).attr('readonly', 'readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_extension').val(primary_office.phone.extension).attr('readonly', 'readonly');

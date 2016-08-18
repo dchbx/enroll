@@ -10,6 +10,7 @@ RSpec.describe Employers::CensusEmployeesController do
   let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 45.days,  hired_on: "2014-11-11") }
+  let(:census_employee_two) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, hired_on: "2014-11-11")}
   let(:census_employee_params) {
     {"first_name" => "aqzz",
      "middle_name" => "",
@@ -192,12 +193,24 @@ RSpec.describe Employers::CensusEmployeesController do
       end
     end
 
-    it "should be render when invalid" do
+    it "should be redirect when invalid" do
       allow(census_employee).to receive(:save).and_return(false)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-      expect(assigns(:reload)).to eq true
-      expect(response).to render_template("edit")
+      expect(response).to redirect_to(employers_employer_profile_census_employee_path(employer_profile.id, census_employee.id, tab: 'employees'))
+    end
+
+
+    it "should have aasm state as eligible when there is no matching record found and employee_role_linked in reverse case" do
+      allow(employee_role).to receive(:person).and_return(person)
+      allow(census_employee).to receive(:save).and_return(true)
+      allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
+      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {} 
+      expect(census_employee.aasm_state).to eq "eligible"
+      person.dob = "11/11/1990"
+      person.save
+      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {} 
+      expect(census_employee.aasm_state).to eq "employee_role_linked"
     end
 
 
@@ -224,7 +237,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-      allow(census_employee).to receive(:employee_role).and_return(true)
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
@@ -273,8 +285,8 @@ RSpec.describe Employers::CensusEmployeesController do
       get :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(flash[:notice]).to eq "Successfully terminated Census Employee."
       expect(response).to be_redirect
-    end
 
+    end
     context "with termination date" do
       it "should terminate census employee" do
         xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
@@ -288,6 +300,19 @@ RSpec.describe Employers::CensusEmployeesController do
         xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: "", :format => :js
         expect(response).to have_http_status(:success)
         expect(assigns[:fa]).to eq nil
+      end
+    end
+
+    context "with invalid termination date" do
+      before do
+        allow(CensusEmployee).to receive(:find).and_return(census_employee_two)
+      end
+      it "should throw error" do
+        xhr :get, :terminate, :census_employee_id => census_employee_two.id, :employer_profile_id => employer_profile_id, termination_date: (TimeKeeper.date_of_record - 75.days).to_s, :format => :js
+        expect(flash[:error]).to eq "Census Employee could not be terminated: Termination date must be within the past 60 days."
+        expect(response).to have_http_status(:success)
+        expect(assigns[:fa]).to eq nil
+        expect(assigns[:census_employee].employment_terminated_on).to eq nil
       end
     end
   end

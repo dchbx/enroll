@@ -165,6 +165,13 @@ class Plan
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
+  scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
+  scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
+  scope :by_carrier_profile,    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
+  scope :by_dc_network,         ->(dc_network) { where(dc_in_network: dc_network) }
+  scope :by_nationwide,            ->(nationwide) { where(nationwide: nationwide) }
+
+
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -209,14 +216,6 @@ class Plan
           active_year: active_year,
           market: "shop",
           coverage_kind: "health"
-        )
-    }
-
-  scope :shop_dental_by_active_year, ->(active_year) {
-      where(
-          active_year: active_year,
-          market: "shop",
-          coverage_kind: "dental"
         )
     }
 
@@ -266,6 +265,14 @@ class Plan
         ]
     )
   }
+
+  scope :shop_dental_by_active_year, ->(active_year) {
+      where(
+          active_year: active_year,
+          market: "shop",
+          coverage_kind: "dental"
+        )
+    }
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
   scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
@@ -369,6 +376,10 @@ class Plan
     (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
   end
 
+  def deductible_int
+    (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
@@ -419,5 +430,52 @@ class Plan
         end
       end
     end
+
+    def build_plan_selectors market_kind='shop', coverage_kind='health'
+      plans = coverage_kind == 'health' ? $quote_shop_health_plans : $quote_shop_dental_plans
+      selectors = {}
+      if coverage_kind == 'dental'
+        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.append('any')
+      else
+        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.append('any')
+      end
+      selectors[:carriers] = plans.map{|p|
+        [ p.carrier_profile.legal_name, p.carrier_profile.abbrev, p.carrier_profile.id ]
+        }.uniq.append(['any','any'])
+      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.append('any')
+      selectors[:dc_network] =  ['true', 'false', 'any']
+      selectors[:nationwide] =  ['true', 'false', 'any']
+      selectors
+    end
+
+    def build_plan_features market_kind='shop', coverage_kind='health'
+      plans = coverage_kind == 'health' ? $quote_shop_health_plans : $quote_shop_dental_plans
+      feature_array = []
+      plans.each{|plan|
+
+        characteristics = {}
+        characteristics['plan_id'] = plan.id.to_s
+        if coverage_kind == 'dental'
+          characteristics['dental_level'] = plan.dental_level
+        else
+          characteristics['metal'] = plan.metal_level
+        end
+        characteristics['carrier'] = plan.carrier_profile.organization.legal_name
+        characteristics['plan_type'] = plan.plan_type
+        characteristics['deductible'] = plan.deductible_int
+        characteristics['carrier_abbrev'] = plan.carrier_profile.abbrev
+        characteristics['nationwide'] = plan.nationwide
+        characteristics['dc_in_network'] = plan.dc_in_network
+
+        if plan.deductible_int.present?
+          feature_array << characteristics
+        else
+          log("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}", {:severity => "error"})
+        end
+      }
+      feature_array
+    end
   end
 end
+
+

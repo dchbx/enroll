@@ -2,9 +2,15 @@ require 'rails_helper'
 
 RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
   let(:qlk) {FactoryGirl.create(:qualifying_life_event_kind)}
+  let(:person) {FactoryGirl.create(:person)}
+  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+
   before :each do
     assign :qle, qlk
     assign :qle_date, TimeKeeper.date_of_record
+    assign :person, person
+    allow(person).to receive(:primary_family).and_return(family)
+    allow(family).to receive(:special_enrollment_periods).and_return([])
   end
 
   it "should show hidden field" do
@@ -28,6 +34,7 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
     end
 
     it "should have effective_on_kind options with date" do
+
       expect(rendered).to have_selector("option", text: "#{TimeKeeper.date_of_record.to_s}")
       expect(rendered).to have_selector("option", text: "#{(TimeKeeper.date_of_record.end_of_month + 1.day).to_s}")
     end

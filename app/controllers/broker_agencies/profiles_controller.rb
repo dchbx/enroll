@@ -1,10 +1,12 @@
+require 'csv'
+
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
 
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :employers_api, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -38,6 +40,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
      @provider = current_user.person
      @staff_role = current_user.has_broker_agency_staff_role?
      @id=params[:id]
+
+      respond_to do |format|
+      format.html {}
+      format.json { render json: {id: @id, first: @provider.first_name } }
+    end
   end
 
   def edit
@@ -150,6 +157,59 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
+
+
+  def contact_struct(first: "", last: "", phone: "", mobile: "", emails: [], address_1: "", address_2: "",
+                      city: "", state: "", zip: "")
+    OpenStruct.new({ :first => first, :last => last, :phone => phone, :mobile => mobile,
+            :emails => emails, :address_1 => address_1, :address_2 => address_2, :city => city,
+            :state => state, :zip => zip })
+  end
+
+  def employers_api
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+    else
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.by_broker_role(broker_role_id)
+    end
+    @employer_profiles = @orgs.map {|o| o.employer_profile}
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+
+    @renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
+
+    @employer_details = @employer_profiles.map do |er|
+
+        #discover the appropriate month to provide premium info for
+        billing_plan_year, billing_report_date = er.billing_plan_year
+
+        enrollments = er.enrollments_for_billing(billing_report_date)
+        premium_amt_total   = enrollments.map(&:total_premium).sum
+        employee_cost_total = enrollments.map(&:total_employee_cost).sum
+        employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+
+        staff = Person.staff_for_employer_including_pending(er)
+        offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
+        result = {
+          :profile => er,
+          :billing_report_date => billing_report_date,
+          :total_premium => premium_amt_total,
+          :employee_contribution => employee_cost_total,
+          :employer_contribution => employer_contribution_total,
+          :contacts => staff.map do |s|
+              contact_struct(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
+                             mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best])
+              end + offices.map do |loc|
+                contact_struct(first: loc.address.kind.capitalize, last: "Office", phone: loc.phone.to_s,
+                  address_1: loc.address.address_1, address_2: loc.address.address_2, city: loc.address.city,
+                  state: loc.address.state, zip: loc.address.zip)
+              end,
+          :emails => staff.map { |s| s.work_email_or_best } || []
+        }
+    end
+  end
+
 
   def general_agency_index
     @broker_role = current_user.person.broker_role || nil
@@ -299,6 +359,28 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   private
+
+  # def parse_employee_roster_file
+  #   begin
+  #     CSV.parse(params[:employee_roster_file].read) if params[:employee_roster_file].present?
+  #   rescue Exception => e
+  #     redirect_to build_employee_roster_broker_agencies_profiles_path, :flash => { :error => "Unable to parse the csv file" }
+  #   end
+  # end
+
+  # def csv_for(employee_roster)
+  #   (output = "").tap do
+  #     CSV.generate(output) do |csv|
+  #       csv << ["FamilyID", "Relationship", "DOB"]
+  #       employee_roster.each do |id,employee|
+  #         csv << [  employee[:family_id],
+  #                   employee[:relationship],
+  #                   employee[:dob]
+  #                 ]
+  #       end
+  #     end
+  #   end
+  # end
 
   def find_hbx_profile
     @profile = current_user.person.hbx_staff_role.hbx_profile

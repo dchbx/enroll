@@ -1,0 +1,196 @@
+<%if @q.can_quote_be_published? %>
+  <div class="module container broker_quote_tool published">
+    <div class="row">
+      <div class="col-md-12">
+        <%= draft_quote_header(@q.aasm_state, @q.quote_name)%><br/>
+
+        <p>Quote: "<%=@q.quote_name %>" effective <b><%=@q.start_on %></b></p>
+
+        <p>Below is your Employer's Plan offering Spectrum. Your offerings are based on.</p>
+
+        <p>Costs are based on the roster associated with this quote of <b><%= @q.quote_households.count %></b> families:</p>
+        <br>
+        <% @q.quote_benefit_groups.each do |benefit_group| %>
+        <div class="panel-body">
+            <div class="panel benefitgroup col-xs-12">
+              <div class="col-xs-12">
+                <div class="row">
+                  <section class="col-xs-10">
+                    <header class="row">
+                      <h3 class="title no-buffer">
+                        <%= "Quote for Benefit Group: #{benefit_group.title}" %>
+                      </h3>
+                    </header>
+                  </section>
+                  <div class="col-xs-2">
+                    <button class="nav-toggle row view" id="showhidebutton" data-toggle="collapse" href="#collapse-health-<%=benefit_group.id.to_s%>" onclick="QuotePageLoad.view_details($(this))">View Details
+                      <i class="fa fa-chevron-down fa-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-2">
+                  <p>Coverage Year</p>
+                </div>
+                <div class="col-md-offset-2">
+                  <p>
+                   <%= @q.start_on.strftime("%m/%d/%Y") %> - <%= (@q.start_on.next_year - 1.day).strftime("%m/%d/%Y") %>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 table-responsive">
+
+              <table class="table table-striped table-hover table-sm panel panel-default">
+                <thead class="thead-default">
+                  <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Relationship</th>
+                    <th>DOB</th>
+                  </tr>
+                </thead>
+                <% @q.quote_households.each do |quote_household| %>
+                  <% if quote_household.quote_benefit_group_id == benefit_group.id %>
+                    <% quote_household.quote_members.each do |member| %>
+                  <tr>
+                    <td><%=member.first_name%></td>
+                    <td><%= member.last_name%></td>
+                    <td><%= member.employee_relationship.humanize%></td>
+                    <td><%= member.dob%></td>
+                  </tr>
+                  <% end %>
+                  <tr>
+                    <td colspan="4">&nbsp;</td>
+                  </tr>
+                   <% end %>
+                <% end %>
+              </table>
+
+            </div>
+            <div class="quote-benefit-group">
+              <div class="benefit-package">
+
+                <div class="published-quote-table">
+                  <table>
+                    <tr>
+                      <th class="col-md-2 col-xs-2 ">
+                        <header>Reference Plan</header>
+                      </th>
+                      <th class="col-md-2 col-xs-2">
+                        <header>Carrier</header>
+                      </th>
+                      <th class="col-md-2 col-xs-2">
+                        <header>Type</header>
+                      </th>
+                      <th class="col-md-2 col-xs-2">
+                        <header>Metal Level</header>
+                      </th>
+                      <th class="col-md-2 col-xs-2">
+                        <header>Plans By</header>
+                      </th>
+                    </tr>
+                    <tr>
+                      <td class="col-md-2 col-xs-2">
+                        <p>
+                          <%=benefit_group.plan.name %>
+                        </p>
+                      </td>
+                      <td class="col-md-2 col-xs-2">
+                        <p>
+                          <%=benefit_group.plan.carrier_profile.abbrev.upcase %>
+                        </p>
+                      </td>
+                      <td class="col-md-2 col-xs-2">
+                        <p>
+                          <%= benefit_group.plan.plan_type.upcase %>
+                        </p>
+                      </td>
+                      <td class="col-md-2 col-xs-2">
+                        <p>
+                          <%=benefit_group.plan.metal_level.capitalize%>
+                        </p>
+                      </td>
+                      <td class="col-md-2 col-xs-2">
+                        <p>
+                          <%= benefit_group.plan_option_kind.titleize %>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div id="collapse-health-<%=benefit_group.id.to_s%>" class="collapse" >
+                  <div class="col-xs-1">
+                    &nbsp;
+                  </div>
+                  <div class="col-xs-12 quote-details">
+                    <div class="col-xs-12">
+                      <table class = "employer-health-contribution">
+                        <tr>
+                          <th>Offered</th>
+                          <th>Employer Contribution</th>
+                        </tr>
+                        <% benefit_group.quote_relationship_benefits.each do|rb| %>
+                          <tr>
+                            <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
+                            <td>
+                              <strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong>
+                            </td>
+                          </tr>
+                        <% end %>
+                      </table>
+                      <div class="col-xs-12">
+                        <div class="col-xs-1">
+                          &nbsp;
+                        </div>
+                        <div class="quote-est-month col-xs-11">
+                          <div class="row">
+                            <div class="col-xs-4">
+                              <div class="row">
+                                <span>Employer Estimated Maximum Monthly Cost</span>
+                                <h2><%= number_to_currency(benefit_group.published_employer_cost)%></h2>
+                              </div>
+                            </div>
+                            <div class="col-xs-8">
+                              <div class="row">
+                                <table>
+                                  <tr>
+                                    <th colspan ="2" ></th>
+                                    <th>Min</th>
+                                    <th>Max</th>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                                    <!--TODO: JIM Methods to calculate estimated monthly max and min cost -->
+                                    <td><%= number_to_currency(385)%></td>
+                                    <td><%= number_to_currency(372)%></td>
+                                  </tr>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <br>
+        <% end%>
+        <br>
+        <p>**Actual costs may vary.</p>
+          <%= render :partial => "quote_publish_button" , :locals => { :quote => @q } %>
+        <h4> Employer Claim Code: &nbsp;<b><%=@q.claim_code%></b></h4>
+        <br>
+        <%= link_to 'Download PDF' , publish_broker_agencies_broker_role_quotes_path(@broker,quote_id: @q.id, :format => "pdf"), class: "btn btn-default" , :target => "_blank " %> <br><br>
+      </div>
+    </div>
+  </div>
+<%else%>
+  <div class="alert alert-notice">
+    <h4>Please select plans for all the benefit groups by using the <b>"COMPARE COSTS / SELECT PLAN" </b> button in health plan selection</h4>
+  </div>
+<% end %>

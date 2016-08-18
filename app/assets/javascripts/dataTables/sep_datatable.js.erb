@@ -1,0 +1,59 @@
+var SEPDatatable = ( function( window, undefined ) {
+
+  function setTab() {
+    var tab = "Sep";
+    return tab;
+  }
+
+  function setBaseModel() {
+    var base_model = "Family";
+    return base_model;
+  }
+
+  function callAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $all_filter = $table.closest('.module').find('.first-level a:contains("All")');
+    $all_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {});
+      $table.DataTable().draw();
+    });
+  }
+
+  function callIndividualFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.first-level a:contains("Individual")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEmployerSponsoredFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.first-level a:contains("Employer Sponsored")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function addScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $invoiced_sort = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Invoiced?")');
+    $invoiced_sort.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "current_month_invoice.present?",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  return {
+    callAllFilter: callAllFilter,
+    callIndividualFilter : callIndividualFilter,
+    callEmployerSponsoredFilter: callEmployerSponsoredFilter,
+    addScopesBeforeSorting : addScopesBeforeSorting
+  };
+
+} )( window );

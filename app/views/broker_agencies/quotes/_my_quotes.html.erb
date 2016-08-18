@@ -1,0 +1,81 @@
+
+    <!--<div class="col-md-6 col-sm-6 col-xs-6">
+    <p> <b> Demographic roster estimator (need a better name)</b></p>
+    <div style='float:left; margin-left:30px; '>
+         <div style='float: left; width: 255px; margin-left:30px'>
+              Employees on Roster:
+              <input id="employees_on_roster" data-slider-id='employees_on_rosterSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="5" data-slider-value="0" style='width:225px'
+                 data-slider-ticks="[0, 50, 100]"
+                 data-slider-ticks-labels='["0%", "50", "100"]'
+               />
+          </div>
+      </div>
+     <input name='employee_count' id='employee_count' value='0' type='hidden'>
+
+      <div style='float:left; margin-left: 30px'>
+        dropdown for the four family types
+        </div>
+        <div  style='float:left; margin-left: 30px'>
+          button to use this roster in a quote
+        </div>
+    </div>-->
+    <div class="container-fluid">
+      <div class="table-responsive">
+        <table class="table">
+          <thead
+          <tr>
+            <th>Quote Action!!</th>
+            <th>Quote Name</th>
+            <th>Employer claim code</th>
+            <th class="text-right">Family Count</th>
+            <th class="text-right">State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+           <% @all_quotes.each do |q| %>
+          <tr>
+             <td>
+          <%=
+            if q.aasm_state == 'draft'
+             link_to "Edit Quote Info & Roster" , "/broker_agencies/quotes/#{q.id}/edit"
+           else
+             link_to "View Published Quote", "#", id: q.id, class: 'view-published'
+           end
+           %>
+         </td>
+             <td><%= q.quote_name %></td>
+             <td><%= q.claim_code %></td>
+             <td class="text-right"><%= q.quote_households.count %></td>
+             <td class="text-right"><%= q.aasm_state %></td>
+             <td><button type="button" onclick="delete_quote_handler" id="close_button" data-quote-id="<%=q.id%>" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+        <%=link_to "New Quote" , new_broker_agencies_quote_path , method: :get, class: "btn btn-trans btn-sm", id: "new_quote"%>
+      <br><br>
+    </div>
+  </div>
+
+
+<script>
+
+var delete_quote_handler = function(){
+  $.ajax({
+      type: "POST",
+      url: "/broker_agencies/quotes/" + this.getAttribute("data-quote-id"),
+      dataType: "js",
+      data: {"_method":"delete"},
+      success: function(){
+        console.log("Deleted successfully");
+
+      }
+  });
+  $(this).parent().parent().remove();
+  event.preventDefault();
+};
+
+$("button#close_button").click(delete_quote_handler);
+
+</script>

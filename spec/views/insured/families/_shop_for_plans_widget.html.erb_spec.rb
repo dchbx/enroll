@@ -1,4 +1,4 @@
-require 'rails_helper'
+ require 'rails_helper'
 
 RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   let(:person) { FactoryGirl.build(:person) }
@@ -7,6 +7,10 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   let(:hbx_enrollments) {double}
   let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
   let(:current_user) { FactoryGirl.create(:user)}
+  let(:family){double(special_enrollment_periods: special_enrollment_periods)}
+  let(:special_enrollment_periods) { double(where: [double(id: 1, qualifying_life_event_kind: qualifying_life_event_kind)])}
+  let(:qualifying_life_event_kind) { double(title: "yo")}
+
 
 
   context "with hbx_enrollments" do
@@ -14,6 +18,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :hbx_enrollments, hbx_enrollments
+      assign :family, family
       sign_in(current_user)
       allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
@@ -44,6 +49,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :hbx_enrollments, []
+      assign :family, family
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       sign_in(current_user)
 
@@ -63,6 +69,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :hbx_enrollments, []
+      assign :family, family
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       sign_in(current_user)
     end

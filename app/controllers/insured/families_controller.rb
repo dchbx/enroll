@@ -2,6 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
+
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -12,7 +13,7 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
-    
+
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
     @enrollment_filter = @family.enrollments_for_display
@@ -45,7 +46,7 @@ class Insured::FamiliesController < FamiliesController
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
     @employee_role = @person.active_employee_roles.first
-    @tab = params['tab'] 
+    @tab = params['tab']
     @family_members = @family.active_family_members
     respond_to do |format|
       format.html
@@ -82,6 +83,8 @@ class Insured::FamiliesController < FamiliesController
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
+
+    @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first
 
     render :layout => 'application'
   end
@@ -137,12 +140,21 @@ class Insured::FamiliesController < FamiliesController
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
+      @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
+  end
+
+  def check_move_reason
+    calculate_dates
+  end
+
+  def check_insurance_reason
+    calculate_dates
   end
 
   def purchase
@@ -280,7 +292,6 @@ class Insured::FamiliesController < FamiliesController
         end
       end
     end
-
   end
 
   def check_for_address_info
@@ -332,5 +343,13 @@ class Insured::FamiliesController < FamiliesController
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
+  end
+
+  def calculate_dates
+    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle = QualifyingLifeEventKind.find(params[:qle_id])
+    start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
+    end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
   end
 end

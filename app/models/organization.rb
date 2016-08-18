@@ -107,20 +107,21 @@ class Organization
   scope :all_employers_by_plan_year_start_on, ->( start_on ){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on)  if start_on.present? }
   scope :plan_year_start_on_or_after,         ->( start_on ){ where(:"employer_profile.plan_years.start_on".gte => start_on) if start_on.present? }
   scope :by_general_agency_profile,           ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
-  scope :er_invoice_data_table_order,         ->{ reorder(:"employer_profile.plan_years.start_on".asc, :"legal_name".asc)}
+  scope :er_invoice_data_table_order,         ->{ reorder(:"employer_profile.plan_years.start_on".asc, :"legal_name".asc) }
   scope :has_broker_agency_profile,           ->{ exists(broker_agency_profile: true) }
   scope :has_general_agency_profile,          ->{ exists(general_agency_profile: true) }
-  scope :all_employers_renewing,              ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
+
   scope :all_employers_renewing_published,    ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING_PUBLISHED_STATE) }
   scope :all_employers_non_renewing,          ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
-  scope :all_employers_enrolled,              ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
-  scope :all_employer_profiles,               ->{ unscoped.exists(employer_profile: true) }
+  scope :employer_profile_plan_year_start_on, ->(begin_on){ where(:"employer_profile.plan_years.start_on" => begin_on) if begin_on.present? }
+
+  scope :offset,                              ->(cursor = 0)      {skip(cursor) if cursor.present?}
+  scope :limit,                               ->(page_size = 25)  {limit(page_size) if page_size.present?}
+
   scope :invoice_view_all,                    ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => EmployerProfile::INVOICE_VIEW_RENEWING + EmployerProfile::INVOICE_VIEW_INITIAL, :"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
+
   scope :employer_profile_renewing_coverage,  ->{ where(:"employer_profile.plan_years.aasm_state".in => EmployerProfile::INVOICE_VIEW_RENEWING) }
   scope :employer_profile_initial_coverage,   ->{ where(:"employer_profile.plan_years.aasm_state".nin => EmployerProfile::INVOICE_VIEW_RENEWING, :"employer_profile.plan_years.aasm_state".in => EmployerProfile::INVOICE_VIEW_INITIAL) }
-  scope :employer_profile_plan_year_start_on, ->(begin_on){ where(:"employer_profile.plan_years.start_on" => begin_on) if begin_on.present? }
-  scope :offset,                              ->(cursor = 0)      {skip(cursor) if cursor.present?}
-  scope :limit,                               ->(page_size = 25)  {limit(page_size) if page_size_present?}
   scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   ->(start_on){
     unscoped.where(
       :"employer_profile.plan_years" => {
@@ -130,6 +131,25 @@ class Organization
         }
       })
   }
+
+  scope :future_plan_year_effective_date,   ->{ where(:"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
+
+  scope :all_employer_profiles,               ->{ exists(:employer_profile => true) }
+  scope :employer_profiles_enrolling,         ->{ where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INITIAL_ENROLLING_STATE + PlanYear::RENEWING) }
+  scope :employer_profiles_enrolled,          ->{ where(:"employer_profile.aasm_state".in => EmployerProfile::ENROLLED_STATE) }
+  scope :employer_profiles_applicants,        ->{ where(:"employer_profile.aasm_state" => "applicant") }
+
+  scope :employer_profiles_initial_eligible,  ->{ where(:"employer_profile.aasm_state" => "registered") }
+  scope :employer_profiles_renewing,          ->{ where(:"employer_profile.plan_years.aasm_state".in => PlanYear::RENEWING) }
+  scope :employer_profiles_open_enrollment,   ->{ where(:"employer_profile.plan_years.aasm_state".in => PlanYear::OPEN_ENROLLMENT_STATE) }
+  scope :employer_profiles_invoice_pending,   ->{ where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
+  scope :employer_profiles_binder_pending,    ->{ where(:"employer_profile.plan_years.aasm_state" => "invoice_generated") }
+  scope :employer_profiles_binder_paid,       ->{ where(:"employer_profile.aasm_state" => "binder_paid") }
+
+  scope :employer_profiles_suspended,         ->{ where(:"employer_profile.aasm_state" => "suspended") }
+  scope :employer_profiles_ineligible,        ->{ where(:"employer_profile.aasm_state" => "ineligible") }
+
+  scope :employer_profiles_by_date_range,     ->( start_on, end_on ){ unscoped.where(:"employer_profile.plan_years.start_on".gte => start_on, :"employer_profile.plan_years.end_on".lte => end_on)  if start_on.present? && end_on.present? }
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
@@ -150,6 +170,51 @@ class Organization
 
   def primary_office_location
     office_locations.detect(&:is_primary?)
+  end
+
+  def employer_profile_aasm
+    employer_profile.aasm_state
+  end
+
+  def enrolled_waived_count
+    plan_year = employer_profile.latest_plan_year
+    census_employees = plan_year.find_census_employees if plan_year.present?
+    enrolled = plan_year.try(:enrolled).try(:count).to_i || 0
+    waived = census_employees.try(:waived).try(:count).to_i || 0
+    return "#{enrolled}/#{waived}"
+  end
+
+  def enrolled_as_percentage
+    plan_year = employer_profile.latest_plan_year
+    census_employees = plan_year.find_census_employees if plan_year.present?
+    enrolled = plan_year.try(:enrolled).try(:count).to_i || 0
+    eligible_to_enroll_count = census_employees.try(:active).try(:count)
+    eligible_to_enroll_count = 0.0 if eligible_to_enroll_count == nil
+    (enrolled / eligible_to_enroll_count * 100).to_s
+  end
+
+  def employer_xml_transmitted_at
+    if employer_profile.xml_transmitted_timestamp.present?
+      employer_profile.xml_transmitted_timestamp
+    else
+      Date.new
+    end
+  end
+
+  def latest_plan_year_effective_date
+    if employer_profile.latest_plan_year.present?
+      employer_profile.latest_plan_year.effective_date
+    else
+      Date.new
+    end
+  end
+
+  def broker_agency_profile_legal_name
+    if employer_profile.broker_agency_profile.present?
+      employer_profile.broker_agency_profile.organization.legal_name
+    else
+      ""
+    end
   end
 
   def self.search_by_general_agency(search_content)

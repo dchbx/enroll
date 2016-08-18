@@ -36,4 +36,3 @@ describe "exchanges/announcements/index.html.erb" do
     expect(rendered).to have_selector('form.form-horizontal')
   end
 end
-

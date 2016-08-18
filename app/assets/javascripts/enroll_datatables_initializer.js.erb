@@ -1,0 +1,520 @@
+var EnrollDataTableInitializer = ( function( window, undefined ) {
+
+  function findTable(table_id) {
+    $table = $('#'+table_id);
+    return $table;
+  }
+
+  function makeResponsiveTable(table_id) {
+    findTable(table_id);
+    $table.wrap('<div class="table-responsive"></div>');
+  }
+
+  function setBaseModel(model) {
+    var base_model = model;
+    return base_model;
+  }
+
+  function setTab(tab) {
+    var tab = tab;
+    return tab;
+  }
+
+  function showTable(table_id) {
+    findTable(table_id);
+    $table.closest('.datatable').css({visibility:"visible", opacity: 0.0}).animate({opacity: 1.0},300);
+    $table.closest('.datatable').prev().hide();
+    // page-loading
+  }
+
+  function setFirstLevel($active_tab) {
+    if ( $active_tab.hasClass('btn') ) {
+      var first_level = $active_tab.data('children-of');
+    } else {
+      var first_level = $active_tab.closest('.dropdown').data('children-of');
+    }
+    return first_level;
+  }
+
+  function setSecondLevel($active_tab) {
+    var second_level = $active_tab.text().toLowerCase();
+    return second_level;
+  }
+
+  function setScopesFromFilters(table_id, tab) {
+    findTable(table_id);
+    $active_first_level_filter = $table.closest('.module').find('.first-level > a.active').text().toLowerCase();
+    $active_second_level_filter = $table.closest('.module').find('.btn-group-second > a.active').text().toLowerCase();
+    if ( $active_second_level_filter.length ) {
+      scopes = DataTablesFilterMap[tab][$active_first_level_filter][$active_second_level_filter]
+    } else {
+      scopes = DataTablesFilterMap[tab][$active_first_level_filter]
+    }
+    return scopes
+  }
+
+  function setFiltersFromScopeMap(table_id, tab, first_level, second_level) {
+    // console.log(table_id, tab, first_level, second_level);
+    findTable(table_id);
+    if ( typeof second_level !== "undefined" ) {
+      scopes = DataTablesFilterMap[tab][first_level][second_level]
+    } else {
+      scopes = DataTablesFilterMap[tab][first_level]
+    }
+    return scopes
+  }
+
+  var setFilterCriteria = function(table_id, tab, first_level, second_level) {
+    $table = $('#'+table_id);
+    return {
+      tab: tab,
+      first_level: first_level,
+      second_level: second_level
+    }
+  }
+
+  function clickActiveFilter(table_id, $active_filter, filter_criteria, base_model) {
+    $active_filter.on('click', function() {
+      filters = EnrollDataTableInitializer.setFiltersFromScopeMap(table_id, filter_criteria.tab, filter_criteria.first_level, filter_criteria.second_level);
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(base_model),
+        filters: filters
+      });
+    });
+  }
+
+  function moveInfo(table_id) {
+    findTable(table_id)
+    var $info = $table.closest('.module').find('.dataTables_info').detach();
+    var $buttons_below_table = $table.closest('.module').find('.footer').find('.buttons-below-table');
+    if ( $buttons_below_table.length ) {
+      $table.closest('.module').find('.footer').find('.buttons-below-table').after($info);
+    } else {
+      $table.closest('.module').find('.footer .vertically-aligned-row').append($info);
+    }
+    $info.show();
+  }
+
+  function showPagination(table_id) {
+    findTable(table_id)
+    var $pagination = $table.closest('.module').find('.dataTables_paginate')
+    if ( $pagination.find('.paginate_button').length >= 4 ) {
+      $pagination.show();
+    }
+  }
+
+  function moveTableLength(table_id) {
+    findTable(table_id)
+    $table_length = $table.closest('.dataTables_wrapper').find('.header .table-length').detach();
+    $dataTables_info = $table.closest('.module').find('.dataTables_info');
+    if ( $dataTables_info.length ) {
+      $dataTables_info_text = $dataTables_info.text();
+      $dataTables_info.after($table_length);
+      $dataTables_info.remove();
+      $table_length.find('.dataTables_length').before($dataTables_info_text);
+    } else {
+      $table.closest('.module').find('.footer .vertically-aligned-row').append($table_length);
+      $table_length.prepend('Showing ');
+    }
+    $table.closest('.module').find('.table-length').css({'white-space': 'nowrap'});
+    $table_length.wrap('<div class="table-length-wrapper text-right"></div>')
+    // $table_length.closest('div').prepend("Showing");
+    $table_length.removeClass('hidden');
+    $table_length.closest('div').append("per page");
+  }
+
+  function initializeFilters(table_id) {
+    findTable(table_id)
+    var $filters_first_level = $table.closest('.module').find('.btn-group.first-level');
+    $filters_first_level.find('> a:first').addClass('active');
+    $filters_first_level.find('> a').on('click', function() {
+      if ( !$(this).hasClass('active') ) {
+        $('.btn-group-second').find('.active').removeClass('active');
+      }
+      var $active_second_level_name = $filters_first_level.find('a.active').attr('name');
+      if ( !$(this).hasClass('active') && $('.'+$active_second_level_name+'-second-level').is(':visible') ) {
+        $('.'+$active_second_level_name+'-second-level').addClass('hidden');
+        if ( $('.'+$active_second_level_name+'-second-level').next().hasClass('dropdown') ) {
+          $('.'+$active_second_level_name+'-second-level').next().addClass('hidden');
+        }
+      }
+      $filters_first_level.find('a').removeClass('active');
+      $(this).addClass('active');
+      $('.second-level').on('click', function() {
+        $(this).closest('.btn-group-second').find('a').removeClass('active');
+        $(this).addClass('active');
+      });
+    });
+    if ( $filters_first_level.find('> a:first').hasClass('second-level') ) {
+      $filters_first_level.find('> a:first').trigger('click');
+    }
+    $('.dataTables_filter').addClass('vertically-aligned-row');
+  }
+
+  function showSecondLevel($thisObj) {
+    var $button = $thisObj.attr('name');
+    var $second_level = $('.'+$button+'-second-level');
+    if ( $second_level.find('.second-level-dropdown').length ) {
+      var $dropdown = $second_level.find('.second-level-dropdown').detach();
+    } else {
+      if ( $second_level.next().hasClass('dropdown') ) {
+        var $dropdown = $second_level.next().detach();
+      }
+    }
+    if ( $thisObj.hasClass('active') == false && $('.'+$button+'-second-level').is(':visible') ) {
+      $second_level.addClass('hidden');
+    }
+    $second_level.detach();
+    $('.btn-group.first-level').parent().after($second_level);
+    if ( $dropdown != undefined ) {
+      $second_level.after($dropdown);
+      $second_level.next().andSelf().wrapAll("<div class='vertically-aligned-row' style='table-layout: fixed;'></div>");
+      $dropdown.removeClass('hidden');
+    } else {
+      $second_level.wrap("<div></div>");
+    }
+    $second_level.removeClass('hidden');
+    if ( $dropdown != undefined ) {
+      $dropdown.find('a').on('click', function() {
+        $second_level.find('a.active').removeClass('active');
+      });
+    }
+  }
+
+  function lastRowSpacing(table_id) {
+    // This is a patch until a better way is found.  Needs to be namespaced with table_id.  Refs #9826
+    $(document).on('click', '#dropdownMenu1', function () {
+      var row = $(this).parent().parent().parent().index()
+      var rows = $('.dataTable tr').size()
+      spacer_count = $('#datatable_tr_spacer').size()
+      if ((spacer_count==0) && (rows < row +4 )) {
+        $('.table-responsive').append('<div id="datatable_tr_spacer" <br/>&nbsp;<br/>&nbsp; <br/> &nbsp;<br/>&nbsp;</div>')
+      }
+      // console.log(row, rows, spacer_count, table_id);
+    });
+  }
+
+  function addSelectAll(table_id) {
+    findTable(table_id)
+    if ( $table.find('tbody tr').length >= 2 ) {
+      $first_th = $table.find('thead>tr>th:first');
+      $first_th.html('<span class="enroll-checkbox"><div class="checkbox"><label><input type="checkbox" class="select-all" id="select-all" name="id[]" value=""><label for="select-all"><i class="fa fa-check-square-o fa-2x"></i><i class="fa fa-square-o fa-2x"></i></label></label></div></span>');
+    }
+  }
+
+  function addBulkActions(table_id) {
+    findTable(table_id)
+    var $header = $table.closest('.module').find('.header ');
+    var $dropdown = $('#'+table_id+'-bulk-actions').closest('.dropdown').detach();
+    $header.prepend($dropdown);
+    $dropdown.removeClass('hidden');
+  }
+
+  function addCheckboxHandlers(table_id) {
+    var $dropdown = $('#'+table_id+'-bulk-actions').closest('.dropdown')
+    $(document).on('change', '#'+table_id+' .enroll-checkbox input', function() {
+      if ( $dropdown.find('.disabled').length && $('#'+table_id+' .enroll-checkbox input:checked').length > 0 ) {
+        $dropdown.find('.dropdown-toggle').removeClass('disabled');
+      } else {
+        if ( !$dropdown.find('.dropdown-toggle').hasClass('disabled') && $('#'+table_id+' .enroll-checkbox input:checked').length == 0 ) {
+          $dropdown.find('.dropdown-toggle').addClass('disabled');
+          $('#'+table_id).closest('.module').find('.select-all').removeProp('checked');
+        }
+      }
+    });
+    $(document).on('change', '.select-all', function() {
+      $('#'+table_id).closest('.module').find('.select-all').prop('checked', $(this).prop('checked'));
+      if ( $('#'+table_id+' .enroll-checkbox input:checked').length + 1 == $('#'+table_id+' .enroll-checkbox input').length ) {
+        $(this).closest('.module').find('#'+table_id+' .enroll-checkbox input').removeProp("checked");
+        $('#'+table_id).closest('.module').find('.select-all').removeProp('checked');
+        $dropdown.find('.dropdown-toggle').addClass('disabled');
+      } else {
+        $(this).closest('.module').find('#'+table_id+' .enroll-checkbox input').prop("checked", "checked");
+        $dropdown.find('.dropdown-toggle').removeClass('disabled');
+      }
+    });
+  }
+
+  function addButtonsBelowTable(table_id) {
+    findTable(table_id)
+    var $buttons_below_table = $table.closest('.module').find('.buttons-below-table').detach();
+    $table.closest('.module').find('.footer .vertically-aligned-row').prepend($buttons_below_table);
+    $buttons_below_table.removeClass('hidden');
+  }
+
+  function swapSearchAndNewButton(table_id) {
+    findTable(table_id);
+    var $search = $table.closest('.module').find('.search input').detach();
+    var $new_button = $table.closest('.module').find('.datatable-header').find('.btn').closest('.col-xs-2').detach();
+    $table.closest('.module').find('.header').append($new_button);
+    $search.removeClass('form-control');
+    $table.closest('.module').find('.datatable-header').append($search);
+    $search.wrap('<div class="search text-right"></div>');
+    $table.closest('.module').find('.datatable-header .search').prepend('<label>Search&nbsp;</label>')
+    if ( !$('#'+table_id+'-bulk-actions').length ) {
+      var $new_button = $table.closest('.module').find('.header .search + .col-xs-2').detach();
+      var $filters_parent = $table.closest('.module').find('.first-level').parent();
+      $filters_parent.addClass('vertically-aligned-row');
+      $filters_parent.append($new_button);
+    }
+    $new_button.removeClass('hidden');
+    $search.removeClass('hidden');
+  }
+
+  function showButtonsBelow(table_id) {
+    findTable(table_id);
+    var $buttons_below_table = $table.closest('.module').find('.buttons-below-table').detach();
+    var $select_all = $table.closest('.module').find('.select-all');
+    $select_all.find('.vertically-aligned-row').html($buttons_below_table);
+    buttons_below_table.removeClass('hidden');
+  }
+
+  function wrapSearchInBootstrap(table_id) {
+    findTable(table_id);
+    var $search_input = $table.closest('.module').find('.search input');
+    $table.closest('.module').find('.search label:first').remove();
+    $search_input.addClass('form-control');
+    $search_input.wrap('<div class="input-group"></div>');
+    $search_input.after('<div class=\"input-group-btn\"><div class=\"btn btn-default\" id=\"census_employee_search_clear\"><span aria-hidden=\"true\" class=\"glyphicon glyphicon-remove\"></span></div><input type=\"submit\" name=\"commit\" value=\"Search\" class="btn btn-default interaction-click-control-search\"></div>');
+    $table.closest('.module').find('.input-group').wrap('<div class="input-no-pd"></div>');
+  }
+
+  function attachModalsToLinks(table_id) {
+    findTable(table_id);
+    $table.find('.row-data .for-modal').each(function() {
+      var $new_link = $(this).find('a');
+      var $replace_for = $(this).attr('id').replace(/-/g, '_');
+      $(this).closest('tr').find('.row-actions a[href="replace_with_modal_'+$replace_for+'"]').replaceWith($new_link);
+    });
+  }
+
+  function replaceRowActionUrls(table_id) {
+    findTable(table_id);
+    $table.find('.row-data .for-remote-replace-url').each(function() {
+      var $new_url = $(this).data('replace-url');
+      var $replace_for = $(this).attr('id').replace(/-/g, '_');
+      // add data-method: post if present
+      if ( $(this).hasClass('disabled')) {
+        $(this).closest('tr').find('.row-actions a[href="replace_url_'+$replace_for+'"]').addClass('disabled');
+      }
+      if ( $(this).data('method') == 'post' ) {
+        $(this).closest('tr').find('.row-actions a[href="replace_url_'+$replace_for+'"]').attr('data-method', 'post');
+      }
+      // add data-method: delete if present
+      if ( $(this).data('method') == 'delete' ) {
+        $(this).closest('tr').find('.row-actions a[href="replace_url_'+$replace_for+'"]').attr('data-method', 'delete');
+      }
+      $(this).closest('tr').find('.row-actions a[href="replace_url_'+$replace_for+'"]').attr('href', $new_url);
+    });
+  }
+
+  function clickRowDataLink(table_id) {
+    findTable(table_id);
+    $table.find('.row-actions .dropdown a[href="click_row_data_link"]').each(function() {
+      var $clicked_link_text = $(this).text();
+      var $row_data_link = $(this).closest('tr').find('.row-data a:contains('+$clicked_link_text+')');
+      if ( $row_data_link.hasClass('disabled') ) {
+        $(this).addClass('disabled');
+      }
+      $(this).on('click', function() {
+        $row_data_link.trigger('click');
+      });
+    });
+  }
+
+  function addRowIndexToRowFunctionLinks(table_id) {
+    findTable(table_id);
+    $remote_links = $table.find('.row-actions .dropdown a');
+    $remote_links.each(function() {
+      $row_index = $(this).closest('tr').find('td:first span').data('index');
+      $existing_href = $(this).attr('href');
+      console.log($existing_href.indexOf('?') + " " + $existing_href);
+      if ( $existing_href.indexOf('?') == -1 ) {
+        $(this).attr('href', $existing_href+"?row="+$row_index);
+      } else {
+        $(this).attr('href', $existing_href+"&row="+$row_index);
+      }
+    });
+  }
+
+  function addRowDataToParams(table_id) {
+    findTable(table_id);
+      $table.find('.row-actions .dropdown a[data-remote="true"]').each(function() {
+        var $link = $(this);
+        var $row = $(this).closest('tr');
+        $row.find('.row-data span.for-remote').each(function(index, $link) {
+          var data_attributes = [];
+          $.each($(this).data(), function(k,v) {
+            k = k.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "")
+            if ( k == "replace_url" ) {
+            } else {
+              data_attributes.push(k+"="+v);
+            }
+          });
+          $.each(data_attributes, function(index,value) {
+            var $link = $row.find('.row-actions .dropdown a[data-remote="true"]').eq(index);
+            var $existing_href = $link.attr('href');
+            $link.attr('href', $existing_href+"&"+value);
+          });
+        });
+      });
+  }
+
+  function attachPostDrawHandlers(table_id) {
+    findTable(table_id);
+    $table.on( 'draw.dt', function () {
+      EnrollDataTableInitializer.addRowIndexToRowFunctionLinks(table_id);
+      EnrollDataTableInitializer.addRowDataToParams(table_id);
+    });
+  }
+
+  function handleCustomDates(table_id) {
+    findTable(table_id);
+    var $from_datepicker = $table.closest('.module').find('.injected-custom-filter #custom-date-from');
+    var $to_datepicker = $table.closest('.module').find('.injected-custom-filter #custom-date-to');
+    $from_datepicker.on('change', function() {
+      var $to_datepicker = $table.closest('.module').find('.injected-custom-filter #custom-date-to');
+      if ($(this).val().length == 10 && $to_datepicker.val().length == 10) {
+        $(this).closest('div').find('.btn-primary').removeClass('disabled');
+        submitCustomDates(table_id, $(this).val(), $to_datepicker.val());
+      } else {
+        $(this).closest('div').find('.btn-primary').addClass('disabled');
+      }
+    });
+    $to_datepicker.on('change', function() {
+      var $from_datepicker = $table.closest('.module').find('.injected-custom-filter #custom-date-from');
+      if ($(this).val().length == 10 && $from_datepicker.val().length == 10) {
+        $(this).closest('div').find('.btn-primary').removeClass('disabled');
+        submitCustomDates(table_id, $(this).val(), $from_datepicker.val());
+      } else {
+        $(this).closest('div').find('.btn-primary').addClass('disabled');
+      }
+    });
+  }
+
+  function submitCustomDates(table_id, start_date, end_date) {
+    findTable(table_id);
+    $table.closest('.module').find('.custom-dates .btn-primary').on('click', function() {
+      var tab = $table.closest('.module').find('.first-level').data('tab');
+      var base_model = $table.closest('.module').find('.first-level').data('base-model');
+      var first_level = $table.closest('.module').find('.first-level a.active').text().toLowerCase();
+      var second_level = "custom_date";
+      AddParamsBeforeDraw(table_id, {
+        base_model: base_model,
+        filters: EnrollDataTableInitializer.setFiltersFromScopeMap(table_id, tab, first_level, second_level),
+        start_on: start_date,
+        end_on: end_date
+      })
+    })
+  }
+
+  function showProcessing(table_id) {
+    findTable(table_id);
+    $table.closest('.module').find('.dataTables_processing').parent().removeClass('hidden');
+  }
+
+  // function addProcessingOverlay(table_id) {
+  //   findTable(table_id);
+  //   if ( !$table.closest('.module').find('.processing-overlay').length ) {
+  //   $table.on( 'processing.dt', function ( e, settings, processing ) {
+  //       $table.closest('.module').find('.table-responsive').append('<div class="processing-overlay"></div>');
+  //     })
+  //   }
+  // }
+  //
+  // function removeProcessingOverlay(table_id) {
+  //   findTable(table_id);
+  //   console.log($table.closest('.module').find('.processing-overlay').length);
+  //   console.log($('.processing-overlay').length);
+  //
+  //   $table.closest('.module').find('.processing-overlay').remove();
+  // }
+
+  function exportPageAsCSV(table_id, table_data, columns) {
+    findTable(table_id);
+    var $url = $table.closest('.module').data('export-csv-url');
+    var $export_csv_link = $('.dropdown-menu').find('a:contains("Export CSV")');
+    $('#export-csv-injected-form').html("");
+    $export_csv_link.on('click', function() {
+      row_indexes_for_export = [];
+      rows_for_export = [];
+      $table.find('tbody .enroll-checkbox input:checked').closest('.enroll-checkbox').each( function() {
+        row_indexes_for_export.push($(this).data('index'));
+      })
+      $(row_indexes_for_export).each(function( index, element ) {
+        row = [];
+        $(columns["0"]).each(function(index, column) {
+          row.push(table_data[element][column]);
+        });
+        rows_for_export.push(row);
+      });
+      $(rows_for_export).each(function(row_index, row) {
+        $(columns["0"]).each(function(index, column_name) {
+          $('#export-csv-injected-form').prepend('<input type="hidden" type="hidden" name="rows['+row_index+']['+column_name+']" value="'+escape(row[index])+'">');
+        });
+      });
+      $(columns["0"]).each(function(index, column_name) {
+        $('#export-csv-injected-form').prepend('<input type="hidden" type="hidden" name="columns[]" value="'+escape(column_name)+'">');
+      });
+      var authenticity_token = $("meta[name='csrf-token']").attr("content");
+      $('#export-csv-injected-form').prepend('<input name="authenticity_token" type="hidden" value="'+authenticity_token+'">');
+      $('#export-csv-injected-form').submit();
+    });
+  }
+
+  function AddParamsBeforeDraw(table_id, params) {
+    findTable(table_id);
+    var additional_params = {};
+    $.each(params, function(k,v) {
+      additional_params[k] = v;
+    });
+    $table.data('dt_params', additional_params );
+    if (additional_params.hasOwnProperty('key')) {
+    } else {
+      $table.EnrollDataTable().draw();
+    }
+  }
+
+  function removeRow($thisObj) {
+    $thisObj.closest('tr').remove();
+  }
+
+  return {
+    removeRow: removeRow,
+    setTab: setTab,
+    showProcessing: showProcessing,
+    clickRowDataLink: clickRowDataLink,
+    exportPageAsCSV: exportPageAsCSV,
+    setFirstLevel: setFirstLevel,
+    setSecondLevel: setSecondLevel,
+    clickActiveFilter: clickActiveFilter,
+    setBaseModel: setBaseModel,
+    setFilterCriteria: setFilterCriteria,
+    setFiltersFromScopeMap : setFiltersFromScopeMap,
+    setScopesFromFilters : setScopesFromFilters,
+    attachModalsToLinks : attachModalsToLinks,
+    replaceRowActionUrls : replaceRowActionUrls,
+    addRowIndexToRowFunctionLinks : addRowIndexToRowFunctionLinks,
+    wrapSearchInBootstrap : wrapSearchInBootstrap,
+    moveInfo : moveInfo,
+    findTable: findTable,
+    showTable: showTable,
+    handleCustomDates: handleCustomDates,
+    moveTableLength : moveTableLength,
+    initializeFilters : initializeFilters,
+    showSecondLevel : showSecondLevel,
+    lastRowSpacing : lastRowSpacing,
+    addSelectAll : addSelectAll,
+    addBulkActions : addBulkActions,
+    addButtonsBelowTable : addButtonsBelowTable,
+    showPagination : showPagination,
+    makeResponsiveTable : makeResponsiveTable,
+    swapSearchAndNewButton : swapSearchAndNewButton,
+    showButtonsBelow : showButtonsBelow,
+    addRowDataToParams : addRowDataToParams,
+    addCheckboxHandlers : addCheckboxHandlers,
+    attachPostDrawHandlers : attachPostDrawHandlers,
+    AddParamsBeforeDraw : AddParamsBeforeDraw
+  };
+
+} )( window );

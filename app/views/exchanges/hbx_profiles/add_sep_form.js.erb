@@ -1,0 +1,126 @@
+var $parent_row = $(".table:first > tbody > tr:not(tr.child-row)").eq(<%= @row %>);
+if ( $('tr.child-row:visible').length > 0 ) {
+  $('tr.child-row:visible').remove();
+}
+
+if ( $parent_row.next().hasClass('child-row') ) {
+//
+} 
+else {
+  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "sep/approval/admin_detail", 
+  f: @family, qle: @qle, formats: [:html] %></td></tr>');
+}
+
+$('.sep_link').hide();
+$('.admin_effective_on_kind_options').hide();
+$('.init_event_date').hide();
+$('.sep_dates_filter').hide();
+$('.optional_date').hide();
+var ivlTable, shopTable, ivl_shop_Table, selectedTable, idTable;
+var self_attested;
+var arrEffectiveDate;
+var idVal;
+var personID;
+
+if("<%= @market %>" == 'both')
+  $('.radio_option').show();
+else
+  $('.radio_option').hide();
+
+$(document).on('change','.admin_selected_sep_reason select',function(){
+  if($(this).val() == '') {
+    $('.init_event_date').hide();
+    $('.admin_effective_on_kind_options').hide();
+    $('.sep_dates_filter').hide();
+    $('.csl_num_options input:text').val("");
+  }
+  else{
+    var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
+    var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
+    self_attested = getObj.data('is-self-attested');
+    arrEffectiveDate = getObj.data('effective-on-kinds');
+    idVal = getObj.data('id');
+
+    $.ajax({
+      type: "GET",
+      data:{id: idVal},
+      url: "/exchanges/hbx_profiles/update_effective_date"
+    });
+  }
+});
+
+$(document).on('change','.admin_effective_on_kind_options select', function(){
+  if($(this).val() == ''){
+    $('.init_effective_date input').val("");
+    $('.sep_dates_filter').hide();
+    $('.optional_date').hide();
+  }
+  else{
+    $('.init_effective_date .label-floatlabel').removeClass('dn-1');
+    $('.init_effective_date .label-floatlabel').addClass('dn-1');
+    $('.start_end_date').show();
+
+    $.ajax({
+      type: "GET",
+      data:{eventDate: $('#event_date').val(), effective_kind: $('#effective_on_date').val(), id: idVal, person: $('#person').val()},
+      url: "/exchanges/hbx_profiles/calculate_sep_dates"
+    });
+  }
+});
+
+
+$(document).on('change','.radio_option input', function(){
+  if($(this).val() == 'shop')
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qle_shop.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective_on_kinds: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+  else
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qle_ivl.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective_on_kinds: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+
+  $('.admin_effective_on_kind_options').hide();
+  $('.init_event_date').hide();
+  $('.sep_dates_filter').hide();
+  $('.init_effective_date input').val('');
+  $('.csl_num_options input').val('');
+});
+
+$(document).on('change','.init_event_date input', function(){
+  if($(this).val() == ''){
+   $('.admin_effective_on_kind_options').hide();
+  }
+  else{
+    $('.admin_effective_on_kind_options').show();
+    $('.admin_effective_on_kind_options #effective_on_date').val("");
+    $('.init_effective_date input').val("");
+    //$('.start_end_date').show();
+  }
+    $('.end_date input').val("");
+    $('init_effective_date input').val("");
+    $('.init_event_date .label-floatlabel').removeClass("dn-1");
+    $('.init_event_date .label-floatlabel').addClass("dn-1");
+    $('.sep_dates_filter').hide();
+    $('.admin_effective_on_kind_options #effective_on_date').selectric("refresh");
+    $('.optional_date').hide();
+});
+
+$('#tab_datatables a[data-toggle="tab"]').on("mousedown", function(){
+  if(add_btn_counter > 0){
+    add_btn_state = false;
+    $(idTable + " span.add-control").trigger('click');
+  }
+});
+
+ $(".btn").click(function() {
+    if($("#collapseme").hasClass("out")) {
+        $("#collapseme").addClass("in");
+        $("#collapseme").removeClass("out");
+    } else {
+        $("#collapseme").addClass("out");
+        $("#collapseme").removeClass("in");
+    }
+});
+
+function resetButtons(button){
+  button.prop('disabled', false);
+  button.removeClass('icon_disabled');
+  button.addClass('icon_enabled');
+  button.css("cursor", "pointer");
+}

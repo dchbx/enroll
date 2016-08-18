@@ -34,13 +34,13 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
   effective_date = ce.employer_profile.renewing_plan_year.start_on
 
   expect(page.find_all('.hbx-enrollment-panel').any?{|e| 
-    (e.find('.family-plan-selection').find('.status').find('h4').text() == 'Auto Renewing') && 
-    (e.find('.enrollment-effective').find('strong').text() == effective_date.strftime('%m/%d/%Y'))
+    (e.find('.enrollment-status').find('.label-success').text() == 'Auto Renewing') && 
+    (e.find('.enrollment-effective').text() == "Effective date: #{effective_date.strftime('%m/%d/%Y')}")
   }).to be_truthy
 
   expect(page.find_all('.hbx-enrollment-panel').any?{|e| 
-    (e.find('.family-plan-selection').find('.status').find('h4').text() == 'Coverage Selected') && 
-    (e.find('.enrollment-effective').find('strong').text() == (effective_date - 1.year).strftime('%m/%d/%Y'))
+    (e.find('.enrollment-status').find('.label-success').text() == 'Coverage Selected') && 
+    (e.find('.enrollment-effective').text() == "Effective date: #{(effective_date - 1.year).strftime('%m/%d/%Y')}")
   }).to be_truthy
 end
 
@@ -60,9 +60,9 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
   effective_date = ce.employer_profile.renewing_plan_year.start_on
 
   expect(page.find_all('.hbx-enrollment-panel').any?{|e| 
-    (e.find('.family-plan-selection').find('.status').find('h4').text() == 'Coverage Selected') && 
-    (e.find('.enrollment-effective').find('strong').text() == effective_date.strftime('%m/%d/%Y'))
+    (e.find('.enrollment-status').find('.label-success').text() == 'Coverage Selected') && 
+    (e.find('.enrollment-effective').text() == "Effective date: #{effective_date.strftime('%m/%d/%Y')}")
   }).to be_truthy
 
-  expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey
+  expect(page.find_all('.enrollment-status').any?{|e| e.find('.label-success').text() == 'Auto Renewing'}).to be_falsey
 end

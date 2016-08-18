@@ -6,7 +6,7 @@ class EmployerProfilePolicy < ApplicationPolicy
     hbx_staff.permission.list_enrollments
   end
 
-  def updateable?                
+  def updateable?
     return true unless role = user.person && user.person.hbx_staff_role
     role.permission.modify_employer
   end

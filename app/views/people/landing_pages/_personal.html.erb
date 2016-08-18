@@ -66,9 +66,9 @@
       <div id="email_info" class="row row-form-wrapper no-buffer">
       <%= render 'shared/email_fields', f: email %>
         </div><br>
-      
+
     <% end %>
-  
+
      <div>
       <% if @person.has_active_consumer_role? %>
       <%= render 'shared/contact_preferences', {f: f, role: :consumer_role} %></br>

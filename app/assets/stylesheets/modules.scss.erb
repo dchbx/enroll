@@ -1,5 +1,16 @@
 @import "variables";
 .module {
+  .vertically-aligned-row {
+    display: table;
+    width: 100%;
+    > * {
+      display: table-cell;
+      float: none;
+    }
+    .label {
+      margin: 0;
+    }
+  }
   &.inbox {
     .inboxes {
       margin-bottom: 1.25%;
@@ -29,6 +40,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
+    z-index: 100;
     a {
       color: $primary-white;
     }
@@ -121,6 +133,47 @@
       }
       .fa-stack-1x:last-of-type {
         padding-top: 3px;
+      }
+    }
+  }
+  &.footer {
+    font-size: 14px;
+    color: $primary-white;
+    background-color: #003260;
+    padding: 15px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    a {
+      color: $primary-white;
+    }
+    &>.container {
+      display: table;
+      .col-md-6 {
+        display: table-cell;
+        float: none;
+        vertical-align: middle;
+      }
+      .col-md-6:last-of-type {
+        a, span {
+          display: inline-block;
+        }
+        ul {
+          margin: 0;
+        }
+      }
+    }
+  }
+  &.welcome {
+    h1 {
+      color: $primary-black;
+    }
+  }
+  &.signin {
+    .actions {
+      span {
+        margin-top: 2.5%;
       }
     }
   }
@@ -283,8 +336,8 @@
 						vertical-align: middle;
 					}
 				}
-			}
-			tbody {
+      }
+      tbody {
 				tr {
 					&.top {
 						&.even {
@@ -318,6 +371,33 @@
 						}
 					}
 				}
+			}
+    }
+  }
+
+  &.demo-up {
+    border: 0 !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 150px;
+    text-overflow: "";
+    border-radius: 15px;
+    padding: 0px;
+    margin: 0px;
+  }
+
+  &.verif-type {
+    margin-right: 20px;
+    list-style-type: none;
+  }
+
+
+	&.modal-footer {
+		.modal-sbc-link {
+			text-align: left;
+			position: relative;
+			.fa.fa-file-pdf-o {
+				margin: 2px auto auto 5px;
 			}
 		}
 	}

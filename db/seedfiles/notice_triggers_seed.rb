@@ -90,7 +90,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20A',
-    title: 'Request for Additional Information First Reminder',
+    title: 'Request for Additional Information - First Reminder',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'first_verifications_reminder',
@@ -111,7 +111,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20B',
-    title: 'Request for Additional Information Second Reminder',
+    title: 'Request for Additional Information - Second Reminder',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'second_verifications_reminder',
@@ -128,11 +128,11 @@ ivl_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'Notice21',
-    title: 'Request for Additional Information Third Reminder',
+    title: 'Request for Additional Information - Third Reminder',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'third_verifications_reminder',
@@ -153,7 +153,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice22',
-    title: 'Request for Additional Information Fourth Reminder',
+    title: 'Request for Additional Information - Fourth Reminder',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'fourth_verifications_reminder',
