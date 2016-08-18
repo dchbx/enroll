@@ -22,7 +22,7 @@ var EnrollDataTableInitializer = ( function( window, undefined ) {
 
   function showTable(table_id) {
     findTable(table_id);
-    $table.closest('.datatable').fadeIn();
+    $table.closest('.datatable').css({visibility:"visible", opacity: 0.0}).animate({opacity: 1.0},300);
     $table.closest('.datatable').prev().hide();
     // page-loading
   }
