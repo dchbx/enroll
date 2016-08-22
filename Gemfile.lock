@@ -438,6 +438,9 @@ GEM
     ruby-saml (1.0.0)
       nokogiri (>= 1.5.10)
       uuid (~> 2.3)
+    rubyXL (3.3.21)
+      nokogiri (>= 1.4.4)
+      rubyzip (>= 1.1.6)
     rubyzip (1.2.0)
     sass (3.4.21)
     sass-rails (5.0.4)
@@ -593,6 +596,7 @@ DEPENDENCIES
   rspec_junit_formatter (= 0.2.3)
   ruby-progressbar (= 1.6.0)
   ruby-saml (~> 1.0.0)
+  rubyXL
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)

@@ -450,32 +450,26 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def self.to_csv
-    attributes = %w{employee_name dob hired status renewal_benefit_package benefit_package enrollment_status termination_date}
+  def self.to_excel
 
-    CSV.generate(headers: true) do |csv|
-      csv << attributes
+    excel_template_path = "public/DCHL Employee Census.xlsx"
 
-      all.each do |census_employee|
-        data = [
-          "#{census_employee.first_name} #{census_employee.middle_name} #{census_employee.last_name} ",
-          census_employee.dob,
-          census_employee.hired_on,
-          census_employee.aasm_state.humanize.downcase,
-          census_employee.renewal_benefit_group_assignment.try(:benefit_group).try(:title)
-        ]
+    workbook = RubyXL::Parser.parse(excel_template_path);
+    sheet = workbook[0]
 
-        if active_assignment = census_employee.active_benefit_group_assignment
-          data += [
-            active_assignment.benefit_group.title,
-            "dental: #{ d = active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'dental'}.try(:aasm_state).try(:humanize).try(:downcase)} health: #{ active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'health'}.try(:aasm_state).try(:humanize).try(:downcase)}"
-          ]
-        else
-          data += [nil, nil]
-        end
-        csv << (data + [census_employee.coverage_terminated_on])
+    row = 3
+    all.each do |census_employee|
+
+      add_to_excel(sheet, row, census_employee)
+      row = row + 1
+
+      census_employee.census_dependents.each do |census_dependent|
+        add_to_excel(sheet, row, census_dependent)
+        row = row + 1
       end
     end
+
+    workbook.stream.string
   end
 
   private
@@ -570,6 +564,66 @@ class CensusEmployee < CensusMember
     unset("employee_role_id")
     self.benefit_group_assignments = []
     @employee_role = nil
+  end
+
+  def self.relationship_map(relation)
+    case relation
+      when "self"
+        "Employee"
+      when "employee"
+        "Employee"
+      when "spouse"
+        "Spouse"
+      when "domestic_partner"
+        "Domestic Partner"
+      when "child_under_26"
+        "Child"
+      when "disabled_child_26_and_over"
+        "Disabled Child"
+      else
+        nil
+    end
+  end
+
+  def self.add_to_excel(sheet, row, census_member)
+    sheet.add_cell(row, 0, census_member.employer_assigned_family_id)
+    sheet.add_cell(row, 1, relationship_map(census_member.employee_relationship))
+    sheet.add_cell(row, 2, census_member.last_name)
+    sheet.add_cell(row, 3, census_member.first_name)
+    sheet.add_cell(row, 4, census_member.middle_name || "")
+    sheet.add_cell(row, 5, census_member.name_sfx || "")
+    sheet.add_cell(row, 6, (census_member.email_address rescue "")) if census_member.is_a? CensusEmployee
+    sheet.add_cell(row, 7, census_member.ssn)
+    sheet[row][8].change_contents(census_member.dob)
+    sheet.add_cell(row, 9, census_member.gender)
+    sheet[row][10].change_contents(census_member.hired_on) if census_member.is_a? CensusEmployee
+
+    if census_member.is_a? CensusEmployee
+    census_member.employment_terminated? ? termination_date = census_member.employment_terminated_on : termination_date = ""
+    sheet[row][11].change_contents(termination_date)
+    end
+
+    if census_member.is_a? CensusEmployee
+      census_member.is_business_owner? ? is_business_owner = 'yes' : is_business_owner = 'no'
+      sheet.add_cell(row, 12, is_business_owner)
+    end
+
+    if census_member.is_a? CensusEmployee
+    census_member.active_benefit_group_assignment.present? ? benefit_group = census_member.active_benefit_group_assignment.benefit_group.title : benefit_group = ""
+    sheet.add_cell(row, 13, benefit_group)
+
+
+    census_member.active_benefit_group_assignment.present? ? plan_year = census_member.active_benefit_group_assignment.benefit_group.plan_year.start_on : plan_year = ""
+    sheet.add_cell(row, 14, plan_year)
+    end
+
+    if (census_member.address.present?) && (census_member.is_a? CensusEmployee)
+      sheet.add_cell(row, 15, census_member.address.kind)
+      sheet.add_cell(row, 16, census_member.address.address_1)
+      sheet.add_cell(row, 17, census_member.address.city)
+      sheet.add_cell(row, 18, census_member.address.state)
+      sheet.add_cell(row, 19, census_member.address.zip)
+    end
   end
 end
 

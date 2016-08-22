@@ -24,6 +24,18 @@ RSpec.describe CensusEmployeeImport, :type => :model do
     it "should not throw an exception" do
       expect { CensusEmployeeImport.new({file: file, employer_profile: employer_profile}) }.to_not raise_error
     end
+
+    describe "parse_ssn with text" do
+      it "should return the ssn" do
+        expect(subject.parse_ssn("11-1111111")).to eq("111111111")
+      end
+    end
+
+    describe "parse_ssn with float" do
+      it "should return the ssn" do
+        expect(subject.parse_ssn("111111111".to_f)).to eq("111111111")
+      end
+    end
   end
 
   it "should validate headers" do
@@ -72,4 +84,6 @@ RSpec.describe CensusEmployeeImport, :type => :model do
       expect(subject.save).to be_falsey
     end
   end
+
+
 end

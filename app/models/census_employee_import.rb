@@ -114,15 +114,11 @@ class CensusEmployeeImport
       row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
 
-      if record[:termination_date].present?
-        census_employee = terminate_employee(record)
+      if record[:employee_relationship].nil?
+        self.errors.add :base, "Row #{index + 4}: Relationship is required"
+        break
       else
-        if record[:employee_relationship].nil?
-          self.errors.add :base, "Row #{index + 4}: Relationship is required"
-          break
-        else
-          census_employee = add_or_update_census_member(record)
-        end
+        census_employee = add_or_update_census_member(record)
       end
 
       census_employee ||= nil
@@ -145,7 +141,7 @@ class CensusEmployeeImport
   def add_or_update_census_member(record)
     # Process Employee
     if record[:employee_relationship].downcase == "self"
-      member = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).active.first || CensusEmployee.new
+      member = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).first || CensusEmployee.new
       member = assign_census_employee_attributes(member, record)
       member.terminate_employment(member.employment_terminated_on) if member.employment_terminated_on.present?
       @last_ee_member = member
@@ -179,10 +175,11 @@ class CensusEmployeeImport
     member.name_sfx = record[:name_sfx].to_s if record[:name_sfx]
     member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
-    if ["0", "false"].include? record[:is_business_owner].to_s
-      member.is_business_owner = false
-    else
+    member.employment_terminated_on = record[:termination_date] if record[:termination_date]
+    if ["1", "true", "yes"].include? record[:is_business_owner].to_s
       member.is_business_owner = true
+    else
+      member.is_business_owner = false
     end
     member.gender = record[:gender].to_s if record[:gender]
     member.email = Email.new({address: record[:email].to_s, kind: "home"}) if record[:email]
@@ -302,7 +299,16 @@ class CensusEmployeeImport
   end
 
   def parse_ssn(cell)
-    cell.blank? ? nil : cell.to_s.gsub(/\D/, '')
+
+    if cell.blank?
+      cell = nil
+    elsif cell.is_a? Numeric
+      cell = cell.floor.to_s.gsub(/\D/, '')
+    else
+      cell = cell.to_s.gsub(/\D/, '')
+    end
+
+    cell
   end
 
   def parse_boolean(cell)
