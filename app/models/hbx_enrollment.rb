@@ -329,6 +329,11 @@ class HbxEnrollment
     kind == 'employer_sponsored_cobra'
   end
 
+  def future_enrollment_termination_date
+    return "" unless coverage_termination_pending?
+    employee_role && employee_role.census_employee && employee_role.census_employee.coverage_terminated_on
+  end
+
   def benefit_sponsored?
     benefit_group.present?
   end

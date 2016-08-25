@@ -1846,6 +1846,24 @@ context "for cobra", :dbclean => :after_each do
     end
   end
 
+  context "future_enrollment_termination_date" do
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:coverage_termiante_date) { TimeKeeper.date_of_record + 1.months }
+
+    it "should return blank if not coverage_termination_pending" do
+      expect(enrollment.future_enrollment_termination_date).to eq ""
+    end
+
+    it "should return coverage_termiante_date by census_employee" do
+      census_employee.coverage_terminated_on = coverage_termiante_date
+      employee_role.census_employee = census_employee
+      enrollment.employee_role = employee_role
+      enrollment.aasm_state = "coverage_termination_pending"
+      expect(enrollment.future_enrollment_termination_date).to eq coverage_termiante_date
+    end
+  end
+
   it "can_select_coverage?" do
     enrollment.kind = 'employer_sponsored_cobra' 
     expect(enrollment.can_select_coverage?).to be_truthy
