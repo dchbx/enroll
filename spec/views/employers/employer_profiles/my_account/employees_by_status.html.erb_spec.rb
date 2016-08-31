@@ -6,7 +6,8 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee3) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:census_employees) { [census_employee1, census_employee2, census_employee3] }
+  let(:census_employee4) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let(:census_employees) { [census_employee1, census_employee2, census_employee3, census_employee4 ] }
 
   let(:person) { FactoryGirl.create(:person) }
   let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
@@ -29,6 +30,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:benefit_group_assignment1) { double(hbx_enrollments: [enrollment_with_coverage_selected], benefit_group: benefit_group)}
   let(:benefit_group_assignment2) { double(hbx_enrollments: [enrollment_with_coverage_terminated], benefit_group: benefit_group)}
   let(:benefit_group_assignment3) { double(hbx_enrollments: [hbx_enrollment], benefit_group: benefit_group) }
+  let(:benefit_group_assignment4) { double(hbx_enrollments: [enrollment_with_coverage_selected], benefit_group: benefit_group)}
 
   before :each do
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true))
@@ -73,6 +75,19 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       assign(:census_employees, [census_employee3])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Coverage Waived/)
+    end
+  end
+  
+  context 'when employee is eligible' do
+    before do
+      hbx_enrollment.update_attributes(aasm_state: 'eligible')
+      allow(census_employee4).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment4)
+    end
+    
+    it "should displays enrollment status as Eligible" do
+      assign(:census_employees, [census_employee4])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to match(/Employee Role Linked/)
     end
   end
 

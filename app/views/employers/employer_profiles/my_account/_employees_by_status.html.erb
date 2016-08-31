@@ -37,7 +37,13 @@
           </td>
           <td><%= format_date census_employee.dob %></td>
           <td><%= format_date census_employee.hired_on %></td>
-          <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
+          <td style="text-transform: capitalize;">
+		  <% if census_employee.aasm_state.humanize == "Eligible" %>
+		  	Employee Role Linked
+		  <% else %>
+		  	<%= census_employee.aasm_state.humanize %>
+		  <% end %>
+		  </td>
           <td>
           <% if census_employee.active_benefit_group_assignment.present? %>
             <%= census_employee.active_benefit_group_assignment.benefit_group.title.capitalize %>
