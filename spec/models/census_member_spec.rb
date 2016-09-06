@@ -18,6 +18,17 @@ RSpec.describe CensusMember, :dbclean => :after_each do
     expect(census_employee.dob).to eq "1980-12-12".to_date
   end
 
+  context "has_primary_caregiver" do
+    it "is true" do
+      census_employee.has_primary_caregiver=true
+      expect(census_employee.has_primary_caregiver).to eq true
+    end
+    it "is false" do
+      census_employee.has_primary_caregiver=false
+      expect(census_employee.has_primary_caregiver).to eq false
+    end
+  end
+
   context "dob" do
     before(:each) do
       census_employee.date_of_birth = "1980-12-01"

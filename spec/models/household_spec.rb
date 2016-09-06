@@ -16,6 +16,10 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     expect(subject.enrolled_hbx_enrollments).to eq []
   end
 
+  it "should have nephew_or_niece , grandchild relationships" do
+    expect(Household::ImmediateFamily).to include("grandchild","nephew_or_niece")
+  end
+
   context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryGirl.create(:consumer_role)}
     let(:person) { double(primary_family: family)}

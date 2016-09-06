@@ -49,12 +49,11 @@
             </div>
           </div>
         </div>
-
         <div class="row row-form-wrapper no-buffer">
           <div class="col-md-3 col-sm-3 no-pd">
             <div class="form-group form-group-lg">
               <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
-               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}"}, dependent.dob %>
+               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}", onchange: "ManageFamilies.appendDependentQuestions(this)"}, dependent.dob %>
              </div>
            </div>
 
@@ -99,7 +98,7 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *"} %>
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *", oninput: "ManageFamilies.appendDependentQuestions(this)"} %>
           </div>
         </div>
 
@@ -117,7 +116,10 @@
               <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
             </div>
           </div>
+
         <% elsif @person.has_active_employee_role? %>
+        <%= render 'shared/primary_caregiver_question_for_dependent', f: f , initial_show: show_has_primary_caregiver(f.object)%>
+        <%= render 'shared/disability_question_for_dependent', f: f, initial_show: show_is_disabled(f.object) %>
           <%= f.hidden_field :same_with_primary, value: 'false' %>
           <%= render 'shared/address_fields_for_dependent', f: f %>
         <% end %>
