@@ -156,5 +156,10 @@
         $("#address_info .address_required").removeAttr('required');
       };
     });
+
+    // Initialize Selectric and bind to 'change' event
+    $('#dependent_relationship').selectric().on('change', function() {
+      ManageFamilies.appendDependentQuestions(this);
+    });
   </script>
 </li>
