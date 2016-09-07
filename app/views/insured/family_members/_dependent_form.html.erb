@@ -98,7 +98,7 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *", oninput: "ManageFamilies.appendDependentQuestions(this)"} %>
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *"} %>
           </div>
         </div>
 
