@@ -13,8 +13,13 @@ var ManageFamilies = (function (window){
           }else if(!$("#dependent_disabled").hasClass("hidden_field")){
            $("#dependent_disabled").addClass("hidden_field");
           }
-       }else if(!$("#primary_caregiver").hasClass("hidden_field")){
-         $("#primary_caregiver").removeClass("hidden_field");
+       }else{
+        if(!$("#primary_caregiver").hasClass("hidden_field")){
+          $("#primary_caregiver").addClass("hidden_field");
+        }
+        if(!$("#dependent_disabled").hasClass("hidden_field")){
+         $("#dependent_disabled").addClass("hidden_field");
+        }
        }
      }
    }
