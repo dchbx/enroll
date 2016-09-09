@@ -7,7 +7,7 @@ namespace :reports do
 
     desc "Invoices data export"
     task :employer_invoices, [:billing_date] => :environment do |task, args|
-      
+
       @billing_date = Date.strptime(args[:billing_date], "%m/%d/%Y")
       @carriers = CarrierProfile.all.inject({}){|hash, carrier| hash[carrier.id] = carrier.legal_name; hash}
       @plans = Plan.where({market: 'shop', active_year: @billing_date.year}).inject({}){|data, plan| data[plan.id] = plan.name; data}
@@ -16,7 +16,7 @@ namespace :reports do
       organizations = Organization.all.where(:"employer_profile.plan_years" => {
         :$elemMatch => {
           :start_on => @billing_date,
-          :open_enrollment_start_on.lt => TimeKeeper.date_of_record, 
+          :open_enrollment_start_on.lt => TimeKeeper.date_of_record,
           :aasm_state.in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE)
         }})
 
@@ -36,7 +36,7 @@ namespace :reports do
           count += 1
         end
       end
-      
+
       puts "processed #{count} employers"
     end
 
@@ -103,4 +103,3 @@ namespace :reports do
     end
   end
 end
-

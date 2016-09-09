@@ -17,12 +17,27 @@ div.dataTables_filter label {
 	font-weight: normal;
 	white-space: nowrap;
 	text-align: left;
+	width: 50%;
+	padding: 0 0 0 10px;
 }
 
-div.dataTables_filter input {
-	margin-left: 0.5em;
+div.dataTables_filter label span:first-of-type {
+	width: 100%;
+	max-width: 25%;
 	display: inline-block;
-	width: auto;
+	font-size: 11px;
+	color: #838780;
+	text-transform: uppercase;
+	text-align: left;
+}
+
+
+div.dataTables_filter input {
+	margin-left: initial;
+	display: inline-block;
+	max-width: 74%;
+	width: 100% !important;
+	padding: 0;
 }
 
 div.dataTables_info {
@@ -83,10 +98,9 @@ table.dataTable thead .sorting_desc_disabled {
 table.dataTable thead .sorting:after,
 table.dataTable thead .sorting_asc:after,
 table.dataTable thead .sorting_desc:after {
-	position: absolute;
-	top: 8px;
-	right: 8px;
-	display: block;
+	position: relative;
+	display: inline;
+
 	font-family: 'Glyphicons Halflings';
 	opacity: 0.5;
 }
@@ -113,6 +127,8 @@ table.dataTable thead .sorting_desc_disabled:after {
 
 table.dataTable thead > tr > th {
 	padding-right: 30px;
+  vertical-align: middle;
+  text-align: center;
 }
 
 table.dataTable th:active {
@@ -128,8 +144,8 @@ table.dataTable.table-condensed thead > tr > th {
 table.dataTable.table-condensed thead .sorting:after,
 table.dataTable.table-condensed thead .sorting_asc:after,
 table.dataTable.table-condensed thead .sorting_desc:after {
-	top: 6px;
-	right: 6px;
+	top: 3px;
+	right: -5px;
 }
 
 /* Scrolling */

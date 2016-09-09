@@ -1,2 +1,3 @@
-$('.premium-reports-table').html("<%= escape_javascript(render "employers/premium_statements/show") %>");
+$('.premium-reports-table').html("<%= escape_javascript(render "shared/premium_reports_table") %>");
 semantic_class()
+$('.premium-reports-table > .table').DataTable();

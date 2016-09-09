@@ -22,7 +22,5 @@
       <%= enrollment.benefit_group.title.try(:titleize) %>
     </span>
   </td>
-
   <%= render "benefit_line_item_detail", census_employee: census_employee, benefit_group: enrollment.benefit_group, enrollment: enrollment %>
-
 </tr>

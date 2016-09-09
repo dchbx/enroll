@@ -14,7 +14,6 @@
  *= require jquery-ui
  *= require font-awesome
  *= require bootstrap-slider
- *= require bootstrap-multiselect
  *= require_self
  */
 
@@ -254,6 +253,82 @@ img {
   float: right;
 }
 
+
+// will delete this once master is merged in and this can easily be moved to tables.scss.erb (june/1/2016)
+.tables {
+  .fa {
+    color: #007bc4;
+  }
+  .datatable-header {
+    display: table;
+    width: 100%;
+    .small-6 {
+      display: table-cell;
+      width: 50%;
+    }
+  }
+  #premium-reports-table {
+
+  }
+}
+
+// remove this really soon because my branch doesn't have this and it needs it (june/1/2016)
+.module, .modal {
+  .selectric-labeled {
+    padding: 0 0 0 10px;
+    display: table;
+    width: 100%;
+    white-space: nowrap;
+    &>* {
+      display:table-cell;
+      width:100%;
+      text-align: center;
+      vertical-align:middle;
+      white-space: normal;
+    }
+    span {
+      width:100%;
+      max-width: 25%;
+      display: inline-block;
+      font-size: 11px;
+      color: rgb(131, 135, 128);
+      text-transform: uppercase;
+      text-align: left;
+    }
+    .selectric-wrapper {
+      width:100%;
+      max-width: 75%;
+      display: inline-block;
+    }
+  }
+  .input-labeled {
+    padding: 0 0 0 10px;
+    display: table;
+    width: 100%;
+    white-space: nowrap;
+    &>* {
+      display:table-cell;
+      width:100%;
+      text-align: center;
+      vertical-align:middle;
+      white-space: normal;
+    }
+    span {
+      width:100%;
+      max-width: 25%;
+      display: inline-block;
+      font-size: 11px;
+      color: rgb(131, 135, 128);
+      text-transform: uppercase;
+      text-align: left;
+    }
+    input {
+      width:100%;
+      max-width: 75%;
+      display: inline-block;
+    }
+  }
+}
 // disables the click action on any element; more general than :disabled
 // Used to implement readonly permissions for admin
 .blocking {
