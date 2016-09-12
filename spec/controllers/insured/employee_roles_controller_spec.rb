@@ -321,14 +321,17 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:person) { double("person")}
     let(:employee_role) {FactoryGirl.create(:employee_role)}
 
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:save!).and_return(true)
+      sign_in(user)
+    end
+
     it "renders the 'welcome' template when user has no employee role" do
       allow(user).to receive(:has_employee_role?).and_return(false)
       allow(user).to receive(:has_consumer_role?).and_return(false)
-      allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:last_portal_visited=).and_return(true)
-      allow(user).to receive(:save!).and_return(true)
-      sign_in(user)
-      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:linked_active_employee_roles).and_return([])
       get :privacy
       expect(response).to have_http_status(:success)
       expect(response).to render_template("privacy")
@@ -336,13 +339,9 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
     it "renders the 'my account' template when user has employee role" do
       allow(user).to receive(:has_employee_role?).and_return(true)
-      allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:last_portal_visited=).and_return(family_account_path)
-
-      allow(user).to receive(:save!).and_return(true)
-      allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(person).to receive(:linked_active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url).and_return(family_account_path)
-      sign_in(user)
       get :privacy
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(family_account_path)

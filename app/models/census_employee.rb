@@ -322,16 +322,18 @@ class CensusEmployee < CensusMember
   def terminate_employment!(employment_terminated_on)
     if may_terminate_employee_role?
 
+      self.employment_terminated_on = employment_terminated_on
+      self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+
       if active_benefit_group_assignment && active_benefit_group_assignment.may_terminate_coverage?
         active_benefit_group_assignment.terminate_coverage!
+        active_benefit_group_assignment.hbx_enrollment.terminate_benefit(self.coverage_terminated_on)
       end
 
       if renewal_benefit_group_assignment && renewal_benefit_group_assignment.may_terminate_coverage?
         renewal_benefit_group_assignment.terminate_coverage!
+        renewal_benefit_group_assignment.hbx_enrollment.terminate_benefit(self.coverage_terminated_on) if renewal_benefit_group_assignment.present?
       end
-
-      self.employment_terminated_on = employment_terminated_on
-      self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
       terminate_employee_role!
     else

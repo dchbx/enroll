@@ -30,6 +30,12 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
 
+    if @employee_role.present?
+      @hbx_enrollments = @hbx_enrollments.select{ |enr|
+        enr.employer_profile.present? && (enr.employer_profile.id == @employee_role.employer_profile.id)
+      }
+    end
+
     # Filter out enrollments for display only
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
@@ -251,7 +257,13 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_employee_role
-    @employee_role = @person.active_employee_roles.first
+    @employee_role = @person.linked_active_employee_roles.first
+    if @employee_role.present?
+      if @person.linked_active_employee_roles.present?
+      else
+        redirect_to search_insured_employee_index_path and return
+      end
+    end
   end
 
   def init_qualifying_life_events

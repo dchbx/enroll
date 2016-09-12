@@ -136,6 +136,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         end
       end
 
+      context "with no employee role" do
+        let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee) }
+
+        before {
+          initial_census_employee.benefit_group_assignments = [benefit_group_assignment]
+          plan_year.publish!
+          initial_census_employee.link_employee_role!
+          initial_census_employee.save
+        }
+
+        it "should be delinkable" do
+          expect(initial_census_employee.may_delink_employee_role?).to be_truthy
+        end
+      end
+
       context "and it is saved" do
         before { initial_census_employee.save }
 
@@ -174,7 +189,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           end
 
           context "and the employee is assigned a benefit group" do
-            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee) }
+            let(:plan){ FactoryGirl.create(:plan) }
+            let(:family){ FactoryGirl.create(:family, :with_primary_family_member) }
+            let(:household){ FactoryGirl.create(:household, family: family) }
+            let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee, hbx_enrollment_id: hbx_enrollment.id) }
+            let(:hbx_enrollment){ FactoryGirl.create(:hbx_enrollment,
+              household: household,
+              plan: plan,
+              benefit_group: benefit_group,
+              hbx_enrollment_members: [hbx_enrollment_member],
+              coverage_kind: "health",
+              employee_role: valid_employee_role )
+            }
+            let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
+
 
             before do
               initial_census_employee.benefit_group_assignments = [benefit_group_assignment]
@@ -204,7 +233,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 end
 
                 context "using matching ssn and dob" do
-                  let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
 
                   it "should return the roster instance" do
                     expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
@@ -237,10 +265,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                         it "should be findable by employee role" do
                           expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).size).to eq 1
                           expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).first).to eq initial_census_employee
-                        end
-
-                        it "and should be delinkable" do
-                          expect(initial_census_employee.may_delink_employee_role?).to be_truthy
                         end
 
                         it "should have a published benefit group" do
@@ -515,7 +539,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           end
 
           context "and assign existing census employee to benefit group" do
-            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: existing_census_employee) }
+            let(:plan){ FactoryGirl.create(:plan) }
+            let(:family){ FactoryGirl.create(:family, :with_primary_family_member) }
+            let(:household){ FactoryGirl.create(:household, family: family) }
+            let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+            let(:hbx_enrollment){ FactoryGirl.create(:hbx_enrollment,
+              household: household,
+              plan: plan,
+              benefit_group: benefit_group,
+              hbx_enrollment_members: [hbx_enrollment_member],
+              coverage_kind: "health",
+              employee_role: employee_role )
+            }
+            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: existing_census_employee, hbx_enrollment_id: hbx_enrollment.id) }
+
 
             let!(:saved_census_employee) do
               ee = CensusEmployee.find(existing_census_employee.id)

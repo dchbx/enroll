@@ -89,7 +89,8 @@ class Insured::EmployeeRolesController < ApplicationController
         # set_employee_bookmark_url
         redirect_path = insured_family_members_path(employee_role_id: @employee_role.id)
         if @person.primary_family && @person.primary_family.active_household
-          if @person.primary_family.active_household.hbx_enrollments.any?
+          if @person.primary_family.active_household.hbx_enrollments.any? &&
+             @person.primary_family.active_household.hbx_enrollments.map(&:employer_profile).map(&:id).include?(@employee_role.employer_profile.id)
             redirect_path = insured_root_path
           end
         end
@@ -195,8 +196,8 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def check_employee_role
     set_current_person(required: false)
-    if @person.try(:employee_roles).try(:last)
-      redirect_to @person.employee_roles.last.bookmark_url || family_account_path
+    if @person.present? && @person.linked_active_employee_roles.present?
+      redirect_to @person.linked_active_employee_roles.last.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_employee_index_path
       current_user.save!

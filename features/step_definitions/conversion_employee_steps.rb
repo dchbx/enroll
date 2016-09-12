@@ -39,6 +39,7 @@ And(/(.*) already matched and logged into employee portal/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
   ce = employer_profile.census_employees.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  ce.update_attributes(aasm_state: "employee_role_linked")
   person_record = FactoryGirl.create(:person_with_employee_role, first_name: person[:first_name], last_name: person[:last_name], ssn: person[:ssn], dob: person[:dob_date], census_employee_id: ce.id, employer_profile_id: employer_profile.id, hired_on: ce.hired_on)
   FactoryGirl.create :family, :with_primary_family_member, person: person_record
   user = FactoryGirl.create(:user, person: person_record, email: person[:email], password: person[:password], password_confirmation: person[:password])
