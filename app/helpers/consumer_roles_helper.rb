@@ -51,6 +51,16 @@ module ConsumerRolesHelper
     show_immigration_status_container(obj) and obj.try(:eligible_immigration_status)
   end
 
+  def show_has_primary_caregiver(obj)
+    obj.has_primary_caregiver = obj.try(:family_member).try(:person).try(:has_primary_caregiver)
+    obj.try(:family_member).try(:person).try(:has_primary_caregiver) != nil
+  end
+
+  def show_is_diabled(obj)
+    obj.is_disabled = obj.try(:family_member).try(:person).try(:is_disabled)
+    obj.try(:family_member).try(:person).try(:is_disabled) != nil
+  end
+
   def show_vlp_documents_container(obj)
     show_naturalization_doc_type(obj) || show_immigration_doc_type(obj)
   end
