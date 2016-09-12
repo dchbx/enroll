@@ -13,8 +13,13 @@ var CensusMember = (function (window){
           }else if(!$$(e).closest("fieldset").find("#dependent_disabled").hasClass("hidden_field")){
            $(e).closest("fieldset").find("#dependent_disabled").addClass("hidden_field");
           }
-       }else if(!$(e).closest("fieldset").find("#primary_caregiver").hasClass("hidden_field")){
-         $(e).closest("fieldset").find("#primary_caregiver").removeClass("hidden_field");
+       }else{
+        if(!$(e).closest("fieldset").find("#primary_caregiver").hasClass("hidden_field")){
+         $(e).closest("fieldset").find("#primary_caregiver").addClass("hidden_field");
+        }
+        if(!$(e).closest("fieldset").find("#dependent_disabled").hasClass("hidden_field")){
+         $(e).closest("fieldset").find("#dependent_disabled").addClass("hidden_field");
+        }
        }
      }
    }
