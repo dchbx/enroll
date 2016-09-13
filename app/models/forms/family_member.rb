@@ -175,12 +175,12 @@ module Forms
         :ethnicity => ethnicity,
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
-        :is_disabled => is_disabled,
+        :is_disabled => is_disabled.nil? ? false : is_disabled,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
         :no_dc_address_reason => no_dc_address_reason,
-        :has_primary_caregiver => has_primary_caregiver
+        :has_primary_caregiver => has_primary_caregiver.nil? ? false : has_primary_caregiver,
       }
     end
 
