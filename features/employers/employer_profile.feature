@@ -1,7 +1,7 @@
 Feature: Employer Profile
   In order for employers to manage their accounts
   Employer Staff should be able to add and delete employer staff roles
-  
+
   Scenario: An existing person asks for a staff role at an existing company
     Given Hannah is a person
     Given Hannah is the staff person for an employer
@@ -42,7 +42,7 @@ Feature: Employer Profile
     And Sarah decides to Update Business information
     Then Point of Contact count is 1
     Then Sarah logs out
-  
+
   Scenario: A new person asks for a staff role at an existing company
     Given Hannah is a person
     Given Hannah is the staff person for an employer
@@ -55,10 +55,10 @@ Feature: Employer Profile
     Given Admin is a person
     Given Admin has HBXAdmin privileges
     And Admin accesses the Employers tab of HBX portal
-    Given Admin selects Hannahs company
-    Given Admin decides to Update Business information
-    Then Point of Contact count is 2
-    Then Admin approves EmployerStaffRole for NewGuy
+    #Given Admin selects Hannahs company
+    #Given Admin decides to Update Business information
+    #Then Point of Contact count is 2
+    #Then Admin approves EmployerStaffRole for NewGuy
 
 Scenario: A new person creates a new company
     Given NewGuy is a user with no person who goes to the Employer Portal
@@ -89,7 +89,7 @@ Scenario: A new person claims an existing company where the Conversion POC has n
     Then NewGuy becomes an Employer
     When NewGuy decides to Update Business information
     Then Point of Contact count is 2
-    And NewGuy logs out 
+    And NewGuy logs out
 
 Scenario: A new person claims an existing company where the Conversion POC has never logged on and matches first, last, dob
    Given a FEIN for an existing company
@@ -102,7 +102,7 @@ Scenario: A new person claims an existing company where the Conversion POC has n
     Then Josh becomes an Employer
     When Josh decides to Update Business information
     Then Point of Contact count is 1
-    And Josh logs out  
+    And Josh logs out
 
 Scenario: A new person claims an existing company where the Conversion POC has never logged on and gives the wrong birthday
    Given a FEIN for an existing company
@@ -116,7 +116,7 @@ Scenario: A new person claims an existing company where the Conversion POC has n
     Then Point of Contact count is 2
     Then there is a linked POC
     Then there is an unlinked POC
-    And Josh logs out             
+    And Josh logs out
 
 Scenario: A company  at least one active linked employer staff can delete pending applicant
     Given a FEIN for an existing company

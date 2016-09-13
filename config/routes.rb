@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
+  post 'export_csv', to: 'application#export_datatable_csv', as: :export_csv
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -33,6 +34,7 @@ Rails.application.routes.draw do
         get :employer_invoice
         post :employer_invoice_datatable
         post :generate_invoice
+        get :custom_dates
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -47,7 +49,7 @@ Rails.application.routes.draw do
         get :binder_index_datatable
         post :binder_paid
         get :verification_index
-        get :verifications_index_datatable
+        post :verifications_index_datatable
       end
 
       member do
@@ -67,6 +69,7 @@ Rails.application.routes.draw do
         get :home
         get :begin_consumer_enrollment
         get :begin_employee_enrollment
+        get :begin_employer_enrollment
         get :resume_enrollment
         get :show
       end

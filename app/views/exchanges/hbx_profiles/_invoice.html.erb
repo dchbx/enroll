@@ -1,107 +1,112 @@
-<%= form_for 'renewingER', {url: generate_invoice_exchanges_hbx_profiles_path, method: :post, :remote => true} do |f| %>
-
-<div class="row">
-  <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-    <select id="ERInvoiceFilter-Dropdown">
-    <%= options_for_select([
-      ['All','All'],
-      ['Renewing ' + @next_30_day.to_s, @next_30_day.to_s + ':R'], ['Renewing ' + @next_60_day.to_s, @next_60_day.to_s + ':R'], ['Renewing ' + @next_90_day.to_s, @next_90_day.to_s + ':R'],
-      ['Initial ' + @next_30_day.to_s, @next_30_day.to_s + ':I'], ['Initial ' + @next_60_day.to_s, @next_60_day.to_s + ':I'], ['Initial ' + @next_90_day.to_s, @next_90_day.to_s + ':I']
-      ]) %>
-    </select>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-<br><br>
-<div class="module">
-  <table class="table table-striped" id="ER-invoices-dataTable">
-    <thead>
-    <tr>
-      <th colspan="7" class="text-center" style="background-color: #f8f8f8;">Employer</th>
-      <th colspan="4" class="text-center" style="background-color: #e8e8e8;">Employees</th>
-    </tr>
-    <tr>
-      <th><%= check_box_tag 'ER-Invoice-check-all' %></th>
-      <th>FEIN</th>
-      <th>Legal Name</th>
-      <th>Conversion?</th>
-      <th>Status</th>
-      <th>Eff Date</th>
-      <th>Invoiced?</th>
-      <th>Enrolled/Waived</th>
-      <th>Pending</th>
-      <th>Eligible</th>
-      <th>Pct</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-</div>
-
-  </div>
-</div>
-
-<div class="pull-right">
-      <%= submit_tag "Generate Invoices", class: "btn btn-primary" + pundit_class(HbxProfile, :modify_admin_tabs?) %>
-      <% end %>
-</div>
-
-<script type="text/javascript" charset="utf-8">
-  // datatables setup
-  $(document).ready(function() {
-    $('#ER-invoices-dataTable').DataTable( {
-      "processing": true,
-      "serverSide": true,
-      "ordering" : false,
-      "paging": true,
-      "lengthMenu": [ 10, 25, 50, 100],
-      "ajax": {
-        url: "<%= employer_invoice_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
-        type: "POST",
-        data: function ( d ) {
-          console.log($('#ERInvoiceFilter-Group input:radio:checked').val());
-          d.criteria = $('#ERInvoiceFilter-Group option:selected').val();
-          d.invoice_date_criteria = $('#ERInvoiceFilter-Dropdown option:selected').val();
-        }
-      },
-      "columnDefs": [
-        { className: "text-right", "targets": [8, 9, 10] },
-        { className: "text-center", "targets": [0, 3, 6, 7] }
+<div class="module" data-generate-invoice-url="<%= generate_invoice_exchanges_hbx_profiles_path %>" data-export-csv-url="<%= export_csv_path %>" data-binder-paid-url="<%= binder_paid_exchanges_hbx_profiles_path %>">
+  <%= render partial: "shared/data_table", locals:  {
+    page_header:  ["Employers", ""],
+    directions:  "",
+    new_button:  ["New Employer", begin_employer_enrollment_exchanges_agents_path(original_application_type: 'paper')],
+    sibling_pages: [],
+    base_model: "organization",
+    tab: "Employer",
+	  filters:  [
+      ["All", "javascript:;", false, [], []],
+      ["Enrolling", "", false, [
+        ["All", "javascript:;", false],
+        ["Initial Eligible", "javascript:;", false],
+        ["Renewing", "javascript:;", false],
+        ["Open Enrollment", "javascript:;", false],
+        ["Binder Pending", "javascript:;", false],
+        ["Binder Paid", "javascript:;", false],
       ],
-      "columns": [
-        { data: 'invoice_id' },
-        { data: 'fein' },
-        { data: 'legal_name' },
-        { data: 'is_conversion' },
-        { data: 'state' },
-        { data: 'plan_year' },
-        { data: 'is_current_month_invoice_generated'},
-        { data: 'enrolled' },
-        { data: 'remaining' },
-        { data: 'eligible' },
-        { data: 'enrollment_ratio' }
+      [
+        ["#{(TimeKeeper.date_of_record.next_month.beginning_of_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.year}", "javascript:;", false, 'month'],
+        ["#{(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.year}", "javascript:;", false, 'month'],
+        ["#{(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month.year}", "javascript:;", false, 'month'],
+        ["Custom Date", custom_dates_exchanges_hbx_profiles_path, true]
+      ]
+    ],
+      ["Enrolled", "", true, [
+        ["All", "javascript:;", false],
+        ["Suspended", "javascript:;", false]
+      ],
+      []
+    ],
+    ["Applicants", "", true, [
+        ["All", "javascript:;", false],
+        ["Initial Ineligible", "javascript:;", false],
+      ],
+      []
+  	]
+    ],
+  	bulk_actions:  [
+      ["Mark Binder Paid", "javascript:;", false, false],
+  		["Generate Invoice", "javascript:;", false, false],
+      ["Export CSV", "javascript:;", false, true]
+  	],
+  	row_functions:  true,
+    row_actions:  [
+      ["Send Secure Message", "replace_url_send_secure_message", true ],
+      ["Transmit XML", "click_row_data_link", true ]
+    ],
+  	buttons_below_table: [
+  		# ['Print', 'url', 'request_type']
+  	],
+    custom_handlers: [
+      "EmployerInvoicesDatatable.callEnrollingAllFilter",
+      "EmployerInvoicesDatatable.callEnrollingInitialEligibleFilter",
+      "EmployerInvoicesDatatable.callEnrollingRenewingFilter",
+      "EmployerInvoicesDatatable.callEnrollingOpenEnrollmentFilter",
+      "EmployerInvoicesDatatable.callEnrollingBinderPendingFilter",
+      "EmployerInvoicesDatatable.callEnrollingBinderPaidFilter",
+      "EmployerInvoicesDatatable.callEnrollingFirstMonthFilter",
+      "EmployerInvoicesDatatable.callEnrollingSecondMonthFilter",
+      "EmployerInvoicesDatatable.callEnrollingThirdMonthFilter",
+      "EmployerInvoicesDatatable.callEnrolledAllFilter",
+      "EmployerInvoicesDatatable.callEnrolledSuspendedFilter",
+      "EmployerInvoicesDatatable.callApplicantsAllFilter",
+      "EmployerInvoicesDatatable.callApplicantsInitialIneligibleFilter",
+      "EmployerInvoicesDatatable.generateInvoicesForSelection",
+      "EmployerInvoicesDatatable.addInvoicedScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addStatusScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addHbxIdScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addFeinScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addLegalNameScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addEmployerStatusScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addEligibilityScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addGeneralAgencyScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addBrokerScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addConversionScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addEffectiveDateScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addEnrolledWaivedScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addPercentageScopesBeforeSorting",
+      "EmployerInvoicesDatatable.addSubmittedAtScopesBeforeSorting",
+      "EmployerInvoicesDatatable.callAllFilter",
+      "EmployerInvoicesDatatable.markBinderPaid"
+    ],
+    child_rows: [false, "datatables/child_row"],
+    destroy: true,
+    processing_text: "Loading Employers...",
+    responsive: true,
+  	checkboxes: true,
+  	pagination: true,
+  	ordering: true,
+  	info: true,
+  	table_id: "employer-invoices-dataTable",
+  	data_url: employer_invoice_datatable_exchanges_hbx_profiles_path(:format => :json),
+  	columns: [
+      ["Legal name", "legal_name", "", [true, ""]],
+      ["Hbx Id", "hbx_id", "", [true, ""]],
+      ["FEIN", "fein", "dt-center", [true, ""]],
+      ["Plan Year Status", "plan_year_status", "dt-center", [false, ""]],
+      ["Eligibility", "eligibility_criteria", "dt-center eligibility", [false, ""]],
+      ["General Agency", "general_agency", "", [false, ""]],
+      ["Broker", "broker", "", [false, ""]],
+      ["CNVRSN?", "conversion", "dt-center", [false, ""]],
+      ["Status", "status", "dt-center", [false, ""]],
+      ["Effective Date", "effective_date", "", [false, ""]],
+  	  ["Invoiced?", "invoiced", "dt-center", [false, ""]],
+  	  ["Enrolled Waived", "enrolled_waived", "dt-center", [false, ""]],
+      ["PCT", "percentage", "dt-center", [false, ""]]
     ]
-    } );
-  });
-
-  // Trigger datatable redraw on 90 day (30,60,90) filter buttons
-  $('#ERInvoiceFilter-Dropdown').change(function() {
-      var table = $('#ER-invoices-dataTable').dataTable().api();
-      table.draw();
-  });
-
-  // Check/Uncheck All Checkboxes
-  $('#ER-Invoice-check-all').click(function() {
-      var action = $(this).is(':checked') ? true : false;
-      var group = $('input[name="employerId[]"]');
-      group.each(function () {
-        $(this).prop("checked", action);
-      });
-  });
-
-
-</script>
+  } %>
+</div>
+<form id="export-csv-injected-form" action="<%= export_csv_path %>.csv" method="post">
+</form>

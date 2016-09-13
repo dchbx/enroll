@@ -1,27 +1,32 @@
-<div class="row no-buffer">
-  <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
-    <h3>New Message</h3>
-
-    <table class="table table-message-wrapper">
-      <tbody>
-        <tr>
-          <th>Recipient:</th>
-          <td>&nbsp; &nbsp;<b><%= @inbox_to_name %></b></td>
-        </tr>
-        <tr>
-          <th>Subject<span class="text-danger">*</span>:</th>
-          <td><%= f.text_field :subject, class: "floatlabel form-control interaction-control-inbox-message-subject", required: true, placeholder: 'Subject' %></td>
-        </tr>
-        <tr>
-          <th style="vertical-align: top;">Content<span class="text-danger">*</span>:</th>
-          <td><%= f.text_area :body, class: "floatlabel form-control interaction-control-inbox-mesage-body", required: true, placeholder: 'Write here...', rows: 10 %></td>
-        </tr>
-      </tbody>
-    </table>
-    <%= f.hidden_field :sender_id, value: @profile._id %>
-    <%= f.hidden_field :from, value: @inbox_provider_name %>
-    <%= f.hidden_field :to, value: @inbox_to_name  %>
-    <%= f.submit 'Send', class: "btn btn-primary interaction-control-inbox-send" %>
-    <a class="btn btn-default interaction-control-inbox-cancel" href="#">Cancel</a>
+<div class="module send-secure-message">
+  <h3 class="no-buffer text-center">Send Secure Message</h3>
+  <table class="table table-message-wrapper">
+    <tbody>
+      <tr>
+        <th>Recipient:</th>
+        <td>&nbsp; &nbsp;
+          <b><%= @inbox_to_name %></b>
+        </td>
+      </tr>
+      <tr>
+        <th>Subject
+          <span class="text-danger">*</span>:</th>
+        <td><%= f.text_field :subject, class: "floatlabel form-control interaction-control-inbox-message-subject", required: true, placeholder: 'Subject' %></td>
+      </tr>
+      <tr>
+        <th style="vertical-align: top;">Content
+          <span class="text-danger">*</span>:</th>
+        <td><%= f.text_area :body, class: "floatlabel form-control interaction-control-inbox-mesage-body", required: true, placeholder: 'Write here...', rows: 4 %></td>
+      </tr>
+    </tbody>
+  </table>
+  <%= f.hidden_field :sender_id, value: @profile._id %>
+  <%= f.hidden_field :from, value: @inbox_provider_name %>
+  <%= f.hidden_field :to, value: @inbox_to_name  %>
+  <div class="vertically-aligned-row">
+    <div class="text-center">
+      <a class="btn btn-default interaction-control-inbox-cancel" onclick="EnrollDataTableInitializer.removeRow($(this));">Cancel</a>
+      <%= f.submit 'Send', class: "btn btn-primary interaction-control-inbox-send" %>
+    </div>
   </div>
 </div>

@@ -119,6 +119,10 @@ module Employers::EmployerHelper
     end
   end
 
+  def last_four_digits(string)
+    string_length = string.length
+    string[(string_length - 4)..string.length]
+  end
 
 
   def display_employee_status_transitions(census_employee)

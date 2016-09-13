@@ -167,6 +167,7 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   find(tab_class).click
 end
 Given /Admin selects Hannahs company/ do
+  sleep(3)
   company = find('a', text: 'Turner Agency, Inc')
   company.click
 end

@@ -64,7 +64,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
     it "updates employers state to binder paid" do
-      post :binder_paid, :employer_profile_ids => [employer_profile.id]
+      xhr :post, :binder_paid, :employer_profile_ids => [employer_profile.id]
       expect(flash[:notice]).to eq 'Successfully submitted the selected employer(s) for binder paid.'
     end
 

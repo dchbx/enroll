@@ -16,11 +16,12 @@ class EmployerProfile
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
+  ENROLLED_STATE = %w(enrolled suspended)
+
   PROFILE_SOURCE_KINDS  = ["self_serve", "conversion"]
 
   INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
   INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
-
 
   field :entity_kind, type: String
   field :sic_code, type: String
@@ -75,7 +76,7 @@ class EmployerProfile
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
-  scope :all_renewing, ->{ Organization.all_employers_renewing }
+  scope :all_renewing, ->{ Organization.employer_profiles_renewing }
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
 
   alias_method :is_active?, :is_active
@@ -231,6 +232,23 @@ class EmployerProfile
     if plan_year = plan_years.published_plan_years_by_date(today).first
       @active_plan_year = plan_year
     end
+  end
+
+  def set_enrolled_waived_count
+    plan_year = latest_plan_year
+    census_employees = plan_year.find_census_employees if plan_year.present?
+    enrolled = plan_year.try(:enrolled).try(:count).to_i || 0
+    waived = census_employees.try(:waived).try(:count).to_i || 0
+    return "#{enrolled}/#{waived}"
+  end
+
+  def set_enrolled_percentage
+    plan_year = latest_plan_year
+    census_employees = plan_year.find_census_employees if plan_year.present?
+    enrolled = plan_year.try(:enrolled).try(:count).to_i || 0
+    eligible_to_enroll_count = census_employees.try(:active).try(:count)
+    eligible_to_enroll_count = 0.0 if eligible_to_enroll_count == nil
+    (enrolled / eligible_to_enroll_count * 100).to_s
   end
 
   def latest_plan_year
@@ -576,7 +594,7 @@ class EmployerProfile
     state :binder_paid, :after_enter => :notify_binder_paid
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
-  state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
+    state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
     state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
 
     event :advance_date do
@@ -724,6 +742,10 @@ class EmployerProfile
 
   def is_conversion?
     self.profile_source == "conversion"
+  end
+
+  def latest_plan_year_effective_date
+    latest_plan_year.effective_date if latest_plan_year.present?
   end
 
 private
