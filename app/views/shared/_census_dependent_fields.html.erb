@@ -74,8 +74,8 @@
           </div>
         </div>
       </div>
-      <%= render 'shared/primary_caregiver_question_for_dependent', f: f %>
-      <%= render 'shared/disability_question_for_dependent', f: f %>
+      <%= render 'shared/primary_caregiver_question_for_dependent', f: f , initial_show: f.object.has_primary_caregiver.present? %>
+      <%= render 'shared/disability_question_for_dependent', f: f , initial_show: f.object.is_disabled.present? %>
       <br/>
     </fieldset>
   </div>

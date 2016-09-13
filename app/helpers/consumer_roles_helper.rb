@@ -56,7 +56,7 @@ module ConsumerRolesHelper
     obj.try(:family_member).try(:person).try(:has_primary_caregiver) != nil
   end
 
-  def show_is_diabled(obj)
+  def show_is_disabled(obj)
     obj.is_disabled = obj.try(:family_member).try(:person).try(:is_disabled)
     obj.try(:family_member).try(:person).try(:is_disabled) != nil
   end
