@@ -28,7 +28,7 @@ while offset < family_count
       person = policy.subscriber.person
 
       #add_to_csv(csv, policy, person, false)
-      row = [policy.hbx_id, policy.effective_on, policy.aasm_state, policy.plan.coverage_kind, policy.plan.metal_level, person.hbx_id,
+      row = [policy.family.id, policy.hbx_id, policy.effective_on, policy.aasm_state, policy.plan.coverage_kind, policy.plan.metal_level, person.hbx_id,
              person.is_incarcerated, person.citizen_status,
              person.is_dc_resident?]
 
