@@ -10,7 +10,7 @@ var CensusMember = (function (window){
          $(e).closest("fieldset").find("#primary_caregiver").removeClass("hidden_field");
           if(age > 18 ){
            $(e).closest("fieldset").find("#dependent_disabled").removeClass("hidden_field");
-          }else if(!$$(e).closest("fieldset").find("#dependent_disabled").hasClass("hidden_field")){
+          }else if(!$(e).closest("fieldset").find("#dependent_disabled").hasClass("hidden_field")){
            $(e).closest("fieldset").find("#dependent_disabled").addClass("hidden_field");
           }
        }else{
