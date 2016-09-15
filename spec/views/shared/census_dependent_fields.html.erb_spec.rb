@@ -14,8 +14,8 @@ describe "shared/census_dependent_fields.html.erb" do
     render "shared/census_dependent_fields", :f => mock_form
   end
 
-  it "should have two radio options" do
-    expect(rendered).to have_selector("input[type='radio']", count: 2)
+  it "should have six checkbox options" do
+    expect(rendered).to have_selector("input[type='radio']", count: 6)
   end
 
   it "should not have checked checkbox option" do

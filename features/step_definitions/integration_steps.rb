@@ -459,10 +459,12 @@ end
 When(/^.+ enters? the dependent info of Sorens daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
-  fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
   find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
+  fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
   find(:xpath, "//label[@for='radio_female']").click
+  sleep 5
+  find(:xpath, "//label[@for='dependent_has_primary_caregiver_true']").click
 end
 
 When(/^.+ clicks? confirm member$/) do

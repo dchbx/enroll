@@ -11,7 +11,7 @@ class InsuredEligibleForBenefitRule
   #     lawful_permanent_resident
   # )
 
-  def initialize(role, benefit_package, coverage_kind='health')
+  def initialize(role, benefit_package,coverage_kind='health')
     @role = role
     @benefit_package = benefit_package
     @coverage_kind = coverage_kind
@@ -71,7 +71,14 @@ class InsuredEligibleForBenefitRule
 
   def is_family_relationships_satisfied?
     age = age_on_next_effective_date(@role.dob)
-    relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
+    return true if relation_ship_with_primary_applicant.nil?
+
+    if ['child','nephew_or_niece', 'grandchild'].include?(relation_ship_with_primary_applicant)
+      if age >= 26 && @role.person.is_disabled?  || age < 26 && @role.person.has_primary_caregiver
+        return true
+      end
+    end
+
   end
 
   def is_benefit_categories_satisfied?
@@ -154,7 +161,10 @@ class InsuredEligibleForBenefitRule
 
   def relation_ship_with_primary_applicant
     primary_applicant.person.person_relationships.select {|r|r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
-  # @role.person.person_relationships.select {|r| r.person.id.to_s == primary_applicant.person_id.to_s }.first.try(:kind) || nil
   end
+
+  # def has_caregiver?
+  #   primary_applicant.person.has_primary_caregiver || nil
+  # end
 
 end

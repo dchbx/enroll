@@ -156,15 +156,15 @@ describe BenefitGroup, "instance methods" do
     end
 
     it "should have same employer_max_amount" do
-      expect(benefit_list.map(&:employer_max_amt)).to eq Array.new(5, 200)
+      expect(benefit_list.map(&:employer_max_amt)).to eq Array.new(8,Money.new(20000))
     end
 
     it "should have different premium_pct" do
-      expect(benefit_list.map(&:premium_pct)).to eq [50,20,20,20,50]
+      expect(benefit_list.map(&:premium_pct)).to eq [50,20,20,20,20,20,20,50]
     end
 
     it "should have different offered" do
-      expect(benefit_list.map(&:offered)).to eq [true, true, true, true, false]
+      expect(benefit_list.map(&:offered)).to eq [true, true, true, true, true, true, true, false]
     end
   end
 end

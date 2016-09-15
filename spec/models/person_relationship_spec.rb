@@ -31,7 +31,10 @@ describe PersonRelationship, dbclean: :after_each do
       "ward",
       "guardian",
       "unrelated",
-      "other_tax_dependent"
+      "other_tax_dependent",
+      "grandchild",
+      "nephew_or_niece"
+
       ] }
 
     let(:kinds) {  [

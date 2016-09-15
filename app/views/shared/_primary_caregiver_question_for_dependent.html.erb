@@ -1,0 +1,23 @@
+
+<div class="row row-form-wrapper no-buffer hidden_field" id="primary_caregiver">
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+    <label>Are you this person's primary caregiver <i class="fa fa-question-circle" data-toggle="tooltip" title="You are the primary caregiver if you provide this person's food, clothing and shelter on a regular and continuous basis."></i></label>
+  
+  </div>
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+    <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :has_primary_caregiver, true, class: "required floatlabel" %>
+        <%= f.label :has_primary_caregiver , :value => true do %>
+          <span>Yes</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :has_primary_caregiver,  false, class: "required floatlabel" %>
+        <%= f.label  :has_primary_caregiver , :value => false do %>
+          <span>No</span>
+        <% end %>
+      </div>
+    </div>
+  </div>

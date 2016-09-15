@@ -37,6 +37,7 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
+  field :has_primary_caregiver , type: Boolean
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array

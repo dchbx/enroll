@@ -10,6 +10,8 @@ class CensusMember
   field :middle_name, type: String
   field :last_name, type: String
   field :name_sfx, type: String
+  field :has_primary_caregiver, type: Boolean
+  field :is_disabled , type: Boolean
 
   include StrippedNames
 

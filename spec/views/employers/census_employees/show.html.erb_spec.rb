@@ -118,7 +118,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   end
 
   context "dependents" do
-    let(:census_dependent1) {double('CensusDependent1', persisted?: true, _destroy: true, valid?: true, relationship: 'child_under_26', first_name: 'jack', last_name: 'White', middle_name: 'bob', ssn: 123123123, dob: Date.today, gender: 'male', employee_relationship: 'child_under_26', id: 1231623)}
+    let(:census_dependent1) {double('CensusDependent1', persisted?: true, _destroy: true, valid?: true, relationship: 'child_under_26', first_name: 'jack', last_name: 'White', middle_name: 'bob', ssn: 123123123, dob: Date.today, gender: 'male', employee_relationship: 'child_under_26', id: 1231623 ,has_primary_caregiver: true,is_disabled: true)}
     let(:census_dependent2) {double('CensusDependent2', persisted?: true, _destroy: true, valid?: true, relationship: 'child_26_and_over', first_name: 'jack', last_name: 'White', middle_name: 'bob', ssn: 123123123, dob: Date.today, gender: 'male', employee_relationship: 'child_26_and_over', id: 1231223)}
     before :each do
       allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)

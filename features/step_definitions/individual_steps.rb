@@ -503,3 +503,4 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   screenshot("aptc_ivl_home")
 
 end
+

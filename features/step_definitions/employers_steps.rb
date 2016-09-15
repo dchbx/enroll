@@ -90,6 +90,7 @@ end
 
 Then(/^.+ should see a form to enter information about employee, address and dependents details$/) do
   # Census Employee
+  page.driver.browser.js_errors = false
   fill_in 'census_employee[first_name]', with: 'John'
   fill_in 'census_employee[middle_name]', with: 'K'
   fill_in 'census_employee[last_name]', with: 'Doe'
@@ -186,8 +187,7 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
 
   fill_in 'census_employee[census_dependents_attributes][0][first_name]', :with => "Mariah"
   find('label[for=census_employee_is_business_owner]').click
-
-  find('.selectric-interaction-choice-control-census-employee-census-dependents-attributes-0-employee-relationship').click
+  find('.selectric-wrapper.selectric-interaction-choice-control-employee-relationship').click
   find('.label', text: 'Child').click
 
   screenshot("update_census_employee_with_data")

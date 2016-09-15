@@ -2,6 +2,8 @@ require 'rails_helper'
 
 describe Forms::FamilyMember do
   let(:family_id) { double }
+  let(:person){FactoryGirl.create :person }
+
   let(:family) { instance_double("Family") }
   before(:each) do
     allow(Family).to receive(:find).and_return(family)
@@ -226,6 +228,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
+      :is_disabled => nil,
+      :has_primary_caregiver => nil,
       :tribal_id => "test",
       :no_dc_address=>nil,
       :no_dc_address_reason=>nil
@@ -277,6 +281,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     before do
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       allow(family).to receive(:save!).and_return(true)
+      allow(subject).to receive(:update_primary_person).and_return true
     end
 
     it "should create a new person" do
@@ -315,7 +320,9 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
-      tribal_id: "test"
+      tribal_id: "test",
+      :is_disabled => nil,
+      :has_primary_caregiver => nil,
     }
   }
   let(:person) { double(:errors => double(:has_key? => false), home_address: nil) }
@@ -413,6 +420,50 @@ describe Forms::FamilyMember, "relationship validation" do
       expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
     end
   end
+
+  context "child" do
+    let(:person){FactoryGirl.create :person }
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => "child" , :has_primary_caregiver => true})) }
+
+    it "should be valid" do
+      allow(family_member).to receive(:relationship).and_return("child")
+      expect(subject.valid?).to be true
+    end
+  end
+
+  context "grand child" do
+    let(:person){FactoryGirl.create :person }
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => "grandchild" , :has_primary_caregiver => true})) }
+
+    it "should be valid" do
+      allow(family_member).to receive(:relationship).and_return("grandchild")
+      expect(subject.valid?).to be true
+    end
+
+    it "should save has_primary_caregiver info to grandchild" do
+      allow(family_member).to receive(:relationship).and_return("grandchild")
+      allow(subject).to receive_message_chain("family.primary_family_member.person").and_return(person)
+      allow(subject).to receive(:relationship_validation).and_return(true)
+      allow(subject.family).to receive(:save_relevant_coverage_households).and_return(true)
+      allow(subject.family).to receive(:find_matching_inactive_member).and_return(nil)
+      allow(Person).to receive(:match_existing_person).and_return(nil)
+      allow(subject.family).to receive(:relate_new_member).and_return(subject)
+      allow(subject.family).to receive(:save!).and_return(true)
+      subject.save
+      expect(subject.has_primary_caregiver).to be true
+    end
+  end
+  
+  context "nephew_or_niece" do
+    let(:person){FactoryGirl.create :person }
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => "nephew_or_niece" , :has_primary_caregiver => true})) }
+
+    it "should save dependent" do
+      allow(subject).to receive(:relationship).and_return("nephew_or_niece")
+      expect(subject.valid?).to be true
+    end
+  end
+
 
   context "life_partner" do
     let(:relationship) { "life_partner" }

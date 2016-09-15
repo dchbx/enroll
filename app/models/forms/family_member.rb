@@ -84,14 +84,23 @@ module Forms
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
+
       if self.is_consumer_role == "true"
         family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
       end
+      update_primary_person(family_member)
       assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
       self.id = family_member.id
       true
+    end
+
+    def update_primary_person(family_member)
+      primary_person =  family_member.family.primary_family_member.person
+      primary_person.update_attributes(extract_primary_person_params).tap do
+        bubble_person_errors(primary_person)
+      end
     end
 
     def try_create_person(person)
@@ -146,6 +155,12 @@ module Forms
       }
     end
 
+    def extract_primary_person_params
+      {
+        # :is_primary_caregiver => is_primary_caregiver
+      }
+    end
+
     def extract_person_params
       {
         :first_name => first_name,
@@ -161,10 +176,12 @@ module Forms
         :ethnicity => ethnicity,
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
+        :is_disabled => is_disabled,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
-        :no_dc_address_reason => no_dc_address_reason
+        :no_dc_address_reason => no_dc_address_reason,
+        :has_primary_caregiver => has_primary_caregiver
       }
     end
 

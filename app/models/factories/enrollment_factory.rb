@@ -213,7 +213,8 @@ module Factories
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
+                               last_name, name_sfx, ssn, dob, gender, role_type, 
+                               no_ssn=nil,is_disabled=nil, has_primary_caregiver=nil)
         person_attrs = {
           user: user,
           name_pfx: name_pfx,
@@ -225,7 +226,9 @@ module Factories
           dob: dob,
           gender: gender,
           no_ssn: no_ssn,
-          role_type: role_type
+          role_type: role_type,
+          is_disabled: is_disabled,
+          has_primary_caregiver: has_primary_caregiver
         }
         result = FindOrCreateInsuredPerson.call(person_attrs)
         return result.person, result.is_new
@@ -271,7 +274,8 @@ module Factories
       person, new_person = initialize_person(nil, nil, dependent.first_name,
                                  dependent.middle_name, dependent.last_name,
                                  dependent.name_sfx, dependent.ssn,
-                                 dependent.dob, dependent.gender, "employee")
+                                 dependent.dob, dependent.gender, "employee",nil,
+                                 dependent.is_disabled, dependent.has_primary_caregiver)
       relationship = person_relationship_for(dependent.employee_relationship)
       primary.ensure_relationship_with(person, relationship)
       family.add_family_member(person) unless family.find_family_member_by_person(person)
@@ -285,6 +289,10 @@ module Factories
         "life_partner"
       when "child_under_26", "child_26_and_over", "disabled_child_26_and_over"
         "child"
+      when "grandchild"
+        "grandchild"
+      when "nephew_or_niece"
+        "nephew_or_niece"
       end
     end
 

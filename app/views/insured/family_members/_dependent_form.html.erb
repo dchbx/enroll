@@ -52,7 +52,7 @@
         <div class="col-md-3 col-sm-3 no-pd">
           <div class="form-group form-group-lg">
             <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
-             :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}"}, dependent.dob %>
+             :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}",  onchange: "ManageFamilies.appendDependentQuestions(this)" }, dependent.dob  %>
            </div>
          </div>
 
@@ -80,7 +80,6 @@
             <div class="col-xs-2">
             </div>
         </div>
-
         <div class="col-md-3 col-sm-3 no-pd">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
             <div class="radio">
@@ -99,7 +98,7 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="form-group form-group-lg">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *"} %>
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "This Person Is #{@person.first_name}'s *", oninput: "ManageFamilies.appendDependentQuestions(this)" } %>
           </div>
         </div>
 
@@ -118,6 +117,8 @@
           </div>
         </div>
       <% elsif @person.has_active_employee_role? %>
+        <%= render 'shared/primary_caregiver_question_for_dependent', f: f %>
+        <%= render 'shared/disability_question_for_dependent', f: f %>
         <%= f.hidden_field :same_with_primary, value: 'false' %>
         <%= render 'shared/address_fields_for_dependent', f: f %>
       <% end %>
@@ -136,7 +137,7 @@
       <%= link_to '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Cancel'.html_safe, insured_family_member_path(dependent), :remote => true %>
       <% end %>
       <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>Confirm Member<% end %>
-      <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">Confirm Member</span>    </div>
+      <span class="btn btn-primary btn-br pull-right mz" oninput="PersonValidations.manageRequiredValidations($(this));">Confirm Member</span>    </div>
     <% end %>
   </div>
 

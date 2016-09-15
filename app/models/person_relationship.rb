@@ -86,10 +86,10 @@ class PersonRelationship
 
 	validates_presence_of :relative_id, message: "Choose a relative"
   validates :kind,
-            presence: true,
-            allow_blank: false,
-            allow_nil:   false,
-            inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
+           presence: true,
+           allow_blank: false,
+           allow_nil:   false,
+           inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
 
   def parent
     raise "undefined parent class: Person" unless person?

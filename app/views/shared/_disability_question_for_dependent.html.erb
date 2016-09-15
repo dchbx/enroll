@@ -1,0 +1,21 @@
+ <div class="row row-form-wrapper no-buffer hidden_field" id="dependent_disabled">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+      <label>Is this person disabled? *</label>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :is_disabled, true, class: "required floatlabel" %>
+        <%= f.label :is_disabled , :value => true do %>
+          <span>Yes</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :is_disabled,  false, class: "required floatlabel" %>
+        <%= f.label  :is_disabled , :value => false do %>
+          <span>No</span>
+        <% end %>
+      </div>
+    </div>
+  </div>

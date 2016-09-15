@@ -23,6 +23,51 @@
     </div>
   </div>
 
+
+<div class="row row-form-wrapper no-buffer hidden_field" id="primary_caregiver">
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+    <label>Are you this person's primary caregiver <i class="fa fa-question-circle" data-toggle="tooltip" title="You are the primary caregiver if you provide this person's food, clothing and shelter on a regular and continuous basis."></i></label>
+  
+  </div>
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+    <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :has_primary_caregiver, true, class: "required floatlabel" %>
+        <%= f.label :has_primary_caregiver , :value => true do %>
+          <span>Yes</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :has_primary_caregiver,  false, class: "required floatlabel" %>
+        <%= f.label  :has_primary_caregiver , :value => false do %>
+          <span>No</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="row row-form-wrapper no-buffer hidden_field" id="dependent_disabled">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+      <label>Is this person disabled? *</label>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :is_disabled, true, class: "required floatlabel" %>
+        <%= f.label :is_disabled , :value => true do %>
+          <span>Yes</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :is_disabled,  false, class: "required floatlabel" %>
+        <%= f.label  :is_disabled , :value => false do %>
+          <span>No</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
   <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %>" id="naturalized_citizen_container">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
       <label>Are you a naturalized citizen? *</label>
@@ -46,7 +91,7 @@
   </div>
 
   <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="immigration_status_container">
-    <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg">
+    <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg ">
       <label>Do you have eligible immigration status? *</label>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">

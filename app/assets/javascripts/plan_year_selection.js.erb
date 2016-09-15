@@ -306,7 +306,7 @@ ready = function() {
   });
 
   //hide border bottom
-  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: none;');
+  $('input[value="child_26_and_over"]').closest('.row-form-wrapper').prev().attr('style','border-bottom: none;');
   $(".package-offering tr:contains('Child under 26')").closest('tr').attr('style','border-bottom: none;');
   // move start date to url for plan options
   $("#plan_year_start_on").on('change', function() {

@@ -39,9 +39,11 @@ RSpec.describe Insured::EmployeeRolesHelper, :type => :helper do
 
   describe "#coverage_relationship_check" do
     let(:orb) {["employee", "spouse", "child_under_26"]}
-    let(:spouse) { double(primary_relationship: "ex-spouse") }
+    let(:spouse) { double(primary_relationship: "ex-spouse", is_disabled: false,
+                           has_primary_caregiver: false , dob:  TimeKeeper.date_of_record ) }
     let(:domestic_partner) { double(primary_relationship: "life_partner") }
-    let(:child) {double(primary_relationship: "ward", dob: TimeKeeper.date_of_record)}
+    let(:child) {double(primary_relationship: "ward",  is_disabled: false,
+                           has_primary_caregiver: true , dob: TimeKeeper.date_of_record)}
 
     it "offered_relationship_benefits include the relationship of family_member" do
       expect(helper.coverage_relationship_check(orb, spouse)).to be_truthy

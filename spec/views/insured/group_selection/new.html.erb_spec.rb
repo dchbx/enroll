@@ -27,6 +27,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
+      allow(family_member3).to receive(:has_primary_caregiver).and_return(true)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
