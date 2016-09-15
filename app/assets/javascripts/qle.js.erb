@@ -1,7 +1,8 @@
 var QLE = ( function( window, undefined ) {
   function initialize() {
     $(document).on('change', 'input[type=radio][name=reason]', function() {
-      $(this).attr('id') == 'reason_accept2' ? $('.calculator').show() : $('.calculator').hide();
+      if($(this).attr('id') == 'reason_accept2')
+        $('[for="reason_accept2"]').find('span:last').popover('toggle');
     });
   }
 
@@ -89,6 +90,8 @@ $(function () {
 
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
+    $('.seps-panel').addClass('hidden');
+    $('#no_qle_checkbox').parent().addClass('hidden');
     $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).data('title'));
     $('.qle-label').html($(this).data('label'));
@@ -110,6 +113,8 @@ $(function () {
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
     init_qle_message();
+    $('.seps-panel').removeClass('hidden');
+    $('#no_qle_checkbox').parent().removeClass('hidden');
 		$('#qle-details').addClass('hidden');
 		$('#qle_flow_info #qle-menu').show();
 	});
@@ -142,7 +147,7 @@ $(function () {
       get_qle_date();
     } else {
       $('#qle_reason').hide();
-      var errorNoticeAction = "The choice you submitted does not qualify for a special enrollment period. Please contact DC Health Link's Customer Care Center: 1-855-532-5465.";
+      var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact DC Health Link customer service at (855) 532-5465.";
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
     }

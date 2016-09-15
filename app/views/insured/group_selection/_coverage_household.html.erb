@@ -6,6 +6,7 @@
     <%# show_residency_alert = false %>
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
         <% is_coverage = offered_relationship_benefits.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
+        is_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_coverage && @coverage_family_members_for_cobra.present?
         is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
         %>
         <tr class="<%='ineligible_row' unless is_coverage%>">

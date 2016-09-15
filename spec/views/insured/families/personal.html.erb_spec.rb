@@ -38,10 +38,10 @@ RSpec.describe "insured/families/personal.html.erb" do
     expect(rendered).to have_select("person[employee_roles_attributes][0][language_preference]", :selected => "English")
    end
  end
- 
+
    context "for consumer role" do
    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-  
+
 
    it "should renders home address fields and consumer fields" do
      expect(response).to render_template("shared/_consumer_fields")

@@ -11,6 +11,14 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
+  def update_individual
+    @person.consumer_role.authorize_residency! verification_attr
+    @person.consumer_role.authorize_lawful_presence! verification_attr
+      respond_to do |format|
+      format.html { redirect_to :back }
+    end
+  end
+
   def authorized_download
     begin
       model = params[:model].camelize
@@ -53,8 +61,10 @@ class DocumentsController < ApplicationController
 
   def enrollment_verification
      family = @person.primary_family
-     if family.try(:active_household).try(:hbx_enrollments) &&  family.active_household.hbx_enrollments.verification_needed.first
-       family.active_household.hbx_enrollments.verification_needed.first.evaluate_individual_market_eligiblity
+     if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
+       family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+         enrollment.evaluate_individual_market_eligiblity
+       end
        family.save!
        respond_to do |format|
          format.html {
@@ -84,7 +94,9 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_docs_state
-    @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:docs_status])
+    @person.primary_family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+      enrollment.update_attributes(:review_status => "ready")
+    end
     flash[:success] = "Your documents were sent for verification."
     redirect_to :back
   end
@@ -93,20 +105,31 @@ class DocumentsController < ApplicationController
     if current_user.has_hbx_staff_role?
       session[:person_id] = params[:person_id]
       set_current_person
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:status])
+      @person.primary_family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+        enrollment.update_attributes(:review_status => "in review")
+      end
     end
     redirect_to verification_insured_families_path
   end
 
+  def change_person_aasm_state
+    @doc_owner.consumer_role.import!
+    @doc_owner.consumer_role.save
+    respond_to do |format|
+           format.html {redirect_to exchanges_hbx_profiles_root_path, notice: "Person Verification Status Updated"}
+           end
+
+  end
+
   def extend_due_date
     family = Family.find(params[:family_id])
-      if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-        if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-          family.active_household.hbx_enrollments.verification_needed.first.special_verification_period += 30.days
-          family.save!
+      if family.any_unverified_enrollments?
+        if family.enrollments.verification_needed.first.special_verification_period
+          new_date = family.enrollments.verification_needed.first.special_verification_period += 30.days
+          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => new_date)
           flash[:success] = "Special verification period was extended for 30 days."
         else
-          family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:special_verification_period => TimeKeeper.date_of_record + 30.days)
+          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => TimeKeeper.date_of_record + 30.days)
           flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.hbx_enrollments.verification_needed.first.special_verification_period}"
         end
       else

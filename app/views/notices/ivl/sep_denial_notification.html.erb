@@ -37,7 +37,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>You may submit a new request for a special enrollment period at any time, with new information, by calling #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}.</strong>"} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["The 2015 Open Enrollment Season ended on February 15, 2015.  If you are already active on another enrollment, this denial does not impact that enrollment.  You must make sure to pay all currently due premiums on that new plan selection to make sure it is active.  Call your health insurance company at the numbers below to make sure your payments are active."], heading: '2015 Open Enrollment', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["The 2016 Open Enrollment Season ended on January 31, 2016.  If you are already active on another enrollment, this denial does not impact that enrollment.  <u>You must make sure to pay all currently due premiums on that new plan selection to make sure it is active.</u>  Call your health insurance company at the numbers below to make sure your payments are active."], heading: '2016 Open Enrollment', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/table', locals:
 	{rows: [['CareFirst', '(855) 444-3119', 'Delta Dental', '(800) 471-0236'],
@@ -47,7 +47,7 @@
     table_width: '100%',
     headers: []} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You can re-apply for a special enrollment period if you meet one of the qualifying criteria in the future and enroll in coverage during 2015.  Otherwise, you must wait to enroll in 2016 coverage, which goes into effect on January 1, 2016.  You can begin shopping for 2016 plans when the 2016 Open Enrollment Period starts on November 1, 2015."], heading: 'If Your Coverage Has Terminated or Been Cancelled', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You can re-apply for a special enrollment period if you meet one of the qualifying criteria in the future and enroll in coverage during 2016.  Otherwise, you must wait to enroll in 2017 coverage, which goes into effect on January 1, 2017.  You can begin shopping for 2017 plans when the 2016 Open Enrollment Period starts on November 1, 2016."], heading: 'If Your Coverage Has Terminated or Been Cancelled', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If you made payments after the effective date of your plan termination or cancellation, and those funds have not already been refunded to you, you can call your health insurance company at the numbers listed above to request a refund.</strong> If the plan refuses to provide the refund, you can contact the Department of Insurance, Securities, and Baking Consumer Services Division at disb.complaints@dc.gov or (202) 727-8000."} %>
 

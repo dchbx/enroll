@@ -39,7 +39,7 @@ RSpec.describe "insured/families/_qles_panel.html.erb" do
       expect(rendered).not_to have_selector('.blocking')
     end
   end
- 
+
   context 'update not authorized' do
     before :each do
 

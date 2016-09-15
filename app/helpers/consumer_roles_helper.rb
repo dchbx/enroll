@@ -61,4 +61,8 @@ module ConsumerRolesHelper
 
     shop_for_plans.blank? && (hbx_enrollment.effective_on.year == (new_effective_on.present? ? new_effective_on.year : nil))
   end
+
+  def required_for_consumer_address(required, has_dc_adress)
+    required.present? && has_dc_adress
+  end
 end

@@ -6,4 +6,3 @@ FactoryGirl.define do
     audiences ['Employer']
   end
 end
-

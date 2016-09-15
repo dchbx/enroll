@@ -13,10 +13,12 @@ class PlanCostDecorator < SimpleDelegator
 
   def plan_year_start_on
     #FIXME only for temp ivl
-    if @benefit_group.present?
+    if @benefit_group.present? && @benefit_group.class != QuoteBenefitGroup
       benefit_group.plan_year.start_on
+    elsif @benefit_group.class == QuoteBenefitGroup
+      benefit_group.quote.start_on
     else
-      TimeKeeper.date_of_record.beginning_of_year
+      TimeKeeper.date_of_record.beginning_of_year + 5.months
     end
   end
 
@@ -92,7 +94,8 @@ class PlanCostDecorator < SimpleDelegator
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
     if relationship_benefit && relationship_benefit.offered?
-      (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)).round(2)
+      value = (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member))
+      BigDecimal.new("#{value}").round(2).to_f
     else
       0.00
     end
@@ -104,6 +107,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def employer_contribution_for(member)
+    return 0 if @member_provider.present? && @member_provider.is_cobra_status?
     ([max_employer_contribution(member), premium_for(member)].min * large_family_factor(member)).round(2)
   end
 
@@ -116,6 +120,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def total_employer_contribution
+    return 0 if @member_provider.present? && @member_provider.is_cobra_status?
     (members.reduce(0.00) do |sum, member|
       (sum + employer_contribution_for(member)).round(2)
     end).round(2)
@@ -126,4 +131,20 @@ class PlanCostDecorator < SimpleDelegator
       (sum + employee_cost_for(member)).round(2)
     end).round(2)
   end
+
+  def get_family_details_hash
+    members.map{ |m|
+      {
+        :plan => @reference_plan.name,
+        :first_name => m.first_name,
+        :employee_relationship => m.employee_relationship,
+        :age => m.age_on(TimeKeeper.date_of_record),
+        :family_id => m.quote_household.id,
+        :employee_cost => employee_cost_for(m),
+        :employer_contribution_percent => employer_contribution_percent(m),
+        :employer_contribution => employer_contribution_for(m),
+        :total_premium => employee_cost_for(m).round(2) + employer_contribution_for(m).round(2)}}
+  end
+
+
 end

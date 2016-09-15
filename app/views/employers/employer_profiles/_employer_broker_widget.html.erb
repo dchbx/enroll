@@ -34,8 +34,11 @@
         <%= mail_to active_broker.email.address, active_broker.email.address %>
       </div>
       <% else %>
-      You can add a broker for free
       <%= link_to 'Add Broker', employers_employer_profile_path(@employer_profile.id, :tab=>'brokers'), "aria-expanded" => "true", class: "btn btn-default center-block" %>
+      <small>
+        <%= link_to "What is a Broker?", '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
+      </small>
+      <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: "What is a broker?", body: "Brokers are licensed professionals with health insurance expertise and long-standing relationships with Small Business owners, Individuals and Families. Brokers help clients identify their options and make choices that are in their best interest and meet their needs and budget. In the District of Columbia, Brokers must have an active DC license in good standing, complete training on DC Health Link, and have contractual relationships with each carrier in DC Health Link for the market in which he/she intends to sell. There is no cost to use an insurance Broker." } %>
       <% end %>
     </div>
   </div>

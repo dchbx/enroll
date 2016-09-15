@@ -52,7 +52,6 @@ Feature: Binder transitions
     When the HBX-Admin clicks the button to transmit the Employer's Group XML
     Then the appropriate XML file is generated and transmitted
 
-
   Scenario: HBX-Admin participation requirements checklist for renewing ER
     Given the employer is renewing
     And the HBX admin visits the Dashboard page

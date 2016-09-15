@@ -51,7 +51,7 @@ class Announcement
     def get_announcements_by_portal(portal_path="", person=nil)
       announcements = []
 
-      case 
+      case
       when portal_path.include?("employers/employer_profiles")
         announcements.concat(Announcement.current_msg_for_employer)
       when portal_path.include?("families/home")

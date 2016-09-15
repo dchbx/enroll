@@ -1,0 +1,8 @@
+{
+  "draw" : <%= @draw %>,
+  "recordsTotal" : <%= @total_records %>,
+  "recordsFiltered" : <%= @records_filtered %>,
+  "data" : [
+    <%= render partial: "datatables/quotes", collection: @quotes, as: 'quote', spacer_template: "shared/json_array_spacer" %>
+  ]
+}

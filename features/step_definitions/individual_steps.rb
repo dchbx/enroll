@@ -28,6 +28,7 @@ end
 Then(/Individual creates HBX account$/) do
   click_button 'Create account', :wait => 10
   fill_in "user[oim_id]", :with => (@u.email :email)
+  find('#user_oim_id').set(@u.email :email)
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
   screenshot("create_account")
@@ -57,11 +58,14 @@ When(/^\w+ clicks? on continue button$/) do
 end
 
 Then(/^user should see heading labeled personal information/) do
+  sleep 1
   expect(page).to have_content("Personal Information")
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
+  wait_for_ajax(3,3)
   expect(page).to have_button("CONTINUE", visible: false)
+  sleep 1
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -172,6 +176,7 @@ And(/^I click on continue button on group selection page$/) do
   #wait_for_ajax(2,2)
   screenshot("test1")
   #click_link "Continue" #Get
+  wait_for_ajax(2,2)
   click_button "CONTINUE"
   screenshot("test2")
   wait_for_ajax
@@ -269,7 +274,7 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
-  find('.container .row div div.btn', text: 'Help').click
+  find('.help-me-sign-up', :text => 'Help Me Sign Up').click
   sleep 1
   click_link "Help from a Customer Service Representative"
   sleep 1

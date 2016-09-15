@@ -4,14 +4,13 @@ percent_complete = 0
 percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0))
 %>
 
-
-  <% if display_aasm_state? hbx_enrollment %>
-    <div class="text-right">
-      <span class="label label-success">
-        <%= hbx_enrollment.aasm_state.titleize %>
-      <span>
-    </div>
-  <% end %>
+<% if display_aasm_state? hbx_enrollment %>
+  <div class="text-right">
+    <span class="label label-success">
+      <%= hbx_enrollment.aasm_state.titleize %>
+    <span>
+  </div>
+<% end %>
 
 <!-- Hide Train stops temporarily (Refs #3725) -->
 <!--

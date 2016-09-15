@@ -1,0 +1,14 @@
+<% row_data = capture do %>
+  <span class="for-remote-replace-url" id="add-sep-form" data-replace-url="<%= add_sep_form_exchanges_hbx_profiles_path(family: family.id)%>"></span>
+  <span class="for-remote-replace-url" id="show-sep-history" data-replace-url="<%= show_sep_history_exchanges_hbx_profiles_path(family: family.id)%>"></span>
+<% end %>
+
+{
+  "hbx_id": "<%= json_escape family.primary_applicant.person.hbx_id %>",
+  "last_name": "<%= json_escape family.primary_applicant.person.last_name %>",
+  "first_name": "<%= json_escape family.primary_applicant.person.first_name %>",
+  "ssn": "<%= json_escape begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %>",
+  "consumer": "<%= json_escape family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %>",
+  "employee": "<%= json_escape family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %>",
+  "row_data" : <%= raw row_data.to_json %>
+}

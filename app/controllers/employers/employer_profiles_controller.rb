@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees,:link_from_quote]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -12,6 +12,27 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
+
+
+  def link_from_quote
+    claim_code = params[:claim_code].upcase
+    import_roster = params[:import_roster] == "yes" ? true : false
+
+    claim_code_status = Quote.claim_code_status?(claim_code)
+
+    if claim_code_status == "invalid"
+      flash[:error] = 'Quote claim code not found.'
+    elsif claim_code_status == "claimed"
+      flash[:error] = 'Quote claim code already claimed.'
+    else
+      flash[:notice] = 'Code claimed with success. Your Plan Year has been created.'
+      @employer_profile.build_plan_year_from_quote(claim_code, import_roster)
+    end
+
+    redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
+
+  end
+
 
   def index
     if params[:broker_agency_id].blank?
@@ -229,7 +250,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def bulk_employee_upload_form
-
   end
 
   def download_invoice
@@ -298,6 +318,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                          @employer_profile.census_employees.terminated.sorted
                        when 'all'
                          @employer_profile.census_employees.sorted
+                       when 'cobra'
+                         @employer_profile.census_employees.by_cobra.sorted
                        else
                          @employer_profile.census_employees.active.sorted
                        end

@@ -1,0 +1,14 @@
+<% row_data = capture do %>
+	<span class="for-remote-replace-url" id="edit-quote" data-replace-url="<%= edit_broker_agencies_broker_role_quote_path(@broker,quote) %>"></span>
+	<span class="for-remote-replace-url <% if quote.can_edit? %>disabled<% end %>" id="view-published-quote" data-replace-url="/broker_agencies/quotes/published_quote/<%= quote.id %>"></span>
+	<span class="for-remote-replace-url <% if quote.can_edit? %>disabled<% end %>" id="download-quote" data-replace-url="<%= publish_broker_agencies_broker_role_quotes_path(@broker,quote_id: quote.id,format: 'pdf')%>"></span>
+	<span class="for-remote-replace-url for-remote" id="delete-quote" data-replace-url="<%= delete_quote_modal_broker_agencies_broker_role_quote_path(@broker,quote) %>"></span>
+<% end %>
+{
+	"quote_name": <%= raw (link_to quote.quote_name.titleize, broker_agencies_broker_role_quote_path(@broker,quote), data: { no_turbolink: true }).to_json %>,
+	"claim_code": "<%= json_escape quote.claim_code %>",
+	"family_count": "<%= json_escape quote.quote_households.count %>",
+	"quote_state" : "<%= json_escape quote.aasm_state.humanize.titleize %>",
+	"row_data" : <%= raw row_data.to_json %>
+}
+

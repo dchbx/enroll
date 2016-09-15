@@ -13,15 +13,9 @@
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
          <% end %>
         </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "employers-tab") %>>
-         <%= link_to(employer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Employers</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
-         <% end %>
-        </li>
         <li role="presentation"<%= menu_tab_class(active_tab, "employers-invoice") %>>
           <%= link_to(employer_invoice_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers-invoices", "role" => "tab" ) do  %>
-              <span class="hidden-xs">ER Invoices</span>
+              <span class="hidden-xs">Employers</span>
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
         </li>
@@ -43,7 +37,6 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
          <% end %>
         </li>
-
         <li role="presentation"<%= menu_tab_class(active_tab, "issuers-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
          <%= link_to(issuer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "issuers", "role" => "tab" ) do  %>
             <span class="hidden-xs">Issuers</span>
@@ -68,21 +61,25 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Configuration"></span>
          <% end %>
         </li>
-
-        <li role="presentation"<%= menu_tab_class(active_tab, "vlp-docs-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
+        <li role="presentation"<%= menu_tab_class(active_tab, "vlp-docs-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>"">
           <%= link_to(verification_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "vlp-docs", "role" => "tab" ) do  %>
               <span class="hidden-xs">Documents</span>
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="VLP Docs"></span>
           <% end %>
         </li>
-
-        <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
+        <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>"">
          <%= link_to(staff_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "staff", "role" => "tab" ) do  %>
             <span class="hidden-xs">Staff</span>
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Staff"></span>
          <% end %>
         </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>  class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
+        <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>"">
+         <%= link_to(sep_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "staff", "role" => "tab" ) do  %>
+            <span class="hidden-xs">SEP</span>
+            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Staff"></span>
+         <% end %>
+        </li>
+        <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %> <%=pundit_class HbxProfile, :view_admin_tabs?%>">
           <%= link_to(inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
             <span class="badge message-unread"><%= @unread_messages %></span>
             Inbox
@@ -92,11 +89,12 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Inbox"></span>
           <% end %>
         </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second">
+        <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>"">
          <%= link_to(binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do  %>
             <span class="hidden-xs">Binder Transition</span>
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Binder"></span>
          <% end %>
+        </li>
       </ul>
     </div>
   </div>

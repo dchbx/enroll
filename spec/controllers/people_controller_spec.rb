@@ -38,7 +38,7 @@ RSpec.describe PeopleController do
       allow(Person).to receive(:first).and_return(person)
       allow(controller).to receive(:sanitize_person_params).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
-
+      allow(controller).to receive(:vlp_docs_clean).and_return(true)
       sign_in user
     end
 
@@ -95,6 +95,45 @@ RSpec.describe PeopleController do
         expect(response).to redirect_to(family_account_path)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
       end
+    end
+  end
+
+  describe "test private method" do
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:vlp_document) {FactoryGirl.build(:vlp_document)}
+    before :each do
+      10.times do
+        person.consumer_role.vlp_documents << vlp_document
+      end
+      person.consumer_role.save
+    end
+
+    it "stores updated person" do
+      expect(controller.send(:vlp_docs_clean, person)).to eq(true)
+    end
+
+    it "stores 10 additional vlp_documents" do
+      expect(person.consumer_role.vlp_documents.count).to eq(11)
+    end
+
+    it "stores identical duplicate records" do
+      id1 = Person.find(person.id).consumer_role.vlp_documents[5]
+      id2 = Person.find(person.id).consumer_role.vlp_documents[7]
+      id3 = Person.find(person.id).consumer_role.vlp_documents[10]
+      expect(id1).to eq id3
+      expect(id2).to eq id3
+    end
+
+    it "clean duplicates" do
+      controller.send(:vlp_docs_clean, person)
+      expect(Person.find(person.id).consumer_role.vlp_documents.count).to eq(2)
+    end
+
+    it "returns documents with only uniq id" do
+      controller.send(:vlp_docs_clean, person)
+      id1 = Person.find(person.id).consumer_role.vlp_documents[0].id.to_s
+      id2 = Person.find(person.id).consumer_role.vlp_documents[1].id.to_s
+      expect(id1).not_to eq(id2)
     end
   end
 end

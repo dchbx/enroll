@@ -57,5 +57,5 @@ plan_xmls.zip
 # Ignore byebug history
 .byebug_history
 
-# Ignore .idea
+#ignore .idea
 .idea

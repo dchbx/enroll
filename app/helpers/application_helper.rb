@@ -439,7 +439,7 @@ module ApplicationHelper
 
     content_tag(:div, class: 'progress-wrapper employer-dummy') do
       content_tag(:div, class: 'progress') do
-        concat(content_tag(:div, class: "progress-bar #{progress_bar_class}", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
+        concat(content_tag(:div, class: "progress-bar #{progress_bar_class} progress-bar-striped", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
           concat content_tag(:span, '', class: 'sr-only')
         end)
 
@@ -462,7 +462,7 @@ module ApplicationHelper
 
   def is_readonly(object)
     return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
-    return true if object.try(:employee_role_linked?)  # cannot edit, employer census roster
+    return true if object.try(:linked?)  # cannot edit, employer census roster
     return !(object.new_record? or object.try(:eligible?)) # employer census roster
   end
 
@@ -559,27 +559,27 @@ module ApplicationHelper
     (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
   end
 
-  def favorite_class(broker_role, general_agency_profile)
-    return "" if broker_role.blank?
-
-    if broker_role.included_in_favorite_general_agencies?(general_agency_profile.id)
-      "glyphicon-star"
-    else
-      "glyphicon-star-empty"
-    end
-  end
-
-  def show_default_ga?(general_agency_profile, broker_agency_profile)
-    return false if general_agency_profile.blank? || broker_agency_profile.blank?
-    broker_agency_profile.default_general_agency_profile == general_agency_profile
-  end
-
   def eligibility_criteria(employer)
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
-      ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      eligibility_text = ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      if text == "Yes"
+        "Eligible"
+      else
+        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+      end
+    else
+      "Ineligible"
+    end
+  end
+
+  def eligibility_criteria_for_export(employer)
+    if employer.show_plan_year.present?
+      @participation_count == 0 && @non_owner_participation_rule == true ? "Eligible" : "Ineligible"
+    else
+      "Ineligible"
     end
   end
 
@@ -601,4 +601,40 @@ module ApplicationHelper
     end
   end
 
+  def favorite_class(broker_role, general_agency_profile)
+    return "" if broker_role.blank?
+
+    if broker_role.included_in_favorite_general_agencies?(general_agency_profile.id)
+      "glyphicon-star"
+    else
+      "glyphicon-star-empty"
+    end
+  end
+
+  def show_default_ga?(general_agency_profile, broker_agency_profile)
+    return false if general_agency_profile.blank? || broker_agency_profile.blank?
+    broker_agency_profile.default_general_agency_profile == general_agency_profile
+  end
+
+  def primary_member(person_id)
+    Person.find(person_id).try(:primary_family).try(:primary_family_member).try(:person) == Person.find(person_id)
+  end
+# Use this in views.   Needed to make rspec work.
+# allow(view).to receive(:policy_helper).and_return(double("PersonPolicy", updateable?: true))
+# https://github.com/elabs/pundit/issues/339
+# https://www.relishapp.com/rspec/rspec-rails/v/3-0/docs/view-specs/view-spec#passing-view-spec-that-stubs-a-helper-method
+  def policy_helper pundit_object
+    policy pundit_object
+  end
+
+  def find_plan_name(hbx_id)
+    HbxEnrollment.find(hbx_id).try(:plan).try(:name)
+  end
+
+  def asset_data_base64(path)
+    asset = Rails.application.assets.find_asset(path)
+    throw "Could not find asset '#{path}'" if asset.nil?
+    base64 = Base64.encode64(asset.to_s).gsub(/\s+/, "")
+    "data:#{asset.content_type};base64,#{Rack::Utils.escape(base64)}"
+  end
 end

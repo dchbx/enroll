@@ -1,0 +1,60 @@
+    <div class="container-fluid">
+      <div class="table-responsive">
+        <table class="table">
+          <thead
+          <tr>
+            <th>Quote Action!!</th>
+            <th>Quote Name</th>
+            <th>Employer claim code</th>
+            <th class="text-right">Family Count</th>
+            <th class="text-right">State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+           <% @all_quotes.each do |q| %>
+          <tr>
+             <td>
+          <%=
+            if q.aasm_state == 'draft'
+             link_to "Edit Quote Info & Roster" , "/broker_agencies/quotes/#{q.id}/edit"
+           else
+             link_to "View Published Quote", "#", id: q.id, class: 'view-published'
+           end
+           %>
+         </td>
+             <td><%= q.quote_name %></td>
+             <td><%= q.claim_code %></td>
+             <td class="text-right"><%= q.quote_households.count %></td>
+             <td class="text-right"><%= q.aasm_state %></td>
+             <td><button type="button" onclick="delete_quote_handler" id="close_button" data-quote-id="<%=q.id%>" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+        <%=link_to "New Quote" , new_broker_agencies_quote_path , method: :get, class: "btn btn-trans btn-sm", id: "new_quote"%>
+      <br><br>
+    </div>
+  </div>
+
+
+<script>
+
+var delete_quote_handler = function(){
+  $.ajax({
+      type: "POST",
+      url: "/broker_agencies/quotes/" + this.getAttribute("data-quote-id"),
+      dataType: "js",
+      data: {"_method":"delete"},
+      success: function(){
+        console.log("Deleted successfully");
+
+      }
+  });
+  $(this).parent().parent().remove();
+  event.preventDefault();
+};
+
+$("button#close_button").click(delete_quote_handler);
+
+</script>

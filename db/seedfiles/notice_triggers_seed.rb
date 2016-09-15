@@ -62,7 +62,49 @@ shop_notice_triggers = [
         }
       }
     ] 
-  }
+  },
+  {
+    hbx_id: 'SHOP3A',
+    title: 'Renewal/Conversion Employer Publishes Plan',
+    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    resource_name: 'employer',
+    event_name: 'planyear_renewal_3a',
+    notice_triggers: [
+      {
+        name: 'PlanYear Renewal',
+        notice_template: 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
+        notice_builder: 'ShopNotices::EmployerNotice',
+        mpi_indicator: 'MPI_SHOPRA',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
+  {
+    hbx_id: 'SHOP3B',
+    title: 'Renewal/Conversion Employer Auto-Published',
+    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    resource_name: 'employer',
+    event_name: 'planyear_renewal_3b',
+    notice_triggers: [
+      {
+        name: 'PlanYear Renewal Auto-Published',
+        notice_template: 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
+        notice_builder: 'ShopNotices::EmployerNotice',
+        mpi_indicator: 'MPI_SHOPRB',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
 ]
 
 
@@ -90,7 +132,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20A',
-    title: 'Request for Additional Information First Reminder',
+    title: 'Request for Additional Information - First Reminder',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'first_verifications_reminder',
@@ -111,7 +153,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice20B',
-    title: 'Request for Additional Information Second Reminder',
+    title: 'Request for Additional Information - Second Reminder',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'second_verifications_reminder',
@@ -128,11 +170,11 @@ ivl_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'Notice21',
-    title: 'Request for Additional Information Third Reminder',
+    title: 'Request for Additional Information - Third Reminder',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'third_verifications_reminder',
@@ -153,7 +195,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'Notice22',
-    title: 'Request for Additional Information Fourth Reminder',
+    title: 'Request for Additional Information - Fourth Reminder',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'fourth_verifications_reminder',
@@ -171,7 +213,95 @@ ivl_notice_triggers = [
         }
       }
     ]
-  }
+  },
+
+  {
+    hbx_id: 'IVLR1',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_1',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        mpi_indicator: 'MPI_IVLR1',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVLR2',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals staying in APTC only',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_2',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_2_projected_renewal_notice',
+        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        mpi_indicator: 'MPI_IVLR2',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVLR3',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals moving from APTC to Medicaid',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_3',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/IVLR_3_APTC_Medicaid',
+        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        mpi_indicator: 'MPI_IVLR3',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVLR4',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals moving from APTC to UQHP',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_4',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/IVLR4_APTC_uqhp',
+        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        mpi_indicator: 'MPI_IVLR4',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 

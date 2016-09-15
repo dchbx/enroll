@@ -18,7 +18,7 @@ Feature: Hbx staff create announcements for consumer role
   Scenario: Consumer see announcement for consumer role
     Given Announcement prepared for Consumer role
     Given Consumer role exists
-    When Consumer login 
+    When Consumer login
     Then Consumer should see announcement
     When Consumer click the link of documents
     Then Consumer should not see announcement
@@ -28,5 +28,5 @@ Feature: Hbx staff create announcements for consumer role
   Scenario: Employer do not see announcement for consumer role
     Given Announcement prepared for Consumer role
     Given Employer role exists
-    When Employer login 
+    When Employer login
     Then Employer should not see announcement

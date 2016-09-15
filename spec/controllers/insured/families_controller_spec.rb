@@ -30,7 +30,7 @@ RSpec.describe Insured::FamiliesController do
     it "should raise the error on invalid person_id" do
       allow(session).to receive(:[]).and_return(33)
       allow(person).to receive(:agent?).and_return(true)
-      expect{get :home}.to raise_error(ArgumentError)
+      expect { get :home }.to raise_error(ArgumentError)
     end
   end
 end
@@ -40,8 +40,9 @@ RSpec.describe Insured::FamiliesController do
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
-  let(:family) { double("Family", active_household: household) }
+  let(:family) { double("Family", active_household: household, special_enrollment_periods: special_enrollment_periods) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
+  let(:special_enrollment_periods) { double(where: [double])}
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
@@ -100,6 +101,7 @@ RSpec.describe Insured::FamiliesController do
 
       before :each do
         FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
+        sign_in user
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
@@ -167,8 +169,7 @@ RSpec.describe Insured::FamiliesController do
       end
 
       context "who has not passed ridp" do
-        let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false) }
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false, has_hbx_staff_role?: false, get_announcements_by_roles_and_portal: [""]) }
 
         before do
           allow(user).to receive(:idp_verified?).and_return false
@@ -452,6 +453,8 @@ RSpec.describe Insured::FamiliesController do
     it "renders the 'check_move_reason' template" do
       xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
       expect(response).to have_http_status(:success)
+      expect(response).to render_template(:check_move_reason)
+      expect(assigns(:qle_date_calc)).to eq assigns(:qle_date) - Settings.aca.qle.with_in_sixty_days.days
     end
 
     describe "with valid and invalid params" do
@@ -480,6 +483,7 @@ RSpec.describe Insured::FamiliesController do
     it "renders the 'check_insurance_reason' template" do
       xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
       expect(response).to have_http_status(:success)
+      expect(response).to render_template(:check_insurance_reason)
     end
 
     describe "with valid and invalid params" do
@@ -617,6 +621,7 @@ RSpec.describe Insured::FamiliesController do
       let(:family) {FactoryGirl.build(:family)}
       before :each do
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
+
         family.broker_agency_accounts = [
           FactoryGirl.build(:broker_agency_account, family: family)
         ]
@@ -716,6 +721,29 @@ RSpec.describe Insured::FamiliesController do
       it "adds a message to person inbox" do
         expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
       end
+    end
+  end
+end
+
+RSpec.describe Insured::FamiliesController do
+  describe "GET purchase" do
+    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    before :each do
+      allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+      allow(person).to receive(:primary_family).and_return(family)
+      sign_in(user)
+      get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
+    end
+
+    it "should get hbx_enrollment" do
+      expect(assigns(:enrollment)).to eq hbx_enrollment
+    end
+
+    it "should get terminate" do
+      expect(assigns(:terminate)).to eq 'terminate'
     end
   end
 end

@@ -4176,7 +4176,7 @@
 			browser = oSettings.oBrowser,
 			ie67 = browser.bScrollOversize;
 
-		var styleWidth = table.style.width;
+		var styleWidth = "100%";
 		if ( styleWidth && styleWidth.indexOf('%') !== -1 ) {
 			tableWidthAttr = styleWidth;
 		}

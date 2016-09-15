@@ -5,7 +5,7 @@ And /^Hbx admin should see the link of announcements and click$/ do
 end
 
 Then /^Hbx admin should see the page of announcements$/ do
-  expect(page).to have_content("Current Announcements")
+  expect(page).to have_content(/Current Announcements/i)
   expect(page).to have_content("Msg Start Date")
 end
 
@@ -13,8 +13,9 @@ When(/Hbx admin enter announcement info$/) do
   fill_in 'announcement[content]', with: 'announcement for current'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record - 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
-  find('#announcement_audiences_ivl').click
-  find('.interaction-click-control-create-announcement').click
+  sleep 1
+  find('#announcement_audiences_ivl').trigger 'click'
+  find('.interaction-click-control-create-announcement').trigger 'click'
 end
 
 When(/^Hbx admin enter announcement info with future date$/) do
@@ -109,4 +110,3 @@ When(/^Consumer login$/) do
   fill_in "user[login]", :with => 'consumer@dc.gov' unless find(:xpath, '//*[@id="user_login"]').value == 'consumer@dc.gov'
   find('.interaction-click-control-sign-in').click
 end
-

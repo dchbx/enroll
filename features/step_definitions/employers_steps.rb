@@ -211,6 +211,19 @@ When(/^.+ clicks on terminate button for a census family$/) do
   @browser.a(text: /Submit/).click
 end
 
+When(/^.+ clicks on terminate button for a census family for invalid case$/) do
+ wait_for_ajax
+ find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[7]/i').click
+ find(".date-picker").set(TimeKeeper.date_of_record - 75.days)
+ # fill_in ".date-picker", :with => TimeKeeper.date_of_record - 75.days
+ find(".delete_confirm").click
+ sleep 1
+ expect(find('.alert')).to have_content('Census Employee could not be terminated: Termination date must be within the past 60 days.')
+ expect(page).to have_content("John")
+
+end
+
+
 When(/^.+ clicks on terminate button for rehired census employee$/) do
   @browser.a(text: /Terminate/).wait_until_present
   @browser.execute_script("$('.interaction-click-control-terminate').last().trigger('click')")
@@ -362,7 +375,7 @@ Then(/^.+ should see the combined filter results$/) do
 end
 
 When(/^.+ go(?:es)? to the benefits tab$/) do
-  find(".interaction-click-control-benefits").click
+  find('.interaction-click-control-benefits').click
 end
 
 Then(/^.+ should see the plan year$/) do
@@ -423,6 +436,7 @@ module EmployeeWorld
     # :employer_profile, *traits, attributes.merge(:employer_profiles_traits => :with_staff)
   end
 end
+
 World(EmployeeWorld)
 
 Given /^an employer exists$/ do
@@ -447,4 +461,31 @@ end
 
 Then /^they should see that employee's details$/ do
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
+end
+
+Then /^they should see that employee details$/ do
+  expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
+end
+
+When(/^the employer goes to benefits tab$/) do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
+end
+
+When(/^the employer clicks on claim quote$/) do
+  find('.interaction-click-control-claim-quote').click
+end
+
+Then(/^the employer enters claim code for his quote$/) do
+  person = FactoryGirl.create(:person, :with_broker_role)
+  @quote=FactoryGirl.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
+  @quote.publish!
+  fill_in "claim_code", :with => @quote.claim_code
+end
+
+When(/^the employer clicks claim code$/) do
+  find('.interaction-click-control-claim-code').click
+end
+
+Then(/^the employer sees a successful message$/) do
+  expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
 end

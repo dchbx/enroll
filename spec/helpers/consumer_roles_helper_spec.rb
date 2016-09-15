@@ -158,4 +158,20 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       end
     end
   end
+
+  context "required_for_consumer_address" do
+    it "should return false when required is blank" do
+      expect(helper.required_for_consumer_address("", true)).to eq false
+    end
+
+    context "when required is not blank" do
+      it "should return true when has_dc_adress is true" do
+        expect(helper.required_for_consumer_address("address_required", true)).to eq true
+      end
+      it "should return false when has_dc_adress is false" do
+        expect(helper.required_for_consumer_address("address_required", false)).to eq false
+      end
+    end
+  end
+
 end

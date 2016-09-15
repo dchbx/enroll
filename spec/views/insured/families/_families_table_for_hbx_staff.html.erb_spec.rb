@@ -49,5 +49,10 @@ RSpec.describe "insured/families/_families_table_for_hbx_staff.html.erb" do
       expect(rendered).to match /<td>1.+<td>No.+<td>Yes.+<td>Yes/m
     end
 
+    it "the rendered partial should have an Edit DOB/SSN button" do
+      render partial: 'insured/families/families_table_for_hbx_staff', :collection => [[family1]] , as: :families
+      expect(response.body).to have_css("a", text: "Edit DOB/SSN")
+    end
+
   end
 end  

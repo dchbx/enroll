@@ -93,7 +93,7 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
     $('#<%= @location_id %> .health .col-xs-12:first').show();
 
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
-      validateEditPlanYear();
+      EmployerProfile.validateEditPlanYear();
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();
       $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');

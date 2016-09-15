@@ -5,10 +5,14 @@ var Hints = ( function( window, undefined ) {
     $('.dropdown[data-toggle="popover"]').popover('show');
     $('.popover-title').append('<button id="popovercloseid" type="button" class="close" style="position: absolute; top: 10px; right: 15px;" title="Don\'t Show Again" data-toggle="tooltip">&times;</button>');
     Freebies.tooltip();
-    $('html').on('click', function(e) {
-      if (typeof $(e.target).data('original-title') == 'undefined') {
-        $('[data-original-title]').popover('hide');
-      }
+    $('body').on('click', function (e) {
+      $('[data-toggle="popover"]').each(function () {
+        //the 'is' for buttons that trigger popups
+        //the 'has' for icons within a button that triggers a popup
+        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+          $(this).popover('hide');
+        }
+      });
     });
     $('#popovercloseid').on('click', function() {
         $.ajax({

@@ -1,0 +1,428 @@
+var EmployerInvoicesDatatable = ( function( window, undefined ) {
+
+  function setTab() {
+    var tab = "Employer";
+    return tab;
+  }
+
+  function setBaseModel() {
+    var base_model = "Organization";
+    return base_model;
+  }
+
+  function callAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $all_filter = $table.closest('.module').find('.first-level a:first:contains("All")');
+    $all_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {});
+      $table.DataTable().draw();
+    });
+  }
+
+  function callEnrollingAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level a:contains("All")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingInitialEligibleFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level a:contains("Initial Eligible")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingRenewingFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level a:contains("Renewing")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingOpenEnrollmentFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level a:contains("Open Enrollment")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingBinderPendingFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level a:contains("Binder Pending")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingFirstMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level').find("a:contains('<%="#{(TimeKeeper.date_of_record.next_month.beginning_of_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.year}" %>')");
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), '<%= "#{(TimeKeeper.date_of_record.next_month.beginning_of_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.year}" %>');
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingSecondMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level').find("a:contains('<%="#{(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.year}" %>')");
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), '<%= "#{(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.year}" %>');
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingThirdMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level').find("a:contains('<%="#{(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.year}" %>')");
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), '<%= "#{(TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month).strftime("%B")} #{TimeKeeper.date_of_record.next_month.beginning_of_month.year}" %>');
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrollingBinderPaidFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolling-second-level a:contains("Binder Paid")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrolledAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolled-second-level a:contains("All")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callEnrolledSuspendedFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Enrolled-second-level a:contains("Suspended")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callApplicantsAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Applicants-second-level a:contains("All")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callApplicantsInitialIneligibleFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Applicants-second-level a:contains("Initial Ineligible")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function addInvoicedScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Invoiced?")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        boolean_sort: true,
+        order_by: "employer_profile.invoiced_for_current_month",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addStatusScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Status")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_profile.aasm_state",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addHbxIdScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Hbx Id")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "id",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addFeinScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("FEIN")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "fein",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addLegalNameScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting_asc .vertically-aligned-row').find('div:contains("Legal name")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        order_by: "legal_name",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addEmployerStatusScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Plan Year Status")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        boolean_sort: true,
+        order_by: "employer_profile.has_renewing_plan_year",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addEligibilityScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Eligibility")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        boolean_sort: true,
+        order_by: "employer_profile.has_passing_eligibility_criteria",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addBrokerScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Broker")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_profile.broker_name",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addGeneralAgencyScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("General Agency")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_profile.general_agency_name",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addConversionScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("CNVRSN?")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        boolean_sort: true,
+        order_by: "employer_profile.is_conversion_employer",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addEffectiveDateScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Effective Date")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      var filter_scopes = EnrollDataTableInitializer.setScopesFromFilters(table_id, tab);
+      var additional_scopes = filter_scopes.push("order_organizations_by_employer_profiles_latest_plan_year");
+      var scopes = filter_scopes;
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "[]",
+        scopes: scopes,
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addEnrolledWaivedScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Enrolled Waived")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_profile.enrolled_wavied_count",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addPercentageScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("PCT")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_profile.enrolled_percentage",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function addSubmittedAtScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $sort_column = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Submitted At")');
+    $sort_column.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "employer_xml_transmitted_at",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab),
+        month_filter: EnrollDataTableInitializer.setMonthFilter(table_id)
+      });
+    });
+  }
+
+  function generateInvoicesForSelection(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $url = $table.closest('.module').data('generate-invoice-url');
+    var $generate_invoices_link = $('.dropdown-menu').find('a:contains("Generate Invoice")');
+    $generate_invoices_link.on('click', function() {
+      var $employer_ids = []
+      $table.find('tbody .enroll-checkbox input:checked').closest('tr').find('.row-data').find('span').each( function() {
+        $employer_ids.push($(this).data('employer-id'))
+      })
+      $.ajax({
+        context: this,
+        type: "post",
+        url: $url,
+        dataType: 'script',
+        data: {
+          employerId: $employer_ids
+        },
+      })
+    });
+  }
+
+  function markBinderPaid(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $url = $table.closest('.module').data('binder-paid-url');
+    var $binder_paid_link = $('.dropdown-menu').find('a:contains("Mark Binder Paid")');
+    $binder_paid_link.on('click', function() {
+      var $employer_ids = []
+      $table.find('tbody .enroll-checkbox input:checked').closest('tr').find('.row-data').find('span').each( function() {
+        if ( $(this).data('employer-profile-id') !== undefined ) {
+          if ( $(this).closest('tr').find('.fa-info-circle').length || $(this).closest('tr td.eligibility:contains("Ineligible")') ) {
+            $(this).closest('tr').find('.enroll-checkbox label > input').removeProp('checked');
+            alert("You can not mark ineligible employers as binder paid.");
+            return false;
+          } else {
+            $employer_ids.push($(this).data('employer-profile-id'));
+          }
+        }
+      })
+      if ( $employer_ids.length ) {
+        $.ajax({
+          context: this,
+          type: "post",
+          url: $url,
+          dataType: 'script',
+          data: {
+            employer_profile_ids: $employer_ids
+          },
+        })
+      }
+    });
+  }
+
+  return {
+    callEnrollingAllFilter : callEnrollingAllFilter,
+    callEnrollingInitialEligibleFilter: callEnrollingInitialEligibleFilter,
+    callEnrollingRenewingFilter: callEnrollingRenewingFilter,
+    callEnrollingOpenEnrollmentFilter: callEnrollingOpenEnrollmentFilter,
+    callEnrollingBinderPendingFilter: callEnrollingBinderPendingFilter,
+    callEnrollingBinderPaidFilter: callEnrollingBinderPaidFilter,
+    callEnrollingFirstMonthFilter: callEnrollingFirstMonthFilter,
+    callEnrollingSecondMonthFilter: callEnrollingSecondMonthFilter,
+    callEnrollingThirdMonthFilter: callEnrollingThirdMonthFilter,
+    callEnrolledAllFilter : callEnrolledAllFilter,
+    callEnrolledAllFilter: callEnrolledAllFilter,
+    callEnrolledSuspendedFilter: callEnrolledSuspendedFilter,
+    callApplicantsAllFilter : callApplicantsAllFilter,
+    callApplicantsInitialIneligibleFilter: callApplicantsInitialIneligibleFilter,
+    generateInvoicesForSelection : generateInvoicesForSelection,
+    markBinderPaid : markBinderPaid,
+    addInvoicedScopesBeforeSorting : addInvoicedScopesBeforeSorting,
+    addStatusScopesBeforeSorting: addStatusScopesBeforeSorting,
+    addHbxIdScopesBeforeSorting: addHbxIdScopesBeforeSorting,
+    addFeinScopesBeforeSorting: addFeinScopesBeforeSorting,
+    addLegalNameScopesBeforeSorting: addLegalNameScopesBeforeSorting,
+    addEmployerStatusScopesBeforeSorting: addEmployerStatusScopesBeforeSorting,
+    addEligibilityScopesBeforeSorting: addEligibilityScopesBeforeSorting,
+    addGeneralAgencyScopesBeforeSorting: addGeneralAgencyScopesBeforeSorting,
+    addBrokerScopesBeforeSorting: addBrokerScopesBeforeSorting,
+    addConversionScopesBeforeSorting: addConversionScopesBeforeSorting,
+    addEffectiveDateScopesBeforeSorting: addEffectiveDateScopesBeforeSorting,
+    addEnrolledWaivedScopesBeforeSorting: addEnrolledWaivedScopesBeforeSorting,
+    addPercentageScopesBeforeSorting: addPercentageScopesBeforeSorting,
+    addSubmittedAtScopesBeforeSorting: addSubmittedAtScopesBeforeSorting,
+    callAllFilter: callAllFilter
+  };
+
+} )( window );

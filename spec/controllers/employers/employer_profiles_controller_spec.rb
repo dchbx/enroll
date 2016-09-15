@@ -196,12 +196,14 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:authorize_show).and_return(true)
         allow(user).to receive(:last_portal_visited=).and_return("true")
+        allow(user).to receive(:has_employer_staff_role?).and_return true
         allow(user).to receive(:save).and_return(true)
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
+
         sign_in(user)
       end
 
@@ -216,6 +218,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
       it "should get announcement" do
         FactoryGirl.create(:announcement, content: "msg for Employer", audiences: ['Employer'])
+        allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
         allow(user).to receive(:person).and_return(person)
         allow(user).to receive(:has_employer_staff_role?).and_return true
         get :show, id: employer_profile.id, tab: "home"
@@ -631,6 +634,17 @@ RSpec.describe Employers::EmployerProfilesController do
    it "should export cvs" do
      sign_in(user)
      get :export_census_employees, employer_profile_id: employer_profile, format: :csv
+     expect(response).to have_http_status(:success)
+   end
+
+  end
+
+
+  describe "GET link_from_quote" do
+    let(:user) { FactoryGirl.create(:user) }
+
+   it "should redirect" do
+     sign_in(user)
      expect(response).to have_http_status(:success)
    end
 

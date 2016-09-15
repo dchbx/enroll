@@ -82,12 +82,12 @@ module Forms
         return true
       end
       person = Person.new(extract_person_params)
+      assign_person_address(person)
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
       if self.is_consumer_role == "true"
         family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
       end
-      assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
       self.id = family_member.id
@@ -164,7 +164,8 @@ module Forms
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
-        :no_dc_address_reason => no_dc_address_reason
+        :no_dc_address_reason => no_dc_address_reason,
+        :is_consumer_role => is_consumer_role
       }
     end
 
@@ -244,6 +245,10 @@ module Forms
         person.errors.get(:ssn).each do |err|
           self.errors.add(:ssn, err)
         end
+      elsif person.errors.has_key?(:base)
+        person.errors.get(:base).each do |err|
+          self.errors.add(:base, err)
+        end
       end
     end
 
@@ -257,12 +262,12 @@ module Forms
       assign_attributes(attr)
       assign_citizen_status
       return false unless valid?
+      assign_person_address(family_member.person)
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
         return false unless assign_person_address(family_member.person)
       end
-      assign_person_address(family_member.person)
       family_member.update_relationship(relationship)
       family_member.save!
       true

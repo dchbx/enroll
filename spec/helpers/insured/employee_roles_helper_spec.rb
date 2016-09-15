@@ -63,4 +63,27 @@ RSpec.describe Insured::EmployeeRolesHelper, :type => :helper do
       end
     end
   end
+
+  describe "#show_market_name_by_enrollment" do
+    let(:enrollment) { HbxEnrollment.new }
+    context "for shop" do
+      it "under employer_sponsored_cobra" do
+        enrollment.kind = 'employer_sponsored_cobra'
+        expect(helper.show_market_name_by_enrollment(enrollment)).to eq 'Employer Sponsored COBRA/Continuation'
+      end
+
+      it "under employer_sponsored" do
+        enrollment.kind = 'employer_sponsored'
+        expect(helper.show_market_name_by_enrollment(enrollment)).to eq 'Employer Sponsored'
+      end
+    end
+
+    it "for individual" do
+      expect(helper.show_market_name_by_enrollment(enrollment)).to eq 'Individual'
+    end
+
+    it "with nil" do
+      expect(helper.show_market_name_by_enrollment(nil)).to eq ''
+    end
+  end
 end

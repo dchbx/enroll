@@ -1,0 +1,534 @@
+set_tab_content("<%= escape_javascript render "sep/index"%>")
+$('.sep_link').hide();
+$('.admin_effective_on_kind_options').hide();
+$('.init_event_date').hide();
+$('.start_end_date').hide();
+
+var ivlTable, shopTable, ivl_shop_Table, selectedTable, idTable;
+var history_btn_counter = 0;
+var add_btn_counter = 0;
+var add_btn_state = true;
+var history_btn_state = true;
+var market;
+
+var columnVal = [
+                  { targets: [6,7], orderable: false},
+                  { targets: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], visible: false}
+                ];
+                
+
+  ivl_shop_Table = $('#sepAdmin').DataTable( {
+      columnDefs: columnVal,
+      "order": [[ 2, "asc" ]]
+    } );
+   
+  ivlTable = $('#sepAdmin1').DataTable( {
+      columnDefs: columnVal,
+      "order": [[ 2, "asc" ]]
+    } );
+
+  shopTable = $('#sepAdmin2').DataTable( {
+      columnDefs: columnVal,
+      "order": [[ 2, "asc" ]]
+    } );
+
+
+
+var objDateMin;
+var objDateMax;
+
+function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, cdate) {
+    var target = $('.qle-date-picker');
+    var splitedate = cdate.split('/');
+    var cur_date = new Date(splitedate[2], splitedate[0]-1, splitedate[1]);
+    var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
+
+    var post_days = (idays - post_event_sep_in_days);
+    var pre_days = (pre_event_sep_in_days + idays);
+    if (post_days >= 0){
+      dateMin = '+' + post_days + 'd';
+    }else{
+      dateMin = post_days + 'd';
+    }
+    if (pre_days >= 0){
+      dateMax = '+' + pre_days + 'd';
+    }else{
+      dateMax = pre_days + 'd';
+    }
+    var cur_qle_title = $('.qle-details-title').html();
+
+    objDateMin = dateMin;
+    objDateMax = dateMax;
+   
+    $(target).val('');
+    $(target).datepicker('destroy');
+    $(target).datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: 'mm/dd/yy',
+      defaultDate: cdate,
+      minDate: dateMin,
+      maxDate: dateMax});
+
+    $('input.floatlabel').floatlabel({
+      slideInput: false
+   });
+  };
+
+ 
+var getObj;
+var self_attested;
+
+$(document).on('change','.admin_selected_sep_reason select',function(){  
+  if($(this).val() == '') {
+   $('.init_event_date').hide();    
+   $('.admin_effective_on_kind_options').hide();
+   $('.start_end_date').hide();
+   $('.csl_num_options input:text').val("");
+  }
+  else{
+   $('.init_event_date').show();
+   $('.admin_effective_on_kind_options').hide();
+   $('.start_end_date').hide();
+   
+   var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
+   getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
+
+   self_attested = getObj.data('is-self-attested');
+
+   //init_datepicker_for_qle_date(getObj.data('pre-event-sep-in-days'), getObj.data('post-event-sep-in-days'), getObj.data('current-date'));
+   init_datepicker_for_qle_date(getObj.data('pre-event-sep-in-days'), getObj.data('post-event-sep-in-days'), getDate());
+
+   
+   self_attested == true ? $('#start_on, #end_on').addClass("disabled-input") : $('#start_on').removeClass("disabled-input");
+
+
+   $('input.floatlabel').floatlabel({
+      slideInput: false
+   });
+  }
+  $('.init_effective_date input').val("");
+  $('.start_end_date').hide();
+});
+
+
+$(document).on('change','.admin_effective_on_kind_options select', function(){
+
+  if($(this).val() == ''){
+    $('.init_effective_date input').val("");
+  }
+
+  else 
+    set_effective_date($(this).val(), '.init_event_date input', '.init_effective_date input' );
+});
+
+
+function set_start_date(init_target, start_day_target, end_day_target ){
+  var eventDate = $(init_target).datepicker('getDate');
+  var convertDate;
+
+  if (idTable == '#sepAdmin1')
+    convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
+  else if(idTable == '#sepAdmin2')
+    convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  else {
+    if (market == 'ivl')
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
+    else
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  }
+
+  $(start_day_target).datepicker().datepicker('setDate', eventDate);
+  $(end_day_target).datepicker().datepicker('setDate', convertDate);
+
+  
+}
+
+function set_end_date(init_target, end_target){
+
+  var eventDate = $(init_target).datepicker('getDate');
+
+  if (idTable == '#sepAdmin1')
+    convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
+  else if(idTable == '#sepAdmin2')
+    convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  else {
+    if (market == 'ivl')
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
+    else
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  }
+
+
+  $(end_target).datepicker().datepicker('setDate', convertDate);
+
+  
+  //$( end_target).datepicker( "option", "showOn", "off" );
+}
+
+function set_effective_date(curObj, init_target, end_target){
+
+  var eventDate, currentDate, midDay;
+  eventDate = $(init_target).datepicker('getDate');
+
+  if(curObj == '1st of next month')
+    convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, 1);
+  else{
+    midDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), 15);
+
+    if(eventDate <= midDay)
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, 1);
+    else
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, 1);
+
+  }
+
+
+  //eventDate = $('.init_event_date input').datepicker('getDate');
+  $(end_target).datepicker().datepicker('setDate', convertDate);
+
+
+  
+  $('.kind input').val(curObj);
+}
+
+function getDate(){
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth()+1; //January is 0!
+  var yyyy = today.getFullYear();
+
+  if(dd<10) {
+    dd='0'+dd
+  } 
+
+  if(mm<10) {
+    mm='0'+mm
+  } 
+
+  today = mm+'/'+dd+'/'+yyyy;
+  return today;
+}
+
+$(document).on('change','.radio_option input', function(){
+
+  if($(this).val() == 'shop')
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qualifying_life_events_shop.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+  else
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qualifying_life_events_individual.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+
+  market = $(this).val();
+  $('.admin_effective_on_kind_options').hide();
+  $('.init_event_date').hide();
+  $('.start_end_date').hide();
+  $('.init_effective_date input').val('');
+  $('.csl_num_options input').val('');
+});
+
+
+$(document).on('change','.init_event_date input', function(){
+  if($(this).val() == ''){
+   $('.admin_effective_on_kind_options').hide(); 
+   $('.start_end_date').hide();
+
+  }
+  else{
+   $('.admin_effective_on_kind_options #effective_on_date').val("");
+   $('.admin_effective_on_kind_options').show();
+
+   
+   if(self_attested == true)
+    $('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DAY RULE', '']]) + options_for_select(@event_kinds_default)%>").selectric("refresh");
+   else { 
+      if(market == 'ivl')  
+        $('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DAY RULE', '']]) + options_for_select(@event_kinds_all)%>").selectric("refresh");
+      else
+        $('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DAY RULE', '']]) + options_for_select(@event_kinds_default)%>").selectric("refresh");
+
+   }
+   //$('.admin_effective_on_kind_options .selectric-hide-select select').selectric("refresh");
+   
+   $('.init_effective_date input').val("");
+
+  
+   $('.start_end_date').show();
+
+    set_start_date('.init_event_date input', '.start_btn input', '.end_btn input');
+
+    //$('select.selectric').selectric();
+
+  }
+    $('.end_date input').val(""); 
+    $('init_effective_date input').val("");
+
+
+});
+
+$(document).on('change','.start_end_date .start_btn input', function(){
+
+  if($(this).val() == ''){
+    $('.qle-endDate').val("");
+  }
+  else
+    set_end_date('.start_btn input', '.end_btn input');     
+});
+
+$('#tab_datatables a[data-toggle="tab"]').on("click", function(){
+
+  if(add_btn_counter > 0){
+    add_btn_state = false;
+    $(idTable + ' td.add-control').trigger('click');
+  }
+
+  if(history_btn_counter > 0){
+    history_btn_state = false;
+    $(idTable + ' td.history-control').trigger('click');
+  }
+
+  switch($(this).attr('data-target')) {
+    case '#ivl_shop_Table':   
+      selectedTable = ivl_shop_Table;
+      idTable = '#sepAdmin'; 
+      break;
+    case '#ivlTable':
+      selectedTable = ivlTable;
+      idTable = '#sepAdmin1';
+      market = 'ivl';
+      break;
+    case '#shopTable':   
+      selectedTable = shopTable;
+      idTable = '#sepAdmin2';
+      market = 'shop';
+      break;
+    }  
+    add_btn_state = true;
+    history_btn_state = true;
+
+  });
+
+
+
+$('.sep_table tbody').on('click', 'td.add-control', function () {
+
+  var btn_class = $(this).attr("class");
+  var tr = $(this).closest('tr');
+  var row = selectedTable.row(tr); 
+  var builder = row.data()[10];
+
+  if (row.child.isShown() ) {
+    add_btn_counter--;
+    $(this).removeClass('fa fa-minus-square');
+    $(this).find('i').addClass('fa fa-plus-square');
+    
+    add_btn_counter == 0 ? resetButtons($('td.history-control')) : add_btn_counter;
+    
+    $('div.add_sep_datatable_slider', row.child()).slideUp( function () {
+    row.child.hide();
+   });
+  }
+  
+  else {
+    if(add_btn_state == true){
+      add_btn_counter++;
+      $(this).find('i').removeClass('fa fa-plus-square');
+      $(this).addClass('fa fa-minus-square');
+      $('td.history-control').prop('disabled', true);
+      $('td.history-control').removeClass('icon_enabled');
+      $('td.history-control').addClass('icon_disabled');
+      $('td.history-control').css("cursor", "default");
+
+      //Open this row
+      row.child(displayTable(builder, btn_class, ""), 'no-padding' ).show();
+      $('select.selectric').selectric();
+      $('input.floatlabel').floatlabel({
+        slideInput: false
+      });
+
+      $('select.floatlabel').floatlabel({
+        slideInput: false
+      });
+
+      $('div.add_sep_datatable_slider', row.child()).slideDown();
+    }
+  }
+
+      idTable == '#sepAdmin' ? $('.radio_option').show() : $('.radio_option').hide();
+});
+
+
+$('.sep_table tbody').on('click', 'td.history-control', function () {
+  var btn_class = $(this).attr("class");
+  var tr = $(this).closest('tr');
+  var row = selectedTable.row(tr)
+  var reason = row.data()[8].split("?dummyData");
+  var admin_comment = row.data()[9].split("?dummyData");
+  var fullName = row.data()[1] + " " + row.data()[2];
+  var csl = row.data()[11].split("?dummyData");
+  var effective_on_kind = row.data()[12].split("?dummyData");
+  var start_on = row.data()[13].split("?dummyData");
+  var end_on = row.data()[14].split("?dummyData");
+  var event_date = row.data()[15].split("?dummyData");
+  var next_poss_date = row.data()[16].split("?dummyData");
+  var option1_date = row.data()[17].split("?dummyData");
+  var option2_date = row.data()[18].split("?dummyData");
+  var option3_date = row.data()[19].split("?dummyData");
+  //var dental = row.data()[18];
+
+  var builder = buildTable(reason.length-1, reason, admin_comment, csl, effective_on_kind, start_on, end_on, event_date, next_poss_date, option1_date, option2_date, option3_date);
+
+  if ( row.child.isShown() ) {
+    history_btn_counter--;
+    $(this).removeClass('fa fa-folder-open');
+    $(this).find('i').addClass('fa fa-folder');
+    
+    history_btn_counter == 0 ? resetButtons($('td.add-control')) : history_btn_counter;
+  // This row is already open - close it
+    $('div.add_sep_datatable_slider', row.child()).slideUp( function () {
+    row.child.hide();
+
+    $('.admin_effective_on_kind_options').hide();
+    //tr.removeClass('shown');
+    } );
+  }
+  
+  else {
+        
+    if(history_btn_state == true){
+      history_btn_counter++;
+      $(this).find('i').removeClass('fa fa-folder');
+      $(this).addClass('fa fa-folder-open');
+      $('td.add-control').prop('disabled', true);
+      $('td.add-control').removeClass('icon_enabled');
+      $('td.add-control').addClass('icon_disabled');
+      $('td.add-control').css("cursor", "default");
+
+      // Open this row
+      row.child(displayTable(builder, btn_class, fullName), 'no-padding' ).show();
+      $('select.selectric').selectric();
+
+      $('div.add_sep_datatable_slider', row.child()).slideDown();
+      }
+    }
+  }
+);
+
+ $(".btn").click(function() {
+    if($("#collapseme").hasClass("out")) {
+        $("#collapseme").addClass("in");
+        $("#collapseme").removeClass("out");
+    } else {
+        $("#collapseme").addClass("out");
+        $("#collapseme").removeClass("in");
+    }
+});
+
+  //$( '#tab_datatables a[data-toggle="tab"]:last').trigger("click");
+$( '#tab_datatables a[data-toggle="tab"]:first').trigger("click");
+  
+
+function resetButtons(button){
+  button.prop('disabled', false);
+  button.removeClass('icon_disabled');
+  button.addClass('icon_enabled');
+  button.css("cursor", "pointer");
+}
+
+function displayTable(custom_table, className, name) {
+
+    if (className == 'add-control'){
+
+      return '<div class="add_sep_datatable_slider" style="display:none">'+
+            '<div class="row container">' +
+            custom_table + 
+            '<br/>'+
+            '</div>' +
+            '</div>';
+    }
+
+    else {
+
+      return '<br/>' + '<br/>' + 
+              '<div class="add_sep_datatable_slider" style="display:none">'+
+              '<h3>' + name + '</h3>' +
+        
+              '<div class = "table-responsive">' + 
+                '<table class = "table table-striped table-bordered table-history">'+
+                  '<div class="col-md-16 no-pd col-sm-16 col-xs-16">' +
+                 
+                      custom_table + 
+                
+                  '</div>' + 
+                '</table>'+
+              '</div>' + 
+              '<br/>'+ 
+            '</div>';
+    }
+}
+
+
+ function buildTable(size, reason, admin_comment, csl, effective_on_kind, start_on, end_on, event_date, next_poss_date, option1_date, option2_date, option3_date)
+ {
+    var val = "";
+    var comment_section;
+
+    for(i=size-1; i>=0; i--){
+
+      if(admin_comment[i] == "")
+        comment_section = 'Admin Comment: N/A';
+      else
+        comment_section = 'Admin Comment: ' + admin_comment[i];
+
+      val =   val + 
+
+              '<thead>' +              
+                '<tr>'+
+                '<th>SEP REASON</th>'+ 
+                '<th>EFFECTIVE DATE RULE</th>'+ 
+                '<th>EVENT DATE</th>'+
+                '<th>SEP START DATE</th>'+
+                '<th>SEP END DATE</th>'+
+                '<th>NEXT POSSIBLE EVENT DATE</th>'+
+                '<th>CHOICE DATE 1</th>'+
+                '<th>CHOICE DATE 2</th>'+
+                '<th>CHOICE DATE 3</th>'+
+                '<th>CSL#</th>'+
+                '<th>MEDICAL SELECTED DATE</th>'+
+                '<th>MEDICAL EFFECTIVE DATE</th>'+
+                '<th>MEDICAL SELECTED DATE</th>'+
+                '<th>MEDICAL EFFECTIVE DATE</th>'+
+                //'<th style="text-align:center";>Review Status</th>'+
+                '</tr>'+
+              '</thead>'+
+        
+              '<tbody>'+
+                '<tr>'+
+                  '<td>' + reason[i] + '</td>'+
+                  '<td>' + effective_on_kind[i].replace(/_/g, " ") + '</td>'+
+                  '<td>' + event_date[i] + '</td>'+
+                  '<td>' + start_on[i] + '</td>'+
+                  '<td>' + end_on[i] + '</td>'+
+                  '<td>' + next_poss_date[i] + '</td>'+
+                  '<td>' + option1_date[i] + '</td>'+
+                  '<td>' + option2_date[i] + '</td>'+
+                  '<td>' + option3_date[i] + '</td>'+
+                  '<td>' + csl[i] + '</td>'+
+                  '<td></td>'+
+                  '<td></td>'+
+                  '<td></td>'+
+                  //'<td style="text-align:center";><i class="fa fa-spinner fa-spin" style="color:grey"></i></td>'+
+                '</tr>'+ 
+
+
+                '<tr>' +
+                   '<td>&nbsp;&nbsp;' + comment_section + '</td>' +
+                '</tr>'+
+              '</tbody>' 
+    }
+
+    return val;
+ }
+
+
+
+
+

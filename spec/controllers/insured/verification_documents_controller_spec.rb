@@ -84,4 +84,43 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
     end
 
   end
+
+  describe "test private method" do
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:vlp_document) {FactoryGirl.build(:vlp_document)}
+    before :each do
+      10.times do
+        person.consumer_role.vlp_documents << vlp_document
+      end
+      person.consumer_role.save
+    end
+
+    it "stores updated person" do
+      expect(controller.send(:vlp_docs_clean, person)).to eq(true)
+    end
+
+    it "stores 10 additional vlp_documents" do
+      expect(person.consumer_role.vlp_documents.count).to eq(11)
+    end
+
+    it "stores identical duplicate records" do
+      id1 = Person.find(person.id).consumer_role.vlp_documents[5]
+      id2 = Person.find(person.id).consumer_role.vlp_documents[7]
+      id3 = Person.find(person.id).consumer_role.vlp_documents[10]
+      expect(id1).to eq id3
+      expect(id2).to eq id3
+    end
+
+    it "clean duplicates" do
+      controller.send(:vlp_docs_clean, person)
+      expect(Person.find(person.id).consumer_role.vlp_documents.count).to eq(2)
+    end
+
+    it "returns documents with only uniq id" do
+      controller.send(:vlp_docs_clean, person)
+      id1 = Person.find(person.id).consumer_role.vlp_documents[0].id.to_s
+      id2 = Person.find(person.id).consumer_role.vlp_documents[1].id.to_s
+      expect(id1).not_to eq(id2)
+    end
+  end
 end

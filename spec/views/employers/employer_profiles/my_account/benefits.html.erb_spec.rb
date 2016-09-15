@@ -48,6 +48,34 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       render "employers/employer_profiles/my_account/benefits"
       expect(rendered).to have_selector("a", text: "View Plans")
     end
+
+    it "should display 'date of hire' for 2015 renewals with date of hire effective_on_kind" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'date_of_hire'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 0
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /date of hire/i
+    end
+
+    it "should display first of the month following or coinciding with date of hire" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'first_of_month'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 0
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /first of the month following or coinciding with date of hire/i
+    end
+
+    it "should display 'first of month following 30 days'" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'first_of_month'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 30
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /first of month/i
+    end
+
+    it "should display 'first of month following 60 days'" do
+      allow(benefit_group).to receive(:effective_on_kind).and_return 'first_of_month'
+      allow(benefit_group).to receive(:effective_on_offset).and_return 60
+      render "employers/employer_profiles/my_account/benefits"
+      expect(rendered).to match /first of month/i
+    end
   end
 
   context "Plan year" do

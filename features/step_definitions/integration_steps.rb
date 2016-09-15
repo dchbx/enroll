@@ -21,7 +21,10 @@ def people
       password: 'aA1!aA1!aA1!',
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
-      fein: "764141112"
+      fein: "764141112",
+      mlegal_name: "Cogswell Cogs, Inc",
+      mdba: "Cogswell Cogs, Inc",
+      mfein: "211141467"
     },
     "Patrick Doe" => {
       first_name: "Patrick",
@@ -91,7 +94,22 @@ def people
       ssn: defined?(@u) ? @u.ssn : "761234567",
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
-
+    },
+    "Jack Cobra" => {
+      first_name: "Jack",
+      last_name: "Cobra",
+      dob: "08/10/1960",
+      ssn: "196008107",
+      email: "jack@cobra.com",
+      password: 'aA1!aA1!aA1!'
+    },
+    "Jack Employee" => {
+      first_name: "Jack",
+      last_name: "Employee",
+      dob: "08/10/1960",
+      ssn: "196008111",
+      email: "jack@employee.com",
+      password: 'aA1!aA1!aA1!'
     },
     "Tim Wood" => {
       first_name: "Tim",
@@ -296,7 +314,7 @@ Given(/^(.+) has not signed up as an HBX user$/) do |actor|
   step "I use unique values"
 end
 
-When(/^I visit the Employer portal$/) do
+When(/^.* visit the Employer portal$/) do
   visit "/"
   page.click_link 'Employer Portal'
   screenshot("employer_start")
@@ -355,6 +373,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
   person = people[named_person]
 
   fill_in "user[oim_id]", :with => person[:email]
+  find('#user_oim_id').set(person[:email])
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
   screenshot("create_account")
@@ -448,7 +467,9 @@ Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link "Add Member"
+  within("#dependent_buttons") do
+    click_link "Add Member"
+  end
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -507,7 +528,7 @@ Then(/^.+ should see the plan shopping page with no dependent$/) do
 end
 
 Then(/^.+ should see the plan shopping page with one dependent$/) do
-  expect(page).to have_content("Soren White + 1 Dependent")
+  expect(page).to have_content("Soren White + 1")
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
@@ -630,7 +651,7 @@ When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
 end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
-  click_link "Continue"
+  click_link "Continue", wait: 10
   click_button "Shop for new plan"
 end
 

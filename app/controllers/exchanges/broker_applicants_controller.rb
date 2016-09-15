@@ -1,6 +1,4 @@
 class Exchanges::BrokerApplicantsController < ApplicationController
-  include Exchanges::BrokerApplicantsHelper
-
   before_action :check_hbx_staff_role
   before_action :find_broker_applicant, only: [:edit, :update]
 
@@ -18,7 +16,14 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       page_no = cur_page_no(@page_alphabets.first)
       @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
     else
-      @broker_applicants = sort_by_latest_transition_time(@people).last(20)
+      # TODO: Clarify and then fix behaviour.
+      #       Currently this selects the last group of brokers to experience a
+      #       transition of *any* kind.  I believe what is actually intended
+      #       is that the brokers who have most recently applied be easily
+      #       visible first to a user who would approve them.
+      #       I'm fixing the performance for now, and leaving the behaviour
+      #       as is, but it's confusing and we should clean it up.
+      @broker_applicants = sort_by_latest_transition_time(@people, 20)
     end
 
     respond_to do |format|
@@ -59,7 +64,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
         staff_role = broker_role.person.broker_agency_staff_roles[0]
         staff_role.broker_agency_accept! if staff_role
       end
-      
+
       if broker_role.agency_pending?
         send_secure_message_to_broker_agency(broker_role) if broker_role.broker_agency_profile
       end
@@ -88,5 +93,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     unless current_user.has_hbx_staff_role?
       redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => "You must be an HBX staff member" }
     end
+  end
+
+  def sort_by_latest_transition_time(broker_applicants, limit_size)
+    broker_applicants.order_by("broker_role.workflow_state_transitions.0.transition_at" => -1).limit(limit_size)
   end
 end

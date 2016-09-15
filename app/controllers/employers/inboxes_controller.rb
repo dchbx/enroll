@@ -1,6 +1,7 @@
 class Employers::InboxesController < InboxesController
 
   def new
+    @row = params[:row]
     @inbox_to_name = params["to"]
     @inbox_provider_name = 'HBXAdmin'
     super

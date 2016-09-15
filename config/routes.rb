@@ -4,7 +4,12 @@ Rails.application.routes.draw do
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
+
+  match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
+  match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
+  match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
+  post 'export_csv', to: 'application#export_datatable_csv', as: :export_csv
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -33,6 +38,7 @@ Rails.application.routes.draw do
         get :employer_invoice
         post :employer_invoice_datatable
         post :generate_invoice
+        get :custom_dates
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -46,14 +52,25 @@ Rails.application.routes.draw do
         get :binder_index
         get :binder_index_datatable
         post :binder_paid
+        get :aptc_csr_family_index
         get :verification_index
-        get :verifications_index_datatable
+        get :binder_index
+        post :binder_paid
+        get :sep_index
+        post :sep_index_datatable
+        post :add_new_sep
+        post :verifications_index_datatable
+        get :update_effective_date
+        get :calculate_sep_dates
+        get :add_sep_form
+        get :show_sep_history
       end
 
       member do
         post :transmit_group_xml
         get :home
         get :inbox
+        get :view_policy_xml
       end
 
       # resources :hbx_staff_roles, shallow: true do
@@ -67,6 +84,7 @@ Rails.application.routes.draw do
         get :home
         get :begin_consumer_enrollment
         get :begin_employee_enrollment
+        get :begin_employer_enrollment
         get :resume_enrollment
         get :show
       end
@@ -199,10 +217,12 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       get 'show_profile'
+      get 'link_from_quote'
       get 'consumer_override'
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+
       member do
         get "download_invoice"
       end
@@ -243,6 +263,8 @@ Rails.application.routes.draw do
         get :delink
         get :terminate
         get :rehire
+        get :cobra
+        get :cobra_reinstate
         get :benefit_group, on: :member
       end
     end
@@ -267,9 +289,14 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employers
+        get :employers_api
         get :messages
         get :staff_index
         get :agency_messages
+        #get :build_employee_roster
+        #post :build_employee_roster
+        #get :upload_employee_roster
+        post :build_plan_year
         get :assign_history
       end
       member do
@@ -294,6 +321,48 @@ Rails.application.routes.draw do
       member do
         get :favorite
       end
+    end
+
+    resources :broker_roles do
+
+     resources :quotes do
+      root 'quotes#index'
+      collection do
+        post :quotes_index_datatable
+        get :new_household, :format => "js"
+        post :update_benefits
+        post :publish_quote
+        get :get_quote_info
+        get :set_plan
+        get :publish
+        get :criteria
+        get :plan_comparison
+        get :health_cost_comparison
+        get :dental_cost_comparison
+        get 'published_quote/:id', to: 'quotes#view_published_quote'
+        get :export_to_pdf
+        get :download_pdf
+        get :dental_plans_data
+        get :my_quotes
+      end
+      member do
+        get :upload_employee_roster
+        post :build_employee_roster
+        delete :delete_quote
+        post :download_employee_roster
+        post :delete_member
+        delete :delete_household
+        post :delete_benefit_group
+        get :delete_quote_modal
+      end
+
+      resources :quote_benefit_groups do
+        get :criteria
+        get :get_quote_info
+        post :update_benefits
+        get :plan_comparison
+      end
+    end
     end
   end
 
@@ -331,6 +400,11 @@ Rails.application.routes.draw do
           post :plan
         end
       end
+      resources :esi, :only => []  do
+        collection do
+          post :roster
+        end
+      end
     end
   end
 
@@ -363,6 +437,10 @@ Rails.application.routes.draw do
   end
 
   match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
+
+  match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
+  match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
+  match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
@@ -401,62 +479,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :sep_history, only: [:index]
+
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-
-
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
-
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
-
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
-
-  # Example resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
-
-  # Example resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
-
-  # Example resource route with more complex sub-resources:
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', on: :collection
-  #     end
-  #   end
-
-  # Example resource route with concerns:
-  #   concern :toggleable do
-  #     post 'toggle'
-  #   end
-  #   resources :posts, concerns: :toggleable
-  #   resources :photos, concerns: :toggleable
-
-  # Example resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
-  #
-  # You can have the root of your site routed with "root"
   root 'welcome#index'
 end

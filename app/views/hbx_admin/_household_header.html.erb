@@ -1,0 +1,29 @@
+<div id = "household-header" class = "module household-header" align = "right">
+  <table>
+    <tr>
+      <td>
+        <i class="fa fa-question-circle" data-toggle="tooltip" title="Second Lowest Cost Silver Plan. The second-lowest priced Marketplace health plan in the Silver category that applies to you. It’s not necessarily the plan you enrolled in."></i>
+        <b>SLCSP</b>
+      </td>
+      <td width = "15px;" ></td>
+      <td><%=@slcsp_value%></span></td>
+
+      <td width="50px;"></td>
+      
+      <th >Max APTC</th>
+      <td width = "15px;" ></td>
+      <td><%= text_field_tag "max_aptc", max_aptc, class: @aptc_errors.present? ? 'form-control error-styling': 'form-control', size: '8px', onchange: "APTCModule.calculateAvailableAPTC('household')", max: 2000%></td>
+
+      <td width="50px;"></td>
+
+      <th>CSR % as Integer</th>
+      <td width = "15px;" ></td>
+      <td width="18%" style="border: thin solid;">
+        <div class="selectric-labeled">
+          <%= select_tag "csr_percentage", options_for_select(EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.keys.map{|variant| variant.gsub('csr_','')} , csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
+        </div>
+        
+      </td>
+    </tr>
+  </table>  
+</div>

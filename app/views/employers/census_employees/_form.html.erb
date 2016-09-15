@@ -40,6 +40,7 @@
 
           <%= render 'member_fields', f: f %>
           <%= render 'shared/census_employee_fields', {f: f} %>
+          <%= render 'cobra_fields', f: f %>
           <br/>
           <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
             <%= render 'address_fields', f: address %>

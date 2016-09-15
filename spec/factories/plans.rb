@@ -51,7 +51,7 @@ FactoryGirl.define do
         gold: 90.00,
         platinum: 80.00,
       }
-      pt.update_attribute(:cost, (pt.age * 1001.00) / metal_hash[:"#{pt.plan.metal_level}"] )
+      pt.update_attribute(:cost, (pt.age * 1001.00) / (metal_hash[:"#{pt.plan.metal_level}"] || 110.0)  )
     end
   end
 end

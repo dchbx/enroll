@@ -17,4 +17,13 @@ module Insured::EmployeeRolesHelper
     offered_relationship_benefits.include? relationship
   end
 
+  def show_market_name_by_enrollment(enrollment)
+    return '' if enrollment.blank?
+
+    if enrollment.is_shop?
+      enrollment.is_cobra_status? ? 'Employer Sponsored COBRA/Continuation' : 'Employer Sponsored'
+    else
+      'Individual'
+    end
+  end
 end

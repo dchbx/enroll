@@ -1,5 +1,5 @@
 <nav>
-  <ul>
+  <ul id="insured-nav">
     <li <%= menu_tab_class(@tab, 'home') %>>
       <%= link_to "My #{Settings.site.short_name}", family_account_path(tab: 'home') %>
     </li>
@@ -13,7 +13,7 @@
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to verification_insured_families_path(tab: 'verification') do %>
             Documents
-          <% if enrollment_group_unverified?(@person) %>
+          <% if enrollment_group_unverified?(@person) && verification_needed?(@person) && !documents_uploaded %>
             <span class="badge message-unread">Action Needed</span>
           <% end %>
         <% end %>
@@ -39,7 +39,7 @@
 	<span class="lg ttu">
 	  Your Household of <%= @family_members.count %>
         </span>
-        <br/>
+
         <% @family_members.each do |f| %>
 	  <span class="twelve ttc">
 	    <%= f.first_name %> <%= f.last_name %><br/>

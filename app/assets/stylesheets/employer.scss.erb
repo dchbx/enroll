@@ -128,6 +128,19 @@
   }
 }
 .module {
+  &.broker {
+    .panel-body, .panel-footer {
+      .fa {
+        color: $primary-blue;
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        > * {
+          vertical-align: top;
+        }
+      }
+    }
+  }
   &.change-employee-status  {
     .form-control, h4 {
       display: inline-block;
@@ -138,6 +151,19 @@
     }
     .btn-primary {
       width: 100%;
+    }
+  }
+  &.broker {
+    .panel-body, .panel-footer {
+      .fa {
+        color: $primary-blue;
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        > * {
+          vertical-align: top;
+        }
+      }
     }
   }
   &.home-tab {
@@ -151,6 +177,8 @@
       .panel:first-of-type {
         border-bottom: none !important;
         padding: 15px;
+        padding-bottom: 0;
+        margin-bottom: -10px !important;
         .col-xs-6 .title {
           font-size: 18px;
         }
@@ -248,13 +276,12 @@
         margin-bottom: 15px;
       }
       .health {
-        padding-top: 10px;
         .fa {
           margin: 0;
         }
       }
       .dental {
-        padding-top: 15px;
+        padding-top: 10px;
         .fa {
           margin: 0;
         }
@@ -340,5 +367,17 @@
   }
   .employer-right-column {
     padding-right: 0;
+  }
+  &#cobra_info {
+    .checkbox {
+      margin-left: 25px;
+    }
+  }
+  &#cobra_info {
+    #cobra_begin_date_field {
+      .cobra-label label {
+        margin: 10px;
+      }
+    }
   }
 }

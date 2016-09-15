@@ -52,7 +52,7 @@ class Insured::PlanShoppingsController < ApplicationController
         @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
       end
 
-      @employer_profile = @person.active_employee_roles.first.employer_profile
+      @employer_profile = @enrollment.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
@@ -84,7 +84,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       end
-      @employer_profile = @person.active_employee_roles.first.employer_profile
+      @employer_profile = @enrollment.employer_profile
     else
       get_aptc_info_from_session(@enrollment)
       if can_apply_aptc?(@plan)
@@ -107,28 +107,32 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def waive
-    person = @person
-    hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    waiver_reason = params[:waiver_reason]
+    begin
+      person = @person
+      hbx_enrollment = HbxEnrollment.find(params.require(:id))
+      waiver_reason = params[:waiver_reason]
 
-    # Create a new hbx_enrollment for the waived enrollment.
-    unless hbx_enrollment.shopping?
-      employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
-      coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
-      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+      # Create a new hbx_enrollment for the waived enrollment.
+      unless hbx_enrollment.shopping?
+        employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
+        coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
+        waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
 
-      waived_enrollment.generate_hbx_signature
+        waived_enrollment.generate_hbx_signature
 
-      if waived_enrollment.save!
-        hbx_enrollment = waived_enrollment
-        hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+        if waived_enrollment.save!
+          hbx_enrollment = waived_enrollment
+          hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+        end
       end
-    end
 
-    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
-      hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
-      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
-    else
+      if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+        hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
+        redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+      else
+        redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+      end
+    rescue Exception => e
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
   rescue => e
@@ -188,14 +192,15 @@ class Insured::PlanShoppingsController < ApplicationController
   def plans
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    @plans = @plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
     if @person.primary_family.active_household.latest_active_tax_household.present?
       if is_eligibility_determined_and_not_csr_100?(@person)
         sort_for_csr(@plans)
       else
+        sort_by_standard_plans(@plans)
         @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
       end
     else
+      sort_by_standard_plans(@plans)
       @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
     end
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
@@ -204,6 +209,13 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  def sort_by_standard_plans(plans)
+    standard_plans, other_plans = plans.partition{|p| p.is_standard_plan? == true}
+    standard_plans = standard_plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
+    other_plans = other_plans.sort_by(&:total_employee_cost).sort{|a,b| b.csr_variant_id <=> a.csr_variant_id}
+    @plans = standard_plans + other_plans
+  end
 
   def sort_for_csr(plans)
     silver_plans, non_silver_plans = plans.partition{|a| a.metal_level == "silver"}

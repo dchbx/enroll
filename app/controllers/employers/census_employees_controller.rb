@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
@@ -116,13 +116,10 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = ""
     end
     last_day_of_work = termination_date
-    if termination_date.present?
+    if termination_date.present? && termination_date >= (TimeKeeper.date_of_record - 60.days)
       @census_employee.terminate_employment(last_day_of_work)
-      if termination_date >= (Date.today-60.days)
-        @fa = @census_employee.save
-      else
-      end
-
+      @fa = @census_employee.save
+    else
     end
     respond_to do |format|
       format.js {
@@ -181,6 +178,33 @@ class Employers::CensusEmployeesController < ApplicationController
     flash.keep(:notice)
     render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: params[:status])}'"
 
+  end
+
+  def cobra
+    cobra_date = params["cobra_date"]
+    if cobra_date.present?
+      @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
+    else
+      @cobra_date = ""
+    end
+
+    if @cobra_date.present? && @census_employee.can_elect_cobra?
+      if @census_employee.update_for_cobra(@cobra_date)
+        flash[:notice] = "Successfully update Census Employee."
+      else
+        flash[:error] = "Please check cobra date."
+      end
+    else
+      flash[:error] = "Please enter cobra date."
+    end
+  end
+
+  def cobra_reinstate
+    if @census_employee.reinstate_eligibility!
+      flash[:notice] = "Successfully update Census Employee."
+    else
+      flash[:error] = "Unable to update Census Employee."
+    end
   end
 
   def show
@@ -263,12 +287,13 @@ class Employers::CensusEmployeesController < ApplicationController
 =end
 
     params.require(:census_employee).permit(:id, :employer_profile_id,
-        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner,
+        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
         :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [
           :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
-        ]
+        ],
+      :benefit_group_assignments_attributes => [:id, :benefit_group_id]
       )
   end
 

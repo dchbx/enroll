@@ -4,10 +4,17 @@ class CensusEmployee < CensusMember
   include Searchable
   # include Validations::EmployeeInfo
   include Autocomplete
+  include Acapi::Notifiers
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired)
+  COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
+  PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
+
+  EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
+  EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
+
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -20,6 +27,8 @@ class CensusEmployee < CensusMember
 
   # Employee linked to this roster record
   field :employee_role_id, type: BSON::ObjectId
+
+  field :cobra_begin_date, type: Date
 
   embeds_many :census_dependents,
     cascade_callbacks: true,
@@ -39,6 +48,7 @@ class CensusEmployee < CensusMember
   validate :allow_id_info_changes_only_in_eligible_state
   validate :check_census_dependents_relationship
   validate :no_duplicate_census_dependent_ssns
+  validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
@@ -61,8 +71,11 @@ class CensusEmployee < CensusMember
 
 
   scope :active,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+  scope :without_cobra, -> { not_in(aasm_state: COBRA_STATES) }
   scope :terminated,  ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
   scope :non_terminated, -> { where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :by_cobra,    ->{ any_in(aasm_state: COBRA_STATES) }
+  scope :pending,  ->{ any_in(aasm_state: PENDING_STATES) }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -93,7 +106,7 @@ class CensusEmployee < CensusMember
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
   scope :matchable, ->(ssn, dob) {
-    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "eligible")
+    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['eligible', 'cobra_eligible']})
     benefit_group_assignment_ids = matched.flat_map() do |ee|
       ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
     end
@@ -101,7 +114,7 @@ class CensusEmployee < CensusMember
   }
 
   scope :unclaimed_matchable, ->(ssn, dob) {
-   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "employee_role_linked")
+   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {'$in': ['employee_role_linked', 'cobra_linked']})
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
@@ -169,7 +182,7 @@ class CensusEmployee < CensusMember
 
 
   def update_hbx_enrollment_effective_on_by_hired_on
-    if employee_role.present? && hired_on != employee_role.hired_on
+    if employee_role.present? && (employee_role.read_attribute(:hired_on).blank? || hired_on != Date.parse(employee_role.read_attribute(:hired_on).strftime('%Y/%m/%d')))
       employee_role.set(hired_on: hired_on)
       enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.active.open_enrollments rescue []
       enrollments.each do |enrollment|
@@ -180,6 +193,12 @@ class CensusEmployee < CensusMember
       end
     end
   end
+
+  def suggested_cobra_effective_date
+    return nil if self.employment_terminated_on.nil?
+    self.employment_terminated_on.next_month.beginning_of_month
+  end
+
 
   def new_hire_enrollment_period
     start_on = [hired_on, created_at].max
@@ -353,10 +372,10 @@ class CensusEmployee < CensusMember
           self.employment_terminated_on = employment_terminated_on
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on)  }
 
         end
@@ -373,10 +392,10 @@ class CensusEmployee < CensusMember
 
       if may_schedule_employee_termination? || employee_termination_pending?
           schedule_employee_termination!
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(active_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
-          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
+          census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment).select {|hbx| !hbx.coverage_terminated? }
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
       end
@@ -441,7 +460,8 @@ class CensusEmployee < CensusMember
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
-    return false if person.blank? || (person.present? && person.has_active_employee_role?)
+    return false if person.blank? || (person.present? && 
+                                      person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
   end
@@ -459,6 +479,41 @@ class CensusEmployee < CensusMember
     bg_assignment.present? && HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
   end
 
+  def current_state
+    if existing_cobra
+      if COBRA_STATES.include? aasm_state
+        aasm_state.humanize
+      else
+        'Cobra'
+      end
+    else
+      aasm_state.humanize
+    end
+  end
+
+  def update_for_cobra(cobra_date)
+    self.cobra_begin_date = cobra_date
+    self.elect_cobra
+    self.save
+  rescue => e
+    false
+  end
+
+  def build_hbx_enrollment_for_cobra
+    family = employee_role.person.primary_family
+    enrollments = active_benefit_group_assignment.hbx_enrollments.select{|hbx| (hbx.coverage_terminated? || hbx.coverage_termination_pending?) && !hbx.is_cobra_status? }
+
+    enrollments.each do |hbx|
+      enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
+      enrollment_cobra_factory.family = family
+      enrollment_cobra_factory.census_employee = self
+      enrollment_cobra_factory.enrollment = hbx
+      enrollment_cobra_factory.clone_for_cobra
+    end
+  rescue => e
+    logger.error(e)
+  end
+
   class << self
 
     def advance_day(new_date)
@@ -466,7 +521,7 @@ class CensusEmployee < CensusMember
     end
 
     def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
-      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending", :employment_terminated_on.lt => as_of_date)
+      census_employees_for_termination = CensusEmployee.pending.where(:employment_terminated_on.lt => as_of_date)
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employment(census_employee.employment_terminated_on)
       end
@@ -504,34 +559,67 @@ class CensusEmployee < CensusMember
       query.to_a
     end
 
+    # Update CensusEmployee records when Person record is updated. (SSN / DOB change)
+    def update_census_employee_records(person, current_user)
+      person.employee_roles.each do |employee_role|
+        ce = employee_role.census_employee
+        if current_user.has_hbx_staff_role? && ce.present?
+          ce.ssn = person.ssn
+          ce.dob = person.dob
+          ce.save!(validate: false)
+        end
+      end
+    end
+
   end
 
   aasm do
     state :eligible, initial: true
+    state :cobra_eligible
     state :employee_role_linked
+    state :cobra_linked
     state :employee_termination_pending
+    state :cobra_termination_pending
     state :employment_terminated
+    state :cobra_terminated
     state :rehired
 
     event :rehire_employee_role, :after => :record_transition do
-      transitions from: [:employment_terminated], to: :rehired
+      transitions from: [:employment_terminated, :cobra_eligible, :cobra_linked, :cobra_terminated], to: :rehired
+    end
+
+    event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
+      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
+      transitions from: :employment_terminated,  to: :cobra_eligible
     end
 
     event :link_employee_role, :after => :record_transition do
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_benefit_group_assignment?
+      transitions from: :cobra_eligible, to: :cobra_linked, guard: :has_benefit_group_assignment?
     end
 
     event :delink_employee_role, :guard => :has_no_hbx_enrollments?, :after => :record_transition do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
+      transitions from: :cobra_linked, to: :cobra_eligible, after: :clear_employee_role
     end
 
     event :schedule_employee_termination, :after => :record_transition do
       transitions from: [:employee_termination_pending, :eligible, :employee_role_linked], to: :employee_termination_pending
+      transitions from: [:cobra_termination_pending, :cobra_eligible, :cobra_linked],  to: :cobra_termination_pending
     end
 
     event :terminate_employee_role, :after => :record_transition do
       transitions from: [:eligible, :employee_role_linked, :employee_termination_pending], to: :employment_terminated
+      transitions from: [:cobra_eligible, :cobra_linked, :cobra_termination_pending],  to: :cobra_terminated
     end
+
+    event :reinstate_eligibility, :after => [:record_transition] do
+      transitions from: :employment_terminated, to: :employee_role_linked, :guard => :has_employee_role_linked?
+      transitions from: :employment_terminated,  to: :eligible
+      transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
+      transitions from: :cobra_terminated,  to: :cobra_eligible
+    end
+
   end
 
   def self.roster_import_fallback_match(f_name, l_name, dob, bg_id)
@@ -572,6 +660,51 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def existing_cobra
+    COBRA_STATES.include? aasm_state
+  end
+
+  def existing_cobra=(cobra)
+    self.aasm_state = 'cobra_eligible' if cobra == 'true'
+  end
+
+  def linked?
+    employee_role_linked? || cobra_linked?
+  end
+
+  def is_cobra_status?
+    existing_cobra
+  end
+
+  def can_elect_cobra?
+    ['employment_terminated'].include?(aasm_state)
+  end
+
+  def have_valid_date_for_cobra?
+    cobra_begin_date.present? && hired_on <= cobra_begin_date &&
+      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months) &&
+      coverage_terminated_on <= cobra_begin_date &&
+      cobra_begin_date <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months)
+  end
+
+  def has_employee_role_linked?
+    employee_role.present?
+  end
+
+  def has_hbx_enrollments?
+    return false if employee_role.blank?
+    benefit_group_assignments.any? { |bga| bga.hbx_enrollment.present? && !bga.hbx_enrollment.coverage_canceled? }
+  end
+
+  def has_cobra_hbx_enrollment?
+    return false if active_benefit_group_assignment.blank? || active_benefit_group_assignment.hbx_enrollment.blank?
+    active_benefit_group_assignment.hbx_enrollment.is_cobra_status?
+  end
+
+  def need_update_hbx_enrollment_effective_on?
+    !has_cobra_hbx_enrollment? && coverage_terminated_on.present?
+  end
+
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -599,6 +732,8 @@ class CensusEmployee < CensusMember
   end
 
   def check_employment_terminated_on
+    return false if is_cobra_status?
+
     if employment_terminated_on && employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before hiring date")
     end
@@ -607,6 +742,12 @@ class CensusEmployee < CensusMember
       if employment_terminated_on && employment_terminated_on <= TimeKeeper.date_of_record - 60.days
         errors.add(:employment_terminated_on, "Employee termination must be within the past 60 days")
       end
+    end
+  end
+
+  def check_cobra_begin_date
+    if existing_cobra && hired_on > cobra_begin_date
+      errors.add(:cobra_begin_date, 'Cobra Begin Date should later than Hire Date')
     end
   end
 
@@ -639,7 +780,7 @@ class CensusEmployee < CensusMember
 
   # SSN and DOB values may be edited only in pre-linked status
   def allow_id_info_changes_only_in_eligible_state
-    if (ssn_changed? || dob_changed?) && aasm_state != "eligible"
+    if (ssn_changed? || dob_changed?) && (aasm_state != "eligible" && aasm_state != 'cobra_eligible')
       message = "An employee's identifying information may change only when in 'eligible' status. "
       errors.add(:base, message)
     end
@@ -670,6 +811,14 @@ class CensusEmployee < CensusMember
     unset("employee_role_id")
     self.benefit_group_assignments = []
     @employee_role = nil
+  end
+
+  def notify_terminated
+    notify(EMPLOYEE_TERMINATED_EVENT_NAME, { :census_employee_id => self.id } )
+  end
+
+  def notify_cobra_terminated
+    notify(EMPLOYEE_COBRA_TERMINATED_EVENT_NAME, { :census_employee_id => self.id } )
   end
 end
 

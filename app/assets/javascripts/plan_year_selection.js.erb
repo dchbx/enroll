@@ -8,10 +8,6 @@ ready = function() {
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeProp('disabled', false);
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').trigger('click');
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').prop('disabled');
-
-
-
-
     } else {
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeProp('checked');
 

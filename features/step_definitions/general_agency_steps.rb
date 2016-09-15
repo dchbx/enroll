@@ -40,6 +40,7 @@ Then(/^.+ should see general agency registration successful message$/) do
 end
 
 Then(/^.+ should see the list of general agencies$/) do
+  sleep 1
   expect(page).to have_content('General Agencies')
   expect(page).to have_content('Housecare Inc')
 end

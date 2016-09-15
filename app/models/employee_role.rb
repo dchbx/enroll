@@ -95,12 +95,24 @@ class EmployeeRole
   alias_method :census_employee=, :new_census_employee=
   alias_method :census_employee, :new_census_employee
 
+  def is_cobra_status?
+    if census_employee.present?
+      census_employee.is_cobra_status?
+    else
+      false
+    end
+  end
+
   def coverage_effective_on
     benefit_group.effective_on_for(census_employee.hired_on)
   end
 
   def can_enroll_as_new_hire?    
     census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
+  end
+
+  def hired_on
+    census_employee.try(:hired_on) || (read_attribute(:hired_on).present? ? Date.parse(read_attribute(:hired_on).strftime('%Y/%m/%d')) : nil)
   end
 
   def is_active?

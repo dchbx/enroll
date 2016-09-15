@@ -22,6 +22,13 @@ FactoryGirl.define do
     password_confirmation ' '
   end
 
+  trait :hbx_staff_sep do
+    roles ["hbx_staff"]
+
+    after :create do |user|
+      FactoryGirl.create :person, :with_hbx_staff_role, :with_family, :user => user
+    end
+  end
 
   trait :hbx_staff do
     roles ["hbx_staff"]
@@ -38,6 +45,12 @@ FactoryGirl.define do
     roles ["consumer"]
   end
 
+  trait :ridp_verified do
+    after :create do |user|
+      user.ridp_by_payload!
+    end  
+  end  
+
   trait "assister" do
     roles ["assister"]
   end
@@ -48,6 +61,23 @@ FactoryGirl.define do
 
   trait "employee" do
     roles ["employee"]
+  end
+
+  trait :broker_with_person do
+    roles ["broker"]
+
+    transient do
+      organization {}
+    end
+
+    after :create do |user, evaluator|
+      if user.person.present?
+        user.person.broker_agency_staff_roles.push FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile_id: evaluator.organization.broker_agency_profile.id)
+        evaluator.organization.broker_agency_profile.primary_broker_role = FactoryGirl.create :broker_role, person: user.person, broker_agency_profile: evaluator.organization.broker_agency_profile
+        evaluator.organization.save
+        user.save
+      end
+    end
   end
 
   trait :employer do

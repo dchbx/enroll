@@ -25,4 +25,3 @@ describe "exchanges/announcements/_new_form.html.erb" do
     expect(rendered).to have_text(/Audience/)
   end
 end
-

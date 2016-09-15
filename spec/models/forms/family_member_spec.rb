@@ -228,7 +228,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :is_incarcerated => "no",
       :tribal_id => "test",
       :no_dc_address=>nil,
-      :no_dc_address_reason=>nil
+      :no_dc_address_reason=>nil,
+      :is_consumer_role=>nil
     }
   }
 
@@ -333,6 +334,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     allow(family_member).to receive(:citizen_status)
     allow(person).to receive(:has_mailing_address?).and_return(false)
     allow(subject).to receive(:valid?).and_return(true)
+    allow(subject).to receive(:assign_person_address).and_return(true)
   end
 
   it "should be considered persisted" do
@@ -357,14 +359,14 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil, :is_consumer_role=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil, :is_consumer_role=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end

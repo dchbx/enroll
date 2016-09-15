@@ -53,6 +53,10 @@ describe Subscribers::DefaultGaChanged do
         broker_agency_profile.save
       end
 
+      it "should do change" do
+        expect(employer_profile.active_general_agency_account.general_agency_profile).to eq general_agency_profile
+      end
+
       it "should do change when employer_profile does not have active general_agency_profile" do
         employer_profile.fire_general_agency!
         expect(employer_profile.active_general_agency_account).to eq nil
@@ -60,7 +64,7 @@ describe Subscribers::DefaultGaChanged do
         expect(Organization).to receive(:by_broker_agency_profile).with(broker_agency_profile.id)
         expect(subject).to receive(:send_general_agency_assign_msg)
         subject.call(nil, nil, nil, nil, message)
-        expect(employer_profile.active_general_agency_account.general_agency_profile).to eq new_ga 
+        expect(employer_profile.active_general_agency_account.general_agency_profile).to eq new_ga
       end
 
       it "should do not change when employer_profile have active general_agency_profile" do

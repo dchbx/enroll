@@ -8,4 +8,3 @@ describe "shared/_tab_panel.html.erb" do
     expect(rendered).not_to have_selector('a', text: 'Announcements')
   end
 end
-

@@ -5,7 +5,7 @@ FactoryGirl.define do
     area_code 202
     sequence(:number, 1111111) { |n| "#{n}"}
     sequence(:extension) { |n| "#{n}"}
-
+    sequence(:full_phone_number, 123123123) { |n| "#{n}"}
 
     trait :without_kind do
       kind ' '

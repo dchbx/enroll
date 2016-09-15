@@ -136,12 +136,11 @@ Then(/^.+ should see confirm modal dialog box$/) do
 end
 
 Then(/^.+ confirms? broker selection$/) do
-  within '.modal-dialog' do
-    find('input.btn-primary').click
-  end
+  find(:xpath, "//div[@class='modal fade in']//div[@class='modal-dialog']//input[@value='Confirm']").trigger 'click'
 end
 
 Then(/^.+ should see broker selected successful message$/) do
+  sleep 1
   expect(page).to have_content("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
 end
 
@@ -153,7 +152,7 @@ end
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
   find('.interaction-click-control-change-broker').trigger 'click'
-
+  sleep 1
   within '.modal-dialog' do
     click_link 'Terminate Broker'
   end

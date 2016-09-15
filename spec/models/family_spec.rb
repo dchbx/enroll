@@ -4,7 +4,14 @@ describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
-
+  let(:enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: household,
+                       coverage_kind: "health",
+                       enrollment_kind: "open_enrollment",
+                       aasm_state: 'shopping'
+    )
+  }
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
   let(:family_member_dependent) { FamilyMember.new(person: dependent) }
 
@@ -24,6 +31,10 @@ describe Family, "given a primary applicant and a dependent" do
     it "enrolled hbx enrollments should come from latest household" do
       expect(subject.enrolled_hbx_enrollments).to eq subject.latest_household.enrolled_hbx_enrollments
     end
+  end
+
+  context "#any_unverified_enrollments?" do
+
   end
 
 end
@@ -602,6 +613,21 @@ describe Family, "given an inactive member" do
     it "should not find the member" do
       expect(subject.find_matching_inactive_member(criteria)).to eq nil
     end
+  end
+end
+
+
+describe Family, "active family members" do
+  let(:dependent) {
+    double(:id => "123456", ssn: double, :last_name => "A Last Name", :first_name => "A First Name", :dob => Date.new(2012,3,15))
+  }
+  let(:primary_family_member) { FamilyMember.new(:is_active => true, :is_primary_applicant => true,  :person => dependent) }
+  let(:dependent_family_member) { FamilyMember.new(:is_active => true, :person => dependent) }
+
+  subject { Family.new(family_members: [dependent_family_member, primary_family_member]) }
+
+  it "should show family members in ordered way " do
+    expect(subject.active_family_members).to eq [primary_family_member, dependent_family_member]
   end
 end
 

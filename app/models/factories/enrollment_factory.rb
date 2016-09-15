@@ -231,6 +231,52 @@ module Factories
         return result.person, result.is_new
     end
 
+    def self.initialize_person_for_census_dependent(name_pfx, first_name, middle_name,
+                                             last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
+      people = Person.match_by_id_info(ssn: ssn, dob: dob, last_name: last_name, first_name: first_name)
+      person, is_new = nil, nil
+      case people.count
+      when 1
+        person = people.first
+        if person.dob == dob
+          if person.ssn.nil?
+            person.ssn = ssn
+            person.gender = gender
+          end
+          person.save
+          person, is_new = person, false
+        else
+          person, is_new = Person.create(
+            name_pfx: name_pfx,
+            first_name: first_name,
+            middle_name: middle_name,
+            last_name: last_name,
+            name_sfx: name_sfx,
+            ssn: nil,
+            no_ssn: "1",
+            dob: dob,
+            gender: gender,
+          ), true
+        end
+      when 0
+        person, is_new = Person.create(
+          name_pfx: name_pfx,
+          first_name: first_name,
+          middle_name: middle_name,
+          last_name: last_name,
+          name_sfx: name_sfx,
+          ssn: ssn,
+          no_ssn: no_ssn,
+          dob: dob,
+          gender: gender,
+        ), true
+      else
+        #WAT
+        return nil, nil
+      end
+      return person, is_new
+    end
+
     def self.find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       roles = person.employee_roles.where(
           "employer_profile_id" => employer_profile.id.to_s,
@@ -268,7 +314,7 @@ module Factories
     end
 
     def self.initialize_dependent(family, primary, dependent)
-      person, new_person = initialize_person(nil, nil, dependent.first_name,
+      person, new_person = initialize_person_for_census_dependent(nil, dependent.first_name,
                                  dependent.middle_name, dependent.last_name,
                                  dependent.name_sfx, dependent.ssn,
                                  dependent.dob, dependent.gender, "employee")

@@ -31,6 +31,16 @@ module Factories
         @plan_year_end_on   = @active_plan_year.end_on + 1.year
 
         open_enrollment_start_on = @plan_year_start_on - 2.months
+        open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+
+        validate_employer_profile
+
+        @active_plan_year = @employer_profile.active_plan_year
+
+        @plan_year_start_on = @active_plan_year.end_on + 1.day
+        @plan_year_end_on   = @active_plan_year.end_on + 1.year
+
+        open_enrollment_start_on = @plan_year_start_on - 2.months
         open_enrollment_end_on = Date.new((@plan_year_start_on - 1.month).year, (@plan_year_start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
 
         @renewal_plan_year = @employer_profile.plan_years.build({
@@ -80,10 +90,6 @@ module Factories
 
       unless TimeKeeper.date_of_record <= @employer_profile.active_plan_year.end_on
         raise PlanYearRenewalFactoryError, "Renewal time period has expired.  You must submit a new application"
-      end
-
-      unless @employer_profile.is_primary_office_local?
-        raise PlanYearRenewalFactoryError, "Employer primary address must be located in #{Settings.aca.state_name}"
       end
     end
 

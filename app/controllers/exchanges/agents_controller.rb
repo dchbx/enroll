@@ -35,6 +35,12 @@ class Exchanges::AgentsController < ApplicationController
     redirect_to search_insured_consumer_role_index_path
   end
 
+  def begin_employer_enrollment
+    session[:person_id] = nil
+    session[:original_application_type] = params['original_application_type']
+    redirect_to new_employers_employer_profile_path
+  end
+
   def resume_enrollment
     session[:person_id] = params[:person_id]
     session[:original_application_type] = params['original_application_type']
@@ -79,7 +85,3 @@ class Exchanges::AgentsController < ApplicationController
     return bookmark_path
   end
 end
-
-
-
-

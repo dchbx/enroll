@@ -201,8 +201,12 @@ var EmployerProfile = ( function( window, undefined ) {
         $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
         $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Click here to save your plan year');
+        $('.interaction-click-control-save-plan-year').unbind('click');
       } else {
         $('.interaction-click-control-save-plan-year').addClass('disabled');
+        $('.interaction-click-control-save-plan-year').click(function(event){
+          event.preventDefault();
+        });
       }
       Freebies.tooltip();
   }
@@ -303,12 +307,51 @@ var EmployerProfile = ( function( window, undefined ) {
       Freebies.tooltip();
   }
 
+  function validateCobraBeginDate() {
+    var hired_on_str = $('#census_employee_hired_on_jq_datepicker_plain_field').val();
+    var cobra_begin_date_str = $('#census_employee_cobra_begin_date_jq_datepicker_plain_field').val();
+    if($('#census_employee_existing_cobra').prop("checked") == true){
+      if (hired_on_str != '' && cobra_begin_date_str != ''){
+        var hired_on = new Date(hired_on_str);
+        var cobra_begin_date = new Date(cobra_begin_date_str);
+        if (hired_on > cobra_begin_date) {
+          alert('Hire Date must before Cobra Begin Date.');
+        }
+      }
+    }
+  }
+
+  function submitCobraDate(type, ce_id) {
+    var target = $("tr."+type+'_'+ce_id);
+    var cobra_date = target.find('input.date-picker').val();
+    var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+    $.ajax({
+      type: 'get',
+      datatype : 'js',
+      url: cobra_link,
+      data: {cobra_date: cobra_date},
+    });
+  }
+
+  function viewCobraDateField() {
+    var target = $('#census_employee_existing_cobra');
+    if(target.prop("checked") == true){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').removeClass('hidden');
+    }else if(target.prop("checked") == false){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').addClass('hidden');
+    }
+  }
+
   return {
       changeCensusEmployeeStatus: changeCensusEmployeeStatus,
       validateEditPlanYear : validateEditPlanYear,
       validatePlanYear : validatePlanYear,
-      viewDetails : viewDetails
+      validateCobraBeginDate : validateCobraBeginDate,
+      viewDetails : viewDetails,
+      viewCobraDateField : viewCobraDateField,
+      submitCobraDate : submitCobraDate,
     };
+
 
 } )( window );
 
@@ -326,7 +369,7 @@ var EmployerProfile = ( function( window, undefined ) {
 //         url: '/employers/search'
 //       }
 //     });
-//
+
 //     // initialize the bloodhound suggestion engine
 //     employers.initialize();
 //     // instantiate the typeahead UI
@@ -338,7 +381,7 @@ var EmployerProfile = ( function( window, undefined ) {
 //       name: 'employers',
 //       source: employers.ttAdapter()
 //     });
-//
+
 //     $('input.typeahead').on('blur keyup', function(e) {
 //       if (e.keyCode == 8 && $('input#organization_fein').val() != "") {
 //         $('#office_locations_buttons a.btn').removeAttr('disabled');
@@ -352,15 +395,15 @@ var EmployerProfile = ( function( window, undefined ) {
 //         $('input#organization_office_locations_attributes_0_address_attributes_city').val("").removeAttr('readonly');
 //         $('select#organization_office_locations_attributes_0_address_attributes_state').val("").removeAttr('disabled').selectric('refresh');
 //         $('input#organization_office_locations_attributes_0_address_attributes_zip').val("").removeAttr('readonly');
-//
+
 //         $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val("").removeAttr('readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_number').val("").removeAttr('readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_extension').val("").removeAttr('readonly');
 //       };
 //     });
-//
+
 //     $('input.typeahead').bind('typeahead:select', function(e, suggestion) {
-//
+
 //       $('#office_locations_buttons a.btn').attr('disabled', 'disabled');
 //       $('input#employer_id').val(suggestion._id);
 //       $('input#organization_dba').val(suggestion.dba).attr('readonly', 'readonly');
@@ -374,7 +417,7 @@ var EmployerProfile = ( function( window, undefined ) {
 //         $('input#organization_office_locations_attributes_0_address_attributes_city').val(primary_office.address.city).attr('readonly', 'readonly');
 //         $('select#organization_office_locations_attributes_0_address_attributes_state').val(primary_office.address.state).attr('disabled', 'disabled').selectric('refresh').removeAttr('disabled');
 //         $('input#organization_office_locations_attributes_0_address_attributes_zip').val(primary_office.address.zip).attr('readonly', 'readonly');
-//
+
 //         $('input#organization_office_locations_attributes_0_phone_attributes_area_code').val(primary_office.phone.area_code).attr('readonly', 'readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_number').val(primary_office.phone.number).attr('readonly', 'readonly');
 //         $('input#organization_office_locations_attributes_0_phone_attributes_extension').val(primary_office.phone.extension).attr('readonly', 'readonly');
@@ -402,13 +445,6 @@ $(function() {
     })
   })
 })
-
-$(document).on('click', ".show_confirm", function(){
-  var el_id = $(this).attr('id');
-  $( "td." + el_id ).toggle();
-  $( "#confirm-terminate-2" ).hide();
-  return false
-});
 
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
@@ -447,6 +483,7 @@ $(document).on('click', ".rehire_confirm", function(){
     }
   });
 });
+
 
 $(document).on('change', '.dependent_info input.dob-picker', function(){
   var element = $(this).val().split("/");

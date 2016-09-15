@@ -39,8 +39,8 @@ module VerificationHelper
         "success"
       when "in review"
         "warning"
-      else
-        "danger"
+      when "outstanding"
+        member.consumer_role.processing_hub_24h? ? "info" : "danger"
     end
   end
 
@@ -53,7 +53,7 @@ module VerificationHelper
   end
 
   def verification_needed?(person)
-    person.try(:primary_family).try(:active_household).try(:hbx_enrollments).verification_needed.any?
+    person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
   end
 
   def verification_due_date(family)
@@ -138,6 +138,21 @@ module VerificationHelper
 
   def show_doc_status(status)
     ["verified", "rejected"].include?(status)
+  end
+
+  def show_v_type(v_type, person)
+    case verification_type_status(v_type, person)
+      when "in review"
+        "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
+      when "verified"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      else
+        person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+    end
+  end
+
+  def text_center(v_type, person)
+    (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
   end
 end
 

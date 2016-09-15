@@ -55,14 +55,14 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
     }
 
 
-    let(:generate_passive_renewal) {
+    def generate_passive_renewal
       factory = Factories::FamilyEnrollmentRenewalFactory.new
-      factory.family = family
-      factory.census_employee = ce
-      factory.employer = employer_profile
-      factory.renewing_plan_year = employer_profile.renewing_plan_year
+      factory.family = family.reload
+      factory.census_employee = ce.reload
+      factory.employer = employer_profile.reload
+      factory.renewing_plan_year = employer_profile.renewing_plan_year.reload
       factory.renew
-    }
+    end
 
     context 'with active coverage' do 
 
@@ -194,6 +194,73 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
           generate_passive_renewal
           family.reload
           expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to include('renewing_waived')
+        end
+      end
+    end
+
+    context 'with active coverage' do 
+      let!(:new_renewal_plan) {
+        FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: renewal_year, hios_id: "11111111122301-01", csr_variant_id: "01")
+      }
+
+      let!(:family) {
+        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+        ce.update_attributes({employee_role: employee_role})
+        family_rec = Family.find_or_build_from_employee_role(employee_role)
+
+        FactoryGirl.create(:hbx_enrollment,
+          household: person.primary_family.active_household,
+          coverage_kind: "health",
+          effective_on: ce.active_benefit_group_assignment.benefit_group.start_on,
+          enrollment_kind: "open_enrollment",
+          kind: "employer_sponsored",
+          submitted_at: ce.active_benefit_group_assignment.benefit_group.start_on - 20.days,
+          benefit_group_id: ce.active_benefit_group_assignment.benefit_group.id,
+          employee_role_id: person.active_employee_roles.first.id,
+          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+          plan_id: plan.id
+          )
+
+        family_rec.reload
+      }
+
+      context 'when passive renewal already exists and employer changed plan offerings' do
+
+        it 'should be canceld' do
+          generate_passive_renewal
+          passive_renewal = family.active_household.hbx_enrollments.renewing.first
+          expect(passive_renewal.auto_renewing?).to be_truthy
+
+          renewal_benefit_group.reference_plan_id = new_renewal_plan.id 
+          renewal_benefit_group.elected_plans= [new_renewal_plan]
+          renewal_benefit_group.save!
+
+          generate_passive_renewal
+          passive_renewal.reload
+
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+        end
+      end
+
+      context 'passive renewal not exists and employer changed plan offerings' do
+
+        it 'should generate passive renewal' do 
+          renewal_benefit_group.reference_plan_id = new_renewal_plan.id 
+          renewal_benefit_group.elected_plans= [new_renewal_plan]
+          renewal_benefit_group.save!
+
+          generate_passive_renewal
+          expect(family.active_household.hbx_enrollments.renewing.blank?).to be_truthy
+
+          renewal_benefit_group.reference_plan_id = renewal_plan.id 
+          renewal_benefit_group.elected_plans= [renewal_plan]
+          renewal_benefit_group.save!
+
+          generate_passive_renewal
+
+          passive_renewal = family.active_household.hbx_enrollments.renewing.first
+          expect(passive_renewal.auto_renewing?).to be_truthy
         end
       end
     end

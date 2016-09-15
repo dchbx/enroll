@@ -24,6 +24,7 @@ class BrokerRole
      :united_health_care_mid_atlantic => nil}
 
   embedded_in :person
+  has_many :quotes
 
   field :aasm_state, type: String
 
@@ -233,7 +234,7 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
+    event :pending , :after =>[:record_transition, :send_invitation, :notify_updated, :notify_broker_pending] do
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
 

@@ -1,0 +1,53 @@
+var QuotesDatatable = ( function( window, undefined ) {
+
+  function setTab() {
+    var tab = "Broker";
+    return tab;
+  }
+
+  function setBaseModel() {
+    var base_model = "quote";
+    return base_model;
+  }
+
+  function callAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $all_filter = $table.closest('.module').find('.first-level a:contains("All")');
+    $all_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {});
+      $table.EnrollDataTable().draw();
+    });
+  }
+
+  function callDraftFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.first-level a:contains("Draft")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setSecondLevel($active_filter), undefined );
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callPublishedFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.first-level a:contains("Published")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setSecondLevel($active_filter), undefined );
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callClaimedFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.first-level a:contains("Claimed")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setSecondLevel($active_filter), undefined );
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  return {
+    callAllFilter: callAllFilter,
+    callDraftFilter : callDraftFilter,
+    callPublishedFilter : callPublishedFilter,
+    callClaimedFilter : callClaimedFilter
+  };
+
+} )( window );

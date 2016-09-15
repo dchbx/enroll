@@ -57,5 +57,5 @@ When(/^the consumer should see documents verification page$/) do
 end
 
 Then(/^the consumer can expand the table by clicking on caret sign$/) do
-  find('.fa-caret-down').click
+  find('.fa-caret-down').trigger('click')
 end

@@ -1,0 +1,88 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>RE: Application to Offer Group Health Coverage in DC Health Link</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<% if notice.trigger_type.try(:downcase) == 'auto' %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "DC Health Link finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>."} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Thank you for finalizing your plan offerings to your employees through #{Settings.site.short_name}."} %>
+<%end%>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}."} %>
+<br>
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "Please note that your group will only obtain coverage if:",
+  listings: ["At least two-thirds of your eligible employees enroll in your group health coverage or waive due to having other coverage.",
+             "One non-owner employee enrolls in health coverage."] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "If you are unable to satisfy these requirements, you will only be able to offer #{Settings.site.short_name} coverage during the special annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without contributing 50% to employees’ premiums or meeting the two-thirds minimum participation requirement."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""],
+    heading: 'Next Steps', sub_heading: ''} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 0px;">
+          <strong>Employee Open Enrollment Period</strong><br>We sent an email to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a <%= Settings.site.short_name %> account and log in, review their plan options, and enroll into coverage.<br>During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan.
+        </li>
+        <li style="margin-top: 5px;">
+          <strong>Review Employee Enrollments</strong><br>As your employees enroll, you are able to track their enrollment actions in your <%= Settings.site.short_name %> Employer account by clicking on “View Enrollment Reports”, including a breakdown of employer and employee premium contributions.
+        </li>
+        <li style="margin-top: 5px;">
+          <strong>Continue Paying Your Monthly Invoices</strong><br>You will continue to be billed by <%= Settings.site.short_name %> on the same cycle for the upcoming plan year.
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Please contact your broker for further assistance.  You can also contact DC Health Link with any questions:"],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+           <strong>By calling <%=Settings.contact_center.phone_number%></strong>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)"} %>

@@ -2,6 +2,56 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
+  describe ".sort_by_standard_plans" do
+      context "width standard plan present" do
+        let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+        let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+        let(:person) { FactoryGirl.build_stubbed(:person) }
+        let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
+        let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+        let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group) }
+
+        before :each do
+          sign_in user
+          allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+          allow(person.primary_family).to receive(:active_household).and_return(household)
+        end
+
+        @controller = Insured::PlanShoppingsController.new
+
+        let(:plan1) { FactoryGirl.build(:plan) }
+        let(:plan2) { FactoryGirl.build(:plan, is_standard_plan: true ) }
+        let(:plans) {[PlanCostDecorator.new(plan1, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id), PlanCostDecorator.new(plan2, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id)]}
+
+        it "should display the standard plan first" do
+          expect(@controller.send(:sort_by_standard_plans,plans) ).to eq [plan2, plan1]
+        end
+      end
+  end
+
+  describe "not eligible for cost sharing or aptc / normal user" do
+
+    let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+    let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+    let(:person) { FactoryGirl.build_stubbed(:person) }
+    let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
+    let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+
+    context "GET plans" do
+      before :each do
+        sign_in user
+        allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+        allow(person.primary_family).to receive(:active_household).and_return(household)
+      end
+
+      it "returns http success" do
+        xhr :get, :plans, id: "hbx_id", format: :js
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+  end
+
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
   let(:household){ double("Household") }
@@ -16,6 +66,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:employee_role) { EmployeeRole.new }
   let(:household) {double("Household", hbx_enrollments: hbx_enrollments)}
   let(:hbx_enrollments) {double("HbxEnrollment")}
+  let(:coverage_household) {double("CoverageHousehold", is_immediate_family: true)}
 
   context "POST checkout" do
     before do
@@ -93,6 +144,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:reference_plan) { double("Plan") }
     let(:employee_role) { double("EmployeeRole") }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -111,6 +163,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       get :receipt, id: "id"
       expect(response).to have_http_status(:success)
     end
+
+    it "should get employer_profile" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:coverage_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      sign_in(user)
+      get :receipt, id: "id"
+      expect(assigns(:employer_profile)).to eq employer_profile
+    end
   end
 
   context "GET thankyou" do
@@ -121,6 +182,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:reference_plan) { double("Plan") }
     let(:family) { double("Family") }
     let(:plan_year) { double("PlanYear") }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -156,6 +218,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       sign_in(user)
       get :thankyou, id: "id", plan_id: "plan_id"
       expect(assigns(:waivable)).to be_truthy
+    end
+
+    it "should get employer_profile" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:coverage_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:employer_profile)).to eq employer_profile
     end
 
     it "returns http success as BROKER" do
@@ -274,6 +345,42 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     it "should get failure flash message" do
       allow(hbx_enrollment).to receive(:valid?).and_return(false)
+      post :waive, id: "hbx_id", waiver_reason: "waiver"
+      expect(flash[:alert]).to eq "Waive Coverage Failed"
+      expect(response).to be_redirect
+    end
+  end
+
+  context "POST waive without shopping state" do
+    before :each do
+      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_return(true)
+      allow(hbx_enrollment).to receive(:shopping?).and_return(false)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:active_household).and_return(household)
+      allow(household).to receive(:coverage_households).and_return(coverage_household)
+      allow(household).to receive(:immediate_family_coverage_household).and_return coverage_household
+      allow(coverage_household).to receive(:household).and_return household
+      sign_in user
+    end
+    it "should get success flash message if new_hbx_enrollment_from not raise an error" do
+      allow(household).to receive(:new_hbx_enrollment_from).and_return hbx_enrollment
+      allow(hbx_enrollment).to receive(:generate_hbx_signature).and_return hbx_enrollment
+      allow(hbx_enrollment).to receive(:save!).and_return(true)
+      allow(hbx_enrollment).to receive(:household).and_return household
+      allow(household).to receive(:reload).and_return hbx_enrollment
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:save).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(true)
+      post :waive, id: "hbx_id", waiver_reason: "waiver"
+      expect(flash[:notice]).to eq "Waive Coverage Successful"
+      expect(response).to be_redirect
+    end
+
+    it "should get failure flash message if new_hbx_enrollment_from raise an error" do
+      allow(household).to receive(:new_hbx_enrollment_from).and_raise "You may not enroll until you're eligible under an enrollment period."
       post :waive, id: "hbx_id", waiver_reason: "waiver"
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect

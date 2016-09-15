@@ -2,6 +2,10 @@
 <%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 
 <div class="row container">
+    <%= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
+</div>
+
+<div class="row container">
   <h3 class="title-inline">Families</h3>
   <div class="form-inline button-group-wrapper families_search_div">
     <div class="input-group search-wp">

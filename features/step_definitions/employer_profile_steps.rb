@@ -30,6 +30,7 @@ Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   find(portal_class).click
   @pswd = 'aA1!aA1!aA1!'
   fill_in "user[oim_id]", :with => email
+  find('#user_oim_id').set('email')
   fill_in "user[password]", :with => @pswd
   fill_in "user[password_confirmation]", :with => @pswd
   sleep(1)
@@ -103,14 +104,18 @@ Then /(\w+) decides to Update Business information/ do |person|
   find('.interaction-click-control-update-business-info', :wait => 10).click
   wait_for_ajax(10)
   screenshot('update_business_info')
+  sleep 1
 end
 
 Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   person = Person.where(first_name: new_staff).first
   click_link 'Add Employer Staff Role'
   fill_in 'first_name', with: person.first_name
+  find('#first_name').set(person.first_name)
   fill_in 'last_name', with: person.last_name
+  find('#last_name').set(person.last_name)
   fill_in  'dob', with: person.dob
+  find('#dob').set(person.dob)
   screenshot('add_existing_person_as_staff')
   find('.interaction-click-control-save').click
   step 'Point of Contact count is 2'
@@ -167,6 +172,7 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   find(tab_class).click
 end
 Given /Admin selects Hannahs company/ do
+  sleep(3)
   company = find('a', text: 'Turner Agency, Inc')
   company.click
 end

@@ -18,7 +18,7 @@
         <h3 class="no-buffer">
           <%= link_to summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, active_year: plan.try(:active_year), market_kind: @market_kind, coverage_kind: @coverage_kind}), {:remote => true} do %>
             <% if plan.is_csr?%>
-              <i class="fa fa-check-square-o"></i>
+              <i class="fa fa-check-square-o" title="Eligible for Cost Sharing Reduction" data-toggle="tooltip"></i>
             <% end %>
             <%= plan.name %>
           <% end %>

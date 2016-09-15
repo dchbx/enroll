@@ -36,6 +36,7 @@ module Subscribers
       family.save! # In case the tax household does not exist
       #        family = Family.find(stupid_family_id) # wow
       #        active_household = family.active_household
+      new_person_flag = (active_household.tax_households.size == 0) ? true : false
       active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
       active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
       new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
@@ -84,6 +85,7 @@ module Subscribers
       end
       family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
       family.save!
+      UserMailer.plan_shopping_initiated(primary_person).deliver_now if new_person_flag
     end
 
     def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )

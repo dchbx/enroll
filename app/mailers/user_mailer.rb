@@ -16,6 +16,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def plan_shopping_initiated(person)
+    if person.work_email_or_best.present?
+      mail({to: person.work_email_or_best, subject: "Time to choose your plan on #{Settings.site.short_name}", from: 'no-reply@dchealthlink.com'}) do |format|
+        format.html { render "plan_shopping_initiated", :locals => { :person => person} }
+      end
+    end
+  end
+
   def invitation_email(email, person_name, invitation)
     if email.present?
       mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|

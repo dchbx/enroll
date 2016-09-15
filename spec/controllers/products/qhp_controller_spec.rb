@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
   let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
-  let(:hbx_enrollment){double("HbxEnrollment", kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
+  let(:hbx_enrollment){double("HbxEnrollment", is_shop?: true, kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
   let(:plan) { double("Plan") }
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
@@ -28,7 +28,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET summary" do
-    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health') }
+    let(:hbx_enrollment){ double("HbxEnrollment", is_shop?: false, id: double("id"), enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health') }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:dental_reference_plan){ double("Plan") }

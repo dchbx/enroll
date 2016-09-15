@@ -1,0 +1,71 @@
+$('.admin_effective_on_kind_options').hide();
+$('.sep_dates_filter').hide();
+$('.init_effective_date input').val("");
+$('.optional_date').hide();
+$('.init_event_date').show();
+$('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DATE RULE', '']]) + options_for_select(@qle.effective_on_kinds)%>").selectric("refresh");
+if("<%= @qle.is_self_attested %>" == 'true'){
+  $('#start_on, #end_on').addClass("disabled-input");
+  $('#next_poss_effective_date').addClass("disabled-input");
+}
+else{
+  $('#start_on, #end_on').removeClass("disabled-input");
+  $('#next_poss_effective_date').removeClass("disabled-input");
+}
+
+function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, cdate) {
+  var target = $('.qle-date-picker');
+  if("<%= @qle.is_self_attested %>" == 'false'){
+    dateMin = '-110y';
+    dateMax = '+110y';
+  }
+  else{
+    var splitdate = cdate.split('/');
+    var cur_date = new Date(splitdate[2], splitdate[0]-1, splitdate[1]);
+    var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
+    var post_days = (idays - post_event_sep_in_days);
+    var pre_days = (pre_event_sep_in_days + idays);
+    if (post_days >= 0){
+      dateMin = '+' + post_days + 'd';
+    }else{
+      dateMin = post_days + 'd';
+    }
+    if (pre_days >= 0){
+      dateMax = '+' + pre_days + 'd';
+    }else{
+      dateMax = pre_days + 'd';
+    }
+  }
+  $(target).val('');
+  $(target).datepicker('destroy');
+  $(target).datepicker({
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'mm/dd/yy',
+    defaultDate: cdate,
+    minDate: dateMin,
+    maxDate: dateMax});
+  $('input.floatlabel').floatlabel({
+      slideInput: false
+  });
+};
+
+function getDate(){
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth()+1; //January is 0!
+  var yyyy = today.getFullYear();
+  if(dd<10) {
+    dd='0'+dd
+  }
+  if(mm<10) {
+    mm='0'+mm
+  }
+  today = mm+'/'+dd+'/'+yyyy;
+  return today;
+}
+
+init_datepicker_for_qle_date('<%= @qle.pre_event_sep_in_days %>', '<%= @qle.post_event_sep_in_days %>', getDate())
+$('input.floatlabel').floatlabel({
+  slideInput: false
+});

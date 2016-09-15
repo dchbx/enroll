@@ -18,6 +18,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       hbx_enrollment_members: members,
       effective_on: TimeKeeper.date_of_record.beginning_of_month,
       plan: new_plan,
+      is_cobra_status?: false,
+      coverage_kind: 'health',
+      is_shop?: true,
+      benefit_package_name: 'benefit_package',
       employee_role: double("EmployeeRole")
     )
   end
@@ -86,5 +90,19 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should have print area" do
     expect(rendered).to have_selector('#printArea')
     expect(rendered).to have_selector('a#btnPrint')
+  end
+
+  it "should have market" do
+    expect(rendered).to match('Market')
+    expect(rendered).to match('Employer Sponsored')
+  end
+
+  it "should have benefit_package" do
+    expect(rendered).to match('Benefit Package:')
+    expect(rendered).to match('benefit_package')
+  end
+
+  it "should not have cobra msg" do
+    expect(rendered).not_to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
   end
 end

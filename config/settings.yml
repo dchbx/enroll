@@ -5,8 +5,11 @@ site:
   long_name: ""
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
+  login_message: "Log in to DC Health Link"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  login_url: "https://app.dchealthlink.com/"
+  trained_expert_url: "https://www.dchealthlink.com/find-expert"
 
   social_media:
     facebook_url: ""
@@ -16,12 +19,17 @@ contact_center:
   alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
+  psi_number: "1-855-532-5432" # plan-shopping-information
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 #
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
+
+#
+  qle:
+    with_in_sixty_days: 60
 #
   individual_market:
     monthly_enrollment_due_on: 15
@@ -82,7 +90,10 @@ aca:
       maximum_length:
         months: 2
 
+    cobra_enrollment_period:
+      months: 6
 
+paper_notice: 'paper-notices'
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth

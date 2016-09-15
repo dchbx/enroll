@@ -258,6 +258,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       allow(view).to receive(:pundit_class).and_return(double("EmployerProfilePolicy", updateable?: true))
       allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
       assign :employer_profile, employer_profile
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render partial: "employers/employer_profiles/my_account/home_tab"
     end
 

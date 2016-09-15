@@ -1,4 +1,4 @@
-<div class='module hidden' id="qle-details">
+<div class="<%= @existing_sep.blank? ? 'module hidden' : 'module' %>" id="qle-details" >
   <div class="hbx-enrollment-panel panel panel-default module">
     <div class="panel-heading">
       <div class="vertically-aligned-row">
@@ -25,8 +25,12 @@
             <div class="vertically-aligned-row">
               <div class="form-inline text-center">
                 <div class="form-group">
-                  <%= text_field_tag 'qle_date', '', placeholder: "mm/dd/yyyy",
-                      class: "required date-picker qle-date-picker form-control", required: true %>
+                  <%= text_field_tag 'qle_date', @existing_sep.try(:qle_on).try(:strftime, '%m/%d/%Y'),
+                    :'data-date-max'=> "+30d",
+                    :'data-date-min'=> "-30d",
+                    placeholder: "mm/dd/yyyy",
+                    class: "required date-picker qle-date-picker form-control",
+                    required: true %>
                 </div>
                 <div class="form-group">
                   <%= link_to 'CONTINUE', 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>

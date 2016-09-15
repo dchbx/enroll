@@ -40,6 +40,8 @@ Feature: Create Employer
       When Employer goes to the benefits tab I should see plan year information
       Then Employer clicks on publish plan year
       Then Employer should see a published success message
+      When Employer clicks on the Employees tab
+      When Employer clicks on terminate button for a census family for invalid case
       When Employer logs out
 
       Given Employee has not signed up as an HBX user

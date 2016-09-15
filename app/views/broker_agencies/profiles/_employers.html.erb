@@ -72,7 +72,6 @@
             <% end %>
           </tbody>
         </table>
-
         <div class="col-md-4">
           <h3>General Agencies</h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>

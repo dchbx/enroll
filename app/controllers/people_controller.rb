@@ -196,6 +196,7 @@ class PeopleController < ApplicationController
 
     if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
+      vlp_docs_clean(@person)
       redirect_path = personal_insured_families_path
     else
 
@@ -385,6 +386,16 @@ private
   def clean_duplicate_addresses
     @old_addresses = @person.addresses
     @person.addresses = [] #fix unexpected duplicates issue
+  end
+
+  def vlp_docs_clean(person)
+    existing_documents = person.consumer_role.vlp_documents
+    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role.vlp_documents =[]
+    person_consumer_role.save
+    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role.vlp_documents = existing_documents.uniq
+    person_consumer_role.save
   end
 
 end

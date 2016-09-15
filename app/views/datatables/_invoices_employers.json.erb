@@ -1,0 +1,123 @@
+<% plan_year = organization.employer_profile.latest_plan_year %>
+<% census_employees = plan_year.find_census_employees if plan_year.present? %>
+<% enrolled = plan_year.try(:enrolled).try(:count).to_i %>
+<% eligible_to_enroll_count = census_employees.try(:active).try(:count).to_i %>
+<% waived = census_employees.try(:waived).try(:count).to_i %>
+<% disabled = organization.employer_profile.can_transmit_xml? %>
+
+<% row_data = capture do %>
+	<span class="for-remote" data-employer-id="<%= organization._id %>"></span>
+	<span data-employer-profile-id="<%= organization.employer_profile.id %>"></span>
+	<span class="for-remote-replace-url" id="send-secure-message" data-replace-url="<%= new_employers_inbox_path(id: organization.employer_profile.id, profile_id: @profile._id, to: organization.legal_name)%>"></span>
+	<span class="click-row-data-link" id="transmit-xml">Transmit XML</span>
+	<% if disabled %>
+		<span><%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(organization.employer_profile), method: :post, class: "disabled" , data: { confirm: group_xml_transmitted_message(organization.employer_profile) }) %></span
+	<% else %>
+		<span><%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(organization.employer_profile), method: :post, data: { confirm: group_xml_transmitted_message(organization.employer_profile) }) %></span
+	<% end %>
+<% end %>
+
+<% hbx_id = capture do %>
+	<span data-export="<%= truncate(organization.id.to_s, length: 8, omission: '' )%>">
+		<%= truncate(organization.id.to_s, length: 8, omission: '' ) %>
+	</span>
+<% end %>
+
+<% fein = capture do %>
+	<span data-export="<%= last_four_digits(organization.fein) %>">
+		<%= last_four_digits(organization.fein) %>
+	</span>
+<% end %>
+
+<% plan_year_status = capture do %>
+	<span data-export="<%= organization.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New' %>">
+		<%= organization.employer_profile.renewing_plan_year.present? ? 'Renewing' : 'New' %>
+	</span>
+<% end %>
+
+<% eligibility_criteria = capture do %>
+	<span data-export="<%= eligibility_criteria_for_export(organization.employer_profile) %>">
+		<%= eligibility_criteria(organization.employer_profile) %>
+	</span>
+<% end %>
+
+<% general_agency = capture do %>
+	<% if organization.employer_profile.active_general_agency_legal_name.present? %>
+		<span data-export="<%= organization.employer_profile.active_general_agency_legal_name.titleize %>">
+			<%= organization.employer_profile.active_general_agency_legal_name.titleize %>
+		</span>
+	<% else %>
+		<span data-export=""></span>
+	<% end %>
+<% end %>
+
+<% broker = capture do %>
+	<% if organization.employer_profile.broker_agency_profile.present? %>
+		<span data-export="<%= organization.employer_profile.broker_agency_profile.organization.legal_name.titleize %>">
+			<%= organization.employer_profile.broker_agency_profile.organization.legal_name.titleize %>
+		</span>
+	<% else %>
+		<span data-export=""></span>
+	<% end %>
+<% end %>
+
+<% coversion = capture do %>
+	<span data-export="<%= organization.employer_profile.is_conversion? ? 'Yes' : 'No' %>">
+		<%= boolean_to_glyph(organization.current_month_invoice.present?) %>
+	</span>
+<% end %>
+
+<% status = capture do %>
+	<span data-export="<%= organization.employer_profile.aasm_state.humanize.titleize %>">
+		<%= organization.employer_profile.aasm_state.humanize.titleize %>
+	</span>
+<% end %>
+
+<% effective_date = capture do %>
+	<% if plan_year.present? %>
+		<span data-export="<%= organization.employer_profile.latest_plan_year.effective_date %>">
+			<%= organization.employer_profile.latest_plan_year.effective_date %>
+		</span>
+	<% else %>
+		<span data-export=""></span>
+	<% end %>
+<% end %>
+
+<% invoiced = capture do %>
+	<% if plan_year.present? %>
+		<span data-export="<%= organization.current_month_invoice.present? ? 'Yes' : 'No' %>">
+			<%= boolean_to_glyph(organization.current_month_invoice.present?) %>
+		</span>
+	<% else %>
+		<span data-export=""></span>
+	<% end %>
+<% end %>
+
+<% enrolled_waived = capture do %>
+	<span data-export="<%= enrolled %>/<%= waived %>">
+		<%= enrolled %>/<%= waived %>
+	</span>
+<% end %>
+
+<% percentage = capture do %>
+	<span data-export="<%= (enrolled / eligible_to_enroll_count * 100).to_i rescue 0 %>%">
+		<%= (enrolled / eligible_to_enroll_count * 100).to_i rescue 0 %>%
+	</span>
+<% end %>
+
+{
+"legal_name": <%= raw (link_to organization.legal_name.titleize, employers_employer_profile_path(organization.employer_profile, :tab=>'home'), data: {'export': organization.legal_name.titleize }).to_json %>,
+"hbx_id": <%= raw hbx_id.to_json %>,
+"fein": <%= raw fein.to_json %>,
+"plan_year_status": <%= raw plan_year_status.to_json %>,
+"eligibility_criteria": <%= raw eligibility_criteria.to_json %>,
+"general_agency": <%= raw general_agency.to_json %>,
+"broker": <%= raw broker.to_json %>,
+"conversion": <%= raw coversion.to_json %>,
+"status": <%= raw status.to_json %>,
+"effective_date" : <%= raw effective_date.to_json %>,
+"invoiced" : <%= raw invoiced.to_json %>,
+"enrolled_waived" : <%= raw enrolled_waived.to_json %>,
+"percentage" : <%= raw percentage.to_json %>,
+"row_data" : <%= raw row_data.to_json %>
+}

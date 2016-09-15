@@ -19,7 +19,6 @@ RSpec.describe "_employer_broker_widget.html.erb" do
     it "should display broker widget for consumer" do
       expect(rendered).to match /select a broker/i
       expect(rendered).to match /no broker/i
-      expect(rendered).to match /you can add a broker for free/i
     end
   end
 

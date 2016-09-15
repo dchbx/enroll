@@ -744,21 +744,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "construct_employee_role_for_match_person" do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
     let(:census_employee1) { FactoryGirl.build(:census_employee) }
 
     it "should return false when not match person" do
       expect(census_employee1.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has active employee role" do
+    it "should return false when match person which has active employee role for current census employee" do
+      census_employee.update_attributes(employer_profile_id: employer_profile.id)
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    census_employee_id: census_employee.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has no active employee role" do
-      person.employee_roles.destroy_all
-      allow(Factories::EnrollmentFactory).to receive(:build_employee_role).and_return true
+    it "should return true when match person has no active employee roles for current census employee" do
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
   end
@@ -991,7 +998,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context '.find_or_build_benefit_group_assignment' do
-    
+
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
@@ -1018,7 +1025,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let!(:census_employee) { CensusEmployee.create(**valid_params) }
 
     before do
-      census_employee.benefit_group_assignments.each{|bg| bg.delete} 
+      census_employee.benefit_group_assignments.each{|bg| bg.delete}
     end
 
     context 'when benefit group assignment with benefit group already exists' do
@@ -1069,6 +1076,36 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq white_collar_benefit_group
       end
     end
+  end
+
+  context 'editing a CensusEmployee SSN/DOB that is in a linked status' do
+    let(:census_employee)     { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1977-01-01'.to_date, ssn: '123456789') }
+    let(:person)              { FactoryGirl.create(:person,          first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '314159265') }
+
+    let(:user)          { double("user") }
+    let(:employee_role) {FactoryGirl.create(:employee_role)}
+
+
+    it 'should allow Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
+      allow(user).to receive(:has_hbx_staff_role?).and_return true # Admin
+      allow(person).to receive(:employee_roles).and_return [employee_role]
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(census_employee).to receive(:aasm_state).and_return "employee_role_linked"
+      CensusEmployee.update_census_employee_records(person, user)
+      expect(census_employee.ssn).to eq person.ssn
+      expect(census_employee.dob).to eq person.dob
+    end
+
+    it 'should NOT allow Non-Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
+      allow(user).to receive(:has_hbx_staff_role?).and_return false # Non-Admin
+      allow(person).to receive(:employee_roles).and_return [employee_role]
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(census_employee).to receive(:aasm_state).and_return "employee_role_linked"
+      CensusEmployee.update_census_employee_records(person, user)
+      expect(census_employee.ssn).not_to eq person.ssn
+      expect(census_employee.dob).not_to eq person.dob
+    end
+
   end
 
   context "check_hired_on_before_dob" do

@@ -1,7 +1,7 @@
 module Insured::FamiliesHelper
 
   def plan_shopping_dependent_text(hbx_enrollment)
-    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
+    subscriber, dependents = hbx_enrollment.family.active_family_members.partition {|h| h.is_primary_applicant == true }
     if subscriber.present? && dependents.count == 0
       ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>").html_safe
     elsif subscriber.blank? && dependents.count == 1
@@ -14,7 +14,7 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.kind == 'employer_sponsored'
+    if hbx_enrollment.is_shop?
       hbx_enrollment.total_employee_cost
     else
       hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
@@ -72,6 +72,7 @@ module Insured::FamiliesHelper
 
   def qle_link_generater(qle, index)
     options = {class: 'qle-menu-item'}
+    options[:class] += ' pre-selected' if !@existing_sep.blank? and @existing_sep.qualifying_life_event_kind == qle
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
@@ -109,13 +110,61 @@ module Insured::FamiliesHelper
     employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
   end
 
-  def has_writing_agent?(employee_role)
-    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  def disable_make_changes_button?(hbx_enrollment)
+    # return false if IVL
+    return false if hbx_enrollment.census_employee.blank?
+
+    # Enable the button under these conditions
+      # 1) plan year under open enrollment period
+      # 2) new hire covered under enrolment period
+      # 3) qle enrolmlent period check
+
+    return false if hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.special_enrollment_period.contains?(TimeKeeper.date_of_record) if hbx_enrollment.is_special_enrollment?
+
+    # Disable only  if non of the above conditions match
+    return true
+  end
+
+  def admin_permitted_sep_effective_dates(person, qle)
+    additional_options = []
+    sep = person.primary_family.special_enrollment_periods.detect { |sep| sep.qualifying_life_event_kind_id.to_s == qle.id.to_s }
+    if sep.present?
+      additional_options << sep.option1_date if sep.option1_date.present?
+      additional_options << sep.option2_date if sep.option2_date.present?
+      additional_options << sep.option3_date if sep.option3_date.present?
+    end
+    return additional_options
+  end
+
+  def show_employer_panel?(person, hbx_enrollments)
+    return false if person.blank? or !person.has_active_employee_role?
+    return true if hbx_enrollments.blank? or hbx_enrollments.shop_market.blank?
+
+    if hbx_enrollments.shop_market.entries.map(&:employee_role_id).include? person.active_employee_roles.first.id
+      false
+    else
+      true
+    end
+  end
+
+  def all_active_enrollment_with_aptc(family)
+    family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+  end
+
+  def hbx_member_names(hbx_enrollment_members)
+    member_names = Array.new
+    hbx_enrollment_members.each do |hem|
+      member_names.push(Person.find(hem.family_member.person_id.to_s).full_name)
+    end
+    return member_names.join(", ")
   end
 
   def has_writing_agent?(employee_role)
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
+
 
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
@@ -124,5 +173,4 @@ module Insured::FamiliesHelper
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
     end
   end
-
 end
