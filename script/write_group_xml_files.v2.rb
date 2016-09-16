@@ -1,4 +1,4 @@
-feins = ["23-7333380", "52-1263300", "46-0580695", "47-3510402", "45-2393822", "46-4528344", "52-1854132", "52-1583134", "46-4160139", "27-3865361", "26-1089584", "26-4203364", "27-0467200", "45-2472065", "47-3188126", "52-1499111", "30-0473980", "47-4089422", "52-1992124", "43-2066514", "45-3783744", "06-1811886", "47-4045086", "52-1688268", "37-1576351", "46-2671148", "52-1248559", "52-6065505", "47-2178688", "27-1315669", "04-3779224", "45-3757162", "52-1089824", "20-5939282", "47-4131339", "52-1282069", "52-1694859", "52-1867495", "47-3679621", "52-1532143", "27-4851102", "52-1169002", "41-2238287", "38-3851491", "26-4179120", "61-1577184", "47-2871408", "52-6063003", "23-7122917", "47-3292237", "90-0956030"]
+feins = []
 
 Dir.mkdir("employer_xmls.v2") unless File.exists?("employer_xmls.v2")
 
@@ -6,7 +6,7 @@ carrier_abbreviations = {
     "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "United Health Care": "UHIC", "Delta Dental": "DDPA",
     "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
 
-plan_year = {"start_date": "20160801", "end_date": "20160731"}
+plan_year = {"start_date": "", "end_date": ""}
 
 XML_NS = "http://openhbx.org/api/terms/1.0"
 
@@ -44,7 +44,8 @@ def remove_other_carrier_nodes(xml, trading_partner, employer_profile, pys, opti
 
   previous_plan_year_value = previous_plan_year(employer_profile)
   previous_plan_year_end_date = previous_plan_year_value.present? ? previous_plan_year_value.end_on.strftime("%Y%m%d") : "19700101"
-  if doc.xpath("//cv:plan_year/cv:plan_year_end[contains(text(), '#{previous_plan_year_end_date}')]", {:cv => XML_NS}).any?
+
+  if previous_plan_year_end_date.present?
     has_last_year = true
   end
 
