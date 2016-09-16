@@ -1,4 +1,4 @@
-feins = []
+feins = ['463816160']
 
 Dir.mkdir("employer_xmls.v2") unless File.exists?("employer_xmls.v2")
 
@@ -6,7 +6,7 @@ carrier_abbreviations = {
     "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "United Health Care": "UHIC", "Delta Dental": "DDPA",
     "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
 
-plan_year = {"start_date": "", "end_date": ""}
+plan_year = {"start_date": "20161001", "end_date": "20170930"}
 
 XML_NS = "http://openhbx.org/api/terms/1.0"
 
@@ -171,6 +171,8 @@ feins.each do |fein|
 
     # carrier switch scenario
     switched_carriers(employer_profile, plan_year).uniq.each do |switched_carrier|
+      organizations_hash[switched_carrier.legal_name] = [] if organizations_hash[switched_carrier.legal_name].nil?
+
       organizations_hash[switched_carrier.legal_name] << remove_other_carrier_nodes(cv_xml, switched_carrier.legal_name,
                                                                                     employer_profile,
                                                                                     previous_plan_year(employer_profile).start_on.strftime("%Y%m%d"),
