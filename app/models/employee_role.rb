@@ -96,7 +96,7 @@ class EmployeeRole
   alias_method :census_employee, :new_census_employee
 
   def coverage_effective_on
-    benefit_group.effective_on_for(census_employee.hired_on)
+    benefit_group.effective_on_for(census_employee.hired_on) if benefit_group.present?
   end
 
   def can_enroll_as_new_hire?    

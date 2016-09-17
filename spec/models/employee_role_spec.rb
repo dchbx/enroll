@@ -490,6 +490,16 @@ describe EmployeeRole, dbclean: :after_each do
     end
   end
 
+  context ".coverage_effective_on" do
+    before do
+      allow(employee_role).to receive(:benefit_group).and_return(nil)
+    end
+
+    it "should return nil without benefit group" do
+      expect(employee_role.coverage_effective_on.nil?).to be_truthy
+    end
+  end
+
   context ".is_eligible_to_enroll_without_qle?" do
     context 'when new hire open enrollment period available' do
       let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
