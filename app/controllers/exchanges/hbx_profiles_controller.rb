@@ -47,7 +47,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations= Organization.where(:id.in => params[:employerId]).all
     @organizations.each do |org|
       @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+      #save invoice in the tmp directory to send out to mail house
+      @employer_invoice.save_and_notify
     end
 
     respond_to do |format|
