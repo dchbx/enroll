@@ -118,7 +118,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
 
-   context "#is_family_relationships_satisfied?" do
+  context "#is_family_relationships_satisfied?" do
     let(:consumer_role) {double}
     let(:benefit_package) {double}
     let(:person){FactoryGirl.create :person}
