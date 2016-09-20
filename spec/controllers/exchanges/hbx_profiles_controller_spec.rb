@@ -432,20 +432,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "GET edit_dob_ssn" do
 
-    let(:user) { double("user") }
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
-    let(:hbx_staff_role) { double("hbx_staff_role")}
-    let(:hbx_profile) { double("hbx_profile")}
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
+    #let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, :person => person, :permission_id => permission.id, :hbx_profile => hbx_profile)}
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
+    let(:permission) { FactoryGirl.create(:permission, :can_update_ssn => true)}
+    
 
     it "should return authorization error for Non-Admin users" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return false
+      #allow(user).to receive(:has_hbx_staff_role?).and_return false
+      allow(hbx_staff_role).to receive(:permission).and_return :permission
+      #allow(:hbx_staff_role)
       sign_in(user)
       xhr :get, :edit_dob_ssn
       expect { HbxProfile.update_dob_ssn }.to raise_error(StandardError)
     end
 
     it "should render the edit_dob_ssn partial for logged in users with an admin role" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return true
+      allow(hbx_staff_role).to receive(:permission).and_return :permission
       sign_in(user)
       expect(response).to have_http_status(:success)
       response.content_type == Mime::JS
@@ -459,7 +464,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "POST update_dob_ssn" do
 
-    let(:user) { double("user") }
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
