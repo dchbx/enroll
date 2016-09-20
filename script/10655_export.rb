@@ -2,7 +2,7 @@ batch_size = 500
 offset = 0
 family_count = Family.count
 
-csv = CSV.open("10655_export_ea_multirow.csv", "w")
+csv = CSV.open("10655_export_ea_multirow_sep_19.csv", "w")
 csv << %w(family.id policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.subscriber.person.hbx_id
         policy.subscriber.person.is_incarcerated  policy.subscriber.person.citizen_status
         policy.subscriber.person.is_dc_resident? is_dependent)
@@ -20,8 +20,7 @@ while offset < family_count
       next if policy.plan.nil?
       next if policy.effective_on < Date.new(2016, 01, 01)
       next if !policy.is_active?
-      next if (policy.plan.metal_level == "catastrophic") ||
-          (!(['unassisted_qhp', 'individual'].include? policy.kind)) || policy.family.has_aptc_hbx_enrollment?
+      next if (!(['unassisted_qhp', 'individual'].include? policy.kind)) || policy.family.has_aptc_hbx_enrollment?
 
       person = policy.subscriber.person
 
