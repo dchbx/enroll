@@ -368,7 +368,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def edit_dob_ssn
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    authorize Family, :can_update_ssn?
     @person = Person.find(params[:id])
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
@@ -384,7 +384,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def update_dob_ssn
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    authorize  Family, :can_update_ssn?
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn])
 
