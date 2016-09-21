@@ -183,6 +183,10 @@
       <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-default btn-block' } %>
     </span>
     <% end %>
+    <% if  hbx_enrollment.coverage_terminated? && current_user.has_hbx_staff_role? %>
+      <%= link_to "ReInstate Coverage", "#", {data: { toggle:'modal',target: "#reinstate_modal" } , class: 'btn btn-default btn-block'} %>
+      <%= render 'reinstate_modal' , hbx_enrollment: hbx_enrollment %>
+    <%end%>
     <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %>
   </div>
 </div>

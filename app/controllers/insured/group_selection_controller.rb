@@ -109,6 +109,12 @@ class Insured::GroupSelectionController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
   end
 
+  def reinstate_confirm
+    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    @hbx_enrollment.reinstate
+    redirect_to :back
+  end
+
   def terminate
     term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))

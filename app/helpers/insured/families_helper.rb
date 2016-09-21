@@ -125,4 +125,10 @@ module Insured::FamiliesHelper
     end
   end
 
+  def new_coverage_start_on(enrollment)
+    if enrollment && enrollment.coverage_terminated?
+      return enrollment.terminated_on + 1.day
+    end
+  end
+
 end

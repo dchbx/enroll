@@ -66,7 +66,7 @@ class Exchanges::AgentsController < ApplicationController
       redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, IPA or a Broker" }
     end
     current_user.last_portal_visited = home_exchanges_agents_path
-    current_user.save!
+    # current_user.save!
   end
 
 

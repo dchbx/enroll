@@ -32,7 +32,8 @@ class HbxEnrollment
       "coverage_renewed",
       "coverage_termination_pending",
       "enrolled_contingent",
-      "unverified"
+      "unverified",
+      "coverage_reinstated"
     ]
 
   SELECTED_AND_WAIVED = ["coverage_selected", "inactive"]
@@ -889,6 +890,16 @@ class HbxEnrollment
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
 
+  def reinstate
+    if may_reinstate_coverage?
+      binding.pry
+      effective_on = terminated_on + 1.day
+      terminated_on= nil
+      reinstate_coverage!
+      # coverage_reinstated!
+    end
+  end
+
   def self.find(id)
     id = BSON::ObjectId.from_string(id) if id.is_a? String
     families = Family.where({
@@ -980,6 +991,7 @@ class HbxEnrollment
     state :coverage_termination_pending
     state :coverage_canceled      # coverage never took effect
     state :coverage_terminated    # coverage ended
+    state :coverage_reinstated     # coverage reinstated 
 
     state :coverage_expired
 
@@ -1100,6 +1112,11 @@ class HbxEnrollment
     event :expire_coverage, :after => :record_transition do
       transitions from: [:coverage_selected, :transmitted_to_carrier, :coverage_enrolled], to: :coverage_expired, :guard  => :can_be_expired?
     end
+    
+    event :reinstate_coverage, :after => :record_transition do
+      transitions from: :coverage_terminated, to: :coverage_reinstated 
+    end
+
   end
 
 
