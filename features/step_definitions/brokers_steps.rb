@@ -112,7 +112,7 @@ end
 
 Then(/^.+ should see broker agencies index view$/) do
   #wait_for_ajax(3)
-  expect(page).to have_content('Broker Agencies')
+  expect(page).to have_content('Broker Agencies', :wait => 5)
 end
 
 When(/^.+ searches broker agency by name$/) do
