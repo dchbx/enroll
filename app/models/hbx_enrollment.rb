@@ -892,7 +892,6 @@ class HbxEnrollment
 
   def reinstate
     if may_reinstate_coverage?
-      binding.pry
       effective_on = terminated_on + 1.day
       terminated_on= nil
       reinstate_coverage!
