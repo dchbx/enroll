@@ -1,4 +1,4 @@
-feins = ['463816160']
+feins = ["521963820","311573701","541392052","521165054","522019596","522110168","521771397","521191969","521272894","208583706","562332341","530241123","521136132","530201498","521949191","521238374","521976304","521265622","521385872","204368380","421545198","522249589","522356681","521274001","272387291","942282759","455054392","300814595"]
 
 Dir.mkdir("employer_xmls.v2") unless File.exists?("employer_xmls.v2")
 
@@ -6,7 +6,7 @@ carrier_abbreviations = {
     "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "United Health Care": "UHIC", "Delta Dental": "DDPA",
     "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
 
-plan_year = {"start_date": "20161001", "end_date": "20170930"}
+plan_year = {"start_date": "20160901", "end_date": "20170831"}
 
 XML_NS = "http://openhbx.org/api/terms/1.0"
 
@@ -43,9 +43,9 @@ def remove_other_carrier_nodes(xml, trading_partner, employer_profile, pys, opti
   event = "urn:openhbx:events:v1:employer#other"
 
   previous_plan_year_value = previous_plan_year(employer_profile)
-  previous_plan_year_end_date = previous_plan_year_value.present? ? previous_plan_year_value.end_on.strftime("%Y%m%d") : "19700101"
+  #previous_plan_year_end_date = previous_plan_year_value.present? ? previous_plan_year_value.end_on.strftime("%Y%m%d") : "19700101"
 
-  if previous_plan_year_end_date.present?
+  if previous_plan_year_value.present?
     has_last_year = true
   end
 
@@ -64,9 +64,9 @@ def remove_other_carrier_nodes(xml, trading_partner, employer_profile, pys, opti
       if employer_profile.eligible? || employer_profile.enrolled? || employer_profile.binder_paid?
         event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_application_eligible"
       elsif employer_profile.suspended?
-        event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_application_carrier_dropped"
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"
       elsif employer_profile.ineligible?
-        event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_application_carrier_dropped"
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"
       end
     else
       event = "urn:openhbx:events:v1:employer#benefit_coverage_period_expired"
@@ -179,7 +179,7 @@ feins.each do |fein|
                                                                                     {event: "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"})
     end
   rescue => e
-    puts "Error FEIN #{fein} #{e.message}\n " + e.backtrace.to_s
+    puts "Error FEIN #{fein} #{e.message}\n "# + e.backtrace.to_s
   end
 end
 
