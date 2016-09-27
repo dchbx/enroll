@@ -4,8 +4,8 @@
     @data_hash = {}
     @data.each do |d|
       if @data_hash[d["ic_ref"]].present?
-        hbx_ids = @data_hash[d["ic_ref"]].collect{|r| r['applid']}
-        next if hbx_ids.include?(d["applid"])
+        hbx_ids = @data_hash[d["ic_ref"]].collect{|r| r['personid']}
+        next if hbx_ids.include?(d["personid"])
         @data_hash[d["ic_ref"]] << d
       else
         @data_hash[d["ic_ref"]] = [d]
@@ -39,7 +39,7 @@
                 )
           builder.deliver
         rescue Exception => e
-          puts "Unable to deliver to #{primary_member["ic_ref"]} for the following error #{e}"
+          puts "Unable to deliver to #{primary_member["ic_ref"]} for the following error #{e.backtrace}"
         end
         csv << [
           ic_ref
