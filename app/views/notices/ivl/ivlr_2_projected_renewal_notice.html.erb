@@ -32,7 +32,7 @@
   content: "Information we have for you or other members of your household:"} %>
 
 <% notice.individuals.each do |member| %>
-  <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: [member.full_name], 
+  <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: [member.full_name.titleize],
                            rows: [['State of Residency', "#{member.residency_verified}"],
                               ['Citizenship/Lawful Presence', "#{member.citizen_status}"],
                               ['Tax Status',"#{member.tax_status}"],
@@ -44,7 +44,7 @@
 <%end%>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by #{(TimeKeeper.date_of_record+35.days).strftime("%m/%d/%Y")}.</strong> You can report any changes by calling #{Settings.site.short_name} Customer Service at (855) 532-5465."} %>
+  content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong> You can report any changes by calling #{Settings.site.short_name} Customer Service at (855) 532-5465."} %>
 
 <%if notice.individuals.first.uqhp_reason == "Exceeded Renew Years"%>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

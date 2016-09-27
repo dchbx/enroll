@@ -4,8 +4,8 @@
     @data_hash = {}
     @data.each do |d|
       if @data_hash[d["ic_ref"]].present?
-        hbx_ids = @data_hash[d["ic_ref"]].collect{|r| r['personid']}
-        next if hbx_ids.include?(d["personid"])
+        hbx_ids = @data_hash[d["ic_ref"]].collect{|r| r['hbx_id']}
+        next if hbx_ids.include?(d["hbx_id"])
         @data_hash[d["ic_ref"]] << d
       else
         @data_hash[d["ic_ref"]] = [d]
@@ -16,6 +16,7 @@
   end
   field_names  = %w(
           ic_ref
+          hbx_id
         )
   file_name = "#{Rails.root}/public/ivl_renewal_notice_2_report.csv"
 
@@ -26,8 +27,8 @@
     notice_trigger = event_kind.notice_triggers.first
     @data_hash.each do |ic_ref, members|
       primary_member = members[0]
-      family = Family.where(:e_case_id => Regexp.new(primary_member["ic_ref"],true)).first
-      consumer_role =family.primary_family_member.person.consumer_role
+      person = Person.where(:hbx_id => primary_member["hbx_id"]).first
+      consumer_role =person.consumer_role
       if consumer_role.present?
         begin
           builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
@@ -43,7 +44,8 @@
           puts "Unable to deliver to #{primary_member["ic_ref"]} for the following error #{e.backtrace}"
         end
         csv << [
-          ic_ref
+          ic_ref,
+          person.hbx_id
         ]
       else
         puts "Unable to send notice to family_id : #{ic_ref}"
