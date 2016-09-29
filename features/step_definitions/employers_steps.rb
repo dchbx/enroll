@@ -90,7 +90,6 @@ end
 
 Then(/^.+ should see a form to enter information about employee, address and dependents details$/) do
   # Census Employee
-  page.driver.browser.js_errors = false
   fill_in 'census_employee[first_name]', with: 'John'
   fill_in 'census_employee[middle_name]', with: 'K'
   fill_in 'census_employee[last_name]', with: 'Doe'
