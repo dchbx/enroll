@@ -97,9 +97,6 @@ module Forms
 
     def update_primary_person(family_member)
        primary_person =  family_member.family.primary_family_member.person
-       primary_person.update_attributes(extract_primary_person_params).tap do
-       bubble_person_errors(primary_person)
-       end
      end
 
     def try_create_person(person)
@@ -107,12 +104,6 @@ module Forms
         bubble_person_errors(person)
       end
     end
-    
-    def extract_primary_person_params
-       {
-         # :is_primary_caregiver => is_primary_caregiver
-       }
-     end
 
     def assign_person_address(person)
       if same_with_primary == 'true'
