@@ -605,6 +605,21 @@ describe Family, "given an inactive member" do
   end
 end
 
+
+describe Family, "active family members" do
+  let(:dependent) {
+    double(:id => "123456", ssn: double, :last_name => "A Last Name", :first_name => "A First Name", :dob => Date.new(2012,3,15))
+  }
+  let(:primary_family_member) { FamilyMember.new(:is_active => true, :is_primary_applicant => true,  :person => dependent) }
+  let(:dependent_family_member) { FamilyMember.new(:is_active => true, :person => dependent) }
+
+  subject { Family.new(family_members: [dependent_family_member, primary_family_member]) }
+
+  it "should show family members in ordered way " do
+    expect(subject.active_family_members).to eq [primary_family_member, dependent_family_member]
+  end
+end
+
 describe Family, "with a primary applicant" do
   describe "given a new person and relationship to make to the primary applicant" do
     let(:primary_person_id) { double }

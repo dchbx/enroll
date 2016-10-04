@@ -196,7 +196,7 @@ class Family
   end
 
   def active_family_members
-    family_members.find_all { |family_member| family_member.is_active? }
+    family_members.order(is_primary_applicant: :desc).find_all { |family_member| family_member.is_active?  }
   end
 
   def find_family_member_by_person(person)

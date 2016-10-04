@@ -6,22 +6,13 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:person) { FactoryGirl.build_stubbed(:person)}
     let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
-    let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_two]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     let(:hbx_enrollment_member_two) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
-
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_two]) }
 
     it "it should return subscribers full name in span with dependent-text class" do
-      allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(true)
-      allow(hbx_enrollment_member).to receive_message_chain("person.full_name").and_return("Bobby Boucher")
-      expect(helper.plan_shopping_dependent_text(hbx_enrollment)).to eq "<span class='dependent-text'>Bobby Boucher</span>"
-    end
-
-    it "it should return subscribers and dependents modal" do
-      allow(hbx_enrollment_member).to receive_message_chain("person.full_name").and_return("Bobby Boucher")
-      allow(hbx_enrollment_member).to receive_message_chain("person.find_relationship_with").and_return("Spouse")
-      allow(hbx_enrollment_member_two).to receive_message_chain("person.full_name").and_return("Danny Boucher")
-      expect(helper.plan_shopping_dependent_text(hbx_enrollment)).to match '<h4 class="modal-title">Coverage For</h4>'
+      allow(hbx_enrollment).to receive(:family).and_return(family)
+      expect(helper.plan_shopping_dependent_text(hbx_enrollment)).to eq "<span class='dependent-text'>#{person.full_name}</span>"
     end
 
   end

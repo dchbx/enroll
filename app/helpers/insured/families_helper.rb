@@ -1,7 +1,7 @@
 module Insured::FamiliesHelper
 
   def plan_shopping_dependent_text(hbx_enrollment)
-    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
+    subscriber, dependents = hbx_enrollment.family.active_family_members.partition {|h| h.is_primary_applicant == true }
     if subscriber.present? && dependents.count == 0
       ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>").html_safe
     elsif subscriber.blank? && dependents.count == 1

@@ -31,11 +31,14 @@ describe "shared/_comparison.html.erb" do
   let(:mock_qhps) {[mock_qhp]}
   let(:sbc_document) { double("SbcDocument", identifier: "download#abc") }
   let(:mock_family){ double("Family") }
+  let(:mock_family_members){ [double("FamilyMember", is_primary_applicant: true, person: mock_person)] }
 
   before :each do
     Caches::MongoidCache.release(CarrierProfile)
     allow(mock_plan).to receive(:sbc_document).and_return(mock_plan.sbc_document)
     allow(mock_qhp).to receive("[]").with(:total_employee_cost).and_return(30)
+    allow(mock_hbx_enrollment).to receive(:family).and_return(mock_family)
+    allow(mock_family).to receive(:active_family_members).and_return(mock_family_members)
     allow(mock_hbx_enrollment).to receive(:humanized_dependent_summary).and_return(2)
     allow(mock_person).to receive(:primary_family).and_return(mock_family)
     allow(mock_person).to receive(:has_consumer_role?).and_return(false)

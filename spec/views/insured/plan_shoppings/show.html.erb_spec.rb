@@ -5,7 +5,7 @@ RSpec.describe "insured/show" do
   let(:plan){FactoryGirl.create(:plan)}
   let(:benefit_group){ FactoryGirl.build(:benefit_group) }
   let(:hbx_enrollment_member_one) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
-  let(:family) { FactoryGirl.build_stubbed(:family, person: person, family_members: [hbx_enrollment_member_one]) }
+  let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group,
     hbx_enrollment_members: [hbx_enrollment_member_one],
     employee_role: employee_role,
