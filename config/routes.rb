@@ -29,7 +29,13 @@ Rails.application.routes.draw do
       get :dismiss, on: :collection
     end
     resources :agents_inboxes, only: [:show, :destroy]
+<<<<<<< HEAD
 
+=======
+    resources :residents do
+      post :match_person, on: :collection
+    end
+>>>>>>> 80d988d23... Refs #11076 added initial backend code for CoverAll
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 

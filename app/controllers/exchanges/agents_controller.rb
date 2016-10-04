@@ -52,6 +52,12 @@ class Exchanges::AgentsController < ApplicationController
     end
   end
 
+  def begin_resident_enrollment
+    session[:person_id] = nil
+    session[:original_application_type] = params['original_application_type']
+    redirect_to search_insured_consumer_role_index_path
+  end
+
   def inbox
     @inbox_provider = current_user.person
     @profile=@inbox_provider
