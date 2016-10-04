@@ -47,7 +47,7 @@ Rails.application.routes.draw do
         get :binder_index_datatable
         post :binder_paid
         get :verification_index
-        get :verifications_index_datatable
+        post :verifications_index_datatable
       end
 
       member do
@@ -199,10 +199,12 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       get 'show_profile'
+      get 'link_from_quote'
       get 'consumer_override'
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+
       member do
         get "download_invoice"
       end
@@ -270,6 +272,10 @@ Rails.application.routes.draw do
         get :messages
         get :staff_index
         get :agency_messages
+        #get :build_employee_roster
+        #post :build_employee_roster
+        #get :upload_employee_roster
+        post :build_plan_year
         get :assign_history
       end
       member do
@@ -294,6 +300,49 @@ Rails.application.routes.draw do
       member do
         get :favorite
       end
+    end
+
+    resources :broker_roles do
+
+     resources :quotes do
+      root 'quotes#index'
+      collection do
+        post :quotes_index_datatable
+        get :new_household, :format => "js"
+        post :update_benefits
+        post :publish_quote
+        get :get_quote_info
+        get :copy
+        get :set_plan
+        get :publish
+        get :criteria
+        get :plan_comparison
+        get :health_cost_comparison
+        get :dental_cost_comparison
+        get 'published_quote/:id', to: 'quotes#view_published_quote'
+        get :export_to_pdf
+        get :download_pdf
+        get :dental_plans_data
+        get :my_quotes
+      end
+      member do
+        get :upload_employee_roster
+        post :build_employee_roster
+        delete :delete_quote
+        get :download_employee_roster
+        post :delete_member
+        delete :delete_household
+        post :delete_benefit_group
+        get :delete_quote_modal
+      end
+
+      resources :quote_benefit_groups do
+        get :criteria
+        get :get_quote_info
+        post :update_benefits
+        get :plan_comparison
+      end
+    end
     end
   end
 
@@ -408,59 +457,5 @@ Rails.application.routes.draw do
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-
-
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
-
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
-
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
-
-  # Example resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
-
-  # Example resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
-
-  # Example resource route with more complex sub-resources:
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', on: :collection
-  #     end
-  #   end
-
-  # Example resource route with concerns:
-  #   concern :toggleable do
-  #     post 'toggle'
-  #   end
-  #   resources :posts, concerns: :toggleable
-  #   resources :photos, concerns: :toggleable
-
-  # Example resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
-  #
-  # You can have the root of your site routed with "root"
   root 'welcome#index'
 end

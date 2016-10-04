@@ -1,3 +1,5 @@
+require 'csv'
+
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
 

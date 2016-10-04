@@ -6,5 +6,5 @@ Feature: Employer can view their employees
     And the employer is logged in
     When they visit the Employee Roster
     And click on one of their employees
-    Then they should see that employee's details
+    Then they should see that employee details
     And employer logs out

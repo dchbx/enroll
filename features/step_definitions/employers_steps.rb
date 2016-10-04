@@ -362,7 +362,7 @@ Then(/^.+ should see the combined filter results$/) do
 end
 
 When(/^.+ go(?:es)? to the benefits tab$/) do
-  find(".interaction-click-control-benefits").click
+  find('.interaction-click-control-benefits').click
 end
 
 Then(/^.+ should see the plan year$/) do
@@ -423,6 +423,7 @@ module EmployeeWorld
     # :employer_profile, *traits, attributes.merge(:employer_profiles_traits => :with_staff)
   end
 end
+
 World(EmployeeWorld)
 
 Given /^an employer exists$/ do
@@ -445,6 +446,30 @@ Given /^the employer is logged in$/ do
   login_as owner, scope: :user
 end
 
-Then /^they should see that employee's details$/ do
+
+Then /^they should see that employee details$/ do
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
+end
+
+When(/^the employer goes to benefits tab$/) do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
+end
+
+When(/^the employer clicks on claim quote$/) do
+  find('.interaction-click-control-claim-quote').click
+end
+
+Then(/^the employer enters claim code for his quote$/) do
+  person = FactoryGirl.create(:person, :with_broker_role)
+  @quote=FactoryGirl.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
+  @quote.publish!
+  fill_in "claim_code", :with => @quote.claim_code
+end
+
+When(/^the employer clicks claim code$/) do
+  find('.interaction-click-control-claim-code').click
+end
+
+Then(/^the employer sees a successful message$/) do
+  expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
 end

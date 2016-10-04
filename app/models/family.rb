@@ -581,10 +581,24 @@ class Family
   end
 
   def enrollments_for_display
+
+
+Family.collection.aggregate([
+{"$unwind" => '$households'},
+{"$unwind" => '$households.hbx_enrollments'},
+{"$match" => {"households.hbx_enrollments.aasm_state" => "coverage_terminated",
+   "households.hbx_enrollments.terminated_on" => {"$gt" => TimeKeeper.date_of_record.beginning_of_year},
+   "households.hbx_enrollments.effective_on" => {"$lt" => TimeKeeper.date_of_record.beginning_of_year},
+   }},
+{"$project" => {'households.hbx_enrollments._id' => 1}}
+],:allow_disk_use => true)
+
+
     Family.collection.aggregate([
       {"$match" => {'_id' => self._id}},
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
+      {"$match" => {"aasm_state" => {"$ne" => 'inactive'},  }},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
       {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},

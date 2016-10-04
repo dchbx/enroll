@@ -332,6 +332,75 @@ class EmployerProfile
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
 
+  def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
+    quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
+
+    # Perform quote link if claim_code is valid
+    if quote.present? && !quote_claim_code.blank? && quote.published?
+
+      plan_year = self.plan_years.build({
+        start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, end_on: ((TimeKeeper.date_of_record + 2.months).beginning_of_month + 1.year) - 1.day,
+        open_enrollment_start_on: TimeKeeper.date_of_record, open_enrollment_end_on: (TimeKeeper.date_of_record + 1.month).beginning_of_month + 9.days,
+        fte_count: quote.member_count
+        })
+
+      benefit_group_mapping = Hash.new
+
+      # Build each quote benefit group from quote
+      quote.quote_benefit_groups.each do |quote_benefit_group|
+        benefit_group = plan_year.benefit_groups.build({plan_option_kind: quote_benefit_group.plan_option_kind, title: quote_benefit_group.title, description: "Linked from Quote with claim code " + quote_claim_code })
+
+        # map quote benefit group to newly created plan year benefit group so it can be assigned to census employees if imported
+        benefit_group_mapping[quote_benefit_group.id.to_s] = benefit_group.id
+
+        # Assign benefit group plan information (HEALTH)
+        benefit_group.lowest_cost_plan_id = quote_benefit_group.published_lowest_cost_plan
+        benefit_group.reference_plan_id = quote_benefit_group.published_reference_plan
+        benefit_group.highest_cost_plan_id = quote_benefit_group.published_highest_cost_plan
+        benefit_group.elected_plan_ids.push(quote_benefit_group.published_reference_plan)
+        benefit_group.dental_plan_option_kind = quote_benefit_group.dental_plan_option_kind
+        benefit_group.relationship_benefits = quote_benefit_group.quote_relationship_benefits.map{|x| x.attributes.slice(:offered,:relationship, :premium_pct)}
+
+        # Assign benefit group plan information (DENTAL )
+        benefit_group.dental_reference_plan_id = quote_benefit_group.published_dental_reference_plan
+        benefit_group.elected_dental_plan_ids = quote_benefit_group.elected_dental_plan_ids
+
+        benefit_group.dental_relationship_benefits = quote_benefit_group.quote_dental_relationship_benefits.map{|x| x.attributes.slice(:offered,:relationship, :premium_pct)}
+
+      end
+
+      if plan_year.save!
+
+        quote.claim!
+
+        if import_census_employee == true
+          quote.quote_households.each do |qhh|
+            qhh_employee = qhh.employee
+            if qhh.employee.present?
+                quote_employee = qhh.employee
+                ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
+                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s))
+
+                qhh.dependents.each do |qhh_dependent|
+                  ce.census_dependents << CensusDependent.new(
+                    last_name: qhh_dependent.last_name, first_name: qhh_dependent.first_name, dob: qhh_dependent.dob, employee_relationship: qhh_dependent.employee_relationship
+                    )
+                end
+                ce.save(:validate => false)
+            end
+          end
+        end
+
+        return true
+
+      end
+
+    end
+
+    return false
+
+  end
+
   ## Class methods
   class << self
 

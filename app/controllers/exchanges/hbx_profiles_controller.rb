@@ -1,5 +1,8 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include DataTablesSorts
+  include DataTablesFilters
+
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -339,11 +342,17 @@ class Exchanges::HbxProfilesController < ApplicationController
         "family_members.person_id" => {"$in" => person_ids}
       })
     end
+
+    sort_direction = set_sort_direction
+    families = sort_verifications_index_columns(families, sort_direction) if sort_direction.present?
+    filter = set_filter
+    employers = filter_employers(employers, filter) if filter.present?
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
     @families = families.skip(dt_query.skip).limit(dt_query.take)
-    render
+    render "datatables/verifications_index_datatable"
   end
 
   def product_index
@@ -487,6 +496,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+
   def update_setting
     authorize HbxProfile, :modify_admin_tabs?
     setting_record = Setting.where(name: setting_params[:name]).last
@@ -500,6 +510,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 private
+
 
    def modify_admin_tabs?
      authorize HbxProfile, :modify_admin_tabs?

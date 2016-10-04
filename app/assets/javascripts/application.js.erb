@@ -38,11 +38,19 @@
 //= require announcement
 //= require bootstrap-hooks
 //= require general_agency
+//= require datatables_scope_map
 //= require dataTables/jquery.dataTables
+//= require enrolldatatables
+//= require dataTables/dataTables.select.min.js
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require enroll_datatables_initializer
 //= require freebies
 //= require responsive
+//= require react
+//= require react_ujs
 //= require_tree .
+
+var disableSelectric = false;
 
 $(document).on('ready page:load', function () {
 	Freebies.fadeElement($("body"));
@@ -52,12 +60,12 @@ $(document).on('ready page:load', function () {
 
 function applyMultiLanguageSelect() {
   $('#broker_agency_language_select').multiselect({
-    nonSelectedText: 'Select Language',
+    nonSelectedText: 'Select Plans',
     maxHeight: 300
   });
   $('#broker_agency_language_select').multiselect('select', 'en', true);
   $('#broker_agency_language_select').on('selectric-init', function(element){
-    $('.language_multi_select .selectric-interaction-field-control-broker-agency-languages-spoken').hide();
+    $('.selectric-interaction-field-control-broker-agency-languages-spoken').hide();
   });
 };
 

@@ -1,0 +1,10 @@
+var $parent_row = $( ".table:first > tbody > tr:not(tr.child-row)" ).eq( <%= @row %> );
+var $quote_id = $parent_row.find('.row-data span.hbx-id').data('hbx-id');
+if ( $('tr.child-row:visible').length > 0 ) {
+  $('tr.child-row:visible').remove();
+}
+if ( $parent_row.next().hasClass('child-row') ) {
+} else {
+  $parent_row.closest('.table').after('<tr class="child-row"><td colspan="100"><%= j render partial: "datatables/delete_quote_modal", locals: {quote: @quote} %></td></tr>');
+  $('#deleteQuote_<%= @quote.id %>').modal("show");
+}

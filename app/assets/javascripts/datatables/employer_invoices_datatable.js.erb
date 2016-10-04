@@ -1,0 +1,117 @@
+var EmployerInvoicesDatatable = ( function( window, undefined ) {
+
+  function setTab() {
+    var tab = "Employer";
+    return tab;
+  }
+
+  function setBaseModel() {
+    var base_model = "Organization";
+    return base_model;
+  }
+
+  function callAllFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $all_filter = $table.closest('.module').find('.first-level a:contains("All")');
+    $all_filter.on('click', function() {
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {});
+      $table.DataTable().draw();
+    });
+  }
+
+  function callInitialFirstMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Initial-second-level a:contains("<%= TimeKeeper.date_of_record.next_month.beginning_of_month %>")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callInitialSecondMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Initial-second-level a:contains("<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month %>")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callInitialThirdMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Initial-second-level a:contains("<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month %>")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callRenewingFirstMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Renewing-second-level a:contains("<%= TimeKeeper.date_of_record.next_month.beginning_of_month %>")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callRenewingSecondMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Renewing-second-level a:contains("<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month %>")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function callRenewingThirdMonthFilter(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $active_filter = $table.closest('.module').find('.Renewing-second-level a:contains("<%= TimeKeeper.date_of_record.next_month.beginning_of_month.next_month.next_month %>")');
+    var filter_criteria = EnrollDataTableInitializer.setFilterCriteria(table_id, setTab(), EnrollDataTableInitializer.setFirstLevel($active_filter), EnrollDataTableInitializer.setSecondLevel($active_filter));
+    var base_model = setBaseModel();
+    EnrollDataTableInitializer.clickActiveFilter(table_id, $active_filter, filter_criteria, base_model);
+  }
+
+  function addScopesBeforeSorting(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $invoiced_sort = $table.closest('.module').find('.sorting .vertically-aligned-row').find('div:contains("Invoiced?")');
+    $invoiced_sort.on('click', function() {
+      var tab = setTab();
+      EnrollDataTableInitializer.AddParamsBeforeDraw(table_id, {
+        base_model: setBaseModel(),
+        custom_sort: true,
+        order_by: "current_month_invoice.present?",
+        scopes: EnrollDataTableInitializer.setScopesFromFilters(table_id, tab)
+      });
+    });
+  }
+
+  function generateInvoicesForSelection(table_id) {
+    EnrollDataTableInitializer.findTable(table_id);
+    var $url = $table.closest('.module').data('generate-invoice-url');
+    var $generate_invoices_link = $('.dropdown-menu').find('a:contains("Generate Invoice")');
+    $generate_invoices_link.on('click', function() {
+      var $employer_ids = []
+      $table.find('tbody .enroll-checkbox input:checked').closest('tr').find('.row-data').find('span').each( function() {
+        $employer_ids.push($(this).data('employer-id'))
+      })
+      $.ajax({
+        context: this,
+        type: "post",
+        url: $url,
+        dataType: 'script',
+        data: {
+          employerId: $employer_ids
+        },
+      })
+    });
+  }
+
+  return {
+    callInitialFirstMonthFilter : callInitialFirstMonthFilter,
+    callInitialSecondMonthFilter : callInitialSecondMonthFilter,
+    callInitialThirdMonthFilter : callInitialThirdMonthFilter,
+    callRenewingFirstMonthFilter : callRenewingFirstMonthFilter,
+    callRenewingSecondMonthFilter : callRenewingSecondMonthFilter,
+    callRenewingThirdMonthFilter : callRenewingThirdMonthFilter,
+    generateInvoicesForSelection : generateInvoicesForSelection,
+    addScopesBeforeSorting : addScopesBeforeSorting,
+    callAllFilter: callAllFilter
+  };
+
+} )( window );
