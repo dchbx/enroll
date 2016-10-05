@@ -30,6 +30,14 @@ others = []
 
 create_directory "#{Rails.root.to_s}/public/paper_notices/"
 
+hbx_ids = []
+CSV.foreach("#{Rails.root.to_s}/valid_gluedb_fourth_verification_reminder_data_export.csv") do |row|
+  next if row[0].strip == 'Primary HbxId'
+
+  hbx_ids << row[0].strip.to_i
+end
+
+
 CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
 
   csv << [
@@ -41,6 +49,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
 
   count   = 0
   counter = 0
+  found = 0
 
   families.each do |family|
     counter += 1
@@ -63,16 +72,21 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     end
 
     next if person.inbox.blank?
-    next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
-    if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
-      next if secure_message.created_at > 35.days.ago
-    end
+    next if person.inbox.messages.where(:"subject" => "Request for Additional Information - Third Reminder").blank?
+    next if !hbx_ids.include?(person.hbx_id.to_i)
 
-      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
+    puts "----#{person.full_name}"
+
+    found += 1
+
+    # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+    #   next if secure_message.created_at > 35.days.ago
+    # end
+
+      event_kind = ApplicationEventKind.where(:event_name => 'fourth_verifications_reminder').first
       # event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
 
-      notice_trigger = event_kind.notice_triggers.first 
-
+      notice_trigger = event_kind.notice_triggers.first
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
         template: notice_trigger.notice_template, 
@@ -85,7 +99,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
       puts 'processed--' + person.full_name
 
     rescue Exception  => e
-      case e.to_s 
+      case e.to_s
       when 'needs ssa validation!'
         pending_ssa_validation << person.full_name
       when 'mailing address not present'
@@ -110,4 +124,5 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   puts mailing_address_missing.count
   puts coverage_not_found.count
   puts others.count
+  puts found
 end
