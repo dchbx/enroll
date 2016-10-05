@@ -49,12 +49,12 @@ namespace :employers do
     if org.employer_profile.present?
       employer = org.employer_profile
       employer_attributes = []
-      employer_attributes << [org.legal_name, org.dba, org.fein, org.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state]
+      employer_attributes += [org.legal_name, org.dba, org.fein, org.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state]
       office_location = get_primary_office_location(org)
       if employer.general_agency_profile.present?
-        employer_attributes << [employer.general_agency_profile.fein, employer.general_agency_profile.legal_name] 
+        employer_attributes += [employer.general_agency_profile.fein, employer.general_agency_profile.legal_name] 
       else
-        employer_attributes << ["", ""] 
+        employer_attributes += ["", ""] 
       end
       employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
                               office_location.address.state, office_location.address.zip]
