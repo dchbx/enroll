@@ -492,7 +492,7 @@ function setProgressBar(){
   $('.progress-bar').css({'width': percentageCurrent + "%"});
   $('.divider-progress').css({'left': (percentageDivider - 1) + "%"});
 
-  barClass = currentVal <= dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
+  barClass = currentVal < dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
   $('.progress-bar').addClass(barClass);
 
   if(maxVal == 0){

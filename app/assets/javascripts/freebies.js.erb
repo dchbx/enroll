@@ -32,7 +32,14 @@ var Freebies = ( function( window, undefined ) {
 
 	function tooltip() {
 		// apply tooltips
-		$('[data-toggle="tooltip"]').tooltip();
+		$('[data-toggle="tooltip"]:not(".manual")').tooltip();
+	}
+
+	function manualTooltip() {
+		// apply tooltips
+		$('.manual[data-toggle="tooltip"]').tooltip({
+			trigger: 'manual'
+		}).tooltip('show');
 	}
 
 	function popover() {
@@ -77,6 +84,7 @@ var Freebies = ( function( window, undefined ) {
 	}
 
 	return {
+		manualTooltip: manualTooltip,
 		manualPopover: manualPopover,
     allFreebies : allFreebies,
 		floatlabels : floatLabels,
@@ -86,6 +94,6 @@ var Freebies = ( function( window, undefined ) {
 		tooltip : tooltip,
 		datePicker : datePicker,
 		fadeElement: fadeElement
-	  };
+	};
 
 } )( window );

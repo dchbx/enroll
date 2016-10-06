@@ -200,6 +200,7 @@ Then(/^.* creates and publishes a plan year$/) do
   find('.alert-notice')
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-publish-plan-year').click
+  wait_for_ajax
 end
 
 Then(/^.+ sees employer census family created$/) do

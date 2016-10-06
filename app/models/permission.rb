@@ -14,6 +14,7 @@ class Permission
   field :approve_ga, type: Boolean, default: false
   field :modify_admin_tabs, type: Boolean, default: false  
   field :view_admin_tabs, type: Boolean, default: false 
+  field :can_update_ssn, type: Boolean, default: false
 
   class << self
     def hbx_staff 

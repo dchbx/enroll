@@ -170,7 +170,7 @@ When(/^.+ assign employer to general agency$/) do
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Housecare Inc')]").click
   find("#assign_general_agency").click
-  sleep(1)
+
 end
 
 Then(/^.+ should see assign successful message$/) do

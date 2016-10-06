@@ -20,8 +20,9 @@
   </tbody>
 </table>
 
+<% enrollment = notice.enrollments.first %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You enrolled in an insurance plan through #{Settings.site.short_name} on #{notice.enrollments.first.created_at.strftime('%B %d, %Y')}.
+  content: "You enrolled in an insurance plan through #{Settings.site.short_name} on #{(enrollment.submitted_at || enrollment.created_at).strftime('%B %d, %Y')}.
 
   The information you provided does not match our records or is not enough to
   make a final determination of your eligibility. This is your first reminder notice to provide documentation."} %>

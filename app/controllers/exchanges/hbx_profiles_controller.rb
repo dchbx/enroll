@@ -362,6 +362,44 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def edit_dob_ssn
+    authorize Family, :can_update_ssn?
+    @person = Person.find(params[:id])
+    respond_to do |format|
+      format.js { render "edit_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
+    end
+  end
+
+  def verify_dob_change
+    @person = Person.find(params[:person_id])
+    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
+    respond_to do |format|
+      format.js { render "edit_enrollment", :new_ssn => params[:new_ssn], :new_dob => params[:new_dob] }
+    end
+  end
+
+  def update_dob_ssn
+    authorize  Family, :can_update_ssn?
+    @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
+    @ssn_match = Person.find_by_ssn(params[:person][:ssn])
+
+    if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
+      @dont_allow_change = true
+    else
+      begin
+        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        CensusEmployee.update_census_employee_records(@person, current_user) 
+      rescue Exception => e
+        @error_on_save = @person.errors.messages
+        @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
+      end
+    end
+    respond_to do |format|
+      format.js { render "edit_enrollment", person: @person } if @error_on_save
+      format.js { render "update_enrollment", person: @person}
+    end
+  end
+
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show

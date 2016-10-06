@@ -152,10 +152,10 @@
     </div>
   </div>
   <% if read_only == true %>
-  <% if !hbx_enrollment.is_coverage_waived? %>
-  <br/>
-  <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == hbx_enrollment.coverage_kind } } %>
-  <% end %>
+    <% if !hbx_enrollment.is_coverage_waived? %>
+    <br/>
+    <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment:  hbx_enrollment} %>
+    <% end %>
   <% end %>
 </div>
 
@@ -191,5 +191,5 @@
 </div>
 </div>
 <% else %>
-<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == hbx_enrollment.coverage_kind } } %>
+<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
 <% end %>

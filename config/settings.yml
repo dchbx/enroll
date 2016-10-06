@@ -85,7 +85,7 @@ aca:
         days: 5
       maximum_length:
         months: 2
-
+paper_notice: 'paper-notices'
 
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum

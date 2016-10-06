@@ -6,6 +6,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
+  before_action :find_or_build_consumer_role, only: [:home]
 
   def home
     set_flash_by_announcement
@@ -254,6 +255,10 @@ class Insured::FamiliesController < FamiliesController
     @employee_role = @person.active_employee_roles.first
   end
 
+  def find_or_build_consumer_role
+    @family.check_for_consumer_role
+  end
+
   def init_qualifying_life_events
     begin
       raise if @person.nil?
@@ -289,7 +294,6 @@ class Insured::FamiliesController < FamiliesController
         end
       end
     end
-
   end
 
   def check_for_address_info

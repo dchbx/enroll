@@ -116,7 +116,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
-  after_save :generate_family_search
+  #after_save :generate_family_search
   after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})
@@ -242,7 +242,7 @@ class Person
     end
   end
 
-  after_save :update_family_search_collection
+  #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
 
   def move_encrypted_ssn_errors
@@ -592,6 +592,33 @@ class Person
       Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
     end
 
+    def dob_change_implication_on_active_enrollments(person, new_dob)
+      # This method checks if there is a premium implication in all active enrollments when a persons DOB is changed.
+      # Returns a hash with Key => HbxEnrollment ID and, Value => true if  enrollment has Premium Implication.
+      premium_impication_for_enrollment = Hash.new
+      active_enrolled_hbxs = person.primary_family.active_household.hbx_enrollments.active.enrolled_and_renewal
+
+      # Iterate over each enrollment and check if there is a Premium Implication based on the following rule:
+      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the 
+      #       change is all within the 0-20 age range or all within the 61+ age range (20 >= age <= 61)
+      active_enrolled_hbxs.each do |hbx|
+        new_temp_person = person.dup
+        new_temp_person.dob = Date.strptime(new_dob.to_s, '%m/%d/%Y')
+        new_age     = new_temp_person.age_on(hbx.effective_on)  # age with the new DOB on the day coverage started
+        current_age = person.age_on(hbx.effective_on)           # age with the current DOB on the day coverage started
+
+        next if new_age == current_age # No Change in age -> No Premium Implication
+
+        # No Implication when the change is all within the 0-20 age range or all within the 61+ age range
+        if ( current_age.between?(0,20) && new_age.between?(0,20) ) || ( current_age >= 61 && new_age >= 61 )
+          #premium_impication_for_enrollment[hbx.id] = false
+        else
+          premium_impication_for_enrollment[hbx.id] = true
+        end
+      end
+      premium_impication_for_enrollment
+    end
+
     # Return an instance list of active People who match identifying information criteria
     def match_by_id_info(options)
       ssn_query = options[:ssn]
@@ -660,8 +687,8 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if (roles = person.employer_staff_roles.select{ |role| role.employer_profile_id.to_s == employer_profile_id.to_s }).present?
-        roles.each { |role| role.update_attributes!(:aasm_state => :is_closed) }
+      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
+        role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
         return false, 'No matching employer staff role'

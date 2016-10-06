@@ -32,7 +32,7 @@ Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   fill_in "user[oim_id]", :with => email
   fill_in "user[password]", :with => @pswd
   fill_in "user[password_confirmation]", :with => @pswd
-  sleep(1)
+
   find(:xpath, '//label[@for="user_email_or_username"]').set(email)
   # find('#user_email_or_username').set(email)
   #TODO this fixes the random login fails b/c of empty params on email

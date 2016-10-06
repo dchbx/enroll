@@ -134,7 +134,7 @@ class PlanYear
 
       coverage_filter = lambda do |enrollments, date|
         enrollments = enrollments.select{|e| e.terminated_on.blank? || e.terminated_on >= date}
-        
+
         if enrollments.size > 1
           enrollment = enrollments.detect{|e| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(e.aasm_state.to_s)}
           enrollment || enrollments.detect{|e| HbxEnrollment::RENEWAL_STATUSES.include?(e.aasm_state.to_s)}
@@ -257,13 +257,13 @@ class PlanYear
   def enrollment_period_errors
     errors = []
     minimum_length = RENEWING.include?(self.aasm_state) ? Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
-      : Settings.aca.shop_market.open_enrollment.minimum_length.days 
+      : Settings.aca.shop_market.open_enrollment.minimum_length.days
 
     if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
       errors.push "open enrollment period is less than minumum: #{minimum_length} days"
     end
 
-    enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on 
+    enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
       : Settings.aca.shop_market.open_enrollment.monthly_end_on
 
     if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
@@ -315,7 +315,7 @@ class PlanYear
       errors.merge!({publish: "You may only have one published plan year at a time"})
     end
 
-    if !is_publish_date_valid? 
+    if !is_publish_date_valid?
       errors.merge!({publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"})
     end
 
@@ -687,7 +687,7 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid? , :after => :trigger_renew_notice
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -705,7 +705,7 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => :trigger_auto_renew_notice
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -887,6 +887,25 @@ private
     TimeKeeper.date_of_record.end_of_day == end_on
   end
 
+  def trigger_renew_notice
+    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3a').first
+    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
+                                                  :subject => "PlanYear Renewal Notice(3A)",
+                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
+                                                  :template => application_event.notice_triggers.first.notice_template})
+    shop_notice.deliver
+  end
+
+  def trigger_auto_renew_notice
+    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3b').first
+    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
+                                                  :subject => "PlanYear Renewal Notice(3B)",
+                                                  :trigger_type => "auto",
+                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
+                                                  :template => application_event.notice_triggers.first.notice_template})
+    shop_notice.deliver
+  end
+
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
@@ -942,7 +961,7 @@ private
     if open_enrollment_end_on < open_enrollment_start_on
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
-    
+
     if open_enrollment_start_on < (start_on - 2.months)
       errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
     end
@@ -963,7 +982,7 @@ private
     end
 
     if ['draft', 'renewing_draft'].include?(aasm_state)
-      enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on 
+      enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
         : Settings.aca.shop_market.open_enrollment.monthly_end_on
 
       if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)

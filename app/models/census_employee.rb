@@ -504,6 +504,18 @@ class CensusEmployee < CensusMember
       query.to_a
     end
 
+    # Update CensusEmployee records when Person record is updated. (SSN / DOB change)
+    def update_census_employee_records(person, current_user)
+      person.employee_roles.each do |employee_role|
+        ce = employee_role.census_employee
+        if current_user.has_hbx_staff_role? && ce.present?
+          ce.ssn = person.ssn
+          ce.dob = person.dob
+          ce.save!(validate: false)
+        end
+      end
+    end 
+
   end
 
   aasm do
@@ -570,6 +582,20 @@ class CensusEmployee < CensusMember
         csv << (data + [census_employee.coverage_terminated_on])
       end
     end
+  end
+
+  def enrollments_for_display
+    enrollments = []
+
+    coverages_selected = lambda do |benefit_group_assignment|
+      return [] if benefit_group_assignment.blank?
+      coverages = benefit_group_assignment.hbx_enrollments.reject{|e| e.external_enrollment}
+      [coverages.detect{|c| c.coverage_kind == 'health'}, coverages.detect{|c| c.coverage_kind == 'dental'}]
+    end
+
+    enrollments += coverages_selected.call(active_benefit_group_assignment)
+    enrollments += coverages_selected.call(renewal_benefit_group_assignment)
+    enrollments.compact.uniq
   end
 
   private

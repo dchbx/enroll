@@ -166,7 +166,7 @@ end
 Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true)
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -235,10 +235,10 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
 
-  sleep(1)
+
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
-  sleep(1)
+
   find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
   step "I enter office location for #{default_office_location}"
   fill_in 'organization[email]', :with => Forgery('email').address
@@ -396,7 +396,7 @@ When(/^.+ accepts? the matched employer$/) do
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
-  sleep 3
+
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
   wait_for_ajax
@@ -452,7 +452,7 @@ When(/^.+ clicks? Add Member$/) do
 end
 
 Then(/^.+ should see the new dependent form$/) do
-  sleep 3
+
   expect(page).to have_content('Confirm Member')
 end
 
@@ -695,7 +695,7 @@ And(/I select three plans to compare/) do
     page.all("span.checkbox-custom-label")[1].click
     page.all("span.checkbox-custom-label")[2].click
     all('.compare-selected-plans-link')[1].click
-    sleep 3
+
     wait_for_ajax(10)
     expect(page).to have_content("Choose Plan - Compare Selected Plans")
     find(:xpath, '//*[@id="plan-details-modal-body"]/div[2]/button[2]').trigger('click')

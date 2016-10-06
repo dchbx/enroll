@@ -11,7 +11,7 @@ When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
   Caches::PlanDetails.load_record_cache!
-  sleep 2
+
   visit "/"
   click_link 'Consumer/Family Portal'
   screenshot("individual_start")
@@ -52,7 +52,7 @@ When(/user goes to register as an individual$/) do
 end
 
 When(/^\w+ clicks? on continue button$/) do
-  sleep(2)
+  wait_for_ajax
   click_link "Continue"
 end
 
@@ -270,9 +270,11 @@ end
 
 Then(/Individual asks for help$/) do
   find('.container .row div div.btn', text: 'Help').click
-  sleep 1
+
+  wait_for_ajax
   click_link "Help from a Customer Service Representative"
-  sleep 1
+
+  expect(page).to have_content "First name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
@@ -291,7 +293,7 @@ end
 
 When(/^a CSR exists/) do
   p = FactoryGirl.create(:person, :with_csr_role, first_name: "Sherry", last_name: "Buckner")
-  sleep 2
+  sleep 2 # Need to wait on factory
   FactoryGirl.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"] )
 end
 
@@ -335,7 +337,7 @@ end
 
 Then(/^click continue again$/) do
   wait_and_confirm_text /continue/i
-  sleep(1)
+
   scroll_then_click(@browser.a(text: /continue/i))
 end
 

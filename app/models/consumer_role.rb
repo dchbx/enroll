@@ -424,6 +424,26 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :verification_period_ended, to: :ssa_pending, :guard => [:call_ssa?]
     end
+
+    event :verifications_backlog, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :first_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :second_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :third_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
+    event :fourth_verifications_reminder, :after => [:record_transition] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
   end
 
   def invoke_verification!(*args)
@@ -618,6 +638,11 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
+  end
+
+  #check if consumer purchased a coverage and no response from hub in 24 hours
+  def processing_hub_24h?
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
   end
 
   def record_transition(*args)

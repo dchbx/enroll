@@ -42,6 +42,8 @@ class HbxEnrollment
   RENEWAL_STATUSES = %w(auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled)
   WAIVED_STATUSES = ["inactive", "renewing_waived"]
 
+  ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
+
   ENROLLMENT_KINDS = ["open_enrollment", "special_enrollment"]
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
@@ -129,6 +131,7 @@ class HbxEnrollment
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
+  scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
   scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
   scope :effective_asc,      -> { order(effective_on: :asc) }
@@ -235,7 +238,38 @@ class HbxEnrollment
       end
     end
 
+    def process_verification_reminders(date_passed)
+      people_to_check = Person.where("consumer_role.lawful_presence_determination.aasm_state" => "verification_outstanding")
+      families = Family.where("family_members.person_id" => {"$in" => people_to_check.map(&:_id)})
+
+      # TODO handle multiple enrollments with different special enrolment period dates
+      families.each do |family|
+        [10, 25, 50, 65].each do |reminder_days|
+          enrollment = family.enrollments.order(created_at: :desc).select{|e| e.currently_active? || e.future_active?}.first
+
+          if enrollment.special_verification_period.present? && enrollment.special_verification_period.strftime('%m/%d/%Y') == (date_passed + (95 - reminder_days).days).strftime('%m/%d/%Y')
+            consumer_role = family.primary_applicant.person.consumer_role
+            begin
+              case reminder_days
+              when 10
+                consumer_role.first_verifications_reminder
+              when 25
+                consumer_role.second_verifications_reminder
+              when 50
+                consumer_role.third_verifications_reminder
+              when 65
+                consumer_role.fourth_verifications_reminder
+              end
+            rescue Exception => e
+              Rails.logger.error e.to_s
+            end
+          end
+        end
+      end
+    end
+
     def advance_day(new_date)
+      # process_verification_reminders(new_date - 1.day)
 
       # families_with_contingent_enrollments.each do |family|
       #   enrollment = family.enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a.first
@@ -257,7 +291,7 @@ class HbxEnrollment
 
       HbxEnrollment.terminate_scheduled_enrollments
 
-      # #FIXME Families with duplicate renewals
+      #FIXME Families with duplicate renewals
       families_with_effective_renewals_as_of(new_date).each do |family|
         family.enrollments.renewing.each do |hbx_enrollment|
           if hbx_enrollment.effective_on <= new_date
@@ -826,6 +860,7 @@ class HbxEnrollment
       enrollment.benefit_package_id = benefit_package.try(:id)
 
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+
       if qle && enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"

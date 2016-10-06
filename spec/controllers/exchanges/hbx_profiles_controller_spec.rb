@@ -431,6 +431,73 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "GET edit_dob_ssn" do
+
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
+    let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
+    let(:permission_no) { FactoryGirl.create(:permission, :can_update_ssn => false)}
+    
+    it "should return authorization error for Non-Admin users" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = {:id => person.id, :format => 'js'}
+      xhr :get, :edit_dob_ssn, @params
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render the edit_dob_ssn partial for logged in users with an admin role" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = {:id => person.id, :format => 'js'}
+      xhr :get, :edit_dob_ssn, @params
+      expect(response).to have_http_status(:success)
+    end
+
+  end
+
+
+  describe "POST update_dob_ssn" do
+
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
+    let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
+    let(:permission_no) { FactoryGirl.create(:permission, :can_update_ssn => false)}
+    let(:invalid_ssn) { "234-45-839" }
+    let(:valid_ssn) { "234-45-8390" }
+    let(:valid_dob) { "03/17/1987" }
+
+    it "should render back to edit_enrollment if there is a validation error on save" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      xhr :get, :update_dob_ssn, @params
+      expect(response).to render_template('edit_enrollment')
+    end 
+
+    it "should render update_enrollment if the save is successful" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      xhr :get, :update_dob_ssn, @params
+      expect(response).to render_template('update_enrollment')
+    end 
+
+
+    it "should return authorization error for Non-Admin users" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return false
+      sign_in(user)
+      xhr :get, :update_dob_ssn
+      expect(response).not_to have_http_status(:success)
+    end
+
+  end
+
   describe "GET general_agency_index" do
     let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
     before :each do
@@ -449,3 +516,4 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 end
+

@@ -1830,6 +1830,84 @@ context "A cancelled external enrollment", :dbclean => :after_each do
   end
 end
 
+context '.process_verification_reminders' do 
+  context "when family exists with pending outstanding verifications" do
+
+    let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: rand(10000), person: consumer_role.person) }
+    let(:plan) { FactoryGirl.create(:plan) }
+
+    let(:hbx_enrollment) {
+      enrollment = family.active_household.new_hbx_enrollment_from(
+        consumer_role: consumer_role,
+        coverage_household: family.active_household.coverage_households.first,
+        benefit_package: benefit_package,
+        qle: true
+      )
+      enrollment.plan_id = plan.id
+      enrollment.aasm_state = 'coverage_selected'
+      enrollment
+    }
+
+    before do
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return(true)
+      hbx_enrollment.save
+      consumer_role.lawful_presence_determination.update_attributes(:aasm_state => 'verification_outstanding')
+      consumer_role.update_attributes(:aasm_state => 'verification_outstanding')
+    end
+
+    context 'when first verification due date reached' do 
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now) 
+      end
+
+      it 'should trigger first reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
+
+    context 'when second verification due date reached' do
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now) 
+      end
+
+      it 'should trigger second reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
+
+    context 'when third verification due date reached' do
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now) 
+      end
+
+      it 'should trigger third reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
+
+    context 'when fourth verification due date reached' do 
+      before do
+        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now) 
+      end 
+
+      it 'should trigger fourth reminder event' do
+        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+        consumer_role.reload
+        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+      end
+    end
+  end
+end
+
 describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage selected', type: :model, dbclean: :after_all do
 
   let!(:employer_profile) {

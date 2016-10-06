@@ -1036,9 +1036,11 @@ describe Person do
 
   describe "person_has_an_active_enrollment?" do
 
+
     let(:person) { FactoryGirl.create(:person) }
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
     let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
 
     context 'person_has_an_active_enrollment?' do
       let(:active_enrollment)   { FactoryGirl.create( :hbx_enrollment,
@@ -1046,7 +1048,9 @@ describe Person do
                                           employee_role_id: employee_role.id,
                                           is_active: true
                                        )}
+
       it 'returns true if person has an active enrollment.' do
+
         allow(person).to receive(:primary_family).and_return(primary_family)
         allow(primary_family).to receive(:enrollments).and_return([active_enrollment])
         expect(Person.person_has_an_active_enrollment?(person)).to be_truthy
@@ -1059,7 +1063,9 @@ describe Person do
                                           employee_role_id: employee_role.id,
                                           is_active: false
                                        )}
+
       it 'returns false if person does not have any active enrollment.' do
+
         allow(person).to receive(:primary_family).and_return(primary_family)
         allow(primary_family).to receive(:enrollments).and_return([inactive_enrollment])
         expect(Person.person_has_an_active_enrollment?(person)).to be_falsey
@@ -1076,6 +1082,57 @@ describe Person do
       expect(person.agent?).to be_truthy
     end
   end
+  
+  describe "dob_change_implication_on_active_enrollments" do
+    
+    let(:persons_dob) { TimeKeeper.date_of_record - 19.years }
+    let(:person) { FactoryGirl.create(:person, dob: persons_dob) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:enrollment)   { FactoryGirl.create( :hbx_enrollment,
+                                              household: primary_family.latest_household,
+                                              aasm_state: 'coverage_selected',
+                                              effective_on: TimeKeeper.date_of_record - 10.days,
+                                              is_active: true
+                                            )}
+    let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
+    let(:new_dob_without_premium_implication) { TimeKeeper.date_of_record - 17.years }
+    
+    let(:premium_implication_hash) { {enrollment.id => true} }
+    let(:empty_hash) { {} } 
+
+    before do
+      allow(person).to receive(:primary_family).and_return(primary_family)
+      allow(primary_family).to receive(:enrollments).and_return([enrollment])
+    end
+
+    it "should return a NON-EMPTY hash with at least one enrollment if DOB change RESULTS in premium change" do
+      expect(Person.dob_change_implication_on_active_enrollments(person, new_dob_with_premium_implication)).to eq premium_implication_hash
+    end
+
+    it "should return an EMPTY hash if DOB change DOES NOT RESULT in premium change" do
+      expect(Person.dob_change_implication_on_active_enrollments(person, new_dob_without_premium_implication)).to eq empty_hash
+    end
+    
+    context 'edge case when DOB change makes person 61' do
+      
+      let(:age_older_than_sixty_one) { TimeKeeper.date_of_record - 75.years }
+      let(:person_older_than_sixty_one) { FactoryGirl.create(:person, dob: age_older_than_sixty_one) }
+      let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
+      let(:enrollment)   { FactoryGirl.create( :hbx_enrollment, household: primary_family.latest_household, aasm_state: 'coverage_selected', effective_on: Date.new(2016,1,1), is_active: true)}
+      let(:new_dob_to_make_person_sixty_one)    { Date.new(1955,1,1) }
+  
+      before do
+        allow(person_older_than_sixty_one).to receive(:primary_family).and_return(primary_family)
+        allow(primary_family).to receive(:enrollments).and_return([enrollment])
+      end
+
+      it "should return an EMPTY hash if a person more than 61 year old changes their DOB so that they are 61 on the day the coverage starts" do
+        expect(Person.dob_change_implication_on_active_enrollments(person_older_than_sixty_one, new_dob_to_make_person_sixty_one)).to eq empty_hash 
+      end
+
+    end
+  end 
 
   describe "given a consumer role" do
     let(:consumer_role) { ConsumerRole.new }
