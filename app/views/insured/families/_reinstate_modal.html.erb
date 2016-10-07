@@ -1,0 +1,18 @@
+<div class="modal" id="reinstate_modal" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><bold>Please conform that you wish to reinstate this enrollment as of the date indicated below<bold></h4>
+      </div>
+      <div class="modal-body">
+       	The new Coverage starts from the date: <%= new_coverage_start_on(hbx_enrollment) %>
+        <ul class="application-warnings"></ul>
+      </div>
+      <div class="modal-footer">
+       	<%= link_to "Confirm", reinstate_confirm_insured_group_selections_path(:hbx_enrollment_id => hbx_enrollment) , method: :post, class: "btn btn-primary mtz  btn-small"%>
+        <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+      </div>
+    </div>
+  </div>
+</div>
