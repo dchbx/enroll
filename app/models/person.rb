@@ -862,6 +862,10 @@ class Person
     end
   end
 
+  def resident_role
+      resident_role ||= ResidentRole.new
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
