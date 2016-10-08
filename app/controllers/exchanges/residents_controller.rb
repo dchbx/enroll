@@ -40,7 +40,7 @@ class Exchanges::ResidentsController < ApplicationController
     else
       session.delete(:individual_assistance_path)
     end
-
+    binding.pry
     if params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]
       person = Person.find(session[:person_id])
 
@@ -48,9 +48,9 @@ class Exchanges::ResidentsController < ApplicationController
       @person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
       @person_params[:dob] = person.dob.strftime("%Y-%m-%d")
 
-      @person = Forms::ConsumerCandidate.new(@person_params)
+      @person = Forms::ResidentCandidate.new(@person_params)
     else
-      @person = Forms::ConsumerCandidate.new
+      @person = Forms::ResidentCandidate.new
     end
     respond_to do |format|
       format.html
@@ -58,54 +58,20 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def match
+
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
-
-    @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
-    @person = @consumer_candidate
+    @resident_candidate = Forms::ResidentCandidate.new(@person_params)
+    @person = @resident_candidate
     respond_to do |format|
-      if @consumer_candidate.valid?
-        idp_search_result = nil
-        if current_user.idp_verified?
-          idp_search_result = :not_found
-        else
-          idp_search_result = IdpAccountManager.check_existing_account(@consumer_candidate)
-        end
-        case idp_search_result
-        when :service_unavailable
-          format.html { render 'shared/account_lookup_service_unavailable' }
-        when :too_many_matches
-          format.html { redirect_to SamlInformation.account_conflict_url }
-        when :existing_account
-          format.html { redirect_to SamlInformation.account_recovery_url }
-        else
-          unless params[:persisted] == "true"
-            @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
+      found_person = @resident_candidate.match_person
+      if found_person.present?
+        session[:person_id] = found_person.id
+        binding.pry
 
-            if @employee_candidate.valid?
-              found_census_employees = @employee_candidate.match_census_employees
-              @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
-              if @employment_relationships.present?
-                format.html { render 'insured/employee_roles/match' }
-              end
-            end
-          end
-
-          found_person = @consumer_candidate.match_person
-          if found_person.present?
-            format.html { render 'match' }
-          else
-            format.html { render 'no_match' }
-          end
-        end
-      elsif @consumer_candidate.errors[:ssn_taken].present?
-        text = "The SSN entered is associated with an existing user. "
-        text += "Please #{view_context.link_to('Sign In', SamlInformation.iam_login_url)} with your user name and password "
-        text += "or #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-        flash[:alert] = text
-        format.html {redirect_to ssn_taken_insured_consumer_role_index_path}
+        format.html { render 'match' }
       else
-        format.html { render 'search' }
+        format.html { render 'no_match' }
       end
     end
   end
@@ -114,10 +80,14 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def create
+    binding.pry
     begin
       @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
       if @resident_role.present?
         @person = @resident_role.person
+        session[:person_id] = @person.id
+
+
       else
       # not logging error because error was logged in construct_consumer_role
         render file: 'public/500.html', status: 500
@@ -128,7 +98,7 @@ class Exchanges::ResidentsController < ApplicationController
       redirect_to search_exchanges_residents_path
       return
     end
-    create_sso_account(current_user, @person, 15, "individual") do
+    create_sso_account(current_user, @person, 15, "resident") do
       respond_to do |format|
         format.html {
           redirect_to :action => "edit", :id => @resident_role.id
@@ -138,8 +108,9 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def edit
-    #authorize @consumer_role, :edit?
-    set_consumer_bookmark_url
+    set_resident_bookmark_url
+    binding.pry
+    @resident_role = ResidentRole.find(params[:id])
     @resident_role.build_nested_models_for_person
   end
 
@@ -175,21 +146,6 @@ class Exchanges::ResidentsController < ApplicationController
     ]
   end
 
-  def find_consumer_role
-    @consumer_role = ConsumerRole.find(params.require(:id))
-  end
-
-  def check_consumer_role
-    set_current_person(required: false)
-    if @person.try(:has_active_consumer_role?)
-      redirect_to @person.consumer_role.bookmark_url || family_account_path
-
-    else
-      current_user.last_portal_visited = search_insured_consumer_role_index_path
-      current_user.save!
-      # render 'privacy'
-    end
-  end
 
   def set_error_message(message)
     if message.include? "year too big to marshal"

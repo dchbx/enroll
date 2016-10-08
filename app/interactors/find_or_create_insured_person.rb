@@ -37,6 +37,7 @@ class FindOrCreateInsuredPerson
           return
         end
       else
+        binding.pry
         person, is_new = Person.create(
           user: user,
           name_pfx: context.name_pfx,

@@ -212,12 +212,13 @@ module Factories
     end
 
     def self.construct_resident_role(person_params, user)
+      binding.pry
       person_params = person_params[:person]
       person, person_new = initialize_person(
         user, person_params["name_pfx"], person_params["first_name"],
         person_params["middle_name"] , person_params["last_name"],
         person_params["name_sfx"], person_params["ssn"],
-        person_params["dob"], person_params["gender"], "resident", person_params["no_ssn"]
+        person_params["dob"], person_params["gender"], "resident", true
         )
       if person.blank? && person_new.blank?
         begin
@@ -253,7 +254,7 @@ module Factories
 
     def self.find_or_build_resident_role(person)
       return person.resident_role if person.resident_role.present?
-      person.build_consumer_role(is_applicant: true)
+      person.build_resident_role(is_applicant: true)
     end
 
     private
