@@ -30,6 +30,8 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employer_index
+        get :employer_poc
+        post :employer_poc_datatable
         get :employer_invoice
         post :employer_invoice_datatable
         post :generate_invoice
