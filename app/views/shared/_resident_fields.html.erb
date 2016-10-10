@@ -1,1 +1,3 @@
-<h1>hiiiii</h1>
+<%= render "shared/race_and_ethnicity_options", f: f %>
+<%= hidden_field_tag :form_for_resident_role, f.object.is_a?(Person) %>
+<%= f.hidden_field :is_resident_role, value: 'true' %>

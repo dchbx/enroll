@@ -2,7 +2,7 @@ class FindOrCreateInsuredPerson
   include Interactor
 
   def call
-    binding.pry
+    #binding.pry
     user = context.user
     people = Person.match_by_id_info(ssn: context.ssn, dob: context.dob, last_name: context.last_name, first_name: context.first_name)
     person, is_new = nil, nil
@@ -37,7 +37,7 @@ class FindOrCreateInsuredPerson
           return
         end
       else
-        binding.pry
+        #binding.pry
         person, is_new = Person.create(
           user: user,
           name_pfx: context.name_pfx,

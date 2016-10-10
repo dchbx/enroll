@@ -40,7 +40,7 @@ class Exchanges::ResidentsController < ApplicationController
     else
       session.delete(:individual_assistance_path)
     end
-    binding.pry
+    #binding.pry
     if params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]
       person = Person.find(session[:person_id])
 
@@ -67,7 +67,7 @@ class Exchanges::ResidentsController < ApplicationController
       found_person = @resident_candidate.match_person
       if found_person.present?
         session[:person_id] = found_person.id
-        binding.pry
+        #binding.pry
 
         format.html { render 'match' }
       else
@@ -79,8 +79,16 @@ class Exchanges::ResidentsController < ApplicationController
   def show
   end
 
+  def build
+    set_current_person(required: false)
+    build_person_params
+    render 'match'
+  end
+
+
+
   def create
-    binding.pry
+    #binding.pry
     begin
       @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
       if @resident_role.present?
@@ -109,10 +117,41 @@ class Exchanges::ResidentsController < ApplicationController
 
   def edit
     set_resident_bookmark_url
-    binding.pry
+    #binding.pry
     @resident_role = ResidentRole.find(params[:id])
     @resident_role.build_nested_models_for_person
   end
+
+  def update
+    binding.pry
+    # need to add @resident_role to pundit?
+    # authorize @resident_role, :update?
+    save_and_exit =  params['exit_after_method'] == 'true'
+    redirect_to ridp_agreement_exchanges_residents_path
+  #  return
+  #  if save_and_exit
+  #    respond_to do |format|
+  #      format.html {redirect_to destroy_user_session_path}
+  #    end
+  #  else
+  #    @resident_role = ResidentRole.find(params[:id])
+  #    bubble_address_errors_by_person(@resident_role.person)
+  #    respond_to do |format|
+  #      format.html { render "edit" }
+  #    end
+  #  end
+  end
+
+  def ridp_agreement
+    set_current_person
+    if session[:original_application_type] == 'paper'
+      redirect_to insured_family_members_path(:resident_role_id => @person.resident_role.id)
+      return
+    else
+      set_resident_bookmark_url
+    end
+  end
+
 
   private
   def person_parameters_list

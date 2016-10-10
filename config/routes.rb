@@ -33,7 +33,9 @@ Rails.application.routes.draw do
     resources :residents, only: [:create, :edit, :update] do
       get :search, on: :collection
       post :match, on: :collection
+      post :build, on: :collection
       get :begin_resident_enrollment, on: :collection
+      get :ridp_agreement, on: :collection
     end
 
     resources :hbx_profiles do

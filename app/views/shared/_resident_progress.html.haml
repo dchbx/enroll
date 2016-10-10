@@ -28,6 +28,7 @@
     %span.circle-progress
     .vertical-line-progress
     Complete
+
 - if step == 1 && search_page == true
   = link_to "Continue", exchanges_residents_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
 - elsif step == 1

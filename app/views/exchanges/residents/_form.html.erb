@@ -7,11 +7,11 @@
         <p>Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.</p>
         <p class='memo'>* = required field</p>
         <%= render "shared/error_messages", object: f.object %>
-        <%= render 'shared/person/consumer_information', f: f %>
+        <%= render 'shared/person/resident_information', f: f %>
         <br>
-        <%= render 'shared/resident_fields', f: f %> 
+        <%= render 'shared/resident_fields', f: f %>
         <br>
-        <%= render 'shared/consumer_home_address_fields', f: f %><br>
+        <%= render 'shared/resident_home_address_fields', f: f %><br>
         <%= render 'shared/phone_fields', f: f %><br>
 
         <div id="email_info" class="row row-form-wrapper no-buffer">
@@ -25,7 +25,7 @@
 
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-        <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
+        <%= render  partial: 'shared/resident_progress', locals: {step: '1'} %>
         <%= render partial: 'shared/help_me_sign_up' %>
       </div>
     </div>
