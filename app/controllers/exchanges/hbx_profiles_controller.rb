@@ -1,7 +1,9 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include SepAll
+
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
-  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
+  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
@@ -250,7 +252,87 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     respond_to do |format|
       format.html { render "insured/families/index" }
+      format.js
+    end
+  end
+
+  def families_index_datatable
+    dt_query = extract_datatable_parameters
+    families_dt = []
+    all_families = Family.all
+    if dt_query.search_string.blank?
+      families_dt = all_families
+    else
+      #debugger
+      person_ids = Person.search(dt_query.search_string).pluck(:id)
+      families_dt = all_families.where({
+        "family_members.person_id" => {"$in" => person_ids}
+      })
+    end
+    @draw = dt_query.draw
+    @total_records = all_families.count
+    @records_filtered = families_dt.count
+
+    if families_dt.is_a? Array
+      @families = families_dt[dt_query.skip..@total_records.count]
+    else
+      @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
+    end
+    render "families_index_datatable"
+  end
+
+  def add_sep_form
+    getActionParams
+  end
+
+  def show_sep_history
+    getActionParams
+  end
+
+  def update_effective_date
+    @qle = QualifyingLifeEventKind.find(params[:id])
+    respond_to do |format|
       format.js {}
+    end
+    @effective_kinds = @qle.effective_on_kinds.map{|t| t.humanize}
+  end
+
+  def calculate_sep_dates
+    calculateDates
+    respond_to do |format|
+      format.js {}
+    end
+  end
+
+  def add_new_sep
+    if params[:qle_id].present?
+      createSep
+    end
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
+  def cancel_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    @row = params[:row]
+    respond_to do |format|
+      format.js { render "datatables/cancel_enrollment" }
+    end
+  end
+
+  def update_cancel_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    # debugger
+    if @hbx_enrollment.cancel_coverage!
+      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Cancellation Successful" }
+    end
+  end
+
+
+  def terminate_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    @row = params[:row]
+    respond_to do |format|
+      format.js { render "datatables/terminate_enrollment" }
     end
   end
 

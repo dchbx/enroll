@@ -1,0 +1,21 @@
+<%if  dual_role_without_shop_sep? %>
+
+  <!--TODO: Handle the case when a person has dual role and the only admin-SEP given out to them is from the IVL market -->
+
+<%else%>
+  
+  <div class="alert alert-notice">
+    <a href="#" data-dismiss="alert" class="close interaction-click-control-×">×</a>
+    <div class="row">
+      <div class="col-md-11 col-sm-12 col-xs-12">
+        <strong>
+        	You are eligible to enroll or change coverage through <%= @active_admin_sep.end_on %>.
+        	<i class="fa fa-lg fa-info-circle" data-toggle="tooltip" title="Your ‘<%=@active_admin_sep.title%>’ Qualifying Life Event resulted in a Special Enrollment Period starting <%=@active_admin_sep.start_on%>"></i> &nbsp;&nbsp;&nbsp;
+        	<%= build_link_for_sep_type(@active_admin_sep) %>
+        </strong>
+      </div>
+    </div>
+  </div>
+
+<%end%>
+

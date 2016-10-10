@@ -62,10 +62,10 @@ end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
   wait_for_ajax
-  if find_all('.interaction-click-control-continue', wait: 10).any?
+  if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
-    find('.interaction-click-control-shop-for-new-plan', wait: 10).click
+    find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
   end
 end
 
@@ -110,6 +110,7 @@ When(/Employee enters Qualifying Life Event/) do
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link "CONTINUE"
   click_button "Continue"
+  screenshot("completing SEP")
 end
 
 When(/Employee clicks continue on the family members page/) do

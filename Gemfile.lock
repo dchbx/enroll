@@ -1,4 +1,15 @@
 GIT
+  remote: https://github.com/aq1018/mongoid-history.git
+  revision: 1c69841f823d7ebf69fb2145d307d60b1500b89c
+  branch: master
+  specs:
+    mongoid-history (0.5.1)
+      activesupport
+      easy_diff
+      mongoid (>= 3.0)
+      mongoid-compatibility
+
+GIT
   remote: https://github.com/dchbx/acapi.git
   revision: d41e5fab75a77abca64f33278150735438acfff6
   branch: development
@@ -190,6 +201,7 @@ GEM
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
+    easy_diff (1.0.0)
     email_spec (2.0.0)
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
@@ -292,6 +304,9 @@ GEM
       tzinfo (>= 0.3.37)
     mongoid-autoinc (5.0.2)
       mongoid (~> 5.0)
+    mongoid-compatibility (0.4.0)
+      activesupport
+      mongoid (>= 2.0)
     mongoid-enum (0.4.0)
       mongoid (~> 5.0)
     mongoid-grid_fs (2.2.1)
@@ -304,6 +319,8 @@ GEM
     mongoid-versioning (2.0.0)
       activesupport (~> 4.0)
       mongoid (>= 4.0.0, <= 6.0.0)
+    mongoid_userstamp (0.4.0)
+      mongoid (>= 3.0.4)
     multi_json (1.12.1)
     multi_test (0.1.2)
     net-scp (1.2.1)
@@ -564,8 +581,10 @@ DEPENDENCIES
   mongoid (= 5.0.1)
   mongoid-autoinc
   mongoid-enum
+  mongoid-history!
   mongoid-rspec (= 3.0.0)
   mongoid-versioning
+  mongoid_userstamp
   newrelic_rpm
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper

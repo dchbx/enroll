@@ -611,4 +611,9 @@ module ApplicationHelper
   def find_plan_name(hbx_id)
     HbxEnrollment.find(hbx_id).try(:plan).try(:name)
   end
+
+  def has_new_hire_enrollment_period?(census_employee)
+    census_employee.new_hire_enrollment_period.present?
+  end  
+
 end

@@ -328,6 +328,11 @@ class Family
     special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
 
+  def active_admin_seps
+    special_enrollment_periods.find_all { |sep| sep.is_active? && sep.admin_flag }
+  end
+  
+
   # single SEP with latest end date from list of active SEPs
   def current_sep
     active_seps.max { |sep| sep.end_on }

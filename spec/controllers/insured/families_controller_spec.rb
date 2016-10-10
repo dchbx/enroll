@@ -48,7 +48,7 @@ RSpec.describe Insured::FamiliesController do
   let(:consumer_role) { double("ConsumerRole") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
-
+  let(:sep) { double("SpecialEnrollmentPeriod") }
 
   before :each do
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
@@ -71,6 +71,7 @@ RSpec.describe Insured::FamiliesController do
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
+      allow(family).to receive(:active_admin_seps).and_return([sep])
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
       allow(user).to receive(:has_employee_role?).and_return(true)
@@ -378,6 +379,7 @@ RSpec.describe Insured::FamiliesController do
     let(:user) { double(identity_verified?: true, idp_verified?: true) }
     let(:employee_roles) { double }
     let(:employee_role) { [double("EmployeeRole")] }
+    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
 
     before :each do
       allow(person).to receive(:user).and_return(user)
@@ -386,6 +388,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
+      allow(family).to receive_message_chain("special_enrollment_periods.where").and_return([special_enrollment_period])
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 
