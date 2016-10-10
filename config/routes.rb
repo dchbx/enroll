@@ -24,6 +24,11 @@ Rails.application.routes.draw do
       get :dismiss, on: :collection
     end
     resources :agents_inboxes, only: [:show, :destroy]
+    resources :residents, only: [:create, :edit, :update] do
+      get :search, on: :collection
+      post :match, on: :collection
+      get :begin_resident_enrollment, on: :collection
+    end
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 

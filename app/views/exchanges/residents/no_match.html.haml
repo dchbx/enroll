@@ -1,0 +1,15 @@
+= content_for :horizontal_status do
+  = render  partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1}
+.container
+  #new_person_wrapper
+    .row
+      = form_for @person, { :as => :person, :url => match_exchanges_residents_path, :method => :post } do |f|
+        .col-lg-7.col-md-7.col-sm-8.col-xs-12
+          %h3 Personal Information
+          = render 'exchanges/residents/remote_search_form', f: f
+          #person_search_results
+            = render 'no_match'
+          %br
+
+        .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+          = render  partial: 'shared/resident_progress', locals: {step: '1', search_page: true}

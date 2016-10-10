@@ -79,7 +79,3 @@ class Exchanges::AgentsController < ApplicationController
     return bookmark_path
   end
 end
-
-
-
-
