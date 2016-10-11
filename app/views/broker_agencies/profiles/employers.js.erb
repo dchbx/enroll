@@ -2,7 +2,7 @@ setTabContent("<%= escape_javascript render "employers" %>");
 set_active_ontab("#employers-tab");
 
 $(document).ready(function() {
-    $('#employers_dataTable').DataTable( {
+    $('#employers_dataTable').EnrollDataTable( {
       "order": [[ 2, "asc" ]],
       columnDefs: [
       				{ targets: [0,1,3,4,7], sorting: false}

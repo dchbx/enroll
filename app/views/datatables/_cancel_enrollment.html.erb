@@ -1,0 +1,61 @@
+<div class="vertically-aligned-row module">
+  <!-- Plan Name -->
+  <div>
+    <label>
+      <strong>
+        Plan
+      </strong>
+    </label>
+    <br/>
+    <%= @hbx_enrollment.plan.name %>
+  </div>
+  <!-- Effective Date -->
+  <div>
+    <label>
+      <strong>
+        Effective Date
+      </strong>
+    </label>
+    <br/>
+    <%= @hbx_enrollment.effective_on %>
+  </div>
+  <!-- Cancel date set to start date -->
+  <div>
+    <label>
+      <strong>
+        Cancellation Date
+      </strong>
+    </label>
+    <br/>
+    <%= @hbx_enrollment.effective_on %>
+  </div>
+  <!-- EDI Transmission to Carrier -->
+  <!-- EDI Transmisison checkbox -->
+
+  <%= form_for @hbx_enrollment, :url => { :action => "update_cancel_enrollment"}, :method => :post, :html => { :class => 'vertically-aligned-row' } do |f| %>
+  <div class="enroll-checkbox">
+    <div class="checkbox disabled">
+      <label>
+        <%= f.check_box :transmit_to_carrier %>
+        <%= f.label :transmit_to_carrier do %>
+        <%= hidden_field_tag :hbx_id, @hbx_enrollment.id %>
+        <i class="fa fa-check-square-o fa-2x"></i>
+        <i class="fa fa-square-o fa-2x"></i>
+        <span>
+          EDI Transmission to Carrier
+        </span>
+      </label>
+      <% end %>
+
+    </div>
+  </div>
+  <div>
+    <span class="btn btn-default btn-sm" onclick="EnrollDataTableInitializer.removeRow($(this));">Cancel</span>
+    <%= f.submit "Submit", class: 'btn btn-primary btn-sm' %>
+  </div>
+  <% end %>
+  <!-- Drop down with cancellation reasons -->
+
+  <!-- Submit button -->
+</div>
+<% @hbx_enrollment.inspect %>

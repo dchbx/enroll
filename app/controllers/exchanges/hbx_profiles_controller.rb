@@ -1,12 +1,16 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include DataTablesSorts
+  include DataTablesFilters
+  include SepAll
+
+  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :families_index_datatable, :update_cancel_enrollment, :update_terminate_enrollment]
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
-  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
-  before_action :check_csr_or_hbx_staff, only: [:family_index]
+  before_action :check_csr_or_hbx_staff, only: [:family_index, :families_index_datatable]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -250,7 +254,105 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     respond_to do |format|
       format.html { render "insured/families/index" }
+      format.js
+    end
+  end
+
+  def families_index_datatable
+
+    dt_query = extract_datatable_parameters
+    collection = []
+    all_families = Family.all
+
+    if dt_query.search_string.blank?
+      collection = all_families
+    else
+      #debugger
+      person_ids = Person.search(dt_query.search_string).pluck(:id)
+      collection = all_families.where({
+        "family_members.person_id" => {"$in" => person_ids}
+      })
+    end
+
+    collection = apply_sort_or_filter(collection, dt_query.skip, dt_query.take)
+
+    @draw = dt_query.draw
+    @total_records = all_families.count
+    @records_filtered = collection.count
+    if collection.is_a? Array
+      @families = collection[dt_query.skip..@total_records]
+    else
+      @families = collection.skip(dt_query.skip).limit(dt_query.take)
+    end
+    render "datatables/families_index_datatable"
+
+  end
+
+  def add_sep_form
+    getActionParams
+  end
+
+  def hide_form
+    getActionParams
+  end
+
+  def show_sep_history
+    getActionParams
+  end
+
+  def update_effective_date
+    @qle = QualifyingLifeEventKind.find(params[:id])
+    respond_to do |format|
       format.js {}
+    end
+    @effective_kinds = @qle.effective_on_kinds.map{|t| t.humanize}
+  end
+
+  def calculate_sep_dates
+    calculateDates
+    respond_to do |format|
+      format.js {}
+    end
+  end
+
+  def add_new_sep
+    if params[:qle_id].present?
+      createSep
+    end
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
+  def cancel_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    @row = params[:row]
+    respond_to do |format|
+      format.js { render "datatables/cancel_enrollment" }
+    end
+  end
+
+  def update_cancel_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    # debugger
+    if @hbx_enrollment.cancel_coverage!
+      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Cancellation Successful" }
+    end
+  end
+
+
+  def terminate_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    @row = params[:row]
+    respond_to do |format|
+      format.js { render "datatables/terminate_enrollment" }
+    end
+  end
+
+  def update_terminate_enrollment
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_id])
+    termination_date = Date.strptime(params[:termination_date], "%m/%d/%Y")
+
+    if @hbx_enrollment.schedule_coverage_termination!(termination_date)
+      redirect_to exchanges_hbx_profiles_path, :flash => { :success => "Termination Successful" }
     end
   end
 
@@ -339,11 +441,17 @@ class Exchanges::HbxProfilesController < ApplicationController
         "family_members.person_id" => {"$in" => person_ids}
       })
     end
+
+    sort_direction = set_sort_direction
+    families = sort_verifications_index_columns(families, sort_direction) if sort_direction.present?
+    filter = set_filter
+    employers = filter_employers(employers, filter) if filter.present?
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
     @families = families.skip(dt_query.skip).limit(dt_query.take)
-    render
+    render "datatables/verifications_index_datatable"
   end
 
   def product_index

@@ -77,6 +77,7 @@ end
 
 When(/(.*) clicks on Continue button on receipt page/) do |named_person|
   find('.interaction-click-control-continue').click
+  screenshot ("Please be right")
 end
 
 Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
@@ -110,6 +111,7 @@ When(/Employee enters Qualifying Life Event/) do
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link "CONTINUE"
   click_button "Continue"
+  screenshot("completing SEP")
 end
 
 When(/Employee clicks continue on the family members page/) do

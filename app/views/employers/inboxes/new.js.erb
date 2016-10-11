@@ -1,7 +1,8 @@
-$('#inbox_provider_form').hide();
-$('#message_form').show();
-$('#message_form').html("<%= escape_javascript(render "shared/inboxes/form") %>");
-$(".btn-danger").click(function(){
-  $('#message_form').hide();
-  $('#inbox_provider_form').show();
-});
+var $parent_row = $( ".table:first > tbody > tr:not(tr.child-row)" ).eq( <%= @row %> );
+if ( $('tr.child-row:visible').length > 0 ) {
+  $('tr.child-row:visible').remove();
+}
+if ( $parent_row.next().hasClass('child-row') ) {
+} else {
+  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render partial: "shared/inboxes/form" %></td></tr>');
+}

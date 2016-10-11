@@ -73,7 +73,7 @@ class HbxEnrollment
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
-  field :terminate_reason, type: String
+  field :transmit_to_carrier, type: Boolean, default: true
 
   field :plan_id, type: BSON::ObjectId
   field :carrier_profile_id, type: BSON::ObjectId
@@ -481,8 +481,18 @@ class HbxEnrollment
       benefit_group_assignment.save
     end
 
-    callback_context = { :hbx_enrollment => self }
-    HandleCoverageSelected.call(callback_context)
+    if consumer_role.present?
+      hbx_enrollment_members.each do |hem|
+        hem.person.consumer_role.invoke_verification!(effective_on)
+      end
+      notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+      self.published_to_bus_at = Time.now
+    else
+      if is_shop_sep?
+        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+        self.published_to_bus_at = Time.now
+      end
+    end
   end
 
   def should_transmit_update?

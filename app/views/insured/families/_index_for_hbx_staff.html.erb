@@ -1,30 +1,85 @@
-<%- model_class = Family -%>
-<%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
-
-<div class="row container">
-  <h3 class="title-inline">Families</h3>
-  <div class="form-inline button-group-wrapper families_search_div">
-    <div class="input-group search-wp">
-      <%= render 'shared/search', url: family_index_exchanges_hbx_profiles_path, q: @q, placeholder: "Name, HBX ID, SSN", remote: true %>
-    </div>
-  </div>
+<div class="module">
+  <%= render partial:"shared/data_table", locals: {
+    base_model: "families",
+    tab: "admin",
+    page_header:  ["Families", ""],
+    directions:  "",
+    new_button:  [],
+    sibling_pages: [],
+    processing_text: "",
+    custom_handlers: [
+      "AdminFamiliesDatatable.callAllAllFilter",
+      "AdminFamiliesDatatable.callAllIndividualFilter",
+      "AdminFamiliesDatatable.callAllEmployeeFilter",
+      "AdminFamiliesDatatable.callActiveAllFilter",
+      "AdminFamiliesDatatable.callActiveIndividualFilter",
+      "AdminFamiliesDatatable.callActiveEmployeeFilter",
+      "AdminFamiliesDatatable.callAllFilter"
+    ],
+    filters:  [
+       ["All", "javascript:;", false, []
+      ],
+      ["Individual-Enrolled", "javascript:;", true, [
+        ["All", "javascript:;", false],
+        ["Assisted", "javascript:;", false],
+        ["Unassisted", "javascript:;", false],
+        ["Cover All", "javascript:;", false],
+        ["SEP Eligible", "javascript:;", false]
+       ]
+     ],
+      ["Employer-Sponsored-Coverage-Enrolled", "javascript:;", true, [
+        ["All", "javascript:;", false],
+        ["Enrolled", "javascript:;", false],
+        ["Renewing", "javascript:;", false],
+        ["Waived", "javascript:;", false],
+        ["SEP Eligible", "javascript:;", false]
+      ]
+     ],
+      ["Non-Enrolled", "javascript:;", false, []
+     ],
+    ],
+    bulk_actions:  [
+      ["Export to CSV", "", ""]
+    ],
+    row_functions:  true,
+    row_actions:  [
+      ["Add SEP", "replace_url_add_sep_form", true ],
+      ["View SEP History", "replace_url_show_sep_history", true ],
+      ["Cancel", "replace_url_cancel", true ],
+      ["Terminate", "replace_url_terminate", true],
+      ["Collapse Form", "replace_url_hide_form", true]
+      # ["trash ", "url", "request_type", "Cancel/Terminate", "Cancel/Terminate", [
+      #   ["Cancel", cancel_enrollment_exchanges_hbx_profiles_path, true],
+      #   ["Terminate", "url", true]
+      # ]]
+    ],
+    buttons_below_table:  [
+      # ['Export CSV', 'url', 'request_type'],
+      # ['Print', 'url', 'request_type']
+    ],
+    row_data: true,
+    child_rows:  [false, "datatables/child_row"],
+    destroy: true,
+    responsive:  true,
+    checkboxes:  true,
+    pagination:  true,
+    ordering:  false,
+    info:  true,
+    table_id: "family-dataTable",
+    data_url: families_index_datatable_exchanges_hbx_profiles_path(:format => :json),
+    columns:  [
+      ["Name", "name", "", [false, ""]],
+      ["SSN", "ssn", "dt-center", [false, ""]],
+      ["DOB", "dob", "dt-center", [false, ""]],
+      ["HBX ID", "hbx_id", "dt-center", [false, ""]],
+      ["Family Count", "family_ct", "dt-center", [false, ""]],
+  	  ["Registered?", "registered", "dt-center", [false, ""]],
+  	  ["Consumer?", "consumer", "dt-center", [false, ""]],
+  	  ["Employee?", "employee", "dt-center", [false, ""]]
+  	]
+  } %>
 </div>
 
-<div class="row container">
-  <div id="families">
-    <%= render "insured/families/families_table_for_hbx_staff", families: @families %>
-  </div>
-
-  <div class="row container">
-    <div class="col-md-8" id="families_paginator">
-      <%= paginate @families, :remote => true, :param_name => "families_page" %>
-    </div>
-
-    <div class="col-md-4" id="families_count">
-      <p><%= "#{number_with_delimiter(@families.count)} / #{number_with_delimiter(Family.count)} " %><small>(families selected / total)</small></p>
-    </div>
-  </div>
-</div>
 <div class="row container">
   <%=render 'exchanges/agents/consumer_application_links' %>
 </div>

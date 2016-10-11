@@ -1,0 +1,32 @@
+<%- model_class = Family -%>
+<%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
+<div class="row container">
+  <h3 class="title-inline">Families</h3>
+  <div class="form-inline button-group-wrapper families_search_div">
+    <div class="input-group search-wp">
+      <%= render 'shared/search', url: family_index_exchanges_hbx_profiles_path, q: @q, placeholder: "Name, HBX ID, SSN", remote: true %>
+    </div>
+  </div>
+</div>
+
+<div class="row container">
+  <div id="families">
+    <%= render "insured/families/families_table_for_hbx_staff", families: @families %>
+  </div>
+
+  <div class="row container">
+    <div class="col-md-8" id="families_paginator">
+      <%= paginate @families, :remote => true, :param_name => "families_page" %>
+    </div>
+
+    <div class="col-md-4" id="families_count">
+      <p><%= "#{number_with_delimiter(@families.count)} / #{number_with_delimiter(Family.count)} " %><small>(families selected / total)</small></p>
+    </div>
+  </div>
+</div>
+<div class="row container">
+  <%=render 'exchanges/agents/consumer_application_links' %>
+</div>
+<div class='row container'>
+  <p> After working on an enrollment return to this page via the person icon in the header </p>
+</div>

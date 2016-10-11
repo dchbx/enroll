@@ -1,0 +1,14 @@
+var hide_form = ( function(window, undefined) {
+  function parentRow(){
+    var $parent_row = $(".table:first > tbody > tr:not(tr.child-row)").eq(<%= @row %>);
+    if ( $('tr.child-row:visible').length > 0 ) {
+        $("li>a:contains('Collapse Form')").eq(<%= @row %>).addClass('disabled');
+        $('tr.child-row:visible').remove();  
+        $('.dropdown.pull-right').removeClass('open');
+    }
+  }
+  return{
+    parentRow: parentRow
+  }
+})(window);
+hide_form.parentRow();

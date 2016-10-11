@@ -53,7 +53,7 @@
 <script type="text/javascript" charset="utf-8">
   // datatables setup
   $(document).ready(function() {
-    $('#ER-invoices-dataTable').DataTable( {
+    $('#ER-invoices-dataTable').EnrollDataTable( {
       "processing": true,
       "serverSide": true,
       "ordering" : false,
@@ -63,7 +63,6 @@
         url: "<%= employer_invoice_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
         type: "POST",
         data: function ( d ) {
-          console.log($('#ERInvoiceFilter-Group input:radio:checked').val());
           d.criteria = $('#ERInvoiceFilter-Group option:selected').val();
           d.invoice_date_criteria = $('#ERInvoiceFilter-Dropdown option:selected').val();
         }

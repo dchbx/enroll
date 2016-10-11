@@ -3,7 +3,7 @@ var Register = ( function( window, undefined ) {
   var charPassword;
   var minPasswordLength = 8;
   var baseScore = 0, score = 0;
-  
+
   var num = {};
   num.Excess = 0;
   num.Upper = 0;
@@ -15,7 +15,7 @@ var Register = ( function( window, undefined ) {
   bonus.Upper = 4;
   bonus.Numbers = 5;
   bonus.Symbols = 5;
-  bonus.Combo = 0; 
+  bonus.Combo = 0;
   bonus.FlatLower = 0;
   bonus.FlatNumber = 0;
 
@@ -186,9 +186,9 @@ var Register = ( function( window, undefined ) {
     init();
 
     if (charPassword.length >= minPasswordLength) {
-      baseScore = 50; 
-      analyzeString();  
-      calcComplexity();   
+      baseScore = 50;
+      analyzeString();
+      calcComplexity();
     } else {
       baseScore = 0;
     }
@@ -204,46 +204,45 @@ var Register = ( function( window, undefined ) {
     num.Upper = 0;
     num.Numbers = 0;
     num.Symbols = 0;
-    bonus.Combo = 0; 
+    bonus.Combo = 0;
     bonus.FlatLower = 0;
     bonus.FlatNumber = 0;
     baseScore = 0;
     score =0;
   }
 
-  function analyzeString() { 
+  function analyzeString() {
     for (i=0; i<charPassword.length;i++) {
       if (charPassword[i].match(/[A-Z]/g)) {num.Upper++;}
       if (charPassword[i].match(/[0-9]/g)) {num.Numbers++;}
-      if (charPassword[i].match(/(.*[!,@,#,$,%,^,&,*,?,_,~])/)) {num.Symbols++;} 
+      if (charPassword[i].match(/(.*[!,@,#,$,%,^,&,*,?,_,~])/)) {num.Symbols++;}
     }
 
     num.Excess = charPassword.length - minPasswordLength;
 
     if (num.Upper && num.Numbers && num.Symbols) {
-      bonus.Combo = 25; 
+      bonus.Combo = 25;
     } else if ((num.Upper && num.Numbers) || (num.Upper && num.Symbols) || (num.Numbers && num.Symbols)) {
-      bonus.Combo = 15; 
+      bonus.Combo = 15;
     }
 
-    if (strPassword.match(/^[\sa-z]+$/)) { 
+    if (strPassword.match(/^[\sa-z]+$/)) {
       bonus.FlatLower = -15;
     }
 
-    if (strPassword.match(/^[\s0-9]+$/)) { 
+    if (strPassword.match(/^[\s0-9]+$/)) {
       bonus.FlatNumber = -35;
     }
   }
-  
+
   function calcComplexity() {
     score = baseScore + (num.Excess*bonus.Excess) + (num.Upper*bonus.Upper) + (num.Numbers*bonus.Numbers) + (num.Symbols*bonus.Symbols) + bonus.Combo + bonus.FlatLower + bonus.FlatNumber;
-  } 
-  
+  }
+
   function outputResult() {
-    console.log(score);
     var complexity = $("#complexity");
     var pass_strength = $("#pass_strength");
-    if ($("#user_password").val()== "") { 
+    if ($("#user_password").val()== "") {
       complexity.html("").removeClass("weak strong stronger strongest").addClass("default");
       pass_strength.html("");
     } else if (score<50) {
@@ -321,16 +320,16 @@ var Register = ( function( window, undefined ) {
     $(element).val($.trim($(element).val()));
     var username= $(element).val();
     var email_regexp = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
-    
+
     if(email_regexp.test(username)) {
-      $('.email_field').addClass("hidden_field"); 
-      $('.email_field input').val(""); 
+      $('.email_field').addClass("hidden_field");
+      $('.email_field input').val("");
     }else if(username.length == 0 ){
-      $('.email_field').addClass("hidden_field"); 
+      $('.email_field').addClass("hidden_field");
       $('.email_field input').val("");
     }else{
-      $('.email_field').removeClass("hidden_field");  
-    }  
+      $('.email_field').removeClass("hidden_field");
+    }
   }
 
   function trimEmail(element){
