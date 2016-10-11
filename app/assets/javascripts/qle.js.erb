@@ -37,17 +37,17 @@ var QLE = ( function( window, undefined ) {
 } )( window );
 
 $(function () {
-	function check_qle_date() {
-		var date_value = $('#qle_date').val();
-		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
-		return true;
-	}
+  function check_qle_date() {
+    var date_value = $('#qle_date').val();
+    if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
+    return true;
+  }
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
-    $("#qle_date").val("");
+    //$("#qle_date").val("");
     var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
@@ -78,18 +78,20 @@ $(function () {
       var dateMax = pre_days + 'd';
     }
     var cur_qle_title = $('.qle-details-title').html();
-    $(target).val('');
+    //$(target).val('');
     $(target).datepicker('destroy');
     $(target).datepicker({
       changeMonth: true,
       changeYear: true,
       dateFormat: 'mm/dd/yy',
       defaultDate: cdate
-		});
+    });
   }
 
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
+    $('.seps-panel').addClass('hidden');
+    $('#no_qle_checkbox').parent().addClass('hidden');
     $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).data('title'));
     $('.qle-label').html($(this).data('label'));
@@ -107,15 +109,47 @@ $(function () {
     };
 
     $('#qle-details').removeClass('hidden');
+    $('#qle-details-for-existing-sep').addClass('hidden');
   });
 
-	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
+  $(document).on('click', 'a.existing-sep-item', function() {
+    $('#choose_flow').modal('hide');
+    //window.scrollTo(0, 0);
+    $('html,body').animate({scrollTop: 0});
     init_qle_message();
-		$('#qle-details').addClass('hidden');
-		$('#qle_flow_info #qle-menu').show();
-	});
+    $('.seps-panel').addClass('hidden');
+    $('#no_qle_checkbox').parent().addClass('hidden');
+    $('#qle_flow_info #qle-menu').hide();
+    $('.qle-details-title').html($(this).data('title'));
+    $('.qle-label').html($(this).data('label'));
+    $('#change_plan').val($(this).data('title'));
+    $('#qle_id').val($(this).data('id'));
+    $('#qle_reason .special_qle_reasons').addClass('hidden');
+    $('#qle-date-chose').show();
+    var is_self_attested = $(this).data('is-self-attested');
 
-	// Disable form submit on pressing Enter, instead click Submit link
+    $('#qle-details-for-existing-sep').removeClass('hidden');
+    $('#qle-details').addClass('hidden');
+
+  });
+
+  $(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
+    init_qle_message();
+    $('.seps-panel').removeClass('hidden');
+    $('#no_qle_checkbox').parent().removeClass('hidden');
+    $('#qle-details').addClass('hidden');
+    $('#qle_flow_info #qle-menu').show();
+  });
+
+  $(document).on('click', '#qle-details-for-existing-sep .close-popup, #qle-details-for-existing-sep .cancel', function() {
+    //init_qle_message();
+    //$('.seps-panel').removeClass('hidden');
+    //$('#no_qle_checkbox').parent().removeClass('hidden');
+    $('#qle-details-for-existing-sep').addClass('hidden');
+    //$('#qle_flow_info #qle-menu').show();
+  });
+
+  // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keyup keypress', function(e) {
     var code = e.keyCode || e.which;
     if (code == 13) {
@@ -125,7 +159,7 @@ $(function () {
     }
   });
 
-	/* QLE Date Validator */
+  /* QLE Date Validator */
   $(document).on('click', '#qle_submit', function() {
     if(check_qle_date()) {
       $('#qle_date').removeClass('input-error');
@@ -149,23 +183,25 @@ $(function () {
     }
   });
 
-	$(document).on('click', '#qle_continue_button', function() {
-		$('#qle_flow_info .initial-info').hide();
-		$('#qle_flow_info .qle-info').removeClass('hidden');
+  $(document).on('click', '#qle_continue_button', function() {
+    $('#qle_flow_info .initial-info').hide();
+    $('#qle_flow_info .qle-info').removeClass('hidden');
   });
 
-  $(document).on('page:update', function(){
-    if ($('select#effective_on_kind').length > 0){
-      $('form#qle_form').submit(function(e){
-        if ($('select#effective_on_kind').val() == "" || $('select#effective_on_kind').val() == undefined) {
-          $('#qle_effective_on_kind_alert').show();
-          e.preventDefault&&e.preventDefault();
-        } else {
-          $('#qle_effective_on_kind_alert').hide();
-        }
-      });
-    }
-  });
+$(document).on('page:update', function(){
+  if ($('select#effective_on_kind').length > 0){
+    $('form#qle_form').submit(function(e){
+      if ($('select#effective_on_kind').val() == "" || $('select#effective_on_kind').val() == undefined) {
+        $('#qle_effective_on_kind_alert').show();
+        e.preventDefault&&e.preventDefault();
+      } else {
+        $('#qle_effective_on_kind_alert').hide();
+      };
+    });
+  };
+
+  $('a.qle-menu-item.pre-selected').trigger('click').removeClass('pre-selected');
+});
 
   $(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
     if(this.checked) {

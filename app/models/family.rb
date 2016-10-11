@@ -72,7 +72,11 @@ class Family
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
-  index({"households.hbx_enrollments.kind" => 1})
+  index({"households.hbx_enrollments.kind" => 1,
+          "households.hbx_enrollments.aasm_state" => 1,
+          "households.hbx_enrollments.created_at" => 1},
+          {name: "kind_and_state_and_created"})
+
   index({"households.hbx_enrollments.submitted_at" => 1})
   index({"households.hbx_enrollments.effective_on" => 1})
   index({"households.hbx_enrollments.terminated_on" => 1}, { sparse: true })
@@ -104,9 +108,20 @@ class Family
  # after_save :update_family_search_collection
  # after_destroy :remove_family_search_record
 
+  default_scope -> {order("hbx_assigned_id ASC")}
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
       where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
     }
+
+  scope :enrolled_shop_market,        ->{ where(:"households.hbx_enrollments" => {:$elemMatch => {:kind => "employer_sponsored", :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}}) }
+  scope :enrolled_individual_market,  ->{ where(:"households.hbx_enrollments" => {:$elemMatch => {:kind.in => %w(unassisted_qhp insurance_assisted_qhp individual) }}) }
+  scope :enrolled,           ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :shop_market,        ->{ where(:"primary_applicant.person.user.present?" => true) }
+  scope :individual_market,  ->{ where(:"primary_family_member.person.consumer_role".in => %w(true)) }
+  scope :non_enrolled,           ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  # scope :individual_market_enrolled,  ->{ where(:"households.hbx_enrollments" => {:$elemMatch => {:kind.in => %w(unassisted_qhp insurance_assisted_qhp individual), :aasm_state.in => HbxEnrollment::ENROLLED_STATUSE}}) }
+  # scope :shop_market_enrolled,        ->{ where(:"households.hbx_enrollments" => {:$elemMatch => {:kind => "employer_sponsored", :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}}) }
+  # scope :individual_market_enrolled,  ->{ where(:"households.hbx_enrollments" => {:$elemMatch => {:kind.in => %w(unassisted_qhp insurance_assisted_qhp individual), :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}}) }
 
   scope :all_with_single_family_member,       ->{ exists({:'family_members.1' => false}) }
   scope :all_with_multiple_family_members,    ->{ exists({:'family_members.1' => true})  }
@@ -142,6 +157,7 @@ class Family
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
+
 
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
@@ -327,6 +343,11 @@ class Family
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
+
+  def active_admin_seps
+    special_enrollment_periods.find_all { |sep| sep.is_active? && sep.admin_flag }
+  end
+  
 
   # single SEP with latest end date from list of active SEPs
   def current_sep
