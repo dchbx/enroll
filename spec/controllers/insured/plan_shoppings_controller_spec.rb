@@ -54,7 +54,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
-  let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
   let(:family_members){ [family_member, family_member] }
@@ -328,6 +327,30 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
     end
+  end
+
+  context "GET plans" do
+      let(:family){ FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:household){ FactoryGirl.create(:household, family: family) }
+      let(:benefit_group){ FactoryGirl.create(:benefit_group) }
+      let(:tax_household){ FactoryGirl.build(:tax_household, household: household) }
+      let(:hbx_enrollment){ FactoryGirl.create(:hbx_enrollment,
+        household: household,
+        benefit_group: benefit_group,
+        coverage_kind: "health" )
+      }
+
+    before :each do
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(household).to receive(:latest_active_tax_household).and_return(tax_household)
+      sign_in user
+    end
+
+    it "should return correct hsa_eligibility" do
+      get :plans, id: hbx_enrollment.id, format: :js
+      expect(assigns(:plan_hsa_status)[benefit_group.elected_plan_ids.first.to_s]).to eq "yes"
+    end
+
   end
 
   context "GET show" do

@@ -142,23 +142,6 @@ class Products::Qhp
     "Accidental Dental"
   ]
 
-
-  def self.plan_hsa_status_map(plans)
-    plan_hsa_status = {}
-    @hios_ids = plans.map(&:hios_id)
-    @year = plans.first.present? ? plans.first.active_year : ""
-    qcsvs = get_cost_share_variances
-    qcsvs.map {|qcsv| plan_hsa_status[qcsv.plan.id.to_s] = qcsv.qhp.hsa_eligibility}
-
-    plan_hsa_status
-  end
-
-  def self.get_cost_share_variances
-    Rails.cache.fetch("csvs-hios-ids-#{@hios_ids}-year-#{@year}", expires_in: 5.hour) do
-      Products::QhpCostShareVariance.find_qhp_cost_share_variances(@hios_ids, @year, "")
-    end
-  end
-
   def self.csv_for(qhps, visit_types)
     (output = "").tap do
       CSV.generate(output) do |csv|

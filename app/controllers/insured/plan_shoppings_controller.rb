@@ -199,7 +199,7 @@ class Insured::PlanShoppingsController < ApplicationController
       sort_by_standard_plans(@plans)
       @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
     end
-    @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
+    @plan_hsa_status = @plans.each_with_object(Hash.new(0)){|plan, h| h[plan.id.to_s] = plan.hsa_eligibility}
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
   end

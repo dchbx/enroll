@@ -13,6 +13,7 @@ FactoryGirl.define do
     carrier_profile         { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
     maximum_age         66
+    hsa_eligibility     "yes"
 
     # association :premium_tables, strategy: :build
 

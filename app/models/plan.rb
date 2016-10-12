@@ -26,6 +26,7 @@ class Plan
   field :abbrev, type: String
   field :provider, type: String
   field :ehb, type: Float, default: 0.0
+  field :hsa_eligibility, type: String
 
   field :renewal_plan_id, type: BSON::ObjectId
   field :is_standard_plan, type: Boolean, default: false
