@@ -156,6 +156,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def show
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
+    set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -252,10 +253,13 @@ class Insured::PlanShoppingsController < ApplicationController
     if @hbx_enrollment.blank?
       @plans = []
     else
+      binding.pry
       if @market_kind == 'shop'
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+      elsif @market_kind == 'coverall'
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       end
     end

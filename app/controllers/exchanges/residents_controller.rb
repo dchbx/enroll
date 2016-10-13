@@ -1,5 +1,6 @@
 class Exchanges::ResidentsController < ApplicationController
   include ApplicationHelper
+  include Pundit
   include VlpDoc
   include ErrorBubble
 
@@ -123,11 +124,10 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def update
-    binding.pry
     # need to add @resident_role to pundit?
     # authorize @resident_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
-    redirect_to ridp_agreement_exchanges_residents_path
+    redirect_to ridp_bypass_exchanges_residents_path
   #  return
   #  if save_and_exit
   #    respond_to do |format|
@@ -142,7 +142,7 @@ class Exchanges::ResidentsController < ApplicationController
   #  end
   end
 
-  def ridp_agreement
+  def ridp_bypass
     set_current_person
     if session[:original_application_type] == 'paper'
       redirect_to insured_family_members_path(:resident_role_id => @person.resident_role.id)
@@ -152,7 +152,19 @@ class Exchanges::ResidentsController < ApplicationController
     end
   end
 
+  def find_sep
+    @hbx_enrollment_id = params[:hbx_enrollment_id]
+    @change_plan = params[:change_plan]
+    @employee_role_id = params[:employee_role_id]
 
+
+    @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
+
+    @market_kind = (params[:resident_role_id].present? && params[:resident_role_id] != 'None') ? 'coverall' : 'individual'
+
+    render :layout => 'application'
+  end
+  
   private
   def person_parameters_list
     [

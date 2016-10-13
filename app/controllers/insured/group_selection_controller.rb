@@ -8,6 +8,8 @@ class Insured::GroupSelectionController < ApplicationController
       'shop'
     elsif @person.try(:has_active_consumer_role?)
       'individual'
+    elsif @person.try(:has_active_resident_role?)
+      'coverall'
     else
       nil
     end
@@ -19,7 +21,8 @@ class Insured::GroupSelectionController < ApplicationController
 
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
-    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
+    @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
+    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
@@ -52,6 +55,7 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def create
+
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
@@ -81,8 +85,10 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
+
     # Set effective_on if this is a case of QLE with date options available.
     hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
+
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
@@ -146,6 +152,7 @@ class Insured::GroupSelectionController < ApplicationController
       end
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
+        resident_role: @person.resident_role,
         coverage_household: @coverage_household,
         benefit_group: benefit_group,
         benefit_group_assignment: benefit_group_assignment,
@@ -153,6 +160,14 @@ class Insured::GroupSelectionController < ApplicationController
     when 'individual'
       @coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
+        resident_role: @person.resident_role,
+        coverage_household: @coverage_household,
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+    when 'coverall'
+      #binding.pry
+      @coverage_household.household.new_hbx_enrollment_from(
+        consumer_role: @person.consumer_role,
+        resident_role: @person.resident_role,
         coverage_household: @coverage_household,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     end
@@ -160,6 +175,7 @@ class Insured::GroupSelectionController < ApplicationController
 
 
   def initialize_common_vars
+    #binding.pry
     person_id = params.require(:person_id)
     @person = Person.find(person_id)
     @family = @person.primary_family
@@ -170,6 +186,9 @@ class Insured::GroupSelectionController < ApplicationController
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
       @role = @employee_role
+    elsif params[:resident_role_id].present?
+      @resident_role = @person.resident_role
+      @role = @resident_role
     else
       @consumer_role = @person.consumer_role
       @role = @consumer_role

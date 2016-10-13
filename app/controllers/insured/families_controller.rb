@@ -53,6 +53,7 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
+    @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
 
@@ -98,13 +99,20 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def find_sep
+    #binding.pry
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
+
+    @resident_role_id = params[:resident_role_id]
+
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
-    @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first unless params.key?(:shop_for_plan)
+    if (params[:resident_role_id].present? && params[:resident_role_id])
+      @market_kind = "coverall"
+    end
+
     render :layout => 'application'
   end
 

@@ -35,7 +35,8 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :begin_resident_enrollment, on: :collection
-      get :ridp_agreement, on: :collection
+      get :ridp_bypass, on: :collection
+      get :find_sep, on: :collection
     end
 
     resources :hbx_profiles do
@@ -194,8 +195,13 @@ Rails.application.routes.draw do
 
     root 'families#home'
 
-    resources :family_members
-
+    resources :family_members do
+      get :resident_index, on: :collection
+      get :new_resident_dependent, on: :collection
+      get :edit_resident_dependent, on: :member
+      get :show_resident, on: :collection
+    end
+    
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
