@@ -992,7 +992,7 @@ end
 describe HbxEnrollment, dbclean: :after_each do
 
   context ".can_select_coverage?" do
-    let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+    let(:employer_profile){ FactoryGirl.create(:employer_profile) }
 
     let(:calender_year) { TimeKeeper.date_of_record.year }
 
@@ -1277,6 +1277,73 @@ context "Benefits are terminated" do
   end
 end
 
+
+context "Reinstate a terminated enrollment" do
+  let(:effective_on_date)         { TimeKeeper.date_of_record.beginning_of_month }
+  let(:benefit_group)             { FactoryGirl.create(:benefit_group) }
+  let!(:hbx_profile)               { FactoryGirl.create(:hbx_profile) }
+  let(:terminated_on_date)        {effective_on_date + 10.days}
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(effective_on_date.year, 6, 1))
+  end
+
+   context "Individual benefit" do
+    let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment,
+                                                    household: ivl_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_on_date,
+                                                    enrollment_kind: "open_enrollment",
+                                                    kind: "individual",
+                                                    aasm_state: "coverage_terminated",
+                                                    terminated_on: terminated_on_date
+                                                  )
+                                                }
+
+  
+    it "should be a coverage_reinstated" do
+      ivl_enrollment.reinstate
+      expect(ivl_enrollment.aasm_state).to eq "coverage_reinstated"
+    end
+
+    it "effective_on date should be terminated_on plus 1 day " do
+      ivl_enrollment.reinstate
+      expect(ivl_enrollment.reload.effective_on).to eq terminated_on_date+1.days
+      expect(ivl_enrollment.reload.terminated_on).to eq nil
+    end
+  end
+
+    context "SHOP benefit" do
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:shop_termination_date)  { TimeKeeper.date_of_record.end_of_month }
+    let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+                                                    household: shop_family.latest_household,
+                                                    coverage_kind: "health",
+                                                    effective_on: effective_on_date,
+                                                    enrollment_kind: "open_enrollment",
+                                                    kind: "employer_sponsored",
+                                                    submitted_at: effective_on_date - 10.days,
+                                                    benefit_group_id: benefit_group.id,
+                                                    aasm_state: "coverage_terminated",
+                                                    terminated_on: shop_termination_date
+                                                  )
+                                                }
+
+    
+
+    it "should be a coverage_reinstated" do
+      shop_enrollment.reinstate
+      expect(shop_enrollment.aasm_state).to eq "coverage_reinstated"
+    end
+
+    it "effective_on date should be terminated_on plus 1 day " do
+      shop_enrollment.reinstate
+      expect(shop_enrollment.reload.effective_on).to eq shop_termination_date+1.days
+      expect(shop_enrollment.reload.terminated_on).to eq nil
+    end
+   
+  end
+end
 
 
 
