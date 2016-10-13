@@ -83,7 +83,7 @@
           </div>
         </div>
 
-        <% if @person.has_active_consumer_role? %>
+        <% if @person.has_active_resident_role? %>
           <br>
           <%= render 'shared/resident_fields', f: f %>
           <div id="dependent-address">
@@ -97,9 +97,6 @@
               <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
             </div>
           </div>
-        <% elsif @person.has_active_employee_role? %>
-          <%= f.hidden_field :same_with_primary, value: 'false' %>
-          <%= render 'shared/address_fields_for_dependent', f: f %>
         <% end %>
 
         <%= f.hidden_field :family_id %>

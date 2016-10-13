@@ -3,20 +3,35 @@ class ResidentRole
   include Mongoid::Timestamps
   include AASM
 
+  RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
+
   embedded_in :person
+
+  embeds_one :lawful_presence_determination
 
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
+  field :is_state_resident, type: Boolean, default:true
+  field :residency_determined_at, type: DateTime
 
   delegate :hbx_id,           to: :person, allow_nil: true
   delegate :ssn, :ssn=,       to: :person, allow_nil: true
   delegate :dob, :dob=,       to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
+  delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
+
+  delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
+  delegate :citizen_status=, :citizenship_result=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
+
   validates_presence_of :dob, :gender
 
   accepts_nested_attributes_for :person
+
+  embeds_many :local_residency_responses, class_name:"EventResponse"
+
+  alias_method :is_incarcerated?,   :is_incarcerated
 
   def parent
     raise "undefined parent: Person" unless person?
@@ -42,6 +57,7 @@ class ResidentRole
     end
 
     (Address::KINDS - ['work']).each do |kind|
+      binding.pry
       person.addresses.build(kind: kind) if person.addresses.select { |address| address.kind.to_s.downcase == kind }.blank?
     end
 
@@ -52,6 +68,59 @@ class ResidentRole
 
   def is_active?
     self.is_active
+  end
+
+  def setup_lawful_determination_instance
+    unless self.lawful_presence_determination.present?
+      self.lawful_presence_determination = LawfulPresenceDetermination.new
+    end
+  end
+
+  def lawful_presence_determination_instance
+    setup_lawful_determination_instance
+    self.lawful_presence_determination
+  end
+
+  def latest_active_tax_household_with_year(year)
+    person.primary_family.latest_household.latest_active_tax_household_with_year(year)
+  rescue => e
+    log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
+    nil
+  end
+
+  def start_residency_verification_process
+    notify(RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.person})
+  end
+
+  def update_by_person(*args)
+    person.addresses = []
+    person.phones = []
+    person.emails = []
+    person.update_attributes(*args)
+  end
+
+
+  private
+  def mark_residency_denied(*args)
+    self.residency_determined_at = Time.now
+    self.is_state_resident = false
+  end
+
+  def mark_residency_authorized(*args)
+    self.residency_determined_at = Time.now
+    self.is_state_resident = true
+  end
+
+  def residency_pending?
+    is_state_resident.nil?
+  end
+
+  def residency_denied?
+    (!is_state_resident.nil?) && (!is_state_resident)
+  end
+
+  def residency_verified?
+    is_state_resident?
   end
 
 end

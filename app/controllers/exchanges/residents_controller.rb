@@ -4,6 +4,7 @@ class Exchanges::ResidentsController < ApplicationController
   include VlpDoc
   include ErrorBubble
 
+  before_action :find_resident_role, only: [:edit, :update]
 
   def index
     @resident_enrollments = Person.where(:resident_enrollment_id.nin =>  ['', nil]).map(&:resident_enrollment)
@@ -42,7 +43,7 @@ class Exchanges::ResidentsController < ApplicationController
       session.delete(:individual_assistance_path)
     end
     #binding.pry
-    if params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]
+    if params.permit(:build_resident_role)[:build_resident_role].present? && session[:person_id]
       person = Person.find(session[:person_id])
 
       @person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
@@ -118,8 +119,7 @@ class Exchanges::ResidentsController < ApplicationController
 
   def edit
     set_resident_bookmark_url
-    #binding.pry
-    @resident_role = ResidentRole.find(params[:id])
+    binding.pry
     @resident_role.build_nested_models_for_person
   end
 
@@ -127,7 +127,16 @@ class Exchanges::ResidentsController < ApplicationController
     # need to add @resident_role to pundit?
     # authorize @resident_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
-    redirect_to ridp_bypass_exchanges_residents_path
+    if save_and_exit
+      respond_to do |format|
+        format.html {redirect_to destroy_user_session_path}
+      end
+    else
+      binding.pry
+      @resident_role.build_nested_models_for_person
+      @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+      redirect_to ridp_bypass_exchanges_residents_path
+    end
   #  return
   #  if save_and_exit
   #    respond_to do |format|
@@ -164,7 +173,7 @@ class Exchanges::ResidentsController < ApplicationController
 
     render :layout => 'application'
   end
-  
+
   private
   def person_parameters_list
     [
@@ -217,4 +226,7 @@ class Exchanges::ResidentsController < ApplicationController
     @person_params.merge!({user_id: current_user.id})
   end
 
+  def find_resident_role
+    @resident_role = ResidentRole.find(params.require(:id))
+  end
 end

@@ -253,14 +253,14 @@ class Insured::PlanShoppingsController < ApplicationController
     if @hbx_enrollment.blank?
       @plans = []
     else
-      binding.pry
+      #binding.pry
       if @market_kind == 'shop'
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       elsif @market_kind == 'coverall'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
     end
     # for carrier search options

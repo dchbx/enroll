@@ -121,10 +121,7 @@ class HbxEnrollment
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
   associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
-<<<<<<< HEAD
-=======
   associated_with_one :resident_role, :resident_role_id, "ResidentRole"
->>>>>>> 7e5433672... Refs #11076 need to add plans
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
   delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
@@ -737,12 +734,8 @@ class HbxEnrollment
   #   return @benefit_coverage_period if defined? @benefit_coverage_period
   # end
 
-<<<<<<< HEAD
+
   def decorated_elected_plans(coverage_kind, market=nil)
-=======
-  def decorated_elected_plans(coverage_kind)
-    binding.pry
->>>>>>> 7e5433672... Refs #11076 need to add plans
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
@@ -753,7 +746,7 @@ class HbxEnrollment
     end
 
     tax_household = household.latest_active_tax_household_with_year(effective_on.year)
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, market, tax_household)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -858,11 +851,8 @@ class HbxEnrollment
     end
   end
 
-<<<<<<< HEAD
-  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
-=======
+
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil)
->>>>>>> 7e5433672... Refs #11076 need to add plans
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
 
