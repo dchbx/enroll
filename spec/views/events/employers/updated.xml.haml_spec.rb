@@ -109,7 +109,6 @@ RSpec.describe "events/employers/updated.haml.erb" do
         end
       end
 
-
       context "staff is owner" do
         let(:staff_and_owner) { FactoryGirl.create(:person, first_name: 'name5') }
 
@@ -127,7 +126,6 @@ RSpec.describe "events/employers/updated.haml.erb" do
     end
 
   end
-
 
   (1..15).to_a.each do |rnd|
 
