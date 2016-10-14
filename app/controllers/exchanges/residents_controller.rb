@@ -42,7 +42,6 @@ class Exchanges::ResidentsController < ApplicationController
     else
       session.delete(:individual_assistance_path)
     end
-    #binding.pry
     if params.permit(:build_resident_role)[:build_resident_role].present? && session[:person_id]
       person = Person.find(session[:person_id])
 
@@ -69,7 +68,6 @@ class Exchanges::ResidentsController < ApplicationController
       found_person = @resident_candidate.match_person
       if found_person.present?
         session[:person_id] = found_person.id
-        #binding.pry
 
         format.html { render 'match' }
       else
@@ -90,7 +88,6 @@ class Exchanges::ResidentsController < ApplicationController
 
 
   def create
-    #binding.pry
     begin
       @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
       if @resident_role.present?
@@ -119,7 +116,6 @@ class Exchanges::ResidentsController < ApplicationController
 
   def edit
     set_resident_bookmark_url
-    binding.pry
     @resident_role.build_nested_models_for_person
   end
 
@@ -132,7 +128,6 @@ class Exchanges::ResidentsController < ApplicationController
         format.html {redirect_to destroy_user_session_path}
       end
     else
-      binding.pry
       @resident_role.build_nested_models_for_person
       @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       redirect_to ridp_bypass_exchanges_residents_path
@@ -195,6 +190,7 @@ class Exchanges::ResidentsController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,

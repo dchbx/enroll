@@ -122,7 +122,6 @@ class BenefitCoveragePeriod
   end
 
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, market, tax_household=nil)
-    #binding.pry
     ivl_bgs = []
     benefit_packages.each do |bg|
       satisfied = true

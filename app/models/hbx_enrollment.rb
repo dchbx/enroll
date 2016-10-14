@@ -798,6 +798,12 @@ class HbxEnrollment
       else
         benefit_sponsorship.current_benefit_period.earliest_effective_date
       end
+    when 'coverall'
+      if qle && family.is_under_special_enrollment_period?
+        family.current_sep.effective_on
+      else
+        benefit_sponsorship.current_benefit_period.earliest_effective_date
+      end
     end
   rescue => e
     log(e.message, {:severity => "error"})
@@ -893,7 +899,6 @@ class HbxEnrollment
         raise "You may not enroll until you're eligible under an enrollment period"
       end
     when resident_role.present?
-      #binding.pry
       enrollment.kind = "coverall"
       enrollment.resident_role = resident_role
       if qle && enrollment.family.is_under_special_enrollment_period?
@@ -909,7 +914,6 @@ class HbxEnrollment
       raise "either employee_role or consumer_role is required" unless resident_role.present?
     end
     coverage_household.coverage_household_members.each do |coverage_member|
-      #binding.pry
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on
       enrollment_member.coverage_start_on = enrollment.effective_on

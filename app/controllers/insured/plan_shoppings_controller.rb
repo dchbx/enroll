@@ -253,7 +253,6 @@ class Insured::PlanShoppingsController < ApplicationController
     if @hbx_enrollment.blank?
       @plans = []
     else
-      #binding.pry
       if @market_kind == 'shop'
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)

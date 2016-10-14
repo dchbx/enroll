@@ -762,6 +762,7 @@ class Person
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
   attr_accessor :is_consumer_role
+  attr_accessor :is_resident_role
 
   before_save :assign_citizen_status_from_consumer_role
 

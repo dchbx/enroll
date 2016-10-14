@@ -249,7 +249,6 @@ module Factories
     end
 
     def self.construct_resident_role(person_params, user)
-      #binding.pry
       person_params = person_params[:person]
       person, person_new = initialize_person(
         user, person_params["name_pfx"], person_params["first_name"],
@@ -311,7 +310,6 @@ module Factories
           no_ssn: no_ssn,
           role_type: role_type
         }
-        #binding.pry
         result = FindOrCreateInsuredPerson.call(person_attrs)
         return result.person, result.is_new
     end

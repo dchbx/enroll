@@ -223,6 +223,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,

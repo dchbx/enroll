@@ -2,6 +2,9 @@ class ResidentRole
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
+  include SetCurrentUser
+  include Mongoid::Attributes::Dynamic
 
   RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
 
@@ -57,7 +60,6 @@ class ResidentRole
     end
 
     (Address::KINDS - ['work']).each do |kind|
-      binding.pry
       person.addresses.build(kind: kind) if person.addresses.select { |address| address.kind.to_s.downcase == kind }.blank?
     end
 
