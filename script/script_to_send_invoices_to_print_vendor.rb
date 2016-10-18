@@ -43,7 +43,7 @@ FEINS= ["371453243","521837305","383943185","521008522","530115970","870469987",
 
 FEINS.each do |fein|
   organization = Organization.where(:fein => fein).first
-  invoices = organization.invoices.select {|i| i.date == DateTime.parse("2016-09-14") }
+  invoices = organization.invoices.select {|i| i.date == DateTime.parse("2016-10-14") }
   dir_name = "invoices_to_send"
   dir=FileUtils.mkdir_p(dir_name)
   invoices.each do |i|
@@ -53,8 +53,7 @@ FEINS.each do |fein|
     t.write(file_content)
     t.close
   end
-	
-  puts "creating a tar file now"
-  system("tar -zcvf #{dir_name}.tar.gz #{dir_name}")
-  puts "Folder created!"
 end
+puts "creating a tar file now"
+system("tar -zcvf #{dir_name}.tar.gz #{dir_name}")
+puts "Folder created!"
