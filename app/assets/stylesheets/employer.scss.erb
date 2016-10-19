@@ -231,6 +231,19 @@
       width: 100%;
     }
   }
+  &.broker {
+    .panel-body, .panel-footer {
+      .fa {
+        color: $primary-blue;
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        > * {
+          vertical-align: top;
+        }
+      }
+    }
+  }
   &.home-tab {
     .plan-details {
       border-top: none !important;

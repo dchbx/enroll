@@ -99,12 +99,6 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def notice_uploaded_notification(person)
-    mail({to: person.user.email, subject: "New Notice Uploaded"}) do |format|
-      format.html { render "notice_uploaded", :locals => { :person_name => person.full_name }}
-    end
-  end
-
   def broker_pending_notification(broker_role,unchecked_carriers)
     subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
     subject_prefix = broker_role.training || broker_role.training == true ? "Completed NAHU Training" : "Needs to Complete NAHU training"

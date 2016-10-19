@@ -1,28 +1,62 @@
-<% if @person && @person.primary_family && @person.primary_family.current_broker_agency.present? %>
+<% broker_and_agency_present = true if @person && @person.primary_family && @person.primary_family.current_broker_agency.present? %>
 <div class="panel panel-default module consumer-broker-widget">
   <div class="panel-heading">
     <h3 class="panel-title">
       <strong>
+        <% if broker_and_agency_present %>
         Your Broker or Assister
+        <% else %>
+        Select a Broker or Assister
+        <% end %>
       </strong>
     </h3>
   </div>
   <div class="panel-body">
     <div class="text-center">
-      <i class="fa fa-user fa-3x" aria-hidden="true"></i>
+      <i aria-hidden="true" class="fa fa-user fa-3x"></i>
+      <% if broker_and_agency_present %>
       <br/>
-      <%=  @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+      <span class="word-break">
+        <%=  @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+      </span>
+      <% else %>
+      <br/>
+      No Selection
+      <% end %>
     </div>
     <div class="text-left">
-        <div class="broker-information">
+      <% if broker_and_agency_present %>
+      <div class="broker-information">
+        <span class="word-break">
           <%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %>
           <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %>
-          <br/>
-          <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1 <%= @person.primary_family.current_broker_agency.writing_agent.phone %></a>
-          <br/>
-          <%= mail_to @person.primary_family.current_broker_agency.writing_agent.email.address, @person.primary_family.current_broker_agency.writing_agent.email.address %><br>
-        </div>
+        </span>
+        <br/>
+        <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1
+          <%= @person.primary_family.current_broker_agency.writing_agent.phone %></a>
+        <br/>
+        <span class="word-break">
+          <%= mail_to @person.primary_family.current_broker_agency.writing_agent.email.address, @person.primary_family.current_broker_agency.writing_agent.email.address %>
+        </span>
+        <br>
+      </div>
+      <% else %>
+      <%= link_to "Get Help Signing Up", '', class: 'btn btn-default btn-block', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
+      <small>
+        <%= link_to "What is an Assister?", '', data: { target: '#read_only_modal_what_is_an_assister', toggle: 'modal' } %>
+      </small>
+      <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_an_assister', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: "What is an assister?", body: "Assisters help Individuals, Families and Small Businesses in the District find quality, affordable health insurance through DC Health Link. Assisters are trained experts with deep roots and trusted relationships in the District and its communities. They include consumer and patient advocates, civic and faith-based organizations, business leaders and others. Assisters must complete more than 30 hours of rigorous training and pass criminal background checks prior to service. There is no cost to use an Assister." } %>
+      <br/>
+      <small>
+        <%= link_to "What is a Broker?", '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
+      </small>
+      <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: "What is a broker?", body: "Brokers are licensed professionals with health insurance expertise and long-standing relationships with Small Business owners, Individuals and Families. Brokers help clients identify their options and make choices that are in their best interest and meet their needs and budget. In the District of Columbia, Brokers must have an active DC license in good standing, complete training on DC Health Link, and have contractual relationships with each carrier in DC Health Link for the market in which he/she intends to sell. There is no cost to use an insurance Broker." } %>
+      <% end %>
+      <% if broker_and_agency_present %>
+      <small>
+        <%= link_to "Find Assistance Another Way", '', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
+      </small>
+      <% end %>
     </div>
   </div>
 </div>
-<% end %>

@@ -4,7 +4,7 @@ namespace :employers do
   desc "Export employers to csv."
   # Usage rake employers:export
   task :export => [:environment] do
-    employers = Organization.no_timeout.where("employer_profile" => {"$exists" => true}).map(&:employer_profile)
+    orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
     FILE_PATH = Rails.root.join "employer_export.csv"
 
@@ -46,8 +46,9 @@ namespace :employers do
                                 broker.name broker.npn broker.assigned_on)
       csv << headers
 
-      employers.each do |employer| 
+      orgs.all.each do |org| 
         begin
+          employer = org.employer_profile
           employer_attributes = []
           employer_attributes += [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state, employer.general_agency_profile.fein, employer.general_agency_profile.legal_name, employer.active_general_agency_account.start_on]
           office_location = get_primary_office_location(employer.organization)

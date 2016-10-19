@@ -1,28 +1,39 @@
-<% if @employee_role.employer_profile.active_broker_agency_account.present? %>
-<div class="panel panel-default module employee-broker-widget">
+<% broker_and_agency_present = true if @employee_role.employer_profile.active_broker_agency_account.present? %>
+<div class="panel panel-default module consumer-broker-widget">
   <div class="panel-heading">
     <h3 class="panel-title">
       <strong>
-        Your Broker or Assister
+        <%= title.present? ? title : "Your Broker" %>
       </strong>
     </h3>
   </div>
   <div class="panel-body">
     <div class="text-center">
-      <i class="fa fa-user fa-3x" aria-hidden="true"></i>
+      <i aria-hidden="true" class="fa fa-user fa-3x"></i>
       <br/>
-      <%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
+      <span class="word-break">
+        <%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
+      </span>
     </div>
     <div class="text-left">
-        <div class="broker-information">
+      <% if broker_and_agency_present %>
+      <div class="broker-information">
+        <span class="word-break">
           <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.first_name.capitalize %>
           <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %>
-          <br/>
-          <a href="tel:1-<%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>">1 <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %></a>
-          <br/>
-          <%= mail_to @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address, @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address %><br>
-        </div>
+        <span>
+        <br/>
+        <a href="tel:1-<%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>">1
+          <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %></a>
+        <br/>
+        <span class="word-break">
+          <%= mail_to @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address, @employee_role.employer_profile.active_broker_agency_account.writing_agent.email_address %>
+        </span>
+        <br>
+      </div>
+      <% else %>
+      Your employer has no yet added a broker.
+      <% end %>
     </div>
   </div>
 </div>
-<% end %>

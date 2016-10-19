@@ -1,5 +1,21 @@
 @import "variables";
 .modal {
+	&.read-only-modal {
+		.modal-title {
+			color: $primary-green;
+			font-weight: $primary-bold;
+			text-transform: uppercase;
+			font-size: 18px;
+			.fa {
+				color: $primary-green;
+			}
+		}
+		.modal-header {
+			.close {
+				margin-top: 0;
+			}
+		}
+	}
 	.dependents-list-members {
 		td {
 			text-transform: capitalize;
