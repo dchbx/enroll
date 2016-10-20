@@ -63,11 +63,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(response).to render_template("exchanges/hbx_profiles/binder_index")
     end
 
-    it "updates employers state to binder paid" do
-      post :binder_paid, :employer_profile_ids => [employer_profile.id]
-      expect(flash[:notice]).to eq 'Successfully submitted the selected employer(s) for binder paid.'
-    end
-
     it "should render json template" do
       get :binder_index_datatable, {format: :json}
       expect(response).to render_template("exchanges/hbx_profiles/binder_index_datatable")
@@ -271,7 +266,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
     it "create new organization if params valid" do
-      xhr :get, :generate_invoice, {"employerId"=>[organization.id]} ,  format: :js
+      xhr :get, :generate_invoice, {"employerId"=>[organization.id], ids: [organization.id]} ,  format: :js
       expect(response).to have_http_status(:success)
       # expect(organization.invoices.size).to eq 1
     end

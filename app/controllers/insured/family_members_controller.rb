@@ -15,7 +15,13 @@ class Insured::FamilyMembersController < ApplicationController
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
-    if params[:qle_id].present?
+    if params[:sep_id].present?
+      @sep = @family.special_enrollment_periods.find(params[:sep_id])
+      @qle = QualifyingLifeEventKind.find(params[:qle_id])
+      @change_plan = 'change_by_qle'
+      @change_plan_date = @sep.qle_on
+    elsif params[:qle_id].present? && !params[:shop_for_plan]
+
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?

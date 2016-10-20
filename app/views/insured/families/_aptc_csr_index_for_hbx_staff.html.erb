@@ -1,0 +1,29 @@
+<%- model_class = Family -%>
+<%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
+<div class="row container">
+    <%= link_to 'Switch to All Families', family_index_exchanges_hbx_profiles_path, remote: true%>
+</div>
+<div class="row container">
+  <h3 class="title-inline">Families with APTC / CSR</h3>
+  <div class="form-inline button-group-wrapper families_search_div">
+    <div class="input-group search-wp">
+      <%= render 'shared/search', url: aptc_csr_family_index_exchanges_hbx_profiles_path, q: @q, placeholder: "Name, HBX ID, SSN", remote: true %>
+    </div>
+  </div>
+</div>
+
+<div class="row container">
+  <div id="families">
+    <%= render "insured/families/aptc_csr_families_table_for_hbx_staff", families: @families %>
+  </div>
+
+  <div class="row container">
+    <div class="col-md-8" id="families_paginator">
+      <%= paginate @families, :remote => true, :param_name => "families_page" %>
+    </div>
+
+    <div class="col-md-4" id="families_count">
+      <p><%= "#{number_with_delimiter(@families.count)} / #{@total} " %><small>(families selected / total)</small></p>
+    </div>
+  </div>
+</div>

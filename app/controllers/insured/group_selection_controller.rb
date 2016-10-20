@@ -43,7 +43,9 @@ class Insured::GroupSelectionController < ApplicationController
       family: @family,
       employee_role: @employee_role,
       benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
-      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)) 
+    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
+    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
@@ -77,6 +79,8 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
+    # Set effective_on if this is a case of QLE with date options available.
+    hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
 
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away

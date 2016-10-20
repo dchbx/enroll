@@ -134,6 +134,7 @@
 
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
+            <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%> 
             <br/>
             <h3>What would you like to do?</h3>
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>

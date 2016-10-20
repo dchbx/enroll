@@ -21,6 +21,7 @@ class EmployerProfile
   INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
   INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
+  ENROLLED_STATE = %w(enrolled suspended)
 
   field :entity_kind, type: String
   field :sic_code, type: String
@@ -234,7 +235,8 @@ class EmployerProfile
   end
 
   def latest_plan_year
-    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
+    return @latest_plan_year if defined? @latest_plan_year
+    @latest_plan_year = plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
   def draft_plan_year

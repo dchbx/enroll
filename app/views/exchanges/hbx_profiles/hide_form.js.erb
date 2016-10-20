@@ -1,0 +1,18 @@
+var hide_form = ( function(window, undefined) {
+  function parentRow(){
+    var containing_row = $("#<%= @element_to_replace_id %>").closest('TR');
+    var $parent_row = containing_row;
+    if ( $('tr.child-row:visible').length > 0 ) {
+        $("li>a:contains('Collapse Form')").eq(containing_row.index()).addClass('disabled');
+        $('tr.child-row:visible').remove();  
+        $('.dropdown.pull-right').removeClass('open');
+    }
+  }
+  return{
+    parentRow: parentRow
+  }
+})(window);
+hide_form.parentRow();
+
+
+

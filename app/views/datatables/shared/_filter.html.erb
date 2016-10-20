@@ -1,0 +1,34 @@
+<% level = defined?(level) && level || 1 %>
+<% if level == 1 %>
+   <% ancestors=[] %>
+   <% data_scope = filters[:top_scope] %>
+   <div class='custom_filter'>
+<% end %>
+
+<% filter_group = ancestors.join('-')%>
+<br class="hide custom_level_<%=level%> Filter-<%=filter_group%>"/>
+
+
+<div class="btn btn-group  <%= level > 1 && 'hide sub_level'%> custom_level_<%=level%> Filter-<%=filter_group%>" data-scope="<%=data_scope%>"  role='group'>
+  <% filters[data_scope].each do |filter| %>
+    <div class="btn btn-default" data-key="<%=filter[:scope]%>"
+    id="Tab:<%=filter_group.present? ? [filter_group,filter[:scope]].join('-') : filter[:scope] %>">
+      <%=filter[:label]%>
+    </div>
+  <% end %>
+</div>
+
+<% filters[data_scope].each do |filter| %>
+  <% new_data_scope = filter[:subfilter] %>
+  <% if new_data_scope %>
+    <%= render partial: '/datatables/shared/filter',
+       locals: {filters: filters, level: level+1, ancestors: ancestors + [filter[:scope]], data_scope: new_data_scope} %>
+    <%end%>
+<% end %>
+
+<% if level==1 %>
+  </div>
+  <script>
+     DT.filters()
+  </script>
+<% end %>

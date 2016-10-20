@@ -1,0 +1,2 @@
+//set_tab_content("<%= escape_javascript render "insured/families/aptc_csr_index_for_hbx_staff"%>")
+set_tab_content("<%= escape_javascript(render :partial => 'insured/families/aptc_csr_index_for_hbx_staff', :locals =>{:search_query => params[:search_query]}) %>");

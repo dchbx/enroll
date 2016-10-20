@@ -7,22 +7,20 @@
 <%end%>
 
 <div class="container bottom-pd">
+    <h3 class="title">Edit DOB / SSN</h3>
+    <h5> <%=@person.full_name%> </h5>
   
-  <div class="row">
-    <h3 class="title-inline">Editing DOB / SSN for:</h3>
-  </div>
-  
-  <div>
+<!--   <div>
     <table class="table table-border">
       <thead></thead>
       <tbody>
         <tr>
-        <td><p> <b>Name:</b> <%=@person.first_name%> <%=@person.last_name%></p></td>
-        <td><p> <b>HBX ID:</b> <%=@person.hbx_id%></p></tb>
+        <td><p> <b>Name:</b> <%#=@person.first_name%> <%#=@person.last_name%></p></td>
+        <td><p> <b>HBX ID:</b> <%#=@person.hbx_id%></p></tb>
       </tr>
       </tbody>
     </table>
-  </div>
+  </div> -->
 
   <div class="row input-no-pd">
     <%= form_for @person, remote: true, url: update_dob_ssn_path, method: "post", class: "form" do |f|%>
@@ -33,20 +31,26 @@
           <tr>
             <td>
               <p><b>New DOB</b></p>
-              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :value => params[:new_dob].present? ? Date.strptime(params[:new_dob], '%m/%d/%Y') : @person.dob, :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication('#{@person.id}', this.value)"} %>
+              <%= datepicker_control f, :dob, {:class => "interaction-field-control-census-employee-dob", :value => params[:new_dob].present? ? Date.strptime(params[:new_dob], '%m/%d/%Y') : @person.dob, :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication('#{@person.id}', this.value, '#{@element_to_replace_id}')"} %>
             </td>  
             <td>
                <p><b>New SSN</b></p>  
-              <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required mask-ssn form-control", :value => params[:new_ssn].present? ? params[:new_ssn] : @person.ssn, required: true, :input_html => {:maxlength => 15, :size => 40} %>
+              <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required mask-ssn ", :value => params[:new_ssn].present? ? params[:new_ssn] : @person.ssn, required: true, :input_html => {:maxlength => 15, :size => 40, :width => '100%'} %>
             </td>
               <%= f.hidden_field :pid, :value => @person.id  %>
+              <%= f.hidden_field :family_actions_id, :value => "family_actions_#{@person.primary_family.id.to_s}" %>
             </tr>
             <td></td>
             <td>
               <div class= "pull-right">
-                <%= link_to "Reset", edit_dob_ssn_path(id: @person.primary_family.primary_applicant.person.id) , class: "btn btn-info", remote: true %>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary"%>
+                <tr>
+                  <td>
+                    <%= link_to "Reset", edit_dob_ssn_path(id: @person.id, family_actions_id: "family_actions_#{@person.primary_family.id.to_s}"), class: "btn btn-info", remote: true %>
+                  </td>
+                  <td>
+                    <div align = "right" style = "width:100px"> <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px'%> </div>
+                  </td>
+                </tr>
               </div>
             </td>
         </tbody>
@@ -64,4 +68,4 @@
   <%end%>
 </div>
 
-<%= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true, class: 'btn btn-default' %>
+<%#= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true, class: 'btn btn-default' %>

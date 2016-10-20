@@ -1,0 +1,42 @@
+  <!-- Plan Name -->
+  <td class="col-bulk_actions_column col-bulk_actions"></td>
+  <td class="col-string">
+    <label>
+      <strong>
+        Plan
+      </strong>
+    </label>
+    <br/>
+    <%= @hbx_enrollment.plan.name %>
+  </td>
+  <!-- Effective Date -->
+  <td class="col-string">
+    <label>
+      <strong>
+        Effective Date
+      </strong>
+    </label>
+    <br/>
+    <%= @hbx_enrollment.effective_on %>
+  </td>
+  <!-- Cancel date set to start date -->
+  <td class="col-string">
+    <label>
+      <strong>
+        Cancellation Date
+      </strong>
+    </label>
+    <br/>
+    <%= @hbx_enrollment.effective_on %>
+  </td>
+  <!-- EDI Transmission to Carrier -->
+  <!-- EDI Transmisison checkbox -->
+  <td style="width:280px !important">
+  <%= form_for @hbx_enrollment, :url => update_cancel_enrollment_exchanges_hbx_profiles_path(@hbx_enrollment, :hbx_id => @hbx_enrollment.id), :method => :post, :html => { :class => 'vertically-aligned-row' } do |f| %>
+
+  <div>
+    <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>
+    <%= f.submit "Submit", class: 'btn btn-primary' %>
+  </div>
+    <% end %>
+  </td>
