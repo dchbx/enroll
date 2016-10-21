@@ -25,7 +25,7 @@ class Exchanges::ResidentsController < ApplicationController
     session[:person_id] = params[:person_id]
     session[:original_application_type] = params['original_application_type']
     person = Person.find(params[:person_id])
-    resident_role = person.consumer_role
+    resident_role = person.resident_role
 
     if resident_role && resident_role.bookmark_url
       redirect_to bookmark_url_path(resident_role.bookmark_url)
@@ -93,8 +93,6 @@ class Exchanges::ResidentsController < ApplicationController
       if @resident_role.present?
         @person = @resident_role.person
         session[:person_id] = @person.id
-
-
       else
       # not logging error because error was logged in construct_consumer_role
         render file: 'public/500.html', status: 500
@@ -132,18 +130,6 @@ class Exchanges::ResidentsController < ApplicationController
       @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       redirect_to ridp_bypass_exchanges_residents_path
     end
-  #  return
-  #  if save_and_exit
-  #    respond_to do |format|
-  #      format.html {redirect_to destroy_user_session_path}
-  #    end
-  #  else
-  #    @resident_role = ResidentRole.find(params[:id])
-  #    bubble_address_errors_by_person(@resident_role.person)
-  #    respond_to do |format|
-  #      format.html { render "edit" }
-  #    end
-  #  end
   end
 
   def ridp_bypass

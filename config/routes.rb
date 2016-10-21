@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :begin_resident_enrollment, on: :collection
+      get :resume_resident_enrollment, on: :collection
       get :ridp_bypass, on: :collection
       get :find_sep, on: :collection
     end
