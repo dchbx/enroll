@@ -90,11 +90,8 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
 
-<<<<<<< HEAD
-  accepts_nested_attributes_for :consumer_role, :broker_role, :hbx_staff_role,
-=======
+
   accepts_nested_attributes_for :consumer_role, :resident_role, :responsible_party, :broker_role, :hbx_staff_role,
->>>>>>> b98450d0d... Refs #11076 fixed controller logic for resident role
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
