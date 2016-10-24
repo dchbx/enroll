@@ -60,10 +60,6 @@ module Forms
       true
     end
 
-    #def is_resident_role=(val)
-    #  true
-    #end
-
     def save
       assign_citizen_status
       return false unless valid?
