@@ -125,7 +125,7 @@ class BenefitCoveragePeriod
     ivl_bgs = []
     benefit_packages.each do |bg|
       satisfied = true
-      is_coverall = hbx_enrollment_members.map(&:person).map(&:resident_role).present?
+      is_coverall = hbx_enrollment_members.map(&:person).map(&:resident_role).first.present?
       roles = hbx_enrollment_members.map(&:person).map(&:consumer_role)
       roles = hbx_enrollment_members.map(&:person).map(&:resident_role) if is_coverall
       roles.each do |role|
