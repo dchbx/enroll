@@ -395,6 +395,28 @@ def employer_poc
     end
   end
 
+
+  def view_terminated_hbx_enrollments
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    @health_enrollments = @person.primary_family.terminated_enrollments.select{|e| e.coverage_kind == 'health'}
+    # byebug
+    @dental_enrollments = @person.primary_family.terminated_enrollments.select{|e| e.coverage_kind == 'dental'}
+  end
+
+  def reinstate_hbx_enrollments
+    @terminated_enrollments=[]
+    params[:enrollment_ids].each do |id|
+      begin
+        enrollment =HbxEnrollment.find id
+        enrollment.reinstate
+      rescue Exception => e
+        @terminated_enrollments << id
+        next 
+      end
+    end
+  end
+
   def verify_dob_change
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
