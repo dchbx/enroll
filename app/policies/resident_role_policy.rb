@@ -2,6 +2,7 @@ class ResidentRolePolicy < ApplicationPolicy
   def privacy?
     if @user.has_role? :hbx_staff
       true
+    end  
   end
 
   def search?
