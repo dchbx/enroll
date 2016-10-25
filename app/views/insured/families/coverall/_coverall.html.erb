@@ -33,20 +33,6 @@
     </table>
   </div>
 </div>
-
-<div class="row">
-  <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
-    <% if current_user.has_hbx_staff_role? %>
-        <%= link_to "Complete Application Upload for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like to upload the application.' } %>``
-    <% end %>
-  </div>
-  <div class="col-xs-6">
-    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button">
-      Documents FAQ
-    </a>
-  </div>
-</div>
-
 <div class="collapse" id="docs-verification-faq">
   <%= render partial: "insured/families/verification/documents_verification_list" %>
 </div>
