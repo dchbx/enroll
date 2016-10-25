@@ -1271,6 +1271,8 @@ class HbxEnrollment
       end
     elsif plan.present? && consumer_role.present?
       @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
+    elsif plan.present? && resident_role.present?
+      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
       @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)

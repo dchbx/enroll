@@ -106,7 +106,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    #binding.pry
     @dependent = Forms::FamilyMember.find(params.require(:id))
 
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
