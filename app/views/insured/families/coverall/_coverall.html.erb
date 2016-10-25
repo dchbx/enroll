@@ -4,13 +4,11 @@
       <thead class="thead-default">
       <tr>
         <th>Family Member</th>
-        <th>Verification Type</th>
-        <th>Status</th>
 
         <% if current_user && current_user.has_hbx_staff_role? %>
             <!--<th>Complete</th>-->
         <% end %>
-        <th>Documents</th>
+        <th>Paper Application</th>
         <th></th>
       </tr>
       </thead>
@@ -19,6 +17,9 @@
           <tr class="<%= cycle("odd top", "even top") %>">
             <td><%= member.person.first_name.capitalize %>
               <%= member.person.last_name.capitalize %></td>
+              <td colspan="3">
+                    <%= render partial: 'insured/families/coverall/missing_paper_application', locals: {member: member} %>
+              </td>
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
               <% end %>
@@ -36,9 +37,7 @@
 <div class="row">
   <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? %>
-        <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
-    <% elsif show_send_button_for_consumer? %>
-        <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id, :docs_status => "ready"), class: "btn btn-success btn-sm", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
+        <%= link_to "Complete Application Upload for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like to upload the application.' } %>``
     <% end %>
   </div>
   <div class="col-xs-6">
