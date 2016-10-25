@@ -129,10 +129,10 @@ module Api::V1::MobileApiHelper
           plan:                   benefit_group.dental_reference_plan, 
           plan_option_kind:       benefit_group.plan_option_kind, 
           relationship_benefits:  benefit_group.dental_relationship_benefits, 
-          employer_estimated_max: benefit_group.monthly_employer_contribution_amount(dental_reference_plan), 
+          employer_estimated_max: benefit_group.monthly_employer_contribution_amount(benefit_group.dental_reference_plan), 
           employee_estimated_min: benefit_group.monthly_min_employee_cost('dental'), 
           employee_estimated_max: benefit_group.monthly_max_employee_cost('dental'),
-          elected_dental_plans:   elected_dental_plans) if benefit_group.is_offering_dental? && dental_reference_plan
+          elected_dental_plans:   elected_dental_plans) if benefit_group.is_offering_dental? && benefit_group.dental_reference_plan
 
        { 
           benefit_group_name: benefit_group.title,
@@ -213,7 +213,7 @@ module Api::V1::MobileApiHelper
   def marshall_employer_details_json(employer_profile, report_date)
     plan_year = employer_profile.show_plan_year
     if plan_year then
-      enrollments = employer_profile.enrollments_for_billing(report_date)
+      enrollments = employer_profile.enrollments_for_billing(report_date) || []
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
@@ -318,8 +318,15 @@ module Api::V1::MobileApiHelper
     [employer_profiles, broker_agency_profile, broker_name] if employer_query
   end
 
+  def detect_plan_in_states(employer_profile, states)
+    employer_profile.plan_years.detect { |py| states.include? py.aasm_state }
+  end
+
   def active_and_renewal_plan_years(employer_profile)
-    { active: employer_profile.active_plan_year }
+    { 
+      active: detect_plan_in_states(employer_profile, PlanYear::PUBLISHED),
+      renewal: detect_plan_in_states(employer_profile, PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::RENEWING)
+    }
     #TODO: renewal when appropriate, see employer_profiles_controller.sort_plan_years
   end
 

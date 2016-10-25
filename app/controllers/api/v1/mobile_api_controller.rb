@@ -19,8 +19,10 @@ module Api
         else
           render json: { error: 'no broker agency profile found' }, :status => :not_found
         end
-#      rescue Exception => e 
-#          render json: { error: e.message  }, :status => :internal_server_error
+      rescue Exception => e 
+          logger.error "Exception caught in employer_details: #{e.message}"
+          e.backtrace.each { |line| logger.error line }
+          render json: { error: e.message }, :status => :internal_server_error
       end
 
       def employer_details
@@ -31,6 +33,8 @@ module Api
           render json: marshall_employer_details_json(employer_profile, params[:report_date])
         end
       rescue Exception => e 
+          logger.error "Exception caught in employer_details: #{e.message}"
+          e.backtrace.each { |line| logger.error line }
           render json: { error: e.message }, :status => :internal_server_error
       end
 
