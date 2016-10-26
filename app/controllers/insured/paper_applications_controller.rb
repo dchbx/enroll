@@ -1,4 +1,4 @@
-class Insured::VerificationDocumentsController < ApplicationController
+class Insured::PaperApplicationsController < ApplicationController
   include ApplicationHelper
 
   before_action :get_family
@@ -11,7 +11,13 @@ class Insured::VerificationDocumentsController < ApplicationController
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
-          if update_vlp_documents(file_name(file), doc_uri)
+          if (@docs_owner.resident_role? && params[:file])
+            if update_paper_application(file_name(file), doc_uri)
+              flash[:notice] = "File Saved"
+            else
+              flash[:error] = "Could not save file. " + @doc_errors.join(". ")
+            end
+          elsif update_vlp_documents(file_name(file), doc_uri)
             flash[:notice] = "File Saved"
           else
             flash[:error] = "Could not save file. " + @doc_errors.join(". ")
@@ -25,7 +31,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     else
       flash[:error] = "File not uploaded. Please select the file to upload."
     end
-    redirect_to verification_insured_families_path
+    redirect_to upload_application_insured_families_path
   end
 
   def download
@@ -55,6 +61,10 @@ class Insured::VerificationDocumentsController < ApplicationController
     @person.consumer_role
   end
 
+  def person_resident_role
+    @person.resident_role
+  end
+
   def file_path(file)
     file.tempfile.path
   end
@@ -67,22 +77,15 @@ class Insured::VerificationDocumentsController < ApplicationController
     @person.primary_family.family_members.find(id).person
   end
 
-  def update_vlp_documents(title, file_uri)
-    document = @docs_owner.consumer_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
-    @doc_errors = document.errors.full_messages unless success
-    @docs_owner.save
-  end
-
   def update_paper_application(title, file_uri)
-    document = @docs_owner.resident_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
+    application = @docs_owner.resident_role.paper_applications.build
+    success = application.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end
 
   def get_document(key)
-    @person.consumer_role.find_vlp_document_by_key(key)
+    @person.resident_role.find_paper_application_by_key(key)
   end
 
   def download_options(document)

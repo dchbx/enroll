@@ -11,6 +11,7 @@ class ResidentRole
   embedded_in :person
 
   embeds_one :lawful_presence_determination
+  embeds_many :paper_applications, as: :documentable
 
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
   field :is_active, type: Boolean, default: true
@@ -20,7 +21,7 @@ class ResidentRole
 
   field :contact_method, type: String, default: "Only Paper communication"
   field :language_preference, type: String, default: "English"
-  
+
   delegate :hbx_id,           to: :person, allow_nil: true
   delegate :ssn, :ssn=,       to: :person, allow_nil: true
   delegate :dob, :dob=,       to: :person, allow_nil: true
@@ -33,7 +34,7 @@ class ResidentRole
 
   validates_presence_of :dob, :gender
 
-  accepts_nested_attributes_for :person
+  accepts_nested_attributes_for :person, :paper_applications
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
 
@@ -104,6 +105,25 @@ class ResidentRole
     person.update_attributes(*args)
   end
 
+
+  def find_paper_application_by_key(key)
+    candidate_paper_applications = paper_applications
+    if person.primary_family.present?
+      person.primary_family.family_members.flat_map(&:person).each do |family_person|
+        next unless family_person.resident_role.present?
+        candidate_paper_applications << family_person.resident_role.paper_applications
+      end
+      candidate_paper_applications.uniq!
+    end
+
+    return nil if candidate_paper_applications.nil?
+
+    candidate_paper_applications.detect do |document|
+      next if document.identifier.blank?
+      doc_key = document.identifier.split('#').last
+      doc_key == key
+    end
+  end
 
   private
   def mark_residency_denied(*args)

@@ -1,5 +1,5 @@
 <div class="row  <%=pundit_class(Family, :updateable?)%>">
-  <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
+  <%= form_tag insured_paper_applications_upload_path, multipart: true, method: :post do %>
       <%= hidden_field_tag 'family_member', member.id  %>
 
   <div class="btn-group" role="group" aria-label="...">

@@ -22,6 +22,11 @@
               </td>
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
+                <% if member_has_uploaded_paper_applications(member) %>
+                  <span data-toggle="tooltip" title="View Documents" class="function-text">
+                  <i class="fa fa-caret-down fa-2x"></i>
+                  </span>
+                <% end %>
               <% end %>
             </td>
           </tr>
