@@ -18,6 +18,9 @@ class ResidentRole
   field :is_state_resident, type: Boolean, default:true
   field :residency_determined_at, type: DateTime
 
+  field :contact_method, type: String, default: "Only Paper communication"
+  field :language_preference, type: String, default: "English"
+  
   delegate :hbx_id,           to: :person, allow_nil: true
   delegate :ssn, :ssn=,       to: :person, allow_nil: true
   delegate :dob, :dob=,       to: :person, allow_nil: true
