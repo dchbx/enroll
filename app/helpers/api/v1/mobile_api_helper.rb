@@ -17,15 +17,16 @@ module Api::V1::MobileApiHelper
   end
 
   def render_employer_summary_json(employer_profile: nil, year: nil, num_enrolled: nil, 
-                                        num_waived: nil, staff: nil, offices: nil, 
-                                        include_details_url: false)
+                                   num_waived: nil, num_terminated: nil, staff: nil, 
+                                   offices: nil, include_details_url: false)
     renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
     summary = { 
       employer_name: employer_profile.legal_name,
       employees_total: employer_profile.roster_size,   
       employees_enrolled:             num_enrolled,  
-      employees_waived:               num_waived,
+      employees_waived:               num_waived,  
+      employees_terminated:           num_terminated,
       open_enrollment_begins:         year ? year.open_enrollment_start_on                 : nil,
       open_enrollment_ends:           year ? year.open_enrollment_end_on                   : nil,
       plan_year_begins:               year ? year.start_on                                 : nil,
@@ -144,10 +145,11 @@ module Api::V1::MobileApiHelper
   end
 
   def render_employer_details_json(employer_profile: nil, year: nil, num_enrolled: nil, 
-                                   num_waived: nil, total_premium: nil, 
+                                   num_waived: nil, num_terminated: nil, total_premium: nil, 
                                    employer_contribution: nil, employee_contribution: nil)
     details = render_employer_summary_json(employer_profile: employer_profile, year: year, 
-                                           num_enrolled: num_enrolled, num_waived: num_waived)
+                                           num_enrolled: num_enrolled, num_waived: num_waived,
+                                           num_terminated: num_terminated)
     details[:total_premium] = total_premium
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
@@ -176,20 +178,20 @@ module Api::V1::MobileApiHelper
 
   # alternative, faster way to calcuate total_enrolled_count 
   # returns a list of number enrolled (actually enrolled, not waived) and waived
-  def count_enrolled_and_waived_employees(plan_year)  
+  def count_enrolled_waived_and_terminated_employees(plan_year)  
     if plan_year && plan_year.employer_profile.census_employees.count < 100 then
       assignments = get_benefit_group_assignments_for_plan_year(plan_year)
-      count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(assignments)
+      count_employees_by_enrollment_status(assignments)
     end 
   end
   
   # as a performance optimization, in the mobile summary API (list of all employers for a broker)
   # we only bother counting the subscribers if the employer is currently in OE
-  def count_enrolled_and_waived_employees_if_in_open_enrollment(plan_year, as_of)
+  def count_enrolled_waived_and_terminated_employees_if_in_open_enrollment(plan_year, as_of)
     if plan_year && as_of && 
        plan_year.open_enrollment_start_on && plan_year.open_enrollment_end_on &&
        plan_year.open_enrollment_contains?(as_of) then
-        count_enrolled_and_waived_employees(plan_year) 
+        count_enrolled_waived_and_terminated_employees(plan_year) 
     else
         nil
     end
@@ -203,9 +205,10 @@ module Api::V1::MobileApiHelper
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
-        enrolled, waived = count_enrolled_and_waived_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) 
+        enrolled, waived, terminated = count_enrolled_waived_and_terminated_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) 
         render_employer_summary_json(employer_profile: er, year: plan_year, 
                                      num_enrolled: enrolled, num_waived: waived, 
+                                     num_terminated: terminated,
                                      staff: staff, offices: offices, include_details_url: true) 
     end  
   end
@@ -217,12 +220,13 @@ module Api::V1::MobileApiHelper
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      enrolled, waived = count_enrolled_and_waived_employees(plan_year)
+      enrolled, waived, terminated = count_enrolled_waived_and_terminated_employees(plan_year)
       
       render_employer_details_json(employer_profile: employer_profile, 
                                    year: plan_year,  
                                    num_enrolled: enrolled, 
                                    num_waived: waived, 
+                                   num_terminated: terminated,
                                    total_premium: premium_amt_total, 
                                    employer_contribution: employer_contribution_total, 
                                    employee_contribution: employee_cost_total
@@ -261,21 +265,22 @@ module Api::V1::MobileApiHelper
     end.map(&:benefit_group_assignment_id)
   end
 
-  # A faster way of counting employees who are enrolled (not waived) 
+  # A faster way of counting employees who are enrolled vs waived vs terminated
   # where enrolled + waived = counting towards SHOP minimum healthcare participation
   # We first do the query to find families with appropriate enrollments,
   # then check again inside the map/reduce to get only those enrollments.
   # This avoids undercounting, e.g. two family members working for the same employer. 
   #
-  def count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignments = [])
+  def count_employees_by_enrollment_status(benefit_group_assignments = [])
     enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
     waived = HbxEnrollment::WAIVED_STATUSES
+    terminated = HbxEnrollment::TERMINATED_STATUSES
 
     return [] if benefit_group_assignments.blank?
     id_list = benefit_group_assignments.map(&:id) #.uniq
     families = Family.where(:"households.hbx_enrollments".elem_match => { 
       :"benefit_group_assignment_id".in => id_list, 
-      :aasm_state.in => enrolled_or_renewal + waived, 
+      :aasm_state.in => enrolled_or_renewal + waived + terminated, 
       :kind => "employer_sponsored", 
       :coverage_kind => "health",
       :is_active => true #???  
@@ -290,9 +295,11 @@ module Api::V1::MobileApiHelper
 
     enrolled_ids = benefit_group_ids_of_enrollments_in_status(relevant_enrollments, enrolled_or_renewal)
     waived_ids = benefit_group_ids_of_enrollments_in_status(relevant_enrollments, waived)
+    terminated_ids = benefit_group_ids_of_enrollments_in_status(relevant_enrollments, terminated)
 
-    #return count of enrolled, count of waived -- only including those originally asked for
-    [enrolled_ids, waived_ids].map { |found_ids| (found_ids & id_list).count }
+    # return count of enrolled, count of waived, count of terminated 
+    # -- only including those originally asked for
+    [enrolled_ids, waived_ids, terminated_ids].map { |found_ids| (found_ids & id_list).count }
   end
 
  
