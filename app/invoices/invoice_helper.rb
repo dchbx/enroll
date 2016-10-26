@@ -423,7 +423,6 @@ module InvoiceHelper
     logo_x = 360
     cheque_amount_path_x = 350
     @pdf.move_down 36
-
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
       invoice_header_data = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
@@ -432,7 +431,7 @@ module InvoiceHelper
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
         # ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
-        ["DATE DUE:", "#{PlanYear.calculate_open_enrollment_date("01-09-2016")[:binder_payment_due_date].strftime("%m/%d/%Y")}"]
+        ["DATE DUE:", "#{PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
