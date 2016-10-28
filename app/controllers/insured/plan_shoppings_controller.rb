@@ -107,28 +107,32 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def waive
-    person = @person
-    hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    waiver_reason = params[:waiver_reason]
+    begin
+      person = @person
+      hbx_enrollment = HbxEnrollment.find(params.require(:id))
+      waiver_reason = params[:waiver_reason]
 
-    # Create a new hbx_enrollment for the waived enrollment.
-    unless hbx_enrollment.shopping?
-      employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
-      coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
-      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+      # Create a new hbx_enrollment for the waived enrollment.
+      unless hbx_enrollment.shopping?
+        employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
+        coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
+        waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
 
-      waived_enrollment.generate_hbx_signature
+        waived_enrollment.generate_hbx_signature
 
-      if waived_enrollment.save!
-        hbx_enrollment = waived_enrollment
-        hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+        if waived_enrollment.save!
+          hbx_enrollment = waived_enrollment
+          hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+        end
       end
-    end
 
-    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
-      hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
-      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
-    else
+      if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+        hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
+        redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+      else
+        redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+      end
+    rescue Exception => e
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
   rescue => e
