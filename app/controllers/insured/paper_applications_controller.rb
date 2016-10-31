@@ -11,14 +11,12 @@ class Insured::PaperApplicationsController < ApplicationController
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
-          if (@docs_owner.resident_role? && params[:file])
+          if (@docs_owner.resident_role?)
             if update_paper_application(file_name(file), doc_uri)
               flash[:notice] = "File Saved"
             else
               flash[:error] = "Could not save file. " + @doc_errors.join(". ")
             end
-          elsif update_vlp_documents(file_name(file), doc_uri)
-            flash[:notice] = "File Saved"
           else
             flash[:error] = "Could not save file. " + @doc_errors.join(". ")
             redirect_to(:back)
