@@ -59,3 +59,10 @@ end
 Then(/^the consumer can expand the table by clicking on caret sign$/) do
   find('.fa-caret-down').click
 end
+
+Then(/^Consumer does not see FedHub details table$/) do
+  expect(page).to have_content('Verification')
+  expect(page).to_not have_content('FedHub')
+  expect(page).to have_content('Verification Type')
+  expect(page).to have_content('Status')
+end

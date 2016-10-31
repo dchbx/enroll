@@ -38,6 +38,7 @@ describe "insured/families/verification/_verification.html.erb" do
   context "when user is admin" do
     before :each do
       allow(view).to receive(:all_family_members_verified).and_return true
+      allow_any_instance_of(Person).to receive_message_chain("consumer_role.hub_retrigger_count").and_return 5
       allow(view).to receive(:verification_due_date).and_return (TimeKeeper.date_of_record)
       allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return true
       stub_template "insured/families/verification/_verification_docs_table.html.erb" => "content"

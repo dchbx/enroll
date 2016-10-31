@@ -72,6 +72,40 @@ RSpec.describe DocumentsController, :type => :controller do
       expect(response).to redirect_to :back
     end
   end
+
+  describe "GET fed_hub_request" do
+    context "first call" do
+      before :each do
+        request.env["HTTP_REFERER"] = "http://test.com"
+        put :fed_hub_request, person_id: person.id
+      end
+      it "increments counter with default value" do
+        person.reload
+        expect(person.consumer_role.hub_retrigger_count).to eq 1
+      end
+
+      it "should redirect to back" do
+        expect(response).to redirect_to :back
+      end
+    end
+
+    context "retrigger" do
+      before :each do
+        person.consumer_role.update_attributes(:hub_retrigger_count => 5)
+        request.env["HTTP_REFERER"] = "http://test.com"
+        put :fed_hub_request, person_id: person.id
+      end
+      it "increments counter with existing value" do
+        person.reload
+        expect(person.consumer_role.hub_retrigger_count).to eq 6
+      end
+
+      it "should redirect to back" do
+        expect(response).to redirect_to :back
+      end
+    end
+  end
+
   describe "PUT update_verification_type" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"

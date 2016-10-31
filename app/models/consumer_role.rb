@@ -70,6 +70,7 @@ class ConsumerRole
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
+  field :hub_retrigger_count, type: Integer, default: 0
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -568,6 +569,11 @@ class ConsumerRole
 
   def lawful_presence_outstanding?
     lawful_presence_determination.verification_outstanding?
+  end
+
+  def count_hub_calls
+    count = hub_retrigger_count + 1
+    self.update_attributes(:hub_retrigger_count => count)
   end
 
   def lawful_presence_authorized?

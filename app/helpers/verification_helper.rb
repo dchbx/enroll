@@ -73,7 +73,7 @@ module VerificationHelper
   end
 
   def member_has_uploaded_docs(member)
-    true if member.person.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
+    true if member.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
   end
 
   def docs_uploaded_for_all_types(member)
@@ -150,5 +150,44 @@ module VerificationHelper
         person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
     end
   end
-end
 
+  def ssa_response_any?(f_member)
+    f_member.try(:consumer_role).try(:lawful_presence_determination).try(:ssa_responses).try(:any?)
+  end
+
+  def dhs_response_any?(f_member)
+    f_member.try(:consumer_role).try(:lawful_presence_determination).try(:vlp_responses).try(:any?)
+  end
+
+  def ssa_received_date(f_member)
+    ssa_response(f_member).received_at.to_date
+  end
+
+  def dhs_received_date(f_member)
+    vlp_response(f_member).received_at.to_date
+  end
+
+  def ssn_status_ssa_hub(f_member)
+    ssa_response(f_member).parse_ssa.first ? "verified" : "failed"
+  end
+
+  def citizenship_status_ssa_hub(f_member)
+    ssa_response(f_member).parse_ssa.last ? "verified" : "failed"
+  end
+
+  def response_dhs_hub(f_member)
+    vlp_response(f_member).parse_dhs.first
+  end
+
+  def legal_status_dhs_hub(f_member)
+    vlp_response(f_member).parse_dhs.last
+  end
+
+  def ssa_response(f_member)
+    f_member.consumer_role.lawful_presence_determination.ssa_responses.sort_by(&:received_at).last
+  end
+
+  def vlp_response(f_member)
+    f_member.consumer_role.lawful_presence_determination.vlp_responses.sort_by(&:received_at).last
+  end
+end

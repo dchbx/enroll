@@ -2,8 +2,11 @@ require "rails_helper"
 
 RSpec.describe VerificationHelper, :type => :helper do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
   before :each do
     assign(:person, person)
+    assign(:family, family)
   end
   describe "#doc_status_label" do
     doc_status_array = VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
@@ -129,14 +132,13 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#enrollment_group_verified?" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     it "returns true if any family members has outstanding verification state" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.person.consumer_role.aasm_state="verification_outstanding"
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
+      allow(person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
@@ -145,18 +147,15 @@ RSpec.describe VerificationHelper, :type => :helper do
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
+      allow(person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq false
     end
   end
 
   describe "#verification due date" do
-    let(:family) { FactoryGirl.build(:family) }
     let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
     let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
-    before :each do
-      assign(:family, family)
-    end
+
     context "for special verification period" do
       it "returns special verification period" do
         allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
@@ -173,12 +172,11 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#documents uploaded" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     it "returns true if any family member has uploaded docs" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
+      allow(person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.documents_uploaded).to be_falsey
     end
   end
@@ -197,23 +195,24 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe "#hbx_enrollment_incomplete" do
     let(:hbx_enrollment_incomplete) { HbxEnrollment.new(:review_status => "incomplete") }
     let(:hbx_enrollment) { HbxEnrollment.new(:review_status => "ready") }
+
     context "if verification needed" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+        allow(person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
       end
       it "returns true if enrollment has complete review status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment_incomplete)
+        allow(person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment_incomplete)
         expect(helper.hbx_enrollment_incomplete).to be_truthy
       end
       it "returns false for not incomplete status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment)
+        allow(person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment)
         expect(helper.hbx_enrollment_incomplete).to be_falsey
       end
     end
 
     context "without enrollments that needs verification" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(false)
+        allow(person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(false)
       end
 
       it "returns false without enrollments" do
@@ -296,6 +295,71 @@ RSpec.describe VerificationHelper, :type => :helper do
         person.consumer_role.vlp_documents = []
         expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
       end
+    end
+  end
+
+  describe "#ssa_response_any?" do
+    let(:ssa_response) { FactoryGirl.build(:event_response)  }
+
+    it "returns true if person has any SSA hub response" do
+      person.consumer_role.lawful_presence_determination.ssa_responses<<ssa_response
+      expect(helper.ssa_response_any?(person)).to be_truthy
+    end
+  end
+
+  describe "#dhs_response_any?" do
+    let(:vlp_response) { FactoryGirl.build(:event_response)  }
+
+    it "returns true if person has any DHS hub response" do
+      person.consumer_role.lawful_presence_determination.vlp_responses<<vlp_response
+      expect(helper.dhs_response_any?(person)).to be_truthy
+    end
+  end
+
+  describe "#ssa_received_date" do
+    let(:ssa_response) { FactoryGirl.build(:event_response)  }
+    it "returns SSA response received date" do
+      person.consumer_role.lawful_presence_determination.ssa_responses<<ssa_response
+      expect(helper.ssa_received_date(person)).to eq ssa_response.received_at.to_date
+    end
+  end
+
+  describe "dhs_received_date" do
+    let(:dhs_response) { FactoryGirl.build(:event_response)  }
+    it "returns DHS response received date" do
+      person.consumer_role.lawful_presence_determination.vlp_responses<<dhs_response
+      expect(helper.dhs_received_date(person)).to eq dhs_response.received_at.to_date
+    end
+  end
+
+  describe "#ssn_status_ssa_hub" do
+    let(:ssa_response) { FactoryGirl.build(:event_response)  }
+    before do
+      person.consumer_role.lawful_presence_determination.ssa_responses<<ssa_response
+    end
+    it "returns failed for failed ssn in SSA response" do
+      allow(ssa_response).to receive_message_chain("parse_ssa.first").and_return false
+      expect(helper.ssn_status_ssa_hub(person)).to eq "failed"
+    end
+    it "returns verified for successful ssn in SSA response" do
+      allow(ssa_response).to receive_message_chain("parse_ssa.first").and_return true
+      expect(helper.ssn_status_ssa_hub(person)).to eq "verified"
+    end
+  end
+
+  describe "#citizenship_status_ssa_hub" do
+    let(:ssa_response) { FactoryGirl.build(:event_response)  }
+    before do
+      person.consumer_role.lawful_presence_determination.ssa_responses<<ssa_response
+    end
+    it "returns failed for failed citizenship in SSA response" do
+      allow(ssa_response).to receive_message_chain("parse_ssa.last").and_return false
+      expect(helper.citizenship_status_ssa_hub(person)).to eq "failed"
+    end
+
+    it "returns verified for successful citizenship in SSA response" do
+      allow(ssa_response).to receive_message_chain("parse_ssa.last").and_return true
+      expect(helper.citizenship_status_ssa_hub(person)).to eq "verified"
     end
   end
 end

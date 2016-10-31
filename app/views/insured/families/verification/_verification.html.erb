@@ -12,51 +12,109 @@
     </h4>
   </div>
 </div>
-<div class="module ivl-documents-table panel">
-  <div class="table-responsive">
-    <table class="table table-striped table-hover table-sm">
-      <thead class="thead-default">
-      <tr>
-        <th>Family Member</th>
-        <th>Verification Type</th>
-        <th>Status</th>
-
-        <% if current_user && current_user.has_hbx_staff_role? %>
-            <!--<th>Complete</th>-->
-        <% end %>
-        <th>Documents</th>
-        <th></th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @family_members.each do |member|%>
-          <tr class="<%= cycle("odd top", "even top") %>">
-            <td><%= member.person.first_name.capitalize %>
-              <%= member.person.last_name.capitalize %></td>
-            <td colspan="3">
-              <% if unverified?(member.person) %>
-                  <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
-              <% end %>
-            </td>
-            <td class="table-functions">
-              <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
-                  <% if member_has_uploaded_docs(member) %>
+<!-- tabs with content -->
+<div class="row">
+  <ul class="nav nav-pills">
+    <li class="active"><a href="#verification-tab-table" data-toggle="tab">Verification</a></li>
+    <% if current_user.has_hbx_staff_role? %>
+      <li><a href="#fedhub-tab-table" data-toggle="tab">FedHub</a></li>
+    <% end %>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="verification-tab-table">
+      <div class="module ivl-documents-table panel">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover table-sm">
+            <thead class="thead-default">
+            <tr>
+              <th>Family Member</th>
+              <th>Verification Type</th>
+              <th>Status</th>
+              <th>Documents</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @family_members.each do |member|%>
+                <% f_member = member.person %>
+                <tr class="<%= cycle("odd top", "even top") %>">
+                  <td><%= f_member.first_name.capitalize %>
+                    <%= f_member.last_name.capitalize %></td>
+                  <td colspan="3">
+                    <% if unverified?(f_member) %>
+                        <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
+                    <% end %>
+                  </td>
+                  <td class="table-functions">
+                    <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
+                        <% if member_has_uploaded_docs(f_member) %>
                     <span data-toggle="tooltip" title="View Documents" class="function-text">
                       <i class="fa fa-caret-down fa-2x"></i>
                     </span>
-                  <% end %>
-              <% end %>
-            </td>
-          </tr>
-          <div id="verification_docs_table">
-            <%= render partial: "insured/families/verification/verification_docs_table", locals: {member: member} %>
+                        <% end %>
+                    <% end %>
+                  </td>
+                </tr>
+                <div id="verification_docs_table">
+                  <%= render partial: "insured/families/verification/verification_docs_table", locals: {member: member} %>
+                </div>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <% if current_user.has_hbx_staff_role? %>
+        <div class="tab-pane" id="fedhub-tab-table">
+          <div class="module ivl-documents-table panel">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover table-sm">
+                <thead class="thead-default-hub">
+                <tr>
+                  <th>Family Member</th>
+                  <th>SSA Response</th>
+                  <th>DHS Response</th>
+                  <th>Retriger Hub</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% @family_members.each do |member|%>
+                    <% f_member = member.person %>
+                    <tr class="<%= cycle("odd top", "even top") %>">
+                      <td>
+                        <%= f_member.first_name.capitalize %>
+                        <%= f_member.last_name.capitalize %>
+                      </td>
+                      <td>
+                        <% if ssa_response_any?(f_member) %>
+                            SSA Received: <%= ssa_received_date(f_member) %> <br>
+                            SSN:          <%= ssn_status_ssa_hub(f_member) %><br>
+                            Citizenship:  <%= citizenship_status_ssa_hub(f_member) %>
+                        <% end %>
+                      </td>
+                      <td>
+                        <% if dhs_response_any?(f_member) %>
+                            DHS Received:  <%= dhs_received_date(f_member) %> <br>
+                            Response: <%= response_dhs_hub(f_member) %><br>
+                            Legal status:  <%= legal_status_dhs_hub(f_member) %><br>
+                        <% end %>
+                      </td>
+                      <td class="hub-trigger">
+                        <%= link_to "Call Hub", fed_hub_request_documents_path(:person_id => f_member.id), class:"btn btn-default btn-xs", remote: true %><br><br>
+                        Hub calls: <span class="badge" id="<%= f_member.id %>"><%= f_member.consumer_role.hub_retrigger_count %></span>
+                      </td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </div>
           </div>
-      <% end %>
-      </tbody>
-    </table>
+        </div>
+    <% end %>
   </div>
 </div>
 
+<!-- *** tabs with content -->
 <div class="row">
   <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>
