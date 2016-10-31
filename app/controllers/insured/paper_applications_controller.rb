@@ -44,7 +44,7 @@ class Insured::PaperApplicationsController < ApplicationController
       flash[:error] = "File does not exist or you are not authorized to access it."
       redirect_to verification_insured_families_path
     end
-    vlp_docs_clean(@person)
+    #vlp_docs_clean(@person)
   end
 
   private
