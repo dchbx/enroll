@@ -137,6 +137,7 @@ class Exchanges::ResidentsController < ApplicationController
       return
     else
       set_resident_bookmark_url
+      redirect_to insured_family_members_path(:resident_role_id => @person.resident_role.id)
     end
   end
 
