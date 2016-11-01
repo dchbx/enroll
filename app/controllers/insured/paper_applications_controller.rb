@@ -5,29 +5,24 @@ class Insured::PaperApplicationsController < ApplicationController
   before_action :updateable?, only: [:upload]
 
   def upload
+    if params[:file].nil?
+      flash[:error] = "File not uploaded. Please select the file to upload."
+      redirect_to upload_application_insured_families_path
+      return
+    end
+
     @doc_errors = []
     @docs_owner = find_docs_owner(params[:family_member])
+
     if params[:file]
-      params[:file].each do |file|
-        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
-        if doc_uri.present?
-          if (@docs_owner.resident_role?)
-            if update_paper_application(file_name(file), doc_uri)
-              flash[:notice] = "File Saved"
-            else
-              flash[:error] = "Could not save file. " + @doc_errors.join(". ")
-            end
-          else
-            flash[:error] = "Could not save file. " + @doc_errors.join(". ")
-            redirect_to(:back)
-            return
-          end
-        else
-          flash[:error] = "Could not save file"
-        end
+      doc_uri = Aws::S3Storage.save(file_path(params[:file]), 'id-verification')
+      if doc_uri.present? && @docs_owner.resident_role? && update_paper_application(file_name(params[:file]), doc_uri)
+        flash[:notice] = "File Saved"
+      else
+        flash[:error] = "Could not save file. " + @doc_errors.join(". ")
       end
     else
-      flash[:error] = "File not uploaded. Please select the file to upload."
+        flash[:error] = "Could not save file"
     end
     redirect_to upload_application_insured_families_path
   end
