@@ -204,7 +204,7 @@ Rails.application.routes.draw do
       get :resident_index, on: :collection
       get :new_resident_dependent, on: :collection
       get :edit_resident_dependent, on: :member
-      get :show_resident, on: :collection
+      get :show_resident_dependent, on: :member
     end
     
     resources :group_selections, controller: "group_selection", only: [:new, :create] do

@@ -177,6 +177,14 @@ class Insured::FamilyMembersController < ApplicationController
     end
   end
 
+  def show_resident_dependent
+    @dependent = Forms::FamilyMember.find(params.require(:id))
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
 private
   def set_family
     @family = @person.try(:primary_family)

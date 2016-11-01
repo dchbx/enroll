@@ -111,7 +111,7 @@
           Cancel
           </a>
         <% else %>
-          <%= link_to '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Cancel'.html_safe, insured_family_member_path(dependent), :remote => true %>
+          <%= link_to '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Cancel'.html_safe, show_resident_dependent_insured_family_member_path(dependent), :remote => true %>
         <% end %>
 
         <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>    Confirm Member<% end %>
