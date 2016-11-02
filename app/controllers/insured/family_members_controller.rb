@@ -3,13 +3,15 @@ class Insured::FamilyMembersController < ApplicationController
 
   before_action :set_current_person, :set_family
   def index
+    binding.pry
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
-      redirect_to resident_index_insured_family_members_path
+      @family.hire_broker_agency(current_user.person.broker_role.try(:id))
+      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id)
     end
 
     if @type == "employee"
