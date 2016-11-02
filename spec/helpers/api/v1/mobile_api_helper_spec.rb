@@ -1,6 +1,10 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::MobileApiHelper, dbclean: :after_each do
+RSpec.describe Api::V1::MobileApiHelper, dbclean: :around_each do
+
+  before(:all) do
+  DatabaseCleaner.clean_with(:truncation)
+  end
    
   let!(:employer_profile_cafe)      { FactoryGirl.create(:employer_profile) }
   let!(:employer_profile_salon)     { FactoryGirl.create(:employer_profile) }
@@ -58,7 +62,7 @@ RSpec.describe Api::V1::MobileApiHelper, dbclean: :after_each do
 
       let!(id) { 
           FactoryGirl.create(:person, first_name: name, last_name: 'Smith', 
-            dob: '1966-10-10'.to_date, ssn: "99966771#{index}") 
+            dob: '1966-10-10'.to_date, ssn: rand.to_s[2..10] ) 
       }
   
       let!(census_employee_id) {
@@ -158,6 +162,7 @@ context "count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments 
   
   before :each do
     create_brady_census_families
+
   end
 
 
@@ -294,6 +299,26 @@ context "count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments 
      end
 
 
+     describe "render_plan_offerings_by_year", :dbclean => :after_all do
+
+      let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state: "published") }
+
+      let!(:benefit_group) { FactoryGirl.create(:benefit_group, :with_valid_dental, plan_year: plan_year, title: "Test Benefit Group") }
+      
+      
+      it "should match with the expected result set" do
+      response = render_plan_offerings_by_year(benefit_group.plan_year) 
+      expect(response[0][:benefit_group_name]).to eq benefit_group.title
+      expect(response[0][:eligibility_rule]).to eq eligibility_rule_for(benefit_group)
+      expect(response[0][:health]).to_not be nil
+      expect(response[0][:dental]).to_not be nil
+      expect(response[0][:health][:reference_plan_name].downcase).to eq benefit_group.reference_plan.name.downcase
+      expect(response[0][:dental][:reference_plan_name].downcase).to eq benefit_group.dental_reference_plan.name.downcase
+      expect(response[0][:dental]).to_not be nil
+
+
+      end
+    end
  
 end
 

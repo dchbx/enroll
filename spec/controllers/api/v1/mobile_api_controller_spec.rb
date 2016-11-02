@@ -120,8 +120,12 @@ describe "GET employer_details" do
   let(:user) { double("user", :person => person) }
   let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
   let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
-  let(:plan_year) { FactoryGirl.create(:plan_year) }
-  let(:employer_profile) { plan_year.employer_profile}
+  let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state: "published") }
+  let!(:benefit_group) { FactoryGirl.create(:benefit_group, :with_valid_dental, plan_year: plan_year, title: "Test Benefit Group") }
+  let!(:employer_profile) { plan_year.employer_profile}
+  let!(:employee1) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
+  let!(:employee2) { FactoryGirl.create(:census_employee, :with_enrolled_census_employee, employer_profile_id: employer_profile.id) }
+  
 
   before(:each) do 
    sign_in(user)
@@ -141,7 +145,7 @@ describe "GET employer_details" do
   it "should match with the expected result set" do
     get :employer_details, {employer_profile_id: employer_profile.id.to_s}
     output = JSON.parse(response.body)
-    puts "#{employer_profile.inspect}"
+    puts "#{output.inspect}"
     expect(output["employer_name"]).to eq(employer_profile.legal_name)
     expect(output["employees_total"]).to eq(employer_profile.roster_size)
     expect(output["active_general_agency"]).to eq(employer_profile.active_general_agency_legal_name)
@@ -150,19 +154,24 @@ describe "GET employer_details" do
     if py
       expect(output["employees_enrolled"]).to             eq(py.total_enrolled_count - py.waived_count )
       expect(output["employees_waived"]).to               eq(py.waived_count)
-      expect(output["open_enrollment_begins"]).to         eq(py.open_enrollment_start_on)
-      expect(output["open_enrollment_ends"]).to           eq(py.open_enrollment_end_on) 
-      expect(output["plan_year_begins"]).to               eq(py.start_on) 
+      expect(output["open_enrollment_begins"]).to         eq(py.open_enrollment_start_on.strftime("%Y-%m-%d"))
+      expect(output["open_enrollment_ends"]).to           eq(py.open_enrollment_end_on.strftime("%Y-%m-%d")) 
+      expect(output["plan_year_begins"]).to               eq(py.start_on.strftime("%Y-%m-%d")) 
       expect(output["renewal_in_progress"]).to            eq(py.is_renewing?) 
-      expect(output["renewal_application_available"]).to  eq(py.start_on >> Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months) 
-      expect(output["renewal_application_due"]).to        eq(py.due_date_for_publish) 
+      expect(output["renewal_application_available"]).to  eq((py.start_on >> Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months).strftime("%Y-%m-%d")) 
+      expect(output["renewal_application_due"]).to        eq((py.due_date_for_publish).strftime("%Y-%m-%d"))
       expect(output["minimum_participation_required"]).to eq(py.minimum_enrolled_count) 
 
       expect(output["total_premium"]).to eq(0.0) 
       expect(output["employer_contribution"]).to eq(0.0) 
       expect(output["employee_contribution"]).to eq(0.0) 
 
-      expect(output["plan_offerings"]).to eq([])
+      expect(output["plan_offerings"]["active"][0]["benefit_group_name"]).to eq benefit_group.title
+      expect(output["plan_offerings"]["active"][0]["health"]).to_not be nil
+      expect(output["plan_offerings"]["active"][0]["dental"]).to_not be nil
+      expect(output["plan_offerings"]["active"][0]["health"]["reference_plan_name"].downcase).to eq benefit_group.reference_plan.name.downcase
+      expect(output["plan_offerings"]["active"][0]["dental"]["reference_plan_name"].downcase).to eq benefit_group.dental_reference_plan.name.downcase
+      
     end 
 
   end
@@ -298,7 +307,7 @@ describe "GET employer_details" do
 
          #TODO Venu & Pavan: can we get some real plan offerings here?
          #it would be cool if Mike had just active but Carol had active and renewal, for instance
-         expect(@output["plan_offerings"].keys).to eq(["active"]) 
+         expect(@output["plan_offerings"].keys).to eq(["active", "renewal"]) 
         end
 
         it "should not be able to access Carol's broker's employer list" do
@@ -342,6 +351,8 @@ describe "GET employer_details" do
 
         it "Mikes employer should render 200 with valid ID" do
             get :employer_details, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
+            @output = JSON.parse(response.body)
+            puts JSON.pretty_generate(@output)
             expect(response).to have_http_status(200), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
             expect(response.content_type).to eq "application/json"
           end
