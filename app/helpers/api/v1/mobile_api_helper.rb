@@ -314,6 +314,7 @@ module Api::V1::MobileApiHelper
       employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
 #TODO fix security hole
 #@broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
+# check that in the broker agency staff case, the broker_agency_profile requested is one that is a broker_agency_profile connecteed to one of the current users's broker_agency_staff_roles
 
     else
       if broker_role

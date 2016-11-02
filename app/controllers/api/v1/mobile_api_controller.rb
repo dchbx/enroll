@@ -39,6 +39,11 @@ module Api
       end
 
       def fetch_employer_profile
+        # check that the current user is:
+        # - the employer indicated by the id
+        # - their broker
+        # - staff at their broker's broker agency
+        # - or HBX staff
         id_params = params.permit(:id, :employer_profile_id, :report_date)
         id = id_params[:id] || id_params[:employer_profile_id]  #TODO user check
         EmployerProfile.find(id)
