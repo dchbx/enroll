@@ -1,0 +1,29 @@
+<div class="container bottom-pd">
+  <div class="row"><h3 class="title-inline"> APTC CSR Update</h3></div>
+
+  <%= render 'demographics_info.html.erb'%>
+
+  
+  <div class="row">
+    <%if @eligibility_redetermination_result || @enrollment_update_result%>
+      <h3 class="title-inline"> Update Successful </h3>
+    <%else%>
+      <h3 class="title-inline"> No changes made. Nothing to update.</h3>
+    <%end%> 
+  </div>
+
+  <%if @eligibility_redetermination_result || @enrollment_update_result%>
+    <div class="row">
+      <ul>
+        <%if @eligibility_redetermination_result %> <li><h4>Eligibility Redetermined with new Max APTC and/or CSR values.</h4></li> <%end%>
+        <%if @enrollment_update_result %> <li><h4>Enrollment(s) updated with new Applied APTC value(s).</h4></li> <%end%>
+      </ul>
+    </div>
+  <%end%>
+  <br />
+  <div class="row">
+    <i class="fa fa-list" aria-hidden="true"></i> &nbsp;
+    <%#= link_to ' Go back to APTC / CSR Families List', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
+    <%= link_to '<i class="fa fa-chevron-left"></i> Go back to Families Index'.html_safe, family_index_dt_exchanges_hbx_profiles_path, remote: true %>
+  </div>
+</div>

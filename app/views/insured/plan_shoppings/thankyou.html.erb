@@ -41,6 +41,12 @@
           <% else %>
             <%= render  partial: 'shared/sep_progress', locals: {step: '6'} %>
           <% end %>
+        <% elsif @change_plan.blank? && @market_kind == "coverall" %>
+            <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+              <%= render  partial: 'shared/individual_progress', locals: {step: '5'} %>
+            <% else %>
+              <%= render  partial: 'shared/sep_progress', locals: {step: '6'} %>
+            <% end %>
         <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
         <% elsif @change_plan == "change_by_qle" %>

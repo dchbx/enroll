@@ -470,6 +470,39 @@ class CensusEmployee < CensusMember
 
   class << self
 
+    def enrolled_count(benefit_group)
+
+        return 0 unless benefit_group
+
+        cnt = CensusEmployee.collection.aggregate([
+        {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
+        {"$unwind" => "$benefit_group_assignments"},
+        {"$match" => {"aasm_state" => { "$in" =>  EMPLOYMENT_ACTIVE_STATES  } }},
+        {"$match" => {"benefit_group_assignments.aasm_state" => { "$in" => ["coverage_selected"]} }},
+        #{"$match" => {"benefit_group_assignments.is_active" => true}},
+        {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
+        {"$group" => {
+            "_id" =>  { "bgid" => "$benefit_group_assignments.benefit_group_id",
+                        #"state" => "$aasm_state",
+                        #{}"active" => "$benefit_group_assignments.is_active",
+                        #{}"bgstate" => "$benefit_group_assignments.aasm_state"
+                      },
+                      "count" => { "$sum" => 1 }
+                    }
+              },
+        #{"$match" => {"count" => {"$gte" => 1}}}
+      ],
+      :allow_disk_use => true)
+
+
+      if cnt.count >= 1
+        return cnt.first['count']
+      else
+        return 0
+      end
+    end
+
+
     def advance_day(new_date)
       CensusEmployee.terminate_scheduled_census_employees
     end
@@ -523,7 +556,7 @@ class CensusEmployee < CensusMember
           ce.save!(validate: false)
         end
       end
-    end 
+    end
 
   end
 

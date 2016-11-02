@@ -279,6 +279,14 @@ class ApplicationController < ActionController::Base
       session[:last_market_visited] = 'individual'
     end
 
+    def set_resident_bookmark_url(url=nil)
+      set_current_person
+      role = @person.try(:resident_role)
+      bookmark_url = url || request.original_url
+      save_bookmark role, bookmark_url
+      session[:last_market_visited] = 'resident'
+    end
+
     def stashed_user_password
       session["stashed_password"]
     end

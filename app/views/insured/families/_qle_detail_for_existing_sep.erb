@@ -1,0 +1,41 @@
+<%qle = find_qle_for_sep(@active_admin_sep)%>
+<div id="qle-details-for-existing-sep" class='module hidden'>
+  <div class="hbx-enrollment-panel panel panel-default">
+    <div class="panel-heading">
+      <div class="vertically-aligned-row">
+        <h3 class="no-buffer">ELIGIBLE TO ENROLL</h3>
+        <div class="text-right">
+          <a class="close-popup" href="javascript:void(0);">
+            <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+      <% url, http_method = '/insured/family_members', :get %>
+        <%= form_tag url, method: http_method, class: 'input-no-pd', id: 'qle_form' do %>
+          <%= hidden_field_tag 'change_plan', qle.title %>
+          <%= hidden_field_tag 'qle_id', qle.id %>
+          <%= hidden_field_tag 'sep_id', @active_admin_sep.id %>
+          <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
+          <p class=" darkblue text-center">
+            <strong id="qle-input-info">Your ‘<%=@active_admin_sep.title%>’ Qualifying Life Event resulted in a Special Enrollment Period starting <%=@active_admin_sep.start_on%>.</strong><br>
+          </p>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <% if qle.date_options_available? && @active_admin_sep.optional_effective_on.present?%> <!--Show Dropdown if there are choice Dates available.-->
+              <div class="alert alert-danger" id='qle_effective_on_kind_alert' role="alert" style='display:none'>Please Select Effective Date</div>
+              <div style='margin: 0 auto;max-width:250px;'>
+                  <%= select_tag 'effective_on_option', options_for_select(@active_admin_sep.optional_effective_on), include_blank: 'SELECT EFFECTIVE DATE *' %>
+              </div>
+            <% else %>  <!--Go with the Next possible effective date.-->
+              <%= hidden_field_tag 'effective_on_option', @active_admin_sep.next_poss_effective_date %>
+            <% end %>
+            <br />
+            <div align="center"> <%= submit_tag 'Continue', class: 'btn btn-primary' %> </div>
+          </div>
+        <% end %> <!--End Form tag-->
+      </div>
+    </div>
+  </div>
+</div>

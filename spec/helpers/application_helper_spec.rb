@@ -61,14 +61,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#participation_rule" do
-    let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
-
-    it "should return correct eligibility criteria" do
-      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer"
-    end
-
-  end
 
   describe "#enrollment_progress_bar" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }

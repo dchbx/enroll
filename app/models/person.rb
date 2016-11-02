@@ -71,9 +71,11 @@ class Person
                 index: true
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
+  embeds_one :resident_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
-  embeds_one :responsible_party, cascade_callbacks: true, validate: true
+  #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
+
   embeds_one :csr_role, cascade_callbacks: true, validate: true
   embeds_one :assister_role, cascade_callbacks: true, validate: true
   embeds_one :inbox, as: :recipient
@@ -89,7 +91,7 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
 
-  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
+  accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
@@ -162,14 +164,18 @@ class Person
   index({"person_relationship.relative_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
-  index({"hbx_responsible_party_role._id" => 1})
+
+  #index({"hbx_responsible_party_role._id" => 1})
+
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
+  scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
   scope :all_employer_staff_roles,    -> { exists(employer_staff_role: true) }
-  scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
+
+  #scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
   scope :all_broker_roles,            -> { exists(broker_role: true) }
   scope :all_hbx_staff_roles,         -> { exists(hbx_staff_role: true) }
   scope :all_csr_roles,               -> { exists(csr_role: true) }
@@ -481,6 +487,10 @@ class Person
     consumer_role.present? and consumer_role.is_active?
   end
 
+  def has_active_resident_role?
+    resident_role.present? and resident_role.is_active?
+  end
+
   def can_report_shop_qle?
     employee_roles.first.census_employee.qle_30_day_eligible?
   end
@@ -609,7 +619,7 @@ class Person
       active_enrolled_hbxs = person.primary_family.active_household.hbx_enrollments.active.enrolled_and_renewal
 
       # Iterate over each enrollment and check if there is a Premium Implication based on the following rule:
-      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the 
+      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the
       #       change is all within the 0-20 age range or all within the 61+ age range (20 >= age <= 61)
       active_enrolled_hbxs.each do |hbx|
         new_temp_person = person.dup
@@ -713,6 +723,7 @@ class Person
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
   attr_accessor :is_consumer_role
+  attr_accessor :is_resident_role
 
   before_save :assign_citizen_status_from_consumer_role
 

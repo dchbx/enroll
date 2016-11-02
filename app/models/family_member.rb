@@ -24,7 +24,7 @@ class FamilyMember
   field :former_family_id, type: BSON::ObjectId
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
-
+  scope :by_primary_member_role, ->{ where(:is_active => true).where(:is_primary_applicant => true) }
   embeds_many :hbx_enrollment_exemptions
   accepts_nested_attributes_for :hbx_enrollment_exemptions
 

@@ -3,7 +3,7 @@ class Insured::ConsumerRolesController < ApplicationController
   include VlpDoc
   include ErrorBubble
 
-  before_action :check_consumer_role, only: [:search]
+  before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   #before_action :authorize_for, except: [:edit, :update]
 
@@ -15,9 +15,12 @@ class Insured::ConsumerRolesController < ApplicationController
     @val = params[:aqhp] || params[:uqhp]
     @key = params.key(@val)
     @search_path = {@key => @val}
-    if @person.try(:consumer_role?)
+    if @person.try(:resident_role?)
+      bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
+      redirect_to bookmark_url || family_account_path
+    elsif @person.try(:consumer_role?)
       bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
-      redirect_to bookmark_url || family_account_path 
+      redirect_to bookmark_url || family_account_path
     end
   end
 
@@ -81,7 +84,15 @@ class Insured::ConsumerRolesController < ApplicationController
               end
             end
           end
-
+          #binding.pry
+          #@resident_candidate = Forms::ResidentCandidate.new(@person_params)
+          #if @resident_candidate.valid?
+          #  found_resident = @resident_candidate.match_person
+          #  if found_resident.present?
+              #link headless user with found_resident
+          #    format.html { render 'exchanges/residents/match' }
+          #  end
+          #end
           found_person = @consumer_candidate.match_person
           if found_person.present?
             format.html { render 'match' }
@@ -223,6 +234,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,
@@ -238,9 +250,13 @@ class Insured::ConsumerRolesController < ApplicationController
     @consumer_role = ConsumerRole.find(params.require(:id))
   end
 
+
   def check_consumer_role
     set_current_person(required: false)
-    if @person.try(:has_active_consumer_role?)
+    # need this check for cover all
+    if @person.try(:has_active_resident_role?)
+      redirect_to @person.resident_role.bookmark_url || family_account_path
+    elsif @person.try(:has_active_consumer_role?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
 
     else

@@ -1,0 +1,63 @@
+<!-- Plan Name -->
+<td class="col-bulk_actions_column col-bulk_actions"></td>
+<td class="col-string">
+  <label>
+    <strong>
+      Plan
+    </strong>
+  </label>
+  <br/>
+  <%= @hbx_enrollment.plan.name %>
+</td>
+<!-- Effective Date -->
+<td class="col-string">
+  <label>
+    <strong>
+      Effective Date
+    </strong>
+  </label>
+  <br/>
+  <%= @hbx_enrollment.effective_on %>
+</td>
+<!-- Cancel date set to start date -->
+
+<!-- EDI Transmission to Carrier -->
+<!-- EDI Transmisison checkbox -->
+<td style="width:280px !important">
+<%= form_for @hbx_enrollment, :url => update_terminate_enrollment_exchanges_hbx_profiles_path(@hbx_enrollment, :hbx_id => @hbx_enrollment.id), :method => :post, :html => { :class => 'vertically-aligned-row' } do |f| %>
+<div style="width:312px">
+  <label>
+    <strong> Termination Date </strong>
+  </label>
+  <br/>
+  <div class="width:100px">
+  <%= text_field_tag "termination_date", nil, readonly: true, placeholder:  TimeKeeper.date_of_record, id: "termination-date-picker", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_effective_on(@hbx_enrollment, TimeKeeper.date_of_record) %>
+  </div>
+</div>
+
+<div>
+  <span class="btn btn-default btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>
+  <%= f.submit "Submit", class: 'btn btn-primary' %>
+</div>
+<% end %>
+</td>
+
+<script>
+$( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
+  if($('#termination-date-picker').val().length !=0)
+        this.submit();
+  else {
+    event.preventDefault();
+    alert("Please select a valid date.");
+  }
+});
+</script>
+
+<style>
+#termination-date-picker {
+  width:100px !important;
+  margin-top:5px;
+  float:left;
+  margin-left:20px;
+}
+</style>

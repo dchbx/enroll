@@ -36,12 +36,14 @@ gem 'font-awesome-rails', '4.5.0.1'
 gem 'nokogiri-happymapper', :require => 'happymapper'
 gem 'nokogiri', '1.6.7.2'
 
-gem 'mongoid', '5.0.1'
 gem 'mongo', '2.1.2'
+gem 'mongoid', '5.0.1'
+gem 'mongoid-history', git: "https://github.com/aq1018/mongoid-history.git", branch: "master"
+# gem 'mongoid-history', '~> 5.1.0'
+gem 'mongoid_userstamp'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem "mongoid-autoinc"
 gem 'mongoid-versioning'
-
 gem 'money-rails', '~> 1.3.0'
 gem "mongoid-enum"
 gem 'mongo_session_store-rails4', '~> 6.0.0'
@@ -96,6 +98,7 @@ gem 'wicked_pdf', '1.0.6'
 gem "recaptcha", '1.1.0'
 
 gem 'jquery-datatables-rails', '3.4.0'
+gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'

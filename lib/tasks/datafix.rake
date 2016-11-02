@@ -1,7 +1,6 @@
 namespace :datafix do
   desc "cleanup general agency profiles"
   task general_agency_profile_clean_up: :environment do
-  	#binding.pry
   	general_agency_profiles = GeneralAgencyProfile.all
   	general_agency_profiles.each do |ga|
   		ga.general_agency_staff_roles.each do |staff_role|

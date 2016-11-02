@@ -1,0 +1,44 @@
+<%if @error_on_save %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%@error_on_save.each do |err|%>
+      <li><%=err[1][0]%></li>
+    <%end%>
+  </div>
+<%end%>
+<div id="add_sep">
+  <div class="bottom-pd">
+    <%= form_for @person, remote: true, url: update_dob_path, method: "post", class: "form" do |f|%>
+      <%= f.hidden_field :person_id, value: @person.id %>
+      <div class="row no-buffer form-wrapper-buffer">
+        <h3 class="title">Edit DOB </h3>
+          <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+            <div class="col-md-3 col-md-offset-3 col-sm-3 col-md-offset-3 col-xs-12 form-group form-group-lg no-pd">
+              New DOB
+              <%= datepicker_control f, :dob, {:class => "interaction-field-control-census-employee-dob input_txt", :value => params[:new_dob].present? ? Date.strptime(params[:new_dob], '%m/%d/%Y') : @person.dob, :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication_coverall('#{@person.id}', this.value, '#{@element_to_replace_id}')"}
+              %>
+              <%= f.hidden_field :pid, :value => @person.id  %>
+              <%= f.hidden_field :family_actions_id, :value => "family_actions_#{@person.primary_family.id.to_s}" %>
+            </div>
+          </div>
+      </div>
+      <div class="row no-buffer child-row">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <%= link_to "Reset", edit_dob_path(id: @person.id, family_actions_id: "family_actions_#{@person.primary_family.id.to_s}"), class: "btn btn-info", remote: true %>
+          <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px'%>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+<%if @premium_implications.present?%>
+  <div class="alert alert-warning row">
+    <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span>
+    <b>
+      Active enrollment(s) for this person exists. Updating DOB has implications as it could result in the change of premium for the following enrollment(s):
+    </b>
+    <%@premium_implications.each do |key, val|%>
+      <li><%=find_plan_name(key)%></li>
+    <%end%>
+  </div>
+<%end%>
+<%#= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true, class: 'btn btn-default' %>

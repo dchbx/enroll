@@ -36,6 +36,43 @@ module Factories
 
     end
 
+
+    def self.add_resident_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
+                               new_is_state_resident:, new_citizen_status:)
+
+      [:new_is_incarcerated, :new_is_applicant, :new_is_state_resident, :new_citizen_status].each do |value|
+        name = value.id2name
+        raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
+      end
+
+      ssn = new_ssn
+      dob = new_dob
+      gender = new_gender
+      is_incarcerated = new_is_incarcerated
+      is_applicant = new_is_applicant
+      is_state_resident = new_is_state_resident
+      citizen_status = new_citizen_status
+
+      # Assign consumer-specifc attributes
+      resident_role = person.build_resident_role(ssn: ssn,
+                                                 dob: dob,
+                                                 gender: gender,
+                                                 is_incarcerated: is_incarcerated,
+                                                 is_applicant: is_applicant,
+                                                 is_state_resident: is_state_resident,
+                                                 citizen_status: citizen_status)
+     if person.save
+        resident_role.save
+      else
+        resident_role.errors.add(:person, "unable to update person")
+      end
+
+     return resident_role
+
+    end
+
+
+
     def self.construct_consumer_role(person_params, user)
       person_params = person_params[:person]
       person, person_new = initialize_person(
@@ -169,7 +206,7 @@ module Factories
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on
     end
-    
+
     def self.migrate_census_employee_contact_to_person(census_employee, person)
       if census_employee
         if census_employee.address
@@ -194,7 +231,7 @@ module Factories
       elsif person_new
         person.delete
       end
-      
+
       return role, family
     end
 
@@ -209,6 +246,53 @@ module Factories
       end
       return family
     end
+
+    def self.construct_resident_role(person_params, user)
+      person_params = person_params[:person]
+      person, person_new = initialize_person(
+        user, person_params["name_pfx"], person_params["first_name"],
+        person_params["middle_name"] , person_params["last_name"],
+        person_params["name_sfx"], person_params["ssn"],
+        person_params["dob"], person_params["gender"], "resident", true
+        )
+      if person.blank? && person_new.blank?
+        begin
+          raise
+        rescue => e
+          error_message = {
+            :error => {
+              :message => "unable to construct resident role",
+              :person_params => person_params.inspect,
+              :user => user.inspect,
+              :backtrace => e.backtrace.join("\n")
+            }
+          }
+          log(JSON.dump(error_message), {:severity => 'error'})
+        end
+        return nil
+      end
+      role = build_resident_role(person, person_new)
+    end
+
+    def self.build_resident_role(person, person_new)
+      role = find_or_build_resident_role(person)
+      family, primary_applicant =  initialize_family(person,[])
+      family.family_members.map(&:__association_reload_on_person)
+      saved = save_all_or_delete_new(family, primary_applicant, role)
+      if saved
+        role
+      elsif person_new
+        person.delete
+      end
+      return role
+    end
+
+    def self.find_or_build_resident_role(person)
+      return person.resident_role if person.resident_role.present?
+      person.build_resident_role(is_applicant: true)
+    end
+
+
 
     private
 
