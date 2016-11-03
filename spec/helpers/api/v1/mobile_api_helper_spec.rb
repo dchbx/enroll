@@ -131,9 +131,9 @@ RSpec.describe Api::V1::MobileApiHelper, dbclean: :around_each do
 
   context "get_benefit_group_assignments_for_plan_year" do
       it "should get the correct benefit group assignments for the businesses" do
-        expect(get_benefit_group_assignments_for_plan_year(plan_year_cafe)).to eq [   benefit_group_assignment_barista, benefit_group_assignment_manager, benefit_group_assignment_janitor ]
+        expect(benefit_group_assignments(plan_year_cafe)).to eq [benefit_group_assignment_barista, benefit_group_assignment_manager, benefit_group_assignment_janitor ]
   
-        expect(get_benefit_group_assignments_for_plan_year(plan_year_salon)).to eq [    benefit_group_assignment_hairdresser]      
+        expect(benefit_group_assignments(plan_year_salon)).to eq [benefit_group_assignment_hairdresser]
       end
      end
 
@@ -288,7 +288,7 @@ context "count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments 
   	     FactoryGirl.create(:employer_staff_role, person: person[5], employer_profile_id: employer_profile[2].id,    aasm_state: "is_active")
   	     
   	     @employer_profile_ids = [employer_profile[0].id, employer_profile[1].id, employer_profile[2].id] 
-  	     @res = staff_for_employers_including_pending(@employer_profile_ids)  
+  	     @res = employer_staff(@employer_profile_ids)
   	   end
   	   
   	   it "Should give the correct count of staff members across multiple employers" do
