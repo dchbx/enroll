@@ -8,21 +8,15 @@ module Api
       def employers_list
         execute {
           json = EmployerHelper.employers_and_broker_agency current_user, params[:id]
-          if json
-            render json: json
-          else
-            render json: {error: 'no broker agency profile found'}, :status => :not_found
-          end
+          json ? (render json: json) :
+              (render json: {error: 'no broker agency profile found'}, :status => :not_found)
         }
       end
 
       def employer_details
         execute {
-          if @employer_profile
-            render json: EmployerHelper.employer_details(@employer_profile, params[:report_date])
-          else
-            render json: {file: 'public/404.html'}, status: :not_found
-          end
+          @employer_profile ? (render json: EmployerHelper.employer_details(@employer_profile, params[:report_date]))
+          : (render json: {file: 'public/404.html'}, status: :not_found)
         }
       end
 
