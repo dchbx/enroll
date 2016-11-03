@@ -3,8 +3,6 @@ require_relative '../../../../lib/api/v1/employer_helper'
 module Api
   module V1
     class MobileApiController < ApplicationController
-      include MobileApiRosterHelper
-
       before_filter :employer_profile, except: :employers_list
 
       def employers_list
@@ -30,13 +28,13 @@ module Api
 
       def employee_roster
         execute {
-          census_employees = employees_by @employer_profile, params[:employee_name], params[:status]
-          limited_census_employees = census_employees.limit(50).to_a #TODO: smaller limits, & paging past 50
+          employees = EmployeeHelper.employees_sorted_by @employer_profile, params[:employee_name], params[:status]
+          limited_employees = employees.limit(50).to_a #TODO: smaller limits, & paging past 50
 
           render json: {
               employer_name: @employer_profile.legal_name,
-              total_num_employees: census_employees.size,
-              roster: render_roster_employees(limited_census_employees, @employer_profile.renewing_published_plan_year.present?)
+              total_num_employees: employees.size,
+              roster: EmployeeHelper.roster_employees(limited_employees, @employer_profile.renewing_published_plan_year.present?)
           }
         }
       end
