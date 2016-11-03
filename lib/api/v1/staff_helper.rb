@@ -1,8 +1,8 @@
-require_relative 'base'
+require_relative 'base_helper'
 
 module Api
   module V1
-    class Staff < Base
+    class StaffHelper < BaseHelper
 
       # Returns a hash of arrays of staff members, keyed by employer id
       def by_employer_id

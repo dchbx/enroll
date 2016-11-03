@@ -1,16 +1,15 @@
-require_relative '../../../../lib/api/v1/mobile_api_helper'
+require_relative '../../../../lib/api/v1/employer_helper'
 
 module Api
   module V1
     class MobileApiController < ApplicationController
-      include MobileApiHelper
       include MobileApiRosterHelper
 
       before_filter :employer_profile, except: :employers_list
 
       def employers_list
         execute {
-          json = employers_and_broker_agency current_user, params[:id]
+          json = EmployerHelper.employers_and_broker_agency current_user, params[:id]
           if json
             render json: json
           else
@@ -22,7 +21,7 @@ module Api
       def employer_details
         execute {
           if @employer_profile
-            render json: marshall_employer_details_json(@employer_profile, params[:report_date])
+            render json: EmployerHelper.employer_details(@employer_profile, params[:report_date])
           else
             render json: {file: 'public/404.html'}, status: :not_found
           end
