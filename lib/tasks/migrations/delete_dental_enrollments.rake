@@ -3,6 +3,6 @@ namespace :migrations do
 
   desc "delete dental enrollment"
   task :delete_dental_enrollment => :environment do |t, args|
-    DeleteDentalEnrollment.migrate()
+    DeleteDentalEnrollment
   end
 end
