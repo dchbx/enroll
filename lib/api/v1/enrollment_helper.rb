@@ -35,7 +35,7 @@ module Api
           %w{health dental}.each do |coverage_kind|
             enrollment, rendered_enrollment = initialize_enrollment assignment, coverage_kind
 
-            ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
+            EmployeeHelper::ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
               value = enrollment.plan.try(field)
               rendered_enrollment[field] = value if value
             end if enrollment && enrollment.plan
