@@ -74,9 +74,7 @@ module Api
         employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
         enrolled, waived, terminated = count_enrolled_waived_and_terminated_employees @plan_year
 
-        details employer_profile: @employer_profile,
-                year: @plan_year,
-                num_enrolled: enrolled,
+        details num_enrolled: enrolled,
                 num_waived: waived,
                 num_terminated: terminated,
                 total_premium: premium_amt_total,
