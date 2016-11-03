@@ -93,7 +93,7 @@ module Api
         details[:employee_contribution] = employee_contribution
         details[:active_general_agency] = @employer_profile.active_general_agency_legal_name # Note: queries DB
         details[:plan_offerings] = Hash[active_and_renewal_plan_years.map do |period, py|
-          [period, py ? PlanYearHelper.render_plan_offerings_by_year(py) : nil]
+          [period, py ? PlanYearHelper.plan_offerings(py) : nil]
         end]
         details
       end
@@ -174,7 +174,6 @@ module Api
       # we only bother counting the subscribers if the employer is currently in OE
       #
       def open_enrollment_employee_count plan_year, as_of
-        puts "..plan_year: #{self.inspect}, as of: #{as_of}, contains: #{plan_year.open_enrollment_contains?(as_of)}" if plan_year
         return unless PlanYearHelper.open_enrollment? plan_year, as_of
         count_by_enrollment_status plan_year
       end
