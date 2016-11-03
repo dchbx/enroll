@@ -84,15 +84,32 @@ class Insured::ConsumerRolesController < ApplicationController
               end
             end
           end
-          #binding.pry
-          #@resident_candidate = Forms::ResidentCandidate.new(@person_params)
-          #if @resident_candidate.valid?
-          #  found_resident = @resident_candidate.match_person
-          #  if found_resident.present?
-              #link headless user with found_resident
-          #    format.html { render 'exchanges/residents/match' }
-          #  end
-          #end
+
+          @resident_candidate = Forms::ResidentCandidate.new(@person_params)
+          if @resident_candidate.valid?
+            found_person = @resident_candidate.match_person
+            if found_person.present?
+              begin
+                @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+                if @resident_role.present?
+                  @person = @resident_role.person
+                  session[:person_id] = @person.id
+                else
+                # not logging error because error was logged in construct_consumer_role
+                  render file: 'public/500.html', status: 500
+                  return
+                end
+              rescue Exception => e
+                flash[:error] = set_error_message(e.message)
+                redirect_to search_exchanges_consumers_path
+                return
+              end
+              create_sso_account(current_user, @person, 15, "resident") do
+                format.html { redirect_to family_account_path }
+              end
+            end
+          end
+
           found_person = @consumer_candidate.match_person
           if found_person.present?
             format.html { render 'match' }

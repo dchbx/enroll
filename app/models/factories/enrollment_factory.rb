@@ -71,8 +71,6 @@ module Factories
 
     end
 
-
-
     def self.construct_consumer_role(person_params, user)
       person_params = person_params[:person]
       person, person_new = initialize_person(
