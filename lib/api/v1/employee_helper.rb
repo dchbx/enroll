@@ -96,9 +96,10 @@ module Api
       end
 
       def self.dependents_of employee
-        all_dependents = employee.try(:employee_role).try(:person).try(:primary_family).try(:active_family_members) ||
-            employee.census_dependents || []
-        all_dependents.reject { |d| relationship_with(d) == 'self' }
+        all_family_dependents = employee.try(:employee_role).try(:person).try(:primary_family).try(:active_family_members) || []
+        family_dependents = all_family_dependents.reject { |d| relationship_with(d) == 'self' }
+        census_dependents = employee.census_dependents || []
+        (family_dependents + census_dependents).uniq { |p| p.ssn }
       end
 
     end
