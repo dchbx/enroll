@@ -114,8 +114,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
-    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "any_state"]
-    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated"]
+    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "auto_renewing", "any_state"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing"]
 
     context "IVL market" do
       before :each do
