@@ -15,17 +15,17 @@ module Api
         employer.plan_year ? employer.details_for_plan_year : employer.details
       end
 
-      def self.employers_and_broker_agency user, broker_agency_id
-        employer = Api::V1::EmployerHelper.new broker_agency_id: broker_agency_id, user: user
-        employer.organization do |broker_agency_profile, organization, broker_role|
-          break unless organization
+      def self.employers_and_broker_agency user, auth
+        employer = Api::V1::EmployerHelper.new auth: auth, user: user
+        organization = employer.organization auth
+        if organization
           employer_profiles = organization.map { |o| o.employer_profile }
-          broker_name = user.person.first_name if broker_role
+          broker_name = user.person.first_name if auth[:broker_role]
 
           {broker_name: broker_name,
-           broker_agency: broker_agency_profile.legal_name,
-           broker_agency_id: broker_agency_profile.id,
-           broker_clients: marshall_employer_summaries(employer_profiles)} if broker_agency_profile
+           broker_agency: auth[:broker_agency_profile].legal_name,
+           broker_agency_id: auth[:broker_agency_profile].id,
+           broker_clients: marshall_employer_summaries(employer_profiles)} if auth[:broker_agency_profile]
         end
       end
 
@@ -38,17 +38,9 @@ module Api
         })
       end
 
-      def organization
-        broker_role = @user.person.broker_role
-        if @broker_agency_id && (@user.has_broker_agency_staff_role? || @user.has_hbx_staff_role?)
-          broker_agency_profile = BrokerAgencyProfile.find @broker_agency_id
-          organization = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
-          #TODO fix security hole
-        elsif broker_role
-          broker_agency_profile = broker_role.broker_agency_profile
-          organization = Organization.by_broker_role broker_role.id
-        end
-        yield broker_agency_profile, organization, broker_role
+      def organization auth
+        auth.has_key?(:broker_role) ? Organization.by_broker_role(auth[:broker_role].id) :
+            Organization.by_broker_agency_profile(auth[:broker_agency_profile]._id)
       end
 
       def summaries

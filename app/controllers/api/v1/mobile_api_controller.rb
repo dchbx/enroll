@@ -5,11 +5,18 @@ module Api
     class MobileApiController < ApplicationController
       before_filter :employer_profile, except: :employers_list
 
+      NO_BROKER_AGENCY_PROFILE_FOUND = 'no broker agency profile found'
+
       def employers_list
         execute {
-          json = EmployerHelper.employers_and_broker_agency(current_user, params[:id]) if SecurityHelper.can_view_employer_list?(current_user, params[:id])
-          json ? (render json: json) :
-              (render json: {error: 'no broker agency profile found'}, :status => :not_found)
+          auth = SecurityHelper.authorize_employer_list current_user, params
+          if auth[:status] == 200
+            json = EmployerHelper.employers_and_broker_agency current_user, auth
+            json ? (render json: json) :
+                (render json: {error: NO_BROKER_AGENCY_PROFILE_FOUND}, :status => :not_found)
+          else
+            render json: {error: NO_BROKER_AGENCY_PROFILE_FOUND}, status: auth[:status]
+          end
         }
       end
 
