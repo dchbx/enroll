@@ -9,7 +9,7 @@ module Api
           broker_agency_profile = BrokerAgencyProfile.find params[:id]
           broker_agency_profile ? admin_or_staff(broker_agency_profile, current_user, params) : {status: 404}
         else
-          current_user.has_hbx_staff_role? ? {status: 406} : broker_role(current_user)
+          broker_role current_user
         end
       end
 
