@@ -95,6 +95,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with all required attributes" do
       let(:params)                  { valid_params }
       let(:initial_census_employee) { CensusEmployee.new(**params) }
+      let(:dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
+      let(:dependent2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333, dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
 
       it "should be valid" do
         expect(initial_census_employee.valid?).to be_truthy
@@ -102,6 +104,18 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should save" do
         expect(initial_census_employee.save).to be_truthy
+      end
+      
+      it "allow dependent ssn's to be updated to nil" do
+        initial_census_employee.census_dependents = [dependent]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match(nil)
+      end
+      
+      it "ignores depepent ssn's if ssn not nil" do
+        initial_census_employee.census_dependents = [dependent2]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match("333333333")
       end
 
       context "with duplicate ssn's on dependents" do
@@ -114,15 +128,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "with duplicate blank ssn's on dependents" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
         let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
-
+        
         it "should not have errors" do
           initial_census_employee.census_dependents = [child1,child2]
           expect(initial_census_employee.valid?).to be_truthy
-          expect(initial_census_employee.save).to be_truthy
         end
       end
 
@@ -135,7 +148,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "and it is saved" do
         before { initial_census_employee.save }
 

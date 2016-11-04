@@ -143,7 +143,7 @@ Then(/^.+ confirms? broker selection$/) do
 end
 
 Then(/^.+ should see broker selected successful message$/) do
-  wait_for_ajax
+  wait_for_ajax(1,0.01)
   expect(page).to have_content("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
 end
 
@@ -154,8 +154,7 @@ end
 
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
-  wait_for_ajax
-
+  wait_for_ajax(2,2)
   within '.modal-dialog' do
     click_link 'Terminate Broker'
   end
@@ -193,7 +192,7 @@ Then(/^.* creates and publishes a plan year$/) do
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax(10)
   find('.carriers-tab a').click
-  wait_for_ajax(10)
+  wait_for_ajax(10,2)
   find('.reference-plan label').click
   wait_for_ajax(10)
   find('.interaction-click-control-create-plan-year').trigger('click')

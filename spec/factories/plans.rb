@@ -3,7 +3,7 @@ FactoryGirl.define do
     sequence(:hbx_id)    { |n| n + 12345 }
     sequence(:name)      { |n| "BlueChoice Silver#{n} 2,000" }
     abbrev              "BC Silver $2k"
-    sequence(:hios_id, (10..99).cycle)  { |n| "86052DC04000#{n}-01" }
+    sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
     active_year         { TimeKeeper.date_of_record.year }
     coverage_kind       "health"
     metal_level         "silver"
@@ -16,13 +16,21 @@ FactoryGirl.define do
 
     # association :premium_tables, strategy: :build
 
+    trait :with_dental_coverage do
+      coverage_kind "dental"
+       metal_level "dental"
+      dental_level "high"
+    end
+
     trait :with_premium_tables do
       transient do
         premium_tables_count 48
       end
 
       after(:create) do |plan, evaluator|
-        create_list(:premium_table, evaluator.premium_tables_count, plan: plan)
+        start_on = Date.new(plan.active_year,1,1)
+        end_on = start_on + 1.year - 1.day
+        create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
       end
     end
 
@@ -78,6 +86,7 @@ FactoryGirl.define do
       metal_level "dental"
       dental_level "high"
     end
+
     trait :ivl_dental do
       market "individual"
       coverage_kind "dental"

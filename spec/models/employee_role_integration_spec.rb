@@ -5,6 +5,10 @@ describe EmployeeRole do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
   end
 
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
   context "an organization exists" do
     let!(:organization) { FactoryGirl.create(:organization) }
 

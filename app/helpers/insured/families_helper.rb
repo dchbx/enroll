@@ -126,8 +126,12 @@ module Insured::FamiliesHelper
     return true
   end
 
-  def has_writing_agent?(employee_role)
-    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  def has_writing_agent?(employee_role_or_person)
+    if employee_role_or_person.is_a?(EmployeeRole)
+      employee_role_or_person.employer_profile.active_broker_agency_account.writing_agent rescue false
+    elsif employee_role_or_person.is_a?(Person)
+       employee_role_or_person.primary_family.current_broker_agency.writing_agent.present? rescue false
+    end
   end
 
 
@@ -135,7 +139,7 @@ module Insured::FamiliesHelper
     if enrollment.is_shop?
       true
     else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated'].include?(enrollment.aasm_state.to_s)
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing'].include?(enrollment.aasm_state.to_s)
     end
   end
 

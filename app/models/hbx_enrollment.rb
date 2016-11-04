@@ -410,14 +410,6 @@ class HbxEnrollment
   def waive_coverage_by_benefit_group_assignment(waiver_reason)
     update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
     propogate_waiver
-    hbxs = HbxEnrollment.find_by_benefit_group_assignments([benefit_group_assignment])
-    return if hbxs.blank?
-    hbxs.each do |hbx|
-      if hbx.may_waive_coverage?
-        hbx.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
-        hbx.propogate_waiver
-      end
-    end
   end
 
   def cancel_previous(year)
@@ -1075,11 +1067,11 @@ class HbxEnrollment
     # end
     event :schedule_coverage_termination, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing, :enrolled_contingent, :coverage_enrolled], to: :coverage_termination_pending, after: :set_coverage_termination_date
+      transitions from: [:renewing_waived, :inactive], to: :inactive
     end
 
     event :cancel_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled], to: :coverage_canceled, after: :set_coverage_termination_date
-      transitions from: :renewing_waived, to: :inactive
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified, :coverage_enrolled, :renewing_waived, :inactive], to: :coverage_canceled
     end
 
     event :terminate_coverage, :after => :record_transition do

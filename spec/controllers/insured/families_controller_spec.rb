@@ -45,7 +45,7 @@ RSpec.describe Insured::FamiliesController do
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
-  let(:consumer_role) { double("ConsumerRole") }
+  let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
 
@@ -96,12 +96,13 @@ RSpec.describe Insured::FamiliesController do
     context "for SHOP market" do
 
       let(:employee_roles) { double }
-      let(:employee_role) { [double("EmployeeRole")] }
+      let(:employee_role) { [double("EmployeeRole", bookmark_url: "/families/home")] }
 
       before :each do
         FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
+        allow(person).to receive(:employee_roles).and_return(employee_role)
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return nil
@@ -144,6 +145,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
+        allow(person).to receive(:employee_roles).and_return(nil)
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return true
         sign_in user
@@ -192,13 +194,14 @@ RSpec.describe Insured::FamiliesController do
 
     context "for both ivl and shop" do
       let(:employee_roles) { double }
-      let(:employee_role) { [double("EmployeeRole")] }
+      let(:employee_role) { double("EmployeeRole", bookmark_url: "/families/home") }
       let(:enrollments) { double }
 
       before :each do
         sign_in user
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:employee_roles).and_return(employee_roles)
+        allow(person.employee_roles).to receive(:last).and_return(employee_role)
         allow(person).to receive(:active_employee_roles).and_return(employee_roles)
         allow(employee_roles).to receive(:first).and_return(employee_role)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)

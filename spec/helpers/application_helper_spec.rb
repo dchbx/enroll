@@ -10,6 +10,20 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#display_carrier_logo" do
+    let(:plan){ Maybe.new(FactoryGirl.build(:plan)) }
+    let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
+    let(:plan_1){ Maybe.new(FactoryGirl.build(:plan, hios_id: "89789DC0010006-01", carrier_profile: carrier_profile)) }
+
+    it "should return uhic logo" do
+      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/uhic.jpg\" alt=\"Uhic\" />"
+    end
+
+    it "should return non united logo" do
+      expect(helper.display_carrier_logo(plan_1)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
+    end
+  end
+
   describe "#format_time_display" do
     let(:timestamp){ Time.now.utc }
     it "should display the time in proper format" do

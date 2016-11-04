@@ -149,6 +149,7 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
+  wait_for_ajax
   within '.census-employees-table' do
     find('.top').click
   end
@@ -317,7 +318,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax
   find('.carriers-tab a').click
-  wait_for_ajax
+  wait_for_ajax(10,2)
   find('.reference-plans label').click
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
@@ -453,7 +454,7 @@ And /^clicks on terminate employee$/ do
   page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
   find('.interaction-click-control-terminate-employee').click
   expect(page).to have_content 'Employee Roster'
-  wait_for_ajax
+  wait_for_ajax(2,2)
 end
 
 Then /^employer clicks on terminated filter$/ do
@@ -504,5 +505,6 @@ Then /^employer should not see termination date column$/ do
 end
 
 Then /^they should see that employee's details$/ do
+  wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end

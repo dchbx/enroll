@@ -62,16 +62,15 @@ RSpec.describe "events/employers/updated.haml.erb" do
       end
     end
 
-    context "staff is owner" do
-      let(:staff_and_owner) {FactoryGirl.create(:person)}
+    context "person of contact" do
+      let(:staff) {FactoryGirl.create(:person)}
 
       before do
-        allow(employer).to receive(:staff_roles).and_return([staff_and_owner])
-        allow(employer).to receive(:owners).and_return([staff_and_owner])
+        allow(employer).to receive(:staff_roles).and_return([staff])
         render :template => "events/employers/updated", :locals => { :employer => employer }
       end
 
-      it "does not included the contact person twice" do
+      it "should be included in xml" do
         expect(rendered).to have_selector('contact', count: 1)
       end
     end

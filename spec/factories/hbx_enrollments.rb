@@ -18,5 +18,9 @@ FactoryGirl.define do
     enrollment_kind "open_enrollment"
     # hbx_enrollment_members
     # comments
+    trait :with_dental_coverage_kind do
+      association :plan, factory: [:plan, :with_dental_coverage]
+      coverage_kind "dental"
+    end
   end
 end

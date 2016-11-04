@@ -243,6 +243,17 @@ function setGroupSelectionHandlers(){
     $('#shop-coverage-household .health input').removeProp('checked');
   });
 <% end %>
+
+$("input[type='checkbox']").change(function() {
+  if ($("#coverage_kind_health").is(":checked")){
+    if($(this).is(":checked")) {
+      $(this).attr( "checked", true );
+    }else{
+      $(this).removeProp('checked');
+      $('#shop-coverage-household .dental input').removeProp('checked');
+      }
+    }
+});
 }
 
 $(document).ready(function() {

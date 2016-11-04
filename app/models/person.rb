@@ -207,7 +207,17 @@ class Person
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } ) if need_to_notify?
+  end
+
+  def need_to_notify?
+    changed_fields = changed_attributes.keys
+    changed_fields << consumer_role.changed_attributes.keys if consumer_role.present?
+    changed_fields << employee_roles.map(&:changed_attributes).map(&:keys) if employee_roles.present?
+    changed_fields << employer_staff_roles.map(&:changed_attributes).map(&:keys) if employer_staff_roles.present?
+    changed_fields = changed_fields.flatten.compact.uniq
+    notify_fields = changed_fields.reject{|field| ["bookmark_url", "updated_at"].include?(field)}
+    notify_fields.present?
   end
 
   def is_aqhp?
@@ -801,6 +811,14 @@ class Person
 
   def generate_family_search
     ::MapReduce::FamilySearchForPerson.populate_for(self)
+  end
+
+  def set_consumer_role_url
+    if consumer_role.present? && user.present?
+      if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
+        consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
+      end
+    end
   end
 
   private

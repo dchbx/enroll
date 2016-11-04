@@ -424,12 +424,12 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(@enrollment4.waiver_reason).to eq "start a new job"
       end
 
-      it "enrollment5 should be inactive" do
-        expect(@enrollment5.aasm_state).to eq "inactive"
+      it "enrollment5 should not be waived" do
+        expect(@enrollment5.aasm_state).to eq "shopping"
       end
 
-      it "enrollment5 should get waiver_reason" do
-        expect(@enrollment5.waiver_reason).to eq "start a new job"
+      it "enrollment5 should not have waiver_reason" do
+        expect(@enrollment5.waiver_reason).to eq nil
       end
     end
 
@@ -835,6 +835,20 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "cancel_coverage!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
 end
 
 describe HbxEnrollment, dbclean: :after_each do
@@ -907,6 +921,10 @@ describe HbxEnrollment, dbclean: :after_each do
     allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
     allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   context ".effective_date_for_enrollment" do
@@ -1830,7 +1848,7 @@ context "A cancelled external enrollment", :dbclean => :after_each do
   end
 end
 
-context '.process_verification_reminders' do 
+context '.process_verification_reminders' do
   context "when family exists with pending outstanding verifications" do
 
     let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -1858,9 +1876,9 @@ context '.process_verification_reminders' do
       consumer_role.update_attributes(:aasm_state => 'verification_outstanding')
     end
 
-    context 'when first verification due date reached' do 
+    context 'when first verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now)
       end
 
       it 'should trigger first reminder event' do
@@ -1872,7 +1890,7 @@ context '.process_verification_reminders' do
 
     context 'when second verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now)
       end
 
       it 'should trigger second reminder event' do
@@ -1884,7 +1902,7 @@ context '.process_verification_reminders' do
 
     context 'when third verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now) 
+        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now)
       end
 
       it 'should trigger third reminder event' do
@@ -1894,10 +1912,10 @@ context '.process_verification_reminders' do
       end
     end
 
-    context 'when fourth verification due date reached' do 
+    context 'when fourth verification due date reached' do
       before do
-        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now) 
-      end 
+        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now)
+      end
 
       it 'should trigger fourth reminder event' do
         HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
