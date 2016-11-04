@@ -17,13 +17,13 @@ module Api
 
       def self.employers_and_broker_agency user, auth
         employer = Api::V1::EmployerHelper.new auth: auth, user: user
-        organization = employer.organization auth
-        if organization
-          employer_profiles = organization.map { |o| o.employer_profile }
+        organizations = employer.organizations auth
+        unless organizations.empty?
+          employer_profiles = organizations.map { |o| o.employer_profile }
           broker_name = user.person.first_name if auth[:broker_role]
 
           {broker_name: broker_name,
-           broker_agency: auth[:broker_agency_profile].legal_name,
+           broker_agency: auth[:broker_agency_profile].try(:legal_name),
            broker_agency_id: auth[:broker_agency_profile].id,
            broker_clients: marshall_employer_summaries(employer_profiles)} if auth[:broker_agency_profile]
         end
@@ -38,7 +38,7 @@ module Api
         })
       end
 
-      def organization auth
+      def organizations auth
         auth.has_key?(:broker_role) ? Organization.by_broker_role(auth[:broker_role].id) :
             Organization.by_broker_agency_profile(auth[:broker_agency_profile]._id)
       end
