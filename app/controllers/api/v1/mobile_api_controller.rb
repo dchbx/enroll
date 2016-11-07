@@ -1,8 +1,11 @@
 require_relative '../../../../lib/api/v1/employer_helper'
+require_relative '../../../../lib/api/v1/renderer_helper'
 
 module Api
   module V1
     class MobileApiController < ApplicationController
+      include RendererHelper
+
       before_filter :employer_profile, except: :employers_list
 
       NO_BROKER_AGENCY_PROFILE_FOUND = 'no broker agency profile found'
@@ -11,30 +14,31 @@ module Api
         execute {
           auth = SecurityHelper.authorize_employer_list current_user, params
           if auth[:status] == 200
-            json = EmployerHelper.employers_and_broker_agency current_user, auth
-            json ? (render json: json) :
-                (render json: {error: NO_BROKER_AGENCY_PROFILE_FOUND}, :status => :not_found)
+            render_employers_list EmployerHelper.employers_and_broker_agency current_user, auth
           else
-            render json: {error: NO_BROKER_AGENCY_PROFILE_FOUND}, status: auth[:status]
+            render_employers_list_error auth[:status]
           end
         }
       end
 
       def employer_details
         execute {
-          details = EmployerHelper.employer_details(@employer_profile, params[:report_date]) if @employer_profile && SecurityHelper.can_view_employer_details?(current_user)
-          details ? (render json: details) : (render json: {file: 'public/404.html'}, status: :not_found)
+          if SecurityHelper.can_view_employer_details? current_user, @employer_profile
+            render_employer_details EmployerHelper.employer_details(@employer_profile, params[:report_date])
+          else
+            render_employer_details_error
+          end
         }
       end
 
       def employee_roster
         execute {
-          employees = EmployeeHelper.employees_sorted_by @employer_profile, params[:employee_name], params[:status] if @employer_profile && SecurityHelper.can_view_employee_roster?(current_user)
-          employees ? (render json: {
-              employer_name: @employer_profile.legal_name,
-              total_num_employees: employees.size,
-              roster: EmployeeHelper.roster_employees(employees.limit(50).to_a, @employer_profile.renewing_published_plan_year.present?)
-          }) : (render json: {error: 'no employee roster found'}, :status => :not_found)
+          if SecurityHelper.can_view_employee_roster? current_user, @employer_profile
+            employees = EmployeeHelper.employees_sorted_by @employer_profile, params[:employee_name], params[:status]
+            employees ? render_employee_roster(employees) : render_employee_roster_error
+          else
+            render_employee_roster_error
+          end
         }
       end
 
@@ -54,7 +58,7 @@ module Api
       end
 
       def employer_profile
-        @employer_profile ||= EmployerProfile.find params[:id] || params[:employer_profile_id]
+        @employer_profile ||= EmployerProfile.find params[:employer_profile_id]
       end
 
     end

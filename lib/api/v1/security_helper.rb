@@ -13,12 +13,16 @@ module Api
         end
       end
 
-      def self.can_view_employer_details? current_user
-        true #TODO(krish)
+      def self.can_view_employer_details? current_user, employer_profile
+        can_view_employee_roster? current_user, employer_profile
       end
 
-      def self.can_view_employee_roster? current_user
-        true #TODO(krish)
+      def self.can_view_employee_roster? current_user, employer_profile
+        employer_profile && (
+        current_user.has_hbx_staff_role? ||
+            current_user.person.broker_agency_staff_roles.map(&:broker_agency_profile_id).include?(employer_profile.active_broker_agency_account.broker_agency_profile_id) ||
+            current_user.person.active_employer_staff_roles.map(&:employer_profile_id).include?(employer_profile.id) ||
+            current_user.person.broker_role == employer_profile.active_broker_agency_account.writing_agent)
       end
 
       #
