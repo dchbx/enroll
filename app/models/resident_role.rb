@@ -26,7 +26,7 @@ class ResidentRole
   delegate :ssn, :ssn=,       to: :person, allow_nil: true
   delegate :dob, :dob=,       to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
-
+  delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
   delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
 
   delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
