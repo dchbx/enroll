@@ -4,12 +4,19 @@ module Api
   module V1
     class EnrollmentHelper < BaseHelper
 
-      def filter_active_employer_sponsored_health
-        @active_health_enrollments = @all_enrollments.select do |enrollment|
-          enrollment.kind == 'employer_sponsored' &&
-              enrollment.coverage_kind == 'health' &&
-              enrollment.is_active
+      def active_employer_sponsored_health_enrollments
+        unless @active_employer_sponsored_health_enrollments 
+          @active_employer_sponsored_health_enrollments = @all_enrollments.select do |enrollment|
+            enrollment.kind == 'employer_sponsored' &&
+                enrollment.coverage_kind == 'health' &&
+                enrollment.is_active
+          end.sort do |e1, e2| 
+            e2.submitted_at <=> e1.submitted_at # most recently submitted first
+          end.uniq do |e|
+            e.benefit_group_assignment_id       # only the most recent per employee
+          end
         end
+        @active_employer_sponsored_health_enrollments
       end
 
       def benefit_group_assignment_ids enrolled, waived, terminated
@@ -78,7 +85,7 @@ module Api
       end
 
       def bg_assignment_ids statuses
-        @active_health_enrollments.select do |enrollment|
+        active_employer_sponsored_health_enrollments.select do |enrollment|
           statuses.include? (enrollment.aasm_state)
         end.map(&:benefit_group_assignment_id)
       end

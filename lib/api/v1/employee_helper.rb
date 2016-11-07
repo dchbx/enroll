@@ -38,7 +38,7 @@ module Api
       # This avoids undercounting, e.g. two family members working for the same employer.
       #
       def count_by_enrollment_status
-        return [] if benefit_group_assignments.blank?
+        return [0, 0, 0] if benefit_group_assignments.blank?
 
         enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
         waived = HbxEnrollment::WAIVED_STATUSES
@@ -47,7 +47,6 @@ module Api
         id_list = @benefit_group_assignments.map(&:id)
         all_enrollments = FamilyHelper.hbx_enrollments id_list, enrolled_or_renewal + waived + terminated
         enrollment = EnrollmentHelper.new all_enrollments: all_enrollments
-        enrollment.filter_active_employer_sponsored_health
 
         # return count of enrolled, count of waived, count of terminated
         # only including those originally asked for
