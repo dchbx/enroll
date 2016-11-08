@@ -97,13 +97,15 @@
       <div class="panel panel-default module census-employee-address">
         <div class="panel-body">
           <div class="address">
-            <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
+            <% census_employee_address = @census_employee.address.present? ? @census_employee.address : @census_employee.build_address%>
+            <%= f.fields_for :address, census_employee_address, errors: {}, fieldset: false do |address| %>
             <%= render 'address_fields', f: address %>
             <% end %>
           </div>
         </div>
       </div>
     </div>
+    <% @census_employee.email = Email.new if @census_employee.email.blank? %>
     <div class="col-md-6 col-sm-12">
       <h3>
         Email

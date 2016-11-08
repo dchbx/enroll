@@ -149,6 +149,7 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
+  wait_for_ajax
   within '.census-employees-table' do
     find('.top').click
   end
@@ -281,13 +282,16 @@ end
 
 And(/^.+ should see a button to create new plan year$/) do
   screenshot("employer_plan_year")
-  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
+  #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+  year = (Date.today + 2.months).year
+  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
+  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
   find('a.interaction-click-control-add-plan-year').click
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{Date.today.year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -317,7 +321,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax
   find('.carriers-tab a').click
-  wait_for_ajax
+  wait_for_ajax(10,2)
   find('.reference-plans label').click
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
@@ -453,7 +457,7 @@ And /^clicks on terminate employee$/ do
   page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
   find('.interaction-click-control-terminate-employee').click
   expect(page).to have_content 'Employee Roster'
-  wait_for_ajax
+  wait_for_ajax(2,2)
 end
 
 Then /^employer clicks on terminated filter$/ do
@@ -504,5 +508,6 @@ Then /^employer should not see termination date column$/ do
 end
 
 Then /^they should see that employee's details$/ do
+  wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end

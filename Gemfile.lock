@@ -269,7 +269,7 @@ GEM
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.0.0)
     method_source (0.8.2)
-    mime-types (2.99.2)
+    mime-types (2.99.3)
     mini_portile2 (2.0.0)
     minitest (5.9.0)
     monetize (1.1.0)
@@ -326,10 +326,9 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    poltergeist (1.9.0)
+    poltergeist (1.11.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
-      multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
     pry (0.10.3)
       coderay (~> 1.1.0)
@@ -605,4 +604,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 BUNDLED WITH
-   1.12.5
+   1.13.6

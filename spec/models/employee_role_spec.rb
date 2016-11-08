@@ -44,6 +44,27 @@ describe EmployeeRole, "given a person" do
 
 end
 
+describe "coverage_effective_on" do
+  let(:employee_role) { FactoryGirl.create(:employee_role) }
+  let(:effective_on) { Date.new(2009, 2, 5) }
+
+  context "when benefit group present" do
+    it "should return coverage_effective_on" do
+      allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(employee_role.hired_on)
+      allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(effective_on)
+      expect(employee_role.coverage_effective_on).to eq effective_on
+    end
+  end
+
+  context "when benefit group doesn't exists" do
+    it "coverage_effective_on should be nil" do
+      allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(effective_on)
+      allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(nil)
+      expect(employee_role.coverage_effective_on).to eq nil
+    end
+  end
+end
+
 describe EmployeeRole, dbclean: :after_each do
   let(:ssn) {"987654321"}
   let(:dob) { 36.years.ago.to_date }
@@ -436,7 +457,11 @@ describe EmployeeRole, dbclean: :after_each do
   let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
   let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
 
-  let!(:plan_year) { 
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
+  let!(:plan_year) {
 
     py = FactoryGirl.create(:plan_year,
       start_on: plan_year_start_on,
@@ -463,7 +488,7 @@ describe EmployeeRole, dbclean: :after_each do
       })
   }
 
-  before do 
+  before do
     allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
   end
@@ -494,11 +519,11 @@ describe EmployeeRole, dbclean: :after_each do
     context 'when new hire open enrollment period available' do
       let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
 
-      before do 
+      before do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 15.days)
       end
 
-      it "should return true" do 
+      it "should return true" do
         expect(employee_role.is_eligible_to_enroll_without_qle?).to be_truthy
       end
     end
@@ -507,11 +532,11 @@ describe EmployeeRole, dbclean: :after_each do
     context 'when new roster entry enrollment period available' do
       let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: middle_of_prev_year) }
 
-      before do 
+      before do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 15.days)
       end
 
-      it "should return true" do 
+      it "should return true" do
         expect(employee_role.is_eligible_to_enroll_without_qle?).to be_truthy
       end
     end
@@ -519,11 +544,11 @@ describe EmployeeRole, dbclean: :after_each do
     context 'when outside new hire enrollment period and employer open enrolment' do
       let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
 
-      before do 
+      before do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 55.days)
       end
 
-      it "should return false" do 
+      it "should return false" do
         expect(employee_role.is_eligible_to_enroll_without_qle?).to be_falsey
       end
     end
@@ -548,8 +573,8 @@ describe EmployeeRole do
 
   context 'is_dental_offered?' do
 
-    let!(:employer_profile) { 
-      org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+    let!(:employer_profile) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
       FactoryGirl.create :employer_profile, organization: org
     }
 
@@ -591,7 +616,7 @@ describe EmployeeRole do
       let(:open_enrollment_start_on) { start_on - 1.month }
       let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
 
-      before do 
+      before do
         allow(current_benefit_group).to receive(:is_offering_dental?).and_return(true)
       end
 
@@ -616,7 +641,7 @@ describe EmployeeRole do
       let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id }
       let!(:renewal_benefit_group_assignment) { ce.add_renew_benefit_group_assignment renewal_benefit_group }
 
-      before do 
+      before do
         allow(current_benefit_group).to receive(:is_offering_dental?).and_return(false)
         allow(renewal_benefit_group).to receive(:is_offering_dental?).and_return(true)
       end

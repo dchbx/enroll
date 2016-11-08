@@ -1,3 +1,6 @@
+<% content_for :navigation do %>
+<%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<% end %>
 <%- if @tab == 'home' %>
       <%= render 'employers/employer_profiles/my_account/home_tab' %>
 <%- elsif @tab == 'profile' %>

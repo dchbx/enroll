@@ -16,13 +16,21 @@ FactoryGirl.define do
 
     # association :premium_tables, strategy: :build
 
+    trait :with_dental_coverage do
+      coverage_kind "dental"
+       metal_level "dental"
+      dental_level "high"
+    end
+
     trait :with_premium_tables do
       transient do
         premium_tables_count 48
       end
 
       after(:create) do |plan, evaluator|
-        create_list(:premium_table, evaluator.premium_tables_count, plan: plan)
+        start_on = Date.new(plan.active_year,1,1)
+        end_on = start_on + 1.year - 1.day
+        create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
       end
     end
 
@@ -36,6 +44,19 @@ FactoryGirl.define do
       end
     end
 
+    factory :active_individual_health_plan,       traits: [:individual_health, :this_year, :with_premium_tables]
+    factory :active_shop_health_plan,             traits: [:shop_health, :this_year, :with_premium_tables]
+    factory :active_individual_dental_plan,       traits: [:individual_dental, :this_year, :with_premium_tables]
+    factory :active_individual_catastophic_plan,  traits: [:catastrophic, :this_year, :with_premium_tables]
+    factory :active_csr_87_plan,                  traits: [:csr_87, :this_year, :with_premium_tables]
+    factory :active_csr_00_plan,                  traits: [:csr_00, :this_year, :with_premium_tables]
+
+    factory :renewal_individual_health_plan,      traits: [:individual_health, :next_year, :with_premium_tables]
+    factory :renewal_shop_health_plan,            traits: [:shop_health, :next_year, :with_premium_tables]
+    factory :renewal_individual_dental_plan,      traits: [:individual_dental, :next_year, :with_premium_tables]
+    factory :renewal_individual_catastophic_plan, traits: [:catastrophic, :next_year, :with_premium_tables]
+    factory :renewal_csr_87_plan,                 traits: [:csr_87, :next_year, :with_premium_tables]
+    factory :renewal_csr_00_plan,                 traits: [:csr_00, :next_year, :with_premium_tables]
   end
 
   factory :premium_table do
@@ -78,6 +99,7 @@ FactoryGirl.define do
       metal_level "dental"
       dental_level "high"
     end
+
     trait :ivl_dental do
       market "individual"
       coverage_kind "dental"

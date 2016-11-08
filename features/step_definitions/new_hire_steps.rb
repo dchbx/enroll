@@ -61,7 +61,7 @@ When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
 end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
-  wait_for_ajax
+  wait_for_ajax(2,2)
   if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
   else
@@ -90,8 +90,8 @@ end
 
 Then(/Employee should see \"not yet eligible\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
-  wait_for_ajax
-  find('.alert', text: "You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
+  wait_for_ajax(2,2)
+  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
   visit '/families/home'
 end
 
