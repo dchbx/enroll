@@ -4,7 +4,7 @@ module Forms
     attr_accessor :id
     attr_accessor :person_id
     attr_accessor :person
-    attr_accessor :legal_name, :dba, :entity_kind, :fein
+    attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein
     attr_reader :dob
     attr_accessor :office_locations
 

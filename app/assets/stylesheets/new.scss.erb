@@ -333,7 +333,7 @@
     }
   }
 
-  .benefits-tab, .home-tab, .my-broker {
+  .benefits-tab, .home-tab {
 
     .benefit-package {
       position: relative;
@@ -388,14 +388,11 @@
       }
     }
     .package-offering {
-      border: solid 1px #b7b7b7;
 
       background-color: #ffffff;
       padding: 10px 0 20px;
-      border-bottom: solid 1px #b7b7b7;
 
     table {
-      width: 96%;
       padding: 0 2%;
       margin: auto;
       table-layout: fixed;
@@ -1037,9 +1034,23 @@
 
   }
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
-  .planyear-add-tab, .brokers-tab, .employer-tab, .employer-edit-tab,
-   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab,
-    .my-broker {
+  .planyear-add-tab, .employer-tab, .employer-edit-tab,
+   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab {
+    .btn-primary {
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      letter-spacing: 1px;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      margin-top: 5px;
+      margin-right: 5px;
+      &.mtz {
+        margin-top: 0;
+      }
+    }
     .starter {
       max-width: 660px;
     }
@@ -1099,16 +1110,15 @@
           background-color: #ffffff;
           h3 {
             font-size: 18px;
-            padding: 0;
             margin-top: 0;
             i {
               color: #007bc4;
             }
           }
           .progress, .progress-wrapper {
-            height: 8px;
-            border: solid 1px #d5d5d5;
-            border-radius: 0;
+            max-width: 90%;
+            height: 16px;
+            border-radius: 4px;
             margin-bottom: 12px;
             &+.information {
               padding-bottom: 15px;

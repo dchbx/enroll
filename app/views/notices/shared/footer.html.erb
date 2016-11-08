@@ -8,6 +8,13 @@
 
   <style type="text/css">
 
+  @font-face {
+    font-family: 'NimbusTimesRoman';
+    font-style: normal;
+    font-weight: 300;
+    src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype')
+  }
+
   body {
     width:100%!important;
     -webkit-text-size-adjust:100%;
@@ -17,14 +24,14 @@
     mso-line-height-rule:exactly
     font-size:10px;
     color:rgb(0,0,0);
-    font-family: "Times New Roman", Times, serif;
+    font-family: "NimbusTimesRoman", Times, serif;
     margin-top: 17px;
   }
 
   table td {
     border-collapse:collapse;
     font-size:10px;
-    font-family: "Times New Roman", Times, serif;
+    font-family: "NimbusTimesRoman", Times, serif;
   }
   table {
     border-collapse: collapse;
@@ -76,7 +83,7 @@
 <body onload="subst()">
   <table class="footer-section" style="background:rgb(198,217,241); padding:3px 15px;" border="1" bordercolor="#000">
     <tr>
-      <td style="padding:3px 10px; font-size:11px; line-height:15px;"><strong style="color:rgb(54,95,145);">Questions?</strong> Call <%= Settings.contact_center.alt_name %> at <%= Settings.contact_center.phone_number %> (TTY/TDD 711) or go online to <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>. You may also contact <%= Settings.contact_center.alt_name %> or go online to search for a broker or in-person assister to help you.</td> 
+      <td style="padding:3px 10px; font-size:11px; line-height:15px;"><strong style="color:rgb(54,95,145);">Questions?</strong> Call <%= Settings.contact_center.alt_name %> at (855) 532-5465/TTY: 711 or go online to <a href="www.DCHealthLink.com">www.dchealthlink.com</a>. You may also contact <%= Settings.contact_center.alt_name %> or go online to search for a broker or in-person assister to help you.</td>
     </tr>
   </table>
 

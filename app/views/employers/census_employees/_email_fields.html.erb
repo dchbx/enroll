@@ -3,6 +3,6 @@
       <%= f.select(:kind, options_for_select(Email::KINDS, selected: f.object.kind), {:include_blank => "SELECT KIND"}, { :class => ''}) %>
     </div>
     <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :address, placeholder: "Email", class: "floatlabel form-control", required: true %>
+      <%= f.text_field :address, placeholder: "Email", class: "floatlabel form-control" %>
     </div>
 </div>

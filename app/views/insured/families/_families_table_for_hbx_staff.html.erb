@@ -16,6 +16,7 @@
         <th>Employee?</th>
         <th></th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -40,6 +41,9 @@
         <td><%= pp.active_employee_roles.present?  ? "Yes" : "No" %></td>
         <td class='unblock'>
           <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
+        </td>
+        <td>
+          <%= link_to 'Edit DOB/SSN', edit_dob_ssn_path(id: family.primary_applicant.person.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-default btn-xs" + pundit_class(Family, :can_update_ssn?) , remote: true%>
         </td>
         <% if (pp.user.present? || pp.emails.present?) && current_user.person.hbx_staff_role %>
           <td>

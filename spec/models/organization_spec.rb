@@ -399,7 +399,7 @@ RSpec.describe Organization, dbclean: :after_each do
 
     context "with valid arguments" do
       before do
-        Organization.upload_invoice(file_path)
+        Organization.upload_invoice(file_path,valid_file_names.first)
       end
        it "should upload invoice to the organization" do
         expect(organization.documents.size).to eq 1
@@ -408,15 +408,15 @@ RSpec.describe Organization, dbclean: :after_each do
     context "with duplicate files" do
 
        it "should upload invoice to the organization only once" do
-        Organization.upload_invoice(file_path)
-        Organization.upload_invoice(file_path)
+        Organization.upload_invoice(file_path,valid_file_names.first)
+        Organization.upload_invoice(file_path,valid_file_names.first)
         expect(organization.documents.size).to eq 1
       end
     end
 
     context "without date in file name" do
       before do
-        Organization.upload_invoice('dummyfile.pdf')
+        Organization.upload_invoice("test/hbxid_invoice_R.pdf",'dummyfile.pdf')
       end
        it "should Not Upload invoice" do
         expect(organization.documents.size).to eq 0

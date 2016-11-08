@@ -38,7 +38,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
     end
 
     it "should show Broker Agency name" do
-      expect(rendered).to have_selector('.tt-u', text: broker_agency_account.broker_agency_profile.legal_name)
+      expect(rendered).to have_selector('span', text: broker_agency_account.broker_agency_profile.legal_name)
     end
 
     it "show should the Broker email" do

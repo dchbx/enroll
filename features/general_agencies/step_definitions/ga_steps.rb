@@ -199,6 +199,7 @@ end
 
 When /^the employer login in$/ do
   visit '/'
+  portal_uri = find("a.interaction-click-control-employer-portal")["href"]
   click_link 'Employer Portal'
   find('.interaction-click-control-sign-in-existing-account').click
 
@@ -208,10 +209,10 @@ When /^the employer login in$/ do
   fill_in "user[password]", with: "1qaz@WSX"
   fill_in "user[login]", :with => "employer1@dc.gov" unless find(:xpath, '//*[@id="user_login"]').value == "employer1@dc.gov"
   find('.interaction-click-control-sign-in').click
+  visit portal_uri
 end
 
 Then /^the employer should see the home of employer$/ do
-  expect(page).to have_content('Signed in successfully')
   expect(page).to have_content("I'm an Employer")
 end
 
@@ -225,7 +226,7 @@ end
 
 Then /^the employer should see Acarehouse broker active for the employer$/ do
   expect(page).to have_content('Acarehouse')
-  expect(page).to have_content('Active Broker')
+  expect(page).to have_content(/active broker/i)
 end
 
 When /^the broker login in$/ do

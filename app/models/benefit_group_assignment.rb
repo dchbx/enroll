@@ -53,6 +53,11 @@ class BenefitGroupAssignment
     benefit_group.plan_year if benefit_group
   end
 
+  def belongs_to_offexchange_planyear?
+    employer_profile = plan_year.employer_profile
+    employer_profile.is_coversion_employer? && plan_year.coverage_period_contains?(employer_profile.registered_on)
+  end
+
   def benefit_group=(new_benefit_group)
     raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id

@@ -1,0 +1,51 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Subject: Your 2017 Health Insurance Coverage and Preliminary Renewal Information</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "#{Settings.site.short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017.  Please review the information below and let us know by <strong>10/31/2016</strong> if anything will be different next year."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "<strong>Note: If this notice was sent to you in error, and your health and/or dental plan for 2016 has been cancelled or terminated, you must go to <a href='www.DCHealthLink.com'>www.dchealthlink.com</a> during open enrollment to re-enroll for 2017.  If your coverage is terminated or cancelled for any reason, including for non-payment of premiums, now or before the end of the year, your health and/or dental insurance  will not be automatically renewed for 2017.</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["We are renewing coverage for the following people:"],
+   heading: 'Review Your Information', sub_heading: ''} %>
+
+
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|member| member.full_name } } %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "According to the information in our records, these people are all:",
+  listings: ["Residents of the District of Columbia",
+             "U.S. citizens or have an eligible immigration status",
+             "Not currently incarcerated"]} %>
+
+ <%= render partial: 'notices/shared/paragraph', :locals => {
+content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by #{(TimeKeeper.date_of_record + 35.days).strftime("%m/%d/%Y")}.  </strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "You can report any changes online in your account on <a href='www.DCHealthLink.com'>www.dchealthlink.com</a> or by calling DC Health Link Customer Service at (855) 532-5465 and telling the customer service representative that you want to make changes to the information used for your 2017 renewal."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you want to see if you qualify for the advanced premium tax credit in 2017, which would reduce your premiums, please call DC Health Link Customer Service at (855) 532-5465. We will ask you to complete a new application or provide us with updated information about your household and income to determine if you are eligible."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.dchealthlink.com</a>. You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer Service toll-free at (855) 532-5465."],
+   heading: 'Your Secure User Account', sub_heading: ''} %>

@@ -14,23 +14,32 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
-     if type == 'Social Security Number'
-       if member.consumer_role.ssn_verified?
-         "verified"
-       elsif member.consumer_role.has_docs_for_type?(type)
-         "in review"
-       else
-         "outstanding"
-       end
-     elsif type == 'Citizenship' || type == 'Immigration status'
-       if member.consumer_role.lawful_presence_verified?
-         "verified"
-       elsif member.consumer_role.has_docs_for_type?(type)
-         "in review"
-       else
-         "outstanding"
-       end
-     end
+    case type
+      when 'Social Security Number'
+        if member.consumer_role.ssn_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
+      when 'American Indian Status'
+        if member.consumer_role.native_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
+      else
+        if member.consumer_role.lawful_presence_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
+    end
   end
 
   def verification_type_class(type, member)
@@ -39,8 +48,8 @@ module VerificationHelper
         "success"
       when "in review"
         "warning"
-      else
-        "danger"
+      when "outstanding"
+        member.consumer_role.processing_hub_24h? ? "info" : "danger"
     end
   end
 
@@ -138,6 +147,17 @@ module VerificationHelper
 
   def show_doc_status(status)
     ["verified", "rejected"].include?(status)
+  end
+
+  def show_v_type(v_type, person)
+    case verification_type_status(v_type, person)
+      when "in review"
+        "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
+      when "verified"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      else
+        person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+    end
   end
 end
 

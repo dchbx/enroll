@@ -7,7 +7,7 @@
       <tr>
         <th class="row-title">Plans</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%= display_carrier_logo(qhp.plan.carrier_profile.organization.legal_name, {width: 80}) %></th>
+          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%= display_carrier_logo(Maybe.new(qhp.plan), {width: 80}) %></th>
         <% end %>
       </tr>
       <tr>

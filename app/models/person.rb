@@ -116,7 +116,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
-  after_save :generate_family_search
+  #after_save :generate_family_search
   after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})
@@ -202,12 +202,27 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+  delegate :all_types_verified?, :to => :consumer_role
+
+
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } ) if need_to_notify?
+  end
+
+  def need_to_notify?
+    changed_fields = changed_attributes.keys
+    changed_fields << consumer_role.changed_attributes.keys if consumer_role.present?
+    changed_fields << employee_roles.map(&:changed_attributes).map(&:keys) if employee_roles.present?
+    changed_fields << employer_staff_roles.map(&:changed_attributes).map(&:keys) if employer_staff_roles.present?
+    changed_fields = changed_fields.flatten.compact.uniq
+    notify_fields = changed_fields.reject{|field| ["bookmark_url", "updated_at"].include?(field)}
+    notify_fields.present?
   end
 
   def is_aqhp?
@@ -242,7 +257,7 @@ class Person
     end
   end
 
-  after_save :update_family_search_collection
+  #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
 
   def move_encrypted_ssn_errors
@@ -254,10 +269,6 @@ class Person
     end
     true
   end
-
-  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
-
-  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
@@ -369,7 +380,8 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'Social Security Number' if self.ssn
+    verification_types << 'Social Security Number' if ssn
+    verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
     if self.us_citizen
       verification_types << 'Citizenship'
     else
@@ -592,6 +604,33 @@ class Person
       Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
     end
 
+    def dob_change_implication_on_active_enrollments(person, new_dob)
+      # This method checks if there is a premium implication in all active enrollments when a persons DOB is changed.
+      # Returns a hash with Key => HbxEnrollment ID and, Value => true if  enrollment has Premium Implication.
+      premium_impication_for_enrollment = Hash.new
+      active_enrolled_hbxs = person.primary_family.active_household.hbx_enrollments.active.enrolled_and_renewal
+
+      # Iterate over each enrollment and check if there is a Premium Implication based on the following rule:
+      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the 
+      #       change is all within the 0-20 age range or all within the 61+ age range (20 >= age <= 61)
+      active_enrolled_hbxs.each do |hbx|
+        new_temp_person = person.dup
+        new_temp_person.dob = Date.strptime(new_dob.to_s, '%m/%d/%Y')
+        new_age     = new_temp_person.age_on(hbx.effective_on)  # age with the new DOB on the day coverage started
+        current_age = person.age_on(hbx.effective_on)           # age with the current DOB on the day coverage started
+
+        next if new_age == current_age # No Change in age -> No Premium Implication
+
+        # No Implication when the change is all within the 0-20 age range or all within the 61+ age range
+        if ( current_age.between?(0,20) && new_age.between?(0,20) ) || ( current_age >= 61 && new_age >= 61 )
+          #premium_impication_for_enrollment[hbx.id] = false
+        else
+          premium_impication_for_enrollment[hbx.id] = true
+        end
+      end
+      premium_impication_for_enrollment
+    end
+
     # Return an instance list of active People who match identifying information criteria
     def match_by_id_info(options)
       ssn_query = options[:ssn]
@@ -660,8 +699,8 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if (roles = person.employer_staff_roles.select{ |role| role.employer_profile_id.to_s == employer_profile_id.to_s }).present?
-        roles.each { |role| role.update_attributes!(:aasm_state => :is_closed) }
+      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
+        role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
         return false, 'No matching employer staff role'
@@ -774,6 +813,14 @@ class Person
 
   def generate_family_search
     ::MapReduce::FamilySearchForPerson.populate_for(self)
+  end
+
+  def set_consumer_role_url
+    if consumer_role.present? && user.present?
+      if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
+        consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
+      end
+    end
   end
 
   private

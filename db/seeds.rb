@@ -77,8 +77,34 @@ if missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
-  puts "Loading renewal plans"
-  system "bundle exec rake xml:renewal_and_standard_plans"
+  puts "Processing Plan Mapping ..."
+  system "bundle exec rake xml:plan_cross_walk"
+  puts "Processing Plan Mapping completed"
+  puts "*"*80
+  puts "Marking plans as standard ..."
+  system "bundle exec rake xml:standard_plans"
+  puts "Marking plans as standard completed"
+
+  puts "*"*80
+  puts "updating cost share variance deductibles"
+  system "bundle exec rake serff:update_cost_share_variances"
+  puts "updating cost share variance deductibles complete"
+  puts "*"*80
+
+  puts "*"*80
+  puts "importing provider_directory_urls and rx_formulary_urls for plans"
+  system "bundle exec rake import:provider_and_rx_formulary_url"
+  puts "importing provider_directory_urls and rx_formulary_urls for plans complete"
+  puts "*"*80
+
+  puts "*"*80
+  puts "::: Mapping Plans to SBC pdfs in S3 :::"
+  system "bundle exec rake sbc:map"
+  puts "::: Mapping Plans to SBC pdfs seed complete :::"
+
+  puts "*"*80
+  system "bundle exec rake migrations:cat_age_off_renewal_plan"
+  puts "*"*80
 
   require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
   puts "::: complete :::"
@@ -105,7 +131,7 @@ system "bundle exec rake update_seed:qualifying_life_event"
 puts "::: complete :::"
 
 puts "*"*80
-puts "Loading sanitized plans, people, families, employers, and census."
+puts "Loading sanitized people, families, employers, and census."
 load_tasks = %w(
   seed:people
   seed:families
@@ -131,28 +157,10 @@ puts "*"*80
 puts "Loading benefit packages."
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2017_seed')
 puts "::: benefit packages seed complete :::"
 
 puts "*"*80
-puts "::: Mapping Plans to SBC pdfs in S3 :::"
-system "bundle exec rake sbc:map"
-puts "::: Mapping Plans to SBC pdfs seed complete :::"
-
-
-puts "*"*80
-puts "updating cost share variance deductibles"
-system "bundle exec rake serff:update_cost_share_variances"
-puts "updating cost share variance deductibles complete"
-puts "*"*80
-
-puts "*"*80
-puts "importing provider_directory_urls and rx_formulary_urls for plans"
-system "bundle exec rake import:provider_and_rx_formulary_url"
-puts "importing provider_directory_urls and rx_formulary_urls for plans complete"
-puts "*"*80
-
-puts "*"*80
 system "bundle exec rake permissions:initial_hbx"
-
 puts "*"*80
 puts "End of Seed Data"

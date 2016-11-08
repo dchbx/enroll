@@ -1,63 +1,41 @@
-
-
-  <div class="my-broker">
-    <h1>Your Broker</h1>
-    <div class="panel benefitgroup col-xs-12">
-      <section class="col-xs-6">
-        <header class="row">
-          <h5 class="bg-title sb">Your Broker:<span>
-<%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
-</span></h5>
-        </header>
-      </section>
-      <section class="col-xs-6">
-        <header class="row">
-        </header>
-      </section>
-      <table>
-        <tr>
-          <td>
-            <header>Your Broker</header>
-          </td>
-          <td>
-            <p><%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.first_name.capitalize %>
-               <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.person.last_name.capitalize %></p>
-          </td>
-        </tr>
-        <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone.present? %>
-        <tr>
-          <td>
-            <header>Phone Number</header>
-          </td>
-          <td>
-            <p>
-              <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>
-            </p>
-          </td>
-        </tr>
-        <% end %>
-        <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address.present? %>
-        <tr>
-          <td>
-            <header>Email Address</header>
-          </td>
-          <td>
-            <p>
-              <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address %>
-            </p>
-          </td>
-        </tr>
-        <% end %>
-
-
-      </table>
-    </div>
-    <div class="col-xs-12">
-      <div class="row">
-      <br/>
-
-      <%= link_to "Back", :back, class: 'btn btn-default' %>
-    </div>
-    </div>
-
+<div class="panel panel-default module broker employee-broker">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      <%= title.present? ? title : "Your Broker" %>
+    </h3>
   </div>
+  <div class="panel-body">
+    <div class="vertically-aligned-row">
+      <div>
+        <strong>
+          Broker Name:
+        </strong>
+        <span>
+          <%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
+        </span>
+      </div>
+    </div>
+    <div class="vertically-aligned-row">
+      <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone.present? %>
+        <div>
+          <strong>
+            Phone Number:
+          </strong>
+          <span>
+            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>
+          </span>
+        </div>
+      <% end %>
+      <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address.present? %>
+        <div>
+          <strong>
+            Email Address:
+          </strong>
+          <span>
+            <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

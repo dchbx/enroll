@@ -25,7 +25,7 @@ RSpec.describe "layouts/_header.html.erb" do
     expect(rendered).to match(/I'm a Broker/)
   end
   it 'identifies Employers' do
-    allow(person_user).to receive(:employer_staff_roles).and_return(employer_staff_role)
+    allow(person_user).to receive(:employer_staff_roles).and_return([employer_staff_role])
     current_user.roles=['employer_staff']
     current_user.save
     render :template => 'layouts/_header.html.erb'

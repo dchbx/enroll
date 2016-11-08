@@ -45,7 +45,7 @@ RSpec.describe Insured::FamiliesController do
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
-  let(:consumer_role) { double("ConsumerRole") }
+  let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
 
@@ -96,14 +96,16 @@ RSpec.describe Insured::FamiliesController do
     context "for SHOP market" do
 
       let(:employee_roles) { double }
-      let(:employee_role) { [double("EmployeeRole")] }
+      let(:employee_role) { [double("EmployeeRole", bookmark_url: "/families/home")] }
 
       before :each do
         FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
+        allow(person).to receive(:employee_roles).and_return(employee_role)
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(family).to receive(:active_family_members).and_return(family_members)
+        allow(family).to receive(:check_for_consumer_role).and_return nil
         sign_in user
         get :home
       end
@@ -143,7 +145,9 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
+        allow(person).to receive(:employee_roles).and_return(nil)
         allow(family).to receive(:active_family_members).and_return(family_members)
+        allow(family).to receive(:check_for_consumer_role).and_return true
         sign_in user
         get :home
       end
@@ -190,13 +194,14 @@ RSpec.describe Insured::FamiliesController do
 
     context "for both ivl and shop" do
       let(:employee_roles) { double }
-      let(:employee_role) { [double("EmployeeRole")] }
+      let(:employee_role) { double("EmployeeRole", bookmark_url: "/families/home") }
       let(:enrollments) { double }
 
       before :each do
         sign_in user
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:employee_roles).and_return(employee_roles)
+        allow(person.employee_roles).to receive(:last).and_return(employee_role)
         allow(person).to receive(:active_employee_roles).and_return(employee_roles)
         allow(employee_roles).to receive(:first).and_return(employee_role)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
@@ -206,6 +211,7 @@ RSpec.describe Insured::FamiliesController do
         allow(family).to receive(:enrollments).and_return(enrollments)
         allow(enrollments).to receive(:order).and_return([display_hbx])
         allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
+        allow(family).to receive(:check_for_consumer_role).and_return true
         allow(controller).to receive(:update_changing_hbxs).and_return(true)
       end
 
@@ -452,6 +458,8 @@ RSpec.describe Insured::FamiliesController do
     it "renders the 'check_move_reason' template" do
       xhr :get, 'check_move_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
       expect(response).to have_http_status(:success)
+      expect(response).to render_template(:check_move_reason)
+      expect(assigns(:qle_date_calc)).to eq assigns(:qle_date) - Settings.aca.qle.with_in_sixty_days.days
     end
 
     describe "with valid and invalid params" do
@@ -480,6 +488,7 @@ RSpec.describe Insured::FamiliesController do
     it "renders the 'check_insurance_reason' template" do
       xhr :get, 'check_insurance_reason', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => @qle.id, :format => 'js'
       expect(response).to have_http_status(:success)
+      expect(response).to render_template(:check_insurance_reason)
     end
 
     describe "with valid and invalid params" do
@@ -663,6 +672,7 @@ RSpec.describe Insured::FamiliesController do
 
   describe "GET upload_notice", dbclean: :after_each do
 
+    let(:consumer_role2) { FactoryGirl.create(:consumer_role) }
     let(:person2) { FactoryGirl.create(:person) }
     let(:user2) { FactoryGirl.create(:user, person: person2, roles: ["hbx_staff"]) }
     let(:file) { double }
@@ -670,6 +680,7 @@ RSpec.describe Insured::FamiliesController do
     let(:file_path) { File.dirname(__FILE__) }
     let(:bucket_name) { 'notices' }
     let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}#sample-key" }
+    let(:subject) {"New Notice"}
 
     before(:each) do
       @controller = Insured::FamiliesController.new
@@ -682,7 +693,7 @@ RSpec.describe Insured::FamiliesController do
       allow(@controller).to receive(:file_name).and_return("sample-filename")
       allow(@controller).to receive(:file_content_type).and_return("application/pdf")
       allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
-      person2.consumer_role =   FactoryGirl.create(:consumer_role)
+      person2.consumer_role = consumer_role2
       person2.consumer_role.gender = 'male'
       person2.save
       request.env["HTTP_REFERER"] = "/insured/families/upload_notice_form"
@@ -690,15 +701,15 @@ RSpec.describe Insured::FamiliesController do
     end
 
     it "when successful displays 'File Saved'" do
-      post :upload_notice, {:file => file}
-      expect(flash[:notice]).to include("File Saved")
+      post :upload_notice, {:file => file, :subject=> subject}
+      expect(flash[:notice]).to eq("File Saved")
       expect(response).to have_http_status(:found)
       expect(response).to redirect_to request.env["HTTP_REFERER"]
     end
 
     it "when failure displays 'File not uploaded'" do
       post :upload_notice
-      expect(flash[:error]).to include("File not uploaded")
+      expect(flash[:error]).to eq("File or Subject not provided")
       expect(response).to have_http_status(:found)
       expect(response).to redirect_to request.env["HTTP_REFERER"]
     end
@@ -710,11 +721,67 @@ RSpec.describe Insured::FamiliesController do
 
       before do
         allow(@controller).to receive(:authorized_document_download_path).with("Person", person2.id, "documents", notice.id).and_return("/path/")
-        @controller.send(:notice_upload_secure_message, notice)
+        @controller.send(:notice_upload_secure_message, notice, subject)
       end
 
       it "adds a message to person inbox" do
         expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
+      end
+    end
+
+    context "notice_upload_email" do
+      context "person has a consumer role" do
+        context "person has chosen to receive electronic communication" do
+          before do
+            consumer_role2.contact_method = "Paper and Electronic communications"
+          end
+
+          it "sends the email" do
+            expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
+          end
+
+        end
+
+        context "person has chosen not to receive electronic communication" do
+          before do
+            consumer_role2.contact_method = "Only Paper communication"
+          end
+
+          it "should not sent the email" do
+            expect(@controller.send(:notice_upload_email)).to be nil
+          end
+        end
+      end
+
+      context "person has a employee role" do
+        let(:employee_role2) { FactoryGirl.create(:employee_role) }
+
+        before do
+          person2.consumer_role = nil
+          person2.employee_roles = [employee_role2]
+          person2.save
+        end
+
+        context "person has chosen to receive electronic communication" do
+          before do
+            employee_role2.contact_method = "Paper and Electronic communications"
+          end
+
+          it "sends the email" do
+            expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
+          end
+
+        end
+
+        context "person has chosen not to receive electronic communication" do
+          before do
+            employee_role2.contact_method = "Only Paper communication"
+          end
+
+          it "should not sent the email" do
+            expect(@controller.send(:notice_upload_email)).to be nil
+          end
+        end
       end
     end
   end

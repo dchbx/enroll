@@ -194,6 +194,31 @@ RSpec.describe User, :type => :model do
       end
     end
   end
+
+  describe "for password" do
+    context "password_invalid?" do
+      it "with valid password" do
+        expect(User.password_invalid?("XLEY5HGH95moZPJaA1!")).to be_falsy
+      end
+
+      it "with invalid password" do
+        expect(User.password_invalid?("abA12!")).to be_truthy
+        expect(User.password_invalid?("abcdefghijklmnopqst")).to be_truthy
+        expect(User.password_invalid?("123456789abc123456!")).to be_truthy
+        expect(User.password_invalid?("123456789abcdefg567")).to be_truthy
+        expect(User.password_invalid?("XaEYaHaH95maZPJaA1!")).to be_truthy
+      end
+    end
+
+    context "generate_valid_password" do
+      it "should get valid password" do
+        10.times.each do
+          password = User.generate_valid_password
+          expect(User.password_invalid?(password)).to be_falsy
+        end
+      end
+    end
+  end
 end
 
 describe User do
@@ -294,32 +319,48 @@ describe User do
     end
   end
 
-  # describe "orphans" do
-  #   context "when users have person associated" do
-  #     before do
-  #       user = FactoryGirl.create :user
-  #       user.person = FactoryGirl.create :person
-  #     end
-  #     it "should return no orphans" do
-  #       expect(User.orphans).to eq []
-  #     end
-  #   end
+describe "orphans" do
+    let(:person) { create :person }
+    let(:user) { create :user, person: person }
 
-  #   context "when some users does NOT have person associated", dbclean: :after_each do
-  #     before do
-  #       user_with_person = FactoryGirl.create :user
-  #       user_with_person.person = FactoryGirl.create :person
-  #       @user1_without_person = FactoryGirl.create :user , :email => "aaa@aaa.com"
-  #       @user2_without_person = FactoryGirl.create :user , :email => "zzz@zzz.com"
-  #     end
-  #     it "should return orphans" do
-  #       expect(User.orphans).to eq [@user1_without_person,@user2_without_person]
-  #     end
-  #     it "should return orphans with email ASC" do
-  #       expect(User.orphans.first.email).to eq "aaa@aaa.com"
-  #     end
-  #   end
-  # end
+    before do
+      User.destroy_all
+    end
+
+    context "when users have person associated" do
+      it "should return no orphans" do
+        user.save!
+        expect(User.orphans).to eq []
+      end
+    end
+
+    context "when a user does NOT have a person associated", dbclean: :after_each do
+      let(:orphaned_user) { FactoryGirl.create(:user) }
+
+      it "should return the orphaned user" do
+        orphaned_user.save!
+        expect(User.orphans).to eq [orphaned_user]
+      end
+    end
+
+    context "when more than one user does not have a person associated", dbclean: :after_each do
+      let(:orphaned_user1) { FactoryGirl.create(:user, email: "zzz@mail.com") }
+      let(:orphaned_user2) { FactoryGirl.create(:user, email: "aaa@mail.com") }
+      let(:orphaned_users) { [orphaned_user1, orphaned_user2] }
+
+      before do
+        orphaned_users
+      end
+
+      it "should return the orphaned user" do
+        expect(User.orphans).to eq orphaned_users.reverse
+      end
+
+      it "should return orphans with email ASC" do
+        expect(User.orphans.first.email).to eq orphaned_user2.email
+      end
+    end
+  end
 
   describe "can_change_broker?" do
     context "with user" do

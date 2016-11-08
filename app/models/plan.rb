@@ -28,6 +28,7 @@ class Plan
   field :ehb, type: Float, default: 0.0
 
   field :renewal_plan_id, type: BSON::ObjectId
+  field :cat_age_off_renewal_plan_id, type: BSON::ObjectId
   field :is_standard_plan, type: Boolean, default: false
 
   field :minimum_age, type: Integer, default: 0
@@ -306,6 +307,11 @@ class Plan
     @carrier_profile = CarrierProfile.find(carrier_profile_id) unless carrier_profile_id.blank?
   end
 
+  def cat_age_off_renewal_plan
+    return @cat_age_off_renewal_plan if defined? @cat_age_off_renewal_plan
+    @cat_age_off_renewal_plan = Plan.find(cat_age_off_renewal_plan_id) unless cat_age_off_renewal_plan_id.blank?
+  end
+
   # has_one renewal_plan
   def renewal_plan=(new_renewal_plan)
     if new_renewal_plan.nil?
@@ -345,7 +351,8 @@ class Plan
   def premium_for(schedule_date, age)
     bound_age_val = bound_age(age)
     begin
-      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost.round(2)
+      value = premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
+      BigDecimal.new("#{value}").round(2).to_f
     rescue
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end

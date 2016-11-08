@@ -1,5 +1,4 @@
 <div class="special_qle_reasons hidden">
-  <br/>
   <h4> Please indicate which of the following circumstances apply to you: </h4> <br/> 
   <div class = 'moving_radio_btn'>
     <div class="n-radio-group">
@@ -19,10 +18,10 @@
       </div>      
       <div class="n-radio-row">
         <label class="n-radio vertically-aligned-row" for="reason_accept2">
-          <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio" %>
+          <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio"%>
           <span class="n-radio"></span>
-          <span>
-            I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below) 
+          <span data-placement="top" data-toggle="popover" data-html="true" data-content="<a href='http://www.healthcare.gov/lower-costs', target='_blank'>Use Calculator">
+            I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid
           </span>
         </label>
       </div>      
@@ -30,13 +29,9 @@
         <label class="n-radio" for="reason_reject">
           <%= radio_button_tag :reason, "None of the Above", false, id:'reason_reject', class: "n-radio" %>
           <span class="n-radio"></span>
-          <span> None of the Above.</span>
+          <span> None of the Above</span>
         </label>
-      </div>                    
-      <div class = 'calculator'>
-        <br/>
-          Tool-tip: Use this calculator ( <%= link_to('www.healthcare.gov/lower-costs/', 'http://www.healthcare.gov/lower-costs/', target: :_blank) %>) to find out if you meet the qualifications. 
-      </div>      
+      </div>                        
       <div class="center">
         <%= link_to 'CONTINUE', 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit_reason' %>
       </div>  

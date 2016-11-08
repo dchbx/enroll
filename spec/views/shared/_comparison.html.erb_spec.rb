@@ -21,6 +21,7 @@ describe "shared/_comparison.html.erb" do
       :rx_formulary_url => "http://www.example.com",
       :provider_directory_url => "http://www.example1.com",
       :total_employer_contribution => 20,
+      :hios_id => "89789DC0010006-01",
       :total_employee_cost => 30,
       :id => "1234234234",
       :coverage_kind => "health",

@@ -1,0 +1,33 @@
+<% if @employer_profile.active_plan_year.present? && @employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record.end_of_month ) && @employer_profile.active_plan_year.aasm_state != "renewing_draft" %>
+
+  <% plan_year, billing_date = @employer_profile.billing_plan_year %>
+  <% if billing_date.present? && plan_year.present? %>
+    <% bill_query = Queries::EmployerShowPageBill.new(@employer_profile) %>
+    <% bill = bill_query.execute %>
+
+    <div class="panel panel-default module premium-reports-widget widget">
+      <div class="panel-heading">
+        <h3 class="no-buffer text-green">
+          <strong>Enrollment Report</strong>
+        </h3>
+        <span><%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></span>
+      </div>
+      <div class="panel-body">
+        <table>
+          <tr>
+            <td style="padding-right: 10px;">Total Premium:</td>
+            <td><%= number_to_currency(bill.total_premium || 0)%></td>
+          </tr>
+          <tr>
+            <td style="padding-right: 10px;">Employee Contributions:</td>
+            <td><%= number_to_currency(bill.total_employee_cost || 0) %></td>
+          </tr>
+          <tr>
+            <td style="padding-right: 10px;">Employer Contributions:</td>
+            <td><%= number_to_currency(bill.total_employer_contribution || 0) %></td>
+          </tr>
+        </table>
+      </div>
+  <% end %>
+  </div>
+<% end %>
