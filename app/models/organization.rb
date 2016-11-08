@@ -34,6 +34,8 @@ class Organization
 
   field :is_active, type: Boolean
 
+  field :is_fake_fein, type: Boolean
+
   # User or Person ID who created/updated
   field :updated_by, type: BSON::ObjectId
 
@@ -131,6 +133,13 @@ class Organization
       })
   }
 
+  def self.generate_fein
+    loop do
+      random_fein = (["00"] + 7.times.map{rand(10)} ).join
+      break random_fein unless Organization.where(:fein => random_fein).count > 0
+    end
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
   end
@@ -211,11 +220,11 @@ class Organization
     Organization.valid_carrier_names.invert.to_a
   end
 
-  def self.upload_invoice(file_path)
+  def self.upload_invoice(file_path,file_name)
     invoice_date = invoice_date(file_path) rescue nil
     org = by_invoice_filename(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      doc_uri = Aws::S3Storage.save(file_path, "invoices")
+      doc_uri = Aws::S3Storage.save(file_path, "invoices",file_name)
       if doc_uri
         document = Document.new
         document.identifier = doc_uri
@@ -229,6 +238,17 @@ class Organization
       end
     else
       logger.warn("Unable to associate invoice #{file_path}")
+    end
+  end
+
+  def self.upload_invoice_to_print_vendor(file_path,file_name)
+    org = by_invoice_filename(file_path) rescue nil
+    return if !org.employer_profile.is_conversion?
+    bucket_name= Settings.paper_notice
+    begin
+      doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
+    rescue Exception => e
+      puts "Unable to upload invoices to paper notices bucket"
     end
   end
 

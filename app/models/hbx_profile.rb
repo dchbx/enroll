@@ -121,9 +121,6 @@ class HbxProfile
   IndividualEnrollmentDueDayOfMonth = 18
   IndividualEnrollmentTerminationMinimum = 14.days
 
-  InitialEmployerPlanYearPublishDueDayOfMonth = 5
-  RenewingEmployerPlanYearPublishDueDayOfMonth = 10
-
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,
 

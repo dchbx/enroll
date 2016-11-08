@@ -9,7 +9,8 @@ namespace :reports do
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
 
       # census_employees = CensusEmployee.find_all_terminated(date_range: date_range)
-      employer_profiles = EmployerProfile.all
+      #employer_profiles = EmployerProfile.all
+      orgs = Organization.exists(employer_profile: true).order_by([:legal_name])
 
       field_names  = %w(
           fein       
@@ -45,7 +46,8 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        employer_profiles.each do |er|
+        orgs.all.each do |org|
+          er = org.employer_profile
           plan_year = er.active_plan_year || er.latest_plan_year
           next unless plan_year
 

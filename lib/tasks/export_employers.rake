@@ -4,7 +4,7 @@ namespace :employers do
   desc "Export employers to csv."
   # Usage rake employers:export
   task :export => [:environment] do
-    employers = Organization.no_timeout.where("employer_profile" => {"$exists" => true}).map(&:employer_profile)
+    orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
     FILE_PATH = Rails.root.join "employer_export.csv"
 
@@ -30,7 +30,6 @@ namespace :employers do
       broker_agency_account
     end
 
-
     CSV.open(FILE_PATH, "w") do |csv|
 
       headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code employer_profile.profile_source employer.status ga_fein ga_agency_name ga_start_on
@@ -46,10 +45,16 @@ namespace :employers do
                                 broker.name broker.npn broker.assigned_on)
       csv << headers
 
-      employers.each do |employer| 
+      orgs.all.each do |org| 
         begin
-          employer_attributes = []
-          employer_attributes += [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state, employer.general_agency_profile.fein, employer.general_agency_profile.legal_name, employer.active_general_agency_account.start_on]
+          employer = org.employer_profile
+
+          puts employer.legal_name + ": no general agency profile" if employer.general_agency_profile.nil?
+          gap_fein = !employer.general_agency_profile.nil? ? employer.general_agency_profile.fein : ""
+          gap_legal_name = !employer.general_agency_profile.nil? ? employer.general_agency_profile.legal_name : ""
+          gap_active_start_on = !employer.active_general_agency_account.nil? ? employer.active_general_agency_account.start_on : "" 
+
+          employer_attributes = [employer.legal_name, employer.dba, employer.fein, employer.hbx_id, employer.entity_kind, employer.sic_code, employer.profile_source, employer.aasm_state, gap_fein, gap_legal_name, gap_active_start_on]
           office_location = get_primary_office_location(employer.organization)
           employer_attributes += [office_location.is_primary, office_location.address.address_1, office_location.address.address_2, office_location.address.city,
                                   office_location.address.state, office_location.address.zip]
@@ -87,6 +92,9 @@ namespace :employers do
               #benefit_group.relationship_benefits.each do |relationship_benefit|
                 row = []
 
+                puts employer.legal_name + " - Plan Year " + plan_year.id.to_s + " : no workflow state transitions" if plan_year.workflow_state_transitions.size == 0
+                plan_year_transition_at = plan_year.workflow_state_transitions.size > 0 ? plan_year.workflow_state_transitions.order(transition_at: :desc).first.transition_at : ""
+
                 begin
                   row += [benefit_group.relationship_benefits[0].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[0].offered, benefit_group.relationship_benefits[1].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[1].offered, benefit_group.relationship_benefits[2].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[2].offered, benefit_group.relationship_benefits[3].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[3].offered, benefit_group.relationship_benefits[4].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[4].offered]
 
@@ -96,7 +104,7 @@ namespace :employers do
                           (benefit_group.plan_option_kind == 'single_plan'),
                           benefit_group.reference_plan.name, benefit_group.effective_on_kind, benefit_group.effective_on_offset]
                   row += [plan_year.start_on, plan_year.end_on, plan_year.open_enrollment_start_on, plan_year.open_enrollment_end_on,
-                          plan_year.fte_count, plan_year.pte_count, plan_year.msp_count, plan_year.aasm_state, plan_year.workflow_state_transitions.last.transition_at]
+                          plan_year.fte_count, plan_year.pte_count, plan_year.msp_count, plan_year.aasm_state, plan_year_transition_at]
 
                   broker_agency_account = get_broker_agency_account(employer.broker_agency_accounts, plan_year)
                   if broker_agency_account.present?

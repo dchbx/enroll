@@ -34,8 +34,8 @@ aca:
 #
     open_enrollment:
       benefit_year_2016:
-        start_on: <%= Date.new(2015,11,1) %>
-        end_on: <%= Date.new(2016,1,31) %>
+        start_on: <%= Date.new(2016,11,1) %>
+        end_on: <%= Date.new(2017,1,31) %>
 
   shop_market:
     small_market_employee_count_maximum: 50
@@ -55,6 +55,7 @@ aca:
       days: -60
 
     initial_application:
+      publish_due_day_of_month: 5
       earliest_start_prior_to_effective_on:
         months: -3
       appeal_period_after_application_denial:
@@ -67,6 +68,8 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -3
       monthly_open_enrollment_end_on: 13
+      publish_due_day_of_month: 11
+      force_publish_day_of_month: 12
       open_enrollment:
         minimum_length:
           days: 3
