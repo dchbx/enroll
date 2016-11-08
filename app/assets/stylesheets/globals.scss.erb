@@ -1,5 +1,73 @@
 @import "variables";
 .module, .modal {
+   .text-green {
+       color: $primary-green;
+     }
+  .enroll-checkbox {
+    input[type=checkbox] {
+      display: none;
+      + label > i.fa {
+        color: #69A30D;
+      }
+    }
+    .checkbox {
+      margin: 0;
+      padding: 0;
+    }
+    .checkbox {
+      &>div {
+        display: inline-block;
+        margin: auto;
+      }
+    }
+    .checkbox label {
+      padding-left: 0;
+    }
+    .checkbox label label {
+      display: table;
+      padding-left: 0;
+      &>* {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: left;
+      }
+      span {
+        font-size: 12px;
+        display: inline-block;
+      }
+    }
+    .checkbox label label + span {
+      display: inline-block;
+      position: relative;
+      text-transform: capitalize;
+      font-size: 16px;
+      top: -5px;
+      left: 10px;
+    }
+    input[type=checkbox]:disabled + label i {
+      color: #b7b7b7;
+      cursor: not-allowed;
+    }
+    input[type=checkbox] + label i {
+      &:first-of-type {
+        display: none;
+      }
+      &:last-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+    }
+    input[type=checkbox]:checked + label i {
+      &:first-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+      &:last-of-type {
+        display: none;
+      }
+    }
+  }
+
   &.hbx-panel {
     .panel-heading {
       background-color: transparent;
@@ -38,6 +106,9 @@
   .census-employee-details .n-radio-row {
     border: none !important;
     padding: inherit;
+  }
+  .word-break {
+    word-break: break-all;
   }
   .no-vertical-padding {
     padding-top: 0;

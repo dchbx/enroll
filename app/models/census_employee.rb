@@ -43,6 +43,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   before_save :assign_default_benefit_package
+  before_save :allow_nil_ssn_updates_dependents
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -105,6 +106,14 @@ class CensusEmployee < CensusMember
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
+  
+  def allow_nil_ssn_updates_dependents
+    census_dependents.each do |cd|
+      if cd.ssn.blank?
+        cd.unset(:encrypted_ssn)
+      end
+    end
+  end
 
   def initialize(*args)
     super(*args)
@@ -265,7 +274,7 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    benefit_group_assignments.detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
   end
 
   def inactive_benefit_group_assignments
@@ -334,8 +343,9 @@ class CensusEmployee < CensusMember
   def terminate_employment(employment_terminated_on)
     begin
       terminate_employment!(employment_terminated_on)
-    rescue
-      nil
+    rescue => e
+      Rails.logger.error { e }
+      false
     else
       self
     end
@@ -348,7 +358,6 @@ class CensusEmployee < CensusMember
       if may_terminate_employee_role?
 
         unless employee_termination_pending?
-
 
           self.employment_terminated_on = employment_terminated_on
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
@@ -380,7 +389,7 @@ class CensusEmployee < CensusMember
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
       end
-  end
+    end
 
     self
   end
@@ -597,7 +606,7 @@ class CensusEmployee < CensusMember
     enrollments += coverages_selected.call(renewal_benefit_group_assignment)
     enrollments.compact.uniq
   end
-
+  
   private
 
   def reset_active_benefit_group_assignments(new_benefit_group)
@@ -684,7 +693,7 @@ class CensusEmployee < CensusMember
       return false
     end
   end
-
+  
   def has_benefit_group_assignment?
     (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
     (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))

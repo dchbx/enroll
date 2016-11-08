@@ -280,9 +280,9 @@ class PlanYear
 
   def due_date_for_publish
     if employer_profile.plan_years.renewing.any?
-      Date.new(start_on.prev_month.year, start_on.prev_month.month, HbxProfile::RenewingEmployerPlanYearPublishDueDayOfMonth)
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.publish_due_day_of_month)
     else
-      Date.new(start_on.prev_month.year, start_on.prev_month.month, HbxProfile::InitialEmployerPlanYearPublishDueDayOfMonth)
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
     end
   end
 
@@ -871,11 +871,11 @@ private
     when "published", "draft", "renewing_published", "renewing_draft"
       today >= open_enrollment_start_on
     when "enrolling", "renewing_enrolling"
-      today.end_of_day >= open_enrollment_end_on
+      today > open_enrollment_end_on
     when "enrolled", "renewing_enrolled"
       today >= start_on
     when "active"
-      today >= end_on
+      today > end_on
     else
       false
     end
@@ -966,7 +966,7 @@ private
       errors.add(:open_enrollment_start_on, "can't occur before 60 days before start date")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) > Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+    if open_enrollment_end_on > (open_enrollment_start_on + Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
       errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")
     end
 
@@ -978,15 +978,6 @@ private
     if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
       if end_on != (start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
-      end
-    end
-
-    if ['draft', 'renewing_draft'].include?(aasm_state)
-      enrollment_end = is_renewing? ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
-        : Settings.aca.shop_market.open_enrollment.monthly_end_on
-
-      if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
-        errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date")
       end
     end
   end

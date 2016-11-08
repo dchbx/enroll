@@ -202,12 +202,27 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+  delegate :all_types_verified?, :to => :consumer_role
+
+
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } ) if need_to_notify?
+  end
+
+  def need_to_notify?
+    changed_fields = changed_attributes.keys
+    changed_fields << consumer_role.changed_attributes.keys if consumer_role.present?
+    changed_fields << employee_roles.map(&:changed_attributes).map(&:keys) if employee_roles.present?
+    changed_fields << employer_staff_roles.map(&:changed_attributes).map(&:keys) if employer_staff_roles.present?
+    changed_fields = changed_fields.flatten.compact.uniq
+    notify_fields = changed_fields.reject{|field| ["bookmark_url", "updated_at"].include?(field)}
+    notify_fields.present?
   end
 
   def is_aqhp?
@@ -254,10 +269,6 @@ class Person
     end
     true
   end
-
-  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
-
-  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
@@ -369,7 +380,8 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'Social Security Number' if self.ssn
+    verification_types << 'Social Security Number' if ssn
+    verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
     if self.us_citizen
       verification_types << 'Citizenship'
     else
@@ -801,6 +813,14 @@ class Person
 
   def generate_family_search
     ::MapReduce::FamilySearchForPerson.populate_for(self)
+  end
+
+  def set_consumer_role_url
+    if consumer_role.present? && user.present?
+      if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
+        consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
+      end
+    end
   end
 
   private

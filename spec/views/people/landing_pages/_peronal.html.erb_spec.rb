@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe "people/landing_pages/_personal.html.erb" do
   let(:person) { FactoryGirl.build(:person) }
+  let(:person1) { FactoryGirl.build(:invalid_person) }
   let(:consumer_role) { FactoryGirl.build(:consumer_role) }
   context 'family is updateable' do
     before(:each) do
@@ -55,6 +56,27 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /Home Address/
       end
+    end
+  end
+
+  context 'create email when person has no home/work emails' do
+    before(:each) do
+      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: false))
+      assign(:person, person1)
+    end
+
+    it "should show home email address" do
+      person.emails.build(kind: 'home')
+      render :template => "people/landing_pages/_personal.html.erb"
+      expect(rendered).to have_selector('div#email_info')
+      expect(rendered).to match /Home Email Address/
+    end
+
+    it "should show work email address" do
+      person.emails.build(kind: 'work')
+      render :template => "people/landing_pages/_personal.html.erb"
+      expect(rendered).to have_selector('div#email_info')
+      expect(rendered).to match /Work Email Address/
     end
   end
 

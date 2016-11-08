@@ -1,11 +1,11 @@
 module CapybaraHelpers
-  def wait_for_ajax(delta=2, time_to_sleep=1)
+  def wait_for_ajax(delta=2, time_to_sleep=0.2)
     start_time = Time.now
     Capybara.default_max_wait_time = delta
     Timeout.timeout(Capybara.default_max_wait_time) do
       until finished_all_ajax_requests? do
         sleep(0.01)
-      end 
+      end
     end
     end_time = Time.now
     Capybara.default_max_wait_time = 2

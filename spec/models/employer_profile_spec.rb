@@ -32,8 +32,8 @@ describe EmployerProfile, dbclean: :after_each do
     }
   end
 
-  after do
-    TimeKeeper.set_date_of_record(TimeKeeper.date_of_record)
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   it { should validate_presence_of :entity_kind }

@@ -38,7 +38,7 @@ class Address
   end
 
   def blank?
-    [:city, :state, :zip, :address_1, :address_2].all? do |attr|
+    [:city, :zip, :address_1, :address_2].all? do |attr|
       self.send(attr).blank?
     end
   end
