@@ -14,7 +14,7 @@ FactoryGirl.define do
     end
 
     trait :hbx_read_only do
-      modify_family false
+      modify_family true
       modify_employer false
       revert_application false
       list_enrollments true
@@ -59,6 +59,19 @@ FactoryGirl.define do
       approve_ga false
     	modify_admin_tabs false
     	view_admin_tabs  false
+    end
+
+
+    trait :developer do
+      modify_family false
+      modify_employer false
+      revert_application false
+      list_enrollments false
+      send_broker_agency_message false
+      approve_broker false
+      approve_ga false
+      modify_admin_tabs false
+      view_admin_tabs  false
     end
   end
 end

@@ -314,6 +314,11 @@ RSpec.describe Plan, dbclean: :after_each do
       it "should compute premium" do
         expect(plan.premium_for(Date.parse("2015-10-01"), plan_params[:premium_tables][0][:age])).to eq(plan_params[:premium_tables][0][:cost])
       end
+
+      it "should round premium amount" do
+        allow(BigDecimal).to receive_message_chain(:new, :round, :to_f).and_return("45.45")
+        expect(plan.premium_for(Date.parse("2015-10-01"), plan_params[:premium_tables][0][:age])).to eq "45.45"
+      end
     end
   end
 

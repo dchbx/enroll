@@ -364,6 +364,10 @@ Rails.application.routes.draw do
 
   match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
 
+  match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
+  match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
+  match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
+
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
 

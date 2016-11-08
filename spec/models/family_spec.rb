@@ -1210,3 +1210,35 @@ describe Family, "with 2 households a person and 2 extended family members", :db
     end
   end
 end
+
+describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
+  let(:person) { FactoryGirl.create(:person)}
+  let(:person_two) { FactoryGirl.create(:person) }
+  let(:family_member_dependent) { FactoryGirl.build(:family_member, person: person_two, family: family)}
+  let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
+
+  it "should not build the consumer role for the dependents if primary do not have a consumer role" do
+    expect(family_member_dependent.person.consumer_role).to eq nil
+    family_member_dependent.family.check_for_consumer_role
+    expect(family_member_dependent.person.consumer_role).to eq nil
+  end
+ 
+  it "should build the consumer role for the dependents when primary has a consumer role" do
+    person.consumer_role = FactoryGirl.create(:consumer_role)
+    person.save
+    expect(family_member_dependent.person.consumer_role).to eq nil
+    family_member_dependent.family.check_for_consumer_role
+    expect(family_member_dependent.person.consumer_role).not_to eq nil
+  end
+
+  it "should return the existing consumer roles if dependents already have a consumer role" do
+    person.consumer_role = FactoryGirl.create(:consumer_role)
+    person.save
+    cr = FactoryGirl.create(:consumer_role)
+    person_two.consumer_role = cr
+    person_two.save
+    expect(family_member_dependent.person.consumer_role).to eq cr
+    family_member_dependent.family.check_for_consumer_role
+    expect(family_member_dependent.person.consumer_role).to eq cr
+  end  
+end

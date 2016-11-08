@@ -2,6 +2,14 @@
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
+<style type="text/css" media="screen,print">
+.break{
+   display: block;
+   clear: both;
+   page-break-after: always;
+}
+</style>
+
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -24,11 +32,13 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["To select your new health insurance plan, login to your online account and click on the “Shop for Plans” link."], heading: 'Selecting a Private Health Insurance Plan', sub_heading: ''} %>
 
-[Insert Shop for Plans Image Here]
+<%= render partial: 'notices/shared/sep' %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not see this link, call #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number}."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>You must choose a plan before «SEP_End_Date». The start date for your coverage depends on your circumstances and the date you select your plan.  The earlier you choose a plan, the sooner you will have health insurance.</strong> In most cases, if you select a plan by the 15th of the month, your coverage will start on the first day of the following month once you have paid your first month’s premium. If you enroll after the 15th of a month, your coverage will start on the first day of the next following month once you have paid your first month’s premium. 45 C.F.R. §155.420(b)."} %>
+<div class="break"></div>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>You must choose a plan before [SEP_End_Date]. The start date for your coverage depends on your circumstances and the date you select your plan.  The earlier you choose a plan, the sooner you will have health insurance.</strong> In most cases, if you select a plan by the 15th of the month, your coverage will start on the first day of the following month once you have paid your first month’s premium. If you enroll after the 15th of a month, your coverage will start on the first day of the next following month once you have paid your first month’s premium. 45 C.F.R. §155.420(b)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Certain circumstances, such as having a baby, getting married, and losing other health insurance coverage, may qualify you for an earlier start date. If during the enrollment process you do not see the start date for your coverage that you expected, you should complete your enrollment and then call #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number}. If you qualify for an earlier coverage start date, #{Settings.site.short_name} will work with your insurance company to apply the necessary changes."} %>
 
@@ -47,6 +57,8 @@
   col_styles: ['width: 30%;', 'width: 70%; text-align: center;'], table_width: '100%'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This decision is supported by the following provision of the Code of Federal Regulations: 45 C.F.R. §155.420(d)."} %>
+
+<div class="break"></div>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to www.DCHealthLink.com. You can get help with logging in or creating an account by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."], heading: 'Your Secure User Account', sub_heading: ''} %>
 

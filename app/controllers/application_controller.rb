@@ -192,6 +192,10 @@ class ApplicationController < ActionController::Base
     def set_current_user
       User.current_user = current_user
       SAVEUSER[:current_user_id] = current_user.try(:id)
+      session_id = SessionTaggedLogger.extract_session_id_from_request(request)
+      unless SessionIdHistory.where(session_id: session_id).present?
+        SessionIdHistory.create(session_id: session_id, session_user_id: current_user.try(:id))
+      end
     end
 
     def clear_current_user
@@ -243,6 +247,9 @@ class ApplicationController < ActionController::Base
       if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
         role.bookmark_url = bookmark_url
         role.try(:save!)
+      elsif bookmark_url.match('/families/home') && @person.present?
+        @person.consumer_role.update_attribute(:bookmark_url, family_account_path) if (@person.consumer_role.present? && @person.consumer_role.bookmark_url != family_account_path)
+        @person.employee_roles.last.update_attribute(:bookmark_url, family_account_path) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
       end
     end
     def set_bookmark_url(url=nil)

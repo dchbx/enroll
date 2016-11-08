@@ -9,7 +9,7 @@ namespace :reports do
       census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2015,10,1)))
 
       field_names  = %w(
-          employer_name last_name first_name ssn dob aasm_state hired_on employment_terminated_on updated_at 
+          employer_name last_name first_name ssn dob aasm_state hired_on employment_terminated_on updated_at
         )
 
       processed_count = 0
@@ -34,11 +34,11 @@ namespace :reports do
           active_states = %w(registered eligible binder_paid enrolled suspended)
 
           if active_states.include? census_employee.employer_profile.aasm_state
-            csv << field_names.map do |field_name| 
-              if field_name == "ssn"
-                '="' + eval(field_name) + '"'
-              else
+            csv << field_names.map do |field_name|
+              if eval(field_name).to_s.blank? || field_name != "ssn"
                 eval("#{field_name}")
+              elsif field_name == "ssn"
+                '="' + eval(field_name) + '"'
               end
             end
             processed_count += 1

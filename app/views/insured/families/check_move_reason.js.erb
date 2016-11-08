@@ -2,13 +2,9 @@
   $('#qle-date-chose').hide();
   $("#qle_reason").show();
   $("#qle_reason").html("<%= escape_javascript(render 'moving_fields') %>");
-  $('.calculator').hide();
   $('#qle_reason .special_qle_reasons').removeClass('hidden');
   $("input:radio[name=reason]:first").click();
-  var init_date = new Date($('#qle_date').val());
-  var new_date = new Date(init_date.setDate(init_date.getDate()-61));
-  var prev_date= ((new_date.getMonth() + 1) + '/' + new_date.getDate() + '/' +  new_date.getFullYear());
-  var moving_notice = 'I had other health coverage for at least one day between ' + prev_date + " and " + $('#qle_date').val();   
+  var moving_notice = 'I had other health coverage for at least one day between ' + '<%= @qle_date_calc %>'  + " and " + '<%= @qle_date %>' ;   
   $("#date-change").html(moving_notice);
   $("input:radio[name=reason]:first").val(moving_notice);
 <% else %>

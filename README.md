@@ -1,2 +1,3 @@
 # Enroll
-Enroll is an open source health care exchange build on Ruby on Rails with a Mongo database managed by [IdeaCrew, Inc](http://ideacrew.com) for the [DC Health Benefit Exchange](http://hbx.dc.gov/).
+
+Enroll App is the web-facing, transactional component of the first built-to-purpose, open source eligibility and enrollment solution for Health Benefit Exchanges. Enroll powers the [DC Health Link](https://dchealthlink.com/) site for the [DC Health Benefit Exchange](http://hbx.dc.gov/), and is developed and managed by [IdeaCrew](http://www.ideacrew.com).

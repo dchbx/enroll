@@ -1,0 +1,67 @@
+<%if @error_on_save %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%@error_on_save.each do |err|%>
+      <li><%=err[1][0]%></li>
+    <%end%>
+  </div>
+<%end%>
+
+<div class="container bottom-pd">
+  
+  <div class="row">
+    <h3 class="title-inline">Editing DOB / SSN for:</h3>
+  </div>
+  
+  <div>
+    <table class="table table-border">
+      <thead></thead>
+      <tbody>
+        <tr>
+        <td><p> <b>Name:</b> <%=@person.first_name%> <%=@person.last_name%></p></td>
+        <td><p> <b>HBX ID:</b> <%=@person.hbx_id%></p></tb>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row input-no-pd">
+    <%= form_for @person, remote: true, url: update_dob_ssn_path, method: "post", class: "form" do |f|%>
+      <%= f.hidden_field :person_id, value: @person.id %>
+      <table class="table table-border">
+        <thead></thead>
+        <tbody>
+          <tr>
+            <td>
+              <p><b>New DOB</b></p>
+              <%= datepicker_control f, :dob, {:class => "form-control interaction-field-control-census-employee-dob", :value => params[:new_dob].present? ? Date.strptime(params[:new_dob], '%m/%d/%Y') : @person.dob, :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, :onchange => "check_dob_change_implication('#{@person.id}', this.value)"} %>
+            </td>  
+            <td>
+               <p><b>New SSN</b></p>  
+              <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required mask-ssn form-control", :value => params[:new_ssn].present? ? params[:new_ssn] : @person.ssn, required: true, :input_html => {:maxlength => 15, :size => 40} %>
+            </td>
+              <%= f.hidden_field :pid, :value => @person.id  %>
+            </tr>
+            <td></td>
+            <td>
+              <div class= "pull-right">
+                <%= link_to "Reset", edit_dob_ssn_path(id: @person.primary_family.primary_applicant.person.id) , class: "btn btn-info", remote: true %>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary"%>
+              </div>
+            </td>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+  <%if @premium_implications.present?%> 
+    <div class="alert alert-warning row"> 
+      <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span> 
+      <b>Active enrollment(s) for this person exists. Updating DOB has implications as it could result in the change of premium for the following enrollment(s):</b>
+      <%@premium_implications.each do |key, val|%>
+        <li><%=find_plan_name(key)%></li>
+      <%end%> 
+    </div>
+  <%end%>
+</div>
+
+<%= link_to "Back to Families Index", family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true, class: 'btn btn-default' %>

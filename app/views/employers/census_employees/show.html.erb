@@ -97,13 +97,15 @@
       <div class="panel panel-default module census-employee-address">
         <div class="panel-body">
           <div class="address">
-            <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
+            <% census_employee_address = @census_employee.address.present? ? @census_employee.address : @census_employee.build_address%>
+            <%= f.fields_for :address, census_employee_address, errors: {}, fieldset: false do |address| %>
             <%= render 'address_fields', f: address %>
             <% end %>
           </div>
         </div>
       </div>
     </div>
+    <% @census_employee.email = Email.new if @census_employee.email.blank? %>
     <div class="col-md-6 col-sm-12">
       <h3>
         Email
@@ -137,48 +139,26 @@
       <% end %>
     </div>
   </div>
+
   <div class="row">
+    <% @census_employee.enrollments_for_display.compact.each do |enrollment| %>
     <div class="col-xs-12">
       <h3>
-        Health Enrollment
+        <%= enrollment.coverage_kind.camelcase %> Enrollment
       </h3>
-      <% if @census_employee.active_benefit_group_assignment.present? %>
-      <% if (@census_employee.active_benefit_group_assignment.hbx_enrollments.detect{ |enrollment| enrollment.coverage_kind == 'health' }) %>
-      <%= render partial: "insured/families/enrollment", locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'health'}} %>
-      <% else %>
-      <h4>
-        <%= @census_employee.first_name.capitalize %>
-        <%= @census_employee.last_name.capitalize %>
-        hasn't enrolled in health coverage
-      </h4>
-      <% end %>
-      <% end %>
+
+      <%= render "insured/families/enrollment", read_only: true, hbx_enrollment: enrollment %>
     </div>
+    <% end %>
   </div>
-  <div class="row">
-    <div class="col-xs-12">
-      <h3>
-        Dental Enrollment
-      </h3>
-      <% if @census_employee.active_benefit_group_assignment.present? %>
-      <% if (@census_employee.active_benefit_group_assignment.hbx_enrollments.detect{ |enrollment| enrollment.coverage_kind == 'dental' }).present? %>
-      <%= render partial: "insured/families/enrollment", locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental'}} %>
-      <% else %>
-      <h4>
-        <%= @census_employee.first_name.capitalize %>
-        <%= @census_employee.last_name.capitalize %>
-        hasn't enrolled in dental coverage
-      </h4>
-      <% end %>
-      <% end %>
-    </div>
-  </div>
+
   <% if @past_enrollments.present? %>
     <h3>
       Past Enrollments
     </h3>
       <%= render partial: 'shared/past_enrollments', locals: { hbx_enrollments: @past_enrollments } %>
   <% end %>
+
   <br/>
   <br/>
   <div class="vertically-aligned-row">

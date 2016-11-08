@@ -25,7 +25,7 @@
     <div class="row">
       <div class="col-xs-12 vertically-aligned-row">
         <div>
-          <%= display_carrier_logo(Maybe.new(plan).carrier_profile.legal_name.extract_value, {width: 110}) %>
+          <%= display_carrier_logo(Maybe.new(plan), {width: 110}) %>
         </div>
         <h3>
           <%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year}), remote: true %>
@@ -152,10 +152,10 @@
     </div>
   </div>
   <% if read_only == true %>
-  <% if !hbx_enrollment.is_coverage_waived? %>
-  <br/>
-  <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == hbx_enrollment.coverage_kind } } %>
-  <% end %>
+    <% if !hbx_enrollment.is_coverage_waived? %>
+    <br/>
+    <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment:  hbx_enrollment} %>
+    <% end %>
   <% end %>
 </div>
 
@@ -172,24 +172,24 @@
       <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
     </div>
     <% if !read_only == true %>
-    <div class="col-lg-3">
-      <div class="row">
-        <% if @family.is_eligible_to_enroll? && !hbx_enrollment.coverage_terminated? %>
-        <%= pundit_span Family, :updateable? %>
-        <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-default btn-block" %>
-      </span>
-      <% elsif hbx_enrollment.may_terminate_coverage? && hbx_enrollment.kind == "individual" %>
-      <%= pundit_span Family, :updateable? %>
-      <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-default btn-block' } %>
-    </span>
+      <div class="col-lg-3">
+        <div class="row <%if disable_make_changes_button?(hbx_enrollment)%>cna<%end%>">
+          <% if @family.is_eligible_to_enroll? && !hbx_enrollment.coverage_terminated? %>
+            <%= pundit_span Family, :updateable? %>
+              <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-default btn-block, disabled: disable_make_changes_button?(hbx_enrollment)" %>
+            </span>
+          <% elsif hbx_enrollment.may_terminate_coverage? && hbx_enrollment.kind == "individual" %>
+            <%= pundit_span Family, :updateable? %>
+              <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-default btn-block' } %>
+            </span>
+          <% end %>
+          <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %>
+        </div>
+      </div>
     <% end %>
-    <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %>
   </div>
-</div>
-<% end %>
-</div>
 </div>
 </div>
 <% else %>
-<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == hbx_enrollment.coverage_kind } } %>
+<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
 <% end %>

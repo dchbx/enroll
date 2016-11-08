@@ -21,9 +21,11 @@ describe "shared/_summary.html.erb" do
       :rx_formulary_url => "http://www.example.com",
       :provider_directory_url => "http://www.example1.com",
       :ehb => 0.988,
+      :hios_id => "89789DC0010006-01",
       :id => "1234234234",
       :coverage_kind => "health",
       :sbc_file => "THE SBC FILE.PDF",
+      :is_standard_plan => true,
       :can_use_aptc? => true,
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
                                      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
@@ -37,6 +39,11 @@ describe "shared/_summary.html.erb" do
     assign :person, person
     assign :plan, mock_plan
     assign :hbx_enrollment, mock_hbx_enrollment
+  end
+
+  it "should display standard plan indicator" do
+    render "shared/summary", :qhp => mock_qhp_cost_share_variance
+    expect(rendered).to have_selector('i', text: 'STANDARD PLAN')
   end
 
   context "with no rx_formulary_url and provider urls for coverage_kind = dental" do

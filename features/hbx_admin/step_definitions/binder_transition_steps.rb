@@ -26,7 +26,7 @@ And(/^the HBX admin sees a checklist$/) do |checklist|
 end
 
 When(/^the HBX admin selects the employer to confirm$/) do
-  sleep 1
+  wait_for_ajax
   page.find("#employer_profile_id_#{employer.employer_profile.id.to_s}").click
 end
 
@@ -36,7 +36,7 @@ end
 
 And(/^the HBX admin clicks the "([^"]*)" button$/) do |arg1|
   click_button arg1
-  sleep 1
+  wait_for_ajax
 end
 
 Then(/^then the Employer’s state transitions to "([^"]*)"$/) do |arg1|
@@ -100,4 +100,5 @@ end
 
 Then(/^the appropriate XML file is generated and transmitted$/) do
   expect(page).to have_css(".alert-notice", text: "Successfully transmitted the employer group xml.")
+  wait_for_ajax
 end
