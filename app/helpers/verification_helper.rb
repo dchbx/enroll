@@ -14,23 +14,32 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
-     if type == 'Social Security Number'
-       if member.consumer_role.ssn_verified?
-         "verified"
-       elsif member.consumer_role.has_docs_for_type?(type)
-         "in review"
-       else
-         "outstanding"
-       end
-     elsif type == 'Citizenship' || type == 'Immigration status'
-       if member.consumer_role.lawful_presence_verified?
-         "verified"
-       elsif member.consumer_role.has_docs_for_type?(type)
-         "in review"
-       else
-         "outstanding"
-       end
-     end
+    case type
+      when 'Social Security Number'
+        if member.consumer_role.ssn_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
+      when 'American Indian Status'
+        if member.consumer_role.native_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
+      else
+        if member.consumer_role.lawful_presence_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
+    end
   end
 
   def verification_type_class(type, member)

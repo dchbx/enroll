@@ -4,10 +4,12 @@
 <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
   <%= f.text_field :dba, class: "floatlabel form-control interaction-field-control-organization-dba", placeholder: 'DBA' %>
 </div>
-<div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-  <%= f.text_field :fein, class: "floatlabel form-control fien_field interaction-field-control-organization-fein", required: true, placeholder: 'FEIN*', readonly: defined?(readonly) %>
-</div>
 
+<div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd <%= 'hidden_field' if f.object.is_a?(Forms::BrokerAgencyProfile)%>">
+  <%= f.text_field :fein, class: "floatlabel form-control fien_field interaction-field-control-organization-fein", required: true, placeholder: 'FEIN*' %>
+  <!-- <%= f.text_field :fein, class: "floatlabel form-control fien_field interaction-field-control-organization-fein", required: true, placeholder: 'FEIN*', readonly: defined?(readonly) %> -->
+</div>
+	<%= f.hidden_field(:is_fake_fein, :value => f.object.is_fake_fein) %>
   <%= f.hidden_field(:entity_kind, :value => "s_corporation") %>
 <!--
 <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">

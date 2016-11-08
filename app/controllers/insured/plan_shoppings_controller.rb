@@ -116,7 +116,7 @@ class Insured::PlanShoppingsController < ApplicationController
       employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
       coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
       waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-
+      waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
       waived_enrollment.generate_hbx_signature
 
       if waived_enrollment.save!
