@@ -16,8 +16,10 @@ RSpec.describe Employers::BrokerAgencyController do
     @org2.broker_agency_profile.update_attributes(primary_broker_role: @broker_role2)
     @broker_role2.update_attributes(broker_agency_profile_id: @org2.broker_agency_profile.id)
     @org2.broker_agency_profile.approve!
-
+   
     @user = FactoryGirl.create(:user)
+    p=FactoryGirl.create(:person, user: @user)
+    @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
   end
 
   after :all do
@@ -60,8 +62,9 @@ RSpec.describe Employers::BrokerAgencyController do
 
   describe ".create" do
 
-    context 'with out search string' do
+    context 'with out search string - with modify_employer permission' do
       before(:each) do
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in(@user)
         post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
@@ -69,6 +72,18 @@ RSpec.describe Employers::BrokerAgencyController do
       it "should be a success" do
         expect(flash[:notice]).to eq("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab:'brokers'))
+      end
+    end
+
+    context 'with out search string - WITHOUT modify_employer permission' do
+      before(:each) do
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: false))
+        sign_in(@user)
+        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+      end
+
+      it "should be a success" do
+        expect(flash[:error]).to match(/Access not allowed/)
       end
     end
   end
@@ -99,6 +114,7 @@ RSpec.describe Employers::BrokerAgencyController do
 
     context 'with out search string' do
       before(:each) do
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in(@user)
         get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id
       end
@@ -112,21 +128,37 @@ RSpec.describe Employers::BrokerAgencyController do
 
     context 'when direct terminate' do
       before(:each) do
+        allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
+        sign_in(@user)
+      end
+
+      it "should terminate broker and redirect to my_account with broker tab actived" do
+        get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record
+        expect(flash[:notice]).to eq("Broker terminated successfully.")
+        expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab: "brokers"))
+      end
+    end
+
+    context 'when hbx permission is modify_employer not allowed' do
+      before(:each) do
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: false))
         sign_in(@user)
       end
 
       it "should terminate broker and redirect to my_account with broker tab actived" do
         get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record
 
-        expect(flash[:notice]).to eq("Broker terminated successfully.")
-        expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab: "brokers"))
+        expect(flash[:error]).to match(/Access not allowed/)
+
       end
     end
+
   end
 
   describe ".create for invalid plan year" do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     before (:each) do
+          allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
           sign_in(@user)
           @employer_profile.plan_years=[]
           invalid_plan=FactoryGirl.build(:plan_year, open_enrollment_end_on: Date.today)
@@ -144,6 +176,17 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+    end
+
+    context "send_broker_assigned_msg" do
+
+      before do
+        @controller.send(:send_broker_assigned_msg, @employer_profile, @org2.broker_agency_profile)
+      end
+
+      it "adds a message to person inbox" do
+        expect(@employer_profile.inbox.messages.count).to eq (2)
+      end
     end
   end
 end

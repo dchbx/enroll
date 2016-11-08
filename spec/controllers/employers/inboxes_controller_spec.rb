@@ -52,6 +52,7 @@ RSpec.describe Employers::InboxesController, :type => :controller do
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"))}
     before do
       allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(user)
       allow(EmployerProfile).to receive(:find).and_return(inbox_provider)
       allow(controller).to receive(:find_message)

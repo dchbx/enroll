@@ -19,7 +19,7 @@
 
     <div class="focus_effect row personal-info-row">
       <div class="col-md-10 col-sm-9 no-pd"></div>
-      <div class="col-md-2 col-sm-3 no-pd">
+      <div class="col-md-2 col-sm-3 no-pd<%=pundit_class EmployerProfile,:updateable?%>">
         <%= f.submit "Continue", :class => "btn disable-btn search_continue disabled", :id => "continue-employer" %>
       </div>
     </div>
@@ -27,9 +27,9 @@
     <div class="clear-fix"></div>
 
     <%= render 'people/employer_search' %>
-  </div>
+  </div> 
   <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right hidden" id="key-section">
-      <%= f.submit "Save & Exit", class: 'btn btn-primary' %>
+      <%= f.submit "Save & Exit", class: "btn btn-primary" + pundit_class(EmployerProfile,:updateable?) %>
       <%= render 'shared/signup_progress' %>
   </div>
 

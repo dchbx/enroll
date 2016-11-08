@@ -23,6 +23,10 @@ module MongoidSupport
             end
             val
           end
+
+          def __association_reload_on_#{attr_name}
+            @__proxy_value_for_#{attr_name} = nil
+          end
         RUBYCODE
       end
     end

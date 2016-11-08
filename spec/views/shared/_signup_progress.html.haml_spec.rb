@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe "shared/_signup_progress.html.haml" do
+  before :each do
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+  end
   context "step 1" do
     before :each do
       render "shared/signup_progress"

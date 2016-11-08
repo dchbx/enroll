@@ -15,11 +15,10 @@ RSpec.describe Users::RegistrationsController do
       end
 
       it "should redirect to saml recovery page if user matches" do
-        post :create, { user: { email: email, password: password, password_confirmation: password } }
+        post :create, { user: { oim_id: email, password: password, password_confirmation: password } }
         expect(response).to be_success
-        expect(flash[:alert]).to eq "An account with this email address ( #{email} ) already exists. <a href=\"#{SamlInformation.account_recovery_url}\">Click here</a> if you've forgotten your password."
+        expect(flash[:alert]).to eq "An account with this username ( #{email} ) already exists. <a href=\"#{SamlInformation.account_recovery_url}\">Click here</a> if you've forgotten your password."
       end
-
     end
 
     context "when the email is not the black list" do
@@ -30,7 +29,7 @@ RSpec.describe Users::RegistrationsController do
       end
 
       it "should not redirect to saml recovery page if user matches" do
-        post :create, { user: { email: "test@example.com", password: password, password_confirmation: password } }
+        post :create, { user: { oim_id: "test@example.com", password: password, password_confirmation: password } }
         expect(response).not_to redirect_to(new_user_registration_path)
       end
 
@@ -45,7 +44,7 @@ RSpec.describe Users::RegistrationsController do
       end
 
       it "should complete sign up and redirect" do
-        post :create, { user: { email: email, password: password, password_confirmation: password } }
+        post :create, { user: { oim_id: email, password: password, password_confirmation: password } }
         expect(response).to redirect_to(root_path)
       end
     end
@@ -61,7 +60,7 @@ RSpec.describe Users::RegistrationsController do
       end
 
       it "should re-render the page" do
-        post :create, { user: { email: email, password: password, password_confirmation: password } }
+        post :create, { user: { oim_id: email, password: password, password_confirmation: password } }
         expect(response).to be_success
         expect(response).not_to redirect_to(root_path)
       end

@@ -36,8 +36,10 @@
                   <td><%= er.roster_size %></td>
                   <td><%= er.aasm_state.humanize %></td>
                   <td>
-                    <%= er.published_plan_year.try(:effective_date) %>
-                    <%= link_to ' (Review)',employers_premium_statement_path(er) %>
+                    <%= pundit_span EmployerProfile, :list_enrollments? %>
+                      <%= er.published_plan_year.try(:effective_date) %>
+                      <%= link_to ' (Review)',employers_premium_statement_path(er) %>
+                  </span>
                   </td>
                   <% if controller_name == 'profiles' %>
                     <% if er.active_broker_agency_account.present? %>
@@ -58,7 +60,9 @@
                   <td class='general_agency'>
                     <%= er.hashed_active_general_agency_legal_name(@general_agency_profiles) %>
                       &nbsp;
-                    <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true if er.active_general_agency_account.present? && controller_name == 'profiles' %>
+                    <%= pundit_span EmployerProfile, :updateable? %>
+                      <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true if er.active_general_agency_account.present? && controller_name == 'profiles' %>
+                    </span>
                   </td>
                   <% if @profile %>
                     <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>
@@ -73,8 +77,10 @@
           <h3>General Agencies</h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
           <%= hidden_field_tag :from_assign, false %>
-          <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
-          <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+          <%= pundit_span EmployerProfile, :updateable?  %>
+            <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+            <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+          </span>
         </div>
       <% end %>
     </div>

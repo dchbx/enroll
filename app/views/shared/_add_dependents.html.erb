@@ -1,9 +1,6 @@
 <div class="form-inputs">
-  <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent| %>
-  <%= render 'shared/census_dependent_fields', {f: dependent} %>
-  <% end %>
-
-  <%= link_to_add_fields 'Add Family Member', f, :census_dependents, 'btn btn-default' %>
-  <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'btn btn-default return_to_employee_roster' %>
-
+  <%= pundit_span @employer_profile, :updateable? %>
+    <%= link_to_add_fields 'add dependent', f, :census_dependents, 'btn btn-default' %>
+  </span>
+  <span>&nbsp;</span>
 </div>

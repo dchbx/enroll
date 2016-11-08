@@ -1,0 +1,53 @@
+<div class="panel panel-default module past-enrollments table-responsive">
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th class="text-center">Termination Date</th>
+        <th class="text-center">Plan Name</th>
+        <th class="text-center">Market</th>
+        <th class="text-center">Coverage</th>
+        <th class="text-center">Premium</th>
+        <th class="text-center">Effective Date</th>
+        <th class="text-center">Covered</th>
+        <th class="text-center">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @past_enrollments.each do |hbx_enrollment| %>
+      <% plan = hbx_enrollment.plan %>
+      <% if hbx_enrollment.aasm_state == "shopping" %>
+      <% else %>
+      <tr>
+        <td>
+          <%= hbx_enrollment.terminated_on %>
+        </td>
+        <td>
+          <%= plan.name %>
+        </td>
+        <td>
+          <%= hbx_enrollment.kind.humanize.titleize %>
+        </td>
+        <td>
+          <%= hbx_enrollment.coverage_kind.titleize %>
+        </td>
+        <td>
+          <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
+        </td>
+        <td>
+          <%= hbx_enrollment.effective_on %>
+        </td>
+        <td>
+          <% names = hbx_enrollment.covered_members_first_names %>
+          <% if names.present? %>
+          <%= names.map do |name| name.capitalize end.to_sentence %>
+          <% end %>
+        </td>
+        <td>
+          <%= hbx_enrollment.aasm_state.humanize.titleize %>
+        </td>
+      </tr>
+      <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

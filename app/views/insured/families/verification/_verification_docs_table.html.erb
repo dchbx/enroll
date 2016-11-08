@@ -21,7 +21,7 @@
               </td>
           <!-- HBX admin inclusion -->
           <!-- >>>> hbx admin inclusion -->
-              <td class="table-functions">
+              <td class="table-functions  <%=pundit_class(Family, :updateable?)%>" >
                 <% if vlp_doc.status != "verified" %>
                   <%= link_to document_path(vlp_doc, :person_id => person.id), method: :delete, remote: true do %>
                       <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Delete"></i>

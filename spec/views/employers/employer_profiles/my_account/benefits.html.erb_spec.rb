@@ -11,6 +11,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
     let(:user) { FactoryGirl.create(:user) }
 
     before :each do
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true, list_enrollments?: true))
       sign_in(user)
       allow(benefit_group).to receive(:reference_plan).and_return(plan)
       allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])
@@ -59,6 +60,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
     let(:user) { FactoryGirl.create(:user) }
 
     before :each do
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true, list_enrollments?: true))
       sign_in(user)
       allow(benefit_group).to receive(:reference_plan).and_return(plan)
       allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])

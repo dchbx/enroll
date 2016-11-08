@@ -2,8 +2,9 @@
 <td> <%= broker.npn if broker %></td>
 
 <td>
+<%=pundit_span EmployerProfile, :updateable?%>  
 <%= link_to 'Select Broker', '#', data: {toggle: "modal", target: "#broker_confirm_#{broker.id}"}, class: 'btn btn-default btn-default' %>
-
+</span>
 <div class="modal fade" id="broker_confirm_<%= broker.id %>" tabindex="-1" role="dialog" aria-labelledby="brokerConfirm" role="document">
   <div class="modal-dialog">
     <div class="modal-content">

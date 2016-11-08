@@ -8,7 +8,7 @@ RSpec.describe "insured/consumer_roles/search.html.haml" do
   before :each do
     sign_in current_user
     assign(:person, Forms::ConsumerCandidate.new)
-
+    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
     render template: "insured/consumer_roles/search.html.haml"
   end
 

@@ -1,4 +1,3 @@
-require "pundit/rspec"
 require "rails_helper"
 
 describe CensusEmployeePolicy do

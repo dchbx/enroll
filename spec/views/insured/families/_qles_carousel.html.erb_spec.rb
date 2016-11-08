@@ -7,6 +7,7 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
     FactoryGirl.create(:qualifying_life_event_kind, tool_tip: "")
     assign(:person, FactoryGirl.create(:person))
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
+    allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     render "insured/families/qles_carousel"
   end
 
@@ -47,6 +48,10 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
     expect(rendered).not_to match(/Individual/)
   end
 
+  it "should not have links blocked" do
+    expect(rendered).not_to have_selector('.blocking')
+  end
+
   context "QLE buttons for person with both roles" do
     before :each do
       assign(:multiroles, true)
@@ -65,4 +70,5 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
       expect(rendered).to match(/Individual/)
     end
   end
+
 end

@@ -73,4 +73,23 @@ describe HbxEnrollmentMember, dbclean: :after_all do
       end
     end
   end
+
+  context "given a family member" do
+    let(:person) { double }
+    let(:family_member) { instance_double(FamilyMember, :person => person ) }
+    subject { HbxEnrollmentMember.new }
+
+    before :each do
+      allow(subject).to receive(:family_member).and_return(family_member)
+    end
+
+    it "delegates #person to the family member" do
+      expect(subject.person).to eq person
+    end
+
+    it "delegates #ivl_coverage_selected to the family member" do
+      expect(family_member).to receive(:ivl_coverage_selected)
+      subject.ivl_coverage_selected
+    end
+  end
 end

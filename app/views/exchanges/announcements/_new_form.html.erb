@@ -36,7 +36,7 @@
       <%= f.collection_check_boxes :audiences, Announcement::AUDIENCE_KINDS, :to_s, :to_s %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group <%=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
     <div class="col-sm-offset-2 col-sm-10">
       <%= f.submit 'Create Announcement', class: 'btn btn-default' %>
     </div>

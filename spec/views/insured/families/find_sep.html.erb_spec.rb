@@ -10,6 +10,7 @@ RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
     assign :qualifying_life_events, [qle1, qle2]
     assign :next_ivl_open_enrollment_date, TimeKeeper.date_of_record
     assign(:person, FactoryGirl.create(:person))
+    allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     render
   end
 

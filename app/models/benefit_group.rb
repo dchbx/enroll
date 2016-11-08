@@ -52,6 +52,8 @@ class BenefitGroup
   # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
   field :is_congress, type: Boolean, default: false
+  field :_type, type: String, default: self.name
+
 
   delegate :start_on, :end_on, to: :plan_year
   # accepts_nested_attributes_for :plan_year
@@ -328,10 +330,12 @@ class BenefitGroup
   end
 
   def self.find(id)
-    organizations = Organization.where({"employer_profile.plan_years.benefit_groups._id" => id })
-    organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
-      bg.id == id
-    end.first
+    ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
+      organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
+      organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
+        bg.id == id
+      end.first
+    end
   end
 
 

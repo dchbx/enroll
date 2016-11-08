@@ -12,11 +12,11 @@ RSpec.describe "_waived_coverage_widget.html.erb" do
     before :each do
       assign(:person, person)
       allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
-      render partial: 'insured/families/waived_coverage_widget', locals: { hbx_enrollment: hbx_enrollment }
+      render partial: 'insured/families/waived_coverage_widget', locals: { hbx_enrollment: hbx_enrollment, read_only: false }
     end
 
     it "should display coverage waived widget" do
-      expect(rendered).to match (hbx_enrollment.aasm_state.gsub!(/_/, ' ')).split(/ |\_/).map(&:capitalize).join(" ")
+      expect(rendered).to match (/waived/i)
     end
 
     it "should display coverage waived time stamp" do

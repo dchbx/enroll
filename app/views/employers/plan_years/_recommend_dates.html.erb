@@ -47,8 +47,8 @@
   </div>
 </div>
 <div class="col-xs-3 pull-right">
-  <div class="row">
-    <a class="btn btn-primary btn-block  pull-right interaction-click-control-continue" onclick="$('#choose-coverage').hide();$('.benefits-setup-tab').fadeIn();$('#plan_year_benefit_groups_attributes_0_title').focus();$(window).scrollTop(0);">Continue</a>
+  <div class="row <%= pundit_class EmployerProfile,:updateable? %>">
+    <a class="btn btn-primary btn-lg btn-block  pull-right interaction-click-control-continue" onclick="$('#choose-coverage').hide();$('.benefits-setup-tab').fadeIn();$('#plan_year_benefit_groups_attributes_0_title').focus();$(window).scrollTop(0);">Continue</a>
   </div>
   <br/><br/><br/>
 </div>

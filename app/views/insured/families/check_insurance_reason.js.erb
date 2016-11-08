@@ -1,0 +1,13 @@
+<% if @qualified_date %>
+  $('#qle-date-chose').hide();
+  $("#qle_reason").show();
+  $("#qle_reason").html("<%= escape_javascript(render 'insurance_fields') %>");
+  $('#qle_reason .special_qle_reasons').removeClass('hidden');
+<% else %>
+  $.ajax({
+      type: "GET",
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
+      url: "/insured/families/check_qle_date.js"
+  });
+<% end %>
+

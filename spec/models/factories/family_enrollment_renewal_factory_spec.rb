@@ -54,27 +54,6 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       organization.employer_profile.census_employees.non_business_owner.first
     }
 
-    let!(:family) {
-      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
-      ce.update_attributes({employee_role: employee_role})
-      family_rec = Family.find_or_build_from_employee_role(employee_role)
-
-      FactoryGirl.create(:hbx_enrollment,
-        household: person.primary_family.active_household,
-        coverage_kind: "health",
-        effective_on: ce.active_benefit_group_assignment.benefit_group.start_on,
-        enrollment_kind: "open_enrollment",
-        kind: "employer_sponsored",
-        submitted_at: ce.active_benefit_group_assignment.benefit_group.start_on - 20.days,
-        benefit_group_id: ce.active_benefit_group_assignment.benefit_group.id,
-        employee_role_id: person.active_employee_roles.first.id,
-        benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
-        plan_id: plan.id
-        )
-
-      family_rec.reload
-    }
 
     let(:generate_passive_renewal) {
       factory = Factories::FamilyEnrollmentRenewalFactory.new
@@ -85,33 +64,137 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       factory.renew
     }
 
-    context 'when employer offering the renewing plan' do 
-      it 'should receive passive renewal' do 
-        expect(family.enrollments.size).to eq 1
-        expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
-        generate_passive_renewal
-        expect(family.enrollments.size).to eq 2
-        expect(family.enrollments.map(&:aasm_state)).to include('auto_renewing')
-        expect(family.enrollments.renewing.first.plan).to eq renewal_plan
+    context 'with active coverage' do 
+
+      let!(:family) {
+        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+        ce.update_attributes({employee_role: employee_role})
+        family_rec = Family.find_or_build_from_employee_role(employee_role)
+
+        FactoryGirl.create(:hbx_enrollment,
+          household: person.primary_family.active_household,
+          coverage_kind: "health",
+          effective_on: ce.active_benefit_group_assignment.benefit_group.start_on,
+          enrollment_kind: "open_enrollment",
+          kind: "employer_sponsored",
+          submitted_at: ce.active_benefit_group_assignment.benefit_group.start_on - 20.days,
+          benefit_group_id: ce.active_benefit_group_assignment.benefit_group.id,
+          employee_role_id: person.active_employee_roles.first.id,
+          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+          plan_id: plan.id
+          )
+
+        family_rec.reload
+      }
+
+      context 'when employer offering the renewing plan' do 
+        it 'should receive passive renewal' do 
+          expect(family.enrollments.size).to eq 1
+          expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
+          generate_passive_renewal
+          expect(family.enrollments.size).to eq 2
+          expect(family.enrollments.map(&:aasm_state)).to include('auto_renewing')
+          expect(family.enrollments.renewing.first.plan).to eq renewal_plan
+        end
+      end
+
+      context 'when employer changed plan offerings for renewing plan year' do
+
+        let!(:new_renewal_plan) {
+          FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: renewal_year, hios_id: "11111111122301-01", csr_variant_id: "01")
+        }
+
+        let(:renewal_benefit_group){
+          FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: new_renewal_plan.id
+        }
+
+        it 'should not recive passive renewal' do
+          expect(family.enrollments.size).to eq 1
+          expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
+          generate_passive_renewal
+          expect(family.enrollments.size).to eq 1
+          expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
+        end
       end
     end
 
-    context 'when employer changed plan offerings for renewing plan year' do
+    context 'with no active coverage' do 
 
-      let!(:new_renewal_plan) {
-        FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: renewal_year, hios_id: "11111111122301-01", csr_variant_id: "01")
+      let!(:family) {
+        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+        ce.update_attributes({employee_role: employee_role})
+        family_rec = Family.find_or_build_from_employee_role(employee_role)
+
+        FactoryGirl.create(:hbx_enrollment,
+          household: person.primary_family.active_household,
+          coverage_kind: "health",
+          effective_on: ce.active_benefit_group_assignment.benefit_group.start_on,
+          enrollment_kind: "open_enrollment",
+          kind: "employer_sponsored",
+          submitted_at: ce.active_benefit_group_assignment.benefit_group.start_on - 20.days,
+          benefit_group_id: ce.active_benefit_group_assignment.benefit_group.id,
+          employee_role_id: person.active_employee_roles.first.id,
+          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+          plan_id: plan.id,
+          terminated_on: ce.active_benefit_group_assignment.benefit_group.start_on + 2.months,
+          aasm_state: 'coverage_terminated'
+          )
+
+        family_rec.reload
       }
 
-      let(:renewal_benefit_group){
-        FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: new_renewal_plan.id
+      context 'when employer enters renewal open enrollment' do
+
+        it 'should recieve passive waiver' do 
+          expect(family.active_household.hbx_enrollments.size).to eq 1
+          expect(family.active_household.hbx_enrollments.first.aasm_state).to eq 'coverage_terminated'
+          generate_passive_renewal
+          family.reload
+          expect(family.active_household.hbx_enrollments.size).to eq 2
+          expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to include('renewing_waived')
+        end
+      end
+    end
+
+    # context 'with waived coverage' do
+
+    #   let!(:family) {
+    #     person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    #     employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+    #     ce.update_attributes({employee_role: employee_role})
+    #     family_rec = Family.find_or_build_from_employee_role(employee_role)
+    #     family_rec.reload
+    #   }
+
+    #   context 'when employer enters renewal open enrollment' do 
+    #     it 'should recieve passive waiver' do
+    #       expect(family.active_household.hbx_enrollments.size).to eq 0
+    #       generate_passive_renewal
+    #       family.reload
+    #       expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to include('renewing_waived')
+    #     end
+    #   end
+    # end
+    
+    context 'with no active/waived coverage' do 
+
+      let!(:family) {
+        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+        ce.update_attributes({employee_role: employee_role})
+        family_rec = Family.find_or_build_from_employee_role(employee_role)
+        family_rec.reload
       }
 
-      it 'should not recive passive renewal' do
-        expect(family.enrollments.size).to eq 1
-        expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
-        generate_passive_renewal
-        expect(family.enrollments.size).to eq 1
-        expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
+      context 'when employer enters renewal open enrollment' do 
+        it 'should recieve passive waiver' do
+          expect(family.active_household.hbx_enrollments.size).to eq 0
+          generate_passive_renewal
+          family.reload
+          expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to include('renewing_waived')
+        end
       end
     end
   end

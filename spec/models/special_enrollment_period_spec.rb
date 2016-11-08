@@ -124,9 +124,13 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       expect(ivl_qle_sep.effective_on).to be_nil
     end
 
+    after :all do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     context "and QLE is reported before end of SEP" do
       let(:today)                           { TimeKeeper.date_of_record }
-      let(:monthly_enrollment_deadline)     { today.beginning_of_month + Settings.aca.individual_market.monthly_enrollment_due_on.days - 1.day }
+      let(:monthly_enrollment_deadline)     { today.beginning_of_month + Setting.individual_market_monthly_enrollment_due_on.days - 1.day }
 
       let(:qle_on_date)                     { today.beginning_of_month }
 
@@ -191,7 +195,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       end
 
       it "and 'effective on kind' is 'first of next month' and date reported is after the monthly deadline and date of event is beginning of month" do
-        ivl_qle_sep.effective_on_kind = "first_of_next_month" 
+        ivl_qle_sep.effective_on_kind = "first_of_next_month"
         ivl_qle_sep.qle_on = TimeKeeper.date_of_record.end_of_month + 1.days
         expect(ivl_qle_sep.effective_on).to eq ((TimeKeeper.date_of_record.end_of_month + 1.days).end_of_month + 1.days)
       end
@@ -210,6 +214,10 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       before do
         TimeKeeper.set_date_of_record_unprotected!(reporting_date)
         ivl_qle_sep.effective_on_kind = "first_of_next_month"
+      end
+
+      after :all do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       it "the effective date should be in the past: first of month following the lapsed date" do
@@ -374,7 +382,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     let!(:published_plan_year) { FactoryGirl.create(:plan_year, start_on: plan_year_start_on) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(TimeKeeper.date_of_record.year, 04, 14)) }
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member)  }
-    
+
     let(:sep){
       sep = shop_family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
@@ -383,7 +391,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       sep
     }
 
-    before do 
+    before do
       published_plan_year.update_attributes('aasm_state' => 'published')
       shop_family.primary_applicant.person.employee_roles.create(
         employer_profile: published_plan_year.employer_profile,

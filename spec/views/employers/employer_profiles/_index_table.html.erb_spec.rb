@@ -6,6 +6,7 @@ RSpec.describe "employers/employer_profiles/my_account/_index_table.html.erb" do
 
   before :each do
     assign(:employer_profiles, [employer_profile_a, employer_profile_b])
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
     render "employers/employer_profiles/index_table"
   end
 

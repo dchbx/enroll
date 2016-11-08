@@ -1,30 +1,64 @@
-<div class="container signin top-pd module">
+<div class="container top-pd module" id='signup'>
   <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div class="col-md-6 col-sm-8 col-xs-12">
-      <h1 class="darkblue">Create Account</h1>
+      <h1 class="darkblue no-top-margin text-center"">Create Account</h1>
         <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'input-no-pd'}) do |f| %>
   	      <%= devise_error_messages! %>
+          <div class="row error-block" style='display: none;'>
+            <div class="col-xs-12">
+              <div class="alert alert-danger text-center"></div>
+            </div>
+          </div>
 	        <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
 
 	        <div class="form-group">
-	          <%= f.label :username %>
-
-<!-- Modal -->
-	          <%= f.text_field :email, class: "form-control", required: true %>
+            <%= f.label :email_or_username %>
+            <%= f.text_field :oim_id, class: "form-control", required: true , onblur: "Register.toggleEmail(this)" %>
 	        </div>
+          <div class="tooltip_box username_tooltip" style="display: none;">
+            <p style="margin-bottom:0;">You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.</p>
+          </div>
 
 	        <div class="form-group">
 	          <%= f.label :password %>
 	          <em>(<%= User.validators.select{|v| v.attributes == [:password] && v.options.has_key?(:minimum) }.first.options[:minimum] %> characters minimum)</em>
+            <span class="pull-right pass-strength">
+              <span id="pass_strength"></span>
+              <span id="complexity" class="default"></span>
+            </span>
 	          <br />
 	          <%= f.password_field :password, autocomplete: "off", class: "form-control", required: true %>
 	        </div>
+          <div id="pswd_info" class="tooltip_box" style="display: none;">
+            <p>Your password must:</p>
+            <ul>
+              <li id="length" class="valid">Be at least 8 characters</li>
+              <li id="longer" class="invalid">Not be longer than 20 characters</li>
+              <li id="lower" class="valid">Include at least one lowercase letter</li>
+              <li id="upper" class="invalid">Include at least one uppercase letter</li>
+              <li id="number" class="invalid">Include at least one number</li>
+              <li id="spec_char" class="invalid">Include at least one special character ($!@%*&amp;)</li>
+              <li id="mtt" class="invalid">Cannot repeat any character more than 4 times</li>
+              <li id="wh_space" class="valid">Not include blank spaces</li>
+              <li id="nm_uid" class="valid">Cannot contain username</li>
+            </ul>
+          </div>
 
 	        <div class="form-group">
-	          <%= f.label :password_confirmation, "Password Confirmation" %><br />
+            <%= f.label :password_confirmation, "Password Confirmation" %>
+            <span class="pull-right con-pass"></span>
+            <br />
 	          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", required: true %>
 	        </div>
-      		<%= f.hidden_field :invitation_id %>
+
+          <div class="email_field form-group <%= 'hidden_field' if f.object.oim_id.size ==0 %>">
+            <%= f.label :email %>
+            <em> (Optional)</em>
+            <br/>
+            <%= f.text_field :email, class: "form-control" ,:oninput => "Register.trimEmail(this);" %>
+          </div>
+
+          <%= f.hidden_field :invitation_id %>
           <br/>
 	        <div class="actions text-center">
   	          <%= f.submit "Create account", class: "btn btn-primary btn-lg " %>
@@ -37,3 +71,9 @@
 		    <% end %>
       </div>
     </div>
+
+<script type="text/javascript">
+  $(document).on('ready page:load', function () {
+    Register.initialize();
+  });
+</script>

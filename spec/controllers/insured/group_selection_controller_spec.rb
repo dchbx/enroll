@@ -106,6 +106,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(assigns(:hbx_enrollment)).not_to eq hbx_enrollment
     end
 
+    it "should disable individual market kind if selected market kind is shop in dual role SEP" do
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
+      allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
+      expect(assigns(:disable_market_kind)).to eq "individual"
+    end
+
     context "individual" do
       let(:hbx_profile) {double(benefit_sponsorship: benefit_sponsorship)}
       let(:benefit_sponsorship) {double(benefit_coverage_periods: [benefit_coverage_period])}
@@ -165,7 +178,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_benefit)
       expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
+      expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
+      expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
       expect(response).to redirect_to(family_account_path)
     end
 

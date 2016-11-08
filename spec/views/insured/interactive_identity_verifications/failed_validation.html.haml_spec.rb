@@ -4,6 +4,7 @@ describe "insured/interactive_identity_verifications/failed_validation" do
   let(:mock_response) { instance_double("IdentityVerification::InteractiveVerificationResponse", :transaction_id => "the_transaction_id") }
   let(:current_user) {FactoryGirl.create(:user)}
   before :each do
+    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
     sign_in current_user
   end
   it "should show a message about the user failing validation and providing contact info" do

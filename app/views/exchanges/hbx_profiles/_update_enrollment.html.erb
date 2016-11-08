@@ -1,0 +1,42 @@
+<div class="container bottom-pd">
+
+  <%if not @dont_allow_change%>
+
+    <div class="row">
+    </span><h3 class="title-inline">DOB / SSN Update Successful</h3>
+    </div>
+    <div>
+      <table class="table table-border">
+        <thead></thead>
+        <tbody>
+          <tr>
+            <td><h5> <b>Name:</b> <%=@person.first_name%> <%=@person.last_name%></h5></td>
+            <td><h5> <b>HBX ID:</b> <%=@person.hbx_id%></h5></tb>
+          </tr>
+          <tr>
+            <td><h5> <b>DOB:</b> <%=@person.dob%> </h5></td>
+            <td><h5> <b>SSN:</b> <%=@person.ssn%></h5></tb>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  <%else%>
+
+    <div class="row"> <h3 class="title-inline">DOB / SSN Update Failed</h3> </div>
+    <h5>
+      <h4>SSN matches with the following user:</h4>
+      First Name :<b><%=@ssn_match.first_name%></b> <br />
+      Last Name:  <b><%=@ssn_match.last_name%></b>  <br />  
+      HBX ID:     <b><%=@ssn_match.hbx_id%></b>     <br />
+      Date of Birth: <b><%=@ssn_match.dob%></b>     <br />
+      SSN: <b><%=@ssn_match.ssn%></b>     <br />
+    </h5>
+    <h5>Please resolve the match issue.</h5>
+
+  <%end%>
+  <br />
+
+</div>
+
+<%= link_to "Back to Edit", edit_dob_ssn_path(id: @person.id), remote: true, class: 'btn btn-default' %>

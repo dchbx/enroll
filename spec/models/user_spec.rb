@@ -17,6 +17,15 @@ RSpec.describe User, :type => :model do
 
   describe 'user' do
 
+    context "when all params are valid" do
+      let(:params){valid_params}
+      it "should not have errors on create" do
+        record = User.create(**params)
+        expect(record).to be_truthy
+        expect(record.errors.messages.size).to eq 0
+      end
+    end
+
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "user+name"})}
       it 'contains invalid characters' do
@@ -33,6 +42,11 @@ RSpec.describe User, :type => :model do
       end
     end
 
+    context 'oim_id validation' do
+      let(:params){valid_params}
+      it {should validate_uniqueness_of(:oim_id).case_insensitive }
+    end
+
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "useruseruseruseruseruseruseruseruseruseruseruseruseruseruseruser"})}
       it 'is too long' do
@@ -47,6 +61,26 @@ RSpec.describe User, :type => :model do
         expect(User.create(**params).errors[:oim_id].any?).to be_truthy
         expect(User.create(**params).errors[:oim_id]).to eq ["can't be blank"]
       end
+    end
+
+    context 'when email doesnt match' do
+      let(:params){valid_params.deep_merge!({email: "test@test"})}
+      it 'does not match' do
+        expect(User.create(**params).errors[:email].any?).to be_truthy
+        expect(User.create(**params).errors[:email]).to eq ["(optional) is invalid"]
+      end
+    end
+
+    context 'when email blank' do
+      let(:params){valid_params.deep_merge!({email: ""})}
+      it 'is valid' do
+        expect(User.create(**params).errors[:email].any?).to be_falsy
+      end
+    end
+
+    context 'email validation' do
+      let(:params){valid_params}
+      it {should validate_uniqueness_of(:email).case_insensitive }
     end
 
     context 'when password' do
@@ -134,16 +168,6 @@ RSpec.describe User, :type => :model do
         expect(User.create(**params).person.errors[:ssn]).to eq ["SSN must be 9 digits"]
       end
     end
-
-    context "when all params are valid" do
-      let(:params){valid_params}
-      it "should not have errors on create" do
-        record = User.create(**params)
-        expect(record).to be_truthy
-        expect(record.errors.messages.size).to eq 0
-      end
-    end
-
     context "roles" do
       let(:params){valid_params.deep_merge({roles: ["employee", "broker", "hbx_staff"]})}
       it "should return proper roles" do
@@ -167,6 +191,31 @@ RSpec.describe User, :type => :model do
         user = User.new(**params)
         user.instantiate_person
         expect(user.person).to be_an_instance_of Person
+      end
+    end
+  end
+
+  describe "for password" do
+    context "password_invalid?" do
+      it "with valid password" do
+        expect(User.password_invalid?("XLEY5HGH95moZPJaA1!")).to be_falsy
+      end
+
+      it "with invalid password" do
+        expect(User.password_invalid?("abA12!")).to be_truthy
+        expect(User.password_invalid?("abcdefghijklmnopqst")).to be_truthy
+        expect(User.password_invalid?("123456789abc123456!")).to be_truthy
+        expect(User.password_invalid?("123456789abcdefg567")).to be_truthy
+        expect(User.password_invalid?("XaEYaHaH95maZPJaA1!")).to be_truthy
+      end
+    end
+
+    context "generate_valid_password" do
+      it "should get valid password" do
+        10.times.each do
+          password = User.generate_valid_password
+          expect(User.password_invalid?(password)).to be_falsy
+        end
       end
     end
   end
@@ -266,6 +315,49 @@ describe User do
       it "with broker agency portal" do
         user.roles = ['consumer', 'broker']
         expect(user.get_announcements_by_roles_and_portal("dc.org/broker_agencies")).to eq ["msg for Broker"]
+      end
+    end
+  end
+
+describe "orphans" do
+    let(:person) { create :person }
+    let(:user) { create :user, person: person }
+
+    before do
+      User.destroy_all
+    end
+
+    context "when users have person associated" do
+      it "should return no orphans" do
+        user.save!
+        expect(User.orphans).to eq []
+      end
+    end
+
+    context "when a user does NOT have a person associated", dbclean: :after_each do
+      let(:orphaned_user) { FactoryGirl.create(:user) }
+
+      it "should return the orphaned user" do
+        orphaned_user.save!
+        expect(User.orphans).to eq [orphaned_user]
+      end
+    end
+
+    context "when more than one user does not have a person associated", dbclean: :after_each do
+      let(:orphaned_user1) { FactoryGirl.create(:user, email: "zzz@mail.com") }
+      let(:orphaned_user2) { FactoryGirl.create(:user, email: "aaa@mail.com") }
+      let(:orphaned_users) { [orphaned_user1, orphaned_user2] }
+
+      before do
+        orphaned_users
+      end
+
+      it "should return the orphaned user" do
+        expect(User.orphans).to eq orphaned_users.reverse
+      end
+
+      it "should return orphans with email ASC" do
+        expect(User.orphans.first.email).to eq orphaned_user2.email
       end
     end
   end

@@ -10,7 +10,13 @@ module DeviseHelper
                       resource: resource.class.model_name.human.downcase)
 
     html = <<-HTML
-    <div class="alert alert-error" role="alert">
+    <div class="alert alert-error module registration-rules" role="alert">
+      <div class="text-center">
+        <strong>
+          Password Requirements
+        </strong>
+      </div>
+      <br/>
       <strong>#{sentence}</strong>
       <ul>#{messages}</ul>
     </div>

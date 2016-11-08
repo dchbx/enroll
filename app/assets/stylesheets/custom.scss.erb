@@ -1440,6 +1440,21 @@ a.close-1, a.close-2{
 /* Sign In page css start */
 .signin {font-size: 16px;}
 .signin h1 {text-align: center;}
+.signin {
+    .popover {
+      max-width: 800px;
+      min-width: 400px !important;
+      border: 0px !important;
+    }
+    .popover.right .arrow:after{
+      border-right-color: #002E60;
+    }
+
+    .popover-content {
+      background-color: #002E60;
+      color: #ffffff;
+    }
+  }
 
 /* Sign In page css end */
 
@@ -2416,8 +2431,6 @@ ul.list-qle li a:hover {
 #qle-details a.close-popup {
     color: #aaaaaa;
     font-size: 17px;
-    position: absolute;
-    right: 30px;
     z-index: 3000;
 }
 
@@ -3707,23 +3720,7 @@ ul.list-right-section li a img {
     padding-right: 0;
     margin-bottom: 0;
 }
-.hbx-enrollment-panel .panel-body .family-plan-selection .status h4{
-    margin-bottom: 0;
-    font-size: 22px;
-    font-weight: 600 !important;
-    float: right;
-}
-
-
-.hbx-enrollment-panel .family-members p{
-    color: #007BC4;
-}
-
-.hbx-enrollment-panel .alert{
-  margin-bottom: 0;
-}
-
-.hbx-enrollment-panel .panel-heading, .qles-panel .panel-heading, .seps-panel .panel-heading{
+.qles-panel .panel-heading, .seps-panel .panel-heading{
   background-image: none;
   padding-bottom: 0;
   border-bottom: 0;
@@ -3739,7 +3736,7 @@ ul.list-right-section li a img {
   }
 }
 
-.hbx-enrollment-panel .panel-heading hr, .qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
+.qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
   margin-bottom: 0;
   margin-top: 0;
 }
@@ -3759,23 +3756,6 @@ ul.list-right-section li a img {
 }
 
 
-.hbx-enrollment-panel .separator:before{
-  content:'\2022 \2003';
-}
-
-.hbx-enrollment-panel .panel-body{
-  padding-top: 0;
-}
-
-.hbx-enrollment-panel label{
-    color: #909090;
-    font-family: Open Sans;
-    font-size: 9pt;
-    font-weight: 600 !important;
-    padding-right: 5px;
-    text-transform: uppercase;
-}
-
 .my-account-page h1{
     color: #003260;
     font-size: 36px;
@@ -3783,66 +3763,9 @@ ul.list-right-section li a img {
     margin-top: 0;
 }
 
-.hbx-enrollment-panel h2{
-    font-family: Open Sans;
-    color: #414141;
-    font-size: 24pt;
-    font-weight: Regular !important;
-}
-
-
-.hbx-enrollment-panel h3{
-    color: #7b7b7b;
-    font-family: Open Sans;
-    font-size: 18pt;
-    font-weight: 600 !important;
-}
-
-.hbx-enrollment-panel h4{
-    font-family: Open Sans;
-    font-size: 13pt;
-}
-
-.hbx-enrollment-panel .panel-heading h4{
-    font-variant: super;
-    margin-top: 0;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.hbx-enrollment-panel p{
-    font-family: Open Sans;
-    color: #414141;
-}
-
-.hbx-enrollment-panel p strong{
-    font-weight: 600 !important;
-}
-
-.hbx-enrollment-panel .icons p{
-  margin-left: 20px;
-}
-
-.hbx-enrollment-panel .options .fa {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.hbx-enrollment-panel .options span p {
-    display: inline-block;
-}
-
-.hbx-enrollment-panel .options span{
-    width: 50px;
-}
-
-.hbx-enrollment-panel #qle-date-chose {
-    text-align: center;
-}
-
 /* Form Elements */
-.row-form-wrapper {border: 1px solid #b7b7b7;border-top: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
-.row-form-wrapper-top, .row-form-wrapper:first-of-type, #email_info, #phone_info, #dependent_ul li {border-top: 1px solid #b7b7b7;}
+.row-form-wrapper {border: 1px solid #ddd; border-top: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
+.row-form-wrapper-top, .row-form-wrapper:first-of-type, #email_info, #phone_info, #dependent_ul li {border-top: 1px solid #ddd;}
 .remove-top-bdr {border-top: none !important;}
 .alert, .alert li {border: none;}
 .row-form-wrapper .form-group {
@@ -4580,21 +4503,12 @@ table.table.table-no-sytle td {
     font-weight: 300;
     font-size: 10px;
     color: #fff;
+    display: none;
 }
 .progress p {
-    background: url("<%= asset_path('icons/progress-divider.png') %>") no-repeat;
-    top: 0px;
     position: absolute;
-    font-weight: 300;
-    font-size: 10px;
-    padding-top: 35px;
-    line-height: 12px;
+    font-size: 14px;
 }
-
-.progress-wrapper {
-    position: relative;
-}
-.progress-wrapper .progress {border-radius: 15px;}
 .form-border hr {
     margin-top: 10px;
     margin-bottom: 10px;

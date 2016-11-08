@@ -6,6 +6,7 @@ describe "insured/interactive_identity_verifications/new" do
   let(:mock_verification) { IdentityVerification::InteractiveVerification.new(:questions => [mock_question]) }
   let(:current_user) {FactoryGirl.create(:user)}
   before :each do
+    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
     sign_in current_user
     assign :interactive_verification, mock_verification
   end

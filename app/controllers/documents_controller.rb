@@ -1,4 +1,5 @@
 class DocumentsController < ApplicationController
+  before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
   respond_to :html, :js
@@ -34,6 +35,9 @@ class DocumentsController < ApplicationController
     if v_type == "Social Security Number"
       @person.consumer_role.update_attributes(:ssn_validation => "valid",
                                               :ssn_update_reason => params[:verification_reason])
+    elsif v_type == "American Indian Status"
+      @person.consumer_role.update_attributes(:native_validation => "valid",
+                                              :native_update_reason => params[:verification_reason])
     else
       @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
       @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
@@ -41,7 +45,7 @@ class DocumentsController < ApplicationController
                                               :update_reason => params[:verification_reason]
                                              } )
     end
-    @person.consumer_role.verify_ivl_by_admin if all_types_verified?(@person)
+    @person.consumer_role.verify_ivl_by_admin if @person.all_types_verified?
     respond_to do |format|
       format.html {
         flash[:notice] = "Verification successfully approved."
@@ -137,6 +141,10 @@ class DocumentsController < ApplicationController
   end
 
   private
+  def updateable?
+    authorize Family, :updateable?
+  end
+
   def get_options(params)
     options = {}
     options[:content_type] = params[:content_type] if params[:content_type]
@@ -145,21 +153,9 @@ class DocumentsController < ApplicationController
     options
   end
 
-  def all_types_verified?(person)
-    person.verification_types.all?{ |type| is_type_verified?(person, type) }
-  end
-
   def authorized_to_download?(owner, documents, document_id)
     return true
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
-  end
-
-  def is_type_verified?(person, type)
-    if type == 'Social Security Number'
-      person.consumer_role.ssn_verified?
-    elsif type == 'Citizenship' || type == 'Immigration status'
-      person.consumer_role.lawful_presence_verified?
-    end
   end
 
   def set_document

@@ -6,13 +6,13 @@ describe "employers/broker_agency/_active_broker.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
 
-
   before :each do
     sign_in user
     employer_profile.broker_agency_profile = broker_agency_account.broker_agency_profile
     employer_profile.save
     assign(:employer_profile, employer_profile)
     assign(:broker_agency_accounts, employer_profile.broker_agency_accounts)
+    allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true))
   end
 
   context "terminate time" do
@@ -38,7 +38,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
     end
 
     it "should show Broker Agency name" do
-      expect(rendered).to have_selector('.tt-u', text: broker_agency_account.broker_agency_profile.legal_name)
+      expect(rendered).to have_selector('span', text: broker_agency_account.broker_agency_profile.legal_name)
     end
 
     it "show should the Broker email" do

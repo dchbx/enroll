@@ -33,7 +33,9 @@ module Factories
         renew_waived_enrollment
       else
         active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
-        if renewal_plan_offered_by_er?(active_enrollment)
+        if active_enrollment.present? && active_enrollment.inactive?
+          renew_waived_enrollment(active_enrollment)
+        elsif renewal_plan_offered_by_er?(active_enrollment)
           renewal_enrollment = renewal_builder(active_enrollment)
           renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
           renewal_enrollment.decorated_hbx_enrollment
@@ -57,7 +59,7 @@ module Factories
       renewal_assignment.benefit_group.elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
     end
 
-    def renew_waived_enrollment
+    def renew_waived_enrollment(waived_enrollment = nil)
       renewal_enrollment = @family.active_household.hbx_enrollments.new
 
       renewal_enrollment.coverage_kind = "health"
@@ -78,7 +80,7 @@ module Factories
       renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
   
-      renewal_enrollment.waiver_reason = "I do not have other coverage"
+      renewal_enrollment.waiver_reason = waived_enrollment.try(:waiver_reason) || "I do not have other coverage"
       renewal_enrollment.renew_waived
 
       if renewal_enrollment.save

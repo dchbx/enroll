@@ -66,6 +66,7 @@ module Factories
     def self.build_consumer_role(person, person_new)
       role = find_or_build_consumer_role(person)
       family, primary_applicant =  initialize_family(person,[])
+      family.family_members.map(&:__association_reload_on_person)
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         role
@@ -176,6 +177,7 @@ module Factories
         end
         if census_employee.email
           person.emails.create!(census_employee.email.attributes) if person.emails.blank?
+          person.emails.create!(kind: 'work', address: census_employee.email_address) if person.work_email.blank? && census_employee.email_address.present?
         end
       end
     end
@@ -184,6 +186,7 @@ module Factories
       role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       self.link_census_employee(census_employee, role, employer_profile)
       family, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
+      family.family_members.map(&:__association_reload_on_person)
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         census_employee.save
@@ -199,6 +202,7 @@ module Factories
       #only build family if there is no primary family, otherwise return primary family
       if person.primary_family.nil?
         family, primary_applicant = self.initialize_family(person, dependents)
+        family.family_members.map(&:__association_reload_on_person)
         saved = save_all_or_delete_new(family, primary_applicant)
       else
         family = person.primary_family
@@ -210,65 +214,21 @@ module Factories
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
                                last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
-      people = Person.match_by_id_info(ssn: ssn, dob: dob, last_name: last_name, first_name: first_name)
-      person, is_new = nil, nil
-      case people.count
-      when 1
-        person = people.first
-        user.save if user
-        person.user = user if user
-        if person.ssn.nil?
-          #matched on last_name and dob
-          person.ssn = ssn
-          person.gender = gender
-        end
-        person.save
-        user = person.user if role_type == User::ROLES[:consumer]
-        person, is_new = person, false
-      when 0
-        if user.try(:person).try(:present?)
-          if user.person.first_name.downcase == first_name.downcase and
-            user.person.last_name.downcase == last_name.downcase # if user enters lowercase during matching.
-            person = user.person
-            person.update(name_sfx: name_sfx,
-                          middle_name: middle_name,
-                          name_pfx: name_pfx,
-                          ssn: ssn,
-                          dob: dob,
-                          gender: gender)
-            is_new = false
-          else
-            return nil, nil
-          end
-        else
-          person, is_new = Person.create(
-            user: user,
-            name_pfx: name_pfx,
-            first_name: first_name,
-            middle_name: middle_name,
-            last_name: last_name,
-            name_sfx: name_sfx,
-            ssn: ssn,
-            no_ssn: no_ssn,
-            dob: dob,
-            gender: gender,
-          ), true
-        end
-      else
-        # what am I doing here?  More than one person had the same SSN?
-        return nil, nil
-      end
-      if user.present?
-        user.roles << role_type unless user.roles.include?(role_type)
-        user.save
-        unless person.emails.count > 0
-          if user.email.present?
-            person.emails.build(kind: "home", address: user.email)
-            person.save
-          end
-        end
-      end
-      return person, is_new
+        person_attrs = {
+          user: user,
+          name_pfx: name_pfx,
+          first_name: first_name,
+          middle_name: middle_name,
+          last_name: last_name,
+          name_sfx: name_sfx,
+          ssn: ssn,
+          dob: dob,
+          gender: gender,
+          no_ssn: no_ssn,
+          role_type: role_type
+        }
+        result = FindOrCreateInsuredPerson.call(person_attrs)
+        return result.person, result.is_new
     end
 
     def self.find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
@@ -332,7 +292,16 @@ module Factories
       objects_to_save = list.reject {|o| !o.changed?}
       num_saved = objects_to_save.count do |o|
         begin
-          o.save
+          o.save.tap do |save_result|
+            unless save_result
+              error_message = {
+                :message => "Unable to save object:\n#{o.errors.to_hash.inspect}",
+                :object_kind => o.class.to_s,
+                :object_id => o.id.to_s
+              }
+              log(JSON.dump(error_message), {:severity => "error"})
+            end
+          end
         rescue => e
           error_message = {
             :error => {

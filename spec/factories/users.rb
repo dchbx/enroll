@@ -22,6 +22,7 @@ FactoryGirl.define do
     password_confirmation ' '
   end
 
+
   trait :hbx_staff do
     roles ["hbx_staff"]
 
@@ -49,18 +50,6 @@ FactoryGirl.define do
     roles ["employee"]
   end
 
-  trait :employer_staff do
-    roles ["employer_staff"]
-  end
-
-  trait "broker" do
-    roles ["broker"]
-  end
-
-  trait "broker_agency_staff" do
-    roles ["broker_agency_staff"]
-  end
-
   trait :employer do
     transient do
       organization {}
@@ -74,6 +63,18 @@ FactoryGirl.define do
       user.person.employer_staff_roles.push FactoryGirl.create(:employer_staff_role, employer_profile_id: evaluator.organization.employer_profile.id)
       user.save
     end
+  end
+
+  trait :employer_staff do
+    roles ["employer_staff"]
+  end
+
+  trait "broker" do
+    roles ["broker"]
+  end
+
+  trait "broker_agency_staff" do
+    roles ["broker_agency_staff"]
   end
 
   trait :general_agency_staff do

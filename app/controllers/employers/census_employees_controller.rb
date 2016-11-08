@@ -1,6 +1,7 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group ]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group]
+  before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
     @census_employee = build_census_employee
@@ -57,7 +58,8 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
-
+    authorize EmployerProfile, :updateable?
+    @status = params[:status]
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
 
@@ -87,15 +89,16 @@ class Employers::CensusEmployeesController < ApplicationController
       end
       flash[:notice] = "Census Employee is successfully updated."
       if benefit_group_id.present?
+        @census_employee.construct_employee_role_for_match_person
         flash[:notice] = "Census Employee is successfully updated."
       else
         flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
         flash[:notice] += "Census Employee is successfully updated."
       end
-      redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
+      redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
     else
-      @reload = true
-      render action: "edit"
+      flash[:error] = @census_employee.errors.full_messages
+      redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
     end
     #else
       #flash[:error] = "Please select Benefit Group."
@@ -104,6 +107,8 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def terminate
+    authorize EmployerProfile, :updateable?
+    status = params[:status]
     termination_date = params["termination_date"]
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
@@ -111,32 +116,31 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = ""
     end
     last_day_of_work = termination_date
-    if termination_date.present?
-      @census_employee.terminate_employment(last_day_of_work)
-      if termination_date >= (Date.today-60.days)
-        @fa = @census_employee.save
-      else
-      end
+    if termination_date.present? && termination_date >= (TimeKeeper.date_of_record - 60.days)
+      @fa = @census_employee.terminate_employment(last_day_of_work) && @census_employee.save
 
+    else
     end
     respond_to do |format|
       format.js {
         if termination_date.present? && @fa
           flash[:notice] = "Successfully terminated Census Employee."
-          render text: true
         else
           flash[:error] = "Census Employee could not be terminated: Termination date must be within the past 60 days."
-          render text: false
         end
       }
       format.all {
         flash[:notice] = "Successfully terminated Census Employee."
-        redirect_to employers_employer_profile_path(@employer_profile)
       }
     end
+    flash.keep(:error)
+    flash.keep(:notice)
+    render js: "window.location = '#{employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, status: status)}'"
   end
 
   def rehire
+    authorize EmployerProfile, :updateable?
+    status = params[:status]
     rehiring_date = params["rehiring_date"]
     if rehiring_date.present?
       rehiring_date = DateTime.strptime(rehiring_date, '%m/%d/%Y').try(:to_date)
@@ -154,9 +158,9 @@ class Employers::CensusEmployeesController < ApplicationController
 
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?
-          new_census_employee.add_default_benefit_group_assignment          
+          new_census_employee.add_default_benefit_group_assignment
           new_census_employee.construct_employee_role_for_match_person
-          
+
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
@@ -170,20 +174,21 @@ class Employers::CensusEmployeesController < ApplicationController
     else
       flash[:error] = "Rehiring date can't occur before terminated date."
     end
+    flash.keep(:error)
+    flash.keep(:notice)
+    render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: params[:status])}'"
+
   end
 
   def show
-    if @benefit_group_assignment = @census_employee.active_benefit_group_assignment
-      @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
-      @benefit_group = @benefit_group_assignment.benefit_group
-    end
-
-    # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
+    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
+    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
+        |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
+    } if @census_employee.employee_role.present?
+    @status = params[:status] || ''
   end
 
   def delink
-    authorize @census_employee, :delink?
-
     employee_role = @census_employee.employee_role
     if employee_role.present?
       employee_role.census_employee_id = nil
@@ -214,23 +219,11 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
-  def assignment_benefit_group
-    benefit_group = @employer_profile.plan_years.first.benefit_groups.find_by(id: benefit_group_id)
-    new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
-
-    if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
-      @census_employee.add_benefit_group_assignment(new_benefit_group_assignment)
-    end
-
-    if @census_employee.save
-      flash[:notice] = "Assignment benefit group is successfully."
-      redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      render action: "benefit_group"
-    end
-  end
-
   private
+
+  def updateable?
+    authorize ::EmployerProfile, :updateable?
+  end
 
   def benefit_group_id
     params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id] rescue nil
@@ -284,5 +277,6 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build
     @census_employee
   end
+  private
 
 end

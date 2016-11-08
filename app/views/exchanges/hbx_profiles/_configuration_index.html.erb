@@ -5,7 +5,7 @@
     <%= link_to 'Announcements', exchanges_announcements_path, {class: 'btn btn-default'} %>
 
     <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f|%>
-      <table class="table table-border">
+      <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
         <tbody>
         <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= @time_keeper.date_of_record %>
         </td>
@@ -16,6 +16,21 @@
           <button type="submit" class="btn btn-primary pull-right display-on-mobile">Set Current Date</button>
         </td>
         <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Set Current Date</button></td>
+      </table>
+    <% end %>
+
+    <%= form_for Setting.get_individual_market_monthly_enrollment_due_on, {url: update_setting_exchanges_hbx_profiles_path, method: :post, class: 'form'} do |f| %>
+      <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
+        <tbody>
+          <td width="50%" style="padding: 18px;font-weight: bold;">individual_market_monthly_enrollment_due_on: <%= Setting.individual_market_monthly_enrollment_due_on %>
+          </td>
+          <td>
+            <%= f.hidden_field :name %>
+            <%= f.number_field :value, {class: 'form-control', required: true, min: 1, max: 31, step: 1} %>
+            <button type="submit" class="btn btn-primary pull-right display-on-mobile">Update</button>
+          </td>
+          <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Update</button></td>
+        </tbody>
       </table>
     <% end %>
   </div>

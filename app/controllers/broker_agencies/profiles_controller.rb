@@ -46,6 +46,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update
+    authorize HbxProfile, :modify_admin_tabs?
     sanitize_broker_profile_params
     params.permit!
 
@@ -53,12 +54,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
     #@organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
 
     @organization = Organization.find(params[:organization][:id])
-
     @organization_dup = @organization.office_locations.as_json
 
     #clear office_locations, don't worry, we will recreate
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
+    person = @broker_agency_profile.primary_broker_role.person
+    person.update_attributes(person_profile_params)
 
 
 
@@ -74,24 +76,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       #render "edit"
       redirect_to broker_agencies_profile_path(@broker_agency_profile)
 
-    end
-  end
-
-  def broker_profile_params
-    params.require(:organization).permit(
-      #:employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
-      :office_locations_attributes => [
-        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
-        :phone_attributes => [:kind, :area_code, :number, :extension],
-        :email_attributes => [:kind, :address]
-      ]
-    )
-  end
-
-  def sanitize_broker_profile_params
-    params[:organization][:office_locations_attributes].each do |key, location|
-      params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
     end
   end
 
@@ -156,6 +140,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def set_default_ga
+    authorize HbxProfile, :modify_admin_tabs?
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
 
     if @broker_agency_profile.present?
@@ -180,6 +165,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def assign
+
     page_string = params.permit(:employers_page)[:employers_page]
     page_no = page_string.blank? ? nil : page_string.to_i
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
@@ -196,6 +182,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update_assign
+    authorize HbxProfile, :modify_admin_tabs?
     if params[:general_agency_id].present? && params[:employer_ids].present?
       general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
       case params[:type]
@@ -241,6 +228,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def clear_assign_for_employer
+    authorize HbxProfile, :modify_admin_tabs?
     @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     if @employer_profile.present?
       send_general_agency_assign_msg(@employer_profile.general_agency_profile, @employer_profile, 'Terminate')
@@ -295,12 +283,35 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   private
 
+  def broker_profile_params
+    params.require(:organization).permit(
+      #:employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :phone_attributes => [:kind, :area_code, :number, :extension],
+        :email_attributes => [:kind, :address]
+      ]
+    )
+  end
+
+  def person_profile_params
+    params.require(:organization).permit(:first_name, :last_name, :dob)
+  end
+
+  def sanitize_broker_profile_params
+    params[:organization][:office_locations_attributes].each do |key, location|
+      params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
+    end
+  end
+
   def find_hbx_profile
     @profile = current_user.person.hbx_staff_role.hbx_profile
   end
 
   def find_broker_agency_profile
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    authorize @broker_agency_profile, :access_to_broker_agency_profile?
   end
 
   def check_admin_staff_role

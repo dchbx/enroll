@@ -16,6 +16,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     allow(consumer_role).to receive(:vlp_document_id)
     allow(consumer_role).to receive(:find_document)
     sign_in current_user
+    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
     render file: "insured/consumer_roles/edit.html.erb"
   end
 

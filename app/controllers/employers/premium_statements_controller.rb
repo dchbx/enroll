@@ -6,6 +6,7 @@ class Employers::PremiumStatementsController < ApplicationController
 
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))
+    authorize @employer_profile, :list_enrollments?
     set_billing_date
     @hbx_enrollments = @employer_profile.enrollments_for_billing(@billing_date)
 

@@ -97,6 +97,9 @@ gem "recaptcha", '1.1.0'
 
 gem 'jquery-datatables-rails', '3.4.0'
 
+gem 'interactor', '3.1.0'
+gem 'interactor-rails', '2.0.2'
+
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
@@ -153,5 +156,5 @@ group :production do
 end
 
 gem 'aws-sdk', '2.2.4'
-gem 'ruby-saml', '~> 1.0.0'
+gem 'ruby-saml', '~> 1.3.0'
 gem 'combine_pdf'

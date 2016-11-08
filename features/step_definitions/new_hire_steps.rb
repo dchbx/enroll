@@ -61,10 +61,11 @@ When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
 end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
-  if find_all('.interaction-click-control-continue').any?
+  wait_for_ajax(2,2)
+  if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
   else
-    find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
+    find('.interaction-click-control-shop-for-new-plan', wait: 10).click
   end
 end
 
@@ -79,7 +80,7 @@ When(/(.*) clicks on Continue button on receipt page/) do |named_person|
 end
 
 Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
-  sleep(1) #wait for e-mail nonsense
+  sleep 1 #wait for e-mail nonsense
   enrollment = first('.hbx-enrollment-panel')
   enrollment.find('.enrollment-effective', text: expected_effective_on.strftime("%m/%d/%Y"))
   # Timekeeper is probably UTC in this case, as we are in a test environment
@@ -89,7 +90,8 @@ end
 
 Then(/Employee should see \"not yet eligible\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
-  find('.alert', text: "You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
+  wait_for_ajax(2,2)
+  expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits. Please return on #{TimeKeeper.date_of_record + 15.days} to enroll for coverage.")
   visit '/families/home'
 end
 
@@ -100,9 +102,11 @@ Then(/Employee should see \"may not enroll until eligible\" error message/) do
 end
 
 When(/Employee enters Qualifying Life Event/) do
+  wait_for_ajax
   first("#carousel-qles a").click
   expect(page).to have_content "Married"
   screenshot("future_qle_date")
+  wait_for_ajax
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link "CONTINUE"
   click_button "Continue"
@@ -110,5 +114,5 @@ end
 
 When(/Employee clicks continue on the family members page/) do
   click_link('btn_household_continue')
-  sleep 1
+  wait_for_ajax
 end

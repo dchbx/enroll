@@ -13,10 +13,7 @@ RSpec.describe Inbox, :type => :model do
       it "should add to collection" do
         expect(inbox_with_message.messages.size).to eq 1
       end
-
-      it "message should be findable"
     end
-
   end
 
   describe "#read_messages" do
@@ -39,7 +36,6 @@ RSpec.describe Inbox, :type => :model do
         expect(inbox.unread_messages.count).to eq unread_messages.count
       end
     end
-
   end
 
   describe "#delete_message" do
@@ -73,8 +69,5 @@ RSpec.describe Inbox, :type => :model do
         expect(inbox_with_many_messages.delete_message(deleteable_message).messages.size).to eq message_count - 1
       end
     end
-
   end
-
-
 end

@@ -18,6 +18,12 @@ class HbxStaffRole
   validates_presence_of :hbx_profile_id
 
   alias_method :is_active?, :is_active
+  #subrole is for documentation. should be redundant with permission_id
+  field :subrole, type: String, default: ""
+  field :permission_id, type: BSON::ObjectId
+  def permission
+    Permission.find(permission_id)
+  end
 
   def self.find(id)
     return nil if id.blank?

@@ -2,6 +2,56 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
+  describe ".sort_by_standard_plans" do
+      context "width standard plan present" do
+        let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+        let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+        let(:person) { FactoryGirl.build_stubbed(:person) }
+        let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
+        let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+        let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group) }
+
+        before :each do
+          sign_in user
+          allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+          allow(person.primary_family).to receive(:active_household).and_return(household)
+        end
+
+        @controller = Insured::PlanShoppingsController.new
+
+        let(:plan1) { FactoryGirl.build(:plan) }
+        let(:plan2) { FactoryGirl.build(:plan, is_standard_plan: true ) }
+        let(:plans) {[PlanCostDecorator.new(plan1, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id), PlanCostDecorator.new(plan2, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id)]}
+
+        it "should display the standard plan first" do
+          expect(@controller.send(:sort_by_standard_plans,plans) ).to eq [plan2, plan1]
+        end
+      end
+  end
+
+  describe "not eligible for cost sharing or aptc / normal user" do
+
+    let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+    let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+    let(:person) { FactoryGirl.build_stubbed(:person) }
+    let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
+    let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+
+    context "GET plans" do
+      before :each do
+        sign_in user
+        allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+        allow(person.primary_family).to receive(:active_household).and_return(household)
+      end
+
+      it "returns http success" do
+        xhr :get, :plans, id: "hbx_id", format: :js
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+  end
+
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
   let(:household){ double("Household") }
@@ -224,13 +274,11 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "POST terminate" do
-    let(:enrollment) { HbxEnrollment.new }
+    let(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected"}) }
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
-      allow(enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(enrollment).to receive(:terminate_coverage!).and_return(true)
-      #allow(hbx_enrollment).to receive(:update_current).and_return(true)
-      #allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
+      allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
+      allow(enrollment).to receive(:schedule_coverage_termination!).and_return(true)
       allow(person).to receive(:primary_family).and_return(Family.new)
       sign_in user
     end
@@ -242,9 +290,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
-      allow(enrollment).to receive(:may_terminate_coverage?).and_return(false)
+      allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
       post :terminate, id: "hbx_id"
       expect(response).to redirect_to(:back)
+    end
+
+    it "should record termination submitted date on terminate of hbx_enrollment" do
+      expect(enrollment.termination_submitted_on).to eq nil
+      post :terminate, id: "hbx_id"
+      expect(enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
+      expect(response).to be_redirect
     end
   end
 
@@ -272,6 +327,41 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       post :waive, id: "hbx_id", waiver_reason: "waiver"
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
+    end
+
+    context "waived_enrollment coverage kind" do
+        let(:person) { FactoryGirl.create(:person) }
+        let(:household) {double(:immediate_family_coverage_household=> coverage_household)}
+        let(:coverage_household) {double}
+        let(:family) {Family.new}
+        let(:hbx_enrollment) {HbxEnrollment.create}
+        let(:wavied_enrollment) {HbxEnrollment.create}
+      before :each do
+        allow(HbxEnrollment).to receive(:find).with(hbx_enrollment.id).and_return(hbx_enrollment)
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(family).to receive(:active_household).and_return(household)
+        allow(coverage_household).to receive(:household).and_return(household)
+        allow(hbx_enrollment).to receive(:shopping?).and_return(false)
+        sign_in user
+      end
+
+      it "wavied enrollment coverage kind should be dental as waiving hbx_enrollment kind is dental" do
+        hbx_enrollment.coverage_kind='dental'
+        hbx_enrollment.save
+        allow(household).to receive(:new_hbx_enrollment_from).and_return(wavied_enrollment)
+        expect(wavied_enrollment.coverage_kind).to eq 'health' #by deafult it will be health
+        post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
+        expect(wavied_enrollment.coverage_kind).to eq 'dental'
+      end
+
+      it "wavied enrollment coverage kind should be health as waiving hbx_enrollment kind is health" do
+        expect(hbx_enrollment.coverage_kind).to eq 'health'
+        allow(household).to receive(:new_hbx_enrollment_from).and_return(wavied_enrollment)
+        expect(wavied_enrollment.coverage_kind).to eq 'health'
+        post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
+        expect(wavied_enrollment.coverage_kind).to eq 'health'
+      end
     end
   end
 

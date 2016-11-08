@@ -62,15 +62,17 @@
         <br/>
         <div class="row top-row no-border">
           <div class="col-xs-12 text-center broker_approve_deny_btn">
-            <% if current_user.has_hbx_staff_role? %>
-              <% if @staff.may_approve? %>
-                <%= submit_tag 'Approve', name: 'approve', class: "btn btn-primary  interaction-click-control-general-agency-approve" %>
-              <% elsif @staff.may_deny? %>
-                <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary  interaction-click-control-general-agency-deny" %>
-              <% elsif @staff.may_decertify? %>
-                <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary  interaction-click-control-general-agency-decertify" %>
-              <% end %>
-            <% end %>
+            <%= pundit_span HbxProfile, :approve_ga? %>
+                <% if current_user.has_hbx_staff_role? %>
+                  <% if @staff.may_approve? %>
+                    <%= submit_tag 'Approve', name: 'approve', class: "btn btn-primary  interaction-click-control-general-agency-approve" %>
+                  <% elsif @staff.may_deny? %>
+                    <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary  interaction-click-control-general-agency-deny" %>
+                  <% elsif @staff.may_decertify? %>
+                    <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary  interaction-click-control-general-agency-decertify" %>
+                  <% end %>
+                <% end %>
+            </span>  
           </div>
         </div>
       </div>

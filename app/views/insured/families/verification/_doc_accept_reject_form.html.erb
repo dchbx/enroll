@@ -1,5 +1,6 @@
+
 <% if current_user.has_hbx_staff_role? && vlp_doc.status != ('verified' || 'rejected') %>
-      <%= link_to "Accept", document_path(vlp_doc, :person_id => person.id, :status => "verified"), method: :put, class: "btn btn-success btn-xs  pull-right", remote: true%>
+      <%= link_to "Accept", document_path(vlp_doc, :person_id => person.id, :status => "verified"), method: :put, class: "btn btn-success btn-xs  pull-right "  , remote: true%>
       <%= link_to "#comment-#{vlp_doc.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "comment-#{vlp_doc.id}" } do %>
           <%= button_tag "Reject", class:"btn btn-danger btn-xs  pull-right" %>
       <% end %>

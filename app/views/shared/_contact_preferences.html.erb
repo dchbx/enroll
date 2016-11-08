@@ -7,10 +7,10 @@
     <%= person_role.hidden_field :id if role == :employee_roles %>
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-6 col-sm-6 no-pd">
-        <%= person_role.select :contact_method, options_for_select(["Only Paper communication", "Only Electronic communications", "Paper and Electronic communications"], selected: "Only Paper communication"), {prompt: 'Select communications preference'} %>
+        <%= person_role.select :contact_method, options_for_select(["Only Paper communication", "Only Electronic communications", "Paper and Electronic communications"], selected: person_role.object.contact_method), {prompt: 'Select communications preference'} %>
       </div>
       <div class="col-md-6 col-sm-6 no-pd">
-        <%= person_role.select :language_preference, options_for_select(["English", "Spanish", "Amharic"], selected: "English"), {prompt: 'Select communications language'} %>
+        <%= person_role.select :language_preference, options_for_select(["English", "Spanish", "Amharic"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
       </div>
     </div>
     <% end %>

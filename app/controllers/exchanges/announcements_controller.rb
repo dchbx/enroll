@@ -1,6 +1,6 @@
 class Exchanges::AnnouncementsController < ApplicationController
   before_action :check_hbx_staff_role, except: [:dismiss]
-
+  before_action :updateable?, :only => [:create, :destroy]
   def dismiss
     if params[:content].present?
       dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
@@ -33,6 +33,11 @@ class Exchanges::AnnouncementsController < ApplicationController
   end
 
   private
+
+  def updateable?
+    authorize HbxProfile, :modify_admin_tabs?
+  end
+
   def announcement_params
     params.require(:announcement).permit(
       :content, :start_date, :end_date,

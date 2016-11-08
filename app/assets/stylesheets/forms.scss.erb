@@ -1,0 +1,97 @@
+.module {
+  &.forms {
+    .owner {
+      > label:first-of-type {
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-bottom: 0;
+        color: rgb(131, 135, 128);
+      }
+      &.checkbox {
+        margin-left: -5px;
+      }
+    }
+    .gender-radios {
+      .vertically-aligned-row {
+        margin-top:-3px;
+        table-layout: fixed;
+      }
+      .n-radio-row {
+        padding: 0 10px;
+        border: none;
+        border-top: none !important;
+      }
+      & > label:first-of-type {
+        font-size: 10px;
+        padding-left: 10px;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-bottom: 0;
+        color: rgb(131, 135, 128);
+      }
+      .n-radio-group .n-radio-row label.n-radio {
+        font-size: 14px;
+      }
+    }
+    .n-radio-row {
+      padding: 9px 10px;
+      border: none;
+      border-top: none !important;
+    }
+    input[type=checkbox] {
+      display: none;
+      + label > i.fa {
+        color: #69A30D;
+      }
+    }
+    .checkbox {
+      margin: auto;
+    }
+    .checkbox {
+      &>div {
+        display: inline-block;
+        margin: auto;
+      }
+      &>.vertically-aligned-row {
+        margin-top:-2px;
+      }
+    }
+    .checkbox label {
+      padding-left: 0;
+      font-weight: 300;
+    }
+    .checkbox label label {
+      padding-left: 0;
+      width: 15%;
+    }
+    .checkbox label label + span {
+      display: inline-block;
+      position: relative;
+      text-transform: capitalize;
+      font-size: 14px;
+    }
+    input[type=checkbox]:disabled + label i {
+      color: #b7b7b7;
+      cursor: not-allowed;
+    }
+    input[type=checkbox] + label i {
+      &:first-of-type {
+        display: none;
+      }
+      &:last-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+    }
+    input[type=checkbox]:checked + label i {
+      &:first-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+      &:last-of-type {
+        display: none;
+      }
+    }
+  }
+}

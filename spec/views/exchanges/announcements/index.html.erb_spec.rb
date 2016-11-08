@@ -7,6 +7,7 @@ describe "exchanges/announcements/index.html.erb" do
     stub_template "exchanges/hbx_profiles/shared/_primary_nav.html.erb"  => 'nav_bar'
     sign_in user
     assign(:announcements, Announcement.current)
+    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", modify_admin_tabs?: true))
     render template: "exchanges/announcements/index.html.erb"
   end
 

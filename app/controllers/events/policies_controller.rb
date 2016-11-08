@@ -8,32 +8,42 @@ module Events
       policy_id = headers.stringify_keys["policy_id"]
       policy = HbxEnrollment.by_hbx_id(policy_id).first
       if !policy.nil?
-        response_payload = render_to_string "events/hbx_enrollment/policy", :formats => ["xml"], :locals => { :hbx_enrollment => policy }
-        with_response_exchange(connection) do |ex|
-          ex.publish(
-            response_payload,
-            {
-              :routing_key => reply_to,
-              :headers => {
-                :return_status => "200",
-                :policy_id => policy_id
-              }
-            }
+        begin
+          response_payload = render_to_string "events/hbx_enrollment/policy", :formats => ["xml"], :locals => { :hbx_enrollment => policy }
+          reply_with(connection, reply_to, policy_id, "200", response_payload, policy.eligibility_event_kind)
+        rescue Exception => e
+          reply_with(
+            connection,
+            reply_to,
+            policy_id,
+            "500",
+            JSON.dump({
+               exception: e.inspect,
+               backtrace: e.backtrace.inspect
+            })
           )
         end
       else
-        with_response_exchange(connection) do |ex|
-          ex.publish(
-            "",
-            {
-              :routing_key => reply_to,
-              :headers => {
-                :return_status => "404",
-                :policy_id => policy_id
-              }
-            }
-          )
-        end
+        reply_with(connection, reply_to, policy_id, "404", "")
+      end
+    end
+
+    def reply_with(connection, reply_to, policy_id, return_status, body, eligibility_event_kind = nil)
+      headers = { 
+              :return_status => return_status,
+              :policy_id => policy_id
+      }
+      if !eligibility_event_kind.blank?
+        headers[:eligibility_event_kind] = eligibility_event_kind
+      end
+      with_response_exchange(connection) do |ex|
+        ex.publish(
+          body,
+          {
+            :routing_key => reply_to,
+            :headers => headers
+          }
+        )
       end
     end
   end

@@ -12,13 +12,13 @@ RSpec.describe "_employer_broker_widget.html.erb" do
       assign(:employer_profile, employer_profile)
       assign(:broker_agency_accounts, [])
       allow(employer_profile).to receive(:broker_agency_profile).and_return(nil)
+      allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
       render 'employers/employer_profiles/employer_broker_widget'
     end
 
     it "should display broker widget for consumer" do
       expect(rendered).to match /select a broker/i
       expect(rendered).to match /no broker/i
-      expect(rendered).to match /you can add a broker for free/i
     end
   end
 
@@ -27,6 +27,7 @@ RSpec.describe "_employer_broker_widget.html.erb" do
       assign(:employer_profile, employer_profile)
       assign(:broker_agency_accounts, [broker_agency_account])
       allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+      allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
       render 'employers/employer_profiles/employer_broker_widget'
     end
 

@@ -30,7 +30,7 @@
        <% else %>
         <% url = plan_details_people_path()person_id: @person.id, employer_id: @employer.id %>
        <% end %>
-        <a href="<% url %>" class="btn btn-save person_landing_continue" >Continue</a>   
+        <a href="<% url %>" class="btn btn-save person_landing_continue <%= pundit_class Family, :updateable?%>" >Continue</a>   
      </div>
     </div>
   </div>

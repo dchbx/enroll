@@ -11,6 +11,7 @@ RSpec.describe "employers/plan_years/new.html.erb" do
     assign(:carriers, Array.new)
     controller.request.path_parameters[:employer_profile_id] = employer_profile.id
     stub_template "shared/_reference_plans_list.html.erb" => ""
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
     render :template => "employers/plan_years/new.html.erb"
   end
 

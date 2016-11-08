@@ -12,9 +12,10 @@ describe Forms::BrokerAgencyProfile, "given nothing" do
     expect(subject).to have_errors_on(:entity_kind)
   end
 
-  it "should validate fein" do
-    expect(subject).to have_errors_on(:fein)
-  end
+  #Auto Generating FEIN for broker agencies
+  # it "should validate fein" do
+    # expect(subject).to have_errors_on(:fein)
+  # end
 
   it "should validate dob" do
     expect(subject).to have_errors_on(:dob)
@@ -117,7 +118,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     end
 
     it 'should raise an error' do
-      expect(subject.errors.to_hash[:base]).to include("organization has already been created.")
+      expect(subject.errors.to_hash[:base]).to include("fein is already in use.")
     end
   end
 

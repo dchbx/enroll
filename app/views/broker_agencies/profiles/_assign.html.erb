@@ -9,8 +9,10 @@
             <h3>General Agencies</h3>
             <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
             <%= hidden_field_tag :from_assign, true %>
-            <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
-            <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+            <%= pundit_span HbxProfile, :modify_admin_tabs? %>
+              <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+              <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+            </span> 
           </div>
         </div>
         <div class="row">
@@ -41,7 +43,9 @@
                     <td class='general_agency'>
                       <%= er.active_general_agency_account.try(:legal_name) %>
                       &nbsp;
-                      <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true if er.active_general_agency_account.present? %>
+                      <%= pundit_span(HbxProfile, :modify_admin_tabs?) %>
+                        <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true if er.active_general_agency_account.present? %>
+                      </span>
                     </td>
                   </tr>
                 <% end %>

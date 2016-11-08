@@ -1,53 +1,43 @@
-<div class="hbx-enrollment-panel waived-coverage module">
-  <div class="panel panel-default min-h">
-    <div class="panel-heading">
-      <h4 class="bg-title">
-        <%= hbx_enrollment.coverage_kind %>
-        Coverage
-        <span class="separator"><%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %></span>
-      </h4>
-      <hr>
+<div class="module hbx-enrollment-panel waived-coverage panel panel-default">
+  <div class="panel-heading vertically-aligned-row">
+    <h3 class="no-buffer">
+      <%= hbx_enrollment.coverage_kind %> Coverage
+      <span class="separator"><%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %></span>
+    </h3>
+    <div class="text-right">
+      <span class="label label-success">
+        Waived
+      </span>
     </div>
-    <div class="panel-body">
-      <div class="row">
-        <div class="col-xs-12">
-          <div class="row">
-            <div class="col-xs-9">
-              <h4>You have selected to waive your employer
-                <%= hbx_enrollment.coverage_kind %>
-                coverage for
-                <%= hbx_enrollment.effective_on.year %></h4>
-            </div>
-            <div class="col-xs-3">
-              <div class="family-plan-selection">
-                <div class="status">
-                  <h4><%= hbx_enrollment.aasm_state.titleize %>
-                  </h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <table>
-        <tr>
-          <td>
-            <div class="enrollment-submitted-at info">
-              <label>
-                Waived Date:
-              </label>
-              <strong>
-                <%= format_policy_waived_date(hbx_enrollment) %> (<%= format_policy_waived_time(hbx_enrollment) %>)
-              </strong>
-            </div>
-          </td>
-        </tr>
-      </table>
-      <div class="row">
-        <div class="col-xs-5 pull-right">
-          <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-default pull-right" %>
-        </div>
+  </div>
+  <div class="panel-body">
+    <h4>
+      You have selected to waive your employer
+      <%= hbx_enrollment.coverage_kind %>
+      coverage for
+      <%= hbx_enrollment.effective_on.year %>
+    </h4>
+    <div class="enrollment-submitted-at info">
+      <strong>
+        Waived Date:
+      </strong>
+      <%= format_policy_waived_date(hbx_enrollment) %>
+      (<%= format_policy_waived_time(hbx_enrollment) %>)
+    </div>
+    <div class="enrollment-reason-waived info">
+      <strong>
+        Reason Waived:
+      </strong>
+      <%= hbx_enrollment.waiver_reason %>
+    </div>
+  </div>
+  <% if read_only != true %>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-xs-5 pull-right">
+        <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-default pull-right" %>
       </div>
     </div>
   </div>
+  <% end %>
 </div>

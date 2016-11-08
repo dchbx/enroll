@@ -1,7 +1,4 @@
 class EmployerProfile
-  BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
-  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
-
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -11,8 +8,19 @@ class EmployerProfile
   include StateTransitionPublisher
 
   embedded_in :organization
-
   attr_accessor :broker_role_id
+
+  BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
+  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
+
+  ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
+  INACTIVE_STATES = ["suspended", "ineligible"]
+
+  PROFILE_SOURCE_KINDS  = ["self_serve", "conversion"]
+
+  INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
+  INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
+
 
   field :entity_kind, type: String
   field :sic_code, type: String
@@ -20,13 +28,10 @@ class EmployerProfile
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
-  ACTIVE_STATES = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
-  INACTIVE_STATES = ["suspended", "ineligible"]
-
-  PROFILE_SOURCE_KINDS = ["self_serve", "conversion"]
 
   field :profile_source, type: String, default: "self_serve"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+  field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -74,6 +79,10 @@ class EmployerProfile
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
 
   alias_method :is_active?, :is_active
+
+  # def self.all_with_next_month_effective_date
+    # Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
+  # end
 
   def parent
     raise "undefined parent Organization" unless organization?
@@ -311,6 +320,10 @@ class EmployerProfile
     plan_years.renewing.first
   end
 
+  def can_transmit_xml?
+    !self.renewing_plan_year.present? && !self.binder_paid?
+  end
+
   def renewing_plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
   end
@@ -321,6 +334,7 @@ class EmployerProfile
 
   ## Class methods
   class << self
+
     def list_embedded(parent_list)
       parent_list.reduce([]) { |list, parent_instance| list << parent_instance.employer_profile }
     end
@@ -439,7 +453,7 @@ class EmployerProfile
         organizations_eligible_for_renewal(new_date).each do |organization|
           plan_year_renewal_factory.employer_profile = organization.employer_profile
           plan_year_renewal_factory.is_congress = false # TODO handle congress differently
-          plan_year_renewal_factory.renew
+          # plan_year_renewal_factory.renew
         end
 
         open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
@@ -468,7 +482,7 @@ class EmployerProfile
           employer_enroll_factory.end
         end
 
-        if new_date.day == 11
+        if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
             plan_year.force_publish!
@@ -480,10 +494,10 @@ class EmployerProfile
       if new_date.day == 1
         orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
         orgs.each do |org|
-          org.employer_profile.employer_profile_account.advance_billing_period!
-          if org.employer_profile.active_plan_year.present?
-            Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
-          end
+          org.employer_profile.employer_profile_account.advance_billing_period! if org.employer_profile.employer_profile_account.may_advance_billing_period?
+          # if org.employer_profile.active_plan_year.present?
+          #   Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
+          # end
         end
       end
 
@@ -674,6 +688,25 @@ class EmployerProfile
   # def is_eligible_to_shop?
   #   registered? or published_plan_year.enrolling?
   # end
+
+  def self.update_status_to_binder_paid(employer_profile_ids)
+    employer_profile_ids.each do |id|
+      empr = self.find(id)
+      empr.update_attribute(:aasm_state, "binder_paid")
+    end
+  end
+
+  def is_new_employer?
+    !renewing_plan_year.present? #&& TimeKeeper.date_of_record > 10
+  end
+
+  def is_renewing_employer?
+     renewing_plan_year.present? #&& TimeKeeper.date_of_record.day > 13
+  end
+
+  def has_next_month_plan_year?
+    show_plan_year.present? && (show_plan_year.start_on == (TimeKeeper.date_of_record.next_month).beginning_of_month)
+  end
 
   def is_eligible_to_enroll?
     published_plan_year.enrolling?

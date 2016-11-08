@@ -22,6 +22,7 @@ class HbxEnrollmentMember
   validate :check_primary_applicant_selected_during_enrollment
 
   validate :end_date_gt_start_date
+  delegate :ivl_coverage_selected, to: :family_member
 
   def family
     hbx_enrollment.family if hbx_enrollment.present?

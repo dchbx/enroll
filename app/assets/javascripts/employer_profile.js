@@ -1,4 +1,42 @@
 var EmployerProfile = ( function( window, undefined ) {
+
+  function changeCensusEmployeeStatus($thisObj) {
+    $('.injected-edit-status').html('<br/><h3 class="no-buffer">'+$thisObj.text()+'</h3><div class="module change-employee-status hbx-panel panel panel-default"><div class="panel-body"><div class="vertically-aligned-row"><div><label class="enroll-label">Enter Date of '+$thisObj.text()+':</label><input title="&#xf073; &nbsp;" placeholder="&#xf073; &nbsp;'+$thisObj.text()+' Date" type="text" class="date-picker date-field form-control"/></div><div class="text-center"><span class="btn btn-primary btn-sm disabled">'+$thisObj.text()+'</span></div></div></div></div>');
+    if ( $thisObj.text() == 'Terminate' ) {
+      $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
+      $('.injected-edit-status .change-employee-status .date-picker').attr('placeholder', $('.injected-edit-status .change-employee-status .date-picker').attr('title')+'Termination Date (must be within the past 60 days)');
+      $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
+    }
+    $('.injected-edit-status').slideDown();
+    $('.injected-edit-status .date-picker').on('change', function() {
+      $(this).closest('.injected-edit-status').find('.btn-primary').removeClass('disabled');
+      var url = $(this).closest('.census-employee').data('rehire-url');
+      var rehiring_date = $(this).val();
+      var status = $(this).closest('.census-employee').data('status');
+      $(this).closest('.injected-edit-status').find('.btn-primary').off('click');
+      $(this).closest('.injected-edit-status').find('.btn-primary:contains("Rehire")').on('click', function() {
+        $.ajax({
+          url: url,
+          data: {
+            rehiring_date: rehiring_date,
+            status: status
+          }
+        })
+      });
+      $(this).closest('.injected-edit-status').find('.btn-primary:contains("Terminate")').on('click', function() {
+        var url = $(this).closest('.census-employee').data('terminate-url');
+        var termination_date = $(this).val();
+        $.ajax({
+          url: url,
+          data: {
+            termination_date: termination_date,
+            status: status
+          }
+        })
+      });
+    });
+  }
+
   function viewDetails($thisObj) {
     if ( $thisObj.hasClass('view') ) {
       $thisObj.closest('.benefit-package').find('.health-offering, .dental-offering').slideDown();
@@ -266,6 +304,7 @@ var EmployerProfile = ( function( window, undefined ) {
   }
 
   return {
+      changeCensusEmployeeStatus: changeCensusEmployeeStatus,
       validateEditPlanYear : validateEditPlanYear,
       validatePlanYear : validatePlanYear,
       viewDetails : viewDetails
@@ -453,7 +492,7 @@ function setProgressBar(){
   $('.progress-bar').css({'width': percentageCurrent + "%"});
   $('.divider-progress').css({'left': (percentageDivider - 1) + "%"});
 
-  barClass = currentVal <= dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
+  barClass = currentVal < dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
   $('.progress-bar').addClass(barClass);
 
   if(maxVal == 0){

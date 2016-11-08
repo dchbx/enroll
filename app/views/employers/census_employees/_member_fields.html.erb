@@ -1,4 +1,4 @@
-<div id="employer_info" class="row module">
+<div class="row module forms" id="employer_info">
   <div class="col-md-12 col-sm-12 col-xs-12">
 
     <div class="row row-form-wrapper no-buffer">
@@ -13,7 +13,9 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <div class="selectric-labeled">
-          <span><strong>Suffix</strong></span>
+          <span>
+            <strong>Suffix</strong>
+          </span>
           <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control" %>
         </div>
       </div>
@@ -28,16 +30,31 @@
         <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}, required: true, readonly: is_readonly(f.object) %>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd no-border-xs">
-        <div class="radio">
-          <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male' %>
-          <label for="radio_male"><span>MALE</span></label>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd no-border-xs">
-        <div class="radio">
-          <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female' %>
-          <label for="radio_female"><span>FEMALE</span></label>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd no-border-xs">
+        <div class="gender-radios">
+          <label>
+            Gender
+          </label>
+          <div class="vertically-aligned-row">
+            <div class="n-radio-group">
+              <div class="n-radio-row">
+                <%= f.label :gender, 'male', :value => 'Male', class: 'n-radio' do %>
+                <%= f.radio_button :gender, "male", class: "n-radio" %>
+                <span class="n-radio"></span>
+                Male
+                <% end %>
+              </div>
+            </div>
+            <div class="n-radio-group">
+              <div class="n-radio-row">
+                <%= f.label :gender, 'female', :value => 'Female', class: 'n-radio' do %>
+                <%= f.radio_button :gender, "female", class: "n-radio" %>
+                <span class="n-radio"></span>
+                Female
+                <% end %>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -45,7 +62,7 @@
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function(){
+  $(document).ready(function () {
     $('.field_with_errors > *').unwrap();
     Freebies.floatlabels();
   });

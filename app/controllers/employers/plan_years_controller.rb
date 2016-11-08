@@ -1,7 +1,7 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
   before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
-
+  before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
   layout "two_column"
 
   def new
@@ -295,6 +295,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def revert
+    authorize EmployerProfile, :revert_application?
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     if @employer_profile.plan_years.renewing.include?(@plan_year) && @plan_year.may_revert_renewal?
       @plan_year.revert_renewal
@@ -339,7 +340,7 @@ class Employers::PlanYearsController < ApplicationController
           flash[:error] = "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
         end
       else
-        errors = @plan_year.application_errors.try(:values)
+        errors = @plan_year.application_errors.try(:values) + @plan_year.enrollment_period_errors
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
@@ -388,7 +389,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_dental_carriers_and_plans
-
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
     @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
@@ -399,6 +399,10 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   private
+
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end
 
   def build_employee_costs_for_benefit_group
     plan = @benefit_group.reference_plan

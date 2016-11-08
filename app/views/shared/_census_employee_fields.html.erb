@@ -1,42 +1,59 @@
-<div class="row row-form-wrapper no-buffer module census-employee-fields">
-  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-    <%= datepicker_control f, :hired_on, {:class => "interaction-field-control-census-employee-hired-on floatlabel form-control", :placeholder => "HIRE DATE", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: is_readonly(f.object)} %>
-  </div>
-  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg">
-    <div class="checkbox">
-      <label>
-        <%= f.check_box :is_business_owner %> OWNER?
-      </label>
+<div class="module census-employee-fields forms">
+  <div class="row row-form-wrapper no-buffer">
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= datepicker_control f, :hired_on, {:class => "interaction-field-control-census-employee-hired-on floatlabel form-control", :placeholder => "HIRE DATE", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: is_readonly(f.object)} %>
     </div>
-  </div>
-
-  <% current_benefit_groups, renewing_benefit_groups = get_benefit_groups_for_census_employee %>
-  <% if renewing_benefit_groups.present? %>
-  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-    <div class="selectric-labeled">
-      <span><strong>Benefit Package</strong></span>
-      <%= f.fields_for :benefit_group_assignments, @census_employee.active_benefit_group_assignment, errors: {}, fieldset: false do |benefit_group_assignment| %>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg">
+      <div class="owner checkbox">
+        <label>
+          Is Owner?
+        </label>
+        <label class="vertically-aligned-row">
+          <%= f.check_box :is_business_owner %>
+          <%= f.label :is_business_owner do %>
+          <i class="fa fa-check-square-o fa-lg"></i>
+          <i class="fa fa-square-o fa-lg"></i>
+          <% end %>
+          <span>
+            Owner?
+          </span>
+        </label>
+      </div>
+    </div>
+    <% current_benefit_groups, renewing_benefit_groups = get_benefit_groups_for_census_employee %>
+    <% if renewing_benefit_groups.present? %>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <div class="selectric-labeled">
+        <span>
+          <strong>Benefit Package</strong>
+        </span>
+        <%= f.fields_for :benefit_group_assignments, @census_employee.active_benefit_group_assignment, errors: {}, fieldset: false do |benefit_group_assignment| %>
         <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_groups, current_option: (@census_employee.active_benefit_group_assignment.try(:benefit_group_id) || @employer_profile.default_benefit_group.try(:id)), prompt: "SELECT BENEFIT PACKAGE"  %>
-      <% end %>
+        <% end %>
+      </div>
     </div>
-  </div>
-  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-     <div class="selectric-labeled">
-       <span><strong>Renewal Benefit Package</strong></span>
-      <%= f.fields_for :renewal_benefit_group_assignments, @census_employee.renewal_benefit_group_assignment, errors: {}, fieldset: false do |benefit_group_assignment| %>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <div class="selectric-labeled">
+        <span>
+          <strong>Renewal Benefit Package</strong>
+        </span>
+        <%= f.fields_for :renewal_benefit_group_assignments, @census_employee.renewal_benefit_group_assignment, errors: {}, fieldset: false do |benefit_group_assignment| %>
         <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: renewing_benefit_groups, current_option: (@census_employee.renewal_benefit_group_assignment.try(:benefit_group_id) || @employer_profile.try(:renewing_plan_year).benefit_groups.first.id), prompt: "SELECT RENEWAL BENEFIT PACKAGE" %>
-      <% end %>
+        <% end %>
+      </div>
     </div>
-  </div>
-  <% else %>
-  <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-    <div class="selectric-labeled">
-      <span><strong>Benefit Group</strong></span>
-        <%= f.fields_for :benefit_group_assignments, (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.last), errors: {}, fieldset: false do |benefit_group_assignment| %>
-        <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_groups, current_option: (@census_employee.active_benefit_group_assignment.try(:benefit_group_id) || @employer_profile.default_benefit_group.try(:id)), prompt: "SELECT BENEFIT PACKAGE" %>
-      <% end %>
+    <% else %>
+    <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+      <div class="selectric-labeled">
+        <span>
+          <strong>Benefit Package</strong>
+        </span>
+            <% @census_employee.benefit_group_assignments << @census_employee.benefit_group_assignments.build if (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.last).blank? %>
+            <%= f.fields_for :benefit_group_assignments, (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.last), errors: {}, fieldset: false do |benefit_group_assignment| %>
+            <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_groups, current_option: (@census_employee.active_benefit_group_assignment.try(:benefit_group_id) || @employer_profile.default_benefit_group.try(:id)), prompt: "SELECT BENEFIT PACKAGE" %>
+            <% end %>
+       </div>
     </div>
+    <% end %>
   </div>
-  <% end %>
-
 </div>

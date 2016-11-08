@@ -22,6 +22,7 @@ class InboxesController < ApplicationController
   end
 
   def show
+    @message.update_attributes(message_read: true) unless current_user.has_hbx_staff_role?
     respond_to do |format|
       format.html
       format.js

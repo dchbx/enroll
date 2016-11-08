@@ -3,13 +3,13 @@
 
     <!-- Admin comment form -->
       <div class="head hide">Provide Verification Reason:</div>
-      <div class="content hide">
+      <div class="content hide ">
         <%= form_tag update_verification_type_documents_path, multipart: true, method: :put do %>
             <ul id="verification-reason">
               <%= hidden_field_tag 'person_id', person.id  %>
               <%= hidden_field_tag 'verification_type', v_type  %>
               <div class="n-radio-group">
-                <div class="n-radio-row">
+                <div class="n-radio-row <%=pundit_class Family, :updateable?%>">
                   <label class="n-radio module verif-type" for='<%= v_type.parameterize.underscore %>_document_in_Enroll_app_<%=person.id%>'>
                     <%= radio_button_tag "verification_reason", 'document_in_Enroll_app', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_Enroll_app_#{person.id}" %>
                     <span class="n-radio">
@@ -17,7 +17,7 @@
                     Document in EnrollApp
                   </label>
                 </div>
-                <div class="n-radio-row">
+                <div class="n-radio-row <%=pundit_class Family, :updateable?%>">
                   <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_document_in_DIMS_<%=person.id%>">
                     <%= radio_button_tag "verification_reason", 'document_in_DIMS', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_DIMS_#{person.id}" %>
                     <span class="n-radio">
@@ -25,7 +25,7 @@
                     Document in DIMS
                   </label>
                 </div>
-                <div class="n-radio-row">
+                <div class="n-radio-row <%=pundit_class Family, :updateable?%>">
                   <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_SAVE_system_<%=person.id%>">
                     <%= radio_button_tag "verification_reason", 'SAVE system', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_SAVE_system_#{person.id}" %>
                     <span class="n-radio">
@@ -33,7 +33,7 @@
                     SAVE system
                   </label>
                 </div>
-                <div class="n-radio-row">
+                <div class="n-radio-row <%=pundit_class Family, :updateable?%>">
                   <label class="n-radio module verif-type" for="<%= v_type.parameterize.underscore %>_e-verified_in_Curam_<%=person.id%>">
                     <%= radio_button_tag "verification_reason", 'e-verified_in_Curam', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_e-verified_in_Curam_#{person.id}" %>
                     <span class="n-radio">
@@ -42,7 +42,7 @@
                   </label>
                 </div>
               </div>
-              <div class="text-center">
+              <div class="text-center <%=pundit_class Family, :updateable?%>">
                 <%= submit_tag "Complete", class: "btn btn-primary btn-small " %>
               </div>
             </ul>

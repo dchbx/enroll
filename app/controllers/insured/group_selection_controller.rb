@@ -32,6 +32,9 @@ class Insured::GroupSelectionController < ApplicationController
       @benefit = benefit_package.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
+    if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+      @disable_market_kind = @market_kind == "shop" ? "individual" : "shop"
+    end
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
@@ -111,6 +114,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
 
     if hbx_enrollment.may_terminate_coverage?
+      hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
       hbx_enrollment.terminate_benefit(term_date)
       hbx_enrollment.propogate_terminate(term_date)
       redirect_to family_account_path

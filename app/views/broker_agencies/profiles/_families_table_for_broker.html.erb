@@ -21,23 +21,23 @@
     <tbody>
       <%= table_empty_to_human if families.count == 0 %>
       <% families.each do |family| %>
-      <% pp = family.primary_applicant.person %>
+        <% pp = family.primary_applicant.person %>
 
-      <tr id="family_<%= family.id %>">
-        <td >
-          <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), class: 'btn btn-normal'%> <br/>
-        </td>
-        <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
-        <td><%= format_date(pp.dob) %></td>
-        <td><%= pp.hbx_id %></td>
-        <td><%= family.active_family_members.size %></td>
-        <td><%= pp.user.present? ? "Yes" : "No" %></td>
-        <td class='consumer_role_present'><%= pp.consumer_role.present?  ? "Yes" : "No" %></td>
-        <td class='employee_role_present'><%= pp.active_employee_roles.present?  ? "Yes" : "No" %></td>
-        <td class='unblock'>
-          <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
-        </td>
-      </tr>
+        <tr id="family_<%= family.id %>">
+          <td >
+            <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), class: 'btn btn-normal'%> <br/>
+          </td>
+          <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
+          <td><%= format_date(pp.dob) %></td>
+          <td><%= pp.hbx_id %></td>
+          <td><%= family.active_family_members.size %></td>
+          <td><%= pp.user.present? ? "Yes" : "No" %></td>
+          <td class='consumer_role_present'><%= pp.consumer_role.present?  ? "Yes" : "No" %></td>
+          <td class='employee_role_present'><%= pp.active_employee_roles.present?  ? "Yes" : "No" %></td>
+          <td class='unblock'>
+            <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
+          </td>
+        </tr>
       <% end %>
     </tbody>
   </table>

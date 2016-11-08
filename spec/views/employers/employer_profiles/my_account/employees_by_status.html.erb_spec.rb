@@ -31,6 +31,8 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:benefit_group_assignment3) { double(hbx_enrollments: [hbx_enrollment], benefit_group: benefit_group) }
 
   before :each do
+    allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true))
+    sign_in(user)
     assign(:employer_profile, employer_profile)
     assign(:page_alphabets, ['a', 'b', 'c'])
     sign_in user

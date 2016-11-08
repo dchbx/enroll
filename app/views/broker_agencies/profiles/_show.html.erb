@@ -1,28 +1,30 @@
 <div class="container bottom-pd">
+  <h3>Broker Agency : <%= @broker_agency_profile.legal_name %></h3>
+  <% if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role? %>
+    <%= link_to "Edit Broker Agency Profile", edit_broker_agencies_profile_path(@broker_agency_profile.id), class: 'btn btn-primary ' %>
+  <% end %>
+  <p></p>
+  <div class="table-border table-responsive">
+    <table class="table">
+      <thead>
+        <th>Legal Name</th>
+        <th>dba</th>
+        <% if fein_display(@broker_agency_profile) %>
+          <th>Fein </th>
+        <%end%>
+        <th>Market Kind</th>
+      </thead>
+      <tbody>
+        <td><%= @broker_agency_profile.legal_name %></td>
+        <td><%= @broker_agency_profile.dba %></td>
+        <% if fein_display(@broker_agency_profile) %>
+          <td><%= @broker_agency_profile.fein %></td>
+        <% end %>
+        <td><%= @broker_agency_profile.market_kind.titleize %></td>
+      </tbody>
+    </table>
+  </div>
 
- <h3>Broker Agency : <%= @broker_agency_profile.legal_name %></h3>
- <% if current_user.has_broker_agency_staff_role? %>
- <%= link_to "Edit Broker Agency Profile", edit_broker_agencies_profile_path(@broker_agency_profile.id), class: 'btn btn-primary ' %>
- <br/>
- <% end %>
-
- <div class="table-border table-responsive">
-  <table class="table">
-    <thead>
-      <th>Legal Name</th>
-      <th>dba</th>
-      <th>Fein</th>
-      <th>Market Kind</th>
-    </thead>
-    <tbody>
-      <td><%= @broker_agency_profile.legal_name %></td>
-      <td><%= @broker_agency_profile.dba %></td>
-      <td><%= @broker_agency_profile.fein %></td>
-      <td><%= @broker_agency_profile.market_kind.titleize %></td>
-    </tbody>
-  </table>
-</div>
-
-<%= render "broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
-<%= render "office_locations", office_locations: @broker_agency_profile.organization.office_locations %>
+  <%= render "broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
+  <%= render "office_locations", office_locations: @broker_agency_profile.organization.office_locations %>
 </div>

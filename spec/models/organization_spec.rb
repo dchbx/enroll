@@ -131,16 +131,56 @@ RSpec.describe Organization, dbclean: :after_each do
       Rails.cache.clear
     end
 
-    it "valid_carrier_names" do
-      carrier_names = {}
-      carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-      carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-      expect(Organization.valid_carrier_names).to eq carrier_names
+    context "carrier_names" do
+
+      it "valid_carrier_names" do
+        carrier_names = {}
+        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+        carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+        expect(Organization.valid_carrier_names).to eq carrier_names
+      end
+
+      it "valid_carrier_names_for_options" do
+        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
+        expect(Organization.valid_carrier_names_for_options).to eq carriers
+      end
     end
 
-    it "valid_carrier_names_for_options" do
-      carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
-      expect(Organization.valid_carrier_names_for_options).to eq carriers
+    context "binder_paid" do
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+      let(:office_location) { OfficeLocation.new(
+          is_primary: true,
+          address: address,
+          phone: phone
+        )
+      }
+      let(:organization) { Organization.create(
+        legal_name: "Sail Adventures, Inc",
+        dba: "Sail Away",
+        fein: "001223833",
+        office_locations: [office_location]
+        )
+      }
+      let(:valid_params) do
+        {
+          organization: organization,
+          entity_kind: "partnership"
+        }
+      end
+      let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
+      let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'enrolling') }
+      let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
+      let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
+
+      before do
+        renewing_employer.save!
+        new_employer.save!
+      end
+
+      it "should return correct number of records" do
+       expect(Organization.retrieve_employers_eligible_for_binder_paid.size).to eq 1
+     end
     end
   end
 
@@ -359,7 +399,7 @@ RSpec.describe Organization, dbclean: :after_each do
 
     context "with valid arguments" do
       before do
-        Organization.upload_invoice(file_path)
+        Organization.upload_invoice(file_path,valid_file_names.first)
       end
        it "should upload invoice to the organization" do
         expect(organization.documents.size).to eq 1
@@ -368,15 +408,15 @@ RSpec.describe Organization, dbclean: :after_each do
     context "with duplicate files" do
 
        it "should upload invoice to the organization only once" do
-        Organization.upload_invoice(file_path)
-        Organization.upload_invoice(file_path)
+        Organization.upload_invoice(file_path,valid_file_names.first)
+        Organization.upload_invoice(file_path,valid_file_names.first)
         expect(organization.documents.size).to eq 1
       end
     end
 
     context "without date in file name" do
       before do
-        Organization.upload_invoice('dummyfile.pdf')
+        Organization.upload_invoice("test/hbxid_invoice_R.pdf",'dummyfile.pdf')
       end
        it "should Not Upload invoice" do
         expect(organization.documents.size).to eq 0

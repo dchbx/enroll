@@ -1,58 +1,80 @@
-<fieldset>
-  <div id="dependent_info" class="row dependent_info">
-    <div class="col-md-12 col-sm-12 col-xs-12">
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME', required: true %>
-        </div>
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
-        </div>
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME', required: true %>
-        </div>
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-         <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}  %>
-         </div>
-        <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.hidden_field :_destroy %>
-          <%= link_to '#', :class => "remove_fields close-2" do %>
-          <%= image_tag("delete.png") %>
-          <% end %>
-        </div>
-      </div>
+<div class="panel panel-default module census-employee-dependents forms">
+  <div class="panel-body">
+    <div class="dependents">
+    <fieldset>
+      <div class="row dependent_info" id="dependent_info">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+              <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME', required: true %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME', required: true %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}  %>
+            </div>
+            <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd">
+              <%= f.hidden_field :_destroy %>
+              <%= link_to '#', :class => "remove_fields close-2" do %>
+              <%= image_tag("delete.png") %>
+              <% end %>
+            </div>
+          </div>
 
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= datepicker_control f, :dob, {:class => "dob-picker floatlabel form-control", :placeholder => "DATE OF BIRTH",
-                                           :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true} %>
-        </div>
-        <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-          <div class="radio">
-              <%= f.radio_button :gender, "male" %>
-              <%= f.label :gender, "<span>MALE</span>".html_safe, value: 'male' %>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= datepicker_control f, :dob, {:class => "dob-picker floatlabel form-control", :placeholder => "DATE OF BIRTH",
+                                         :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true} %>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd no-border-xs">
+              <div class="gender-radios">
+                <label>
+                  Gender
+                </label>
+                <div class="vertically-aligned-row">
+                  <div class="n-radio-group">
+                    <div class="n-radio-row">
+                      <%= f.label :gender, 'male', :value => 'Male', class: 'n-radio' do %>
+                      <%= f.radio_button :gender, "male", class: "n-radio" %>
+                      <span class="n-radio"></span>
+                      Male
+                      <% end %>
+                    </div>
+                  </div>
+                  <div class="n-radio-group">
+                    <div class="n-radio-row">
+                      <%= f.label :gender, 'female', :value => 'Female', class: 'n-radio' do %>
+                      <%= f.radio_button :gender, "female", class: "n-radio" %>
+                      <span class="n-radio"></span>
+                      Female
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%#= f.select :employee_relationship, options_for_select(CensusDependent::EMPLOYEE_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true} %>
+              <% if f.object.dob.present? && (f.object.dob + 26.years > TimeKeeper.date_of_record) %>
+              <% relationships = [["Spouse", 'spouse'], ["Domestic partner", "domestic_partner"], ["Child", "child_under_26"]] %>
+              <% else %>
+              <% relationships = [["Spouse", 'spouse'], ["Domestic partner", "domestic_partner"], ["Child", "child_26_and_over"]] %>
+              <% end %>
+              <div class="selectric-labeled">
+                <span><strong>Relationship</strong></span>
+                <%= f.select :employee_relationship, options_for_select(relationships, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true} %>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-          <div class="radio">
-              <%= f.radio_button :gender, "female" %>
-              <%= f.label :gender, "<span>FEMALE</span>".html_safe, value: 'female' %>
-          </div>
-        </div>
-
-        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-          <%#= f.select :employee_relationship, options_for_select(CensusDependent::EMPLOYEE_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true} %>
-          <% if f.object.dob.present? && (f.object.dob + 26.years > TimeKeeper.date_of_record) %>
-            <% relationships = [["Spouse", 'spouse'], ["Domestic partner", "domestic_partner"], ["Child", "child_under_26"]] %>
-          <% else %>
-            <% relationships = [["Spouse", 'spouse'], ["Domestic partner", "domestic_partner"], ["Child", "child_26_and_over"]] %>
-          <% end %>
-            <%= f.select :employee_relationship, options_for_select(relationships, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true} %>
-        </div>
       </div>
-    </div>
+    </fieldset>
   </div>
-  <br>
-</fieldset>
-
-
+</div>
+</div>

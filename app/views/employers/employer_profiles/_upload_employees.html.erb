@@ -11,6 +11,7 @@
   </div>
 <%= form_for @employer_profile, :url => url_for(:controller => 'employer_profiles', :action => 'bulk_employee_upload'), method: 'post', :html => { :multipart => true } do |f| %>
 <%= file_field_tag :file %>
+<%=pundit_span EmployerProfile, :updateable? %>
 <%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary ' %>
 <%= f.submit 'Upload', class: 'btn btn-primary ' %>
 <% end %>

@@ -2,17 +2,18 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-
+  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
+  before_action :find_or_build_consumer_role, only: [:home]
 
   def home
     set_flash_by_announcement
     set_bookmark_url
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
-
+    
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
     @enrollment_filter = @family.enrollments_for_display
@@ -45,7 +46,8 @@ class Insured::FamiliesController < FamiliesController
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
     @employee_role = @person.active_employee_roles.first
-    @tab = params['tab']
+    @tab = params['tab'] 
+    @family_members = @family.active_family_members
     respond_to do |format|
       format.html
     end
@@ -136,12 +138,21 @@ class Insured::FamiliesController < FamiliesController
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
+      @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
-    if @person.has_active_employee_role?
+    if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
+  end
+
+  def check_move_reason
+    calculate_dates
+  end
+
+  def check_insurance_reason
+    calculate_dates
   end
 
   def purchase
@@ -192,34 +203,35 @@ class Insured::FamiliesController < FamiliesController
   # admin manually uploads a notice for person
   def upload_notice
 
-    if params.permit![:file]
-      doc_uri = Aws::S3Storage.save(file_path, 'notices')
+    if (!params.permit![:file]) || (!params.permit![:subject])
+      flash[:error] = "File or Subject not provided"
+      redirect_to(:back)
+      return
+    elsif file_content_type != 'application/pdf'
+      flash[:error] = "Please upload a PDF file. Other file formats are not supported."
+      redirect_to(:back)
+      return
+    end
 
-      if doc_uri.present?
-        notice_document = Document.new({ title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
-                                         format: file_content_type })
-        begin
-          @person.documents << notice_document
-          @person.save!
-
-          send_notice_upload_notifications(notice_document)
-
-          flash[:notice] = "File Saved"
-          redirect_to(:back)
-          return
-        rescue => e
-          flash[:error] = "Could not save file. "
-          redirect_to(:back)
-          return
-        end
-      else
-        flash[:error] = "Could not save file"
-        redirect_to(:back)
+    doc_uri = Aws::S3Storage.save(file_path, 'notices')
+    
+    if doc_uri.present?
+      notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
+                                      format: file_content_type})
+      begin
+        @person.documents << notice_document
+        @person.save!
+        send_notice_upload_notifications(notice_document, params.permit![:subject])
+        flash[:notice] = "File Saved"
+      rescue => e
+        flash[:error] = "Could not save file."
       end
     else
-      flash[:error] = "File not uploaded"
-      redirect_to(:back)
+      flash[:error] = "Could not save file."
     end
+
+    redirect_to(:back)
+    return
   end
 
   # displays the form to upload a notice for a person
@@ -236,8 +248,16 @@ class Insured::FamiliesController < FamiliesController
 
   private
 
+  def updateable?
+    authorize Family, :updateable?
+  end
+
   def check_employee_role
     @employee_role = @person.active_employee_roles.first
+  end
+
+  def find_or_build_consumer_role
+    @family.check_for_consumer_role
   end
 
   def init_qualifying_life_events
@@ -275,7 +295,6 @@ class Insured::FamiliesController < FamiliesController
         end
       end
     end
-
   end
 
   def check_for_address_info
@@ -311,21 +330,32 @@ class Insured::FamiliesController < FamiliesController
     params.permit![:file].content_type
   end
 
-  def send_notice_upload_notifications(notice)
+  def send_notice_upload_notifications(notice, subject)
     notice_upload_email
-    notice_upload_secure_message(notice)
+    notice_upload_secure_message(notice, subject)
   end
 
   def notice_upload_email
-    UserMailer.notice_uploaded_notification(@person).deliver_now
+    if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
+      (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
+      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
+    end
   end
 
-  def notice_upload_secure_message(notice)
-    subject = "New Notice Available"
+  def notice_upload_secure_message(notice, subject)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
+  end
+
+  def calculate_dates
+    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle = QualifyingLifeEventKind.find(params[:qle_id])
+    start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
+    end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
   end
 end

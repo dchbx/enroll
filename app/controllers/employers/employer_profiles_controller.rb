@@ -8,7 +8,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   before_action :check_employer_staff_role, only: [:new]
   before_action :check_access_to_organization, only: [:edit]
   before_action :check_and_download_invoice, only: [:download_invoice]
+  around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
+  before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
 
   def index
@@ -105,10 +107,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.show_plan_year
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-        enrollments = @employer_profile.enrollments_for_billing
-        @premium_amt_total   = enrollments.map(&:total_premium).sum
-        @employee_cost_total = enrollments.map(&:total_employee_cost).sum
-        @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
 
         set_flash_by_announcement if @tab == 'home'
       end
@@ -265,6 +263,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   private
 
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
@@ -423,6 +424,15 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @organization
   end
 
+  def wrap_in_benefit_group_cache
+#    prof_result = RubyProf.profile do
+      Caches::RequestScopedCache.allocate(:employer_calculation_cache_for_benefit_groups)
+      yield
+      Caches::RequestScopedCache.release(:employer_calculation_cache_for_benefit_groups)
+#    end
+#    printer = RubyProf::MultiPrinter.new(prof_result)
+#    printer.print(:path => File.join(Rails.root, "rprof"), :profile => "profile")
+  end
 
   def employer_params
     params.permit(:first_name, :last_name, :dob)

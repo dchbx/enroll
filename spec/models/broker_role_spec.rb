@@ -245,15 +245,16 @@ describe BrokerRole, dbclean: :after_each do
     context '#phone returns broker work phone or agency office phone' do
       person0= FactoryGirl.create(:person)
       provider_kind = 'broker'
-      @ba = FactoryGirl.create(:broker_agency).broker_agency_profile
-      b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
+
       it 'should return broker agency profile phone' do
-        expect(b1.phone.to_s).to match(/1115/)
+        b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
+        expect(b1.phone.to_s).to eq b1.broker_agency_profile.phone
       end
       it 'should return broker person work phone' do
+        b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
         person0.phones[1].update_attributes!(kind: 'work')
-        expect(b1.phone.to_s).not_to match(/1115/)
-        expect(b1.phone.to_s).to match(/1114/)
+        expect(b1.phone.to_s).not_to eq b1.broker_agency_profile.phone
+        expect(b1.phone.to_s).to eq person0.phones[1].to_s
       end
     end
   end

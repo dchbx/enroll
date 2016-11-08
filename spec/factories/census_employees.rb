@@ -16,6 +16,10 @@ FactoryGirl.define do
       is_business_owner  true
     end
 
+    trait :with_enrolled_census_employee do
+      aasm_state :eligible
+    end
+
     trait :general_agency do
       transient do
         general_agency_traits []

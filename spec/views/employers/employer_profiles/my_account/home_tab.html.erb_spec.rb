@@ -220,6 +220,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     let(:benefit_groups){ [benefit_group_1, benefit_group_2] }
 
     before :each do
+      allow(view).to receive(:pundit_class).and_return(double("EmployerProfilePolicy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
+
       assign :employer_profile, employer_profile
       assign :hbx_enrollments, [hbx_enrollment]
       assign :current_plan_year, employer_profile.published_plan_year
@@ -252,6 +255,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     let(:employer_profile){ FactoryGirl.create(:employer_profile) }
 
     before :each do
+      allow(view).to receive(:pundit_class).and_return(double("EmployerProfilePolicy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
       assign :employer_profile, employer_profile
       render partial: "employers/employer_profiles/my_account/home_tab"
     end

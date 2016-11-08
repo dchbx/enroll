@@ -72,7 +72,6 @@ class CorrectCitizenStatus < MongoidMigrationTask
     if ssn_response
       if citizenship_response
         person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc))
-        @previously_valid = @previously_valid + 1
       else
         person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
       end
@@ -82,7 +81,6 @@ class CorrectCitizenStatus < MongoidMigrationTask
   end
 
   def migrate
-    @previously_valid = 0
     people_to_fix = get_people
     people_to_fix.each do |person|
       begin
@@ -92,9 +90,6 @@ class CorrectCitizenStatus < MongoidMigrationTask
       rescue
         $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}"
       end
-    end
-    if @previously_valid > 0
-      $stderr.puts @previously_valid
     end
   end
 

@@ -5,7 +5,7 @@ module Insured
     end
 
     def can_shop_shop?(person)
-      person.try(:has_active_employee_role?)
+      person.present? && person.has_employer_benefits?
     end
 
     def can_shop_both_markets?(person)
@@ -13,14 +13,14 @@ module Insured
     end
 
     def health_relationship_benefits(employee_role)
-      if employee_role.benefit_group.present?
-        employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
+      if employee_role.census_employee.active_benefit_group
+        employee_role.census_employee.active_benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
 
     def dental_relationship_benefits(employee_role)
-      if employee_role.benefit_group.present?
-        employee_role.benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
+      if employee_role.census_employee.active_benefit_group
+        employee_role.census_employee.active_benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
   end

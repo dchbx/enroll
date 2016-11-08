@@ -4,29 +4,27 @@ $('#qle-details #qle-date-chose').addClass('hidden');
   $('#qle-details .success-info').removeClass('hidden');
   $('#qle-details .error-info').addClass('hidden');
   $('#qle-details .initial-info').addClass('hidden');
-
+  $('#qle_reason').hide();
   <% case %>
   <% when @qle_aptc_block %>
     var qleBlockNotice = "We need a bit of additional information to redetermine your eligibility. Please call us at <%= Settings.contact_center.phone_number %>.<br><a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>";
     $("#qle-details .error-text").html(qleBlockNotice);
-
     $('#qle-details .error-info').removeClass('hidden');
     $('#qle-details .success-info').addClass('hidden');
     $('#qle-details .initial-info').addClass('hidden');
   <% when (@effective_on_options.present? && @effective_on_options.is_a?(Array)) %>
     var mecNotice = "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on <%= @qle_date.beginning_of_month %> instead of <%= (@qle_date + 1.month).beginning_of_month %>. Please call us at <%= Settings.contact_center.phone_number %> by <%= (@qle_date.beginning_of_month - 1.day) %> to use this option";
     $("#qle-details .error-text").html(mecNotice);
-
     $('#qle-details .error-info').removeClass('hidden');
     $('#qle-details .success-info').addClass('hidden');
     $('#qle-details .initial-info').addClass('hidden');
   <% when @qle.present? %>
     $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");
+    $(".spec_reasons").html("<%= escape_javascript(render 'special_reasons') %>");
   <% end %>
 <% else %>
   var errorNotice = "The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact <%= raw(Settings.contact_center.name) %>: <%= Settings.contact_center.phone_number %>.";
   $("#qle-details .error-text").html(errorNotice);
-
   $('#qle-details .error-info').removeClass('hidden');
   $('#qle-details .success-info').addClass('hidden');
   $('#qle-details .initial-info').addClass('hidden');
@@ -35,11 +33,7 @@ $('#qle-details #qle-date-chose').addClass('hidden');
 <% if @future_qualified_date %>
   var errorNoticeAction = "The date you submitted does not qualify for a special enrollment period. Qualifying life events may be reported up to 30 days after the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. For further assistance, please contact DC Health Link Customer Service at <%= Settings.contact_center.phone_number %>.";
   $("#qle-details .error-text").html(errorNoticeAction);
-
   $('#qle-details .error-info').removeClass('hidden');
   $('#qle-details .success-info').addClass('hidden');
   $('#qle-details .initial-info').addClass('hidden');
 <% end %>
-
-
-

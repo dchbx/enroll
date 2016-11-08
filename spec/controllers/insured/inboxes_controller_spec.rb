@@ -42,10 +42,11 @@ RSpec.describe Insured::InboxesController, :type => :controller do
   end
 
   describe "GET show / DELETE destroy" do
-    let(:message){double(to_a: double("to_array"))}
+    let(:message){double(to_a: double("to_array"), message_read: false)}
     let(:inbox_provider){double(id: double("id"),full_name: double("inbox_provider"))}
     before do
       allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(user)
       allow(Person).to receive(:find).and_return(inbox_provider)
       allow(controller).to receive(:find_message)
@@ -53,9 +54,21 @@ RSpec.describe Insured::InboxesController, :type => :controller do
       allow(message).to receive(:update_attributes).and_return(true)
     end
 
+    context "admin user GET show" do
+      before do
+        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+        it "show action" do
+          get :show, id: 1
+          expect(response).to have_http_status(:success)
+          expect(message.message_read).to eq(true)
+        end
+      end
+    end
+
     it "show action" do
       get :show, id: 1
       expect(response).to have_http_status(:success)
+      expect(message.message_read).to eq(false)
     end
 
     it "delete action" do

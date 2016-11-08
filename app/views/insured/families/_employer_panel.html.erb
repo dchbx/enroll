@@ -4,7 +4,7 @@
       <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <strong>Congratulations on your new job at <%= @employee_role.employer_profile.legal_name %>. </strong>
       </div>
-      <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+      <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 <%= pundit_class EmployerProfile, :updateable?%>">
         <%= form_tag new_insured_group_selection_path, method: :get do %>
           <%= hidden_field_tag 'person_id', @person.id if @person %>
           <%= hidden_field_tag 'employee_role_id', @employee_role.id if @employee_role %>

@@ -4,8 +4,9 @@ RSpec.describe CensusMember, :dbclean => :after_each do
   it { should validate_presence_of :first_name }
   it { should validate_presence_of :last_name }
   it { should validate_presence_of :dob }
-
-  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: "1111") }
+  
+  let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
   it "sets gender" do
     census_employee.gender = "MALE"

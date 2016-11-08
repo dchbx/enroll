@@ -32,15 +32,14 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   effective_date = ce.employer_profile.renewing_plan_year.start_on
-
-  expect(page.find_all('.hbx-enrollment-panel').any?{|e| 
-    (e.find('.family-plan-selection').find('.status').find('h4').text() == 'Auto Renewing') && 
-    (e.find('.enrollment-effective').find('strong').text() == effective_date.strftime('%m/%d/%Y'))
+  expect(page.find_all('.hbx-enrollment-panel').any?{|e|
+    (e.find('.label-success').text() == 'Auto Renewing') &&
+    (e.find('.enrollment-effective').text() == "Effective date: " + effective_date.strftime('%m/%d/%Y'))
   }).to be_truthy
 
-  expect(page.find_all('.hbx-enrollment-panel').any?{|e| 
-    (e.find('.family-plan-selection').find('.status').find('h4').text() == 'Coverage Selected') && 
-    (e.find('.enrollment-effective').find('strong').text() == (effective_date - 1.year).strftime('%m/%d/%Y'))
+  expect(page.find_all('.hbx-enrollment-panel').any?{|e|
+    (e.find('.label-success').text() == 'Coverage Selected') &&
+    (e.find('.enrollment-effective').text() == "Effective date: " + (effective_date - 1.year).strftime('%m/%d/%Y'))
   }).to be_truthy
 end
 
@@ -54,14 +53,14 @@ end
 
 Then(/(.*) should see \"my account\" page with new enrollment and passive renewal should be canceled/) do |named_person|
   visit "/families/home"
-  
+
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   effective_date = ce.employer_profile.renewing_plan_year.start_on
 
-  expect(page.find_all('.hbx-enrollment-panel').any?{|e| 
-    (e.find('.family-plan-selection').find('.status').find('h4').text() == 'Coverage Selected') && 
-    (e.find('.enrollment-effective').find('strong').text() == effective_date.strftime('%m/%d/%Y'))
+  expect(page.find_all('.hbx-enrollment-panel').any?{|e|
+    (e.find('.label-success').text() == 'Coverage Selected') &&
+    (e.find('.enrollment-effective').text() == "Effective date: " + effective_date.strftime('%m/%d/%Y'))
   }).to be_truthy
 
   expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey

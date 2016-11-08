@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Employers::PremiumStatementsController do
   let(:user) { double("User") }
-  let(:person) { double("Person") }
-  let(:employer_profile) { double("EmployerProfile", renewing_plan_year: nil) }
+  let(:person) { FactoryGirl.create(:person)}
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:current_plan_year) { double("PlanYear", enrolled: []) }
   let(:subscriber) { double("HbxEnrollmentMember") }
   let(:carrier_profile){ double("CarrierProfile", legal_name: "my legal name") }

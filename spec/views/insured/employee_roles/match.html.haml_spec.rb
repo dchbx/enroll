@@ -12,6 +12,7 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
     found_census_employees = @employee_candidate.match_census_employees
     @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
     sign_in user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
     render template: "insured/employee_roles/match.html.haml"
   end
 

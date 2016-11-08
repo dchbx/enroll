@@ -12,8 +12,11 @@ describe "exchanges/agents/home.erb" do
     end
 
     it "renders the CSR template for CSRs" do
+
       person.csr_role = csr_role
       current_user.save
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      
       sign_in(current_user)
       render template: "/exchanges/agents/home", :active_tab => "home-tab"
       expect(rendered).not_to have_text(@title)

@@ -1,0 +1,48 @@
+<div class='container'>
+  <div class="row">
+    <h3 class="title-inline">Binder Transition Information</h3>
+  </div>
+</div>
+
+<%= form_tag binder_paid_exchanges_hbx_profiles_path, method: :post, id: 'binder_paid_index' do %>
+  <div class="module">
+    <table id="binder-transition-dataTable" class="table table-striped table-hover table-sm display select  <%=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+      <thead class="thead-default">
+        <tr>
+         <th>
+            <%= check_box_tag "checkall" %> &nbsp; &nbsp;Select All
+         </th>
+         <th>Name</th>
+         <th>Status</th>
+         <th>Employer Type</th>
+         <th>Eligibility Criteria</th>
+         <th>Submitted on</th>
+         <th></th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <%= submit_tag "Binder Paid", class: 'btn btn-primary', id: "binderSubmit" %>
+<% end %>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    var table = $('#binder-transition-dataTable').DataTable(
+      {
+        "processing": true,
+        "serverSide": true,
+        "ordering" : false,
+        "ajax": {
+          url: "<%= binder_index_datatable_exchanges_hbx_profiles_path(format: :json) %>",
+          type: "GET"
+        },
+        "drawCallback": function(settings, json) {
+          binderTransition.binder_transition_checkboxes();
+        }
+      }
+    );
+
+  });
+
+</script>

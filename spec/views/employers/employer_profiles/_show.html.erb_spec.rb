@@ -16,6 +16,7 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
     assign(:plan_year, plan_year)
     @current_plan_year = plan_year
     sign_in user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
   end
 
   it "should display the dashboard content" do

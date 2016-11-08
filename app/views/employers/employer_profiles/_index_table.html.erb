@@ -24,7 +24,9 @@
       <td><%= er.roster_size %></td>
       <td><%= er.aasm_state.humanize %></td>
       <td><%= er.published_plan_year.try(:effective_date) %>
-      <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
+      <%= pundit_span EmployerProfile, :list_enrollments? %>
+          <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
+      </span>
       <% if controller_name == 'profiles' %>
         <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
         <% edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.active_broker) %>
@@ -40,8 +42,8 @@
       <% end %>
       <% end %>
       <td><%= er.active_general_agency_legal_name %></td>
-      <%- if @profile %>
-      <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>
+      <% if @profile %>
+        <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default " + (pundit_class HbxProfile, :modify_admin_tabs?), remote: true %></td>
       <% end %>
     </tr>
   <% end %>

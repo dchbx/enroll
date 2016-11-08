@@ -1,32 +1,33 @@
 <% content_for :navigation do %>
-  <%= render 'navigation' %>
+<%= render 'navigation' %>
 <% end %>
 <div class="col-xs-12">
-  <div id="plan-summary">
-  </div>
+  <div id="plan-summary"></div>
 </div>
 <div id='account-detail'>
   <% @person.active_employee_roles.each do |employee_role|%>
-    <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
+  <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
 
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
   </div>
   <div class="row">
-  <div class="col-md-8">
-    <%= render partial: 'qle_detail' %>
-    <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment %>
-    <% if @waived %>
-      <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment %>
-    <% end %>
-    <%= render partial: 'shop_for_plans_widget' %>
-    <%= render partial: 'apply_for_medicaid_widget' %>
+    <div class="col-md-8">
+      <%= render partial: 'qle_detail' %>
+      <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+      <% if @waived %>
+      <div class="waived-coverage">
+        <%= render partial: 'waived_coverage_widget', :collection => @waived_hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+      </div>
 
+        <% end %>
+        <%= render partial: 'shop_for_plans_widget' %>
+        <%= render partial: 'apply_for_medicaid_widget' %>
+      </div>
+      <div class="col-md-4 right-column">
+        <%= render 'right_column' %>
+      </div>
+    </div>
   </div>
-  <div class="col-md-4 right-column">
-    <%= render 'right_column' %>
-  </div>
-</div>
-</div>
-<%= render 'insured/plan_shoppings/help_with_plan' %>
+  <%= render 'insured/plan_shoppings/help_with_plan' %>

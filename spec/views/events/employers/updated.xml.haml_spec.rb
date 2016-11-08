@@ -1,7 +1,7 @@
 require 'rails_helper'
 require File.join(Rails.root, "spec", "support", "acapi_vocabulary_spec_helpers")
 
-RSpec.describe "events/employer/updated.haml.erb" do
+RSpec.describe "events/employers/updated.haml.erb" do
   let(:legal_name) { "A Legal Employer Name" }
   let(:fein) { "867530900" }
   let(:entity_kind) { "c_corporation" }
@@ -15,7 +15,11 @@ RSpec.describe "events/employer/updated.haml.erb" do
       download_vocabularies
     end
 
-    let(:plan_year) { PlanYear.new(:aasm_state => "published", :created_at => DateTime.now, :start_on => DateTime.now, :open_enrollment_start_on => DateTime.now, :open_enrollment_end_on => DateTime.now) }
+    let(:plan_year) { PlanYear.new(:aasm_state => "published", :created_at => DateTime.now, 
+                                  :start_on => DateTime.now,
+                                  :open_enrollment_start_on => DateTime.now, 
+                                  :open_enrollment_end_on => DateTime.now) 
+                    }
     let(:employer) { EmployerProfile.new(:organization => organization, :plan_years => [plan_year], :entity_kind => entity_kind) }
 
     before :each do
@@ -58,16 +62,15 @@ RSpec.describe "events/employer/updated.haml.erb" do
       end
     end
 
-    context "staff is owner" do
-      let(:staff_and_owner) {FactoryGirl.create(:person)}
+    context "person of contact" do
+      let(:staff) {FactoryGirl.create(:person)}
 
       before do
-        allow(employer).to receive(:staff_roles).and_return([staff_and_owner])
-        allow(employer).to receive(:owners).and_return([staff_and_owner])
+        allow(employer).to receive(:staff_roles).and_return([staff])
         render :template => "events/employers/updated", :locals => { :employer => employer }
       end
 
-      it "does not included the contact person twice" do
+      it "should be included in xml" do
         expect(rendered).to have_selector('contact', count: 1)
       end
     end

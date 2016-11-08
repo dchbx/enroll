@@ -530,6 +530,10 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           it "should have linked the family" do
             expect(CensusEmployee.find(census_employee.id).employee_role).to eq @employee_role
           end
+
+          it "should have work email" do
+            expect(@employee_role.person.work_email.address).to eq @employee_role.census_employee.email_address
+          end
         end
       end
     end

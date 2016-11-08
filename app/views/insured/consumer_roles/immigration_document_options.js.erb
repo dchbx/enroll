@@ -29,6 +29,8 @@
   <% partial_target = "insured/consumer_roles/unexpired_foreign_passport_fields" %>
 <% when "immigration_DS_2019_fields_container" %>
   <% partial_target = "insured/consumer_roles/ds_2019_fields" %>
+<%else%>
+  <% partial_target = "insured/consumer_roles/i_94_fields" %>
 <% end %>
 
 <% if @target.present? %>

@@ -16,6 +16,7 @@
         <th>Employee?</th>
         <th></th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -26,8 +27,10 @@
       <tr id="family_<%= family.id %>">
         <td >
           <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id) %> <br/>
-          <%= link_to 'Paper', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper') %>
-          <%= link_to 'Phone', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'phone') %>
+          <%= pundit_span Family, :updateable? %>
+            <%= link_to 'Paper', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper') %>
+            <%= link_to 'Phone', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'phone') %>
+          </span>
         </td>
         <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
         <td><%= format_date(pp.dob) %></td>
@@ -39,12 +42,19 @@
         <td class='unblock'>
           <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
         </td>
+        <td>
+          <%= link_to 'Edit DOB/SSN', edit_dob_ssn_path(id: family.primary_applicant.person.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-default btn-xs" + pundit_class(Family, :can_update_ssn?) , remote: true%>
+        </td>
         <% if (pp.user.present? || pp.emails.present?) && current_user.person.hbx_staff_role %>
-          <td><%= link_to 'Send Secure Message'.html_safe,
-               new_insured_inbox_path(id: family.primary_applicant.person.id,
-                profile_id: current_user.person.hbx_staff_role.hbx_profile.id,
-               to: family.primary_applicant.person.last_name + ', ' + family.primary_applicant.person.first_name),
-            class: "btn btn-default btn-sm", remote: true %></td>
+          <td>
+              <%= pundit_span  Family, :updateable? %>
+                <%= link_to 'Send Secure Message'.html_safe,
+                  new_insured_inbox_path(id: family.primary_applicant.person.id,
+                  profile_id: current_user.person.hbx_staff_role.hbx_profile.id,
+                  to: family.primary_applicant.person.last_name + ', ' + family.primary_applicant.person.first_name),
+                  class: "btn btn-default btn-sm", remote: true %>
+              </span>
+          </td>
         <% end %>
       </tr>
       <% end %>

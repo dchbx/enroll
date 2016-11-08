@@ -8,12 +8,6 @@ namespace :migrations do
     if employer_profile.blank?
       raise 'unable to find employer'
     end
-    
-    employer_profile.census_employees.each do |census_employee|    
-      census_employee.aasm_state = "eligible" if census_employee.aasm_state = "employee_role_linked"    
-      census_employee.save    
-      puts "De-linking #{census_employee}"    
-    end
 
     puts "Processing #{employer_profile.legal_name}"
     organizations = Organization.where(fein: args[:fein])

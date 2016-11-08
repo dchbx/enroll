@@ -1,5 +1,10 @@
 @import "variables";
 
+body {
+  opacity: 0;
+  display: none;
+}
+
 .navbar {
   margin-bottom: 0;
   background-color: $primary-button-text;
@@ -428,4 +433,21 @@ textarea.form-control {
 b,
 strong {
   font-weight: $primary-bold;
+}
+
+.popover-title {
+  padding: 8px 14px;
+  margin: 0;
+  font-size: 14px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0;
+  color: $primary-black;
+}
+.manual {
+  + .tooltip {
+    .tooltip-inner {
+      white-space: nowrap;
+    }
+  }
 }

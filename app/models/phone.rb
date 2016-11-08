@@ -19,6 +19,8 @@ class Phone
 
   before_validation :save_phone_components
 
+  before_save :set_full_phone_number
+
   validates :area_code,
     numericality: true,
     length: { minimum: 3, maximum: 3, message: "%{value} is not a valid area code" },
@@ -78,6 +80,10 @@ class Phone
     else
       full_number.to_s(:phone, area_code: true)
     end
+  end
+
+  def set_full_phone_number
+    self.full_phone_number = to_s
   end
 
 private

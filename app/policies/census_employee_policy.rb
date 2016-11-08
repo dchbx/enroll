@@ -1,4 +1,5 @@
 class CensusEmployeePolicy < ApplicationPolicy
+#TODOJF JULY 1 review this 
   def update?
     if @user.has_role? :hbx_staff
       true

@@ -8,7 +8,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     let(:benefit_group){ FactoryGirl.build(:benefit_group) }
     let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
     let(:carrier_profile) { double(legal_name: "carefirst")}
-
+    
     before :each do
       @person = employee_role.person
       @plan = plan
@@ -18,6 +18,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       allow(@enrollment).to receive(:employee_role).and_return(true)
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
+      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
       render :template => "insured/plan_shoppings/thankyou.html.erb"
     end
 
@@ -46,6 +47,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       @reference_plan = @benefit_group.reference_plan
       @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
+      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
     end
 
     it 'should display the correct plan selection text' do

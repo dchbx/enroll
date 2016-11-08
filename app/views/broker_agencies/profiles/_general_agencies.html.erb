@@ -2,7 +2,9 @@
   <div class="row">
     <div class="col-md-12">
       <h3 class="title-inline">General Agencies</h3>
-      <%= link_to 'Clear Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: 'btn btn-min pull-right' %>
+      <%=pundit_span HbxProfile, :modify_admin_tabs? %>
+        <%= link_to 'Clear Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
+      </span>  
     </div>
     <div class="col-md-12">
       <% if @notice.present? %>
@@ -52,7 +54,9 @@
               <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
                 <div class="ga_status">Default GA</div>
               <% else %>
-                <%= link_to 'Select Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+                <%= pundit_span HbxProfile, :modify_admin_tabs? %>
+                  <%= link_to 'Select Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+                </span>
               <% end %>
             </td>
           </tbody>

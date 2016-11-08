@@ -1,4 +1,6 @@
 $(document).on 'click', 'form .add_fields', (event) ->
+  if $(this).closest('.census-employee').length || $(this).closest('.census-employee-add').length
+    $('.add-dependent-text').hide();
   event.preventDefault()
   time = new Date().getTime()
   regexp = new RegExp($(this).data('id'), 'g')
@@ -122,16 +124,27 @@ $(document).on 'click', 'form .add_fields', (event) ->
       $(this).attr 'href', url + '&start_on=' + start_on
   return
 
-
-
 $(document).on 'click', 'form .remove_fields', (event) ->
-  $(this).closest('fieldset').remove()
+  if $('.dependent_info').length == 1
+    $('.census-employee-dependents').prev().text('0 Dependents')
+    if $(this).closest('.module').closest('.row').find('.add-dependent-text').length
+      $('.census-employee-dependents').prev().find('.add-dependent-text').show()
+      $('.add-dependent-text').show()
+    else
+      if $('.add-dependent-text').length
+      else
+      $('.census-employee-dependents').prev().after('<h4 class="add-dependent-text">Click "Add Dependent" to add a dependent</h4>')
+      $(this).closest('.module').closest('.row').find('.add-dependent-text, .form-inputs:first').wrapAll('<div class="vertically-aligned-row"></div>');
+    $(this).closest('fieldset').closest('.module').remove()
+  else
+    $(this).closest('.census-employee-dependents').remove()
+    $(this).closest('fieldset').remove()
   event.preventDefault()
 
 $(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
   $('.benefit-group-fields:last').remove()
   event.preventDefault()
-  if $('.benefit-group-fields').length == 1 || $('.benefit-group-fields').length == $('#plan_year').data('benefit-group-count') 
+  if $('.benefit-group-fields').length == 1 || $('.benefit-group-fields').length == $('#plan_year').data('benefit-group-count')
     $('.remove_fields').hide();
   if window.location.href.indexOf('edit') > -1 and window.location.href.indexOf('plan_years') > -1
     EmployerProfile.validateEditPlanYear
@@ -147,3 +160,8 @@ $(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
       delete_button.hide()
     else
       delete_button.show()
+
+$(document).on 'click', 'form .add_fields', (event) ->
+  if $(this).closest('.census-employee').length || $(this).closest('.census-employee-add').length
+    $('.remove_fields').show();
+    Freebies.floatlabels();

@@ -12,6 +12,7 @@ RSpec.describe "insured/plan_shoppings/print_waiver.html.erb" do
 
   before :each do
     assign :hbx_enrollment, hbx_enrollment
+    allow(view).to receive(:policy_helper).and_return(double('Family', updateable?: true))
     render file: "insured/plan_shoppings/print_waiver.html.erb"
   end
 

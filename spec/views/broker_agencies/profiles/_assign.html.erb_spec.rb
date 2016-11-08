@@ -8,6 +8,7 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
     assign :employers, Kaminari.paginate_array(EmployerProfile.all).page(0)
     assign :broker_agency_profile, broker_agency_profile
     assign :general_agency_profiles, [general_agency_profile]
+    allow(view).to receive(:policy_helper).and_return(double("Policy", modify_admin_tabs?: true))
     render template: "broker_agencies/profiles/_assign.html.erb"
   end
 

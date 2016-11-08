@@ -1,7 +1,7 @@
 <% content_for :horizontal_status do %>
   <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
-<div class="container">
+<div class="container <%=pundit_class Family, :updateable?%>">
   <div class="row">
     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
       <h1 class="darkblue">Authorization and Consent</h1>

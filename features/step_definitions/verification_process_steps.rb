@@ -27,7 +27,7 @@ Given(/^I upload the file as vlp document$/) do
   script = "$('[name=\"file[]\"]').css({opacity: 100, display: 'block'});"
   page.evaluate_script(script)
   within('div.Number') do
-    attach_file('file[]', Rails.root.join('app', 'assets', 'images', 'logo', 'carefirst.jpg'))
+    attach_file('file[]', Rails.root.join('app', 'assets', 'images', 'logo', 'carrier' ,'carefirst.jpg'))
   end
 end
 

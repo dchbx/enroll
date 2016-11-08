@@ -25,6 +25,7 @@
 //= require floatlabels
 //= require jq_datepicker
 //= require date
+//= require formhelpers
 //= require insured
 //= require qle
 //= require modal_actions
@@ -44,6 +45,7 @@
 //= require_tree .
 
 $(document).on('ready page:load', function () {
+	Freebies.fadeElement($("body"));
 	Freebies.allFreebies();
 	Responsive.setSizeListeners();
 });
@@ -195,7 +197,7 @@ $(document).ready(function () {
   });
 
   // details toggler
-  $('.details').toggleClick(function () {
+  $('.benefitgroup .details').toggleClick(function () {
     $(this).closest('.referenceplan').find('.plan-details').slideDown();
     $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
   }, function () {

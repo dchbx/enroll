@@ -1,5 +1,249 @@
 @import "variables";
 .module {
+  &.hbx-panel {
+    &.employer-my-plan-year {
+      table {
+        width: 100%;
+        tr {
+          width: 100%;
+          &:last-of-type {
+            td {
+              &:last-of-type {
+                h3 {
+                  color: #69a30d;
+                  font-weight: bold;
+                  font-size: 14px;
+                }
+              }
+            }
+          }
+          td {
+              header {
+                text-transform: uppercase;
+                color: #9b9b9b;
+                font-size: 12px;
+              }
+            &:last-of-type {
+              h3 {
+                font-size: 22px;
+                color: #9b9b9b;
+                font-weight: semibold;
+              }
+            }
+            * {
+              margin: 0;
+              padding: 0;
+            }
+          }
+        }
+      }
+    }
+    &.employer-benefit-groups {
+      .health {
+        padding-top: 3.75%;
+      }
+      table {
+        width: 100%;
+        margin-top: 10px;
+        &.benefit-group {
+          table-layout: fixed;
+        }
+        td {
+          vertical-align: top;
+          padding-right: 2.5%;
+          padding-bottom: 1.25%;
+        }
+        tr {
+          width: 100%;
+          &:last-of-type {
+            td {
+              &:last-of-type {
+                h3 {
+                  color: #69a30d;
+                  font-weight: bold;
+                  font-size: 14px;
+                }
+              }
+            }
+          }
+          td, th {
+              header {
+                font-weight: normal;
+                text-transform: uppercase;
+                color: #9b9b9b;
+                font-size: 12px;
+              }
+            &:last-of-type {
+              h3 {
+                font-size: 22px;
+                color: #9b9b9b;
+                font-weight: semibold;
+              }
+            }
+            * {
+              margin: 0;
+              padding: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.census-employee-add {
+  .module {
+    &.census-employee-dependents {
+      .panel-body {
+        padding: 0;
+        .row-form-wrapper:first-of-type {
+          border-top: 0;
+        }
+        .row-form-wrapper:last-of-type {
+          border-bottom: 0;
+        }
+        * {
+          border-left: 0;
+          border-right: 0;
+        }
+      }
+    }
+    &.census-employee-fields {
+      .row-form-wrapper:first-of-type {
+        border-top: 0;
+      }
+    }
+  }
+}
+.census-employee {
+  .injected-edit-status {
+    display: none;
+  }
+  .vertically-aligned-row:first-of-type {
+    .vertically-aligned-row {
+      h4, h5 {
+        display: inline;
+      }
+    }
+  }
+  .census-employee-aasm {
+    font-size: 100%;
+    .fa {
+      cursor: pointer;
+    }
+  }
+  .module {
+    .panel-body {
+      border: 0;
+      .row-form-wrapper {
+        border-left: 0;
+        border-right: 0;
+      }
+      .row-form-wrapper:last-of-type {
+      }
+      .row-form-wrapper:first-of-type, #email_info {
+        border-top: 0;
+      }
+    }
+    &.census-employee-details {
+      .panel-body {
+        padding: 0;
+      }
+      .panel-heading {
+        background-image: none;
+        background-color: transparent;
+        .panel-title {
+          color: $primary-blue;
+        }
+      }
+    }
+    &.census-employee-fields {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper {
+        border-bottom: 0;
+      }
+    }
+    &.census-employee-address {
+      .panel-body {
+        padding: 0;
+      }
+      .address {
+        .row-form-wrapper:first-of-type {
+          display: none;
+        }
+        .row-form-wrapper:last-of-type {
+          border-bottom: none;
+        }
+      }
+    }
+    &.census-employee-email {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper:last-of-type {
+        border-bottom: none;
+      }
+    }
+    &.census-employee-dependents {
+      .panel-body {
+        padding: 0;
+      }
+      .row-form-wrapper:last-of-type {
+        border-bottom: none;
+      }
+    }
+    &.hbx-enrollment-panel {
+      .panel-body {
+        padding-bottom: 15px;
+      }
+      .panel-footer {
+        padding-bottom: 15px;
+        a {
+          padding: 3%;
+        }
+      }
+    }
+  }
+  .form-inputs {
+    display: block;
+    .add_fields {
+      float: right;
+    }
+    .btn-default.return_to_employee_roster {
+      display: none;
+    }
+    span {
+      clear: both;
+    }
+  }
+}
+.module {
+  &.change-employee-status  {
+    .form-control, h4 {
+      display: inline-block;
+    }
+    .form-control {
+      width: 50%;
+      margin-left: 2.5%;
+    }
+    .btn-primary {
+      width: 100%;
+    }
+  }
+  &.broker {
+    .panel-body, .panel-footer {
+      .fa {
+        color: $primary-blue;
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        > * {
+          vertical-align: top;
+        }
+      }
+    }
+  }
   &.home-tab {
     .plan-details {
       border-top: none !important;

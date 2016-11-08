@@ -8,7 +8,7 @@
 	<%= verification_due_date(outstanding_verification_family) %>
 
 
-	<%= link_to extend_due_date_documents_path(:family_id => outstanding_verification_family.id), method: :put, data: { confirm: "Verification due date will be extended." } do %>
+	<%= link_to extend_due_date_documents_path(:family_id => outstanding_verification_family.id), method: :put, data: { confirm: "Verification due date will be extended." }, class: "#{pundit_class(Family, :updateable?)}" do %>
 
 		<br><i class="fa fa-clock-o"></i>&nbsp;extend
 	<% end %>

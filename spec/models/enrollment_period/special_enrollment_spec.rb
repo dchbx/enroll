@@ -172,10 +172,6 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
       let(:qle_start_on_date)   { lapsed_qle_on_date }
       let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
 
-      before do
-        ivl_qle_sep.qle_on = qle_on_date
-      end
-
       # it "Special Enrollment Period should be active" do
       #   expect(ivl_qle_sep.is_active?).to be_truthy
       # end
@@ -184,6 +180,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
         let(:fifteenth_of_month_rule_date)  { qle_on_date.next_month.end_of_month + 1.day }
         before do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
+          ivl_qle_sep.qle_on = qle_on_date
           ivl_qle_sep.effective_on_kind = "first_of_month"
         end
         after do
@@ -214,7 +211,10 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
       context "and 'effective on kind' is 'first of next month'" do
         let(:first_of_next_month_date)  { today.end_of_month + 1.day }
-        before { ivl_qle_sep.effective_on_kind = "first_of_next_month" }
+        before do
+          ivl_qle_sep.effective_on_kind = "first_of_next_month"
+          ivl_qle_sep.qle_on = qle_on_date
+        end
 
         it "the effective date should be first of month immediately following current date" do
           expect(ivl_qle_sep.effective_on).to eq first_of_next_month_date

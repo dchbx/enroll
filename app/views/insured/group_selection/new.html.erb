@@ -34,7 +34,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.benefit_group.is_offering_dental? %>
+              <% if @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -66,7 +66,7 @@
                 <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
                   <div class="n-radio-row">
                     <label class="n-radio" for="market_kind_<%= kind %>">
-                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio" %>
+                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: (@market_kind == kind), disabled: (@disable_market_kind == kind) %>
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>
@@ -103,7 +103,7 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.benefit_group.is_offering_dental? %>">
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.is_dental_offered? %>">
                   <label class="n-radio" for="coverage_kind_dental">
                     <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
@@ -136,17 +136,18 @@
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <br/>
             <h3>What would you like to do?</h3>
-            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg' %>
+            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
-              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-primary btn-br' if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
+              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), 
+              class: ('btn btn-primary ' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->
             <!--<p class="text-justify"><%= t('welcome.employee.select_plan') %></p>-->
           <% end %>
           <br/>
-          <br/>
+        <br/>
           <%= link_to "Back to my account", family_account_path, class: 'btn btn-default btn btn-lg' %>
         </div>
 
@@ -202,7 +203,7 @@ function setGroupSelectionHandlers(){
   <% end %>
 
   $('#market_kind_shop').on('change', function() {
-    <% if !@employee_role.benefit_group.is_offering_dental? %>
+    <% if !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
       $('#dental-radio-button').slideUp();
     <% end %>
     $('#shop-coverage-household').show();
@@ -226,7 +227,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.benefit_group.is_offering_dental? %>
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();
@@ -242,6 +243,17 @@ function setGroupSelectionHandlers(){
     $('#shop-coverage-household .health input').removeProp('checked');
   });
 <% end %>
+
+$("input[type='checkbox']").change(function() {
+  if ($("#coverage_kind_health").is(":checked")){
+    if($(this).is(":checked")) {
+      $(this).attr( "checked", true );
+    }else{
+      $(this).removeProp('checked');
+      $('#shop-coverage-household .dental input').removeProp('checked');
+      }
+    }
+});
 }
 
 $(document).ready(function() {

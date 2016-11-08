@@ -44,6 +44,20 @@ describe Phone, type: :model do
     end
   end
 
+  context "set_full_phone_number" do
+    let(:params) {{kind: "home", number: "111-3333", area_code: "123", person: person}}
+    let(:phone) {Phone.create(**params)}
+
+    it "should return full phone number" do
+      expect(phone.set_full_phone_number).to eq "(123) 111-3333"
+    end
+
+    it "return full phone number with extension when extension present" do
+      phone.extension = "876"
+      expect(phone.set_full_phone_number).to eq "(123) 111-3333 x 876"
+    end
+  end
+
   context "kind" do
     it "invalid with null value" do
       expect(Phone.create(kind: "").errors[:kind].any?).to eq true

@@ -1,3 +1,41 @@
+var QLE = ( function( window, undefined ) {
+  function initialize() {
+    $(document).on('change', 'input[type=radio][name=reason]', function() {
+      if($(this).attr('id') == 'reason_accept2')
+        $('[for="reason_accept2"]').find('span:last').popover('toggle');
+    });
+  }
+
+  function qle_question(url){
+    $.ajax({
+      type: "GET",
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      url: "/insured/families/" + url
+    });
+  }
+
+  function check_qle_reason() {
+    switch ($('.qle-label').html()){
+      case "Coverage end date":
+        QLE.qle_question("check_insurance_reason.js");
+        test = false;
+        break;
+      case "Date of move":
+        QLE.qle_question("check_move_reason.js");
+        test = false;
+        break;
+      default:
+        test = true;
+    }
+    return test;
+  }
+    return {
+      initialize : initialize,
+      check_qle_reason : check_qle_reason,
+      qle_question : qle_question
+    };
+} )( window );
+
 $(function () {
 	function check_qle_date() {
 		var date_value = $('#qle_date').val();
@@ -10,7 +48,6 @@ $(function () {
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
-
     var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
@@ -18,7 +55,7 @@ $(function () {
   function get_qle_date() {
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
       url: "/insured/families/check_qle_date.js"
     });
   }
@@ -28,7 +65,6 @@ $(function () {
     var splitedate = cdate.split('/');
     var cur_date = new Date(splitedate[2], splitedate[0]-1, splitedate[1]);
     var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
-
     var post_days = (idays - post_event_sep_in_days);
     var pre_days = (pre_event_sep_in_days + idays);
     if (post_days >= 0){
@@ -42,7 +78,6 @@ $(function () {
       var dateMax = pre_days + 'd';
     }
     var cur_qle_title = $('.qle-details-title').html();
-
     $(target).val('');
     $(target).datepicker('destroy');
     $(target).datepicker({
@@ -51,7 +86,7 @@ $(function () {
       dateFormat: 'mm/dd/yy',
       defaultDate: cdate
 		});
-  };
+  }
 
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
@@ -60,7 +95,8 @@ $(function () {
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
-
+    $('#qle_reason .special_qle_reasons').addClass('hidden');
+    $('#qle-date-chose').show();
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
       $('#qle-date-chose').addClass('hidden');
@@ -90,40 +126,53 @@ $(function () {
   });
 
 	/* QLE Date Validator */
-	$(document).on('click', '#qle_submit', function() {
-		if(check_qle_date()) {
-			$('#qle_date').removeClass('input-error');
-			get_qle_date();
-		} else {
-			$('#qle_date').addClass('input-error');
-		}
-	});
+  $(document).on('click', '#qle_submit', function() {
+    if(check_qle_date()) {
+      $('#qle_date').removeClass('input-error');
 
-  /* for Family member */
+      if(QLE.check_qle_reason()){
+        get_qle_date();
+      }
+    } else {
+      $('#qle_date').addClass('input-error');
+    }
+  });
+
+  $(document).on('click', '#qle_submit_reason', function() {
+    if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != 'yes'){
+      get_qle_date();
+    } else {
+      $('#qle_reason').hide();
+      var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact DC Health Link customer service at (855) 532-5465.";
+      $("#qle-details .error-text").html(errorNoticeAction);
+      $('#qle-details .error-info').removeClass('hidden');
+    }
+  });
+
 	$(document).on('click', '#qle_continue_button', function() {
 		$('#qle_flow_info .initial-info').hide();
 		$('#qle_flow_info .qle-info').removeClass('hidden');
-	})
-});
+  });
 
-$(document).on('page:update', function(){
-  if ($('select#effective_on_kind').length > 0){
-    $('form#qle_form').submit(function(e){
-      if ($('select#effective_on_kind').val() == "" || $('select#effective_on_kind').val() == undefined) {
-        $('#qle_effective_on_kind_alert').show();
-        e.preventDefault&&e.preventDefault();
-      } else {
-        $('#qle_effective_on_kind_alert').hide();
-      };
-    });
-  };
-});
+  $(document).on('page:update', function(){
+    if ($('select#effective_on_kind').length > 0){
+      $('form#qle_form').submit(function(e){
+        if ($('select#effective_on_kind').val() == "" || $('select#effective_on_kind').val() == undefined) {
+          $('#qle_effective_on_kind_alert').show();
+          e.preventDefault&&e.preventDefault();
+        } else {
+          $('#qle_effective_on_kind_alert').hide();
+        }
+      });
+    }
+  });
 
-$(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
-  if(this.checked) {
-    $('#outside-open-enrollment').modal('show');
-    $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
-      $("#no_qle_checkbox").attr("checked",false)
-    });
-  }
+  $(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
+    if(this.checked) {
+      $('#outside-open-enrollment').modal('show');
+      $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
+        $("#no_qle_checkbox").attr("checked",false)
+      });
+    }
+  });
 });

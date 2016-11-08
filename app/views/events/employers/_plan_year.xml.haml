@@ -6,6 +6,7 @@
   %pte_count= plan_year.pte_count
   %open_enrollment_start= simple_date_for(plan_year.open_enrollment_start_on)
   %open_enrollment_end= simple_date_for(plan_year.open_enrollment_end_on)
-  %benefit_groups
-    = render :partial => "events/v2/employers/health_and_dental_benefit_group", :collection => plan_year.benefit_groups, as: :benefit_group
+  - if plan_year.benefit_groups.any?
+    %benefit_groups
+      = render :partial => "events/v2/employers/health_and_dental_benefit_group", :collection => plan_year.benefit_groups, as: :benefit_group
   = render :partial => "events/shared/versioned_resource", :object => plan_year

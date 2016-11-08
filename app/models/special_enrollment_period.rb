@@ -30,6 +30,9 @@ class SpecialEnrollmentPeriod
   # Date Enrollment Period ends
   field :end_on, type: Date
 
+  # QLE Answer to specific question
+  field :qle_answer, type: String
+
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
   validate :end_date_follows_start_date
@@ -153,7 +156,7 @@ private
   end
 
   def first_of_month_effective_date
-    if @reference_date.day <= Settings.aca.individual_market.monthly_enrollment_due_on
+    if @reference_date.day <= Setting.individual_market_monthly_enrollment_due_on
     # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
     else

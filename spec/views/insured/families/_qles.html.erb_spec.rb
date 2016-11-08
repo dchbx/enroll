@@ -6,6 +6,7 @@ RSpec.describe "insured/families/_qles.html.erb" do
     10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
     FactoryGirl.create(:qualifying_life_event_kind, tool_tip: "")
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
+    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
     render "insured/families/qles"
   end
 

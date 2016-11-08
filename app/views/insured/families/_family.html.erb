@@ -25,7 +25,7 @@
         <div class="col-md-8">
           <center><strong>You have added/removed a family member to your profile. <br>You may qualify for a special enrollment period.</strong></center>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 <%=pundit_class Family,:updateable?%>">
           <%= button_tag 'Continue', class: 'btn btn-default', id: 'qle_continue_button' %>
         </div>
       </div>
@@ -43,7 +43,7 @@
   </div>
 </div>
 
-<div id="dependent_buttons" class="focus_effect personal-info-row">
+<div id="dependent_buttons" class="focus_effect personal-info-row <%= pundit_class Family, :updateable?%>">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12" id="add-member-btn">
     <%= link_to new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary " do
       '<i class="fa fa-user-plus"></i> Add Member'.html_safe

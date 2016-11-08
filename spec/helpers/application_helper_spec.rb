@@ -10,6 +10,44 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#display_carrier_logo" do
+    let(:plan){ Maybe.new(FactoryGirl.build(:plan)) }
+    let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
+    let(:plan_1){ Maybe.new(FactoryGirl.build(:plan, hios_id: "89789DC0010006-01", carrier_profile: carrier_profile)) }
+
+    it "should return uhic logo" do
+      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/uhic.jpg\" alt=\"Uhic\" />"
+    end
+
+    it "should return non united logo" do
+      expect(helper.display_carrier_logo(plan_1)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
+    end
+  end
+
+  describe "#format_time_display" do
+    let(:timestamp){ Time.now.utc }
+    it "should display the time in proper format" do
+      expect(helper.format_time_display(timestamp)).to eq timestamp.in_time_zone('Eastern Time (US & Canada)')
+    end
+
+    it "should return empty if no timestamp is present" do
+      expect(helper.format_time_display(nil)).to eq ""
+    end
+  end
+
+  describe "#group_xml_transmitted_message" do
+    let(:employer_profile_1){ double("EmployerProfile", xml_transmitted_timestamp: Time.now.utc, legal_name: "example1 llc.") }
+    let(:employer_profile_2){ double("EmployerProfile", xml_transmitted_timestamp: nil, legal_name: "example2 llc.") }
+
+    it "should display re-submit message if xml is being transmitted again" do
+      expect(helper.group_xml_transmitted_message(employer_profile_1)).to eq  "The group xml for employer #{employer_profile_1.legal_name} was transmitted on #{format_time_display(employer_profile_1.xml_transmitted_timestamp)}. Are you sure you want to transmit again?"
+    end
+
+    it "should display first time message if xml is being transmitted first time" do
+      expect(helper.group_xml_transmitted_message(employer_profile_2)).to eq  "Are you sure you want to transmit the group xml for employer #{employer_profile_2.legal_name}?"
+    end
+  end
+
   describe "#display_dental_metal_level" do
     let(:dental_plan_2015){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2015)}
     let(:dental_plan_2016){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2016)}
@@ -21,6 +59,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should display metal level if its a 2016 plan" do
       expect(display_dental_metal_level(dental_plan_2016)).to eq dental_plan_2016.dental_level.titleize
     end
+  end
+
+  describe "#participation_rule" do
+    let(:employer) { FactoryGirl.create(:employer, :with_insured_employees) }
+
+    it "should return correct eligibility criteria" do
+      expect(helper.eligibility_criteria(employer.employer_profile)).to eq "Criteria Met : Yes<br>1. 2/3 Rule Met? : Yes<br>2. Non-Owner exists on the roster for the employer"
+    end
+
   end
 
   describe "#enrollment_progress_bar" do
@@ -255,4 +302,41 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq false
     end
   end
+
+
+
+  describe "find_plan_name", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:shop_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                                        household: family.active_household,
+                                        kind: "employer_sponsored",
+                                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
+                                        created_at: TimeKeeper.datetime_of_record - 3.days
+                                )}
+    let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment,
+                                        household: family.latest_household,
+                                        coverage_kind: "health",
+                                        effective_on: TimeKeeper.datetime_of_record - 10.days,
+                                        enrollment_kind: "open_enrollment",
+                                        kind: "individual",
+                                        submitted_at: TimeKeeper.datetime_of_record - 20.days
+                            )}
+    let(:valid_shop_enrollment_id)  { shop_enrollment.id }
+    let(:valid_ivl_enrollment_id)   { ivl_enrollment.id }
+    let(:invalid_enrollment_id)     {  }
+
+    it "should return the plan name given a valid SHOP enrollment ID" do
+      expect(helper.find_plan_name(valid_shop_enrollment_id)).to eq shop_enrollment.plan.name
+    end
+
+    it "should return the plan name given a valid INDIVIDUAL enrollment ID" do
+      expect(helper.find_plan_name(valid_ivl_enrollment_id)).to eq  ivl_enrollment.plan.name
+    end
+
+    it "should return nil given an invalid enrollment ID" do
+      expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
+    end
+
+  end
+
 end

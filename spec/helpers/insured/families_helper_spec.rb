@@ -45,15 +45,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:health_plan_2016){FactoryGirl.create(:plan_template,:shop_health, active_year: 2016, metal_level: "silver")}
 
     it "should return dental plan with dental_level = high for 2016 plan" do
-      expect(helper.render_plan_type_details(dental_plan_2016)).to eq "<label><span class=\"dental-icon\">High</span></label>"
+      expect(helper.render_plan_type_details(dental_plan_2016)).to eq "<span class=\"dental-icon\">High</span>"
     end
 
     it "should return dental plan with metal_level = dental for 2015 plan" do
-      expect(helper.render_plan_type_details(dental_plan_2015)).to eq "<label><span class=\"dental-icon\">Dental</span></label>"
+      expect(helper.render_plan_type_details(dental_plan_2015)).to eq "<span class=\"dental-icon\">Dental</span>"
     end
 
     it "should return health plan with metal_level = bronze" do
-      expect(helper.render_plan_type_details(health_plan_2016)).to eq "<label><span class=\"silver-icon\">Silver</span></label>"
+      expect(helper.render_plan_type_details(health_plan_2016)).to eq "<span class=\"silver-icon\">Silver</span>"
     end
   end
 
@@ -102,10 +102,21 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   describe "has_writing_agent?" do
     let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:person) { FactoryGirl.build(:person) }
 
-    it "should return false" do
+    it "should return false when employee_role is passwed with out writing_agent" do
       expect(helper.has_writing_agent?(employee_role)).to eq false
     end
+
+    it "should return false when person is passwed with out writing_agent" do
+      expect(helper.has_writing_agent?(person)).to eq false
+    end
+
+    it "should return true when employee_role is passed with out writing_agent" do
+      allow(person).to receive_message_chain(:primary_family,:current_broker_agency,:writing_agent).and_return(true)
+      expect(helper.has_writing_agent?(person)).to eq true
+    end
+
   end
 
   describe "display_aasm_state?" do
@@ -114,8 +125,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
-    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "any_state"]
-    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated"]
+    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "auto_renewing", "any_state"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing"]
 
     context "IVL market" do
       before :each do

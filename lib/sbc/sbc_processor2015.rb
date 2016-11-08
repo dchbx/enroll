@@ -26,9 +26,9 @@ class SbcProcessor2015
       hios_id = row[0].gsub(/\A\p{Space}*|\p{Space}*\z/, '')
 
       if hios_id.include? '-'
-        plans = Plan.where(active_year:'2015').and(hios_id:hios_id)
+        plans = Plan.where(active_year:'2017').and(hios_id:hios_id)
       else
-        plans = Plan.where(active_year:'2015').and(hios_id:/#{hios_id}/)
+        plans = Plan.where(active_year:'2017').and(hios_id:/#{hios_id}/)
       end
 
       plans.each do |plan|

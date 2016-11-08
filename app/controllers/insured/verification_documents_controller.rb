@@ -2,7 +2,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   include ApplicationHelper
 
   before_action :get_family
-
+  before_action :updateable?, only: [:upload]
 
   def upload
     @doc_errors = []
@@ -42,6 +42,10 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   private
+  def updateable?
+    authorize Family, :updateable?
+  end
+
   def get_family
     set_current_person
     @family = @person.primary_family

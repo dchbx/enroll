@@ -8,7 +8,7 @@
         </div>
         <strong>Shop for health and dental plans</strong>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
         <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
           Shop for Plans
         </button>
@@ -42,7 +42,7 @@
                 </div>
                 <strong>Shop for health and dental plans</strong>
               </div>
-              <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+              <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%>">
                 <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
               </div>
             </div>

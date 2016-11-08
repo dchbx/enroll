@@ -4,6 +4,7 @@ When(/^.+ visits the HBX Broker Registration form$/) do
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
+  wait_for_ajax
   expect(page).to have_css("#broker_agency_form")
 end
 
@@ -21,7 +22,8 @@ end
 And(/^.+ enters broker agency information$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
   fill_in 'organization[dba]', with: "Logistics Inc"
-  fill_in 'organization[fein]', with: "890890891"
+  # Auto-Generates FEIN
+  # fill_in 'organization[fein]', with: "890890891"
 
   # this field was hidden 4/13/2016
   # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
@@ -89,7 +91,7 @@ When(/^.+ clicks? on Create Account$/) do
 end
 
 When(/^.+ registers? with valid information$/) do
-  fill_in "user[email]", with: "ricky.martin@example.com"
+  fill_in "user[oim_id]", with: "ricky.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'
@@ -142,6 +144,7 @@ Then(/^.+ confirms? broker selection$/) do
 end
 
 Then(/^.+ should see broker selected successful message$/) do
+  wait_for_ajax(1,0.01)
   expect(page).to have_content("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
 end
 
@@ -152,8 +155,7 @@ end
 
 When(/^.+ terminates broker$/) do
   find('.interaction-click-control-change-broker').click
-  find('.interaction-click-control-change-broker').trigger 'click'
-
+  wait_for_ajax(2,2)
   within '.modal-dialog' do
     click_link 'Terminate Broker'
   end
@@ -191,13 +193,14 @@ Then(/^.* creates and publishes a plan year$/) do
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax(10)
   find('.carriers-tab a').click
-  wait_for_ajax(10)
+  wait_for_ajax(10,2)
   find('.reference-plan label').click
   wait_for_ajax(10)
   find('.interaction-click-control-create-plan-year').trigger('click')
   find('.alert-notice')
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-publish-plan-year').click
+  wait_for_ajax
 end
 
 Then(/^.+ sees employer census family created$/) do
@@ -210,14 +213,14 @@ Then(/^(?:(?!Employee).)+ should see the matched employee record form$/) do
 end
 
 Then(/^Broker Assisted is a family$/) do
-  #sleep 1
+  #
   wait_for_ajax
   find(:xpath, "//li[contains(., 'Families')]/a").click
   expect(page).to have_content('Broker Assisted')
 end
 
 Then(/^.+ goes to the Consumer page$/) do
-  click_link 'Consumer'
+  click_link 'Broker Assisted'
   expect(page).to have_content("My #{Settings.site.short_name}")
 end
 

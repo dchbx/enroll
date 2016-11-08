@@ -27,12 +27,12 @@
           </div>
         </div>
 
-        <div class="row no-buffer">
+        <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
           <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
             <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
               <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
               <br>
-              <div class="form-inline text-center">
+              <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
                 <%= link_to "Add Member", new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
                   &nbsp; &nbsp;
                 <a class="text-center btn btn-success">Continue</a>
@@ -51,7 +51,7 @@
         </div>
 
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
-          <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
             <%= link_to 'Add Member'.html_safe, new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
 
             <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind) %>
@@ -59,9 +59,10 @@
 
             <% if @change_plan.present? %>
               <%=
-                link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_url, class: 'btn btn-primary pull-right', id: 'btn_household_continue'
+                link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_url,
+                 class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue'
               %>
-            <% end %>
+            <% end %> 
           </div>
         </div>
       </div>

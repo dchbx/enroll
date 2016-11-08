@@ -19,7 +19,6 @@ class CorrectNonCitizenStatus < CorrectCitizenStatus
       if citizenship_response
         person.consumer_role.ssn_valid_citizenship_valid!(args(response_doc))
       else
-        @pass_ssn_fail_citizen = @pass_ssn_fail_citizen + 1
         person.consumer_role.ssn_valid_citizenship_invalid!(args(response_doc))
       end
     else
@@ -28,7 +27,6 @@ class CorrectNonCitizenStatus < CorrectCitizenStatus
   end
 
   def migrate
-    @pass_ssn_fail_citizen = 0
     people_to_fix = get_people
     people_to_fix.each do |person|
       begin
@@ -38,9 +36,6 @@ class CorrectNonCitizenStatus < CorrectCitizenStatus
       rescue
         $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}"
       end
-    end
-    if @pass_ssn_fail_citizen > 0
-      $stderr.puts @pass_ssn_fail_citizen
     end
   end
 end

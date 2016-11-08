@@ -1,6 +1,6 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
 
-  before_action :check_access_to_employer_profile
+  before_action :check_access_to_employer_profile,:updateable?
 
   def create
 
@@ -44,6 +44,10 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
   end
 
   private
+
+  def updateable?
+    authorize EmployerProfile, :updateable?
+  end
   # Check to see if current_user is authorized to access the submitted employer profile
   def check_access_to_employer_profile
     employer_profile = EmployerProfile.find(params[:id])

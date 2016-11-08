@@ -1,17 +1,27 @@
 var Freebies = ( function( window, undefined ) {
 
+	function fadeElement(element) {
+		element = element;
+		element.css({
+		    "opacity":"0",
+		    "display":"block",
+		}).show().animate({
+	    opacity: 1
+	  }, 200 )
+		}
+
 	function allFreebies() {
 		  // apply floatlabels
-			$('input.floatlabel').floatlabel({
-			  slideInput: false
-			});
+			floatLabels();
 		  // apply selectric
-		  $("select[multiple!='multiple']").selectric();
+		  selectric();
 			// apply popover
-			$("[data-toggle=popover]").popover();
+			popover();
+			// apply maual popover
+			manualPopover()
 			// apply tooltips
-			$('[data-toggle="tooltip"]').tooltip();
-			// apply datePicker
+			tooltip();
+			// apply datepickers
 			applyJQDatePickers();
   }
 
@@ -22,12 +32,28 @@ var Freebies = ( function( window, undefined ) {
 
 	function tooltip() {
 		// apply tooltips
-		$('[data-toggle="tooltip"]').tooltip();
+		$('[data-toggle="tooltip"]:not(".manual")').tooltip();
+	}
+
+	function manualTooltip() {
+		// apply tooltips
+		$('.manual[data-toggle="tooltip"]').tooltip({
+			trigger: 'manual'
+		}).tooltip('show');
 	}
 
 	function popover() {
 		// apply tooltips
-		$("[data-toggle=popover]").popover();
+		$('[data-toggle=popover]:not(".manual")').popover();
+	}
+
+	function manualPopover(element) {
+		$(".manual[data-toggle=popover]").popover({
+			trigger: 'manual'
+		});
+		if (element != null) {
+			element.popover('show');
+		}
 	}
 
 	function floatLabels() {
@@ -58,12 +84,16 @@ var Freebies = ( function( window, undefined ) {
 	}
 
 	return {
-	    allFreebies : allFreebies,
-			floatlabels : floatLabels,
-			selectric : selectric,
-			disableEnterKey : disableEnterKey,
-			popover : popover,
-			tooltip : tooltip
-	  };
+		manualTooltip: manualTooltip,
+		manualPopover: manualPopover,
+    allFreebies : allFreebies,
+		floatlabels : floatLabels,
+		selectric : selectric,
+		disableEnterKey : disableEnterKey,
+		popover : popover,
+		tooltip : tooltip,
+		datePicker : datePicker,
+		fadeElement: fadeElement
+	};
 
 } )( window );

@@ -7,6 +7,7 @@ describe "exchanges/announcements/_list.html.erb" do
   before :each do
     sign_in user
     assign(:announcements, [announcement])
+    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", modify_admin_tabs?: true))
     render template: "exchanges/announcements/_list.html.erb"
   end
 

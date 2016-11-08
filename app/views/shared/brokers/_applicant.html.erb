@@ -21,35 +21,36 @@
           </a>
       </div>
       <% broker_or_staff_role = @broker_applicant.broker_role.nil? ? @broker_applicant.broker_agency_staff_roles[0] : @broker_applicant.broker_role %>
-
       <%= render partial: "shared/brokers/broker_fields", :locals => {f: f, broker_or_staff_role: broker_or_staff_role} %>
       <br/>
        <div class="row top-row no-border">
         <div class="col-xs-12 text-center broker_approve_deny_btn">
-          <% if @broker_agency_profile.present? %>
-            <% if broker_or_staff_role.may_broker_agency_accept? %>
-              <%= submit_tag 'Accept', class: "btn btn-primary  interaction-click-control-broker-approve" %>
+          <%= pundit_span HbxProfile, :approve_broker? %>
+            <% if @broker_agency_profile.present? %>
+              <% if broker_or_staff_role.may_broker_agency_accept? %>
+                <%= submit_tag 'Accept', class: "btn btn-primary  interaction-click-control-broker-approve" %>
+              <% end %>
+              <% if broker_or_staff_role.may_broker_agency_decline? %>
+                <%= submit_tag 'Decline', name: 'decline', class: "btn btn-primary  interaction-click-control-broker-deny" %>
+              <% end %>
+              <% if broker_or_staff_role.may_broker_agency_terminate? %>
+                <%= submit_tag 'Terminate', name: 'terminate', class: "btn btn-primary  interaction-click-control-broker-decertify" %>
+              <% end %>
+            <% else %>
+              <% if broker_or_staff_role.may_approve? || (broker_or_staff_role.may_broker_agency_accept? && broker_or_staff_role.is_primary_broker?) %>
+                <%= submit_tag 'Approve', class: "btn btn-primary interaction-click-control-broker-approve" %>
+              <% end %>
+              <% if broker_or_staff_role.may_pending? %>
+                <%= submit_tag 'Pending', name: 'pending', class: "btn btn-primary interaction-click-control-broker-pending" %>
+              <% end %>
+              <% if broker_or_staff_role.may_broker_agency_decline? %>
+                <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary interaction-click-control-broker-deny" %>
+              <% end %>
+              <% if broker_or_staff_role.may_decertify? %>
+                <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary  interaction-click-control-broker-decertify" %>
+              <% end %>
             <% end %>
-            <% if broker_or_staff_role.may_broker_agency_decline? %>
-              <%= submit_tag 'Decline', name: 'decline', class: "btn btn-primary  interaction-click-control-broker-deny" %>
-            <% end %>
-            <% if broker_or_staff_role.may_broker_agency_terminate? %>
-              <%= submit_tag 'Terminate', name: 'terminate', class: "btn btn-primary  interaction-click-control-broker-decertify" %>
-            <% end %>
-          <% else %>
-            <% if broker_or_staff_role.may_approve? || (broker_or_staff_role.may_broker_agency_accept? && broker_or_staff_role.is_primary_broker?) %>
-              <%= submit_tag 'Approve', class: "btn btn-primary interaction-click-control-broker-approve" %>
-            <% end %>
-            <% if broker_or_staff_role.may_pending? %>
-              <%= submit_tag 'Pending', name: 'pending', class: "btn btn-primary interaction-click-control-broker-pending" %>
-            <% end %>
-            <% if broker_or_staff_role.may_broker_agency_decline? %>
-              <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary interaction-click-control-broker-deny" %>
-            <% end %>
-            <% if broker_or_staff_role.may_decertify? %>
-              <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary  interaction-click-control-broker-decertify" %>
-            <% end %>
-          <% end %>
+          </span>
         </div>
       </div>
       </div>

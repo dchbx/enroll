@@ -6,6 +6,7 @@ FactoryGirl.define do
     sequence(:last_name) {|n| "Smith#{n}" }
     # name_sfx 'Jr'
     dob "1972-04-04".to_date
+    is_incarcerated false
     is_active true
     gender "male"
 
@@ -53,6 +54,12 @@ FactoryGirl.define do
     trait :with_employer_staff_role do
       after(:create) do |p, evaluator|
         create_list(:employer_staff_role, 1, person: p)
+      end
+    end
+
+    trait :with_general_agency_staff_role do
+      after(:create) do |p, evaluator|
+        create_list(:general_agency_staff_role, 1, person: p)
       end
     end
 

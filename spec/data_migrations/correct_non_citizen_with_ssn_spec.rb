@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "correct_non_citizen_with_ssn")
 
-shared_examples_for "a determination in the correct states" do |cr_state, ssn_state, lpd_state, cit_result|
+shared_examples_for "determination in the correct states" do |cr_state, ssn_state, lpd_state, cit_result|
   it "has a lawful presence determination status of #{lpd_state}" do
     expect(person.consumer_role.lawful_presence_determination.aasm_state).to eq lpd_state
   end
@@ -146,7 +146,7 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
         person.reload
       end
 
-      it_behaves_like "a determination in the correct states", "fully_verified", "valid", "verification_successful", "non_native_citizen" 
+      it_behaves_like "determination in the correct states", "fully_verified", "valid", "verification_successful", "non_native_citizen"
 
         it "stores transition information from existing response" do
           expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq ssa_response_ssn_true_citizenship_true.received_at
@@ -166,7 +166,7 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
           person.reload
         end
 
-        it_behaves_like "a determination in the correct states", "dhs_pending", "valid", "verification_outstanding", "not_lawfully_present_in_us"
+        it_behaves_like "determination in the correct states", "dhs_pending", "valid", "verification_outstanding", "not_lawfully_present_in_us"
 
         it "stores transition information from existing response" do
           expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq ssa_response_ssn_true_citizenship_false.received_at
@@ -186,7 +186,7 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
         person.reload
       end
       
-      it_behaves_like "a determination in the correct states", "verification_outstanding", "outstanding", "verification_outstanding", "not_lawfully_present_in_us" 
+      it_behaves_like "determination in the correct states", "verification_outstanding", "outstanding", "verification_outstanding", "not_lawfully_present_in_us"
 
       it "stores transition information from existing response" do
         expect(person.consumer_role.lawful_presence_determination.vlp_verified_at).to eq ssa_response_ssn_false.received_at

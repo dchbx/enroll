@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row  <%=pundit_class(Family, :updateable?)%>">
   <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
       <%= hidden_field_tag 'family_member', member.id  %>
       <%= hidden_field_tag 'verification_type', v_type  %>

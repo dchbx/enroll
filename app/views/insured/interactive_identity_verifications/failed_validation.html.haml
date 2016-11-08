@@ -12,7 +12,7 @@
       - else
         %h4= t('insured.interactive_identity_verifications.failed_validation.contact_information', :ref_number => @verification_response.transaction_id)
 
-      %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_response.transaction_id), :method => :put, :class => "btn btn-primary  btn-small interaction-click-control-override-identity-verification")
+      %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_response.transaction_id), :method => :put, :class => "btn btn-primary  btn-small interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))
       %br
       .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
         Help me sign up

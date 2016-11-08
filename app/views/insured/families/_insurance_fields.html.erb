@@ -1,0 +1,24 @@
+<div class="special_qle_reasons hidden">
+  <h4> Is your other health coverage ending because you did not pay your premiums on time? </h4> <br/> 
+  <div class = 'moving_radio_btn'>
+    <div class="n-radio-group">
+      <div class="n-radio-row">
+    	  <label class="n-radio vertically-aligned-row" for="reason_accept">
+    	    <%= radio_button_tag :reason, "yes",  true, id: 'reason_accept', class: "n-radio" %>
+    	    <span class = "n-radio"></span>
+    	      yes
+    	  </label>
+      </div>
+      <div class="n-radio-row">
+        <label class="n-radio" for="reason_accept1">
+        <%= radio_button_tag :reason, "no", false, id: 'reason_accept1', class: "n-radio" %>
+        <span class="n-radio"></span>
+          no
+        </label>
+      </div>
+    </div>
+    <div class="center">
+      <%= link_to 'CONTINUE', 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit_reason' %>
+    </div>
+  </div>
+</div>

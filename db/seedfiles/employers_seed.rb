@@ -46,7 +46,7 @@ hbx_inbox.post_message(admin_message)
 hbx_inbox.save!
 
 jetson_0 = CensusEmployee.new(
-        last_name: "Jetson", first_name: "George", dob: "04/01/1974", ssn: 987654321, hired_on: "03/20/2015", gender: "male",
+        last_name: "Jetson", first_name: "George", dob: "04/01/1974", ssn: 987654321, hired_on: "20/03/2015", gender: "male",
         email: Email.new(kind: "work", address: "dan.thomas@dc.gov"),
         employer_profile: spacely_employer_profile, is_business_owner: true,
     census_dependents: [
@@ -78,7 +78,7 @@ cogswell_employer_profile = cogswell.create_employer_profile(
   )
 
 jetson_1 = CensusEmployee.new(
-        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, hired_on: "03/23/2015", gender: "male",
+        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, hired_on: "23/03/2015", gender: "male",
         email: Email.new(kind: "work", address: "dan.thomas@dc.gov"),
         employer_profile: cogswell_employer_profile, is_business_owner: false,
       ).save!
@@ -105,7 +105,7 @@ org_1_employer_profile = org_1.create_employer_profile(
   )
 
 org_1_jetson = CensusEmployee.new(
-        last_name: "Doe", first_name: "John", dob: "01/12/1980", ssn: "111222331", hired_on: "03/20/2015", gender: "male",
+        last_name: "Doe", first_name: "John", dob: "01/12/1980", ssn: "111222331", hired_on: "30/03/2015", gender: "male",
         email: Email.new(kind: "work", address: "john.doe@example.com"),
         employer_profile: org_1_employer_profile, is_business_owner: true,
     census_dependents: [
@@ -142,7 +142,7 @@ org_2_employer_profile = org_2.create_employer_profile(
   )
 
 org_2_jetson = CensusEmployee.new(
-      last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015", gender: "female",
+      last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "20/03/2015", gender: "female",
       email: Email.new(kind: "work", address: "patricia.johnson@example.com"),
       employer_profile: org_2_employer_profile, is_business_owner: false,
     census_dependents: [

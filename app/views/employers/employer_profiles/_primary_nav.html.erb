@@ -12,7 +12,7 @@
     <li <%= menu_tab_class(active_tab, "brokers") %>>
       <%= link_to 'Brokers', employers_employer_profile_path(@employer_profile.id, :tab=>'brokers'), "aria-expanded" => "true" %>
     </li>
-    <% if current_user.try(:has_broker_agency_staff_role?) || current_user.try(:has_general_agency_staff_role?) %>
+    <% if display_families_tab(current_user) %>
       <li <%= menu_tab_class(active_tab, "families") %>>
         <%= link_to 'Families', employers_employer_profile_show_profile_path(@employer_profile.id, :tab=>'families'), "aria-expanded" => "true" %>
       </li>
@@ -42,8 +42,9 @@
       <h4><%= @employer_profile.organization.legal_name %></h4>
       <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile', add_staff: 'no') %>
       <br/>
-      <%= link_to 'View Enrollment Reports', employers_premium_statement_path(@employer_profile, :tab=>'profile') %>
-
+      <%= pundit_span @employer_profile, :list_enrollments? %>
+        <%= link_to 'View Enrollment Reports', employers_premium_statement_path(@employer_profile, :tab=>'profile') %>
+      </span>
     </div>
     <div class="panel-body">
       <%= link_to employers_employer_profile_path(@employer_profile.id, :tab=>'employees') do %>

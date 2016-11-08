@@ -1,184 +1,178 @@
 <% if @hbx_enrollment.shopping?%>
 <% else %>
-  <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
-  <br/>
-  <br/>
+<%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
+<br/>
+<br/>
 <% end %>
-
-
 <% if qhp.present? %>
-
-  <div class="row plan module" style="margin-top: 0;">
+<div class="row plan module" style="margin-top: 0;">
+  <div class="col-xs-12">
+    <div class="col-xs-6">
+      <span class="pull-left">
+        <%= display_carrier_logo(Maybe.new(@plan), {width: 180}) %>
+      </span>
+    </div>
+    <div class="col-xs-6">
+      <span class="pull-right">
+        <span style="font-size: 24px;">
+          <% if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.coverage_kind == 'health' %>
+          <%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source, @plan.can_use_aptc?)) %>
+          <% else %>
+          <%= number_to_currency(@plan.total_employee_cost) %>
+          <% end %>
+        </span>
+        <br/>
+        <span class="lg">per month</span>
+      </span>
+    </div>
+    <div class="col-xs-12">
+      <h3 class="text-blue"><%= @plan.name %></h3>
+    </div>
+    <div>
+      <% if @plan.try(:is_standard_plan) %>
+      <div class="col-md-12">
+        <i class="fa fa-bookmark">
+          STANDARD PLAN
+        </i>
+      </div>
+      <% end %>
+    </div>
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-7">
+          <table style="width: 100%; table-layout:fixed;">
+            <tr>
+              <td>
+                <span class="ttu lg twelve">
+                  Type
+                </span>
+                <br/>
+                <span class="ttu dg fourteen">
+                  <%= @plan.plan_type ? @plan.plan_type.upcase : "" %>
+                </span>
+              </td>
+              <td>
+                <span class="ttu lg twelve" style="margin-left: -10px">
+                  Metal Level
+                </span>
+                <br/>
+                <span class="ttu dg fourteen" style="margin-left: -10px">
+                  <%= display_dental_metal_level @plan %>
+                </span>
+              </td>
+              <td>
+                <span class="ttu lg twelve">
+                  Network
+                </span>
+                <br/>
+                <span class="ttu dg fourteen">
+                  <%= @plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                </span>
+              </td>
+              <td>
+                <span class="ttu lg twelve">
+                  <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+                  Family Deductible
+                  <% else %>
+                  Deductible
+                  <% end %>
+                </span>
+                <br/>
+                <span class="ttu dg fourteen">
+                  <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+                  <%= @plan.family_deductible %>
+                  <% else %>
+                  <%= @plan.deductible %>
+                  <% end %>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-xs-5">
+          <div class="pull-right">
+            <% if @hbx_enrollment.shopping?%>
+            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+            <% end %>
+          </div>
+        </div>
+      </div>
       <div class="col-xs-12">
         <div class="row">
-
-          <div class="col-xs-6">
-            <span class="pull-left">
-            <%= display_carrier_logo(@plan.carrier_profile.try(:legal_name), {width: 180}) %>
-          </span>
+          <hr>
+          <div class="col-xs-4">
+            <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
           </div>
-          <div class="col-xs-6">
-            <span class="pull-right">
-              <span style="font-size: 24px;">
-                <% if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.coverage_kind == 'health' %>
-                <%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source, @plan.can_use_aptc?)) %>
-                <% else %>
-                <%= number_to_currency(@plan.total_employee_cost) %>
-                <% end %>
-              </span>
-              <br/><span class="lg">per month</span>
-          </span>
-
-        </div>
-        <div class="col-xs-12">
-          <h3 class="text-blue"><%= @plan.name %></h3>
-        </div>
-
-        <div class="col-xs-12">
-          <div class="row">
-            <div class="col-xs-7">
-              <table style="width: 100%; table-layout:fixed;">
-                <tr>
-                  <td>
-                    <span class="ttu lg twelve">
-                      Type
-                    </span>
-                    <br/>
-                    <span class="ttu dg fourteen">
-                      <%= @plan.plan_type ? @plan.plan_type.upcase : "" %>
-                    </span>
-                  </td>
-                  <td>
-                    <span class="ttu lg twelve">
-                      Metal Level
-                    </span>
-                    <br/>
-                    <span class="ttu dg fourteen">
-                      <%= display_dental_metal_level @plan %>
-                    </span>
-                  </td>
-                  <td>
-                    <span class="ttu lg twelve">
-                      Network
-                    </span>
-                    <br/>
-                    <span class="ttu dg fourteen">
-                      <%= @plan.nationwide ? "Nationwide" : "DC-Metro" %>
-                    </span>
-                  </td>
-                  <td>
-                    <span class="ttu lg twelve">
-                      <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
-                        Family Deductible
-                      <% else %>
-                        Deductible
-                      <% end %>
-                    </span>
-                    <br/>
-                    <span class="ttu dg fourteen">
-                      <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
-
-                      <%= @plan.family_deductible %>
-                      <% else %>
-
-                    <%= @plan.deductible %>
-                      <% end %>
-                    </span>
-                  </td>
-                </tr>
-              </table>
-
-            </div>
-            <div class="col-xs-5">
-              <div class="pull-right">
-              <% if @hbx_enrollment.shopping?%>
-                <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
-              <% end %>
-            </div>
-            </div>
-
+          <div class="col-xs-4">
+            <% if @plan.coverage_kind == "health" && @plan.rx_formulary_url.present? %>
+            <%= link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank" %>
+            <% end %>
           </div>
-          <div class="col-xs-12">
-            <div class="row">
-              <hr>
-              <div class="col-xs-4">
-                <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
-              </div>
-              <div class="col-xs-4">
-                <% if @plan.coverage_kind == "health" && @plan.rx_formulary_url.present? %>
-                  <%= link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank" %>
-                <% end %>
-              </div>
-              <div class="col-xs-4">
-                <% if @plan.nationwide %>
-                  <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
-                <% end %>
-              </div>
-            </div>
+          <div class="col-xs-4">
+            <% if @plan.nationwide %>
+            <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
+            <% end %>
           </div>
         </div>
-
       </div>
     </div>
   </div>
-
-  <div class="col-md-6 col-sm-6 col-xs-12" style="display: none;">
-    <div class="row">
-      <% if @market_kind == "employer_sponsored" && @coverage_kind == 'health' %>
-        <div class="col-md-4 col-sm-4 col-xs-12">
-          <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
-        </div>
-
-        <div class="col-md-4 col-sm-4 col-xs-12">
-          <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3><small>Employer</small>
-        </div>
-      <% end %>
-    </div><br><br>
-
-    <div class="row">
-      <div class="col-md-12 col-sm-12 col-xs-12">
-
-      </div>
-    </div>
+</div>
+</div>
+<div class="col-md-6 col-sm-6 col-xs-12" style="display: none;">
+<div class="row">
+  <% if @market_kind == "employer_sponsored" && @coverage_kind == 'health' %>
+  <div class="col-md-4 col-sm-4 col-xs-12">
+    <h3><%= number_to_currency(@plan.total_premium) %></h3>
+    <small>Premium</small>
   </div>
-  <% if @coverage_kind == "health" %>
-    <div class="details">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th width="30%">SERVICES YOU MAY NEED</th>
-            <th width="40%">YOUR COST AT PARTICIPATING PROVIDER </th>
-            <th width="30%">(IN-NETWORK)</th>
-          </tr>
-          <tr>
-            <th>&nbsp;</th>
-            <th>CO-PAY</th>
-            <th>COINSURANCE</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
-
-          <tr>
-            <td></td>
-            <td colspan="3" class="text-center">
-              <% if @hbx_enrollment.shopping?%>
-                <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
-              <% else %>
-                <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
-              <% end %>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="col-md-4 col-sm-4 col-xs-12">
+    <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3>
+    <small>Employer</small>
+  </div>
   <% end %>
-  <% if @hbx_enrollment.shopping? %>
-    <%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-default all-plans' %>
-    <br/>
-    <br/>
-  <% end %>
+</div><br><br>
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12"></div>
+</div>
+</div>
+<% if @coverage_kind == "health" %>
+<div class="details">
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th width="30%">SERVICES YOU MAY NEED</th>
+      <th width="40%">YOUR COST AT PARTICIPATING PROVIDER
+      </th>
+      <th width="30%">(IN-NETWORK)</th>
+    </tr>
+    <tr>
+      <th>&nbsp;</th>
+      <th>CO-PAY</th>
+      <th>COINSURANCE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
+    <tr>
+      <td></td>
+      <td class="text-center" colspan="3">
+        <% if @hbx_enrollment.shopping?%>
+        <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+        <% else %>
+        <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% if @hbx_enrollment.shopping? %>
+<%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-default all-plans' %>
+<br/>
+<br/>
+<% end %>
 <% else %>
-  No Plan found
+No Plan found
 <% end %>
