@@ -22,7 +22,8 @@ end
 And(/^.+ enters broker agency information$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
   fill_in 'organization[dba]', with: "Logistics Inc"
-  fill_in 'organization[fein]', with: "890890891"
+  # Auto-Generates FEIN
+  # fill_in 'organization[fein]', with: "890890891"
 
   # this field was hidden 4/13/2016
   # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
@@ -219,7 +220,7 @@ Then(/^Broker Assisted is a family$/) do
 end
 
 Then(/^.+ goes to the Consumer page$/) do
-  click_link 'Consumer'
+  click_link 'Broker Assisted'
   expect(page).to have_content("My #{Settings.site.short_name}")
 end
 

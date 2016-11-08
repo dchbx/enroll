@@ -116,13 +116,10 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = ""
     end
     last_day_of_work = termination_date
-    if termination_date.present?
-      @census_employee.terminate_employment(last_day_of_work)
-      if termination_date >= (Date.today-60.days)
-        @fa = @census_employee.save
-      else
-      end
+    if termination_date.present? && termination_date >= (TimeKeeper.date_of_record - 60.days)
+      @fa = @census_employee.terminate_employment(last_day_of_work) && @census_employee.save
 
+    else
     end
     respond_to do |format|
       format.js {
@@ -184,7 +181,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
+    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
         |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
     } if @census_employee.employee_role.present?
