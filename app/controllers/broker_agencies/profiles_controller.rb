@@ -54,12 +54,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
     #@organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
 
     @organization = Organization.find(params[:organization][:id])
-
     @organization_dup = @organization.office_locations.as_json
 
     #clear office_locations, don't worry, we will recreate
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
+    person = @broker_agency_profile.primary_broker_role.person
+    person.update_attributes(person_profile_params)
 
 
 
@@ -291,6 +292,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
         :email_attributes => [:kind, :address]
       ]
     )
+  end
+
+  def person_profile_params
+    params.require(:organization).permit(:first_name, :last_name, :dob)
   end
 
   def sanitize_broker_profile_params

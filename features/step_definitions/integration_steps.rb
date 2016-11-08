@@ -171,7 +171,11 @@ Given(/^Hbx Admin exists$/) do
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
+  #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+  year = (Date.today + 2.months).year
+  year = (Date.today + 2.months).year
+  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
+  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
 end
 
 Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
@@ -409,7 +413,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   screenshot("after modal")
 
   expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
-  wait_for_ajax(3)
+  wait_for_ajax(3,2)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
@@ -420,6 +424,9 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
+  wait_for_ajax
+  fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone] #because why not...
+  expect(page).to have_field("HOME PHONE", with: "(#{person[:home_phone][0..2]}) #{person[:home_phone][3..5]}-#{person[:home_phone][6..9]}") if person[:home_phone].present?
   find("#btn-continue").click
 end
 
@@ -609,6 +616,7 @@ When(/^.+ should see a published success message without employee$/) do
   # TODO: Fix checking for flash messages. We will need to check using
   #       xpath for an element that may not be visible, but has already
   #       been faded away by jQuery.
+  wait_for_ajax
   expect(page).to have_content('You have 0 non-owner employees on your roster')
 end
 

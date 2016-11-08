@@ -45,7 +45,8 @@
         <thead class="thead-default">
           <tr>
             <th>
-              <%= @folder %>: FROM</th>
+              From
+            </th>
             <th>
               Date
             </th>
@@ -57,7 +58,8 @@
         </thead>
         <tbody>
           <% if @employer_profile.inbox && @employer_profile.inbox.messages %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => @employer_profile.inbox.messages.select{|m| @folder.capitalize == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: @employer_profile} %>
+          <% sorted_inbox_messages = @employer_profile.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
+          <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: @employer_profile} %>
           <% end %>
         </tbody>
       </table>

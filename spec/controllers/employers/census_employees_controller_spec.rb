@@ -221,6 +221,49 @@ RSpec.describe Employers::CensusEmployeesController do
     let(:hbx_enrollment) { double }
     let(:hbx_enrollments) { FactoryGirl.build_stubbed(:hbx_enrollment) }
 
+    let(:person) { FactoryGirl.create(:person)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
+    let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+    let(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+    let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:benefit_group_assignment2) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:census_employee1) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
+    let(:current_employer_term_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role1.id,
+                         benefit_group_assignment_id:benefit_group_assignment1.id,
+                         aasm_state: 'coverage_terminated'
+      )
+    end
+    let(:current_employer_active_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role1.id,
+                         benefit_group_assignment_id:benefit_group_assignment1.id,
+                         aasm_state: 'coverage_selected'
+      )
+    end
+    let(:individual_term_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_terminated'
+      )
+    end
+    let(:old_employer_term_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         benefit_group_assignment_id:benefit_group_assignment2.id,
+                         aasm_state: 'coverage_terminated'
+      )
+    end
+
     it "should be render show template" do
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
@@ -230,6 +273,78 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(response).to render_template("show")
+    end
+
+    it "should return employer_sponsored past enrollment matching benefit_group_assignment_id of current employee role " do
+      sign_in
+      allow(CensusEmployee).to receive(:find).and_return(census_employee1)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:all_enrollments).and_return([current_employer_term_enrollment,current_employer_active_enrollment,old_employer_term_enrollment])
+      get :show, :id => census_employee1.id, :employer_profile_id => employer_profile_id
+      expect(response).to render_template("show")
+      expect(assigns(:past_enrollments)).to eq([current_employer_term_enrollment])
+    end
+
+    it "should not return IVL enrollment in past enrollment of current employee role " do
+      sign_in
+      allow(CensusEmployee).to receive(:find).and_return(census_employee1)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:all_enrollments).and_return([current_employer_term_enrollment,individual_term_enrollment,current_employer_active_enrollment])
+      get :show, :id => census_employee1.id, :employer_profile_id => employer_profile_id
+      expect(response).to render_template("show")
+      expect(assigns(:past_enrollments)).to eq([current_employer_term_enrollment])
+    end
+
+    it "enrollment should not be included in past enrollments that doesn't match's current employee benefit_group_assignment_id " do
+      sign_in
+      allow(CensusEmployee).to receive(:find).and_return(census_employee1)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:all_enrollments).and_return([current_employer_term_enrollment,current_employer_active_enrollment,old_employer_term_enrollment])
+      get :show, :id => census_employee1.id, :employer_profile_id => employer_profile_id
+      expect(response).to render_template("show")
+      expect(assigns(:past_enrollments)).to eq([current_employer_term_enrollment])
+    end
+
+    context "for past enrollments" do
+      let(:census_employee) { FactoryGirl.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
+      let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
+      let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
+      let(:person) { FactoryGirl.create(:person, :with_family)}
+      let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first)}
+      let!(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first)}
+
+      it "should not have any past enrollments" do
+        hbx_enrollment.update_attribute(:aasm_state, "coverage_canceled")
+        sign_in
+        allow(CensusEmployee).to receive(:find).and_return(census_employee)
+        get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+        expect(response).to render_template("show")
+        expect(assigns(:past_enrollments)).to eq []
+      end
+
+      it "should have a past non canceled enrollment" do
+        census_employee.benefit_group_assignments << benefit_group_assignment1
+        census_employee.benefit_group_assignments << benefit_group_assignment2
+        hbx_enrollment.update_attributes(aasm_state: "coverage_terminated", benefit_group_assignment_id: benefit_group_assignment1.id)
+        hbx_enrollment_two.update_attributes(aasm_state: "coverage_canceled", benefit_group_assignment_id: benefit_group_assignment2.id)
+        sign_in
+        allow(CensusEmployee).to receive(:find).and_return(census_employee)
+        get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+        expect(response).to render_template("show")
+        expect(assigns(:past_enrollments)).to eq [hbx_enrollment]
+      end
+
+      it "should consider all the enrollments with terminated statuses" do
+        census_employee.benefit_group_assignments << benefit_group_assignment1
+        census_employee.benefit_group_assignments << benefit_group_assignment2
+        hbx_enrollment.update_attributes(aasm_state: "coverage_terminated", benefit_group_assignment_id: benefit_group_assignment1.id)
+        hbx_enrollment_two.update_attributes(aasm_state: "unverified", benefit_group_assignment_id: benefit_group_assignment2.id)
+        sign_in
+        allow(CensusEmployee).to receive(:find).and_return(census_employee)
+        get :show, :id => census_employee.id, :employer_profile_id => employer_profile_id
+        expect(response).to render_template("show")
+        expect((assigns(:past_enrollments)).size).to eq 2
+      end
     end
   end
 
@@ -273,6 +388,14 @@ RSpec.describe Employers::CensusEmployeesController do
       get :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(flash[:notice]).to eq "Successfully terminated Census Employee."
       expect(response).to have_http_status(:success)
+    end
+
+    it "should throw error when census_employee terminate_employment error" do
+      allow(census_employee).to receive(:terminate_employment).and_return(false)
+      xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
+      expect(response).to have_http_status(:success)
+      expect(assigns[:fa]).to eq false
+      expect(flash[:error]).to eq "Census Employee could not be terminated: Termination date must be within the past 60 days."
     end
 
     context "with termination date" do

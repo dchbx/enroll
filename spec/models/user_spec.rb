@@ -194,6 +194,31 @@ RSpec.describe User, :type => :model do
       end
     end
   end
+
+  describe "for password" do
+    context "password_invalid?" do
+      it "with valid password" do
+        expect(User.password_invalid?("XLEY5HGH95moZPJaA1!")).to be_falsy
+      end
+
+      it "with invalid password" do
+        expect(User.password_invalid?("abA12!")).to be_truthy
+        expect(User.password_invalid?("abcdefghijklmnopqst")).to be_truthy
+        expect(User.password_invalid?("123456789abc123456!")).to be_truthy
+        expect(User.password_invalid?("123456789abcdefg567")).to be_truthy
+        expect(User.password_invalid?("XaEYaHaH95maZPJaA1!")).to be_truthy
+      end
+    end
+
+    context "generate_valid_password" do
+      it "should get valid password" do
+        10.times.each do
+          password = User.generate_valid_password
+          expect(User.password_invalid?(password)).to be_falsy
+        end
+      end
+    end
+  end
 end
 
 describe User do
