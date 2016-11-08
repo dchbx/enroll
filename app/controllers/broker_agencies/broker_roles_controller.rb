@@ -95,7 +95,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   def primary_broker_role_params
     params.require(:organization).permit(
       :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba,
-      :fein, :entity_kind, :home_page, :market_kind, :languages_spoken,
+      :fein, :is_fake_fein, :entity_kind, :home_page, :market_kind, :languages_spoken,
       :working_hours, :accept_new_clients,
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
@@ -105,6 +105,8 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def applicant_params
-    params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id, :broker_applicant_type, :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients, :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip])
+    params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id, :broker_applicant_type,
+     :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients, 
+     :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip])
   end
 end

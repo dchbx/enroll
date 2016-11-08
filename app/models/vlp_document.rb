@@ -97,7 +97,7 @@ class VlpDocument < Document
   # document verification status ::VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
   field :status, type: String, default: "not submitted"
 
-  # verification type this document can support: Social Security Number, Citizenship, Immigration status
+  # verification type this document can support: Social Security Number, Citizenship, Immigration status, Native American status
   field :verification_type, default: "Citizenship"
 
   field :comment, type: String

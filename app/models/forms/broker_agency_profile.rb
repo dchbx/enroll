@@ -23,6 +23,12 @@ module Forms
 
     class OrganizationAlreadyMatched < StandardError; end
 
+    def initialize(attrs = {})
+      self.fein = Organization.generate_fein
+      self.is_fake_fein=true
+      super(attrs)
+    end
+
     def self.model_name
       ::BrokerAgencyProfile.model_name
     end
@@ -102,6 +108,7 @@ module Forms
           :fein => fein,
           :legal_name => legal_name,
           :dba => dba,
+          :is_fake_fein => is_fake_fein,
           :broker_agency_profile => ::BrokerAgencyProfile.new({
             :entity_kind => entity_kind,
             :home_page => home_page,

@@ -1,5 +1,6 @@
 And /^Hbx admin should see the link of announcements and click$/ do
   click_link 'Config'
+  wait_for_ajax
   expect(page).to have_content("Announcements")
   click_link 'Announcements'
 end
@@ -102,6 +103,7 @@ end
 When(/^Consumer login$/) do
   visit "/"
   click_link "Consumer/Family Portal"
+  wait_for_ajax
   find('.interaction-click-control-sign-in-existing-account').click
 
   fill_in "user[login]", :with => 'consumer@dc.gov'

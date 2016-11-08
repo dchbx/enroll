@@ -389,7 +389,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_dental_carriers_and_plans
-
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
     @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
@@ -403,8 +402,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def updateable?
     authorize EmployerProfile, :updateable?
-  end  
-
+  end
 
   def build_employee_costs_for_benefit_group
     plan = @benefit_group.reference_plan

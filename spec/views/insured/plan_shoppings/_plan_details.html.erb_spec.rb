@@ -134,9 +134,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to have_css("i.fa-check-square-o")
     end
 
-    it "should match fa-check-square for csr" do
-      expect(rendered).to have_css("i.fa-check-square-o")
-    end
   end
 
 

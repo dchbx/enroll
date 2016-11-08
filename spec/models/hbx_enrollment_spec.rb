@@ -24,35 +24,35 @@ describe HbxEnrollment do
     let(:all_benefit_group_assignments)           { [blue_collar_census_employees, white_collar_census_employees].flat_map do |census_employees|
                                                       census_employees.flat_map(&:benefit_group_assignments)
                                                     end
-                                                  }
+                                                    }
     let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
-                                                      start_on: plan_year_start_on,
-                                                      end_on: plan_year_end_on,
-                                                      open_enrollment_start_on: TimeKeeper.date_of_record,
-                                                      open_enrollment_end_on: TimeKeeper.date_of_record + 5.days,
-                                                      employer_profile: employer_profile
-                                                    )
-                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
-                                                    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
-                                                    py.benefit_groups = [blue, white]
-                                                    py.save
-                                                    py.publish!
-                                                    py
-                                                  }
+                                                                             start_on: plan_year_start_on,
+                                                                             end_on: plan_year_end_on,
+                                                                             open_enrollment_start_on: TimeKeeper.date_of_record,
+                                                                             open_enrollment_end_on: TimeKeeper.date_of_record + 5.days,
+                                                                             employer_profile: employer_profile
+                                                                             )
+                                                     blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                     white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+                                                     py.benefit_groups = [blue, white]
+                                                     py.save
+                                                     py.publish!
+                                                     py
+                                                     }
     let!(:blue_collar_census_employees)            { ees = FactoryGirl.create_list(:census_employee, blue_collar_employee_count, employer_profile: employer_profile)
                                                      ees.each() do |ee|
                                                        ee.benefit_group_assignments = [blue_collar_benefit_group_assignment]
                                                        ee.save
                                                      end
                                                      ees
-                                                    }
+                                                     }
     let!(:white_collar_census_employees)           { ees = FactoryGirl.create_list(:census_employee, white_collar_employee_count, employer_profile: employer_profile)
                                                      ees.each() do |ee|
                                                        ee.benefit_group_assignments = [white_collar_benefit_group_assignment]
                                                        ee.save
                                                      end
                                                      ees
-                                                    }
+                                                     }
 
     it "should have a valid plan year in enrolling state" do
       expect(plan_year.aasm_state).to eq "enrolling"
@@ -67,17 +67,17 @@ describe HbxEnrollment do
       let(:blue_collar_employee_roles) do
         bc_employees = blue_collar_census_employees.collect do |census_employee|
           person = Person.create!(
-                    first_name: census_employee.first_name,
-                    last_name: census_employee.last_name,
-                    ssn: census_employee.ssn,
-                    dob: census_employee.dob,
-                    gender: "male"
-                  )
+            first_name: census_employee.first_name,
+            last_name: census_employee.last_name,
+            ssn: census_employee.ssn,
+            dob: census_employee.dob,
+            gender: "male"
+          )
           employee_role = person.employee_roles.build(
-                    employer_profile: census_employee.employer_profile,
-                    census_employee: census_employee,
-                    hired_on: census_employee.hired_on
-                  )
+            employer_profile: census_employee.employer_profile,
+            census_employee: census_employee,
+            hired_on: census_employee.hired_on
+          )
 
           census_employee.employee_role = employee_role
           census_employee.save!
@@ -89,18 +89,18 @@ describe HbxEnrollment do
       let(:white_collar_employee_roles) do
         wc_employees = white_collar_census_employees.collect do |census_employee|
           person = Person.create!(
-                    first_name: census_employee.first_name,
-                    last_name: census_employee.last_name,
-                    ssn: census_employee.ssn,
-                    # ssn: (census_employee.ssn.to_i + 20).to_s,
-                    dob: census_employee.dob,
-                    gender: "male"
-                  )
+            first_name: census_employee.first_name,
+            last_name: census_employee.last_name,
+            ssn: census_employee.ssn,
+            # ssn: (census_employee.ssn.to_i + 20).to_s,
+            dob: census_employee.dob,
+            gender: "male"
+          )
           employee_role = person.employee_roles.build(
-                    employer_profile: census_employee.employer_profile,
-                    census_employee: census_employee,
-                    hired_on: census_employee.hired_on
-                  )
+            employer_profile: census_employee.employer_profile,
+            census_employee: census_employee,
+            hired_on: census_employee.hired_on
+          )
 
           census_employee.employee_role = employee_role
           census_employee.save!
@@ -141,11 +141,11 @@ describe HbxEnrollment do
           family = blue_collar_families.first
           employee_role = family.primary_family_member.person.employee_roles.first
           enrollment = HbxEnrollment.create_from(
-              employee_role: employee_role,
-              coverage_household: family.households.first.coverage_households.first,
-              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
-              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group,
-            )
+            employee_role: employee_role,
+            coverage_household: family.households.first.coverage_households.first,
+            benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
+            benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group,
+          )
           enrollment.update(effective_on: Date.new(2015, 9, 12))
 
           enrollments = family.households.first.coverage_households.first.household.hbx_enrollments
@@ -159,11 +159,11 @@ describe HbxEnrollment do
           family = blue_collar_families.first
           employee_role = family.primary_family_member.person.employee_roles.first
           election = HbxEnrollment.create_from(
-              employee_role: employee_role,
-              coverage_household: family.households.first.coverage_households.first,
-              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
-              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
-            )
+            employee_role: employee_role,
+            coverage_household: family.households.first.coverage_households.first,
+            benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
+            benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
+          )
           election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
           election.waive_coverage
           election.household.family.save!
@@ -176,11 +176,11 @@ describe HbxEnrollment do
             employee_role = family.primary_family_member.person.employee_roles.first
             benefit_group = employee_role.census_employee.active_benefit_group_assignment.benefit_group
             election = HbxEnrollment.create_from(
-                employee_role: employee_role,
-                coverage_household: family.households.first.coverage_households.first,
-                benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
-                benefit_group: benefit_group
-              )
+              employee_role: employee_role,
+              coverage_household: family.households.first.coverage_households.first,
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
+              benefit_group: benefit_group
+            )
             election.plan = benefit_group.elected_plans.sample
             election.select_coverage if election.can_complete_shopping?
             election.household.family.save!
@@ -212,11 +212,11 @@ describe HbxEnrollment do
             employee_role = family.primary_family_member.person.employee_roles.first
             benefit_group = employee_role.census_employee.active_benefit_group_assignment.benefit_group
             election = HbxEnrollment.create_from(
-                employee_role: employee_role,
-                coverage_household: family.households.first.coverage_households.first,
-                benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
-                benefit_group: benefit_group
-              )
+              employee_role: employee_role,
+              coverage_household: family.households.first.coverage_households.first,
+              benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
+              benefit_group: benefit_group
+            )
             election.plan = benefit_group.elected_plans.sample
             election.select_coverage if election.can_complete_shopping?
             election.household.family.save!
@@ -424,12 +424,12 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(@enrollment4.waiver_reason).to eq "start a new job"
       end
 
-      it "enrollment5 should be inactive" do
-        expect(@enrollment5.aasm_state).to eq "inactive"
+      it "enrollment5 should not be waived" do
+        expect(@enrollment5.aasm_state).to eq "shopping"
       end
 
-      it "enrollment5 should get waiver_reason" do
-        expect(@enrollment5.waiver_reason).to eq "start a new job"
+      it "enrollment5 should not have waiver_reason" do
+        expect(@enrollment5.waiver_reason).to eq nil
       end
     end
 
@@ -459,22 +459,22 @@ describe HbxEnrollment, dbclean: :after_all do
 
     context "find_by_benefit_group_assignments" do
       before :all do
-          enrollment = household.create_hbx_enrollment_from(
-            employee_role: mikes_employee_role,
-            coverage_household: coverage_household,
-            benefit_group: mikes_benefit_group,
-            benefit_group_assignment: @mikes_benefit_group_assignments
-          )
-          enrollment.aasm_state = "auto_renewing"
-          enrollment.is_active = false
-          enrollment.save
+        enrollment = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        enrollment.aasm_state = "auto_renewing"
+        enrollment.is_active = false
+        enrollment.save
       end
 
-    it "should return an auto renewing enrollment if there exists one" do
-      expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).map(&:aasm_state)).to include "auto_renewing"
-    end
+      it "should return an auto renewing enrollment if there exists one" do
+        expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).map(&:aasm_state)).to include "auto_renewing"
+      end
 
-  end
+    end
 
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
@@ -800,11 +800,12 @@ describe HbxProfile, "class methods", type: :model do
 
     it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
       hbx_enrollment1.effective_on = TimeKeeper.date_of_record - 10.days
-
       hbx_enrollment2.select_coverage!
       expect(hbx_enrollment1.coverage_terminated?).to be_truthy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
+      expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
+    
   end
 
   context "can_terminate_coverage?" do
@@ -812,7 +813,7 @@ describe HbxProfile, "class methods", type: :model do
                             kind: 'employer_sponsored',
                             aasm_state: 'coverage_selected',
                             effective_on: TimeKeeper.date_of_record - 10.days
-                          )}
+    )}
     it "should return false when may not terminate_coverage" do
       hbx_enrollment.aasm_state = 'inactive'
       expect(hbx_enrollment.can_terminate_coverage?).to eq false
@@ -835,6 +836,20 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "cancel_coverage!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_coverage!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
 end
 
 describe HbxEnrollment, dbclean: :after_each do
@@ -852,7 +867,7 @@ describe HbxEnrollment, dbclean: :after_each do
       employer_profile: employer_profile,
       hired_on: census_employee.hired_on,
       census_employee_id: census_employee.id
-      )
+    )
   }
 
   let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -864,41 +879,41 @@ describe HbxEnrollment, dbclean: :after_each do
 
 
   let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
-      start_on: plan_year_start_on,
-      end_on: plan_year_end_on,
-      open_enrollment_start_on: open_enrollment_start_on,
-      open_enrollment_end_on: open_enrollment_end_on,
-      employer_profile: employer_profile
-    )
+                                                                           start_on: plan_year_start_on,
+                                                                           end_on: plan_year_end_on,
+                                                                           open_enrollment_start_on: open_enrollment_start_on,
+                                                                           open_enrollment_end_on: open_enrollment_end_on,
+                                                                           employer_profile: employer_profile
+                                                                           )
 
-    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
-    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
-    py.benefit_groups = [blue, white]
-    py.save
-    py.update_attributes({:aasm_state => 'published'})
-    py
-  }
+                                                   blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                   white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+                                                   py.benefit_groups = [blue, white]
+                                                   py.save
+                                                   py.update_attributes({:aasm_state => 'published'})
+                                                   py
+                                                   }
 
 
   let(:benefit_group_assignment) {
     BenefitGroupAssignment.create({
-      census_employee: census_employee,
-      benefit_group: plan_year.benefit_groups.first,
-      start_on: plan_year_start_on
-      })
+                                    census_employee: census_employee,
+                                    benefit_group: plan_year.benefit_groups.first,
+                                    start_on: plan_year_start_on
+    })
   }
 
   let(:shop_enrollment)   { FactoryGirl.build(:hbx_enrollment,
-    household: shop_family.latest_household,
-    coverage_kind: "health",
-    effective_on: effective_date,
-    enrollment_kind: "open_enrollment",
-    kind: "employer_sponsored",
-    submitted_at: effective_date - 10.days,
-    benefit_group_id: plan_year.benefit_groups.first.id,
-    employee_role_id: employee_role.id,
-    benefit_group_assignment_id: benefit_group_assignment.id
-    )}
+                                              household: shop_family.latest_household,
+                                              coverage_kind: "health",
+                                              effective_on: effective_date,
+                                              enrollment_kind: "open_enrollment",
+                                              kind: "employer_sponsored",
+                                              submitted_at: effective_date - 10.days,
+                                              benefit_group_id: plan_year.benefit_groups.first.id,
+                                              employee_role_id: employee_role.id,
+                                              benefit_group_assignment_id: benefit_group_assignment.id
+                                              )}
 
 
   before do
@@ -930,8 +945,8 @@ describe HbxEnrollment, dbclean: :after_each do
 
       let(:special_enrollment_period) {
         special_enrollment = shop_family.special_enrollment_periods.build({
-          qle_on: qle_date,
-          effective_on_kind: "first_of_month",
+                                                                            qle_on: qle_date,
+                                                                            effective_on_kind: "first_of_month",
         })
         special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
         special_enrollment.save!
@@ -1021,42 +1036,42 @@ describe HbxEnrollment, dbclean: :after_each do
 
 
     let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
-                                                      start_on: plan_year_start_on,
-                                                      end_on: plan_year_end_on,
-                                                      open_enrollment_start_on: open_enrollment_start_on,
-                                                      open_enrollment_end_on: open_enrollment_end_on,
-                                                      employer_profile: employer_profile
-                                                    )
+                                                                             start_on: plan_year_start_on,
+                                                                             end_on: plan_year_end_on,
+                                                                             open_enrollment_start_on: open_enrollment_start_on,
+                                                                             open_enrollment_end_on: open_enrollment_end_on,
+                                                                             employer_profile: employer_profile
+                                                                             )
 
-                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
-                                                    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
-                                                    py.benefit_groups = [blue, white]
-                                                    py.save
-                                                    py.update_attributes({:aasm_state => 'published'})
-                                                    py
-                                                  }
+                                                     blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                     white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+                                                     py.benefit_groups = [blue, white]
+                                                     py.save
+                                                     py.update_attributes({:aasm_state => 'published'})
+                                                     py
+                                                     }
 
 
     let(:benefit_group_assignment) {
       BenefitGroupAssignment.create({
-        census_employee: census_employee,
-        benefit_group: plan_year.benefit_groups.first,
-        start_on: plan_year_start_on
+                                      census_employee: census_employee,
+                                      benefit_group: plan_year.benefit_groups.first,
+                                      start_on: plan_year_start_on
       })
     }
 
     let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-                                                    household: shop_family.latest_household,
-                                                    coverage_kind: "health",
-                                                    effective_on: effective_date,
-                                                    enrollment_kind: "open_enrollment",
-                                                    kind: "employer_sponsored",
-                                                    submitted_at: effective_date - 10.days,
-                                                    benefit_group_id: plan_year.benefit_groups.first.id,
-                                                    employee_role_id: employee_role.id,
-                                                    benefit_group_assignment_id: benefit_group_assignment.id
-                                                  )
-                                                }
+                                                 household: shop_family.latest_household,
+                                                 coverage_kind: "health",
+                                                 effective_on: effective_date,
+                                                 enrollment_kind: "open_enrollment",
+                                                 kind: "employer_sponsored",
+                                                 submitted_at: effective_date - 10.days,
+                                                 benefit_group_id: plan_year.benefit_groups.first.id,
+                                                 employee_role_id: employee_role.id,
+                                                 benefit_group_assignment_id: benefit_group_assignment.id
+                                                 )
+                              }
 
     before do
       allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
@@ -1144,23 +1159,23 @@ describe HbxEnrollment, dbclean: :after_each do
 
     context 'with QLE' do
 
-    let(:qle_date) { effective_date + 15.days }
-    let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind)}
-    let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
-    let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
-    let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
-    let(:person) { shop_family.primary_family_member.person }
-    let(:published_plan_year)  { FactoryGirl.build(:plan_year, aasm_state: :published)}
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee: census_employee ) }
-    let(:employee_role_id) { employee_role.id }
-    let(:new_census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
+      let(:qle_date) { effective_date + 15.days }
+      let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind)}
+      let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
+      let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
+      let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
+      let(:person) { shop_family.primary_family_member.person }
+      let(:published_plan_year)  { FactoryGirl.build(:plan_year, aasm_state: :published)}
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+      let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee: census_employee ) }
+      let(:employee_role_id) { employee_role.id }
+      let(:new_census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
 
 
       let(:special_enrollment_period) {
         special_enrollment = shop_family.special_enrollment_periods.build({
-          qle_on: qle_date,
-          effective_on_kind: "first_of_month",
+                                                                            qle_on: qle_date,
+                                                                            effective_on_kind: "first_of_month",
         })
         special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
         special_enrollment.save
@@ -1168,18 +1183,18 @@ describe HbxEnrollment, dbclean: :after_each do
       }
 
       let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-                                                    household: shop_family.latest_household,
-                                                    coverage_kind: "health",
-                                                    effective_on: effective_date,
-                                                    enrollment_kind: "special_enrollment",
-                                                    kind: "employer_sponsored",
-                                                    submitted_at: effective_date - 10.days,
-                                                    benefit_group_id: plan_year.benefit_groups.first.id,
-                                                    employee_role_id: employee_role.id,
-                                                    benefit_group_assignment_id: benefit_group_assignment.id,
-                                                    special_enrollment_period_id: special_enrollment_period.id
-                                                  )
-                                                }
+                                                   household: shop_family.latest_household,
+                                                   coverage_kind: "health",
+                                                   effective_on: effective_date,
+                                                   enrollment_kind: "special_enrollment",
+                                                   kind: "employer_sponsored",
+                                                   submitted_at: effective_date - 10.days,
+                                                   benefit_group_id: plan_year.benefit_groups.first.id,
+                                                   employee_role_id: employee_role.id,
+                                                   benefit_group_assignment_id: benefit_group_assignment.id,
+                                                   special_enrollment_period_id: special_enrollment_period.id
+                                                   )
+                                }
 
       context 'under special enrollment period' do
         before do
@@ -1216,14 +1231,14 @@ context "Benefits are terminated" do
   context "Individual benefit" do
     let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:ivl_enrollment)    { FactoryGirl.create(:hbx_enrollment,
-                                                    household: ivl_family.latest_household,
-                                                    coverage_kind: "health",
-                                                    effective_on: effective_on_date,
-                                                    enrollment_kind: "open_enrollment",
-                                                    kind: "individual",
-                                                    submitted_at: effective_on_date - 10.days
-                                                  )
-                                                }
+                                                 household: ivl_family.latest_household,
+                                                 coverage_kind: "health",
+                                                 effective_on: effective_on_date,
+                                                 enrollment_kind: "open_enrollment",
+                                                 kind: "individual",
+                                                 submitted_at: effective_on_date - 10.days
+                                                 )
+                              }
     let(:ivl_termination_date)  { TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum }
 
     it "should be open enrollment" do
@@ -1248,15 +1263,15 @@ context "Benefits are terminated" do
   context "SHOP benefit" do
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-                                                    household: shop_family.latest_household,
-                                                    coverage_kind: "health",
-                                                    effective_on: effective_on_date,
-                                                    enrollment_kind: "open_enrollment",
-                                                    kind: "employer_sponsored",
-                                                    submitted_at: effective_on_date - 10.days,
-                                                    benefit_group_id: benefit_group.id
-                                                  )
-                                                }
+                                                 household: shop_family.latest_household,
+                                                 coverage_kind: "health",
+                                                 effective_on: effective_on_date,
+                                                 enrollment_kind: "open_enrollment",
+                                                 kind: "employer_sponsored",
+                                                 submitted_at: effective_on_date - 10.days,
+                                                 benefit_group_id: benefit_group.id
+                                                 )
+                              }
 
     let(:shop_termination_date)  { TimeKeeper.date_of_record.end_of_month }
 
@@ -1554,8 +1569,8 @@ describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'" do
 
     before :each do
       allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-        :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
-        :qle_on => qle_on
+                                                                         :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
+                                                                         :qle_on => qle_on
       ))
     end
 
@@ -1606,15 +1621,15 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
       subject.kind = "employer_sponsored"
       subject.submitted_at = purchase_time
       subject.benefit_group_assignment = BenefitGroupAssignment.new({
-        :census_employee => CensusEmployee.new({
-          :hired_on => hired_on
-        })
+                                                                      :census_employee => CensusEmployee.new({
+                                                                                                               :hired_on => hired_on
+                                                                      })
       })
       subject.benefit_group = BenefitGroup.new({
-        :plan_year => PlanYear.new({
-           :open_enrollment_start_on => open_enrollment_start,
-           :open_enrollment_end_on => open_enrollment_end
-        })
+                                                 :plan_year => PlanYear.new({
+                                                                              :open_enrollment_start_on => open_enrollment_start,
+                                                                              :open_enrollment_end_on => open_enrollment_end
+                                                 })
       })
     end
     it "should have an eligibility event date" do
@@ -1646,16 +1661,16 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
       subject.kind = "employer_sponsored"
       subject.submitted_at = purchase_time
       subject.benefit_group_assignment = BenefitGroupAssignment.new({
-        :census_employee => CensusEmployee.new({
-          :hired_on => hired_on
-        })
+                                                                      :census_employee => CensusEmployee.new({
+                                                                                                               :hired_on => hired_on
+                                                                      })
       })
       subject.benefit_group = BenefitGroup.new({
-        :plan_year => PlanYear.new({
-           :open_enrollment_start_on => open_enrollment_start,
-           :open_enrollment_end_on => open_enrollment_end,
-           :start_on => coverage_start
-        })
+                                                 :plan_year => PlanYear.new({
+                                                                              :open_enrollment_start_on => open_enrollment_start,
+                                                                              :open_enrollment_end_on => open_enrollment_end,
+                                                                              :start_on => coverage_start
+                                                 })
       })
     end
 
@@ -1774,7 +1789,7 @@ context "A cancelled external enrollment", :dbclean => :after_each do
                        kind: "employer_sponsored",
                        submitted_at: TimeKeeper.datetime_of_record - 3.day,
                        created_at: TimeKeeper.datetime_of_record - 3.day
-                      )
+                       )
   end
 
   before do
@@ -1959,35 +1974,35 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 
   let!(:enrollment) {
     FactoryGirl.create(:hbx_enrollment,
-      household: family.active_household,
-      coverage_kind: "health",
-      effective_on: current_benefit_group.start_on,
-      enrollment_kind: "open_enrollment",
-      kind: "employer_sponsored",
-      submitted_at: current_benefit_group.start_on - 20.days,
-      benefit_group_id: current_benefit_group.id,
-      employee_role_id: person.active_employee_roles.first.id,
-      benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
-      plan_id: plan.id
-      )
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: current_benefit_group.start_on,
+                       enrollment_kind: "open_enrollment",
+                       kind: "employer_sponsored",
+                       submitted_at: current_benefit_group.start_on - 20.days,
+                       benefit_group_id: current_benefit_group.id,
+                       employee_role_id: person.active_employee_roles.first.id,
+                       benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                       plan_id: plan.id
+                       )
   }
 
   context 'When family has active coverage and makes changes for their coverage' do
 
     let(:new_enrolllment) {
       FactoryGirl.create(:hbx_enrollment,
-        household: family.active_household,
-        coverage_kind: "health",
-        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
-        enrollment_kind: "open_enrollment",
-        kind: "employer_sponsored",
-        submitted_at: TimeKeeper.date_of_record,
-        benefit_group_id: current_benefit_group.id,
-        employee_role_id: person.active_employee_roles.first.id,
-        benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
-        plan_id: plan.id,
-        aasm_state: 'shopping'
-        )
+                         household: family.active_household,
+                         coverage_kind: "health",
+                         effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                         enrollment_kind: "open_enrollment",
+                         kind: "employer_sponsored",
+                         submitted_at: TimeKeeper.date_of_record,
+                         benefit_group_id: current_benefit_group.id,
+                         employee_role_id: person.active_employee_roles.first.id,
+                         benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                         plan_id: plan.id,
+                         aasm_state: 'shopping'
+                         )
     }
 
     it 'should terminate their existing coverage' do
@@ -2024,18 +2039,18 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 
     let(:new_enrollment) {
       FactoryGirl.create(:hbx_enrollment,
-        household: family.active_household,
-        coverage_kind: "health",
-        effective_on: renewing_plan_year.start_on,
-        enrollment_kind: "open_enrollment",
-        kind: "employer_sponsored",
-        submitted_at: TimeKeeper.date_of_record,
-        benefit_group_id: renewal_benefit_group.id,
-        employee_role_id: person.active_employee_roles.first.id,
-        benefit_group_assignment_id: ce.renewal_benefit_group_assignment.id,
-        plan_id: new_plan.id,
-        aasm_state: 'shopping'
-        )
+                         household: family.active_household,
+                         coverage_kind: "health",
+                         effective_on: renewing_plan_year.start_on,
+                         enrollment_kind: "open_enrollment",
+                         kind: "employer_sponsored",
+                         submitted_at: TimeKeeper.date_of_record,
+                         benefit_group_id: renewal_benefit_group.id,
+                         employee_role_id: person.active_employee_roles.first.id,
+                         benefit_group_assignment_id: ce.renewal_benefit_group_assignment.id,
+                         plan_id: new_plan.id,
+                         aasm_state: 'shopping'
+                         )
     }
 
     context 'with same effective date as passive renewal' do
@@ -2069,6 +2084,57 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
         expect(new_enrollment.coverage_selected?).to be_truthy
         expect(passive_renewal.coverage_terminated?).to be_truthy
         expect(passive_renewal.terminated_on).to eq(new_enrollment.effective_on - 1.day)
+      end
+    end
+  end
+end
+
+describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all do
+
+  let!(:hbx_profile)    { FactoryGirl.create(:hbx_profile) }
+  let(:family)          { FactoryGirl.build(:individual_market_family) }
+  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household ) }
+
+  context "Enrollment is in active state" do
+    it "enrollment is in coverage_selected state" do
+      expect(hbx_enrollment.coverage_selected?).to be_truthy
+    end
+
+    context "and the enrollment is invalidated" do
+      it "enrollment should transition to void state" do
+        hbx_enrollment.invalidate_enrollment!
+        expect(HbxEnrollment.find(hbx_enrollment.id).void?).to be_truthy
+      end
+    end
+  end
+
+  context "Enrollment is in terminated state" do
+    before do
+      hbx_enrollment.terminate_benefit(TimeKeeper.date_of_record - 2.months)
+      hbx_enrollment.save!
+    end
+
+    # Although slower, it's essential to read the record from DB, as the in-memory version may differ
+    it "enrollment is in terminated state" do
+      expect(HbxEnrollment.find(hbx_enrollment.id).coverage_terminated?).to be_truthy
+    end
+
+    context "and the enrollment is invalidated" do
+      before do
+        hbx_enrollment.invalidate_enrollment
+        hbx_enrollment.save!
+      end
+
+      it "enrollment should transition to void state" do
+        expect(HbxEnrollment.find(hbx_enrollment.id).void?).to be_truthy
+      end
+
+      it "terminated_on value should be null" do
+        expect(HbxEnrollment.find(hbx_enrollment.id).terminated_on).to be_nil
+      end
+
+      it "terminate_reason value should be null" do
+        expect(HbxEnrollment.find(hbx_enrollment.id).terminate_reason).to be_nil
       end
     end
   end
