@@ -58,11 +58,21 @@ class User
     !persisted? || !password.nil? || !password_confirmation.nil?
   end
 
+  def valid_attribute?(attribute_name)
+    self.valid?
+    self.errors[attribute_name].blank?
+  end
+
+  def self.password_invalid?(password)
+    user = User.new(oim_id: 'example1', password: password)
+    !user.valid_attribute?('password')
+  end
+
   def self.generate_valid_password
     password = Devise.friendly_token.first(16)
     password = password + "aA1!"
     password = password.squeeze
-    if password.length < 8
+    if password_invalid?(password)
       password = generate_valid_password
     else
       password

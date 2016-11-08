@@ -126,6 +126,27 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
   end
 
+  context  'drop down menu at different cases' do
+    it "should have BENEFIT PACKAGE and benefit plan" do
+      render template: "employers/census_employees/show.html.erb"
+      expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
+      expect(rendered).to have_selector('div', text: benefit_group.title)
+    end
+    context "when both ee and er have no benefit group assignment" do
+      #to make sure census_employee.benefit_group_assignments.last
+      let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+      before do
+        # to make sure census_employee.active_benefit_group_assignment = nil
+        allow(census_employee).to receive(:active_benefit_group_assignment).and_return(nil)
+      end
+      it "should only have BENIFIT PACKAGE" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
+        expect(rendered).to_not have_selector('div', text: benefit_group.title)
+      end
+    end
+   end
+
   context 'with no email linked with census employee' do
     let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
     it "should create a blank email record if there was no email for census employees" do

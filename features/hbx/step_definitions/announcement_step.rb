@@ -1,5 +1,6 @@
 And /^Hbx admin should see the link of announcements and click$/ do
   click_link 'Config'
+  wait_for_ajax
   expect(page).to have_content("Announcements")
   click_link 'Announcements'
 end
@@ -26,6 +27,7 @@ When(/^Hbx admin enter announcement info with future date$/) do
 end
 
 Then(/Hbx admin should see the current announcement/) do
+  wait_for_ajax
   expect(page).to have_content('announcement for current')
   expect(page).to have_content('IVL')
 end
@@ -101,6 +103,7 @@ end
 When(/^Consumer login$/) do
   visit "/"
   click_link "Consumer/Family Portal"
+  wait_for_ajax
   find('.interaction-click-control-sign-in-existing-account').click
 
   fill_in "user[login]", :with => 'consumer@dc.gov'

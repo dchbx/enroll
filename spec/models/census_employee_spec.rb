@@ -95,6 +95,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with all required attributes" do
       let(:params)                  { valid_params }
       let(:initial_census_employee) { CensusEmployee.new(**params) }
+      let(:dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
+      let(:dependent2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333, dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
 
       it "should be valid" do
         expect(initial_census_employee.valid?).to be_truthy
@@ -102,6 +104,18 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should save" do
         expect(initial_census_employee.save).to be_truthy
+      end
+      
+      it "allow dependent ssn's to be updated to nil" do
+        initial_census_employee.census_dependents = [dependent]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match(nil)
+      end
+      
+      it "ignores depepent ssn's if ssn not nil" do
+        initial_census_employee.census_dependents = [dependent2]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match("333333333")
       end
 
       context "with duplicate ssn's on dependents" do
@@ -114,15 +128,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "with duplicate blank ssn's on dependents" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
         let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
-
+        
         it "should not have errors" do
           initial_census_employee.census_dependents = [child1,child2]
           expect(initial_census_employee.valid?).to be_truthy
-          expect(initial_census_employee.save).to be_truthy
         end
       end
 
@@ -135,7 +148,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "and it is saved" do
         before { initial_census_employee.save }
 
@@ -1218,6 +1231,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.save).to be_falsey
       expect(census_employee.errors[:hired_on].any?).to be_truthy
       expect(census_employee.errors[:hired_on].to_s).to match /date can't be before  date of birth/
+    end
+  end
+
+  context '.renewal_benefit_group_assignment' do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment_two)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    before do
+      benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
+      benefit_group_assignment_one.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+      benefit_group_assignment_two.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+    end
+
+    it "should select the latest renewal benefit group assignment" do
+      expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
     end
   end
 end

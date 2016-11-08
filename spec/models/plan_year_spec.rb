@@ -332,7 +332,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year_start_on) { Date.new(calender_year, 6, 1) }
     let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
     let(:open_enrollment_end_on) { Date.new(calender_year, 5, 13) }
-    let(:plan_year) { 
+    let(:plan_year) {
       py = FactoryGirl.create(:plan_year,
         start_on: plan_year_start_on,
         end_on: plan_year_start_on + 1.year - 1.day,
@@ -353,7 +353,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 1))
     end
 
-    context "when open enrollment dates valid" do 
+    after :all do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    context "when open enrollment dates valid" do
       it 'should publish' do
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_falsey
@@ -361,25 +365,25 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "when open enrollment period too short" do
-      before do 
+      before do
         plan_year.open_enrollment_start_on = plan_year.open_enrollment_end_on - 1.day
         plan_year.save(:validate => false)
       end
 
-      it 'should error out' do 
+      it 'should error out' do
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
         expect(plan_year.enrollment_period_errors).to include("open enrollment period is less than minumum: #{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days")
       end
     end
 
-    context "when open enrollment period end date not satisfy business rule" do 
+    context "when open enrollment period end date not satisfy business rule" do
       before do
         plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on + 1.day
-        plan_year.save(:validate => false) 
+        plan_year.save(:validate => false)
       end
 
-      it 'should error out' do 
+      it 'should error out' do
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
         expect(plan_year.enrollment_period_errors).to include("open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
@@ -400,6 +404,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     before do
       plan_year_with_benefit_group.update_attributes(:aasm_state => 'renewing_draft')
+    end
+
+    after :all do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     it "plan year should be in renewing_draft state" do
@@ -888,10 +896,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                     end
 
                     bga_ids = census_employees.map do |ce|
-                      ce.active_benefit_group_assignment.id 
+                      ce.active_benefit_group_assignment.id
                     end
                     enrolled_bga_ids = census_employees[0..2].map do |ce|
-                      ce.active_benefit_group_assignment.id 
+                      ce.active_benefit_group_assignment.id
                     end
                     allow(HbxEnrollment).to receive(:enrolled_shop_health_benefit_group_ids).with(array_including(bga_ids)).and_return(enrolled_bga_ids)
                   end
@@ -2251,7 +2259,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   describe PlanYear, "Transitions from active or expired to expired migrations" do
     let(:benefit_group) { FactoryGirl.build(:benefit_group) }
     let!(:employer_profile) { FactoryGirl.build(:employer_profile, profile_source: "conversion", registered_on: TimeKeeper.date_of_record)}
-    let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record - 1.year + 1.month}  
+    let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record - 1.year + 1.month}
     let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
     let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
     let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
@@ -2326,15 +2334,15 @@ describe PlanYear, "which has the concept of export eligibility" do
   end
 end
 
-#11021 
+#11021
 describe PlanYear, "plan year schedule changes" do
 
-  context "initial employer plan year" do 
+  context "initial employer plan year" do
 
     let(:benefit_group) { FactoryGirl.build(:benefit_group) }
     let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
 
-    let(:valid_plan_year_start_on)        { Date.new(2016, 11, 1) }  
+    let(:valid_plan_year_start_on)        { Date.new(2016, 11, 1) }
     let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
     let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
     let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 10.days }
@@ -2359,7 +2367,7 @@ describe PlanYear, "plan year schedule changes" do
     end
   end
 
-  context "renewing employer plan year" do 
+  context "renewing employer plan year" do
 
     let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
 
@@ -2396,7 +2404,7 @@ describe PlanYear, "plan year schedule changes" do
                                                     py
                                                   }
 
-    context 'before publish due date' do 
+    context 'before publish due date' do
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.publish_due_day_of_month))
@@ -2411,13 +2419,13 @@ describe PlanYear, "plan year schedule changes" do
       end
     end
 
-    context 'on force publish date' do 
+    context 'on force publish date' do
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 
-      it 'should be force publishable' do 
+      it 'should be force publishable' do
         expect(renewing_plan_year.renewing_draft?).to be_truthy
         expect(renewing_plan_year.may_force_publish?).to be_truthy
         renewing_plan_year.force_publish!

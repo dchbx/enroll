@@ -124,7 +124,8 @@ end
 And(/^.+ enters broker agency information for ga flow$/) do
   fill_in 'organization[legal_name]', with: "CareFirst Inc"
   fill_in 'organization[dba]', with: "CareFirst Inc"
-  fill_in 'organization[fein]', with: "890222111"
+  # Auto-Generates FEIN
+  # fill_in 'organization[fein]', with: "890222111"
 
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
   find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click

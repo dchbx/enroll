@@ -24,7 +24,7 @@ class CensusMember
   accepts_nested_attributes_for :address, reject_if: :all_blank, allow_destroy: true
 
   embeds_one :email
-  accepts_nested_attributes_for :email, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :email, allow_destroy: true, :reject_if => Proc.new { |addy| Email.new(addy).blank? }
 
   validates_presence_of :first_name, :last_name, :dob, :employee_relationship
 

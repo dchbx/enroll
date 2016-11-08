@@ -9,13 +9,17 @@
       <thead>
         <th>Legal Name</th>
         <th>dba</th>
-        <th>Fein</th>
+        <% if fein_display(@broker_agency_profile) %>
+          <th>Fein </th>
+        <%end%>
         <th>Market Kind</th>
       </thead>
       <tbody>
         <td><%= @broker_agency_profile.legal_name %></td>
         <td><%= @broker_agency_profile.dba %></td>
-        <td><%= @broker_agency_profile.fein %></td>
+        <% if fein_display(@broker_agency_profile) %>
+          <td><%= @broker_agency_profile.fein %></td>
+        <% end %>
         <td><%= @broker_agency_profile.market_kind.titleize %></td>
       </tbody>
     </table>

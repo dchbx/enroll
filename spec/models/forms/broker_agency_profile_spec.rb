@@ -12,9 +12,10 @@ describe Forms::BrokerAgencyProfile, "given nothing" do
     expect(subject).to have_errors_on(:entity_kind)
   end
 
-  it "should validate fein" do
-    expect(subject).to have_errors_on(:fein)
-  end
+  #Auto Generating FEIN for broker agencies
+  # it "should validate fein" do
+    # expect(subject).to have_errors_on(:fein)
+  # end
 
   it "should validate dob" do
     expect(subject).to have_errors_on(:dob)

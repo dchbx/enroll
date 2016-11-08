@@ -12,10 +12,9 @@
     = render :partial => "events/v2/organizations/office_location", :collection => employer.organization.office_locations
   - if !employer.organization.home_page.blank?
     %website= employer.organization.home_page
-  - pocs = employer.staff_roles.to_a.present? ? employer.staff_roles.to_a : employer.owners.to_a
-  - if pocs.any?
+  - if employer.staff_roles.any?
     %contacts
-      = render :partial => "events/v2/employers/owner_contact", :collection => pocs
+      = render :partial => "events/v2/employers/owner_contact", :collection => employer.staff_roles.uniq
   %is_active= (employer.is_active.blank? ? true : employer.is_active)
   = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if employer.broker_agency_profile
   %employer_profile

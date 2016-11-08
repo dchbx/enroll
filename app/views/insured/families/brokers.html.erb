@@ -1,7 +1,7 @@
 <% content_for :navigation do %>
 <%= render 'navigation' %>
 <% end %>
-<% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family && @person.primary_family.current_broker_agency.writing_agent.present? %>
+<% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family &&has_writing_agent?(@person) %>
 <h1 class="darkblue no-buffer">My Brokers</h1>
 <br/>
 <%= render 'consumer_broker', title: "Your Broker or Assister" %>
@@ -11,7 +11,7 @@
 
 <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
 <%= render 'employee_broker', title: nil %>
-<% elsif @person.has_consumer_role? && @person.primary_family.current_broker_agency.writing_agent.present?%>
+<% elsif @person.has_consumer_role? && has_writing_agent?(@person)%>
 
 <%= render 'consumer_broker', title: nil %>
 <% end %>
