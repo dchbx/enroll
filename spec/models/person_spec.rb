@@ -953,74 +953,50 @@ describe Person do
 
   describe "verification types" do
     let(:person) {FactoryGirl.create(:person)}
-    context "consumer is us citizen with ssn" do
-      before :each do
-        allow(person).to receive(:ssn).and_return("2222222222")
-        allow(person).to receive(:us_citizen).and_return(false)
+
+    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native|
+      before do
+        allow(person).to receive(:ssn).and_return(ssn) if ssn
+        allow(person).to receive(:us_citizen).and_return(citizen)
+        allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
       end
-      it "returns array" do
+      it "returns array of verification types" do
         expect(person.verification_types).to be_a Array
       end
 
-      it "returns array with two elements" do
-        expect(person.verification_types.count).to eq(2)
+      it "returns #{types_count} verification types" do
+        expect(person.verification_types.count).to eq types_count
       end
 
-      it "contains SSN verification type for person" do
-        expect(person.verification_types).to include("Social Security Number")
-      end
-
-      it "contains Immigration status verification type for person" do
-        expect(person.verification_types).to include("Immigration status")
-      end
-
-    end
-
-    context "consumer is not us citizen with ssn" do
-      before :each do
-        allow(person).to receive(:ssn).and_return("2222222222")
-        allow(person).to receive(:us_citizen).and_return(true)
-      end
-
-      it "returns array" do
-        expect(person.verification_types).to be_a Array
-      end
-
-      it "returns array with two elements" do
-        expect(person.verification_types.count).to eq(2)
-      end
-
-      it "contains SSN verification type for person" do
-        expect(person.verification_types).to include("Social Security Number")
-      end
-
-      it "contains Immigration status verification type for person" do
-        expect(person.verification_types).to include("Citizenship")
-      end
-
-    end
-
-    context "consumer is us citizen with no ssn" do
-      before :each do
-        allow(person).to receive(:us_citizen).and_return(true)
-      end
-
-      it "returns array" do
-        expect(person.verification_types).to be_a Array
-      end
-
-      it "returns array with one elements" do
-        expect(person.verification_types.count).to eq(1)
-      end
-
-      it "contains SSN verification type for person" do
-        expect(person.verification_types).not_to include("SSN")
-      end
-
-      it "contains Immigration status verification type for person" do
-        expect(person.verification_types).to include("Citizenship")
+      it "contains #{v_types} verification types" do
+        expect(person.verification_types).to eq v_types
       end
     end
+
+    context "SSN + Citizen" do
+      it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true
+    end
+
+    context "SSN + Immigrant" do
+      it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false
+    end
+
+    context "SSN + Native Citizen" do
+      it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native"
+    end
+
+    context "Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true
+    end
+
+    context "Immigrant with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false
+    end
+
+    context "Native Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native"
+    end
+
   end
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do

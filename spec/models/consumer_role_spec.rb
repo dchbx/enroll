@@ -207,6 +207,26 @@ context "Verification process and notices" do
     end
   end
 
+  describe "Native American verification" do
+    shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
+      it "#{action} #{state} for #{consumer_kind}" do
+        person.update_attributes!(:citizen_status=>"indian_tribe_member") if tribe
+        person.consumer_role.update_attributes!(:native_validation => tribe_state) if tribe_state
+        expect(person.consumer_role.native_validation).to eq(state)
+      end
+    end
+    context "native validation doesn't exist" do
+      it_behaves_like "ensures native american field value", "assigns", "na", "NON native american consumer"
+
+      it_behaves_like "ensures native american field value", "assigns", "outstanding", "native american consumer", "tribe"
+    end
+    context "existing native validation" do
+      it_behaves_like "ensures native american field value", "assigns", "pending", "pending native american consumer", "tribe", "pending"
+      it_behaves_like "ensures native american field value", "doesn't change", "outstanding", "outstanding native american consumer", "tribe", "outstanding"
+      it_behaves_like "ensures native american field value", "assigns", "outstanding", "na native american consumer", "tribe", "na"
+    end
+  end
+
   describe "#is_type_outstanding?" do
     context "Social Security Number" do
       it "returns true for unverified ssn and NO docs uploaded for this type" do
@@ -223,25 +243,62 @@ context "Verification process and notices" do
         expect(person.consumer_role.is_type_outstanding?("Social Security Number")).to be_falsey
       end
     end
+
     context "Citizenship" do
-      it "returns true for if lawful_presence fails and No documents for this type" do
+      it "returns true if lawful_presence fails and No documents for this type" do
         person.consumer_role.vlp_documents = []
         expect(person.consumer_role.is_type_outstanding?("Citizenship")).to be_truthy
       end
     end
+
     context "Immigration status" do
-      it "returns true for if lawful_presence fails and No documents for this type" do
+      it "returns true if lawful_presence fails and No documents for this type" do
         expect(person.consumer_role.is_type_outstanding?("Immigration status")).to be_truthy
       end
     end
 
+    context "American Indian Status" do
+      it "returns true if lawful_presence fails and No documents for this type" do
+        expect(person.consumer_role.is_type_outstanding?("American Indian Status")).to be_truthy
+      end
+    end
+
     context "always false if documents uploaded for this type" do
-      types = ["Social Security Number", "Citizenship", "Immigration status"]
+      types = ["Social Security Number", "Citizenship", "Immigration status", "American Indian Status"]
       types.each do |type|
         it "returns false for #{type} and documents for this type" do
           person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => type)
           expect(person.consumer_role.is_type_outstanding?(type)).to be_falsey
         end
+      end
+    end
+  end
+
+  describe "#all_types_verified? private" do
+    context "only one type is verified" do
+      it "returns false if Citizenship/Immigration status unverified" do
+        person.consumer_role.ssn_validation = "valid"
+        expect(person.consumer_role.send(:all_types_verified?)).to be_falsey
+      end
+
+      it "returns false if ssn unverified" do
+        person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
+        person.consumer_role.ssn_validation = "invalid"
+        expect(person.consumer_role.send(:all_types_verified?)).to be_falsey
+      end
+    end
+
+    context "all types are verified" do
+      it "returns true" do
+        person.consumer_role.ssn_validation = "valid"
+        person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
+        expect(person.consumer_role.send(:all_types_verified?)).to be_truthy
+      end
+    end
+
+    context "all types are unverified" do
+      it "returns true" do
+        expect(person.consumer_role.send(:all_types_verified?)).to be_falsey
       end
     end
   end
