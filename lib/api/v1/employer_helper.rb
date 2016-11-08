@@ -20,7 +20,7 @@ module Api
         organizations = employer.organizations auth
         unless organizations.empty?
           employer_profiles = organizations.map { |o| o.employer_profile }
-          broker_name = user.person.first_name if auth[:broker_role]
+          broker_name = user.person.first_name if user.person.broker_role
 
           {broker_name: broker_name,
            broker_agency: auth[:broker_agency_profile].try(:legal_name),

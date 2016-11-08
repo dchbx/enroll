@@ -8,8 +8,6 @@ module Api
 
       before_filter :employer_profile, except: :employers_list
 
-      NO_BROKER_AGENCY_PROFILE_FOUND = 'no broker agency profile found'
-
       def employers_list
         execute {
           auth = SecurityHelper.authorize_employer_list current_user, params

@@ -1,6 +1,7 @@
 module Api
   module V1
     module RendererHelper
+      NO_BROKER_AGENCY_PROFILE_FOUND = 'no broker agency profile found'
 
       def render_employers_list response
         if response
