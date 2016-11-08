@@ -12,7 +12,7 @@ module Api
 
       def self.employer_details employer_profile, report_date
         employer = Api::V1::EmployerHelper.new employer_profile: employer_profile, report_date: report_date
-        employer.plan_year ? employer.details_for_plan_year : employer.details
+        employer.details
       end
 
       def self.employers_and_broker_agency user, broker_agency_id
@@ -67,28 +67,8 @@ module Api
         end
       end
 
-      def details_for_plan_year
-        enrollments = @employer_profile.enrollments_for_billing(@report_date) || []
-        premium_amt_total = enrollments.map(&:total_premium).sum
-        employee_cost_total = enrollments.map(&:total_employee_cost).sum
-        employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-        enrolled, waived, terminated = count_enrolled_waived_and_terminated_employees @plan_year
-
-        details num_enrolled: enrolled,
-                num_waived: waived,
-                num_terminated: terminated,
-                total_premium: premium_amt_total,
-                employer_contribution: employer_contribution_total,
-                employee_contribution: employee_cost_total
-      end
-
-      def details num_enrolled: nil, num_waived: nil, num_terminated: nil, total_premium: nil,
-                  employer_contribution: nil, employee_contribution: nil
-        details = summary employer_profile: @employer_profile, year: @plan_year, num_enrolled: num_enrolled,
-                          num_waived: num_waived, num_terminated: num_terminated
-        details[:total_premium] = total_premium
-        details[:employer_contribution] = employer_contribution
-        details[:employee_contribution] = employee_contribution
+      def details 
+        details = summary employer_profile: @employer_profile, year: @plan_year
         details[:active_general_agency] = @employer_profile.active_general_agency_legal_name # Note: queries DB
         details[:plan_offerings] = Hash[active_and_renewal_plan_years.map do |period, py|
           [period, py ? PlanYearHelper.plan_offerings(py) : nil]
@@ -111,15 +91,12 @@ module Api
         @employer_profile.plan_years.detect { |py| states.include? py.aasm_state }
       end
 
-      def summary employer_profile:, year:, num_enrolled:, num_waived:, num_terminated:, staff: nil,
+      def summary employer_profile:, year:, num_enrolled: nil, num_waived: nil, num_terminated: nil, staff: nil,
                   offices: nil, include_details_url: false
         renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
         summary = {
             employer_name: employer_profile.legal_name,
             employees_total: employer_profile.roster_size,
-            employees_enrolled: num_enrolled,
-            employees_waived: num_waived,
-            employees_terminated: num_terminated,
             open_enrollment_begins: year ? year.open_enrollment_start_on : nil,
             open_enrollment_ends: year ? year.open_enrollment_end_on : nil,
             plan_year_begins: year ? year.start_on : nil,
@@ -129,6 +106,9 @@ module Api
             binder_payment_due: '',
             minimum_participation_required: year ? year.minimum_enrolled_count : nil,
         }
+        summary[:employees_enrolled] = num_enrolled if num_enrolled
+        summary[:employees_waived] = num_waived if num_waived
+        summary[:employees_terminated] = num_terminated if num_terminated
 
         summary[:contact_info] = add_contact_info(staff || [], offices || []) if staff || offices
         add_urls! employer_profile, summary if include_details_url
