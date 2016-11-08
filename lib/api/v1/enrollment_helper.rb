@@ -67,7 +67,7 @@ module Api
       end
 
       def self.initialize_enrollment assignment, coverage_kind
-        enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment
+        enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment #doing a query on Families
         rendered_enrollment = if enrollment
                                 {status: EnrollmentHelper.status_label_for(enrollment.aasm_state),
                                  employer_contribution: enrollment.total_employer_contribution,

@@ -26,7 +26,7 @@ module Api
           employees ? (render json: {
               employer_name: @employer_profile.legal_name,
               total_num_employees: employees.size,
-              roster: EmployeeHelper.roster_employees(employees.limit(50).to_a, @employer_profile.renewing_published_plan_year.present?)
+              roster: EmployeeHelper.roster_employees(employees.limit(500).to_a, @employer_profile.renewing_published_plan_year.present?)
           }) : (render json: {error: 'no employee roster found'}, :status => :not_found)
         }
       end
