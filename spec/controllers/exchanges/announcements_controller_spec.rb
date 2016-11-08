@@ -48,7 +48,7 @@ RSpec.describe Exchanges::AnnouncementsController do
   end
 
   describe "POST create" do
-    let(:announcement_params) { {announcement: {content: 'msg', start_date: '2016-3-1', end_date: '2016-10-1', audiences: ['Employer']}} }
+    let(:announcement_params) { {announcement: {content: 'msg', start_date: '2016-3-1', end_date: TimeKeeper.date_of_record.strftime('%Y/%m/%d'), audiences: ['Employer']}} }
 
     it "should redirect when login without hbx_staff" do
       sign_in user_no_person

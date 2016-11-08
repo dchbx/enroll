@@ -1,10 +1,25 @@
 <% content_for :navigation do %>
-  <%= render 'navigation' %>
+<%= render 'navigation' %>
 <% end %>
+<% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family &&has_writing_agent?(@person) %>
+<h1 class="darkblue no-buffer">My Brokers</h1>
+<br/>
+<%= render 'consumer_broker', title: "Your Broker or Assister" %>
+<%= render 'employee_broker', title: "Employer Assigned Broker" %>
+<% else %>
+<h1 class="darkblue no-buffer">My Broker</h1>
 
+<% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
+<%= render 'employee_broker', title: nil %>
+<% elsif @person.has_consumer_role? && has_writing_agent?(@person)%>
 
-<% if @person.has_active_employee_role? %>
-  <%= render 'employee_broker' %>
-<% elsif @person.has_consumer_role? %>
-  <%= render 'consumer_broker' %>
+<%= render 'consumer_broker', title: nil %>
 <% end %>
+<% end %>
+<div class="vertically-aligned-row">
+  <div class="col-xs-12 col-sm-4 col-md-3">
+    <div class="row">
+      <%= link_to "<i class='fa fa-caret-left' aria-hidden='true'></i>&nbsp; Back".html_safe, :back, class: 'btn btn-default btn-block' %>
+    </div>
+  </div>
+</div>

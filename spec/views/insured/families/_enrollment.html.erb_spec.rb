@@ -107,6 +107,17 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     end
 
+    context "when under a special enrollment but hbx_enrollment is missing a special_enrollment_period id" do
+      before :each do
+        allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(true)
+        allow(hbx_enrollment).to receive(:special_enrollment_period?).and_return(nil)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
+      it "should not disable the Make Changes button" do
+        expect(rendered).to_not have_selector('.cna')
+      end
+    end
+
     it "should display the effective date" do
       expect(rendered).to have_selector('strong', text: 'Effective date:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/

@@ -1,64 +1,46 @@
-
-
-  <div class="my-broker">
-    <h1>Your Broker</h1>
-    <div class="panel benefitgroup col-xs-12">
-      <section class="col-xs-6">
-        <header class="row">
-          <h5 class="bg-title">Your Broker:<span>
-<%= @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
-</span></h5>
-        </header>
-      </section>
-      <section class="col-xs-6">
-        <header class="row">
-        </header>
-      </section>
-      <table>
-        <tr>
-          <td>
-            <header>Your Broker</header>
-          </td>
-          <td>
-            <p><%= @person.primary_family.current_broker_agency.writing_agent.person.first_name.capitalize %>
-               <%= @person.primary_family.current_broker_agency.writing_agent.person.last_name.capitalize %></p>
-          </td>
-        </tr>
-        <% if @person.primary_family.current_broker_agency.writing_agent.phone.present? %>
-        <tr>
-          <td>
-            <header>Phone Number</header>
-          </td>
-          <td>
-            <p>
-              <%= @person.primary_family.current_broker_agency.writing_agent.phone %>
-            </p>
-          </td>
-        </tr>
-        <% end %>
-        <% if @person.primary_family.current_broker_agency.writing_agent.email.address.present? %>
-        <tr>
-          <td>
-            <header>Email Address</header>
-          </td>
-          <td>
-            <p>
-              <%= @person.primary_family.current_broker_agency.writing_agent.email.address %>
-            </p>
-          </td>
-        </tr>
-        <% end %>
-
-
-      </table>
+<div class="panel panel-default module broker consumer-broker">
+  <div class="panel-heading vertically-aligned-row">
+    <div>
+      <h3 class="panel-title">
+        <%= title.present? ? title : "Your Broker" %>
+      </h3>
     </div>
-    <div class="col-xs-12">
-      <div class="row">
-      <br/>
-
-      <%= link_to "Back", :back, class: 'btn btn-default' %>
-      <%= link_to "Delete broker", delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: "Are you sure you want to delete?" }, class: 'btn btn-default'+pundit_class(Family,:updateable?) %>
+    <div class="text-right">
+      <%= link_to "Delete Broker &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>".html_safe, delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: "Are you sure you want to delete?" }, class: 'btn btn-default'+pundit_class(Family,:updateable?) %>
     </div>
-    </div>
-
   </div>
+  <div class="panel-body">
+    <div class="vertically-aligned-row">
+      <div>
+        <strong>
+          Broker Name:
+        </strong>
+        <span>
+          <%= @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
+        </span>
+      </div>
+    </div>
+    <div class="vertically-aligned-row">
+      <% if @person.primary_family.current_broker_agency.writing_agent.phone.present? %>
+        <div>
+          <strong>
+            Phone Number:
+          </strong>
+          <span>
+            <%= @person.primary_family.current_broker_agency.writing_agent.phone %>
+          </span>
+        </div>
+      <% end %>
+      <% if @person.primary_family.current_broker_agency.writing_agent.email.address.present? %>
+        <div>
+          <strong>
+            Email Address:
+          </strong>
+          <span>
+            <%= @person.primary_family.current_broker_agency.writing_agent.email.address %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

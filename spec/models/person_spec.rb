@@ -637,6 +637,89 @@ describe Person do
     end
   end
 
+  describe "need_to_notify?" do
+    let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person2) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person3) { FactoryGirl.create(:person, :with_employer_staff_role) }
+
+    it "should return true when update consumer_role" do
+      consumer_role = person1.consumer_role
+      consumer_role.birth_location = 'DC'
+      person1.updated_at = TimeKeeper.datetime_of_record
+      expect(person1.need_to_notify?).to be_truthy
+    end
+
+    it "should return false when update consumer_role's bookmark_url" do
+      consumer_role = person1.consumer_role
+      consumer_role.bookmark_url = '/families/home'
+      expect(person1.need_to_notify?).to be_falsey
+    end
+
+    it "should return true when update employee_roles" do
+      employee_role = person2.employee_roles.first
+      employee_role.language_preference = "Spanish"
+      expect(person2.need_to_notify?).to be_truthy
+    end
+
+    it "should return false when update employee_role's bookmark_url" do
+      employee_role = person2.employee_roles.first
+      employee_role.bookmark_url = "/families/home"
+      expect(person2.need_to_notify?).to be_falsey
+    end
+
+    it "should return true when update employer_staff_role" do
+      employer_staff_role = person3.employer_staff_roles.first
+      employer_staff_role.is_owner = false
+      expect(person3.need_to_notify?).to be_truthy
+    end
+
+    it "should return false when update employer_staff_role's bookmark_url" do
+      employer_staff_role = person3.employer_staff_roles.first
+      employer_staff_role.bookmark_url = "/families"
+      expect(person3.need_to_notify?).to be_falsey
+    end
+
+    context "call notify" do
+      it "when change person record" do
+        expect(person1).to receive(:notify).exactly(1).times
+        person1.first_name = "Test"
+        person1.save
+      end
+
+      it "when change consumer_role record" do
+        expect(person1).to receive(:notify).exactly(1).times
+        person1.consumer_role.update_attribute(:birth_location, 'DC')
+      end
+
+      it "when change employee_role record" do
+        expect(person2).to receive(:notify).exactly(1).times
+        person2.employee_roles.last.update_attribute(:language_preference, 'Spanish')
+      end
+
+      #it "when change employer_staff_role record" do
+      #  expect(person3).to receive(:notify).exactly(1).times
+      #  person3.employer_staff_roles.first.update_attribute(:aasm_state, 'is_closed')
+      #end
+    end
+
+    context "should not call notify" do
+      it "when change consumer_role's bookmark_url" do
+        expect(person1).to receive(:notify).exactly(0).times
+        person1.consumer_role.update_attribute(:bookmark_url, '/families/home')
+      end
+
+      it "when change employee_role's bookmark_url" do
+        expect(person2).to receive(:notify).exactly(0).times
+        person2.employee_roles.last.update_attribute(:bookmark_url, '/families/home')
+      end
+
+      it "when change employer_staff_role's bookmark_url" do
+        expect(person3).to receive(:notify).exactly(0).times
+        person3.employer_staff_roles.last.update_attribute(:bookmark_url, '/families/home')
+      end
+    end
+  end
+
 
   describe "does not allow two people with the same user ID to be saved" do
     let(:person1){FactoryGirl.build(:person)}
@@ -870,74 +953,50 @@ describe Person do
 
   describe "verification types" do
     let(:person) {FactoryGirl.create(:person)}
-    context "consumer is us citizen with ssn" do
-      before :each do
-        allow(person).to receive(:ssn).and_return("2222222222")
-        allow(person).to receive(:us_citizen).and_return(false)
+
+    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native|
+      before do
+        allow(person).to receive(:ssn).and_return(ssn) if ssn
+        allow(person).to receive(:us_citizen).and_return(citizen)
+        allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
       end
-      it "returns array" do
+      it "returns array of verification types" do
         expect(person.verification_types).to be_a Array
       end
 
-      it "returns array with two elements" do
-        expect(person.verification_types.count).to eq(2)
+      it "returns #{types_count} verification types" do
+        expect(person.verification_types.count).to eq types_count
       end
 
-      it "contains SSN verification type for person" do
-        expect(person.verification_types).to include("Social Security Number")
-      end
-
-      it "contains Immigration status verification type for person" do
-        expect(person.verification_types).to include("Immigration status")
-      end
-
-    end
-
-    context "consumer is not us citizen with ssn" do
-      before :each do
-        allow(person).to receive(:ssn).and_return("2222222222")
-        allow(person).to receive(:us_citizen).and_return(true)
-      end
-
-      it "returns array" do
-        expect(person.verification_types).to be_a Array
-      end
-
-      it "returns array with two elements" do
-        expect(person.verification_types.count).to eq(2)
-      end
-
-      it "contains SSN verification type for person" do
-        expect(person.verification_types).to include("Social Security Number")
-      end
-
-      it "contains Immigration status verification type for person" do
-        expect(person.verification_types).to include("Citizenship")
-      end
-
-    end
-
-    context "consumer is us citizen with no ssn" do
-      before :each do
-        allow(person).to receive(:us_citizen).and_return(true)
-      end
-
-      it "returns array" do
-        expect(person.verification_types).to be_a Array
-      end
-
-      it "returns array with one elements" do
-        expect(person.verification_types.count).to eq(1)
-      end
-
-      it "contains SSN verification type for person" do
-        expect(person.verification_types).not_to include("SSN")
-      end
-
-      it "contains Immigration status verification type for person" do
-        expect(person.verification_types).to include("Citizenship")
+      it "contains #{v_types} verification types" do
+        expect(person.verification_types).to eq v_types
       end
     end
+
+    context "SSN + Citizen" do
+      it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true
+    end
+
+    context "SSN + Immigrant" do
+      it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false
+    end
+
+    context "SSN + Native Citizen" do
+      it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native"
+    end
+
+    context "Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true
+    end
+
+    context "Immigrant with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false
+    end
+
+    context "Native Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native"
+    end
+
   end
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
@@ -1149,6 +1208,44 @@ describe Person do
 
     it "delegates #ivl_coverage_selected to nowhere" do
       expect { subject.ivl_coverage_selected }.not_to raise_error
+    end
+  end
+
+  describe "changing the bookmark url for a consumer role" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family) }
+    let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
+    before(:each) do
+      allow(household).to receive(:hbx_enrollments).with(:first).and_return enrollment
+    end
+
+    it "should not change the bookmark_url if they not passed RIDP" do
+      person.user = FactoryGirl.create(:user, :consumer)
+      person.user.update_attributes(:idp_verified => false)
+      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
+      person.set_consumer_role_url
+      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
+    end
+
+    it "should not change the bookmark_url if they don't have addresses" do
+      person.user = FactoryGirl.create(:user, :consumer)
+      person.user.update_attributes(:idp_verified => true)
+      person.user.ridp_by_payload!
+      person.addresses.to_a.each do |add|
+        add.delete
+      end
+      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
+      person.set_consumer_role_url
+      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
+    end
+
+    it "should change the bookmark_url if it has addresses, active enrollment and passed RIDP" do
+      person.user = FactoryGirl.create(:user, :consumer)
+      person.user.update_attribute(:idp_verified, true)
+      person.user.ridp_by_payload!
+      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
+      person.set_consumer_role_url
+      expect(person.consumer_role.bookmark_url).to eq "/families/home"
     end
   end
 end

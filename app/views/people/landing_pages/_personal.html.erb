@@ -61,6 +61,12 @@
     render 'shared/phone_fields', f: f
   %><br>
 
+    <% unless f.object.emails.nil?
+         ["home","work"].each do |kind|
+           f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
+         end
+       end
+    %>
 
     <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
       <div id="email_info" class="row row-form-wrapper no-buffer">

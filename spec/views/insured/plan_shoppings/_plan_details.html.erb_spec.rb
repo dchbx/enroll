@@ -11,11 +11,12 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     double(plan_type: "ppo", metal_level: "bronze", is_standard_plan: true,
       nationwide: "true", total_employee_cost: 100, deductible: 500,
       name: "My Plan", id: "991283912392", carrier_profile: nil,
-      hios_id: "hios id", carrier_profile_id: carrier_profile.id,
+      carrier_profile_id: carrier_profile.id,
       active_year: TimeKeeper.date_of_record.year, total_premium: 300,
       total_employer_contribution: 200,
       ehb: 0.9881,
       can_use_aptc?: true,
+      :hios_id => "89789DC0010006-01",
       coverage_kind: "health",
       dental_level: "high",
       sbc_document: Document.new({title: 'sbc_file_name', subject: "SBC",
@@ -133,9 +134,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to have_css("i.fa-check-square-o")
     end
 
-    it "should match fa-check-square for csr" do
-      expect(rendered).to have_css("i.fa-check-square-o")
-    end
   end
 
 

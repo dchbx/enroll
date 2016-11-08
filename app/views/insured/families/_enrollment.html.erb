@@ -25,7 +25,7 @@
     <div class="row">
       <div class="col-xs-12 vertically-aligned-row">
         <div>
-          <%= display_carrier_logo(Maybe.new(plan).carrier_profile.legal_name.extract_value, {width: 110}) %>
+          <%= display_carrier_logo(Maybe.new(plan), {width: 110}) %>
         </div>
         <h3>
           <%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year}), remote: true %>
@@ -152,10 +152,10 @@
     </div>
   </div>
   <% if read_only == true %>
-  <% if !hbx_enrollment.is_coverage_waived? %>
-  <br/>
-  <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == hbx_enrollment.coverage_kind } } %>
-  <% end %>
+    <% if !hbx_enrollment.is_coverage_waived? %>
+    <br/>
+    <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment:  hbx_enrollment} %>
+    <% end %>
   <% end %>
 </div>
 
@@ -191,5 +191,5 @@
 </div>
 </div>
 <% else %>
-<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: @census_employee.active_benefit_group_assignment.hbx_enrollments.detect{|enrollment| enrollment.coverage_kind == hbx_enrollment.coverage_kind } } %>
+<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
 <% end %>

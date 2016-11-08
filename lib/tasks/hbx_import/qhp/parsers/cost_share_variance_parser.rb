@@ -12,6 +12,7 @@ module Parser
 
     element :hios_plan_and_variant_id, String, tag: "planId"
     element :plan_marketing_name, String, tag: "planMarketingName"
+    element :plan_variant_marketing_name, String, tag: "planVariantMarketingName"
     element :metal_level, String, tag: "metalLevel"
     element :csr_variation_type, String, tag: "csrVariationType"
     element :issuer_actuarial_value, String, tag: "issuerActuarialValue"
@@ -36,11 +37,11 @@ module Parser
       response = {
         cost_share_variance_attributes: {
           hios_plan_and_variant_id: hios_plan_and_variant_id.gsub(/\n/,'').strip,
-          plan_marketing_name: plan_marketing_name.gsub(/\n/,'').strip,
+          plan_marketing_name: plan_marketing_name.present? ? plan_marketing_name.gsub(/\n/,'').strip : plan_variant_marketing_name.gsub(/\n/,'').strip,
           metal_level: metal_level.gsub(/\n/,'').strip,
           csr_variation_type: csr_variation_type.gsub(/\n/,'').strip,
-          issuer_actuarial_value: issuer_actuarial_value.gsub(/\n/,'').strip,
-          av_calculator_output_number: av_calculator_output_number.gsub(/\n/,'').strip,
+          issuer_actuarial_value: (issuer_actuarial_value.gsub(/\n/,'').strip rescue ""),
+          av_calculator_output_number: (av_calculator_output_number.gsub(/\n/,'').strip rescue ""),
           medical_and_drug_deductibles_integrated: medical_and_drug_deductibles_integrated.gsub(/\n/,'').strip,
           medical_and_drug_max_out_of_pocket_integrated: medical_and_drug_max_out_of_pocket_integrated.gsub(/\n/,'').strip,
           multiple_provider_tiers: multiple_provider_tiers.gsub(/\n/,'').strip,

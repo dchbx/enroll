@@ -95,6 +95,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with all required attributes" do
       let(:params)                  { valid_params }
       let(:initial_census_employee) { CensusEmployee.new(**params) }
+      let(:dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
+      let(:dependent2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333, dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
 
       it "should be valid" do
         expect(initial_census_employee.valid?).to be_truthy
@@ -102,6 +104,18 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should save" do
         expect(initial_census_employee.save).to be_truthy
+      end
+      
+      it "allow dependent ssn's to be updated to nil" do
+        initial_census_employee.census_dependents = [dependent]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match(nil)
+      end
+      
+      it "ignores depepent ssn's if ssn not nil" do
+        initial_census_employee.census_dependents = [dependent2]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match("333333333")
       end
 
       context "with duplicate ssn's on dependents" do
@@ -114,15 +128,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "with duplicate blank ssn's on dependents" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
         let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
-
+        
         it "should not have errors" do
           initial_census_employee.census_dependents = [child1,child2]
           expect(initial_census_employee.valid?).to be_truthy
-          expect(initial_census_employee.save).to be_truthy
         end
       end
 
@@ -135,7 +148,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "and it is saved" do
         before { initial_census_employee.save }
 
@@ -1071,6 +1084,114 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context '.enrollments_for_display' do
+
+    let!(:employer_profile)          { FactoryGirl.create(:employer_profile) }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
+    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:employee_role) { person.employee_roles.create( employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
+    let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
+    let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
+    let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:open_enrollment_end_on) { open_enrollment_start_on + 12.days }
+    let(:effective_date)         { plan_year_start_on }
+
+    let!(:renewing_plan_year)                     { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: open_enrollment_start_on,
+                                                      open_enrollment_end_on: open_enrollment_end_on,
+                                                      employer_profile: employer_profile,
+                                                      aasm_state: 'renewing_enrolled'
+                                                    )
+
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    py.benefit_groups = [blue]
+                                                    py.save(:validate => false)
+                                                    py
+                                                  }
+
+    let!(:plan_year)                              { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on - 1.year,
+                                                      end_on: plan_year_end_on - 1.year,
+                                                      open_enrollment_start_on: open_enrollment_start_on - 1.year,
+                                                      open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
+                                                      employer_profile: employer_profile,
+                                                      aasm_state: 'active'
+                                                    )
+
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    py.benefit_groups = [blue]
+                                                    py.save(:validate => false)
+                                                    py
+                                                  }
+
+    let!(:benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+        census_employee: census_employee,
+        benefit_group: plan_year.benefit_groups.first,
+        start_on: plan_year_start_on - 1.year
+      })
+    }
+
+    let!(:renewal_benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+        census_employee: census_employee,
+        benefit_group: renewing_plan_year.benefit_groups.first,
+        start_on: plan_year_start_on
+      })
+    }
+
+    let!(:health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "health",
+      effective_on: effective_date - 1.year,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: effective_date - 11.months,
+      benefit_group_id: plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: benefit_group_assignment.id
+      )
+    }
+
+    let!(:dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "dental",
+      effective_on: effective_date - 1.year,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: effective_date - 11.months,
+      benefit_group_id: plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: benefit_group_assignment.id
+      )
+    }
+
+    let!(:auto_renewing_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "health",
+      effective_on: effective_date,
+      enrollment_kind: "open_enrollment",
+      kind: "employer_sponsored",
+      submitted_at: effective_date,
+      benefit_group_id: renewing_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: renewal_benefit_group_assignment.id,
+      aasm_state: 'auto_renewing'
+      )
+    }
+
+    context 'when current and renewing coverages present' do
+
+      it 'should return both active and renewing coverages' do 
+        expect(census_employee.enrollments_for_display).to eq [health_enrollment,dental_enrollment,auto_renewing_enrollment]
+      end
+    end
+  end
+  
   context 'editing a CensusEmployee SSN/DOB that is in a linked status' do
     let(:census_employee)     { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1977-01-01'.to_date, ssn: '123456789') }
     let(:person)              { FactoryGirl.create(:person,          first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '314159265') }
@@ -1110,6 +1231,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.save).to be_falsey
       expect(census_employee.errors[:hired_on].any?).to be_truthy
       expect(census_employee.errors[:hired_on].to_s).to match /date can't be before  date of birth/
+    end
+  end
+
+  context '.renewal_benefit_group_assignment' do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment_two)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    before do
+      benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
+      benefit_group_assignment_one.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+      benefit_group_assignment_two.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+    end
+
+    it "should select the latest renewal benefit group assignment" do
+      expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
     end
   end
 end

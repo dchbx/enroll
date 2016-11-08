@@ -1,0 +1,24 @@
+<div class="modal fade read-only-modal" id="read_only_modal_<%= modal_id %>" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="vertically-aligned-row">
+          <h3 class="modal-title">
+            <%= header_icon.html_safe %>&nbsp;<%= title %>
+          </h3>
+          <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p>
+          <%= body %>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <%= link_to 'Close', '', :class => 'btn btn-default', data: { dismiss: "modal"} %>
+      </div>
+    </div>
+  </div>
+</div>

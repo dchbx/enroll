@@ -19,7 +19,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "#{Settings.site.short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017.  Please review the information below and let us know by </strong>#{(TimeKeeper.date_of_record + 35.days).strftime("%m/%d/%Y")}<strong> if anything will be different next year.   We will be using the information we have for you to determine the amount of premium reductions you may qualify for to reduce your monthly 2017 premiums."} %>
+content: "#{Settings.site.short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017.  Please review the information below and let us know by <strong>10/31/2016</strong> if anything will be different next year.   We will be using the information we have for you to determine the amount of premium reductions you may qualify for to reduce your monthly 2017 premiums."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2016 has been cancelled or terminated, you must go to <a href='www.DCHealthLink.com'>www.dchealthlink.com</a> during open enrollment to re-enroll for 2017.  If your coverage is terminated or cancelled for any reason, including for non-payment of premiums, now or before the end of the year, it will not be automatically renewed.</strong>"} %>
@@ -31,41 +31,26 @@ content: "<strong>Note: If this notice was sent to you in error, and your health
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Information we have for you or other members of your household:"} %>
 
-<%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: ['#{notice.primary_fullname}'], 
-                            rows: [['State of Residency', ''],
-                                  ['Citizenship/Lawful Presence', ''],
-                                  ['Tax Status',''],
-                                  ['Other Coverage',''],
-                                  ['Tax Household Size',''],
-                                  ['Projected 2017 Annual Income',''],
-                                  ['Incarcerated','']],
+<% notice.individuals.each do |member| %>
+  <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: [member.full_name.titleize],
+                           rows: [['State of Residency', "#{member.residency_verified}"],
+                              ['Citizenship/Lawful Presence', "#{member.citizen_status}"],
+                              ['Tax Status',"#{member.tax_status}"],
+                              ['Other Coverage',"#{member.mec}"],
+                              ['Tax Household Size',"#{member.taxhh_count}"],
+                              ['Projected 2017 Annual Income',number_to_currency("#{member.projected_amount}")],
+                              ['Incarcerated',"#{member.incarcerated}"]],
   col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
-
-<% if notice.family.size > 1 %>
-  <% notice.family.active_household.latest_active_tax_household.tax_household_members.each do |thm| %>
-    <% next if thm.is_primary_applicant? %>
-    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: ['#{thm.person.full_name}'], 
-                            rows: [['State of Residency', ''],
-                                  ['Citizenship/Lawful Presence', ''],
-                                  ['Tax Status',''],
-                                  ['Other Coverage',''],
-                                  ['Tax Household Size',''],
-                                  ['Projected 2017 Annual Income',''],
-                                  ['Incarcerated','']],
-    col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
-  <% end %>
-<% end %>
+<%end%>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by #{(TimeKeeper.date_of_record + 35.days).strftime("%m/%d/%Y")}.</strong>  You can report any changes by calling #{Settings.site.short_name} Customer Service at (855) 532-5465."} %>
+content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong>  You can report any changes by calling #{Settings.site.short_name} Customer Service at (855) 532-5465."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Based on the information we have for you (detailed above), your household will NOT be eligible for the advanced premium tax credit or cost-sharing reductions in 2017. This is because the people listed below are eligible for Medicaid, based on your household income:"],
    heading: 'Projected 2017 Premium Reduction Eligibility', sub_heading: ''} %>
 
-<% notice.family.active_household.latest_active_tax_household.tax_household_members.each do |thm| %>
-  <%= thm.person.full_name %>
-<% end %>
+<%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|member| member.full_name.titleize } } %>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "45 C.F.R. §155.305(f)(g)."} %>

@@ -21,6 +21,7 @@ describe "shared/_summary.html.erb" do
       :rx_formulary_url => "http://www.example.com",
       :provider_directory_url => "http://www.example1.com",
       :ehb => 0.988,
+      :hios_id => "89789DC0010006-01",
       :id => "1234234234",
       :coverage_kind => "health",
       :sbc_file => "THE SBC FILE.PDF",
