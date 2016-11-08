@@ -453,7 +453,7 @@ class EmployerProfile
         organizations_eligible_for_renewal(new_date).each do |organization|
           plan_year_renewal_factory.employer_profile = organization.employer_profile
           plan_year_renewal_factory.is_congress = false # TODO handle congress differently
-          plan_year_renewal_factory.renew
+          # plan_year_renewal_factory.renew
         end
 
         open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
@@ -482,7 +482,7 @@ class EmployerProfile
           employer_enroll_factory.end
         end
 
-        if new_date.day == 11
+        if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
             plan_year.force_publish!
@@ -494,10 +494,10 @@ class EmployerProfile
       if new_date.day == 1
         orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
         orgs.each do |org|
-          org.employer_profile.employer_profile_account.advance_billing_period!
-          if org.employer_profile.active_plan_year.present?
-            Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
-          end
+          org.employer_profile.employer_profile_account.advance_billing_period! if org.employer_profile.employer_profile_account.may_advance_billing_period?
+          # if org.employer_profile.active_plan_year.present?
+          #   Factories::EmployerRenewal(org.employer_profile) if org.employer_profile.today == (org.employer_profile.active_plan_year.end_on - 3.months + 1.day)
+          # end
         end
       end
 

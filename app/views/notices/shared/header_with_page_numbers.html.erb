@@ -1,0 +1,48 @@
+<!DOCTYPE html>   
+<html>
+</head>
+  <style type="text/css">
+    body {
+      width:100%!important;
+      -webkit-text-size-adjust:100%;
+      -ms-text-size-adjust:100%;
+      margin:0;
+      padding:0;
+      color:rgb(0,0,0);
+      font-family: "TimesNewRoman", Times, serif;
+    }
+    
+    .page_numbers{
+     text-align: right; 
+     font-size: 9pt
+    }
+  </style>
+
+  <script>
+    function number_pages() {
+      var vars={};
+      var x=document.location.search.substring(1).split('&');
+      for(var i in x) {var z=x[i].split('=',2);vars[z[0]] = decodeURIComponent(z[1]);}
+      var x=['frompage','topage','page','webpage','section','subsection','subsubsection'];
+      for(var i in x) {
+        var y = document.getElementsByClassName(x[i]);
+        for(var j=0; j<y.length; ++j){
+          if(j == 0 ){
+            if(x[i] == 'page' && vars[x[i]] == 1){
+              continue;
+            }
+          }
+          y[j].textContent = "Page "+vars[x[i]]+ " of " + vars[x[1]];// ;
+        }
+      }
+    }
+  </script>
+
+  <body onload="number_pages()">
+    <div class='page_numbers'>
+        <span class="page"></span>
+        <div>&nbsp;</div>
+    </div>
+  </body>
+</head>
+</html>

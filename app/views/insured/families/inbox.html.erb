@@ -1,5 +1,14 @@
 <% content_for :navigation do %>
-  <%= render 'navigation' %>
+    <%= render 'navigation' %>
 <% end %>
-<h1 class="darkblue no-buffer">Messages</h1>
-<%= render 'inbox', provider: current_user.person %>
+<div class="module">
+  <div class="vertically-aligned-row">
+    <h1 class="darkblue no-buffer">Messages</h1>
+    <span class='text-right'>
+      <%= link_to "Upload Notices", upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank' if current_user.has_hbx_staff_role? %>
+    </span>
+  </div>
+  <%= render 'inbox', provider: @person %>
+</div>
+<br/>
+<br/>

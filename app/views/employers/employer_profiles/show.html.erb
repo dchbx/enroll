@@ -34,36 +34,7 @@
   <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
     <%= render partial: 'open_enrollment_ends_panel' %>
   <% end %>
-  <% if @employer_profile.active_plan_year.present? && @employer_profile.active_plan_year.coverage_period_contains?(TimeKeeper.date_of_record.end_of_month ) && @employer_profile.active_plan_year.aasm_state != "renewing_draft" %>
-  <section class="row" style="background-color: #fff;">
-    <article class="col-xs-12">
-    <% plan_year, billing_date = @employer_profile.billing_plan_year %>
-      <% if billing_date.present? %>
-
-      <h3>Enrollment Report</h3>
-      <span><%= billing_date.beginning_of_month %> - <%= billing_date.end_of_month %></span>
-        <br/>
-        <br/>
-        <table>
-          <tr>
-            <td style="padding-right: 10px;">Total Premium:</td>
-            <td><%= number_to_currency(@premium_amt_total || 0)%></td>
-          </tr>
-          <tr>
-            <td style="padding-right: 10px;">Employee Contributions:</td>
-            <td><%= number_to_currency(@employee_cost_total || 0) %></td>
-          </tr>
-          <tr>
-            <td style="padding-right: 10px;">Employer Contributions:</td>
-            <td><%= number_to_currency(@employer_contribution_total || 0) %></td>
-          </tr>
-        </table>
-        <br/>
-    </article>
-    <% end %>
-  </section>
-  <br/>
-  <% end %>
+  <%= render partial: 'enrollment_report_widget' %>
   <%= render partial: 'employer_broker_widget' %>
 </aside>
 <% else %>

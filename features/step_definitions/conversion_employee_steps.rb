@@ -59,8 +59,8 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   start_on = open_enrollment_start_on + 1.months
   end_on = start_on + 1.year - 1.day
 
-  renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
-  plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
+  renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months).year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: plan.id

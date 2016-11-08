@@ -22,7 +22,7 @@
 
 <% if notice.ssa_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i><span style='font-size:13px'>Documents Showing Social Security Number</span></i></strong><br>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
+  content: "<div style='padding-bottom: 5px;'><i><strong>Documents Showing Social Security Number</strong></i></div>The Social Security Administration could not confirm that the Social Security Number provided for the following applicants are correct:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
@@ -41,7 +41,7 @@
 
 <% if notice.dhs_unverified.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong><i><span style='font-size:13px'>Documents of Citizenship or Immigration Status</span></i></strong><br>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
+  content: "<div style='padding-bottom: 5px;'><i><strong>Documents of Citizenship or Immigration Status</strong></i></div>We need proof of U.S. citizenship or immigration status for the following applicant household members:"} %>
 
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.dhs_unverified.map{|individual| individual.full_name } } %>
 
@@ -53,7 +53,7 @@
   card containing a recent photo and other identifying information."} %>
 <% end %>
   <br>
-  <%= render partial: 'notices/shared/unordered_list', locals: {
+  <%#= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)",
     listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization",
     "Certificate of Citizenship", "Consular report of Birth Abroad of U.S. Citizen", "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security
@@ -61,6 +61,18 @@
     ["Identify the Tribe issuing the document;", "Identify the individual by name; and", "Confirm the individual’s enrollment in or affiliation with the Tribe.",
       "<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document"]]]
     } %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "<u>Primary documentation</u>:  (Only One (1) is needed) ",
+  listings: [["U.S. Passport", ["<i>Note</i>: Expired passports are acceptable."]],
+    "Certificate of Naturalization", 
+    "Certificate of Citizenship",
+    "Consular report of Birth Abroad of U.S. Citizen",
+    "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license.",
+    ["A tribal document issued by a federally-recognized Indian Tribe, which must:",
+        ["Identify the Tribe issuing the document;",
+          "Identify the individual by name; and",
+          "Confirm the individual’s enrollment in or affiliation with the Tribe.",
+          "<strong>Examples</strong>: tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document"]]]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)",
@@ -288,12 +300,17 @@
       <tr class="fssizeuser">
         <td>
           <div class='display:block; page-break-inside: avoid;'>
-            <ul style='list-style: circle solid;'><li>U.S. Postal Mail: <span style='margin-left: 10px;'><%= Settings.site.short_name %></span><br>
-             <span style='margin-left:96px;'>Department of Human Services</span><br>
-             <span style='margin-left:96px;'>P.O. Box 91560</span><br>
-             <span style='margin-left:96px;'>Washington, DC 20090</span><br><br>
-<!--              <i>Be sure to write your account number (&#60;account number>) on your submission.</i>
- -->           </li>
+            <ul style='list-style: circle solid;'>
+              <li>
+                <span style="width: 300px;">
+                 <span style="float: left; width: 95px;"><strong>U.S. Postal Mail:</strong></span>
+                 <span style="float: left; width: 205px;">
+                  DC Health Link Exchange Contact Center<br>
+                  PO Box 44018<br>
+                  Washington, DC 20026<br><br>
+                </span>
+              </span>    
+            </li>
            </ul></div>
         </td>
       </tr>   
@@ -322,7 +339,7 @@
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free<br>at 1-855-532-5465."],
+  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 

@@ -17,7 +17,7 @@ describe PersonPolicy do
 
     it 'hbx_read_only' do 
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_read_only))
-      expect(policy.updateable?).to be false
+      expect(policy.updateable?).to be true
     end
 
     it 'hbx_csr_supervisor' do
@@ -33,6 +33,11 @@ describe PersonPolicy do
     it 'csr_tier1' do 
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_csr_tier1))
       expect(policy.updateable?).to be true 
+    end
+
+    it 'developer' do 
+      allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :developer))
+      expect(policy.updateable?).to be false 
     end
 
   end

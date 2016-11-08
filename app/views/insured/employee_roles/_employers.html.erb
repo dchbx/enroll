@@ -1,5 +1,5 @@
 <div class="col-md-6 col-sm-6 col-xs-12">
-  <%= render 'shared/employer', employer: @employee_role.employer_profile, employee: @employee_role.new_census_employee, effective_on: @employee_role.coverage_effective_on %>
+  <%= render 'shared/employer', employer: @employee_role.employer_profile, employee: @employee_role.new_census_employee, effective_on: @employee_role.coverage_effective_on if @employee_role.benefit_group.present? %>
 </div>
 <div class="col-md-1 col-sm-1 col-xs-12"></div>
 <div class="col-md-5 col-sm-5 col-xs-12 text-right">

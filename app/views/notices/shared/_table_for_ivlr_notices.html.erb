@@ -1,0 +1,20 @@
+  <div style="display:block; page-break-inside: avoid;">
+    <table align="center" class="total_table household_member_details" style="width: <%= table_width if defined? table_width %>;" border="1">
+      <tbody>
+        <% if defined?(headers) %>
+        <tr style="text-align:left; background-color:rgb(198,217,241); padding:0 10px;">
+          <% headers.size.times do |i| %>
+          <td colspan="2" style="width: <%= col_styles[i] if defined? col_styles %>;"><%= headers[i]%></td>
+          <% end %>
+        </tr>
+        <% end %>
+        <% rows.each do |row| %>
+        <tr>
+          <% row.size.times do |i| %>
+            <td style="<%= col_styles[i] if defined? col_styles %>"><%= row[i] %></td>
+          <% end %>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>

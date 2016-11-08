@@ -211,9 +211,6 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
         expect(assigns(:current_plan_year)).to eq plan_year
-        expect(assigns(:employer_contribution_total)).to eq hbx_enrollment.total_employer_contribution
-        expect(assigns(:premium_amt_total)).to eq hbx_enrollment.total_premium
-        expect(assigns(:employee_cost_total)).to eq hbx_enrollment.total_employee_cost
       end
 
 

@@ -189,6 +189,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
     end
     it "should find  linked family" do
       allow(Person).to receive(:where).and_return([person])
+      allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:primary_family).and_return(family1)
       expect(broker_agency_profile.linked_employees.count).to eq(1)
       expect(broker_agency_profile.families.count).to eq(1)
@@ -196,6 +197,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
     it "should find both consumers and employees" do
       family2.hire_broker_agency(writing_agent.id)
       allow(Person).to receive(:where).and_return([person])
+      allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:primary_family).and_return(family1)
       expect(broker_agency_profile.families.count).to eq(2)
     end

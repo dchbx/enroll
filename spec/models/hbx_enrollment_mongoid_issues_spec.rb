@@ -4,13 +4,14 @@ describe Family, "with 2 policies", :dbclean => :after_each do
   let(:family) { FactoryGirl.build(:family) }
   let(:primary) { FactoryGirl.create(:consumer_role) }
   let(:plan) { FactoryGirl.create(:plan) }
-  let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+  let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
 
   before :each do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 12, 15))
     family.add_family_member(primary.person, is_primary_applicant: true)
     family.save!
+
     @hbx_enrollment_1 = HbxEnrollment.create_from(coverage_household: family.active_household.immediate_family_coverage_household, consumer_role: primary, benefit_package: benefit_package)
     @hbx_enrollment_2 = HbxEnrollment.create_from(coverage_household: family.active_household.immediate_family_coverage_household, consumer_role: primary, benefit_package: benefit_package)
     @id_for_1 = @hbx_enrollment_1.id
@@ -35,6 +36,7 @@ describe Family, "with 2 policies", :dbclean => :after_each do
     end
 
     it "should have the original effective on for the first policy" do
+
       expect(@first_enrollment.effective_on).to eq @pol_1_effective_date
     end
 

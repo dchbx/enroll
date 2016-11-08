@@ -13,7 +13,7 @@ RSpec.describe "insured/families/_families_table_for_hbx_staff.html.erb" do
   context "shows families" do
 
     before :each do
-      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: false))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: false, can_update_ssn?: true))
       sign_in(current_user)
     end
 
@@ -47,6 +47,11 @@ RSpec.describe "insured/families/_families_table_for_hbx_staff.html.erb" do
       render partial: 'insured/families/families_table_for_hbx_staff', :collection => [[family1]] , as: :families
       expect(rendered).not_to match /<td>1.+<td>No.+<td>No.+<td>No/m
       expect(rendered).to match /<td>1.+<td>No.+<td>Yes.+<td>Yes/m
+    end
+
+    it "the rendered partial should have an Edit DOB/SSN button" do
+      render partial: 'insured/families/families_table_for_hbx_staff', :collection => [[family1]] , as: :families
+      expect(response.body).to have_css("a", text: "Edit DOB/SSN")
     end
 
   end

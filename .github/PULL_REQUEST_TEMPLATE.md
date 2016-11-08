@@ -1,6 +1,9 @@
-### Redmine ticket(s)
-* (redmine links here)
-* (if more)
+### Master Redmine ticket
+* (Required!)
+
+### Child Redmine ticket(s)
+* ()
+* ()
 
 ### Local build result
 

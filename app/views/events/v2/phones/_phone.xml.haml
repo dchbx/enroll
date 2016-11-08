@@ -1,11 +1,10 @@
--if phone.kind=="work"
-  %phone
-    %type= "urn:openhbx:terms:v1:phone_type##{phone.kind}"
-    - if !phone.country_code.blank?
-      %country_code=phone.country_code
-    %area_code=phone.area_code
-    %phone_number=phone.number
-    %full_phone_number= phone.area_code.to_s + phone.number
-    - if !phone.extension.blank?
-      %extension= phone.extension
-    %is_preferred= (phone.primary.blank? ? false : phone.primary)
+%phone
+  %type= "urn:openhbx:terms:v1:phone_type##{phone.kind}"
+  - if !phone.country_code.blank?
+    %country_code=phone.country_code
+  %area_code=phone.area_code
+  %phone_number=phone.number
+  %full_phone_number= phone.full_phone_number
+  - if !phone.extension.blank?
+    %extension= phone.extension
+  %is_preferred= (phone.primary.blank? ? false : phone.primary)

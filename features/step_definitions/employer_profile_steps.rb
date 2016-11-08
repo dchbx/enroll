@@ -32,7 +32,7 @@ Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   fill_in "user[oim_id]", :with => email
   fill_in "user[password]", :with => @pswd
   fill_in "user[password_confirmation]", :with => @pswd
-  sleep(1)
+
   find(:xpath, '//label[@for="user_email_or_username"]').set(email)
   # find('#user_email_or_username').set(email)
   #TODO this fixes the random login fails b/c of empty params on email
@@ -101,7 +101,7 @@ end
 
 Then /(\w+) decides to Update Business information/ do |person|
   find('.interaction-click-control-update-business-info', :wait => 10).click
-  wait_for_ajax(10)
+  wait_for_ajax(10,2)
   screenshot('update_business_info')
 end
 
@@ -117,8 +117,7 @@ Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
 end
 
 Then /Point of Contact count is (\d+)/ do |count|
-  rows = page.all('tr').count - 1
-  expect(rows).to eq(count.to_i)
+  expect(page.all('tr').count - 1).to eq(count.to_i)
 end
 
 Then /Hannah cannot remove EmployerStaffRole from Hannah/ do

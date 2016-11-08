@@ -33,6 +33,7 @@ class BrokerAgencyProfile
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :home_page, :home_page=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: false
+  delegate :is_fake_fein, :is_fake_fein=, to: :organization, allow_nil: false
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
@@ -152,7 +153,8 @@ class BrokerAgencyProfile
   end
 
   def families
-    employee_families = linked_employees.map(&:primary_family).to_a
+    linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
+    employee_families = linked_active_employees.map(&:primary_family).to_a
     consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
     families = (consumer_families + employee_families).uniq
     families.sort_by{|f| f.primary_applicant.person.last_name}

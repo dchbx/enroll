@@ -12,6 +12,34 @@ FactoryGirl.define do
                             :allow_numeric => true,
                             :allow_special => false, :exactly => 9)
     end
+
+    trait :with_expired_and_active_plan_years do
+      before :create do |organization, evaluator|
+        organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization, registered_on: Date.new(2015,12,1)
+      end
+      after :create do |organization, evaluator|
+        expired_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :expired, :start_on => Date.new(2015,10,1), :end_on => Date.new(2016,9,30),
+          :open_enrollment_start_on => Date.new(2015,8,11), :open_enrollment_end_on => Date.new(2015, 9, 13), fte_count: 5
+        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :active, :start_on => Date.new(2016,10,1), :end_on => Date.new(2017,9,30),
+          :open_enrollment_start_on => Date.new(2016,8,11), :open_enrollment_end_on => Date.new(2016,9,13), fte_count: 5
+        expired_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: expired_plan_year
+        active_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
+      end
+    end
+
+    trait :with_active_and_renewal_plan_years do
+      before :create do |organization, evaluator|
+        organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization
+      end
+      after :create do |organization, evaluator|
+        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :active, :start_on => Date.new(2016 - 1, 5, 1), :end_on => Date.new(2016, 4, 30),
+        :open_enrollment_start_on => Date.new(2016 - 1, 4, 1), :open_enrollment_end_on => Date.new(2016 - 1, 4, 10), fte_count: 5
+        renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(2016, 5, 1), :end_on => Date.new(2016+1, 4, 30),
+        :open_enrollment_start_on => Date.new(2016, 4, 1), :open_enrollment_end_on => Date.new(2016, 4, 10), fte_count: 5
+        benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
+        renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
+      end
+    end
   end
 
   factory :broker_agency, class: Organization do

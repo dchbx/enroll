@@ -29,7 +29,7 @@ class Family
   field :status, type: String, default: "" # for aptc block
 
   before_save :clear_blank_fields
-  after_save :generate_family_search
+ #after_save :generate_family_search
 
   belongs_to  :person
 
@@ -101,8 +101,8 @@ class Family
   validate :family_integrity
 
   after_initialize :build_household
-  after_save :update_family_search_collection
-  after_destroy :remove_family_search_record
+ # after_save :update_family_search_collection
+ # after_destroy :remove_family_search_record
 
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
       where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
@@ -516,6 +516,14 @@ class Family
     person.save!
   end
 
+  def check_for_consumer_role
+    if primary_applicant.person.consumer_role.present?
+      active_family_members.each do |family_member|
+        build_consumer_role(family_member)
+      end
+    end
+  end
+
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
@@ -578,6 +586,7 @@ class Family
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'void'} }},
       {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},

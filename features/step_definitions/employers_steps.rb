@@ -149,6 +149,7 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
+  wait_for_ajax
   within '.census-employees-table' do
     find('.top').click
   end
@@ -281,13 +282,16 @@ end
 
 And(/^.+ should see a button to create new plan year$/) do
   screenshot("employer_plan_year")
-  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
+  #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+  year = (Date.today + 2.months).year
+  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
+  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
   find('a.interaction-click-control-add-plan-year').click
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{Date.today.year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -315,11 +319,11 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  sleep 1 #Four back to back clicks causes intermittent failures.  Make sure the page setup/DOM load is complete
+  wait_for_ajax
   find('.carriers-tab a').click
-  sleep 1 #maybe some work here
+  wait_for_ajax(10,2)
   find('.reference-plans label').click
-  sleep 1
+  wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
@@ -445,6 +449,65 @@ Given /^the employer is logged in$/ do
   login_as owner, scope: :user
 end
 
+And /^clicks on terminate employee$/ do
+  expect(page).to have_content 'Employee Roster'
+  employees.first
+  first(".fa-trash-o").click
+  terminate_date = (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")
+  page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
+  find('.interaction-click-control-terminate-employee').click
+  expect(page).to have_content 'Employee Roster'
+  wait_for_ajax(2,2)
+end
+
+Then /^employer clicks on terminated filter$/ do
+  expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
+  find('.filter').click
+  wait_for_ajax
+  page.execute_script("$('.filter-options').show();")
+  find("#terminated_yes").trigger('click')
+end
+
+Then /^employer sees termination date column$/ do
+  expect(page).to have_content 'Termination Date'
+end
+
+And /^employer clicks on terminated employee$/ do
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on back button$/ do
+  expect(page).to have_content "Details"
+  find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
+end
+
+Then /^employer should see employee roaster$/ do
+  expect(page).to have_content "Employee Roster"
+end
+And /^employer should also see termination date$/ do
+  expect(page).to have_content "Termination Date"
+end
+
+And /^employer clicks on all employees$/ do
+  expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
+  find('.filter').click
+  wait_for_ajax
+  page.execute_script("$('.filter-options').show();")
+  find("#family_all").trigger('click')
+end
+
+And /^employer clicks on cancel button$/ do
+  expect(page).to have_content "Details"
+  find('.interaction-click-control-cancel').click
+end
+
+Then /^employer should not see termination date column$/ do
+  wait_for_ajax
+  expect(page).not_to have_content "Termination Date"
+end
+
 Then /^they should see that employee's details$/ do
+  wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end

@@ -116,13 +116,10 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = ""
     end
     last_day_of_work = termination_date
-    if termination_date.present?
-      @census_employee.terminate_employment(last_day_of_work)
-      if termination_date >= (Date.today-60.days)
-        @fa = @census_employee.save
-      else
-      end
+    if termination_date.present? && termination_date >= (TimeKeeper.date_of_record - 60.days)
+      @fa = @census_employee.terminate_employment(last_day_of_work) && @census_employee.save
 
+    else
     end
     respond_to do |format|
       format.js {
@@ -184,19 +181,11 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    if @benefit_group_assignment = @census_employee.active_benefit_group_assignment
-      @hbx_enrollments = @benefit_group_assignment.hbx_enrollments
-      @benefit_group = @benefit_group_assignment.benefit_group
-    end
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::CANCELED_STATUSES
-    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select { |hbx_enrollment| past_enrollment_statuses.include? hbx_enrollment.aasm_state } if @census_employee.employee_role.present?
-    @census_employee.build_address unless @census_employee.address.present?
-    @census_employee.build_email unless @census_employee.email.present?
-    @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
-    @census_employee.census_dependents.build unless @census_employee.census_dependents.present?
-    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
-    @status = params[:status]
-    # PlanCostDecorator.new(@hbx_enrollment.plan, @hbx_enrollment, @benefit_group, reference_plan) if @hbx_enrollment.present? and @benefit_group.present? and reference_plan.present?
+    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
+    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
+        |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
+    } if @census_employee.employee_role.present?
+    @status = params[:status] || ''
   end
 
   def delink

@@ -5,16 +5,16 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
   let(:calender_year) { TimeKeeper.date_of_record.year }
   let(:date_of_record_to_use) { Date.new(calender_year, 2, 1)}
 
-  let(:organization) { 
-    org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+  let(:organization) {
+    org = FactoryGirl.create :organization, legal_name: "Corp 1"
     employer_profile = FactoryGirl.create :employer_profile, organization: org
     active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
     :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5
     benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
     owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
     2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
-    
-    employer_profile.census_employees.each do |ce| 
+
+    employer_profile.census_employees.each do |ce|
       ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
       person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
       employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
@@ -38,8 +38,12 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
 
   context '.renew' do
 
-    before do 
+    before do
       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+    end
+
+    after :all do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     it 'should renew the employer profile' do
@@ -66,6 +70,6 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
       employer_profile.census_employees.each do |ce|
         expect(ce.renewal_benefit_group_assignment.present?).to be_truthy
       end
-    end 
+    end
   end
 end
