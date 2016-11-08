@@ -1,10 +1,10 @@
 <tr class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
-  <td>
+  <td style="font-weight:bold">
     <%= message.try(:from) if @folder == 'Inbox' %>
     <%= message.try(:to)   if @folder == 'Sent'%>
   </td>
   <td>
-    <%=message.created_at %>
+    <%=message.created_at.strftime("%m/%d/%Y") %>
     <td>
       <%= message.try(:subject) %>
     </td>

@@ -269,7 +269,7 @@ ivl_notice_triggers = [
       {
         name: 'September Projected Renewal Notice',
         notice_template: 'notices/ivl/ivlr_2_projected_renewal_notice',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR2',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -291,7 +291,7 @@ ivl_notice_triggers = [
       {
         name: 'September Projected Renewal Notice',
         notice_template: 'notices/ivl/IVLR_3_APTC_Medicaid',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR3',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -313,7 +313,7 @@ ivl_notice_triggers = [
       {
         name: 'September Projected Renewal Notice',
         notice_template: 'notices/ivl/IVLR4_APTC_uqhp',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR4',
         notice_trigger_element_group: {
           market_places: ['individual'],

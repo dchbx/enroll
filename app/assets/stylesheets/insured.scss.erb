@@ -1,6 +1,21 @@
 @import "variables";
 .module {
-  &.consumer-broker-widget, &.employee-broker-widget {
+  &.broker {
+    .panel-heading {
+      background-image: none;
+      background-color: $primary-white;
+      h3 {
+        color: $primary-green;
+        font-weight: $primary-bold;
+        text-transform: uppercase;
+        font-size: 18px;
+      }
+    }
+    .panel-footer {
+      background-color: $primary-white;
+    }
+  }
+  &.consumer-broker-widget, &.employee-broker-widget, &.employer-broker-widget {
     .panel-heading {
       background-image: none;
       background-color: transparent;
@@ -11,6 +26,9 @@
     .panel-body {
       display: table;
       width: 100%;
+      .fa {
+        color: $primary-blue;
+      }
       > * {
         display: table-cell;
         vertical-align: middle;
@@ -19,9 +37,14 @@
         }
         &.text-left {
           padding-left: 7.5%;
-          .broker-information {
-            word-break: break-all;
-          }
+        }
+      }
+      small {
+        text-transform: uppercase;
+        font-size: 11px;
+        margin-top: 10%;
+        a {
+          color: $primary-gray;
         }
       }
     }
@@ -29,18 +52,6 @@
   &.past-enrollments {
     th, td {
       vertical-align: middle;
-    }
-  }
-  &.hbx-panel {
-    .panel-heading {
-      background-color: transparent;
-      background-image: none;
-      h3 {
-        color: $primary-green;
-        font-weight: $primary-bold;
-        text-transform: uppercase;
-        font-size: 18px;
-      }
     }
   }
   &.hbx-enrollment-panel {
@@ -105,39 +116,6 @@
       }
     }
   }
-}
-.brokers-widget {
-    h4 {
-      padding: 15px 0 0 0;
-      margin: 0;
-      font-weight: 600;
-    }
-
-  h4, .fa {
-    color: $primary-blue;
-  }
-
-    .col-xs-4 {
-      cursor: pointer;
-      &:hover {
-        * {
-          color: #23527c;
-        }
-      }
-      h2 {
-        margin-bottom: 0;
-        margin-top: 25px;
-        img {
-          width: 85%;
-        }
-      }
-      span {
-        color: #007bc4;
-      }
-    }
-    span {
-      color: $primary-blue;
-    }
 }
 .help-signup {
   h4 {

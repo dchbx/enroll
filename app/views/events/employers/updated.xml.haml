@@ -9,10 +9,9 @@
   - if employer.organization.office_locations.any?
     %office_locations
       = render :partial => "events/organizations/office_location", :collection => employer.organization.office_locations
-  - pocs = (employer.owners.to_a + employer.staff_roles.to_a).uniq
-  - if pocs.any?
+  - if employer.staff_roles.any?
     %contacts
-      = render :partial => "events/employers/owner_contact", :collection => pocs
+      = render :partial => "events/employers/owner_contact", :collection => employer.staff_roles.uniq
   %is_active= (employer.is_active.blank? ? true : employer.is_active)
   %employer_profile
     %business_entity_kind= "urn:openhbx:terms:v1:employers##{employer.entity_kind}"

@@ -1,15 +1,5 @@
 %benefit_group
   %name= benefit_group.title
-  %reference_plan
-    %id
-      %id= reference_plan.hios_id
-    %name= reference_plan.name
-    %active_year= reference_plan.active_year
-    %is_dental_only= reference_plan.is_dental_only?
-    = render :partial => "events/v2/shared/carrier", :object =>reference_plan.carrier_profile
-    %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{reference_plan.metal_level.downcase}"
-    %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{reference_plan.coverage_kind}"
-    %ehb_percent= reference_plan.ehb*100
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
   -#%federal_contributions= " " field not available in benefit group modal

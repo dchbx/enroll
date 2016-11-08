@@ -328,6 +328,41 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
     end
+
+    context "waived_enrollment coverage kind" do
+        let(:person) { FactoryGirl.create(:person) }
+        let(:household) {double(:immediate_family_coverage_household=> coverage_household)}
+        let(:coverage_household) {double}
+        let(:family) {Family.new}
+        let(:hbx_enrollment) {HbxEnrollment.create}
+        let(:wavied_enrollment) {HbxEnrollment.create}
+      before :each do
+        allow(HbxEnrollment).to receive(:find).with(hbx_enrollment.id).and_return(hbx_enrollment)
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(family).to receive(:active_household).and_return(household)
+        allow(coverage_household).to receive(:household).and_return(household)
+        allow(hbx_enrollment).to receive(:shopping?).and_return(false)
+        sign_in user
+      end
+
+      it "wavied enrollment coverage kind should be dental as waiving hbx_enrollment kind is dental" do
+        hbx_enrollment.coverage_kind='dental'
+        hbx_enrollment.save
+        allow(household).to receive(:new_hbx_enrollment_from).and_return(wavied_enrollment)
+        expect(wavied_enrollment.coverage_kind).to eq 'health' #by deafult it will be health
+        post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
+        expect(wavied_enrollment.coverage_kind).to eq 'dental'
+      end
+
+      it "wavied enrollment coverage kind should be health as waiving hbx_enrollment kind is health" do
+        expect(hbx_enrollment.coverage_kind).to eq 'health'
+        allow(household).to receive(:new_hbx_enrollment_from).and_return(wavied_enrollment)
+        expect(wavied_enrollment.coverage_kind).to eq 'health'
+        post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
+        expect(wavied_enrollment.coverage_kind).to eq 'health'
+      end
+    end
   end
 
   context "GET show" do

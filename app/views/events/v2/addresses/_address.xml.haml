@@ -1,17 +1,16 @@
-- unless address.kind=="primary"
-  %address
-    %type= "urn:openhbx:terms:v1:address_type##{address.kind}"
-    %address_line_1= address.address_1
-    - unless address.address_2.blank?
-      %address_line_2= address.address_2
-    - unless address.address_3.blank?
-      %address_line_3= address.address_3
-    %location_city_name= address.city
-    %location_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==address.state end.first.downcase.gsub(' ','_')}"
-    %location_state_code= address.state
-    %postal_code= address.zip_without_extension
-    - unless address.zip_extension.blank?
-      %location_postal_extension_code= address.zip_extension
-    %location_country_name=address.country_name
-    -#%location_country_code= " "  #field not available in address modal
-    %address_full_text=address.full_address
+%address
+  - address.kind.eql?('primary') ? kind='work' : kind=address.kind
+  %type= "urn:openhbx:terms:v1:address_type##{kind}"
+  %address_line_1= address.address_1
+  - unless address.address_2.blank?
+    %address_line_2= address.address_2
+  - unless address.address_3.blank?
+    %address_line_3= address.address_3
+  %location_city_name= address.city
+  %location_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==address.state end.first.downcase.gsub(' ','_')}"
+  %location_state_code= address.state
+  %postal_code= address.zip_without_extension
+  - unless address.zip_extension.blank?
+    %location_postal_extension_code= address.zip_extension
+  %location_country_name=address.country_name
+  %address_full_text=address.full_address

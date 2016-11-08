@@ -107,5 +107,12 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         end
       end
     end
+
+    context "person of contact" do
+      it "should be included in xml" do
+        expect(rendered).to have_selector('contact', count: 1)
+      end
+    end
+
   end
 end

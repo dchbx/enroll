@@ -1,4 +1,95 @@
 @import "variables";
+.module {
+  &.hbx-panel {
+    &.employer-my-plan-year {
+      table {
+        width: 100%;
+        tr {
+          width: 100%;
+          &:last-of-type {
+            td {
+              &:last-of-type {
+                h3 {
+                  color: #69a30d;
+                  font-weight: bold;
+                  font-size: 14px;
+                }
+              }
+            }
+          }
+          td {
+              header {
+                text-transform: uppercase;
+                color: #9b9b9b;
+                font-size: 12px;
+              }
+            &:last-of-type {
+              h3 {
+                font-size: 22px;
+                color: #9b9b9b;
+                font-weight: semibold;
+              }
+            }
+            * {
+              margin: 0;
+              padding: 0;
+            }
+          }
+        }
+      }
+    }
+    &.employer-benefit-groups {
+      .health {
+        padding-top: 3.75%;
+      }
+      table {
+        width: 100%;
+        margin-top: 10px;
+        &.benefit-group {
+          table-layout: fixed;
+        }
+        td {
+          vertical-align: top;
+          padding-right: 2.5%;
+          padding-bottom: 1.25%;
+        }
+        tr {
+          width: 100%;
+          &:last-of-type {
+            td {
+              &:last-of-type {
+                h3 {
+                  color: #69a30d;
+                  font-weight: bold;
+                  font-size: 14px;
+                }
+              }
+            }
+          }
+          td, th {
+              header {
+                font-weight: normal;
+                text-transform: uppercase;
+                color: #9b9b9b;
+                font-size: 12px;
+              }
+            &:last-of-type {
+              h3 {
+                font-size: 22px;
+                color: #9b9b9b;
+                font-weight: semibold;
+              }
+            }
+            * {
+              margin: 0;
+              padding: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 .census-employee-add {
   .module {
     &.census-employee-dependents {
@@ -138,6 +229,19 @@
     }
     .btn-primary {
       width: 100%;
+    }
+  }
+  &.broker {
+    .panel-body, .panel-footer {
+      .fa {
+        color: $primary-blue;
+      }
+      .vertically-aligned-row {
+        table-layout: fixed;
+        > * {
+          vertical-align: top;
+        }
+      }
     }
   }
   &.home-tab {

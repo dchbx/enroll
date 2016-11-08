@@ -29,15 +29,19 @@
       primary_member = members[0]
       person = Person.where(:hbx_id => primary_member["glue_hbx_id"]).first
       consumer_role =person.consumer_role
-      if  consumer_role.present?
-        builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
+      if consumer_role.present?
+        begin
+          builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
               template: notice_trigger.notice_template,
               subject: event_kind.title,
               mpi_indicator: notice_trigger.mpi_indicator,
               data: members
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
               )
-        builder.deliver
+          builder.deliver
+        rescue Exception => e
+          puts "Unable to deliver to #{person.hbx_id} for the following error #{e}"
+        end
         csv << [
           family_id,
           person.hbx_id

@@ -19,6 +19,7 @@ class ConsumerRole
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
+  NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -67,9 +68,12 @@ class ConsumerRole
 
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
+  field :native_validation, type: String, default: nil
+  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
+  field :native_update_reason, type: String
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -121,17 +125,11 @@ class ConsumerRole
 
   after_initialize :setup_lawful_determination_instance
 
-  before_validation :ensure_ssn_validation_status
+  before_validation :ensure_validation_states, on: [:create, :update]
 
   def ivl_coverage_selected
     if unverified?
       coverage_purchased!
-    end
-  end
-
-  def ensure_ssn_validation_status
-    if self.person && self.person.ssn.blank?
-      self.ssn_validation = "na"
     end
   end
 
@@ -173,10 +171,13 @@ class ConsumerRole
 
   #check verification type status
   def is_type_outstanding?(type)
-    if type == 'Social Security Number'
-      !self.ssn_verified? && !self.has_docs_for_type?(type)
-    elsif type == 'Citizenship' || type == 'Immigration status'
-      !lawful_presence_authorized? && !self.has_docs_for_type?(type)
+    case type
+      when 'Social Security Number'
+        !ssn_verified? && !has_docs_for_type?(type)
+      when 'American Indian Status'
+        !native_verified? && !has_docs_for_type?(type)
+      else
+        !lawful_presence_authorized? && !has_docs_for_type?(type)
     end
   end
 
@@ -358,7 +359,7 @@ class ConsumerRole
     state :fully_verified
     state :verification_period_ended
 
-    before_all_events :ensure_ssn_validation_status
+    before_all_events :ensure_validation_states
 
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :fully_verified
@@ -547,6 +548,14 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  #class methods
+  class << self
+    #this method will be used to check 90 days verification period for outstanding verification
+    def advance_day(check_date)
+      #handle all outstanding consumer who is unverified more than 90 days
+    end
+  end
+
   private
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
@@ -588,6 +597,14 @@ class ConsumerRole
 
   def citizenship_verified?
     lawful_presence_authorized?
+  end
+
+  def native_verified?
+    native_validation == "valid"
+  end
+
+  def native_outstanding?
+    native_validation == "outstanding"
   end
 
   def indian_conflict?
@@ -638,6 +655,45 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
+  end
+
+  def all_types_verified?
+    person.verification_types.all?{ |type| is_type_verified?(type) }
+  end
+
+  def is_type_verified?(type)
+    case type
+      when 'Social Security Number'
+        ssn_verified?
+      when 'American Indian Status'
+        native_verified?
+      else
+        lawful_presence_verified?
+    end
+  end
+
+  def ensure_validation_states
+    ensure_ssn_validation_status
+    ensure_native_validation
+  end
+
+  def ensure_native_validation
+    if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
+      self.native_validation = "outstanding" if native_validation == "na"
+    else
+      self.native_validation = "na"
+    end
+  end
+
+  def ensure_ssn_validation_status
+    if self.person && self.person.ssn.blank?
+      self.ssn_validation = "na"
+    end
+  end
+
+  #check if consumer purchased a coverage and no response from hub in 24 hours
+  def processing_hub_24h?
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
   end
 
   def record_transition(*args)

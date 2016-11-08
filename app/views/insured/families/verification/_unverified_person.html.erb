@@ -5,24 +5,19 @@
         <td>
           <%=v_type%>&nbsp;
         </td>
+        <td style="<% if current_user && !current_user.has_hbx_staff_role? %>
+                        text-align: center;
+                   <% end %>">
+          <span class="label label-<%=verification_type_class(v_type, person)%>">
+            <%= show_v_type(v_type, person) %>
+          </span>&nbsp;
+          <%= pundit_span Family, :updateable? %>
           <!-- HBX admin inclusion -->
-            <td style="<% if current_user && !current_user.has_hbx_staff_role? %>
-text-align: center; <% end %>">
-              <span class="label label-<%=verification_type_class(v_type, person)%>">
-                <% if verification_type_status(v_type, person) == "in review"%>
-                  &nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;
-                <% elsif verification_type_status(v_type, person) == "verified" %>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <% else %>
-                  <%= verification_type_status(v_type, person).titleize %>
-                <% end %>
-              </span>&nbsp;
-            <%= pundit_span Family, :updateable? %>  
-              <% if verification_type_status(v_type, person) != "verified" && current_user.has_hbx_staff_role? %>
-                <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: member.person, v_type: v_type } %>
-              <% end %>
-            </span>  
-            </td>
+          <% if verification_type_status(v_type, person) != "verified" && current_user.has_hbx_staff_role? %>
+              <%= render partial: 'insured/families/verification/ivl_verification_complete_form', locals: { person: member.person, v_type: v_type } %>
+          <% end %>
+          </span>
+        </td>
           <!-- >>>> hbx admin inclusion -->
         <td>
           <%= pundit_span Family, :updateable? %>  
