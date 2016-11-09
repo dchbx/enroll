@@ -81,6 +81,7 @@
     </div>
     <% if @employer_profile.census_employees.count > 0 %>
       <div class="row">
+        <%= render_datatable(@datatable)%>
         <div class="module census-employees-table">
             <%= render "employers/employer_profiles/my_account/employees_by_status", status: ( params[:status] || "active" ) %>
         </div>

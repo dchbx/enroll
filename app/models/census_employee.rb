@@ -479,6 +479,10 @@ class CensusEmployee < CensusMember
     bg_assignment.present? && HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
   end
 
+  def full_name
+    @full_name = [first_name,last_name].compact.join(" ")
+  end
+
   class << self
 
     def enrolled_count(benefit_group)
