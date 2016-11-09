@@ -2,6 +2,16 @@
 <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
 
+
+
+
+
+  <%= link_to(census_employee_datatable_employers_employer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers-invoices", "role" => "tab" ) do  %>
+    <span class="hidden-xs">Test</span>
+    <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
+  <% end %>
+
+
 <%- if @tab == 'home' %>
 <%= render :partial => 'employers/employer_profiles/my_account/home_tab' %>
 <%- elsif @tab == 'profile' %>

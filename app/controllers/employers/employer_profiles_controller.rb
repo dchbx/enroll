@@ -1,9 +1,9 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees,:cenesus_employee]
 
-  before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
+  before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form,:census_employee]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
   before_action :check_access_to_organization, only: [:edit]
@@ -260,6 +260,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+  def census_employee_datatable
+    @datatable=Effective::Datatables::CensusEmployees.new(params[:scopes])
+  end
 
   private
 

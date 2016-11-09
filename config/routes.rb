@@ -250,6 +250,7 @@ Rails.application.routes.draw do
         get 'search'
         post 'match'
         get 'inbox'
+        get  'census_employee_datatable'
       end
       resources :plan_years do
         get 'reference_plans'
