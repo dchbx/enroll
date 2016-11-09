@@ -1,14 +1,20 @@
 module Effective
   module Datatables
-    class CensusEmployees < Effective::Datatables
+    class CensusEmployeeDatatable < Effective::MongoidDatatable
       datatable do
-
-
-
+        table_column :first_name
+        table_column :last_name
+        table_column :dob
+        table_column :aasm_state
+        # table_column #hired
+        # table_column #benefit package
+        # table_column #enrollment status
+        # table_column #terminate
+        # table_column #edit
       end
 
       def collection
-        #census_employe = #CensusEmployee.all
+        @census_employee = CensusEmployee.all
       end
 
       scopes do
