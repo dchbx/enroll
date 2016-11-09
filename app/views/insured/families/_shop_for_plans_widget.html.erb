@@ -16,15 +16,20 @@
     </div>
   </div>
 </div>
-        <% else %>
+<% else %>
+  <% action_path = find_sep_insured_families_path  %>
+  <% if is_under_open_enrollment? || @employee_role.try(:is_eligible_to_enroll_without_qle?) || @person.consumer_role.present? || @person.resident_role.present? %>
+    <% action_path = new_insured_group_selection_path %>
+  <% end %>
 
-        <% action_path = find_sep_insured_families_path  %>
-        <% if is_under_open_enrollment? || @employee_role.try(:is_eligible_to_enroll_without_qle?) || @person.consumer_role.present? %>
-        <% action_path = new_insured_group_selection_path %>
-        <% end %>
+  <%= form_tag action_path, method: :get do %>
+    <% if @hbx_enrollments.present? %>
+      <%= hidden_field_tag 'change_plan', 'change_plan' %>
+    <% end %>
 
-        <%= form_tag action_path, method: :get do %>
-
+    <%= hidden_field_tag 'person_id', @person.try(:id) %>
+    <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) %>
+    <%= hidden_field_tag 'shop_for_plans', 'shop_for_plans' %>
         <% if @hbx_enrollments.present? %>
         <%= hidden_field_tag 'change_plan', 'change_plan' %>
         <% end %>
@@ -46,48 +51,67 @@
                 <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
               </div>
             </div>
+            <strong>Shop for health and dental plans</strong>
           </div>
-        </div>
-                <% end %>
-                <% end %>
-
-
-        <div aria-labelledby="myModalLabel" class="modal fade" id="choose_flow" role="dialog" tabindex="-1">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
-                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                <div class="row">
-                  <div class="col-sm-12">
-                    <% if @person.consumer_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? %>
-                    <% options = {shop_for_plan: 'shop_for_plan'}
-              options.merge!(person_id: @person.id) if @person.present?
-              options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
-              options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
-            %>
-                    <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
-                    You are not under open enrollment period.
-                    <% else %>
-                    <p>If you enroll today, coverage will begin
-                      <%= format_date ivl_enrollment_effective_date %>. You can
-                      <%= link_to 'click here', new_insured_group_selection_path(options) %>
-                      for Open Enrollment Period.</p>
-                    <% end %>
-                    <br/>
-
-                    <p>Do you need coverage earlier? See if you qualify for a
-                      <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
-                    <% else %>
-                    You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
-                    <div id="shop-for-plans-widget">
-                      <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
-                    </div>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
+          <% if @family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)%>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%> ">
+              <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
+                Shop for Plans
+              </button>
             </div>
+          <% else %>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%>">
+              <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+<div aria-labelledby="myModalLabel" class="modal fade" id="choose_flow" role="dialog" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <div class="row">
+          <div class="col-sm-12">
+            <% if @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? %>
+              <% options = {shop_for_plan: 'shop_for_plan'}
+                options.merge!(person_id: @person.id) if @person.present?
+                options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
+                options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
+              %>
+              <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
+                You are not under open enrollment period.
+              <% else %>
+                <p>If you enroll today, coverage will begin
+                  <%= format_date ivl_enrollment_effective_date %>. You can
+                  <%= link_to 'click here', new_insured_group_selection_path(options) %>
+                  for Open Enrollment Period.</p>
+              <% end %>
+              <br/>
+              <% if @family.active_seps.last && !dual_role_without_shop_sep?%>
+                <p>Would you like to use your existing special enrollment period? "<%= @family.active_seps.last.qualifying_life_event_kind.title %>"</p>
+                <p>
+                  <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
+                  <%= build_link_for_sep_type(@active_admin_sep, 'Shop with existing SEP') %>
+                </p>
+                <p><%= link_to 'Qualify for new SEP', find_sep_insured_families_path(options) %></p>
+              <% else %>
+                <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
+              <% end %>
+            <% else %>
+              You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
+              <div id="shop-for-plans-widget">
+                <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+              </div>
+            <% end %>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
