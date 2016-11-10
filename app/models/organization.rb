@@ -34,6 +34,8 @@ class Organization
 
   field :is_active, type: Boolean
 
+  field :is_fake_fein, type: Boolean
+
   # User or Person ID who created/updated
   field :updated_by, type: BSON::ObjectId
 
@@ -130,6 +132,13 @@ class Organization
         }
       })
   }
+
+  def self.generate_fein
+    loop do
+      random_fein = (["00"] + 7.times.map{rand(10)} ).join
+      break random_fein unless Organization.where(:fein => random_fein).count > 0
+    end
+  end
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?

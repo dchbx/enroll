@@ -36,24 +36,80 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    context "Citizenship and Immigration status" do
+    context "Native American status" do
+      context "native american with uploaded docs" do
+        it "returns in review status" do
+          person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "American Indian Status")
+          expect(helper.verification_type_status("American Indian Status", person)).to eq "in review"
+        end
+      end
+      context "native validation pending" do
+        it "returns outstanding status" do
+          person.consumer_role.native_validation = "pending"
+          person.consumer_role.vlp_documents=[]
+          expect(helper.verification_type_status("American Indian Status", person)).to eq "outstanding"
+        end
+      end
+      context "native validation outstanding" do
+        it "returns outstanding status" do
+          person.consumer_role.native_validation = "outstanding"
+          person.consumer_role.vlp_documents=[]
+          expect(helper.verification_type_status("American Indian Status", person)).to eq "outstanding"
+        end
+      end
+    end
+
+    context "Citizenship/Immigration" do
       context "lawful presence valid" do
         it "returns verified status" do
           person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
           expect(helper.verification_type_status("Immigration status", person)).to eq "verified"
         end
       end
-      context "lawful presence with uploaded docs" do
-        it "returns in review status" do
-          person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-          person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
-          expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
+      describe "Citizenship" do
+        context "lawful presence with uploaded docs" do
+          it "returns in review status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Citizenship")
+            expect(helper.verification_type_status("Citizenship", person)).to eq "in review"
+          end
+        end
+        context "lawful presence determination pending" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Citizenship", person)).to eq "outstanding"
+          end
+        end
+        context "lawful presence determination outstanding" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Citizenship", person)).to eq "outstanding"
+          end
         end
       end
-      context "lawful presence determination fails" do
-        it "returns outstanding status" do
-          person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-          expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
+      describe "Immigration status" do
+        context "lawful presence with uploaded docs" do
+          it "returns in review status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
+            expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
+          end
+        end
+        context "lawful presence determination pending" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
+          end
+        end
+        context "lawful presence determination outstanding" do
+          it "returns outstanding status" do
+            person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
+            person.consumer_role.vlp_documents=[]
+            expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
+          end
         end
       end
     end
@@ -75,12 +131,22 @@ RSpec.describe VerificationHelper, :type => :helper do
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         expect(helper.verification_type_class("Immigration status", person)).to eq("success")
       end
+
+      it "returns success for American Indian status verified" do
+        person.consumer_role.native_validation = "valid"
+        expect(helper.verification_type_class("American Indian Status", person)).to eq("success")
+      end
     end
 
     context "verification type status in review" do
       it "returns warning for SSN outstanding with docs" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
         expect(helper.verification_type_class("Social Security Number", person)).to eq("warning")
+      end
+
+      it "returns warning for American Indian outstanding with docs" do
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "American Indian Status")
+        expect(helper.verification_type_class("American Indian Status", person)).to eq("warning")
       end
 
       it "returns warning for Citizenship outstanding with docs" do
@@ -97,7 +163,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
 
     context "verification type status outstanding" do
-      let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination, aasm_state: "verification_pending") }
+      let(:lawful_presence_determination) { FactoryGirl.build(:lawful_presence_determination, aasm_state: "verification_outstanding") }
       before :each do
         person.consumer_role.is_state_resident = false
         person.consumer_role.vlp_documents = []
