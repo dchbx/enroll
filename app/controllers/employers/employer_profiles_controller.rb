@@ -111,7 +111,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         set_flash_by_announcement if @tab == 'home'
       end
     end
-    @datatable=Effective::Datatables::CensusEmployeeDatatable.new(params[:scopes])
+    @datatable=Effective::Datatables::CensusEmployeeDatatable.new(:current_employer_profile_id=>@employer_profile.try(:id),:current_employer_profile=>@employer_profile)
+
   end
 
   def show_profile
