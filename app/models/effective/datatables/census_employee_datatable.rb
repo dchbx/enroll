@@ -44,10 +44,22 @@ module Effective
       end
 
       def terminate(row)
-        if row.employment_terminated?
-        else
-          #link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id, status: census_employee.aasm_state, tab: 'employees')
-        end
+
+        # if row.employment_terminated?
+        #     <a class="show_confirm btn btn-green-2" id="show_confirm_#{census_employee.id} <%= pundit_class EmployerProfile, :updateable? %>">
+        #       <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;" onclick="$(this).closest('tr').next().show();">Rehire</span>
+        #     </a>
+        #  else
+        #  link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'),
+        #          employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id, status: status, tab: 'employees')
+        #     <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
+        #   end
+        #
+        #
+        #
+        #
+        #
+
       end
 
       def collection
