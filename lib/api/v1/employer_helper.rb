@@ -5,7 +5,7 @@ module Api
     class EmployerHelper < BaseHelper
       attr_accessor :plan_year
 
-      def initialize args
+      def initialize args={}
         super args
         @plan_year = @employer_profile.show_plan_year if @employer_profile
       end

@@ -299,7 +299,7 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
           expect(@output["open_enrollment_ends"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_end_on.strftime("%Y-%m-%d")
           expect(@output["plan_year_begins"]).to eq mikes_employer_profile.active_plan_year.start_on.strftime("%Y-%m-%d")
           expect(@output["renewal_in_progress"]).to be_falsey
-          expect(@output["renewal_application_available"]).to eq "2016-07-01"
+          expect(@output["renewal_application_available"]).to eq "2016-08-01"
           expect(@output["renewal_application_due"]).to eq mikes_plan_year.due_date_for_publish.strftime("%Y-%m-%d")
           expect(@output["binder_payment_due"]).to eq ""
           expect(@output["minimum_participation_required"]).to eq 1
@@ -314,21 +314,18 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
         end
 
         it "should not be able to access Carol's broker's employer list" do
-          pending("add security for broker from other agency")
           get :employers_list, {id: carols_broker_agency_profile.id}, format: :json
-          expect(response).to have_http_status(:unauthorized)
+          expect(response).to have_http_status(404)
         end
 
         it "should not be able to access Carol's employee roster" do
-          pending("add roster security")
           get :employee_roster, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
-          expect(response).to have_http_status(:unauthorized)
+          expect(response).to have_http_status(404)
         end
 
         it "should not be able to access Carol's employer details" do
-          pending("add details security")
           get :employer_details, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
-          expect(response).to have_http_status(:unauthorized)
+          expect(response).to have_http_status(404)
         end
 
       end
