@@ -17,8 +17,8 @@ class HbxAdminController < ApplicationController
     @aptc_applied_for_all_hbxs = @family.active_household.hbx_enrollments_with_aptc_by_year(@current_year).map{|h| h.applied_aptc_amount.to_f}.sum || 0
     @plan_premium_for_enrollments = Admin::Aptc.build_plan_premium_hash_for_enrollments(@hbxs)
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
-    @max_aptc = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:max_aptc)
-    @csr_percent_as_integer = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:csr_percent_as_integer)
+    @max_aptc = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:max_aptc) || 0
+    @csr_percent_as_integer = @family.active_household.latest_active_tax_household_with_year(@current_year).try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
     respond_to do |format|
       format.js { render (@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
     end
