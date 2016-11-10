@@ -67,13 +67,13 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "patch update" do
     let(:user) { double(has_broker_role?: true)}
     #let(:org) { double }
-    let(:org) { double("Organization", id: "test") }
-
+    let(:org) { FactoryGirl.create(:organization)}
+    let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
-      allow(Organization).to receive(:find).and_return(org)
       allow(controller).to receive(:sanitize_broker_profile_params).and_return(true)
+      allow(controller).to receive(:authorize).and_return(true)
     end
 
     it "should success with valid params" do
@@ -89,6 +89,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
       #expect(response).to render_template("edit")
       #expect(response).to have_http_status(:redirect)
       #expect(flash[:error]).to eq "Failed to Update Broker Agency Profile"
+    end
+
+    it "should update record" do
+      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates"}
+      broker_agency_profile.primary_broker_role.person.reload
+      expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
   end
 

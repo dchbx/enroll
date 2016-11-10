@@ -1233,4 +1233,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.errors[:hired_on].to_s).to match /date can't be before  date of birth/
     end
   end
+
+  context '.renewal_benefit_group_assignment' do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment_two)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    before do
+      benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
+      benefit_group_assignment_one.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+      benefit_group_assignment_two.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+    end
+
+    it "should select the latest renewal benefit group assignment" do
+      expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
+    end
+  end
 end

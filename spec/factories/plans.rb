@@ -44,6 +44,19 @@ FactoryGirl.define do
       end
     end
 
+    factory :active_individual_health_plan,       traits: [:individual_health, :this_year, :with_premium_tables]
+    factory :active_shop_health_plan,             traits: [:shop_health, :this_year, :with_premium_tables]
+    factory :active_individual_dental_plan,       traits: [:individual_dental, :this_year, :with_premium_tables]
+    factory :active_individual_catastophic_plan,  traits: [:catastrophic, :this_year, :with_premium_tables]
+    factory :active_csr_87_plan,                  traits: [:csr_87, :this_year, :with_premium_tables]
+    factory :active_csr_00_plan,                  traits: [:csr_00, :this_year, :with_premium_tables]
+
+    factory :renewal_individual_health_plan,      traits: [:individual_health, :next_year, :with_premium_tables]
+    factory :renewal_shop_health_plan,            traits: [:shop_health, :next_year, :with_premium_tables]
+    factory :renewal_individual_dental_plan,      traits: [:individual_dental, :next_year, :with_premium_tables]
+    factory :renewal_individual_catastophic_plan, traits: [:catastrophic, :next_year, :with_premium_tables]
+    factory :renewal_csr_87_plan,                 traits: [:csr_87, :next_year, :with_premium_tables]
+    factory :renewal_csr_00_plan,                 traits: [:csr_00, :next_year, :with_premium_tables]
   end
 
   factory :premium_table do

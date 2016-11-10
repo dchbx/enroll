@@ -28,6 +28,7 @@ class Plan
   field :ehb, type: Float, default: 0.0
 
   field :renewal_plan_id, type: BSON::ObjectId
+  field :cat_age_off_renewal_plan_id, type: BSON::ObjectId
   field :is_standard_plan, type: Boolean, default: false
 
   field :minimum_age, type: Integer, default: 0
@@ -304,6 +305,11 @@ class Plan
   def carrier_profile
     return @carrier_profile if defined? @carrier_profile
     @carrier_profile = CarrierProfile.find(carrier_profile_id) unless carrier_profile_id.blank?
+  end
+
+  def cat_age_off_renewal_plan
+    return @cat_age_off_renewal_plan if defined? @cat_age_off_renewal_plan
+    @cat_age_off_renewal_plan = Plan.find(cat_age_off_renewal_plan_id) unless cat_age_off_renewal_plan_id.blank?
   end
 
   # has_one renewal_plan
