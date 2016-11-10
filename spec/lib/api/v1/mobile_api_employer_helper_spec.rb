@@ -242,8 +242,8 @@ RSpec.describe Api::V1::EmployerHelper, dbclean: :after_each do
       expect(active[:health]).to include(:reference_plan_name, :reference_plan_HIOS_id, :carrier_name, :plan_type,
                                          :metal_level, :plan_option_kind)
 
-      expect(active[:health][:reference_plan_name]).to eq 'BLUECHOICE SILVER26 2,000'
-      expect(active[:health][:reference_plan_HIOS_id]).to eq '41842DC0400035-01'
+      expect(active[:health][:reference_plan_name]).to include 'BLUECHOICE SILVER'
+      expect(active[:health][:reference_plan_HIOS_id]).to include '41842DC04000'
       expect(active[:health][:carrier_name]).to eq 'United Health Care'
       expect(active[:health][:plan_type]).to eq 'HMO'
       expect(active[:health][:metal_level]).to eq 'Silver'
