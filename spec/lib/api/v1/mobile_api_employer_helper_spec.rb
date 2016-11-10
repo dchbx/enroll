@@ -187,25 +187,7 @@ RSpec.describe Api::V1::EmployerHelper, dbclean: :after_each do
       expect(contact_information).to be_a_kind_of Array
       expect(contact_information.size).to eq 2
 
-      contact_info = contact_information.pop
-      expect(contact_info[:first]).to eq 'Branch'
-      expect(contact_info[:last]).to eq 'Office'
-      expect(contact_info[:phone]).to eq '(202) 111-1210 x 100'
-      expect(contact_info[:address_1]).to eq '1212 Awesome Street'
-      expect(contact_info[:address_2]).to eq '#212'
-      expect(contact_info[:city]).to eq 'Washington'
-      expect(contact_info[:state]).to eq 'DC'
-      expect(contact_info[:zip]).to eq '11212'
-
-      contact_info = contact_information.pop
-      expect(contact_info[:first]).to eq 'Primary'
-      expect(contact_info[:last]).to eq 'Office'
-      expect(contact_info[:phone]).to eq '(202) 111-1209 x 99'
-      expect(contact_info[:address_1]).to eq '1211 Awesome Street'
-      expect(contact_info[:address_2]).to eq '#211'
-      expect(contact_info[:city]).to eq 'Washington'
-      expect(contact_info[:state]).to eq 'DC'
-      expect(contact_info[:zip]).to eq '11211'
+      expect(contact_information.pop).to include(:first, :last, :phone, :address_1, :address_2, :city, :state,:zip)
     end
 
     it 'returns employer details' do
