@@ -1,11 +1,12 @@
 <br/>
 <div class="col-md-10 col-md-10 col-md-10 ">
-  <div class = "table-responsive"> 
+  <div class = "table-responsive" id="terminated_enrollemnts"> 
         <h3 class='title'></h3>
           <% if  @health_enrollments.present? %>
             <table class = "table table-striped table-bordered" style="table-layout: fixed;">
               <thead>        
                 <tr>
+                  <th></th>
                   <th>Medical <br/> Plans</th>
                   <th>Coverage <br/> Year</th> 
                   <th>Effective <br/> Date</th>
@@ -17,7 +18,8 @@
               </thead>
               <%@health_enrollments.each do |enrollment| %>
                 <tr>
-                <td><%= enrollment.benefit_group.reference_plan.name%> </td>
+                <td> <input type="checkbox" name="selected_<%=enrollment.id%>" value="checked" /></td>
+                <td id="name"><%= enrollment.benefit_group.reference_plan.name%> </td>
                 <td><%= enrollment.effective_on.year%></td>
                 <td><%= enrollment.effective_on%></td>
                 <td><%= enrollment.terminated_on%></td>
@@ -35,6 +37,7 @@
             <table class = "table table-striped table-bordered" style="table-layout: fixed;">
               <thead>              
                 <tr>
+                  <th></th>
                   <th>Dental<br/>Plans</th>
                   <th>Coverage<br/>Year</th> 
                   <th>Effective<br/>Date</th>
@@ -47,7 +50,8 @@
               
               <%@dental_enrollments.each do |enrollment| %>
                 <tr>
-                <td><%= enrollment.benefit_group.reference_plan.name%> </td>
+                <td> <input type="checkbox" name="selected_<%=enrollment.id%>" value="checked" /></td>
+                <td id="name"><%= enrollment.benefit_group.reference_plan.name%> </td>
                 <td><%= enrollment.effective_on.year%></td>
                 <td><%= enrollment.effective_on%></td>
                 <td><%= enrollment.terminated_on%></td>               
@@ -73,6 +77,13 @@
         <h4 class="modal-title">You are about to reinstate the following enrollment</h4>
       </div>
       <div style="margin-left:10px;">
+      <input type="text" name="fname" value="<%=@person.first_name%>"><br>
+      
+      </div>
+      <div id="test">
+        
+      </div>
+      <div style="margin-left:10px;">
       <div>comments:</div>
       <textarea rows="4" cols="75"> </textarea>
       </div>
@@ -84,3 +95,10 @@
     </div>
   </div>
 </div>
+<script type="text/javascript">
+  $("div#reinstate_confirm" ).on('shown.bs.modal', function(event){
+    $('#terminated_enrollemnts :checkbox:checked').each(function (){
+     $('#test').html($(this).closest('tr').find("td#name").text());
+     });
+  });
+</script>
