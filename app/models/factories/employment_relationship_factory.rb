@@ -5,7 +5,7 @@ module Factories
     end
 
     def build(employee_candidate, census_employee)
-      benefit_group = (census_employee.renewal_benefit_group_assignment || census_employee.active_benefit_group_assignment).benefit_group
+      benefit_group = (census_employee.active_benefit_group_assignment || census_employee.renewal_benefit_group_assignment).benefit_group
       hired_on = census_employee.hired_on
       employer = census_employee.employer_profile
       ::Forms::EmploymentRelationship.new({
