@@ -6,7 +6,7 @@
 </div>
 <div id='account-detail'>
   <% @person.active_employee_roles.each do |employee_role|%>
-  <%= render 'employer_panel' if newhire_enrollment_eligible?(employee_role) %>
+    <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
 
   <div class="my-account-page">

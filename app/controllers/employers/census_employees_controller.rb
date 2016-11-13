@@ -257,7 +257,8 @@ class Employers::CensusEmployeesController < ApplicationController
         :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [
           :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
-        ]
+        ],
+      :benefit_group_assignments_attributes => [:id, :benefit_group_id]
       )
   end
 

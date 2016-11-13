@@ -1133,6 +1133,37 @@ describe Person do
 
   end
 
+  describe "has_active_employee_role_for_census_employee?" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:census_employee2) { FactoryGirl.create(:census_employee) }
+
+    context "person has no active employee roles" do
+      it "should return false" do
+        expect(person.active_employee_roles).to be_empty
+        expect(person.has_active_employee_role_for_census_employee?(census_employee)).to be_falsey
+      end
+    end
+
+    context "person has active employee roles" do
+      before(:each) do
+        person.employee_roles.create!(FactoryGirl.create(:employee_role, person: person, 
+                                                                       census_employee_id: census_employee.id).attributes)
+        person.employee_roles.pluck(:census_employee).each { |census_employee| census_employee.update_attribute(:aasm_state, 'eligible') }
+      end
+
+      it "should return true if person has active employee role for given census_employee" do
+        expect(person.active_employee_roles).to be_present
+        expect(person.has_active_employee_role_for_census_employee?(census_employee)).to be_truthy
+      end
+
+      it "should return false if person does not have active employee role for given census_employee" do
+        expect(person.active_employee_roles).to be_present
+        expect(person.has_active_employee_role_for_census_employee?(census_employee2)).to be_falsey
+      end
+    end
+   end
+
   describe "agent?" do
     let(:person) { FactoryGirl.create(:person) }
 

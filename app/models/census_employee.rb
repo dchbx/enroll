@@ -450,7 +450,8 @@ class CensusEmployee < CensusMember
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
-    return false if person.blank? || (person.present? && person.has_active_employee_role?)
+    return false if person.blank? || (person.present? && 
+                                      person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
   end

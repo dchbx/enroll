@@ -757,21 +757,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "construct_employee_role_for_match_person" do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
     let(:census_employee1) { FactoryGirl.build(:census_employee) }
 
     it "should return false when not match person" do
       expect(census_employee1.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has active employee role" do
+    it "should return false when match person which has active employee role for current census employee" do
+      census_employee.update_attributes(employer_profile_id: employer_profile.id)
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    census_employee_id: census_employee.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has no active employee role" do
-      person.employee_roles.destroy_all
-      allow(Factories::EnrollmentFactory).to receive(:build_employee_role).and_return true
+    it "should return true when match person has no active employee roles for current census employee" do
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
   end

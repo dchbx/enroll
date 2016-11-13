@@ -28,7 +28,14 @@ Given(/Employee new hire enrollment window is closed/) do
 end
 
 And(/Employee has current hired on date/) do
-  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
+  CensusEmployee.where(:first_name => /Soren/i, 
+                       :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
+end
+
+And(/Current hired on date all employments/) do
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).each do |census_employee|
+    census_employee.update_attributes(:hired_on => TimeKeeper.date_of_record)
+  end
 end
 
 And(/Employee has past hired on date/) do

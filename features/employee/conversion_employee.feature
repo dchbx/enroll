@@ -117,3 +117,43 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Soren White should see coverage summary page with renewing plan year start date as effective date
       Then Soren White should see the receipt page with renewing plan year start date as effective date
       Then Employee should see "my account" page with enrollment
+
+  Scenario: Existing Employee can buy coverage from multiple employers during open enrollment of renewing plan year
+    Given Conversion Employer for Soren White exists with active and renewing plan year
+    Given Multiple Conversion Employers for Soren White exist with active and renewing plan years
+      And Employer for Soren White is under open enrollment
+      And Other Employer for Soren White is under open enrollment
+      And Current hired on date all employments
+      And Soren White matches all employee roles to employers and is logged in
+      And Soren White has New Hire Badges for all employers
+      When Soren White click the first button of new hire badge
+      Then Employee should see the group selection page
+      When Employee clicks continue on the group selection page
+      Then Employee should see the plan shopping welcome page
+      Then Soren White should see the 1st ER name
+      Then Employee should see the list of plans
+      When Employee selects a plan on the plan shopping page
+      Then Employee should see the coverage summary page
+      Then Soren White should see the 1st ER name
+      When Employee clicks on Confirm button on the coverage summary page
+      Then Soren White should see the 1st ER name
+      Then Employee should see the receipt page
+      Then Employee should see the "my account" page
+      Then Soren White should see the 1st ER name
+      And Soren White should see New Hire Badges for 2st ER
+
+      When 2st ER for Soren White published renewing plan year
+      When Soren White click the button of new hire badge for 2st ER
+      Then Employee should see the group selection page
+      When Employee clicks continue on the group selection page
+      Then Soren White should see the 2st ER name
+      Then Employee should see the plan shopping welcome page
+      Then Employee should see the list of plans
+      When Employee selects a plan on the plan shopping page
+      Then Employee should see the coverage summary page
+      Then Soren White should see the 2st ER name
+      When Employee clicks on Confirm button on the coverage summary page
+      Then Soren White should see the 2st ER name
+      Then Employee should see the receipt page
+      Then Employee should see the "my account" page
+      Then Soren White should see the 2st ER name
