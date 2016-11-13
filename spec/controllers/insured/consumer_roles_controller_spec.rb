@@ -67,6 +67,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname", :match_census_employees => []) }
+    let(:mock_resident_candidate) { instance_double("Forms::ResidentCandidate", :valid? => validation_result, ssn: "", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:found_person){ [] }
     let(:person){ instance_double("Person") }
 
@@ -76,7 +77,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(mock_consumer_candidate).to receive(:match_person).and_return(found_person)
       allow(Forms::ConsumerCandidate).to receive(:new).with(person_parameters.merge({user_id: user.id})).and_return(mock_consumer_candidate)
       allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
+      allow(Forms::ResidentCandidate).to receive(:new).and_return(mock_resident_candidate)
       allow(mock_employee_candidate).to receive(:valid?).and_return(false)
+      allow(mock_resident_candidate).to receive(:valid?).and_return(false)
     end
 
     context "given invalid parameters" do
@@ -127,11 +130,12 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
+          #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
           post :match, :person => person_parameters
         end
 
-        it "render employee role match tempalte" do
+        it "render employee role match template" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template('insured/employee_roles/match')
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
@@ -330,7 +334,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         allow(user).to receive(:person).and_return(person)
         allow(person).to receive(:consumer_role?).and_return(true)
         allow(person).to receive(:consumer_role).and_return(consumer_role)
-        allow(person).to receive(:completed_identity_verification?).and_return(true) 
+        allow(person).to receive(:completed_identity_verification?).and_return(true)
         get "ridp_agreement"
       end
 
@@ -346,7 +350,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
       before :each do
         allow(user).to receive(:person).and_return(person)
-        allow(person).to receive(:completed_identity_verification?).and_return(false) 
+        allow(person).to receive(:completed_identity_verification?).and_return(false)
         get "ridp_agreement"
       end
 

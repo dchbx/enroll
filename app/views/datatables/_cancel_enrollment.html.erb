@@ -1,0 +1,51 @@
+<script type="text/javascript">
+  jQuery('[id^="cancel_hbx_"]').click(function($) {
+    if (this.checked) {
+      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', false);
+    }
+    else {
+      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', true);
+      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('checked', false);
+    }
+  });
+</script>
+
+<td colspan="90%">
+  <%if @hbxs.present?%>
+    <%= form_tag update_cancel_enrollment_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
+      <h3 class='title'>Cancel Enrollment</h3>
+      <br />
+      <table  class="table table-striped">
+        <tr>
+          <th>HBX ID</th>
+          <th>Plan</th>
+          <th>Effective Date</th>
+          <th>Cancellation Date</th>
+          <th>Cancel Enrollment ?</th>
+          <th>Transmit to Carrier ?</th>
+        </tr>
+        <% @hbxs.each do |hbx| %>
+        <tr>
+          <td><%= hbx.hbx_id %></td>
+          <td><%= hbx.plan.name %></td>
+          <td><%= hbx.effective_on %></td>
+          <td><%= hbx.effective_on %></td>
+          <td><%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %></td>
+          <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%></td>
+        </tr>
+        <% end %>
+        <tr><td colspan = "6"><br /></td></tr>
+        <tr>
+          <td colspan = "6">
+            <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+            <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
+            <%= hidden_field_tag :family_id, params[:family] %>
+            <%= submit_tag "Submit", class: 'btn btn-primary' %>
+          </td>
+        </tr>
+      </table>
+    <% end %>
+  <%else%>
+    <h4 class='title'>No Enrollments to cancel</h3>
+  <%end%>
+</td>

@@ -1,0 +1,27 @@
+<!--Loading the Modal on Page Load; bypassing the button-->
+<script> $(function() { $("#validationModal").modal(); });</script>
+
+<!-- Validation Modal -->
+<div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Please fix the following validation error(s)</h4>
+      </div>
+      <div class="modal-body">
+        <%@aptc_errors.each do |key, val|%>
+          <li><%=val%></li>
+        <%end%>
+
+        <hr />
+        
+          <div class="warning">
+            <i class="fa fa-info-circle"> &nbsp; You may reset your changes by clicking on the 'Reset' button. It will revert to the values strored in the database.</i>
+          </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>

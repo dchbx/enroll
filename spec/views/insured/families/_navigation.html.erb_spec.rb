@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_navigation.html.erb" do
+  let(:person) {FactoryGirl.create(:person, :with_family)}
+  let(:user){ FactoryGirl.create(:user, person: person) }
 
-  let(:user){ instance_double("User") }
   let(:person){
     instance_double(
       "Person",
@@ -27,9 +28,11 @@ RSpec.describe "insured/families/_navigation.html.erb" do
   let(:family_members){ [ family_member, family_member ] }
 
   before :each do
+    sign_in(user)
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:has_active_employee_role?).and_return(true)
     allow(person).to receive(:has_consumer_role?).and_return(true)
+    allow(person).to receive(:has_resident_role?).and_return(true)
     allow(person).to receive(:inbox).and_return(inbox)
     allow(inbox).to receive(:unread_messages).and_return(3)
     allow(view).to receive(:enrollment_group_unverified?).and_return(true)

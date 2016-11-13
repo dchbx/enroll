@@ -1,5 +1,12 @@
 require 'rails_helper'
+require 'aasm/rspec'
 
 RSpec.describe ResidentRole, :type => :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it { should delegate_method(:hbx_id).to :person }
+  it { should delegate_method(:ssn).to :person }
+  it { should delegate_method(:dob).to :person }
+  it { should delegate_method(:gender).to :person }
+  it { should delegate_method(:is_incarcerated).to :person }
+  it { should validate_presence_of :gender }
+  it { should validate_presence_of :dob }
 end

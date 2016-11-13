@@ -248,10 +248,11 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, resident_role: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
+      resident_role: resident_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
       benefit_group_assignment: benefit_group_assignment,
@@ -308,8 +309,19 @@ class Household
   def enrolled_hbx_enrollments
     hbx_enrollments.enrolled
   end
-
+  
   def hbx_enrollments_with_aptc_by_year(year)
     hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
   end
+
+  def all_eligibility_determinations
+    eds = []
+    tax_households.each do |th|
+      th.eligibility_determinations.each do |ed|
+        eds << ed
+      end
+    end
+    eds
+  end
 end
+

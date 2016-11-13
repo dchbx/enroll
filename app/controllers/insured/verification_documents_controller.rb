@@ -74,6 +74,13 @@ class Insured::VerificationDocumentsController < ApplicationController
     @docs_owner.save
   end
 
+  def update_paper_application(title, file_uri)
+    document = @docs_owner.resident_role.vlp_documents.build
+    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
+    @doc_errors = document.errors.full_messages unless success
+    @docs_owner.save
+  end
+
   def get_document(key)
     @person.consumer_role.find_vlp_document_by_key(key)
   end

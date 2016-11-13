@@ -1,0 +1,69 @@
+<script>
+$(document).ready(function(){
+    $(".toggler").click(function(e){
+        e.preventDefault();
+        $('.cat'+$(this).attr('data-prod-cat')).toggle();
+    });
+});
+</script>
+
+<div id= 'message_form'></div>
+<div id="inbox_provider_form" class="table-responsive">
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th colspan="6">APTC / CSR Enrollments</th>
+      </tr>
+      <tr>
+        <th>HBX ID</th>
+        <th>Last Name</th>
+        <th>First Name</th>
+        <th>DOB</th>
+        <th>SSN</th>
+        <th>Family <br />Count</th>
+        <th>Active <br />Enrollment(s)?</th>
+        <th>Edit <br />APTC/CSR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= table_empty_to_human if families.count == 0 %>
+      <% families.each_with_index do |family, ind| %>
+        <% pp = family.primary_applicant.person %>
+
+        <tr id="family_<%= family.id %>">
+
+          <td><%#= pp.hbx_id %> <%= link_to pp.hbx_id, resume_enrollment_exchanges_agents_path(person_id: pp.id) %></td>
+          <td><%= pp.last_name%></td>
+          <td><%= pp.first_name%></td>
+          <td><%= format_date(pp.dob) %></td>
+          <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
+          <td><%= family.active_family_members.size %></td>
+          <td>
+              <% if all_active_enrollment_with_aptc(family).present?%>
+                <span class="glyphicon glyphicon-check">&nbsp;</span>
+                <a href="#" class="toggler" data-prod-cat="<%=ind%>">+ Enrollments</a>
+              <%else%>
+                <span class="glyphicon glyphicon-unchecked">
+              <%end%> 
+          </td>
+          <td>
+                <%if all_active_enrollment_with_aptc(family).blank?%>
+                    <%= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
+                <%else%>
+                    <%= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
+                <%end%>
+          </td>
+        </tr>
+
+        <%all_active_enrollment_with_aptc(family).each do |hbx|%>
+        <tr class="cat<%=ind%>" style="display:none">
+          <td colspan = "1"></td>
+          <td colspan = "6">(<b>Members:</b> <%=hbx_member_names(hbx.hbx_enrollment_members)%>),  <b>Plan:</b> <%=hbx.plan.name%></td>
+        </tr>
+        <%end%>
+      <% end %>
+      
+    </tbody>
+  </table>
+</div>
+

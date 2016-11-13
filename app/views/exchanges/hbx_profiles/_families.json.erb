@@ -1,0 +1,24 @@
+<% row_data = capture do %>
+	<% if family.enrollments.present? %>
+	<% active_health_enrollment = family.enrollments.detect{|enrollment| enrollment.coverage_kind = "health"} %>
+		<span class="for-remote-replace-url" id="cancel" data-replace-url="<%= cancel_enrollment_exchanges_hbx_profiles_path(hbx_id: active_health_enrollment._id) %>"></span>
+		<span class="for-remote-replace-url" id="terminate" data-replace-url="<%= terminate_enrollment_exchanges_hbx_profiles_path(hbx_id: active_health_enrollment._id) %>"></span>
+	<% else %>
+		<span class="for-remote-replace-url disabled" id="cancel" data-replace-url=""></span>
+		<span class="for-remote-replace-url disabled" id="terminate" data-replace-url=""></span>
+	<% end %>
+	
+	<span class="for-remote-replace-url" id="add-sep-form" data-replace-url="<%= add_sep_form_exchanges_hbx_profiles_path(family: family.id)%>"></span>
+  <span class="for-remote-replace-url" id="show-sep-history" data-replace-url="<%= show_sep_history_exchanges_hbx_profiles_path(family: family.id)%>"></span>
+<% end %>
+{
+	"name": "<%= json_escape family.primary_family_member.full_name %>",
+	"ssn": "<%= json_escape family.primary_family_member %>",
+	"dob": "<%= json_escape family.primary_family_member.dob %>",
+	"hbx_id": "<%= json_escape family.primary_family_member.hbx_id %>",
+	"family_ct": "<%= json_escape family.active_family_members.count %>",
+	"registered": "<%= json_escape family.primary_family_member.person.user.present? ? "Yes" : "No" %>",
+	"consumer": "<%= json_escape family.primary_family_member.person.consumer_role.present?  ? "Yes" : "No" %>",
+	"employee": "<%= json_escape family.primary_family_member.person.active_employee_roles.present?  ? "Yes" : "No" %>",
+	"row_data": <%= raw row_data.to_json %>
+}

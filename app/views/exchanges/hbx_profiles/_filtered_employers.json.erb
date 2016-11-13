@@ -19,7 +19,7 @@
   <%= raw rule.to_json %>,
   "<%= json_escape format_time_display(employer.xml_transmitted_timestamp) %>",
   <% transmit_xml_button = capture do %>
-    <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: group_xml_transmitted_message(employer)  }, disabled: make_binder_checkbox_disabled(employer) || employer.can_transmit_xml? ) %>
+    <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: group_xml_transmitted_message(employer)  }, disabled: make_binder_checkbox_disabled(employer) || employer.is_transmit_xml_button_disabled? ) %>
   <% end %>
   <%= raw transmit_xml_button.to_json %>
   ]

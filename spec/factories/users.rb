@@ -38,6 +38,10 @@ FactoryGirl.define do
     roles ["consumer"]
   end
 
+  trait :resident do
+    roles ["resident"]
+  end
+
   trait "assister" do
     roles ["assister"]
   end
