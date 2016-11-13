@@ -225,7 +225,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     context "for special verification period" do
       it "returns special verification period" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
+        allow(family).to receive(:ivl_unverified_enrollments).and_return([hbx_enrollment_sp])
         expect(helper.verification_due_date(family)).to eq Date.new(2016,5,6)
       end
     end
@@ -265,21 +265,21 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:hbx_enrollment) { HbxEnrollment.new(:review_status => "ready") }
     context "if verification needed" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(true)
       end
       it "returns true if enrollment has complete review status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment_incomplete)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment_incomplete)
         expect(helper.hbx_enrollment_incomplete).to be_truthy
       end
       it "returns false for not incomplete status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment)
         expect(helper.hbx_enrollment_incomplete).to be_falsey
       end
     end
 
     context "without enrollments that needs verification" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(false)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(false)
       end
 
       it "returns false without enrollments" do

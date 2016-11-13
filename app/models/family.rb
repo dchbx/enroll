@@ -445,6 +445,11 @@ class Family
     broker_agency_accounts.detect { |account| account.is_active? }
   end
 
+  def ivl_unverified_enrollments
+    return [] if enrollments.empty?
+    enrollments.individual_market.verification_needed
+  end
+
   class << self
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
