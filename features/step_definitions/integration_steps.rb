@@ -213,6 +213,33 @@ Given(/^Employer for (.*) exists with a published plan year offering health and 
   Caches::PlanDetails.load_record_cache!
 end
 
+
+
+Given(/^Employer for (.*) also has their spouse as an employee and a published plan year$/) do |named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  employer_profile = FactoryGirl.create :employer_profile, organization: organization
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: employer_profile,
+                                                  first_name: person[:first_name],
+                                                  last_name: person[:last_name],
+                                                  ssn: person[:ssn],
+                                                  dob: person[:dob_date]
+  
+  person = people["Patrick Doe"]
+  spouse_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile,
+                                                         first_name: person[:first_name],
+                                                         last_name: person[:last_name],
+                                                         ssn: person[:ssn],
+                                                         dob: person[:dob].to_date
+
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
+  benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
+  employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  spouse_employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  Caches::PlanDetails.load_record_cache!
+end
+
 When(/^.+ enters? office location for (.+)$/) do |location|
   location = eval(location) if location.class == String
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
@@ -472,6 +499,20 @@ When(/^.+ enters? the dependent info of Sorens daughter$/) do
   find(:xpath, "//label[@for='radio_female']").click
 end
 
+When(/^(.*) enters? the dependent info of their spouse$/) do |named_person|
+  if named_person == 'Soren White'
+    person = people["Patrick Doe"]
+  else
+    person = people["Soren White"]
+  end
+  fill_in 'dependent[first_name]', with: person[:first_name]
+  fill_in 'dependent[last_name]', with: person[:last_name]
+  fill_in 'jq_datepicker_ignore_dependent[dob]', with: person[:dob]
+  find(:xpath, "//p[@class='label'][contains(., 'RELATION')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., 'Spouse')]").click
+  find(:xpath, "//label[@for='radio_male']").click
+end
+
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
   expect(page).to have_link('Add Member')
@@ -483,6 +524,7 @@ When(/^.+ clicks? continue on the dependents page$/) do
 end
 
 Then(/^.+ should see the group selection page$/) do
+  save_and_open_screenshot
   expect(page).to have_css('form')
 end
 
@@ -509,12 +551,42 @@ Then(/^.+ should see the plan shopping welcome page$/) do
   screenshot("plan_shopping_welcome")
 end
 
-Then(/^.+ should see the plan shopping page with no dependent$/) do
+Then(/^Employee should see the plan shopping page with no dependent$/) do
   expect(page).to have_content("Soren White")
 end
 
-Then(/^.+ should see the plan shopping page with one dependent$/) do
-  expect(page).to have_content("Soren White + 1 Dependent")
+Then(/^(.*) should see the plan shopping page with no dependent$/) do |named_person|
+  expect(page).to have_content(named_person)
+end
+
+Then(/^(.*) should see the plan shopping page with one dependent$/) do |named_person|
+  expect(page).to have_content("#{named_person} + 1 Dependent")
+  #expect(page).to have_content("Who Needs Coverage")
+  person = Person.where(first_name: /#{named_person["first_name"]}/).first
+  expect(person.user.present?)
+end
+
+Then(/^(.*) should click the dependent link$/) do |named_person|
+  click_link '1 dependent'
+end
+
+When(/^(.*) clicks? continue on the dependent link from the plan shopping page$/) do |named_person|
+  person = Person.where(first_name: /#{(person = people[named_person])["first_name"]}/, 
+                        last_name: /#{person["last_name"]}/).first
+  expect(page).to have_content("Coverage For")
+  expect(page).to have_content("Name")
+  expect(page).to have_content("Relationship")
+  expect(page).to have_content(person["first_name"])
+  expect(page).to have_content(person["last_name"])
+  expect(page).to have_content(person.families.first.dependents.first.first_name)
+  expect(page).to have_content(person.families.first.dependents.first.last_name)
+end
+
+Then(/^(.*) clicks? the close button the dependents modal$/) do |named_person|
+
+  page.all(:css, '.close').each do |close_button|
+    close_button.click
+  end
 end
 
 When(/^.+ clicks? continue on the plan shopping welcome page$/) do
@@ -536,6 +608,23 @@ end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
   click_link 'Select Plan'
+end
+
+Then(/^.+ should be able to confirm plan selection$/) do
+  expect(page).to have_content("CONFIRM")
+end
+
+Then(/^.+ should see the household page$/) do
+  expect(page).to have_content("PREVIOUS")
+end
+
+Then(/^.+ should have household covered$/) do
+  person = people[named_person]
+  person = Person.where(first_name: /#{person.first_name}/, last_name: /#{person.last_name}/)
+  expect(page).to have_content(person.first_name)
+  expect(page).to have_content(person.last_name)
+  expect(page).to have_content(person.families.first.dependents.first.first_name)
+  expect(page).to have_content(person.families.first.dependents.first.last_name)
 end
 
 Then(/^.+ should see the coverage summary page$/) do
