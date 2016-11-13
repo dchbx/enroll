@@ -204,6 +204,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person.employee_roles).to receive(:last).and_return(employee_role)
         allow(person).to receive(:active_employee_roles).and_return(employee_roles)
         allow(employee_roles).to receive(:first).and_return(employee_role)
+        allow(employee_roles).to receive(:count).and_return(1)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(employee_roles).to receive(:active).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)

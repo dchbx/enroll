@@ -197,11 +197,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
+    let(:census_employee) {FactoryGirl.create(:census_employee)}
     before do
       allow(coverage_household).to receive(:household).and_return(household)
       allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(hbx_enrollment).to receive(:rebuild_members_by_coverage_household).with(coverage_household: coverage_household).and_return(true)
       allow(family).to receive(:latest_household).and_return(household)
       allow(hbx_enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)

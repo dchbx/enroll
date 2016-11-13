@@ -34,7 +34,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+              <% if @employee_role.census_employee.active_benefit_group.try(:is_offering_dental?) %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -89,6 +89,9 @@
             <% end %>
           <% end %>
 
+          <% if @employee_role.present? %>
+            <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+          <% end %>
 
           <div id="coverage_kinds" class='row no-buffer'>
               <h3>Benefit Type</h3>
@@ -227,7 +230,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.try(:is_offering_dental?) %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();

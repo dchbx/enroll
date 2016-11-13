@@ -170,6 +170,7 @@ Rails.application.routes.draw do
         post :terminate
         get :terminate_selection
         get :terminate_confirm
+        get :select_employee_role
       end
     end
 

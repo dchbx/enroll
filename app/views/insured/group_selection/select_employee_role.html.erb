@@ -1,0 +1,31 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% end %>
+<div class="container employee-role-selection">
+  <div class="row">
+    <%= form_tag new_insured_group_selection_path, method: :get do %>
+      <%= hidden_field_tag 'person_id', @person.id if @person %>
+      <%= hidden_field_tag 'change_plan', @change_plan if @change_plan.present?  %>
+      <%= hidden_field_tag 'market_kind', @market_kind if @market_kind.present? %>
+
+      <% if @person.active_employee_roles.present? %>
+        <div id="employers" class='row no-buffer'>
+          <h3>Employers</h3>
+          <div class="n-radio-group">
+            <% @person.active_employee_roles.each do |employee_role| %>
+              <div class="n-radio-row">
+                <label class="n-radio" for="employee_role_<%= employee_role.id %>">
+                  <%= radio_button_tag 'employee_role_id', employee_role.id, @employee_role == employee_role, id: "employee_role_#{employee_role.id}", class: 'n-radio' %>
+                  <span class="n-radio">
+                  </span>
+                  <%= employee_role.employer_profile.legal_name %>
+                </label>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <%= submit_tag 'Submit', class: "btn btn-default pull-right" %>
+    <% end %>
+  </div>
+</div>

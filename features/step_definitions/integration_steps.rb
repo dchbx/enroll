@@ -21,7 +21,10 @@ def people
       password: 'aA1!aA1!aA1!',
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
-      fein: "764141112"
+      fein: "764141112",
+      mlegal_name: "Cogswell Cogs, Inc",
+      mdba: "Cogswell Cogs, Inc",
+      mfein: "211141467"
     },
     "Patrick Doe" => {
       first_name: "Patrick",

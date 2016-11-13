@@ -13,6 +13,14 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
+  def select_employee_role
+    person_id = params.require(:person_id)
+    @person = Person.find(person_id)
+    @family = @person.primary_family
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
+  end
+
   def new
     set_bookmark_url
     initialize_common_vars
@@ -128,12 +136,15 @@ class Insured::GroupSelectionController < ApplicationController
   def build_hbx_enrollment
     case @market_kind
     when 'shop'
-      if @hbx_enrollment.present?
+      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+      if @hbx_enrollment.present? && @employee_role == @hbx_enrollment.employee_role
         benefit_group = @hbx_enrollment.benefit_group
         benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
         @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
+      else
+        benefit_group = @employee_role.benefit_group
+        benefit_group_assignment = @employee_role.census_employee.active_benefit_group_assignment
       end
-      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,

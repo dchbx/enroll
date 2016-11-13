@@ -230,6 +230,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group) }
     let(:hbx_enrollment) {HbxEnrollment.new}
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
     before :each do
       assign :person, person
@@ -240,6 +241,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
@@ -287,6 +289,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:coverage_household) { double("coverage household", coverage_household_members: coverage_household_members) }
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: nil) }
     let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: nil)}
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
     before :each do
       assign :person, person
@@ -297,6 +300,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render file: "insured/group_selection/new.html.erb"
     end

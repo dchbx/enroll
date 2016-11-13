@@ -143,6 +143,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:reference_plan) { double("Plan") }
     let(:employee_role) { double("EmployeeRole") }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -161,6 +162,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       get :receipt, id: "id"
       expect(response).to have_http_status(:success)
     end
+
+    it "should get employer_profile" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:coverage_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      sign_in(user)
+      get :receipt, id: "id"
+      expect(assigns(:employer_profile)).to eq employer_profile
+    end
   end
 
   context "GET thankyou" do
@@ -171,6 +181,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:reference_plan) { double("Plan") }
     let(:family) { double("Family") }
     let(:plan_year) { double("PlanYear") }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -206,6 +217,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       sign_in(user)
       get :thankyou, id: "id", plan_id: "plan_id"
       expect(assigns(:waivable)).to be_truthy
+    end
+
+    it "should get employer_profile" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:coverage_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:employer_profile)).to eq employer_profile
     end
 
     it "returns http success as BROKER" do

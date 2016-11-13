@@ -831,7 +831,7 @@ class HbxEnrollment
     enrollment.submitted_at = submitted_at
     case
     when employee_role.present?
-      if benefit_group.blank?
+      if benefit_group.blank? || benefit_group_assignment.blank?
         benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
       end
 
