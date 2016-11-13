@@ -379,7 +379,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     context "when open enrollment period end date not satisfy business rule" do
       before do
-        plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on + 1.day
+        plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on + 3.day
         plan_year.save(:validate => false)
       end
 
