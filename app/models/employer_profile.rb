@@ -453,7 +453,7 @@ class EmployerProfile
         organizations_eligible_for_renewal(new_date).each do |organization|
           plan_year_renewal_factory.employer_profile = organization.employer_profile
           plan_year_renewal_factory.is_congress = false # TODO handle congress differently
-          # plan_year_renewal_factory.renew
+          plan_year_renewal_factory.renew
         end
 
         open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
