@@ -72,18 +72,14 @@
 <div class="modal fade" id="reinstate_confirm" tabindex="-1" role="dialog" aria-labelledby="brokerConfirm" role="document">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="border-bottom:none">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">You are about to reinstate the following enrollment</h4>
+        <h4 class="modal-title" style="display:inline;">You are about to reinstate the following enrollment </br> on behalf of </h4>
+        <p style="display:inline;"><%=@person.first_name%></p>
+      </div> 
+      <div id="test"> 
       </div>
-      <div style="margin-left:10px;">
-      <input type="text" name="fname" value="<%=@person.first_name%>"><br>
-      
-      </div>
-      <div id="test">
-        
-      </div>
-      <div style="margin-left:10px;">
+      <div style="margin-left:20px;">
       <div>comments:</div>
       <textarea rows="4" cols="75"> </textarea>
       </div>
@@ -98,7 +94,8 @@
 <script type="text/javascript">
   $("div#reinstate_confirm" ).on('shown.bs.modal', function(event){
     $('#terminated_enrollemnts :checkbox:checked').each(function (){
-     $('#test').html($(this).closest('tr').find("td#name").text());
+     $('#test').html($(this).closest('tr').find("td#name").text()).css("margin-left","20px");
+     $('#test').html($(this).closest('tr').find("td").text()).css("margin-left","20px");
      });
   });
 </script>
