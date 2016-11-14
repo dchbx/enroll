@@ -116,9 +116,26 @@ RSpec.describe Api::V1::MobileApiRosterHelper, dbclean: :after_each do
 
 			#expect(output[:dependents].count).to   eq 1
 
-
 		end
-	end
+  end 
+
+  #context "brady dependents" do
+  #  include_context "BradyWorkAfterAll"
+  #
+  #  before :each do
+  #    create_brady_census_families
+  #    allow(mikes_census_employee).to receive(
+  #      :active_benefit_group_assignment).and_return(@mikes_benefit_group_assignments)
+  #  end
+  #
+  #  it "Should include dependents" do
+  #    output = render_roster_employee(mikes_census_employee, true)
+  #    expect(output[:dependents].count).to   eq 3 
+  #    #three men living all together; but they are all alone
+  #  end
+  #
+	#end
+
 end
 
    #  "dependents": [
