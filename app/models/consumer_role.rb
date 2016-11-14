@@ -119,7 +119,7 @@ class ConsumerRole
   alias_method :is_state_resident?, :is_state_resident
   alias_method :is_incarcerated?,   :is_incarcerated
 
-  embeds_one :lawful_presence_determination
+  embeds_one :lawful_presence_determination, as: :ivl_role
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
 

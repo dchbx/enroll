@@ -22,7 +22,6 @@ module Forms
     validate :age_less_than_18
     attr_reader :dob
 
-
     def dob=(val)
       @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
     end

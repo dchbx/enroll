@@ -10,7 +10,7 @@ class ResidentRole
 
   embedded_in :person
 
-  embeds_one :lawful_presence_determination
+  embeds_one :lawful_presence_determination, as: :ivl_role
   embeds_many :paper_applications, as: :documentable
 
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
@@ -37,6 +37,8 @@ class ResidentRole
   accepts_nested_attributes_for :person, :paper_applications
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
+
+  after_initialize :setup_lawful_determination_instance
 
   alias_method :is_incarcerated?,   :is_incarcerated
 
