@@ -1,5 +1,3 @@
-require_relative 'base_helper'
-
 module Api
   module V1
     class FamilyHelper < BaseHelper
