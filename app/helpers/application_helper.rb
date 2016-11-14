@@ -157,6 +157,8 @@ module ApplicationHelper
     test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'") : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
   end
 
+
+
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
   def number_to_ssn(number)
     return unless number

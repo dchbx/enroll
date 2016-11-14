@@ -1,0 +1,59 @@
+
+
+<% if census_employee.employment_terminated? %>
+  <a class="show_confirm btn btn-green-2" id="show_confirm_#{census_employee.id} <%= pundit_class EmployerProfile, :updateable? %>">
+    <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;" onclick="$(this).closest('tr').next().show();">Rehire</span>
+  </a>
+<% else %>
+  <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id, status: census_employee.aasm_state, tab: 'employees') %>
+  <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
+<% end %>
+
+
+
+<% if census_employee.employment_terminated? %>
+  <tr class="unbrd  rehire_<%= census_employee.id %> dn">
+    <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="11" id="enter-date">
+      <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
+            <span class="confirm-terminate" style="display:inline;">
+              <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
+              <a class="rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="rehire_<%= census_employee.id %>">
+                <strong>&nbsp;Submit</strong>
+              </a>
+            </span>
+    </td>
+  </tr>
+  <tr></tr>
+<% else %>
+
+  <tr class="unbrd  rehire_<%= census_employee.id %> dn">
+    <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="11" id="enter-date">
+      <p>Hi There</p>
+      <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
+            <span class="confirm-terminate" style="display:inline;">
+              <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
+              <a class="rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="rehire_<%= census_employee.id %>">
+                <strong>&nbsp;Submit</strong>
+              </a>
+            </span>
+    </td>
+  </tr>
+  <!--<tr class="unbrd  remove_<%= census_employee.id %> dn">-->
+    <!--<td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">-->
+      <!--<div class="confirm-terminate <%=pundit_class EmployerProfile, :updateable?%>">-->
+        <!--<h5 style="margin-top: 0; margin-bottom: 0;"><strong>Enter termination date to remove <%= name_to_listing(census_employee) %></strong>-->
+          <!--<br/>-->
+          <!--<span class="lg fourteen">(termination date must be within the past 60 days)</span>-->
+        <!--</h5>-->
+        <div class="pull-right" style="margin-top: 2px;>
+            /*<!--<h5>Enter termination date to remove this employee:</h5>-->*/
+            <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
+        <!--<a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">-->
+          <!--Terminate Employee-->
+        <!--</a>-->
+        <!--<a class="terminate cancel" style="margin-right: 15px;">Cancel</a>-->
+      <!--</div>-->
+
+    <!--</td>-->
+  <!--</tr>-->
+<% end %>

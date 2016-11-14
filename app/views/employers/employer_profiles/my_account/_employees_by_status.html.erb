@@ -69,8 +69,8 @@
           <% end %>
           </td>
         </tr>
-        <% if census_employee.employment_terminated? %>
-        <tr class="unbrd  rehire_<%= census_employee.id %> dn">
+          <% if census_employee.employment_terminated? %>
+            <tr class="unbrd  rehire_<%= census_employee.id %> dn">
           <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="11" id="enter-date">
             <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
             <span class="confirm-terminate" style="display:inline;">
@@ -82,7 +82,7 @@
           </td>
         </tr>
             <tr></tr>
-            <% else %>
+          <% else %>
             <tr class="unbrd  remove_<%= census_employee.id %> dn">
               <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">
                 <div class="confirm-terminate <%=pundit_class EmployerProfile, :updateable?%>">
@@ -98,10 +98,10 @@
                   </a>
                   <a class="terminate cancel" style="margin-right: 15px;">Cancel</a>
                 </div>
-                </div>
+
               </td>
-            </tr>
-            <% end %>
+             </tr>
+          <% end %>
           <% end %>
           <% end %>
        </tbody>
