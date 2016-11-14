@@ -1,6 +1,3 @@
-require_relative '../../../../lib/api/v1/employer_helper'
-require_relative '../../../../lib/api/v1/renderer_helper'
-
 module Api
   module V1
     class MobileApiController < ApplicationController
