@@ -20,42 +20,18 @@ module Api
         end
 
         def details
-          @plan_year ? details_for_plan_year : basic_details
-        end
-
-        #
-        # Private
-        #
-        private
-
-        def details_for_plan_year
-          enrollments = @employer_profile.enrollments_for_billing(@report_date) || []
-          premium_amt_total = enrollments.map(&:total_premium).sum
-          employee_cost_total = enrollments.map(&:total_employee_cost).sum
-          employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-          enrolled, waived, terminated = count_enrolled_waived_and_terminated_employees @plan_year
-
-          basic_details num_enrolled: enrolled,
-                        num_waived: waived,
-                        num_terminated: terminated,
-                        total_premium: premium_amt_total,
-                        employer_contribution: employer_contribution_total,
-                        employee_contribution: employee_cost_total
-        end
-
-        def basic_details num_enrolled: nil, num_waived: nil, num_terminated: nil, total_premium: nil,
-                          employer_contribution: nil, employee_contribution: nil
-          details = summary employer_profile: @employer_profile, year: @plan_year, num_enrolled: num_enrolled,
-                            num_waived: num_waived, num_terminated: num_terminated
-          details[:total_premium] = total_premium
-          details[:employer_contribution] = employer_contribution
-          details[:employee_contribution] = employee_contribution
+          details = summary_details employer_profile: @employer_profile, year: @plan_year
           details[:active_general_agency] = @employer_profile.active_general_agency_legal_name # Note: queries DB
           details[:plan_offerings] = Hash[active_and_renewal_plan_years.map do |period, py|
             [period, py ? Api::V1::Mobile::PlanYear.new(plan_year: py).plan_offerings : nil]
           end]
           details
         end
+
+        #
+        # Private
+        #
+        private
 
         def count_enrolled_waived_and_terminated_employees plan_year
           return unless Api::V1::Mobile::PlanYear.new(plan_year: plan_year).employee_max?
@@ -83,25 +59,16 @@ module Api
           @employer_profiles.map do |er|
             plan_year = er.show_plan_year
             enrolled, waived, terminated = open_enrollment_employee_count plan_year, TimeKeeper.date_of_record
-            summary employer_profile: er,
-                    year: plan_year,
-                    num_enrolled: enrolled,
-                    num_waived: waived,
-                    num_terminated: terminated,
-                    staff: staff_by_employer_id[er.id],
-                    offices: er.organization.office_locations.select { |loc| loc.primary_or_branch? },
-                    include_details_url: true
+            summary_details employer_profile: er,
+                            year: plan_year,
+                            num_enrolled: enrolled,
+                            num_waived: waived,
+                            num_terminated: terminated,
+                            staff: staff_by_employer_id[er.id],
+                            offices: er.organization.office_locations.select { |loc| loc.primary_or_branch? },
+                            include_details_url: true
           end
         end
-
-        # def staff
-        #   StaffHelper.new members: Person.where(:employer_staff_roles => {
-        #       '$elemMatch' => {
-        #           employer_profile_id: {"$in": @employer_profiles.map(&:id)},
-        #           :aasm_state.ne => :is_closed
-        #       }
-        #   })
-        # end
 
         #
         # As a performance optimization, in the mobile summary API (list of all employers for a broker)
@@ -123,8 +90,8 @@ module Api
           employee.count_by_enrollment_status
         end
 
-        def summary employer_profile:, year:, num_enrolled: nil, num_waived: nil, num_terminated: nil, staff: nil,
-                    offices: nil, include_details_url: false
+        def summary_details employer_profile:, year:, num_enrolled: nil, num_waived: nil, num_terminated: nil, staff: nil,
+                            offices: nil, include_details_url: false
           renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
           summary = {
               employer_name: employer_profile.legal_name,
