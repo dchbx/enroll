@@ -43,8 +43,8 @@ module Api
             enrollment.kind == 'employer_sponsored' &&
                 enrollment.coverage_kind == 'health' &&
                 enrollment.is_active
-          end.sort do |e1, e2|
-            e2.submitted_at <=> e1.submitted_at # most recently submitted first
+          end.compact.sort do |e1, e2|
+            e2.submitted_at.to_i <=> e1.submitted_at.to_i # most recently submitted first
           end.uniq do |e|
             e.benefit_group_assignment_id # only the most recent per employee
           end
