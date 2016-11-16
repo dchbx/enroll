@@ -20,8 +20,8 @@ module Api
           @employee_name ? census_employees.employee_name(@employee_name) : census_employees
         end
 
-        def roster_employees has_renewal
-          @employees.compact.map { |ee| roster_employee ee, has_renewal }
+        def roster_employees 
+          @employees.compact.map { |ee| roster_employee ee }
         end
 
         #
@@ -63,9 +63,9 @@ module Api
           end.flatten
         end
 
-        def roster_employee employee, has_renewal
-          assignments = {active: employee.active_benefit_group_assignment}
-          assignments[:renewal] = employee.renewal_benefit_group_assignment if has_renewal
+        def roster_employee employee
+          assignments = {active: employee.active_benefit_group_assignment, 
+                         renewal: employee.renewal_benefit_group_assignment}
 
           result = basic_individual employee
           result[:id] = employee.id
