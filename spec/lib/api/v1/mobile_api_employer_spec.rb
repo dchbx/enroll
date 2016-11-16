@@ -337,7 +337,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       expect(result).to eq [0, 0, 1]
     end
 
-    it "Should give [1,0] for the person not enrolled this year but already enrolled for next year if looking at next year" do
+    it "Should count enrollment for the person not enrolled this year but already enrolled for next year if looking at next year" do
       @mikes_benefit_group_assignments.update_attributes(start_on: mikes_renewing_plan_year.start_on, aasm_state: "coverage_renewed")
       @household = mikes_family.households.first
       @coverage_household1 = household.coverage_households[0]
@@ -355,10 +355,10 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       benefit_group_assignment = [@mikes_benefit_group_assignments]
       employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
-      expect(result).to eq [1, 0, 0]
+      expect(result).to eq [0, 0, 0]
     end
 
-    it "Should give [0,1] for person enrolled this year but already waived for next year if looking at next year" do
+    it "Should count enrollment for person enrolled this year but already waived for next year if looking at next year" do
       @household = mikes_family.households.first
       @coverage_household1 = household.coverage_households[0]
 
@@ -375,7 +375,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       benefit_group_assignment = [@mikes_benefit_group_assignments]
       employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
-      expect(result).to eq [0, 1, 0]
+      expect(result).to eq [0, 0, 0]
 
     end
   end

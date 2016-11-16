@@ -6,7 +6,6 @@ module Api
 
         def initialize args={}
           super args
-          @has_renewal = @employer_profile.renewing_published_plan_year.present? if @employer_profile
         end
 
         def employees_sorted_by
@@ -21,8 +20,8 @@ module Api
           @employee_name ? census_employees.employee_name(@employee_name) : census_employees
         end
 
-        def roster_employees
-          @employees.compact.map { |ee| roster_employee ee }
+        def roster_employees has_renewal
+          @employees.compact.map { |ee| roster_employee ee, has_renewal }
         end
 
         #
@@ -64,9 +63,9 @@ module Api
           end.flatten
         end
 
-        def roster_employee employee
+        def roster_employee employee, has_renewal
           assignments = {active: employee.active_benefit_group_assignment}
-          assignments[:renewal] = employee.renewal_benefit_group_assignment if @has_renewal
+          assignments[:renewal] = employee.renewal_benefit_group_assignment if has_renewal
 
           result = basic_individual employee
           result[:id] = employee.id

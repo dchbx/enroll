@@ -97,8 +97,7 @@ RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
       expect(ce_employee.active_benefit_group_assignment.hbx_enrollments.count).to be > 0
 
       employee = Api::V1::Mobile::Employee.new
-      employee.instance_variable_set(:@has_renewal, true)
-      employee = employee.send(:roster_employee, ce_employee)
+      employee = employee.send(:roster_employee, ce_employee, true)
       expect(employee).to include(:first_name, :middle_name, :last_name, :name_suffix, :gender, :date_of_birth,
                                   :ssn_masked, :hired_on, :id, :is_business_owner, :enrollments)
       expect(employee[:first_name]).to eq "Robert"
