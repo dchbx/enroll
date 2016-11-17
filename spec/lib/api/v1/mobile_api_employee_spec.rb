@@ -2,7 +2,7 @@ require "rails_helper"
 require 'support/brady_bunch'
 
 
-RSpec.describe Api::V1::EmployeeHelper, dbclean: :after_each do
+RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
 
   let!(:calendar_year) { TimeKeeper.date_of_record.year }
   let!(:effective_date) { Date.new(calendar_year, 1, 1) }
@@ -96,7 +96,8 @@ RSpec.describe Api::V1::EmployeeHelper, dbclean: :after_each do
       expect(ce_employee.active_benefit_group_assignment).to_not be nil
       expect(ce_employee.active_benefit_group_assignment.hbx_enrollments.count).to be > 0
 
-      employee = Api::V1::EmployeeHelper.roster_employee ce_employee, true
+      employee = Api::V1::Mobile::Employee.new
+      employee = employee.send(:roster_employee, ce_employee)
       expect(employee).to include(:first_name, :middle_name, :last_name, :name_suffix, :gender, :date_of_birth,
                                   :ssn_masked, :hired_on, :id, :is_business_owner, :enrollments)
       expect(employee[:first_name]).to eq "Robert"
