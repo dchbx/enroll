@@ -20,7 +20,7 @@ module Api
           @employee_name ? census_employees.employee_name(@employee_name) : census_employees
         end
 
-        def roster_employees 
+        def roster_employees
           @employees.compact.map { |ee| roster_employee ee }
         end
 
@@ -64,13 +64,12 @@ module Api
         end
 
         def roster_employee employee
-          assignments = {active: employee.active_benefit_group_assignment, 
-                         renewal: employee.renewal_benefit_group_assignment}
-
           result = basic_individual employee
           result[:id] = employee.id
           result[:hired_on] = employee.hired_on
           result[:is_business_owner] = employee.is_business_owner
+
+          assignments = {active: employee.active_benefit_group_assignment, renewal: employee.renewal_benefit_group_assignment}
           result[:enrollments] = Api::V1::Mobile::Enrollment.new(assignments: assignments).employee_enrollments
           result[:dependents] = dependents_of(employee).map do |d|
             basic_individual(d).merge(relationship: relationship_with(d))
