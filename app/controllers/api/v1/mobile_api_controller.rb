@@ -1,27 +1,25 @@
 module Api
   module V1
     class MobileApiController < ApplicationController
-      include Api::V1::Mobile::Renderer
+      include RendererHelper
 
       before_filter :employer_profile, except: :employers_list
 
       def employers_list
         execute {
-          authorized = Api::V1::Mobile::Security.new(user: current_user, params: params).authorize_employer_list
-          if authorized[:status] == 200
-            employer = Api::V1::Mobile::Employer.new authorized: authorized, user: current_user
-            render_employers_list employer.employers_and_broker_agency
+          auth = SecurityHelper.authorize_employer_list current_user, params
+          if auth[:status] == 200
+            render_employers_list EmployerHelper.employers_and_broker_agency current_user, auth
           else
-            render_employers_list_error authorized[:status]
+            render_employers_list_error auth[:status]
           end
         }
       end
 
       def employer_details
         execute {
-          if Api::V1::Mobile::Security.new(user: current_user, employer_profile: @employer_profile).can_view_employer_details?
-            employer = Api::V1::Mobile::Employer.new employer_profile: employer_profile, report_date: params[:report_date]
-            render_employer_details employer.details
+          if SecurityHelper.can_view_employer_details? current_user, @employer_profile
+            render_employer_details EmployerHelper.employer_details(@employer_profile, params[:report_date])
           else
             render_employer_details_error
           end
@@ -30,10 +28,8 @@ module Api
 
       def employee_roster
         execute {
-          if Api::V1::Mobile::Security.new(user: current_user, employer_profile: @employer_profile).can_view_employee_roster?
-            employees = Api::V1::Mobile::Employee.new(employer_profile: @employer_profile,
-                                                      employee_name: params[:employee_name],
-                                                      status: params[:status]).employees_sorted_by
+          if SecurityHelper.can_view_employee_roster? current_user, @employer_profile
+            employees = EmployeeHelper.employees_sorted_by @employer_profile, params[:employee_name], params[:status]
             employees ? render_employee_roster(employees) : render_employee_roster_error
           else
             render_employee_roster_error
