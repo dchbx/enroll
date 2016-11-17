@@ -148,7 +148,6 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
     it "should match with the expected result set" do
       get :employer_details, {employer_profile_id: employer_profile.id.to_s}
       output = JSON.parse(response.body)
-      puts "#{output.inspect}"
       expect(output["employer_name"]).to eq(employer_profile.legal_name)
       expect(output["employees_total"]).to eq(employer_profile.roster_size)
       expect(output["active_general_agency"]).to eq(employer_profile.active_general_agency_legal_name)
@@ -341,7 +340,6 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
         it "Mikes employer should render 200 with valid ID" do
           get :employer_details, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
           @output = JSON.parse(response.body)
-          puts JSON.pretty_generate(@output)
           expect(response).to have_http_status(200), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
           expect(response.content_type).to eq "application/json"
         end
