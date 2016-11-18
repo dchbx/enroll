@@ -2,7 +2,20 @@ require "rails_helper"
 require 'support/brady_bunch'
 
 
-RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
+RSpec.describe Api::V1::Mobile::Employer do #, dbclean: :after_each do
+
+  shared_examples 'organizations_by' do |desc|
+    it "should #{desc}" do
+      organizations = employer.send(:organizations)
+      expect(organizations).to be_a_kind_of Mongoid::Criteria
+      org = organizations.first
+      expect(org).to be_a_kind_of Organization
+      expect(org.hbx_id).to_not be_nil
+      expect(org.legal_name).to_not be_nil
+      expect(org.fein).to_not be_nil
+      expect(org.dba).to_not be_nil
+    end
+  end
 
   context 'Enrollment Status' do
     let!(:employer_profile_cafe) { FactoryGirl.create(:employer_profile) }
@@ -121,9 +134,18 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       let!(:broker_agency_account) {
         FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile)
       }
+      let!(:broker_agency_account2) {
+        FactoryGirl.build(:broker_agency_account, writing_agent: broker_role)
+      }
       let (:employer_profile) do
         e = FactoryGirl.create(:employer_profile, organization: organization)
         e.broker_agency_accounts << broker_agency_account
+        e.save
+        e
+      end
+      let (:employer_profile2) do
+        e = FactoryGirl.create(:employer_profile, organization: organization)
+        e.broker_agency_accounts << broker_agency_account2
         e.save
         e
       end
@@ -136,6 +158,20 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
 
         @employer = Api::V1::Mobile::Employer.new
       end
+    end
+
+    it_behaves_like 'organizations_by', 'get organization by broker agency profile' do
+      let!(:employer) {
+        allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
+        Api::V1::Mobile::Employer.new user: user, authorized: {broker_agency_profile: broker_agency_profile}
+      }
+    end
+
+    it_behaves_like 'organizations_by', 'get organization by broker role' do
+      let!(:employer) {
+        allow(employer_profile2).to receive(:broker_agency_accounts).and_return([broker_agency_account2])
+        Api::V1::Mobile::Employer.new user: user, authorized: {broker_role: broker_role}
+      }
     end
 
     it 'counts by enrollment status' do
