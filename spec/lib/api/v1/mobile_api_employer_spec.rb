@@ -174,6 +174,20 @@ RSpec.describe Api::V1::Mobile::Employer do #, dbclean: :after_each do
       }
     end
 
+    it 'should return the active and renewal plan years' do
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile
+      allow(employer_profile).to receive(:plan_years).and_return([employer_profile_cafe.show_plan_year])
+      plan_years = employer.send(:active_and_renewal_plan_years)
+      expect(plan_years).to be_a_kind_of Hash
+      expect(plan_years).to have_key(:active)
+      expect(plan_years).to have_key(:renewal)
+
+      active = plan_years[:active]
+      expect(active).to be_a_kind_of PlanYear
+      expect(active.open_enrollment_start_on).to eq employer_profile_cafe.show_plan_year.open_enrollment_start_on
+      expect(active.open_enrollment_end_on).to eq employer_profile_cafe.show_plan_year.open_enrollment_end_on
+    end
+
     it 'counts by enrollment status' do
       mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
       result = @employer.send(:count_by_enrollment_status, mobile_plan_year)
