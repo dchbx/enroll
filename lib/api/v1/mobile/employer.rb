@@ -33,11 +33,6 @@ module Api
         #
         private
 
-        def count_enrolled_waived_and_terminated_employees plan_year
-          return unless Api::V1::Mobile::PlanYear.new(plan_year: plan_year).employee_max?
-          count_by_enrollment_status plan_year
-        end
-
         def active_and_renewal_plan_years
           {active: detect_plan_in_states(::PlanYear::PUBLISHED),
            renewal: detect_plan_in_states(::PlanYear::RENEWING_PUBLISHED_STATE + ::PlanYear::RENEWING)}
@@ -75,9 +70,9 @@ module Api
         # we only bother counting the subscribers if the employer is currently in OE
         #
         def open_enrollment_employee_count plan_year, as_of
-          plan_year = Api::V1::Mobile::PlanYear.new plan_year: plan_year, as_of: as_of
-          return unless plan_year.open_enrollment?
-          count_by_enrollment_status plan_year
+          mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: plan_year, as_of: as_of
+          return unless mobile_plan_year.open_enrollment?
+          count_by_enrollment_status mobile_plan_year
         end
 
         #
@@ -85,8 +80,8 @@ module Api
         # Returns a list of number enrolled (actually enrolled, not waived) and waived
         # Check if the plan year is in renewal without triggering an additional query
         #
-        def count_by_enrollment_status plan_year
-          employee = Employee.new benefit_group: Api::V1::Mobile::BenefitGroup.new(plan_year: plan_year)
+        def count_by_enrollment_status mobile_plan_year
+          employee = Employee.new benefit_group: Api::V1::Mobile::BenefitGroup.new(plan_year: mobile_plan_year.plan_year)
           employee.count_by_enrollment_status
         end
 

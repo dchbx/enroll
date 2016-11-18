@@ -3,6 +3,7 @@ module Api
     module Mobile
       class PlanYear < Base
         MAX_DENTAL_PLANS = 13
+        attr_accessor :plan_year
 
         def open_enrollment?
           employee_max? && @as_of &&

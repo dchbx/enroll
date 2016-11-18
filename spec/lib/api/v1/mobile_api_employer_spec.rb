@@ -7,14 +7,14 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
   context 'Enrollment Status' do
     let!(:employer_profile_cafe) { FactoryGirl.create(:employer_profile) }
     let!(:employer_profile_salon) { FactoryGirl.create(:employer_profile) }
-    let!(:calender_year) { TimeKeeper.date_of_record.year }
+    let!(:calender_year) { TimeKeeper.date_of_record.year + 1 }
 
     let!(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
 
     let!(:shop_family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let!(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
     let!(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
-    let!(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
+    let!(:open_enrollment_start_on) { Date.new(calender_year - 1, 11, 1) }
     let!(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
     let!(:effective_date) { plan_year_start_on }
 
@@ -139,25 +139,13 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     end
 
     it 'counts by enrollment status' do
-      result = @employer.send(:count_by_enrollment_status, employer_profile_cafe.show_plan_year)
+      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
+      result = @employer.send(:count_by_enrollment_status, mobile_plan_year)
       expect(result).to eq [2, 0, 0]
 
-      result = @employer.send(:count_by_enrollment_status, employer_profile_salon.show_plan_year)
+      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_salon.show_plan_year
+      result = @employer.send(:count_by_enrollment_status, mobile_plan_year)
       expect(result).to eq [1, 0, 0]
-    end
-
-    it 'counts enrolled, waived and terminated employees' do
-      result = @employer.send(:count_enrolled_waived_and_terminated_employees, employer_profile_cafe.show_plan_year)
-      expect(result).to eq [2, 0, 0]
-
-      result = @employer.send(:count_enrolled_waived_and_terminated_employees, employer_profile_salon.show_plan_year)
-      expect(result).to eq [1, 0, 0]
-
-      plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
-      allow(plan_year).to receive(:plan_year_employee_max?).and_return(false)
-
-      result = @employer.send(:count_enrolled_waived_and_terminated_employees, employer_profile_cafe.show_plan_year)
-      expect(result).to eq [2, 0, 0]
     end
 
     it 'returns employer summaries' do
@@ -174,11 +162,11 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
                                  :employee_roster_url)
 
       expect(summary[:employer_name]).to eq 'Turner Agency, Inc'
-      expect(summary[:open_enrollment_begins]).to eq Date.parse('2015-12-01')
-      expect(summary[:open_enrollment_ends]).to eq Date.parse('2015-12-10')
-      expect(summary[:plan_year_begins]).to eq Date.parse('2016-01-01')
-      expect(summary[:renewal_application_available]).to eq Date.parse('2015-10-01')
-      expect(summary[:renewal_application_due]).to eq Date.parse('2015-12-05')
+      expect(summary[:open_enrollment_begins]).to eq Date.parse('2016-11-01')
+      expect(summary[:open_enrollment_ends]).to eq Date.parse('2016-12-10')
+      expect(summary[:plan_year_begins]).to eq Date.parse('2017-01-01')
+      expect(summary[:renewal_application_available]).to eq Date.parse('2016-10-01')
+      expect(summary[:renewal_application_due]).to eq Date.parse('2016-12-05')
       expect(summary[:renewal_in_progress]).to be_falsey
       expect(summary[:employees_total]).to eq 0
       expect(summary[:minimum_participation_required]).to eq 2
@@ -202,11 +190,11 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
                                  :minimum_participation_required, :active_general_agency)
 
       expect(details[:employer_name]).to eq 'Turner Agency, Inc'
-      expect(details[:open_enrollment_begins]).to eq Date.parse('2015-12-01')
-      expect(details[:open_enrollment_ends]).to eq Date.parse('2015-12-10')
-      expect(details[:plan_year_begins]).to eq Date.parse('2016-01-01')
-      expect(details[:renewal_application_available]).to eq Date.parse('2015-10-01')
-      expect(details[:renewal_application_due]).to eq Date.parse('2015-12-05')
+      expect(details[:open_enrollment_begins]).to eq Date.parse('2016-11-01')
+      expect(details[:open_enrollment_ends]).to eq Date.parse('2016-12-10')
+      expect(details[:plan_year_begins]).to eq Date.parse('2017-01-01')
+      expect(details[:renewal_application_available]).to eq Date.parse('2016-10-01')
+      expect(details[:renewal_application_due]).to eq Date.parse('2016-12-05')
       expect(details[:renewal_in_progress]).to be_falsey
       expect(details[:employees_total]).to eq 0
       expect(details[:minimum_participation_required]).to eq 2

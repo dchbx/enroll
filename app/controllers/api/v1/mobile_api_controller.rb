@@ -52,7 +52,8 @@ module Api
         rescue Exception => e
           logger.error "Exception caught in employer_details: #{e.message}"
           e.backtrace.each { |line| logger.error line }
-          render json: {error: e.message}, :status => :internal_server_error
+          message = ([:development, :test].include?(Rails.env.to_sym)) ? e.backtrace : e.message
+          render json: {error: message}, :status => :internal_server_error
         end
       end
 
