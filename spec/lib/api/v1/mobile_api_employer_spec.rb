@@ -188,6 +188,87 @@ RSpec.describe Api::V1::Mobile::Employer do #, dbclean: :after_each do
       expect(active.open_enrollment_end_on).to eq employer_profile_cafe.show_plan_year.open_enrollment_end_on
     end
 
+    it 'should count by open enrollment status' do
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile
+      result = employer.send(:open_enrollment_employee_count, employer_profile_cafe.show_plan_year, Time.now - (1*365*24*60*60))
+      expect(result).to be_nil
+      result = employer.send(:open_enrollment_employee_count, employer_profile_cafe.show_plan_year, Time.now)
+      expect(result).to eq [2, 0, 0]
+    end
+
+
+    it 'should return the summary details' do
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile
+      summary = employer.send(:summary_details, {employer_profile: employer_profile, year: employer_profile_cafe.show_plan_year})
+      expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :minimum_participation_required,
+                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, :renewal_application_available,
+                                 :renewal_application_due, :renewal_in_progress)
+      expect(summary[:open_enrollment_begins]).to eq Date.parse('2016-11-01')
+      expect(summary[:open_enrollment_ends]).to eq Date.parse('2016-12-10')
+      expect(summary[:plan_year_begins]).to eq Date.parse('2017-01-01')
+      expect(summary[:renewal_application_available]).to eq Date.parse('2016-10-01')
+      expect(summary[:renewal_application_due]).to eq Date.parse('2016-12-05')
+      expect(summary[:renewal_in_progress]).to be_falsey
+      expect(summary[:employees_total]).to eq 0
+      expect(summary[:minimum_participation_required]).to eq 2
+
+      summary = employer.send(:summary_details, {employer_profile: employer_profile, year: employer_profile_cafe.show_plan_year,
+                                                 num_enrolled: 2, num_waived: 1, num_terminated: 3})
+      expect(summary[:employees_enrolled]).to eq 2
+      expect(summary[:employees_waived]).to eq 1
+      expect(summary[:employees_terminated]).to eq 3
+
+      summary = employer.send(:summary_details, {employer_profile: employer_profile, year: employer_profile_cafe.show_plan_year,
+                                                 staff: [FactoryGirl.create(:person)], offices: [FactoryGirl.build(:office_location)]})
+      expect(summary).to include(:contact_info)
+      contact_info = summary[:contact_info]
+      expect(contact_info).to be_a_kind_of Array
+      expect(contact_info.size).to eq 2
+      offices = contact_info.pop
+      staff = contact_info.pop
+      expect(staff).to include(:first, :last, :phone, :mobile, :emails)
+      expect(offices).to include(:first, :last, :phone, :address_1, :address_2, :city, :state, :zip)
+      expect(staff[:emails]).to be_a_kind_of Array
+      expect(staff[:first]).to_not be_nil
+      expect(staff[:last]).to_not be_nil
+      expect(offices[:first]).to_not be_nil
+      expect(offices[:last]).to_not be_nil
+      expect(offices[:phone]).to_not be_nil
+      expect(offices[:address_1]).to_not be_nil
+      expect(offices[:address_2]).to_not be_nil
+      expect(offices[:city]).to_not be_nil
+      expect(offices[:state]).to_not be_nil
+      expect(offices[:zip]).to_not be_nil
+    end
+
+    it 'should add the URLs to the summary' do
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile
+      summary = {}
+      employer.send(:add_urls!, employer_profile, summary)
+      expect(summary).to include(:employer_details_url, :employee_roster_url)
+      expect(summary[:employer_details_url]).to include('/api/v1/mobile_api/employer_details/')
+      expect(summary[:employee_roster_url]).to include('/api/v1/mobile_api/employee_roster/')
+    end
+
+    it 'should return the details' do
+      allow(employer_profile).to receive(:show_plan_year).and_return(employer_profile_cafe.show_plan_year)
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile,
+                                               plan_year: employer_profile_cafe.show_plan_year
+      summary = employer.details
+      expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :minimum_participation_required,
+                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, :renewal_application_available,
+                                 :renewal_application_due, :renewal_in_progress, :plan_offerings)
+      expect(summary[:plan_offerings]).to include(:active, :renewal)
+      expect(summary[:open_enrollment_begins]).to eq Date.parse('2016-11-01')
+      expect(summary[:open_enrollment_ends]).to eq Date.parse('2016-12-10')
+      expect(summary[:plan_year_begins]).to eq Date.parse('2017-01-01')
+      expect(summary[:renewal_application_available]).to eq Date.parse('2016-10-01')
+      expect(summary[:renewal_application_due]).to eq Date.parse('2016-12-05')
+      expect(summary[:renewal_in_progress]).to be_falsey
+      expect(summary[:employees_total]).to eq 0
+      expect(summary[:minimum_participation_required]).to eq 2
+    end
+
     it 'counts by enrollment status' do
       mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
       result = @employer.send(:count_by_enrollment_status, mobile_plan_year)
