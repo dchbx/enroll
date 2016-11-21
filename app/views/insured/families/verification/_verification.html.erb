@@ -20,10 +20,6 @@
         <th>Family Member</th>
         <th>Verification Type</th>
         <th>Status</th>
-
-        <% if current_user && current_user.has_hbx_staff_role? %>
-            <!--<th>Complete</th>-->
-        <% end %>
         <th>Documents</th>
         <th></th>
       </tr>
@@ -34,9 +30,7 @@
             <td><%= member.person.first_name.capitalize %>
               <%= member.person.last_name.capitalize %></td>
             <td colspan="3">
-              <% if unverified?(member.person) %>
-                  <%= render partial: 'insured/families/verification/unverified_person', locals: {member: member} %>
-              <% end %>
+              <%= render partial: 'insured/families/verification/verification_types', locals: {member: member} %>
             </td>
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>

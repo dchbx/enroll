@@ -159,5 +159,9 @@ module VerificationHelper
         person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
     end
   end
+
+  def text_center(v_type, person)
+    (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+  end
 end
 
