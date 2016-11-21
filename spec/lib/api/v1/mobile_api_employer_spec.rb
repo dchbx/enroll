@@ -160,6 +160,14 @@ RSpec.describe Api::V1::Mobile::Employer do #, dbclean: :after_each do
       end
     end
 
+    it 'initializes the plan year' do
+      allow(employer_profile).to receive(:show_plan_year).and_return(employer_profile_cafe.show_plan_year)
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile
+      plan_year = employer.instance_variable_get(:@plan_year)
+      expect(plan_year).to_not be_nil
+      expect(plan_year).to be_a_kind_of PlanYear
+    end
+
     it_behaves_like 'organizations_by', 'get organization by broker agency profile' do
       let!(:employer) {
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
