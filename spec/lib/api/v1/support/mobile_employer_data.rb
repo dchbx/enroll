@@ -25,7 +25,7 @@ module MobileEmployerData
                                 employer_profile: send(employer_profile_id))
 
         blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
-        white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+        white = FactoryGirl.build(:benefit_group, :with_valid_dental, title: "white collar", plan_year: py)
         py.benefit_groups = [blue, white]
         py.save
         py.update_attributes({:aasm_state => 'published'})

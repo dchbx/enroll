@@ -1,7 +1,7 @@
 require "rails_helper"
 require 'lib/api/v1/support/mobile_employer_data'
 
-RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
+RSpec.describe Api::V1::Mobile::Enrollment, dbclean: :after_each do
   include_context 'employer_data'
 
   context 'Enrollments' do
