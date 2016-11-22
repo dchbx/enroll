@@ -131,13 +131,12 @@ module MobileEmployerData
         e.save
         e
       end
+      let!(:benefit_group_assignment) {send(benefit_group_assignment_id)}
 
       before do
-        benefit_group_assignment = send(benefit_group_assignment_id)
         allow(send(employee_role_id)).to receive(:benefit_group).and_return(benefit_group_assignment.benefit_group)
         allow(send(census_employee_id)).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
         allow(send(shop_enrollment_id)).to receive(:employee_role).and_return(send(employee_role_id))
-
         @employer = Api::V1::Mobile::Employer.new
       end
     end
