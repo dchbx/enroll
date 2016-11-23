@@ -110,7 +110,7 @@ class CensusEmployee < CensusMember
   def allow_nil_ssn_updates_dependents
     census_dependents.each do |cd|
       if cd.ssn.blank?
-        cd.update(encrypted_ssn:"")
+        cd.unset(:encrypted_ssn)
       end
     end
   end
@@ -274,7 +274,7 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    benefit_group_assignments.detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
   end
 
   def inactive_benefit_group_assignments
@@ -343,8 +343,9 @@ class CensusEmployee < CensusMember
   def terminate_employment(employment_terminated_on)
     begin
       terminate_employment!(employment_terminated_on)
-    rescue
-      nil
+    rescue => e
+      Rails.logger.error { e }
+      false
     else
       self
     end
@@ -357,7 +358,6 @@ class CensusEmployee < CensusMember
       if may_terminate_employee_role?
 
         unless employee_termination_pending?
-
 
           self.employment_terminated_on = employment_terminated_on
           self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
@@ -389,7 +389,7 @@ class CensusEmployee < CensusMember
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
 
       end
-  end
+    end
 
     self
   end

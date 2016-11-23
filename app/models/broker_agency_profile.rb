@@ -33,6 +33,7 @@ class BrokerAgencyProfile
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :home_page, :home_page=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: false
+  delegate :is_fake_fein, :is_fake_fein=, to: :organization, allow_nil: false
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 

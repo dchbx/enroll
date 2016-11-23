@@ -102,10 +102,21 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   describe "has_writing_agent?" do
     let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:person) { FactoryGirl.build(:person) }
 
-    it "should return false" do
+    it "should return false when employee_role is passwed with out writing_agent" do
       expect(helper.has_writing_agent?(employee_role)).to eq false
     end
+
+    it "should return false when person is passwed with out writing_agent" do
+      expect(helper.has_writing_agent?(person)).to eq false
+    end
+
+    it "should return true when employee_role is passed with out writing_agent" do
+      allow(person).to receive_message_chain(:primary_family,:current_broker_agency,:writing_agent).and_return(true)
+      expect(helper.has_writing_agent?(person)).to eq true
+    end
+
   end
 
   describe "display_aasm_state?" do
