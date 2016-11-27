@@ -19,6 +19,7 @@ module Api
            broker_clients: marshall_employer_summaries} if @authorized[:broker_agency_profile]
         end
 
+
         def details
           details = summary_details employer_profile: @employer_profile, year: @plan_year
           details[:active_general_agency] = @employer_profile.active_general_agency_legal_name # Note: queries DB
@@ -72,26 +73,28 @@ module Api
         end
 
         def summary_details employer_profile:, years: [], staff: nil, offices: nil, include_details_url: false, include_enrollment_counts: false
+          plan_years =  years.map do |year|
+            mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: year, as_of: TimeKeeper.date_of_record
+
+            plan_year_summary = mobile_plan_year.render_summary
+    
+            # As a performance optimization, in the mobile summary API 
+            # (list of all employers for a broker) we only bother counting the subscribers 
+            # if the employer is currently in OE
+            if include_enrollment_counts && mobile_plan_year.open_enrollment?
+              enrolled, waived, terminated = count_by_enrollment_status mobile_plan_year
+              plan_year_summary[:employees_enrolled  ] = enrolled   
+              plan_year_summary[:employees_waived    ] = waived     
+              plan_year_summary[:employees_terminated] = terminated 
+            end
+
+            plan_year_summary
+          end 
+
           summary = {
               employer_name: employer_profile.legal_name,
               employees_total: employer_profile.roster_size,
-              plan_years: years.map do |year|
-                mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: year, as_of: TimeKeeper.date_of_record
-
-                plan_year_summary = mobile_plan_year.render_summary
-        
-                # As a performance optimization, in the mobile summary API 
-                # (list of all employers for a broker) we only bother counting the subscribers 
-                # if the employer is currently in OE
-                if include_enrollment_counts && mobile_plan_year.open_enrollment?
-                  enrolled, waived, terminated = count_by_enrollment_status mobile_plan_year
-                  plan_year_summary[:employees_enrolled  ] = enrolled   
-                  plan_year_summary[:employees_waived    ] = waived     
-                  plan_year_summary[:employees_terminated] = terminated 
-                end
-
-                plan_year_summary
-              end,
+              plan_years: plan_years,
               binder_payment_due: ''
           }
          
