@@ -25,6 +25,20 @@ module Api
           end
         end
 
+        def render_summary
+          renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
+
+          {
+            open_enrollment_begins:         @plan_year.open_enrollment_start_on,
+            open_enrollment_ends:           @plan_year.open_enrollment_end_on,
+            plan_year_begins:               @plan_year.start_on,
+            renewal_in_progress:            @plan_year.is_renewing?,
+            renewal_application_available:  @plan_year.start_on >> renewals_offset_in_months,
+            renewal_application_due:        @plan_year.due_date_for_publish,
+            state:                          @plan_year.aasm_state.to_s.humanize.titleize : nil
+          }       
+        end
+
         #
         # Private
         #

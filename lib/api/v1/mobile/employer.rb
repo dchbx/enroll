@@ -53,26 +53,12 @@ module Api
           staff_by_employer_id = Api::V1::Mobile::Staff.new(employer_profiles: @employer_profiles).keyed_by_employer_id
           @employer_profiles.map do |er|
             plan_year = er.show_plan_year
-            enrolled, waived, terminated = open_enrollment_employee_count plan_year, TimeKeeper.date_of_record
             summary_details employer_profile: er,
-                            year: plan_year,
-                            num_enrolled: enrolled,
-                            num_waived: waived,
-                            num_terminated: terminated,
+                            years: er.plan_years,
                             staff: staff_by_employer_id[er.id],
                             offices: er.organization.office_locations.select { |loc| loc.primary_or_branch? },
                             include_details_url: true
           end
-        end
-
-        #
-        # As a performance optimization, in the mobile summary API (list of all employers for a broker)
-        # we only bother counting the subscribers if the employer is currently in OE
-        #
-        def open_enrollment_employee_count plan_year, as_of
-          mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: plan_year, as_of: as_of
-          return unless mobile_plan_year.open_enrollment?
-          count_by_enrollment_status mobile_plan_year
         end
 
         #
@@ -85,27 +71,31 @@ module Api
           employee.count_by_enrollment_status
         end
 
-        def summary_details employer_profile:, year:, num_enrolled: nil, num_waived: nil, num_terminated: nil, staff: nil,
-                            offices: nil, include_details_url: false
-          renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
+        def summary_details employer_profile:, years: [], staff: nil, offices: nil, include_details_url: false, include_enrollment_counts: false
           summary = {
               employer_name: employer_profile.legal_name,
               employees_total: employer_profile.roster_size,
-              
-              open_enrollment_begins: year ? year.open_enrollment_start_on : nil,
-              open_enrollment_ends: year ? year.open_enrollment_end_on : nil,
-              plan_year_state: year ? year.aasm_state.to_s.humanize.titleize : nil,
-              plan_year_begins: year ? year.start_on : nil,
-              renewal_in_progress: year ? year.is_renewing? : nil,
-              renewal_application_available: year ? (year.start_on >> renewals_offset_in_months) : nil,
-              renewal_application_due: year ? year.due_date_for_publish : nil,
+              plan_years: years.map do |year|
+                mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: year, as_of: TimeKeeper.date_of_record
+                
+                plan_year = mobile_plan_year.render_summary
+        
+                # As a performance optimization, in the mobile summary API 
+                # (list of all employers for a broker) we only bother counting the subscribers 
+                # if the employer is currently in OE
+                if include_enrollment_counts && mobile_plan_year.open_enrollment?
+                  enrolled, waived, terminated = count_by_enrollment_status mobile_plan_year
+                  plan_year[:employees_enrolled  ] = enrolled   
+                  plan_year[:employees_waived    ] = waived     
+                  plan_year[:employees_terminated] = terminated 
+                end
+
+                plan_year
+              end,
               binder_payment_due: '',
               minimum_participation_required: year ? year.minimum_enrolled_count : nil,
           }
-          summary[:employees_enrolled] = num_enrolled if num_enrolled
-          summary[:employees_waived] = num_waived if num_waived
-          summary[:employees_terminated] = num_terminated if num_terminated
-
+         
           summary[:contact_info] = add_contact_info(staff || [], offices || []) if staff || offices
           add_urls! employer_profile, summary if include_details_url
           summary
