@@ -1,12 +1,12 @@
 <% content_for :navigation do %>
   <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<div class="premium-reports-tab">
+<div class="premium-reports-tab ">
   <div class="row no-buffer">
     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
     <% if plan_year.present? && billing_date.present? %>
 
-      <div class="col-xs-8 col-xs-offset-4">
+      <div class="col-xs-11 col-xs-offset-4">
         <div class="row">
           <div class="col-xs-8">
            <button class="btn btn-lg btn-warning hidden" id="loader">
@@ -27,16 +27,22 @@
     <% end %>
   </div>
 
-  <div class="premium-reports-table">
+  <div class="premium-reports-table"  >
     <%= render 'show' %>
   </div>
 <br>
-<%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-default mz' %>
-  <a class='btn btn-default' data-toggle='modal' data-target='#downloadCsv'>Download</a>
+
 </div>
 
+
+
 <script>
+
 $(function() {
+
+  initializeDataTables();
+// $('.effective-datatable >tbody >tr').length;
+
   $('#billing_date_form').bind({
     'ajax:before': function () {
       $('#loader').removeClass('hidden');
@@ -52,3 +58,18 @@ $(function() {
   });
 });
 </script>
+
+<style type="text/css">
+  .container {
+    width: 950px;
+}
+
+.dataTables_paginate{
+  width: 900px;
+}
+
+#effective_datatable_wrapper .selectric-wrapper{
+  width: 82px;
+}
+</style>
+

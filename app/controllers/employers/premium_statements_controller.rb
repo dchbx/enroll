@@ -5,17 +5,13 @@ class Employers::PremiumStatementsController < ApplicationController
   include Employers::PremiumStatementHelper
 
   def show
-    @employer_profile = EmployerProfile.find(params.require(:id))
-    authorize @employer_profile, :list_enrollments?
-    set_billing_date
-    @hbx_enrollments = @employer_profile.enrollments_for_billing(@billing_date)
-
+    @employer_profile = EmployerProfile.find(params[:id])
+    bill_date = set_billing_date
+    scopes={ id: params.require(:id), billing_date: bill_date}
+    @datatable = Effective::Datatables::PremiumBillingReportDataTable.new(scopes)
     respond_to do |format|
       format.html
       format.js
-      format.csv do
-        send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
-      end
     end
   end
 

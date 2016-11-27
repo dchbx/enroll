@@ -25,6 +25,6 @@ module Employers::PremiumStatementHelper
       options << [billing_date.strftime("%B %Y"), billing_date]
     end
 
-    options
+    options 
   end
 end
