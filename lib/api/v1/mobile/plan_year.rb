@@ -35,7 +35,8 @@ module Api
             renewal_in_progress:            @plan_year.is_renewing?,
             renewal_application_available:  @plan_year.start_on >> renewals_offset_in_months,
             renewal_application_due:        @plan_year.due_date_for_publish,
-            state:                          @plan_year.aasm_state.to_s.humanize.titleize : nil
+            state:                          @plan_year.aasm_state.to_s.humanize.titleize,
+            minimum_participation_required: @plan_year.minimum_enrolled_count
           }       
         end
 
