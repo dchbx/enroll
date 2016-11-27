@@ -58,7 +58,7 @@ module Api
           employee.count_by_enrollment_status
         end
 
-        def summary_details employer_profile:, staff: nil, offices: nil, include_details_url: false, include_enrollment_counts: false, include_plan_offerings: false
+        def summary_details employer_profile:, years: [], staff: nil, offices: nil, include_details_url: false, include_enrollment_counts: false, include_plan_offerings: false
 
           plan_years =  years.map do |year|
             mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: year, as_of: TimeKeeper.date_of_record
