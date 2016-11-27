@@ -5,7 +5,7 @@ module Api
 
         def initialize args={}
           super args
-          @plan_year = @employer_profile.show_plan_year if @employer_profile
+          @plan_years = @employer_profile.try(:plan_years) || []
         end
 
         def employers_and_broker_agency
@@ -21,11 +21,8 @@ module Api
 
 
         def details
-          details = summary_details employer_profile: @employer_profile, year: @plan_year
+          details = summary_details employer_profile: @employer_profile, years: @plan_years, include_plan_offerings: true
           details[:active_general_agency] = @employer_profile.active_general_agency_legal_name # Note: queries DB
-          details[:plan_offerings] = Hash[active_and_renewal_plan_years.map do |period, py|
-            [period, py ? Api::V1::Mobile::PlanYear.new(plan_year: py).plan_offerings : nil]
-          end]
           details
         end
 
@@ -33,16 +30,6 @@ module Api
         # Private
         #
         private
-
-        def active_and_renewal_plan_years
-          {active: detect_plan_in_states(::PlanYear::PUBLISHED),
-           renewal: detect_plan_in_states(::PlanYear::RENEWING_PUBLISHED_STATE + ::PlanYear::RENEWING)}
-          #TODO: renewal when appropriate, see employer_profiles_controller.sort_plan_years
-        end
-
-        def detect_plan_in_states states
-          @employer_profile.plan_years.detect { |py| states.include? py.aasm_state }
-        end
 
         def organizations
           @organizations ||= @authorized.has_key?(:broker_role) ? Organization.by_broker_role(@authorized[:broker_role].id) :
@@ -53,7 +40,6 @@ module Api
           return [] if @employer_profiles.blank?
           staff_by_employer_id = Api::V1::Mobile::Staff.new(employer_profiles: @employer_profiles).keyed_by_employer_id
           @employer_profiles.map do |er|
-            plan_year = er.show_plan_year
             summary_details employer_profile: er,
                             years: er.plan_years,
                             staff: staff_by_employer_id[er.id],
@@ -72,24 +58,26 @@ module Api
           employee.count_by_enrollment_status
         end
 
-        def summary_details employer_profile:, years: [], staff: nil, offices: nil, include_details_url: false, include_enrollment_counts: false
+        def summary_details employer_profile:, staff: nil, offices: nil, include_details_url: false, include_enrollment_counts: false, include_plan_offerings: false
+
           plan_years =  years.map do |year|
             mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: year, as_of: TimeKeeper.date_of_record
 
-            plan_year_summary = mobile_plan_year.render_summary
-    
+            plan_year_summary = include_plan_offerings ?
+                mobile_plan_year.render_details : mobile_plan_year.render_summary
+
             # As a performance optimization, in the mobile summary API 
             # (list of all employers for a broker) we only bother counting the subscribers 
             # if the employer is currently in OE
             if include_enrollment_counts && mobile_plan_year.open_enrollment?
               enrolled, waived, terminated = count_by_enrollment_status mobile_plan_year
-              plan_year_summary[:employees_enrolled  ] = enrolled   
-              plan_year_summary[:employees_waived    ] = waived     
-              plan_year_summary[:employees_terminated] = terminated 
+              plan_year_summary[:employees_enrolled  ] = enrolled
+              plan_year_summary[:employees_waived    ] = waived
+              plan_year_summary[:employees_terminated] = terminated
             end
 
             plan_year_summary
-          end 
+          end
 
           summary = {
               employer_name: employer_profile.legal_name,
@@ -97,7 +85,7 @@ module Api
               plan_years: plan_years,
               binder_payment_due: ''
           }
-         
+
           summary[:contact_info] = add_contact_info(staff || [], offices || []) if staff || offices
           add_urls! employer_profile, summary if include_details_url
           summary

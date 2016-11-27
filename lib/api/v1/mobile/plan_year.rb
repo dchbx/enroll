@@ -40,6 +40,12 @@ module Api
           }       
         end
 
+        def render_details
+          summary = render_summary
+          summary[:plan_offerings] = plan_offerings
+          summary
+        end
+
         #
         # Private
         #
