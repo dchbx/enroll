@@ -28,4 +28,8 @@
 
 <script type="text/javascript" charset="utf-8">
  initializeDataTables();
+ <% if @selector == 'assited' %>
+    $('#Tab\\:by_enrollment_individual_market').click();
+    $('#Tab\\:by_enrollment_individual_market-all_assistance_receiving').addClass('active');
+  <% end %>
 </script>
