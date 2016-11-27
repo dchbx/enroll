@@ -2,7 +2,9 @@ module Api
   module V1
     module Mobile
       module Renderer
-        NO_BROKER_AGENCY_PROFILE_FOUND = 'no broker agency profile found'
+        NO_BROKER_AGENCY_PROFILE_FOUND = 'no broker agency profile or broker role found'
+        NO_EMPLOYER_DETAILS_FOUND = 'no employer details found'
+        NO_EMPLOYEE_ROSTER_FOUND = 'no employee roster found'
 
         def render_employers_list response
           if response
@@ -25,7 +27,7 @@ module Api
         end
 
         def render_employer_details_error
-          render json: {file: 'public/404.html'}, status: :not_found
+          render json: {error: NO_EMPLOYER_DETAILS_FOUND}, status: :not_found
         end
 
         def render_employee_roster employees
@@ -36,7 +38,7 @@ module Api
         end
 
         def render_employee_roster_error
-          render json: {error: 'no employee roster found'}, :status => :not_found
+          render json: {error: NO_EMPLOYEE_ROSTER_FOUND}, :status => :not_found
         end
 
       end

@@ -91,8 +91,10 @@ module Api
           summary = {
               employer_name: employer_profile.legal_name,
               employees_total: employer_profile.roster_size,
+              
               open_enrollment_begins: year ? year.open_enrollment_start_on : nil,
               open_enrollment_ends: year ? year.open_enrollment_end_on : nil,
+              plan_year_state: year ? year.aasm_state.to_s.humanize.titleize : nil,
               plan_year_begins: year ? year.start_on : nil,
               renewal_in_progress: year ? year.is_renewing? : nil,
               renewal_application_available: year ? (year.start_on >> renewals_offset_in_months) : nil,
