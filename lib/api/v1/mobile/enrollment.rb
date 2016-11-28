@@ -8,10 +8,8 @@ module Api
         end
 
         def employee_enrollments
-          enrollments = {}
-          @assignments.keys.each do |period_type|
-            assignment = @assignments[period_type]
-            enrollments[period_type] = {}
+          @assignments.map do |assignment|
+            enrollment_year = { start_on: assignment.plan_year.start_on }
             %w{health dental}.each do |coverage_kind|
               enrollment, rendered_enrollment = initialize_enrollment assignment, coverage_kind
 
@@ -21,10 +19,10 @@ module Api
               end if enrollment && enrollment.plan
 
               enrollment_termination! enrollment, rendered_enrollment
-              enrollments[period_type][coverage_kind] = rendered_enrollment
+              enrollment_year[coverage_kind] = rendered_enrollment
             end
+            enrollment_year
           end
-          enrollments
         end
 
         #

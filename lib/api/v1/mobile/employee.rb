@@ -69,7 +69,10 @@ module Api
           result[:hired_on] = employee.hired_on
           result[:is_business_owner] = employee.is_business_owner
 
-          assignments = {active: employee.active_benefit_group_assignment, renewal: employee.renewal_benefit_group_assignment}
+          assignments = employee.benefit_group_assignments.select do |a| 
+            PlanYear.is_current_or_upcoming? a.plan_year
+          end
+
           result[:enrollments] = Api::V1::Mobile::Enrollment.new(assignments: assignments).employee_enrollments
           result[:dependents] = dependents_of(employee).map do |d|
             basic_individual(d).merge(relationship: relationship_with(d))

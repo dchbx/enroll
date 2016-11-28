@@ -19,7 +19,7 @@ module Api
            broker_agency_id: @authorized[:broker_agency_profile].id,
            broker_clients: marshall_employer_summaries} if @authorized[:broker_agency_profile]
         end
-
+    
         def details
           details = summary_details employer_profile: @employer_profile, years: @plan_years, include_plan_offerings: true
           details[:active_general_agency] = @employer_profile.active_general_agency_legal_name # Note: queries DB
