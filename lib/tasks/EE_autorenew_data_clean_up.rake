@@ -18,8 +18,6 @@ namespace :update_enroll do
           waiver_submission_date
         )
 
-
-
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
       census_employees.each do |census_employee|
