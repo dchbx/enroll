@@ -23,7 +23,7 @@ module MobileEmployeeData
       let!(id) {
         FactoryGirl.create(:person, first_name: first_name, middle_name: middle_name,
                            last_name: last_name, name_sfx: name_suffix,
-                           dob: dob, ssn: ssn, gender: gender)
+                           dob: dob, gender: gender)
       }
 
       let!(census_employee_id) {
