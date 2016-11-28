@@ -5,7 +5,8 @@ module Api
 
         def initialize args={}
           super args
-          @plan_years = @employer_profile.try(:plan_years) || []
+          all_years = @employer_profile.try(:plan_years) || []
+          @plan_years = all_years.select { |y| PlanYear.is_current_or_upcoming? y }
         end
 
         def employers_and_broker_agency
@@ -18,7 +19,6 @@ module Api
            broker_agency_id: @authorized[:broker_agency_profile].id,
            broker_clients: marshall_employer_summaries} if @authorized[:broker_agency_profile]
         end
-
 
         def details
           details = summary_details employer_profile: @employer_profile, years: @plan_years, include_plan_offerings: true
