@@ -1,7 +1,7 @@
 module MobileEmployerData
   shared_context 'employer_data' do
-    let!(:employer_profile_cafe) { FactoryGirl.create(:employer_profile) }
-    let!(:employer_profile_salon) { FactoryGirl.create(:employer_profile) }
+    let!(:employer_profile_cafe) { FactoryGirl.create(:employer_profile, legal_name: "Cafe Curioso") }
+    let!(:employer_profile_salon) { FactoryGirl.create(:employer_profile, legal_name: "Moe's Hair Salon") }
     let!(:calender_year) { TimeKeeper.date_of_record.year + 1 }
 
     let!(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
