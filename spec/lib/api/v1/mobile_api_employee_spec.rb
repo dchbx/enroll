@@ -26,23 +26,18 @@ RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
       expect(emp[:id]).to eq ce_employee.id
       expect(emp[:is_business_owner]).to be false
 
-      expect(emp[:enrollments]).to be_a_kind_of Hash
-      expect(emp[:enrollments]).to include(:renewal)
-      expect(emp[:enrollments][:renewal]).to include('health', 'dental')
-      expect(emp[:enrollments][:renewal]['health']).to include(:status)
-      expect(emp[:enrollments][:renewal]['health'][:status]).to eq 'Not Enrolled'
-      expect(emp[:enrollments][:renewal]['dental']).to include(:status)
-      expect(emp[:enrollments][:renewal]['dental'][:status]).to eq 'Not Enrolled'
-      expect(emp[:enrollments][:active]).to include('health', 'dental')
-      health = emp[:enrollments][:active]["health"]
+      expect(emp[:enrollments]).to be_a_kind_of Array
+      expect(emp[:enrollments].size).to eq 1
+      expect(emp[:enrollments][0]).to include('health', 'dental', :start_on)
+      health = emp[:enrollments][0]["health"]
       expect(health).to_not be nil
-      expect(health).to include(:status, :employer_contribution, :employee_cost, :total_premium, :plan_name, :plan_type,
-                                :metal_level, :benefit_group_name)
+      expect(health).to include(:status, :employer_contribution, :employee_cost, :total_premium, 
+                                :plan_name, :plan_type, :metal_level, :benefit_group_name)
       expect(health[:status]).to eq "Enrolled"
 
-      dental = emp[:enrollments][:active]["dental"]
-      expect(dental).to include(:status, :employer_contribution, :employee_cost, :total_premium, :plan_name, :plan_type,
-                                :metal_level, :benefit_group_name)
+      dental = emp[:enrollments][0]["dental"]
+      expect(dental).to include(:status, :employer_contribution, :employee_cost, :total_premium, 
+                                :plan_name, :plan_type, :metal_level, :benefit_group_name)
     end
   end
 

@@ -103,16 +103,9 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
       expect(output["broker_name"]).to eq("Brunhilde")
       employer = output["broker_clients"][0]
       expect(employer).not_to be(nil), "in #{output}"
+      # TODO check additional fields? they are checked at the lower level...
       expect(employer["employer_name"]).to eq(employer_profile.legal_name)
       expect(employer["employees_total"]).to eq(employer_profile.roster_size)
-      expect(employer["employees_enrolled"]).to be(nil)
-      expect(employer["employees_waived"]).to be(nil)
-      expect(employer["open_enrollment_begins"]).to be(nil)
-      expect(employer["open_enrollment_ends"]).to be(nil)
-      expect(employer["plan_year_begins"]).to be(nil)
-      expect(employer["renewal_in_progress"]).to be(nil)
-      expect(employer["renewal_application_available"]).to be(nil)
-      expect(employer["renewal_application_due"]).to be(nil)
       expect(employer["employer_details_url"]).to end_with("mobile_api/employer_details/#{employer_profile.id}")
     end
   end
@@ -151,25 +144,6 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
       expect(output["employer_name"]).to eq(employer_profile.legal_name)
       expect(output["employees_total"]).to eq(employer_profile.roster_size)
       expect(output["active_general_agency"]).to eq(employer_profile.active_general_agency_legal_name)
-
-      py = employer_profile.show_plan_year
-      if py
-        expect(output["open_enrollment_begins"]).to eq(py.open_enrollment_start_on.strftime("%Y-%m-%d"))
-        expect(output["open_enrollment_ends"]).to eq(py.open_enrollment_end_on.strftime("%Y-%m-%d"))
-        expect(output["plan_year_begins"]).to eq(py.start_on.strftime("%Y-%m-%d"))
-        expect(output["renewal_in_progress"]).to eq(py.is_renewing?)
-        expect(output["renewal_application_available"]).to eq((py.start_on >> Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months).strftime("%Y-%m-%d"))
-        expect(output["renewal_application_due"]).to eq((py.due_date_for_publish).strftime("%Y-%m-%d"))
-        expect(output["minimum_participation_required"]).to eq(py.minimum_enrolled_count)
-
-        expect(output["plan_offerings"]["active"][0]["benefit_group_name"]).to eq benefit_group.title
-        expect(output["plan_offerings"]["active"][0]["health"]).to_not be nil
-        expect(output["plan_offerings"]["active"][0]["dental"]).to_not be nil
-        expect(output["plan_offerings"]["active"][0]["health"]["reference_plan_name"].downcase).to eq benefit_group.reference_plan.name.downcase
-        expect(output["plan_offerings"]["active"][0]["dental"]["reference_plan_name"].downcase).to eq benefit_group.dental_reference_plan.name.downcase
-
-      end
-
     end
   end
 
@@ -286,19 +260,20 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
           expect(response).to have_http_status(:success)
           expect(@output["employer_name"]).to eq "Mike's Architects Limited"
           expect(@output["employees_total"]).to eq 1
-          expect(@output["open_enrollment_begins"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_start_on.strftime("%Y-%m-%d")
-          expect(@output["open_enrollment_ends"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_end_on.strftime("%Y-%m-%d")
-          expect(@output["plan_year_begins"]).to eq mikes_employer_profile.active_plan_year.start_on.strftime("%Y-%m-%d")
-          expect(@output["renewal_in_progress"]).to be_falsey
-          expect(@output["renewal_application_available"]).to eq "2016-08-01"
-          expect(@output["renewal_application_due"]).to eq mikes_plan_year.due_date_for_publish.strftime("%Y-%m-%d")
           expect(@output["binder_payment_due"]).to eq ""
-          expect(@output["minimum_participation_required"]).to eq 1
           expect(@output["active_general_agency"]).to be(nil)
+          plan_year = @output["plan_years"].first
+          expect(plan_year["open_enrollment_begins"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_start_on.strftime("%Y-%m-%d")
+          expect(plan_year["open_enrollment_ends"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_end_on.strftime("%Y-%m-%d")
+          expect(plan_year["plan_year_begins"]).to eq mikes_employer_profile.active_plan_year.start_on.strftime("%Y-%m-%d")
+          expect(plan_year["renewal_in_progress"]).to be_falsey
+          expect(plan_year["renewal_application_available"]).to eq "2016-08-01"
+          expect(plan_year["renewal_application_due"]).to eq mikes_plan_year.due_date_for_publish.strftime("%Y-%m-%d")
+          expect(plan_year["minimum_participation_required"]).to eq 1
 
           #TODO Venu & Pavan: can we get some real plan offerings here?
           #it would be cool if Mike had just active but Carol had active and renewal, for instance
-          expect(@output["plan_offerings"].keys).to eq(["active", "renewal"])
+          expect(plan_year["plan_offerings"].size).to eq 1
         end
 
         it "should not be able to access Carol's broker's employer list" do
@@ -428,10 +403,9 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
         end
 
         it "should not be able to see Mike's employer's roster" do
-          pending("add security to roster")
           get :employee_roster, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
           @output = JSON.parse(response.body)
-          expect(response).to have_http_status(:unauthorized)
+          expect(response).to have_http_status(:not_found)
         end
 
         it "should get 404 NOT FOUND seeking an invalid employer profile ID" do

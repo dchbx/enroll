@@ -20,22 +20,24 @@ RSpec.describe Api::V1::Mobile::Enrollment, dbclean: :after_each do
     end
 
     it 'should return employee enrollments' do
-      assignments = {active: benefit_group_assignment, renewal: benefit_group_assignment}
+      assignments = [benefit_group_assignment, benefit_group_assignment]
       enrollments = Api::V1::Mobile::Enrollment.new(assignments: assignments).employee_enrollments
-      expect(enrollments).to be_a_kind_of Hash
-      expect(enrollments).to include(:active, :renewal)
+      expect(enrollments).to be_a_kind_of Array
+      expect(enrollments.size).to eq 2
 
-      active = enrollments[:active]
-      renewal = enrollments[:renewal]
-      expect(active).to include('health', 'dental')
-      expect(renewal).to include('health', 'dental')
+      active = enrollments[0]
+      renewal = enrollments[1]
+      expect(active).to include('health', 'dental', :start_on)
+      expect(renewal).to include('health', 'dental', :start_on)
 
       active_health, renewal_health = active['health'], renewal['health']
       active_dental, renewal_dental = active['dental'], renewal['dental']
-      expect(active_health).to include(:status, :employer_contribution, :employee_cost, :total_premium, :plan_name,
-                                       :plan_type, :metal_level, :benefit_group_name)
-      expect(renewal_health).to include(:status, :employer_contribution, :employee_cost, :total_premium, :plan_name,
-                                        :plan_type, :metal_level, :benefit_group_name)
+      expect(active_health).to include(:status, :employer_contribution, :employee_cost, 
+                                       :total_premium, :plan_name, :plan_type, :metal_level, 
+                                       :benefit_group_name)
+      expect(renewal_health).to include(:status, :employer_contribution, :employee_cost, 
+                                        :total_premium, :plan_name, :plan_type, :metal_level, 
+                                        :benefit_group_name)
       expect(active_dental).to include(:status)
       expect(renewal_dental).to include(:status)
       expect(active_health[:status]).to eq 'Enrolled'

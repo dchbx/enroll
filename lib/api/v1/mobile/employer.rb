@@ -6,7 +6,7 @@ module Api
         def initialize args={}
           super args
           all_years = @employer_profile.try(:plan_years) || []
-          @plan_years = all_years.select { |y| PlanYear.is_current_or_upcoming? y }
+          @plan_years = all_years.select { |y| Api::V1::Mobile::PlanYear.is_current_or_upcoming? y }
         end
 
         def employers_and_broker_agency

@@ -70,7 +70,7 @@ module Api
           result[:is_business_owner] = employee.is_business_owner
 
           assignments = employee.benefit_group_assignments.select do |a| 
-            PlanYear.is_current_or_upcoming? a.plan_year
+            Api::V1::Mobile::PlanYear.is_current_or_upcoming? a.plan_year
           end
 
           result[:enrollments] = Api::V1::Mobile::Enrollment.new(assignments: assignments).employee_enrollments
