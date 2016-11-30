@@ -25,14 +25,14 @@ class Insured::GroupSelectionController < ApplicationController
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
-      correct_effective_on = HbxEnrollment.calculate_effective_on_from(
+       @correct_effective_on = HbxEnrollment.calculate_effective_on_from(
         market_kind:@market_kind,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
         family: @family,
-        employee_role: nil,
-        benefit_group: nil,
+        employee_role: @market_kind == 'shop' ? @employee_role : nil,
+        benefit_group: @market_kind == 'shop' ? @employee_role.benefit_group : nil,
         benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
-      @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
+      @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(@correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{@correct_effective_on.year}"}.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
     if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')

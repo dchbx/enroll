@@ -143,6 +143,25 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
+
+      context "dual roles", dbclean: :after_each do
+        let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+
+        before do
+          allow(person).to receive(:has_active_employee_role?).and_return true
+          allow(person).to receive(:has_active_consumer_role?).and_return true
+          allow(person).to receive(:active_employee_roles).and_return [employee_role]
+          allow(employee_role).to receive(:benefit_group).and_return benefit_group
+          allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return(TimeKeeper.date_of_record)
+        end
+
+        it "should get correct_effective_on" do
+          sign_in user
+          get :new, person_id: person.id, employee_role_id: employee_role.id
+          expect(assigns(:correct_effective_on)).to eq TimeKeeper.date_of_record
+        end
+
+      end
     end
   end
 
