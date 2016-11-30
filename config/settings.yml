@@ -10,6 +10,17 @@ site:
 
   social_media:
     facebook_url: ""
+#This is the Segment Write Key found here: https://segment.com/enroll/sources/javascript/overview
+analytics:
+  enrolldchealthlinkcom: "dwslbTMoV2ELN15SpGQNsdfu4GFC2HQ2"
+  enrollpreproddchbxorg: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
+  enrolltestdchbxorg: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
+  enrolluatdchbxorg: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
+  enrollcprdchbxorg: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
+  enrollhotfixdchbxorg: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
+  enrollfeaturedchbxorg: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
+  hbxshoporg: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
+  other: "S3LaqPh6HqMN1jyLo8OZleIm5LsioVp2"
 #
 contact_center:
   name: "DC Health Link's Customer Care Center"
