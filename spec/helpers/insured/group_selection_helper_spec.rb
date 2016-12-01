@@ -75,4 +75,62 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
 
   end
+
+  describe "#health_relationship_benefits" do
+
+    context "active/renewal health benefit group offered relationships" do
+      let(:employee_role){FactoryGirl.build(:employee_role)}
+      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
+      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
+
+      let(:relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
+            RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
+        ]
+      end
+
+      it "should return offered relationships of active health benefit group" do
+        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(active_benefit_group)
+        allow(active_benefit_group).to receive_message_chain(:relationship_benefits).and_return(relationship_benefits)
+        expect(subject.health_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      end
+
+      it "should return offered relationships of renewal health benefit group" do
+        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(renewal_benefit_group)
+        allow(renewal_benefit_group).to receive_message_chain(:relationship_benefits).and_return(relationship_benefits)
+        expect(subject.health_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      end
+    end
+  end
+
+  describe "#dental_relationship_benefits" do
+
+    context "active/renewal dental benefit group offered relationships" do
+      let(:employee_role){FactoryGirl.build(:employee_role)}
+      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
+      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
+
+      let(:dental_relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
+            RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
+        ]
+      end
+
+      it "should return offered relationships of active dental benefit group" do
+        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(active_benefit_group)
+        allow(active_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(dental_relationship_benefits)
+        expect(subject.dental_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      end
+
+      it "should return offered relationships of renewal dental benefit group" do
+        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(renewal_benefit_group)
+        allow(renewal_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(dental_relationship_benefits)
+        expect(subject.dental_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      end
+    end
+  end
 end
