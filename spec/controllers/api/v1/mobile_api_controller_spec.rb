@@ -262,12 +262,14 @@ RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
           expect(@output["employees_total"]).to eq 1
           expect(@output["binder_payment_due"]).to eq ""
           expect(@output["active_general_agency"]).to be(nil)
-          plan_year = @output["plan_years"].first
+          plan_year = @output["plan_years"].detect do |py| 
+            py["plan_year_begins"] == mikes_employer_profile.active_plan_year.start_on.strftime("%Y-%m-%d")
+          end
+          expect(plan_year).to_not be nil
           expect(plan_year["open_enrollment_begins"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_start_on.strftime("%Y-%m-%d")
           expect(plan_year["open_enrollment_ends"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_end_on.strftime("%Y-%m-%d")
-          expect(plan_year["plan_year_begins"]).to eq mikes_employer_profile.active_plan_year.start_on.strftime("%Y-%m-%d")
           expect(plan_year["renewal_in_progress"]).to be_falsey
-          expect(plan_year["renewal_application_available"]).to eq "2016-08-01"
+          expect(Date.parse(plan_year["renewal_application_available"])).to be < mikes_employer_profile.active_plan_year.start_on
           expect(plan_year["renewal_application_due"]).to eq mikes_plan_year.due_date_for_publish.strftime("%Y-%m-%d")
           expect(plan_year["minimum_participation_required"]).to eq 1
 
