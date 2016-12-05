@@ -161,13 +161,13 @@ class Employers::PlanYearsController < ApplicationController
     @target = params[:target]
     plan_year = Date.parse(params["start_date"]).year unless params["start_date"].blank?
     @plans = case @kind
-            when "carrier"
-              Plan.valid_shop_health_plans("carrier", @key, plan_year)
-            when "metal-level"
-              Plan.valid_shop_health_plans("metal_level", @key, plan_year)
-            else
-              []
-            end
+    when "carrier"
+      Plan.valid_shop_health_plans("carrier", @key, plan_year)
+    when "metal-level"
+      Plan.valid_shop_health_plans("metal_level", @key, plan_year)
+    else
+      []
+    end
   end
 
   def search_reference_plan
@@ -303,7 +303,7 @@ class Employers::PlanYearsController < ApplicationController
         application_errors = @plan_year.application_errors
         errors = @plan_year.errors.full_messages
         error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1]}</li>"} +
-                         errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
+        errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
 
         flash[:error] = "Renewing Plan Year could not be reverted to draft. #{error_messages}".html_safe
       end
@@ -315,7 +315,7 @@ class Employers::PlanYearsController < ApplicationController
         application_errors = @plan_year.application_errors
         errors = @plan_year.errors.full_messages
         error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1]}</li>"} +
-                         errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
+        errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
 
         flash[:error] = "Published Plan Year could not be reverted to draft. #{error_messages}".html_safe
       end
@@ -457,16 +457,16 @@ class Employers::PlanYearsController < ApplicationController
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
       :benefit_groups_attributes => [ :id, :title, :description, :reference_plan_id, :dental_reference_plan_id, :effective_on_offset,
-                                      :carrier_for_elected_plan, :carrier_for_elected_dental_plan, :metal_level_for_elected_plan,
-                                      :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy, :dental_relationship_benefits_attributes_time,
-                                      :relationship_benefits_attributes => [
-                                        :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
-                                      ],
-                                      :dental_relationship_benefits_attributes => [
-                                        :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
-                                      ]
-    ]
-    )
+        :carrier_for_elected_plan, :carrier_for_elected_dental_plan, :metal_level_for_elected_plan,
+        :plan_option_kind, :dental_plan_option_kind, :employer_max_amt_in_cents, :_destroy, :dental_relationship_benefits_attributes_time,
+        :relationship_benefits_attributes => [
+          :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+          ],
+          :dental_relationship_benefits_attributes => [
+            :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+          ]
+        ]
+        )
 
     plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count < 2 }
     plan_year_params
@@ -477,14 +477,14 @@ class Employers::PlanYearsController < ApplicationController
       "benefit_groups_attributes" =>
       {
         "0" => {
-           "title"=>"2015 Employer Benefits",
+         "title"=>"2015 Employer Benefits",
            # "carrier_for_elected_plan"=>"53e67210eb899a4603000004",
            "reference_plan_id" => params[:reference_plan_id],
            "relationship_benefits_attributes" => params[:relation_benefits],
            "dental_relationship_benefits_attributes" => params[:dental_relation_benefits]
-        }
-      }
-    }
-  end
+         }
+       }
+     }
+   end
 
-end
+ end

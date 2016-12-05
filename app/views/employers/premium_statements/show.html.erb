@@ -1,54 +1,57 @@
 <% content_for :navigation do %>
-  <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<div class="premium-reports-tab">
+<div class="premium-reports-tab ">
   <div class="row no-buffer">
     <% plan_year, billing_date = @employer_profile.billing_plan_year %>
     <% if plan_year.present? && billing_date.present? %>
 
-      <div class="col-xs-8 col-xs-offset-4">
-        <div class="row">
-          <div class="col-xs-8">
-           <button class="btn btn-lg btn-warning hidden" id="loader">
-            <span id="loader" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
-          </button>
-            <span style="float: right; margin-top: 10px;">Select the Coverage Period</span>
-          </div>
-          <div class="col-xs-4">
-            <%= billing_period_dropdown %>
-          </div>
-        </div>
+    <div class="col-xs-8 col-xs-offset-4">
+      <div class="row">
+        <div class="col-xs-8">
+         <button class="btn btn-lg btn-warning hidden" id="loader">
+          <span id="loader" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+        </button>
+        <span style="float: right; margin-top: 10px;">Select the Coverage Period</span>
       </div>
-
-      <%= form_tag employers_premium_statement_path(@employer_profile), :remote => true, :method => :get, :id => 'billing_date_form' do %>
-        <%= hidden_field_tag 'billing_date', @billing_date.strftime("%m/%d/%Y") %>
-      <% end %>
-
-    <% end %>
+      <div class="col-xs-4">
+        <%= billing_period_dropdown %>
+      </div>
+    </div>
   </div>
 
-  <div class="premium-reports-table">
-    <%= render 'show' %>
-  </div>
-<br>
-<%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-default mz' %>
-  <a class='btn btn-default' data-toggle='modal' data-target='#downloadCsv'>Download</a>
+  <%= form_tag employers_premium_statement_path(@employer_profile), :remote => true, :method => :get, :id => 'billing_date_form' do %>
+  <%= hidden_field_tag 'billing_date', @billing_date.strftime("%m/%d/%Y") %>
+  <% end %>
+
+  <% end %>
 </div>
 
-<script>
-$(function() {
-  $('#billing_date_form').bind({
-    'ajax:before': function () {
-      $('#loader').removeClass('hidden');
-    },
-    'ajax:complete': function () {
-      $('#loader').addClass('hidden');
-    }
-  });
+<div class="premium-reports-table"  >
+  <%= render 'show' %>
+</div>
+<br>
+</div>
 
-  $('#enrollment_report_dropdown').on('change', function(){
-    $('#billing_date').val($('option:selected', this).val());
-    $("#billing_date_form").submit();
-  });
+
+
+<script>
+
+  $(function() {
+    initializeDataTables();
+// $('.effective-datatable >tbody >tr').length;
+$('#billing_date_form').bind({
+  'ajax:before': function () {
+    $('#loader').removeClass('hidden');
+  },
+  'ajax:complete': function () {
+    $('#loader').addClass('hidden');
+  }
+});
+
+$('#enrollment_report_dropdown').on('change', function(){
+  $('#billing_date').val($('option:selected', this).val());
+  $("#billing_date_form").submit();
+});
 });
 </script>

@@ -1,43 +1,25 @@
-<% if @hbx_enrollments.present? %>
-<div class="row no-buffer">
-  <h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
-  <div class="text-danger">This is not an invoice.</div>
+
+<div class= "enrolled" >
+	<h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
+	<div class="text-danger">This is not an invoice.</div> 
+	<%= raw render_datatable(@datatable,{ sDom: "B<'row'<'col-sm-4'> <'col-sm-6'f>>" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true})  %>
 </div>
 
-<div class="row no-buffer table-responsive">
-  <table>
-    <thead>
-      <tr>
-        <th>Employee Profile</th>
-        <th>Benefit Package</th>
-        <th>Insurance Coverage</th>
-        <th>Cost</th>
 
-          <!-- <th>Employee</th>
-          <th>SSN</th>
-          <th>DOB</th>
-          <th>Hired</th>
-          <th>Benefit Group</th>
-          <th>Type</th>
-          <th>Plan Name</th>
-          <th>Issuer</th>
-          <th>Covered Ct</th>
-          <th>Employer Contribution</th>
-          <th>Employee Premium</th>
-          <th>Total Premium</th> -->
-        </tr>
-      </thead>
-      <tbody>
-        <% @hbx_enrollments.each do |hbx_enrollment| %>
-        <%= render "employee_line_item", census_employee: hbx_enrollment.census_employee, enrollment: hbx_enrollment %>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-<% else %>
-<div class="row no-buffer">
-  <div class="col-xs-4">No employees enrolled.</div>
+<div class="row no-buffer no_enroll">
+	<div class="col-xs-4">No employees enrolled.</div>
 </div>
-<% end %>
 
-<%= render "download_csv_modal" %>
+<script type="text/javascript">
+
+	if ($('.effective-datatable >tbody >tr').length >= 1){
+		$('.enrolled').show();
+		$('.no_enroll').hide();
+	}
+	else{
+		$('.enrolled').hide();
+		$('.no_enroll').show();
+	}
+
+</script>
+
