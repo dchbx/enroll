@@ -22,7 +22,8 @@ namespace :update_enroll do
       csv << field_names
       census_employees.each do |census_employee|
         person=census_employee.employee_role.person
-        benefit_group_assignments=census_employee.benefit_group_assignments.detect { |assignment| assignment.aasm_state== "coverage_waived" }
+        benefit_group_assignments=census_employee.benefit_group_assignments.detect { |assignment| assignment.aasm_state== "coverage_waived" }.to_a
+
         benefit_group_assignments.each do |benefit_group_assignment|
 
           benefit_group_assignment.hbx_enrollments.each do |hbx_enrollment|
