@@ -5,7 +5,7 @@ require 'csv'
 describe 'user account with no email address' do
   describe 'report:user_account:with_no_email_address' do
     let(:person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, person: person, oim_id:'example1', email:'', roles: ['consumer'], created_at: TimeKeeper.date_of_record) }
+    let(:user) { FactoryGirl.create(:user, person: person, email:'', roles: ['consumer'], created_at: TimeKeeper.date_of_record) }
     before do
       load File.expand_path("#{Rails.root}/lib/tasks/hbx_reports/users_account_with_no_email.rake", __FILE__)
       Rake::Task.define_task(:environment)
@@ -16,7 +16,7 @@ describe 'user account with no email address' do
       start_date = (TimeKeeper.date_of_record-5.days).strftime('%d/%m/%Y')
       end_date = TimeKeeper.date_of_record.strftime('%d/%m/%Y')
       Rake::Task["report:user_account:with_no_email_address"].invoke(start_date,end_date)
-      result =  [["username", "user_first_name", "user_last_name", "user_roles", "person_hbx_id", "person_home_email", "person_work_email", "user_created_at"], ["example1", "John", person.last_name, "[\"consumer\"]", person.hbx_id, person.emails.first.address, "", person.user.created_at.to_s]]
+      result =  [["username", "user_first_name", "user_last_name", "user_roles", "person_hbx_id", "person_home_email", "person_work_email", "user_created_at"], ["#{user.oim_id}", "John", person.last_name, "[\"consumer\"]", person.hbx_id, person.emails.first.address, "", person.user.created_at.to_s]]
       data = CSV.read "#{Rails.root}/hbx_report/users_account_with_no_email.csv"
       expect(data).to eq result
     end

@@ -34,7 +34,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+              <% if @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -202,7 +202,7 @@ function setGroupSelectionHandlers(){
   <% end %>
 
   $('#market_kind_shop').on('change', function() {
-    <% if !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+    <% if @employee_role.census_employee.active_benefit_group.blank? || !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
       $('#dental-radio-button').slideUp();
     <% end %>
     $('#shop-coverage-household').show();
@@ -226,7 +226,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();

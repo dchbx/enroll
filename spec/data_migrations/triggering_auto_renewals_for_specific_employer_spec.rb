@@ -15,7 +15,7 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
   describe "generating auto-renewals for census employees", dbclean: :after_each do
 
     let(:organization) { FactoryGirl.create :organization, :with_active_and_renewal_plan_years}
-    let (:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
+    let(:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
     let(:person) { FactoryGirl.create(:person)}
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -23,8 +23,23 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
     before do
       census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
       census_employee.update_attribute(:ssn, census_employee.employee_role.person.ssn)
-      allow(Time).to receive(:now).and_return(Time.parse("2016-11-10 00:00:00"))
+      new_date = TimeKeeper.date_of_record.beginning_of_month + 11.days
+      TimeKeeper.set_date_of_record_unprotected!(new_date)
+      start_on = Date.new(2016,1,1) # we can fix it better some-time later
+      organization.employer_profile.plan_years.where(aasm_state: "active").first.update_attributes(start_on: start_on, 
+        :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, 
+        :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks
+        )
+      start_on = start_on + 1.year
+      organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.update_attributes(start_on: start_on, 
+        :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, 
+        :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks
+        )
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+    end
+
+    after :all do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     context "triggering a new enrollment", dbclean: :after_each do

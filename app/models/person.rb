@@ -202,10 +202,27 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  def contact_addresses
+    existing_addresses = addresses.to_a
+    home_address = existing_addresses.detect { |addy| addy.kind == "home" }
+    return existing_addresses if home_address
+    add_employee_home_address(existing_addresses)
+  end
+
+  def add_employee_home_address(existing_addresses)
+    return existing_addresses unless employee_roles.any?
+    employee_contact_address = employee_roles.sort_by(&:hired_on).map(&:census_employee).compact.map(&:address).compact.first
+    return existing_addresses unless employee_contact_address
+    existing_addresses + [employee_contact_address]
+  end
+
+  def contact_phones
+    phones.reject { |ph| ph.full_phone_number.blank? }
+  end
+
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
   delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
   delegate :all_types_verified?, :to => :consumer_role
-
 
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )

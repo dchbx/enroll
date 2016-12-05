@@ -298,7 +298,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     it "should record termination submitted date on terminate of hbx_enrollment" do
       expect(enrollment.termination_submitted_on).to eq nil
       post :terminate, id: "hbx_id"
-      expect(enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
+      expect(enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
       expect(response).to be_redirect
     end
   end

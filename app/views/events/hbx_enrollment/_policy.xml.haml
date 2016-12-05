@@ -1,0 +1,31 @@
+%policy
+  %id
+    %id= hbx_enrollment.hbx_id
+  - if hbx_enrollment.broker_agency_account
+    = render :partial => "events/shared/broker", :object => hbx_enrollment, as: :hbx_enrollment
+  %enrollees
+    = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }
+  - if hbx_enrollment.subscriber.family_member != hbx_enrollment.household.family.primary_applicant
+    = render "events/individuals/responsible_party", :object => hbx_enrollment.household.family.primary_applicant.person, as: :person, :locals => {:hbx_enrollment => hbx_enrollment}
+  %enrollment
+    = render :partial => "events/hbx_enrollment/plan", :locals=> {:hbx_enrollment => hbx_enrollment}
+    - if hbx_enrollment.is_shop?
+      %shop_market
+        %employer_link
+          - employer = hbx_enrollment.census_employee.employer_profile
+          %id
+            %id= "urn:openhbx:terms:v1:employer:fein##{employer.fein}"
+          %name= employer.legal_name
+          - unless employer.dba.blank?
+            %dba= employer.dba
+          %fein= employer.fein
+        %total_employer_responsible_amount=(hbx_enrollment.total_employer_contribution).round(2)
+    - else
+      %individual_market
+        %is_carrier_to_bill true
+        %applied_aptc_amount= (hbx_enrollment.applied_aptc_amount).round(2)
+    %premium_total_amount= hbx_enrollment.total_premium.round(2)
+    %total_responsible_amount= (hbx_enrollment.is_shop? ? (hbx_enrollment.total_employee_cost) : (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)).round(2)
+    = render :partial => "events/hbx_enrollment/eligibility_event", :object => hbx_enrollment
+  %request_submitted_timestamp= hbx_enrollment.created_at.strftime('%Y-%m-%dT%H:%M:%S') if hbx_enrollment.created_at
+  %is_active= hbx_enrollment.is_active

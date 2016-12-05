@@ -17,10 +17,6 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
-    it 'should display estimate your costs link' do
-      expect(rendered).to have_selector('a', text: /find your doctor/i)
-    end
-
     it 'should display find your doctor link' do
       expect(rendered).to have_selector('a', text: /estimate your costs/i)
     end

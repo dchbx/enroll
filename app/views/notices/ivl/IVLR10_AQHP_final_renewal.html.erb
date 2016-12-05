@@ -28,28 +28,42 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {content: "We have enrolled the following people in health insurance coverage beginning January 1, 2017."} %>
 
-<table width=75% align=center>
-    <tr><td>Primary First> Primary Last</td><td>P5 First Name> P5 Last Name</td></tr>
-    <tr><td>P2 First Name> P2 Last Name</td><td>P6 First Name> P6 Last Name</td></tr>
-    <tr><td>P3 First Name> P3 Last Name</td><td>P7 First Name> P7 Last Name</td></tr>
-    <tr><td>P4 First Name> P4 Last Name</td><td>P8 First Name> P8 Last Name</td></tr>
-</table>
+  <% if notice.renewal_health_enrollment.present? %>   
+    <table width=75% align=center>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[0] %></td><td><%= notice.renewal_health_enrollment.enrollees[4] %></td></tr>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[1] %></td><td><%= notice.renewal_health_enrollment.enrollees[5] %></td></tr>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[2] %></td><td><%= notice.renewal_health_enrollment.enrollees[6] %></td></tr>
+      <tr><td><%= notice.renewal_health_enrollment.enrollees[3] %></td><td><%= notice.renewal_health_enrollment.enrollees[7] %></td></tr>
+    </table>  
+  <% elsif notice.renewal_dental_enrollment.present? && notice.renewal_health_enrollment.blank? %>
+    <table width=75% align=center>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[0] %></td><td><%= notice.renewal_dental_enrollment.enrollees[4] %></td></tr>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[1] %></td><td><%= notice.renewal_dental_enrollment.enrollees[5] %></td></tr>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[2] %></td><td><%= notice.renewal_dental_enrollment.enrollees[6] %></td></tr>
+      <tr><td><%= notice.renewal_dental_enrollment.enrollees[3] %></td><td><%= notice.renewal_dental_enrollment.enrollees[7] %></td></tr>
+    </table>  
+  <% end %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You still must take action to ensure your coverage for 2017 starts.  Please be sure to do the following:",
   listings: ["<strong>Pay your premium:</strong> You must make your premium payments directly to the insurance company by their payment deadline, which is listed on the invoice your insurance company (not DC Health Link) sends you. If you miss the payment deadline, your plan will be cancelled and you may not be able to sign up again for 2017 coverage.  The fastest way to pay your premium is by calling the health plan or dental plan directly at the numbers listed below.  You should call your health insurance company to make a payment by December 31, 2016, even if you have not received your invoice."]} %>
 
-  <%= render partial: 'notices/shared/table', locals: {rows: [['CareFirst', '(855) 444-3119'],['Kaiser', '(844) 524-7370'],
-  ['Delta Dental ', '(800) 471-0236'], ['Dentegra Dental ', '(800) 471-0284'], ['Dominion Dental ', '(888) 518-5338']],
-  col_styles: ['width: 50%;', 'width: 50%; text-align: center;'], table_width: '70%'} %>
+  <%= render partial: 'notices/shared/table', locals: {headers: ['Carrier','Contact Number'], rows: [['CareFirst', '(855) 444-3119'],['Kaiser', '(844) 524-7370'],['Delta Dental ', '(800) 471-0236'], ['Dentegra Dental ', '(800) 471-0284'], ['Dominion Dental ', '(888) 518-5338']],col_styles: ['width: 50%;', 'width: 50%; text-align: center;'], table_width: '70%'} %>
+
+<div class="break"></div>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
   listings: ["<strong>Update your payment information:</strong> Your premium amount for 2017 has changed. If you have autopay set up through your insurance plan(s) or bank, you must contact your insurance plan(s) or bank to update the amount that will be withdrawn each month. <u>If you do not make an update, your carrier may terminate your plan and you will be unable to sign up for a new plan for 2017 unless you experience another life event (like getting married or having a baby) that qualifies you to re-enroll.</u>","<strong>Provide proof:</strong> If you received an earlier notice from DC Health Link indicating that we need documentation of certain information, please be sure to submit those documents if you haven’t already.  An outstanding document request will not impact your renewal.  However, failing to submit the document(s) by the date indicated on the request may cause your coverage to be terminated in the future."]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["<span style='text-decoration:underline;'>Health Plan: «M 2017 Health Plan»</span>"],
+ contents: [""],
    heading: '2017 Plan Enrollment', sub_heading: ''} %>
+
+<% if notice.renewal_health_enrollment.present? %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "<span style='text-decoration:underline;'>Health Plan: #{notice.renewal_health_enrollment.plan.plan_name}</span>"} %>
 
   <table style='margin: 0px auto;' width='80%'>
     <tr>
@@ -57,7 +71,7 @@
         Total Monthly Premium
       </td>
       <td align=right>
-        «2017_Health_Plan_Premium»
+        <%= notice.renewal_health_enrollment.premium %>
       </td>
     </tr>
     <tr>
@@ -65,7 +79,14 @@
         Minus Your Monthly Premium Tax Credit:
       </td>
       <td align=right>
-        – $ «APTC»
+        – $ <%= notice.renewal_health_enrollment.aptc_amount %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td align=right>
+        _________________________
       </td>
     </tr>
     <tr>
@@ -73,13 +94,17 @@
         <strong>Your Total Monthly Premium Cost:</strong>
       </td>
       <td align=right>
-        <strong>$ «Premium_After_APTC»</strong>
+        <strong>$ <%= notice.renewal_health_enrollment.responsible_amount %></strong>
       </td>
     </tr>
   </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='text-decoration:underline;'>Dental Plan: «M 2017 Dental Plan»</span>"} %>
+<% end %>
+
+<% if notice.renewal_dental_enrollment.present? %>
+
+<% render partial: 'notices/shared/paragraph', :locals => {
+  content: "<span style='text-decoration:underline;'>Dental Plan: #{notice.renewal_dental_enrollment.plan.plan_name}</span>"} %>
 
   <table style='margin: 0px auto;' width='80%'>
     <tr>
@@ -87,7 +112,7 @@
         Total Monthly Premium:
       </td>
       <td align=right>
-        «2017_Dental_Plan_Premium»
+        <%= notice.renewal_dental_enrollment.premium %>
       </td>
     </tr>
     <tr>
@@ -100,13 +125,22 @@
     </tr>
     <tr>
       <td>
+      </td>
+      <td align=right>
+        _________________________
+      </td>
+    </tr>
+    <tr>
+      <td>
         <strong>Your Total Monthly Premium Cost:</strong>
       </td>
       <td align=right>
-        «2017_Dental_Plan_Premium»
+        <%= notice.renewal_dental_enrollment.responsible_amount %>
       </td>
     </tr>
   </table>
+
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account on www.dchealthlink.com or by calling DC Health Link Customer Service toll-free at (855) 532-5465. You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end."],

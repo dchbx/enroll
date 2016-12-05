@@ -26,7 +26,7 @@ class Insured::GroupSelectionController < ApplicationController
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
       correct_effective_on = HbxEnrollment.calculate_effective_on_from(
-        market_kind:@market_kind,
+        market_kind: 'individual',
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
         family: @family,
         employee_role: nil,

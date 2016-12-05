@@ -508,7 +508,6 @@ class CensusEmployee < CensusMember
       CensusEmployee.where(:"aasm_state".in => NEWLY_DESIGNATED_STATES).each do |employee|
         employee.rebase_new_designee! if employee.may_rebase_new_designee?
       end
-      # binding.pry
     end
 
     def find_all_by_employer_profile(employer_profile)
