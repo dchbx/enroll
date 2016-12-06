@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 describe Effective::Datatables::PremiumBillingReportDataTable do
-  
+
   context "in one context" do
-    let(:employee_role1){ 
+    let(:employee_role1){
       FactoryGirl.create :employee_role
     }
 
-    let(:plan_year1){ 
+    let(:plan_year1){
       FactoryGirl.create :plan_year, employer_profile: employee_role1.employer_profile, fte_count: 2, aasm_state: :published
     }
 
@@ -32,15 +32,15 @@ describe Effective::Datatables::PremiumBillingReportDataTable do
       fein: rand(999999999)
     }
 
-  let(:employee_role){ 
+  let(:employee_role){
     FactoryGirl.create :employee_role
   }
 
-  # let(:organization){ 
+  # let(:organization){
   #   FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   # }
 
-  # let(:employer_profile){ 
+  # let(:employer_profile){
   #   FactoryGirl.create :employer_profile, organization: organization
   # }
 
@@ -53,34 +53,34 @@ describe Effective::Datatables::PremiumBillingReportDataTable do
     }
 
 
-  let(:plan_year){ 
+  let(:plan_year){
     FactoryGirl.create :plan_year, employer_profile: employee_role.employer_profile, fte_count: 2, aasm_state: :published
   }
 
   let(:benefit_group){
     FactoryGirl.create :benefit_group, plan_year: plan_year
   }
-  
+
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
 
-  let(:person_with_employee_role){ 
+  let(:person_with_employee_role){
     FactoryGirl.create(:person_with_employee_role, first_name: person[:first_name], last_name: person[:last_name], ssn: person[:ssn], dob: person[:dob_date], census_employee_id: ce.id, employer_profile_id: employer_profile.id, hired_on: ce.hired_on)
   }
   # person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
-  let(:family){ 
+  let(:family){
    FactoryGirl.create :family, :with_primary_family_member, person: employee_role.person
   }
 
-  let(:household){ 
+  let(:household){
     FactoryGirl.create(:household, family: family)
   }
 
-  let(:benefit_group_assignment){ 
+  let(:benefit_group_assignment){
     FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: employee)
-   
+
   }
 
-  let(:hbx_enrollment){ 
+  let(:hbx_enrollment){
     FactoryGirl.create(:hbx_enrollment,
         household: family.active_household,
         coverage_kind: "health",
@@ -100,5 +100,5 @@ describe Effective::Datatables::PremiumBillingReportDataTable do
       expect(d_table1.instance_variable_get(:@hbx_enrollments)).not_to eq(nil)
     end
   end
-  
+
 end

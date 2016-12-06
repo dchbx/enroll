@@ -72,12 +72,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
     #redirect_to exchanges_hbx_profiles_root_path
 
-    respond_to do |format|
-     format.js
-   end
- end
+     respond_to do |format|
+       format.js
+     end
+  end
 
- def employer_invoice
+  def employer_invoice
     # Dynamic Filter values for upcoming 30, 60, 90 days renewals
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
     @next_60_day = @next_30_day.next_month
@@ -92,7 +92,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 
-  def employer_poc
+def employer_poc
 
     # Dynamic Filter values for upcoming 30, 60, 90 days renewals
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month
@@ -105,100 +105,100 @@ class Exchanges::HbxProfilesController < ApplicationController
   #    format.html
    #   format.js
    # end
- end
-
-
- def staff_index
-  @q = params.permit(:q)[:q]
-  @staff = Person.where(:$or => [{csr_role: {:$exists => true}}, {assister_role: {:$exists => true}}])
-  @page_alphabets = page_alphabets(@staff, "last_name")
-  page_no = cur_page_no(@page_alphabets.first)
-  if @q.nil?
-    @staff = @staff.where(last_name: /^#{page_no}/i)
-  else
-    @staff = @staff.where(last_name: @q)
   end
-end
 
-def assister_index
-  @q = params.permit(:q)[:q]
-  @staff = Person.where(assister_role: {:$exists =>true})
-  @page_alphabets = page_alphabets(@staff, "last_name")
-  page_no = cur_page_no(@page_alphabets.first)
-  if @q.nil?
-    @staff = @staff.where(last_name: /^#{page_no}/i)
-  else
-    @staff = @staff.where(last_name: @q)
-  end
-end
 
-def find_email(agent, role)
-  if role == 'Broker'
-    agent.try(:broker_role).try(:email).try(:address)
-  else
-    agent.try(:user).try(:email)
-  end
-end
-
-def request_help
-  role = nil
-  if params[:type]
-    cac_flag = params[:type] == 'CAC'
-    match = CsrRole.find_by_name(params[:firstname], params[:lastname], cac_flag)
-    if match.count > 0
-      agent = match.first
-      role = cac_flag ? 'Certified Applicant Counselor' : 'Customer Service Representative'
-    end
-  else
-    if params[:broker].present?
-      agent = Person.find(params[:broker])
-      broker_role_id = agent.broker_role.id
-      consumer = Person.find(params[:person])
-      family = consumer.primary_family
-      family.hire_broker_agency(broker_role_id)
-      role = 'Broker'
+  def staff_index
+    @q = params.permit(:q)[:q]
+    @staff = Person.where(:$or => [{csr_role: {:$exists => true}}, {assister_role: {:$exists => true}}])
+    @page_alphabets = page_alphabets(@staff, "last_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    if @q.nil?
+      @staff = @staff.where(last_name: /^#{page_no}/i)
     else
-      agent = Person.find(params[:assister])
-      role = 'In-Person Assister'
+      @staff = @staff.where(last_name: @q)
     end
   end
-  if role
-    status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>'
-    if find_email(agent, role)
-      agent_assistance_messages(params,agent,role)
+
+  def assister_index
+    @q = params.permit(:q)[:q]
+    @staff = Person.where(assister_role: {:$exists =>true})
+    @page_alphabets = page_alphabets(@staff, "last_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    if @q.nil?
+      @staff = @staff.where(last_name: /^#{page_no}/i)
     else
-
-      status_text = "Agent has no email.   Please select another"
+      @staff = @staff.where(last_name: @q)
     end
-  else
-    status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
   end
-  @person = Person.find(params[:person])
-  broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
-  render :text => {broker: broker_view, status: status_text}.to_json, layout: false
-end
 
-def family_index
-  @q = params.permit(:q)[:q]
-  page_string = params.permit(:families_page)[:families_page]
-  page_no = page_string.blank? ? nil : page_string.to_i
-  unless @q.present?
-    @families = Family.page page_no
-    @total = Family.count
-  else
-    total_families = Person.search(@q).map(&:families).flatten.uniq
-    @total = total_families.count
-    @families = Kaminari.paginate_array(total_families).page page_no
+  def find_email(agent, role)
+    if role == 'Broker'
+      agent.try(:broker_role).try(:email).try(:address)
+    else
+      agent.try(:user).try(:email)
+    end
   end
-  respond_to do |format|
-    format.html { render "insured/families/index" }
-    format.js
-  end
-end
 
-def family_index_dt
-  @selector = params[:scopes][:selector] if params[:scopes].present?
-  @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
+  def request_help
+    role = nil
+    if params[:type]
+      cac_flag = params[:type] == 'CAC'
+      match = CsrRole.find_by_name(params[:firstname], params[:lastname], cac_flag)
+      if match.count > 0
+        agent = match.first
+        role = cac_flag ? 'Certified Applicant Counselor' : 'Customer Service Representative'
+      end
+    else
+      if params[:broker].present?
+        agent = Person.find(params[:broker])
+        broker_role_id = agent.broker_role.id
+        consumer = Person.find(params[:person])
+        family = consumer.primary_family
+        family.hire_broker_agency(broker_role_id)
+        role = 'Broker'
+      else
+        agent = Person.find(params[:assister])
+        role = 'In-Person Assister'
+      end
+    end
+    if role
+      status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>'
+      if find_email(agent, role)
+        agent_assistance_messages(params,agent,role)
+      else
+
+        status_text = "Agent has no email.   Please select another"
+      end
+    else
+      status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
+    end
+    @person = Person.find(params[:person])
+    broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
+    render :text => {broker: broker_view, status: status_text}.to_json, layout: false
+  end
+
+  def family_index
+    @q = params.permit(:q)[:q]
+    page_string = params.permit(:families_page)[:families_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    unless @q.present?
+      @families = Family.page page_no
+      @total = Family.count
+    else
+      total_families = Person.search(@q).map(&:families).flatten.uniq
+      @total = total_families.count
+      @families = Kaminari.paginate_array(total_families).page page_no
+    end
+    respond_to do |format|
+      format.html { render "insured/families/index" }
+      format.js
+    end
+  end
+
+  def family_index_dt
+    @selector = params[:scopes][:selector] if params[:scopes].present?
+    @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
@@ -367,7 +367,7 @@ def family_index_dt
       org_ids = Organization.search(dt_query.search_string).pluck(:id)
       all_organizations.where({
         "id" => {"$in" => org_ids}
-        })
+      })
     end
 
     @draw = dt_query.draw
@@ -388,7 +388,7 @@ def family_index_dt
       person_ids = Person.search(dt_query.search_string).pluck(:id)
       families = all_families.where({
         "family_members.person_id" => {"$in" => person_ids}
-        })
+      })
     end
     @draw = dt_query.draw
     @total_records = all_families.count
@@ -577,62 +577,62 @@ def family_index_dt
 
   end
 
-  private
+private
 
-  def modify_admin_tabs?
-   authorize HbxProfile, :modify_admin_tabs?
- end
+   def modify_admin_tabs?
+     authorize HbxProfile, :modify_admin_tabs?
+   end
 
- def view_admin_tabs?
-   authorize HbxProfile, :view_admin_tabs?
- end
+   def view_admin_tabs?
+     authorize HbxProfile, :view_admin_tabs?
+   end
 
- def setting_params
-  params.require(:setting).permit(:name, :value)
-end
-
-def agent_assistance_messages(params, agent, role)
-  if params[:person].present?
-    insured = Person.find(params[:person])
-    first_name = insured.first_name
-    last_name = insured.last_name
-    name = insured.full_name
-    insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
-    root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
-    body =
-    "Please contact #{insured.first_name} #{insured.last_name}. <br/> " +
-    "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
-    "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
-    "<a href='" + root+"phone'>Assist Customer</a>  <br>"
-  else
-    first_name = params[:first_name]
-    last_name = params[:last_name]
-    name = first_name.to_s + ' ' + last_name.to_s
-    insured_email = params[:email]
-    body =  "Please contact #{first_name} #{last_name}. <br/>" +
-    "Plan shopping help has been requested by #{insured_email}<br>"
-    body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
-    body += "DOB #{params[:dob]} <br>" if params[:dob].present?
+  def setting_params
+    params.require(:setting).permit(:name, :value)
   end
-  hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
-  message_params = {
-    sender_id: hbx_profile.id,
-    parent_message_id: hbx_profile.id,
-    from: 'Plan Shopping Web Portal',
-    to: "Agent Mailbox",
-    subject: "Please contact #{first_name} #{last_name}. ",
-    body: body,
-  }
-  create_secure_message message_params, hbx_profile, :sent
-  create_secure_message message_params, agent, :inbox
-  result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
-  result.deliver_now
-  puts result.to_s if Rails.env.development?
-end
 
-def find_hbx_profile
-  @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
-end
+  def agent_assistance_messages(params, agent, role)
+    if params[:person].present?
+      insured = Person.find(params[:person])
+      first_name = insured.first_name
+      last_name = insured.last_name
+      name = insured.full_name
+      insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
+      root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
+      body =
+        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " +
+        "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
+        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
+        "<a href='" + root+"phone'>Assist Customer</a>  <br>"
+    else
+      first_name = params[:first_name]
+      last_name = params[:last_name]
+      name = first_name.to_s + ' ' + last_name.to_s
+      insured_email = params[:email]
+      body =  "Please contact #{first_name} #{last_name}. <br/>" +
+        "Plan shopping help has been requested by #{insured_email}<br>"
+      body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
+      body += "DOB #{params[:dob]} <br>" if params[:dob].present?
+    end
+    hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
+    message_params = {
+      sender_id: hbx_profile.id,
+      parent_message_id: hbx_profile.id,
+      from: 'Plan Shopping Web Portal',
+      to: "Agent Mailbox",
+      subject: "Please contact #{first_name} #{last_name}. ",
+      body: body,
+      }
+    create_secure_message message_params, hbx_profile, :sent
+    create_secure_message message_params, agent, :inbox
+    result = UserMailer.new_client_notification(find_email(agent,role), first_name, name, role, insured_email, params[:person].present?)
+    result.deliver_now
+    puts result.to_s if Rails.env.development?
+   end
+
+  def find_hbx_profile
+    @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_hbx_profile

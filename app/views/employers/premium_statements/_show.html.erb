@@ -1,14 +1,20 @@
 
-<div class= "enrolled" >
-	<h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
-	<div class="text-danger">This is not an invoice.</div> 
-	<%= raw render_datatable(@datatable,{ sDom: "B<'row'<'col-sm-4'> <'col-sm-6'f>>" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true})  %>
+<div class="enrolled">
+  <h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
+  <div class="text-danger">This is not an invoice.</div>
+  <%= button_to 'CSV', employers_premium_statement_path(@employer_profile, format: :csv), method: :get, params: { billing_date: @billing_date.strftime("%m/%d/%Y")}, class: 'btn btn-default buttons-csv buttons-html5 interaction-click-control-csv' %>
+    </div>
+  </div>
 </div>
 
+	<%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-4'> <'col-sm-6'f>>" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true})  %>
+</div>
 
 <div class="row no-buffer no_enroll">
-	<div class="col-xs-4">No employees enrolled.</div>
+  <div class="col-xs-4">No employees enrolled.</div>
 </div>
+
+
 
 <script type="text/javascript">
 
@@ -21,5 +27,4 @@
 		$('.no_enroll').show();
 	}
 
-</script>
-
+ </script>

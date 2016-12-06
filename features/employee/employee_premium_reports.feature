@@ -16,7 +16,7 @@ Feature: Validation of Adding Datatables to premium billing reports
 
     Then display no records
 
-  Scenario: Employer should able to click on View Enrolment Reports with active benefit plan 
+  Scenario: Employer should able to click on View Enrolment Reports with active benefit plan
 
     Given Hbx Admin exists
 
