@@ -61,11 +61,7 @@ module Effective
            def collection
             @employer_profile = EmployerProfile.find(attributes[:id])
             billing_date = (attributes[:billing_date].is_a? Date) ? attributes[:billing_date] : Date.parse(attributes[:billing_date])
-<<<<<<< HEAD
             @hbx_enrollments = @employer_profile.enrollments_for_billing(billing_date).select{|e|e.employee_role}
-=======
-            @hbx_enrollments = @employer_profile.enrollments_for_billing(billing_date)
->>>>>>> ee79c9af0ac7e3e910e7f4d4e9f7de8a38e8d0fd
           end
 
           def global_search?
