@@ -2,7 +2,7 @@
 <div class= "enrolled" >
 	<h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
 	<div class="text-danger">This is not an invoice.</div> 
-	<%= raw render_datatable(@datatable,{ sDom: "B<'row'<'col-sm-4'> <'col-sm-6'f>>" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true})  %>
+	<%= raw render_datatable(@datatable,{ sDom: "B<'row'<'col-sm-4'> <'col-sm-4'f>>" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true})  %>
 </div>
 
 
