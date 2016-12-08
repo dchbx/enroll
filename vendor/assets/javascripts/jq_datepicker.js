@@ -63,19 +63,16 @@ function applyJQDatePickerSetup(ele) {
         changeMonth: true,
         changeYear: true,
         dateFormat: 'mm/dd/yy',
-
         altFormat: 'yy-mm-dd',
         altField: otherFieldSelector,
         yearRange: yearMin + ":" + yearMax,
-        
         maxDate: new Date(currentYear, 11, 31),
-        // minDate: dateMin,
         onSelect: function(dateText, dpInstance) {
             $(this).datepicker("hide");
             $(this).trigger('change');
-            var date = $(this).val();
- 
-var entered_dob = $(this).val();
+    
+    var date = $(this).val();
+    var entered_dob = $(this).val();
     var entered_year = entered_dob.substring(entered_dob.length -4);
     var entered_month = entered_dob.substring(0, 2);
     var entered_day = entered_dob.substring(3, 5);
@@ -108,7 +105,7 @@ var entered_dob = $(this).val();
     });
     el.datepicker("refresh");
     el.addClass("jq_datepicker_already_applied");
-}
+   }
 
 function applyJQDatePickers() {
     $(".jq-datepicker").each(function(idx, ele) {
