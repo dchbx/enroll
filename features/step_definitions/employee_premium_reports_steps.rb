@@ -15,14 +15,14 @@ When(/^login to HBX portal with email: (.*) and password: (.*)$/) do |username,p
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
-  
+
   FactoryGirl.create(:person_with_employee_role, first_name: person[:first_name], last_name: person[:last_name], ssn: person[:ssn], dob: person[:dob_date], census_employee_id: ce.id, employer_profile_id: employer_profile.id, hired_on: ce.hired_on)
   person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
-  
+
   FactoryGirl.create :family, :with_primary_family_member, person: person_rec
   FactoryGirl.create(:household, family: person_rec.primary_family)
   benefit_group_assignment = FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: ce)
-  
+
   FactoryGirl.create(:hbx_enrollment,
     household: person_rec.primary_family.active_household,
     coverage_kind: "health",
@@ -35,7 +35,7 @@ When(/^login to HBX portal with email: (.*) and password: (.*)$/) do |username,p
     benefit_group_assignment_id: benefit_group_assignment.id,
     plan_id: benefit_group.elected_plan_ids.first
     )
-  
+
   visit '/'
   click_link 'HBX Portal'
 

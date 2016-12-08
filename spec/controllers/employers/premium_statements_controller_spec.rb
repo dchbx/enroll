@@ -26,33 +26,33 @@ RSpec.describe Employers::PremiumStatementsController do
       total_premium: 981.2,
       )] }
 
-    let(:census_employee) {
-      double("CensusEmployee",
-        full_name: "my full name",
-        ssn: "my ssn",
-        dob: "my dob",
-        hired_on: "my hired_on",
-        published_benefit_group: benefit_group
-        )
-    }
+  let(:census_employee) {
+    double("CensusEmployee",
+      full_name: "my full name",
+      ssn: "my ssn",
+      dob: "my dob",
+      hired_on: "my hired_on",
+      published_benefit_group: benefit_group
+      )
+  }
 
-    context "GET show" do
+  context "GET show" do
 
-      before do
-        allow(user).to receive(:person).and_return(person)
-        allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-        allow(employer_profile).to receive(:enrollments_for_billing).and_return(hbx_enrollments)
-        allow(census_employee).to receive(:is_active?).and_return(true)
-        hbx_enrollments.each do |hbx_enrollment|
-          allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
-        end
-      end
-
-      it "should return contribution" do
-        sign_in(user)
-        xhr :get, :show, id: "test"
-        expect(response).to have_http_status(:success)
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(EmployerProfile).to receive(:find).and_return(employer_profile)
+      allow(employer_profile).to receive(:enrollments_for_billing).and_return(hbx_enrollments)
+      allow(census_employee).to receive(:is_active?).and_return(true)
+      hbx_enrollments.each do |hbx_enrollment|
+        allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
       end
     end
 
+    it "should return contribution" do
+      sign_in(user)
+      xhr :get, :show, id: "test"
+      expect(response).to have_http_status(:success)
+    end
   end
+
+end
