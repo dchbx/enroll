@@ -33,7 +33,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
-        expect(rendered).to match /living outside of DC temporarily and intend to return/
+        expect(rendered).to match /Select this option if you're a DC resident living temporarily outside of DC and intend to return/
       end
     end
 

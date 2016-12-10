@@ -766,14 +766,3 @@ $(document).on('click', '.interaction-click-control-cancel, .interaction-click-c
 
 Freebies.popover();
 
-$(document).on('click', '#address_info + span.form-action', function(){
-  if ($(this).text() == "Add Mailing Address"){
-    $(this).text('Remove Mailing Address');
-    $('.row-form-wrapper.mailing-div').show();
-  }else if ($(this).text() == "Remove Mailing Address"){
-    $(this).text('Add Mailing Address');
-    $('.mailing-div').hide();
-    $(".mailing-div input[type='text']").val("");
-    $('.mailing-div .label-floatlabel').hide();
-  }
-});

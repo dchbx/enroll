@@ -27,4 +27,12 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
   it "should display only one no_dc_address" do
     expect(rendered).to have_selector('input#no_dc_address', count: 1)
   end
+
+  it "should have text for temporarily absent" do
+    expect(rendered).to match /Select this option if you're a DC resident living temporarily outside of DC and intend to return/
+  end
+
+  it "should have consumer_role initialize" do
+    expect(rendered).to match /ConsumerRole\.initialize/
+  end
 end

@@ -158,4 +158,42 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       end
     end
   end
+
+  context "show_consumer_role_state" do
+    let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+
+    it "should return blank when consumer_role is nil" do
+      expect(helper.show_consumer_role_state(nil)).to eq ""
+    end
+
+    it "should return Pending when consumer_role is unverified" do
+      allow(consumer_role).to receive(:aasm_state).and_return "unverified"
+      expect(helper.show_consumer_role_state(consumer_role)).to eq "Pending"
+    end
+
+    it "should return Verified when consumer_role is Verified" do
+      allow(consumer_role).to receive(:aasm_state).and_return "fully_verified"
+      expect(helper.show_consumer_role_state(consumer_role)).to eq "Verified"
+    end
+
+    it "should return Outstanding verifications when consumer_role is verification_outstanding" do
+      allow(consumer_role).to receive(:aasm_state).and_return "verification_outstanding"
+      expect(helper.show_consumer_role_state(consumer_role)).to eq "Outstanding verification"
+    end
+  end
+
+  context "required_for_consumer_address" do
+    it "should return false when required is blank" do
+      expect(helper.required_for_consumer_address("", true)).to eq false
+    end
+
+    context "when required is not blank" do
+      it "should return true when has_dc_adress is true" do
+        expect(helper.required_for_consumer_address("address_required", true)).to eq true
+      end
+      it "should return false when has_dc_adress is false" do
+        expect(helper.required_for_consumer_address("address_required", false)).to eq false
+      end
+    end
+  end
 end

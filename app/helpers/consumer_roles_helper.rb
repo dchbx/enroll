@@ -61,4 +61,19 @@ module ConsumerRolesHelper
 
     shop_for_plans.blank? && (hbx_enrollment.effective_on.year == (new_effective_on.present? ? new_effective_on.year : nil))
   end
+
+  def show_consumer_role_state(consumer_role)
+    return "" if consumer_role.blank?
+    if consumer_role.unverified? || consumer_role.ssa_pending? || consumer_role.dhs_pending?
+      "Pending"
+    elsif consumer_role.fully_verified?
+      "Verified"
+    else
+      "Outstanding verification"
+    end
+  end
+
+  def required_for_consumer_address(required, has_dc_adress)
+    required.present? && has_dc_adress
+  end
 end

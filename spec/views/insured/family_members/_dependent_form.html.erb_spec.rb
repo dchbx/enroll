@@ -55,6 +55,14 @@ describe "insured/family_members/_dependent_form.html.erb" do
       end
       expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
     end
+
+    it "should have text for temporarily absent" do
+      expect(rendered).to match /Select this option if you're a DC resident living temporarily outside of DC and intend to return/
+    end
+
+    it "should have consumer_role initialize" do
+      expect(rendered).to match /ConsumerRole\.initialize/
+    end
   end
 
   context "without consumer_role" do

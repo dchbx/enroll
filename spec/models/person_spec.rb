@@ -1278,6 +1278,64 @@ describe Person do
     end
   end 
 
+  describe "consumer_fields_validations" do
+    let(:person) {FactoryGirl.create(:person)}
+    let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, person: person)}
+
+    it "should get invalid msg" do
+      person.is_consumer_role = "true"
+      person.no_dc_address = true
+      person.no_dc_address_reason = "homeless"
+      person.mailing_address.destroy if person.has_mailing_address?
+      expect(person.save).to eq false
+      expect(person.errors[:base].to_s).to match /We need your mailing address so that your health insurance plan can send important documents like invoices and insurance cards. If you don’t check this address regularly, be sure to indicate that you want electronic notices below. You may also want to call your health insurance company to request electronic notifications from them/
+    end
+
+    it "should get invalid msg when person has no_dc_address and home_address" do
+      person.is_consumer_role = "true"
+      person.no_dc_address = true
+      person.no_dc_address_reason = "homeless"
+      person.addresses.build(kind: 'mailing') if !person.has_mailing_address?
+      person.addresses.build(kind: 'home') if !person.has_home_address?
+      expect(person.save).to eq false
+      expect(person.errors[:base].to_s).to match /You should not have home address when you has no dc address/
+    end
+  end
+
+  describe "methods for address" do
+    let(:person) {FactoryGirl.create(:person)}
+    
+    context "when just home address" do
+      before :each do
+        person.addresses = []
+        person.addresses.build(kind: 'home')
+      end
+
+      it "has_mailing_address? should return false" do
+        expect(person.has_mailing_address?).to eq false
+      end
+
+      it "has_home_address? should return true" do
+        expect(person.has_home_address?).to eq true
+      end
+    end
+    
+    context "when just mailing address" do
+      before :each do
+        person.addresses = []
+        person.addresses.build(kind: 'mailing')
+      end
+
+      it "has_mailing_address? should return true" do
+        expect(person.has_mailing_address?).to eq true
+      end
+
+      it "has_home_address? should return false" do
+        expect(person.has_home_address?).to eq false
+      end
+    end
+  end
+
   describe "given a consumer role" do
     let(:consumer_role) { ConsumerRole.new }
     let(:subject) { Person.new(:consumer_role => consumer_role) }
