@@ -1,0 +1,73 @@
+<div class="container">
+  <%= form_tag(url: :exchanges_hbx_setting_url, class: "form-horizontal") do %>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <h4>General</h4>
+      <div class="row">
+        <% @current_settings.with_indifferent_access[:general].each do |setting| %>
+            <div class="form-group form-group-lg">
+              <%= label_tag setting["id"], setting["title"], class: "col-sm-2 control-label" %>
+              <div class="col-sm-10">
+                <%= text_field_tag setting["id"], setting["value"], class: "form-control" %>
+              </div>
+            </div>
+        <% end %>
+      </div>
+
+
+      <div class="row">
+        <h4>Customer Service Center</h4>
+        <% @current_settings.with_indifferent_access[:customer_service_center].each do |setting| %>
+          <div class="row">
+            <%= field_set_tag do %>
+              <p><%= label_tag setting["id"], setting["title"], class: "sr-only" %></p>
+              <p><%= text_field_tag setting["id"], setting["value"] %></p>
+                <span>
+                  <%= tag :i, class: 'fa fa-question-circle', data: { toggle: "tooltip"}, title: "#{setting['tip']}" %>
+                </span>
+
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+
+      <div class="row">
+        <h4>ACA</h4>
+        <% @current_settings["aca"].each do |k,v| %>
+          <%= field_set_tag do %>
+            <p><%= label_tag "aca[" + k + "]", mixed_case(k.humanize) %></p>
+            <p><%= text_field_tag "aca[" + k + "]", v %></p>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="row">
+        <h4>SHOP Market</h4>
+        <% @current_settings["contact_center"].each do |k,v| %>
+          <%= field_set_tag do %>
+            <p><%= label_tag "contact_center[" + k + "]", mixed_case(k.humanize) %></p>
+            <p><%= text_field_tag "contact_center[" + k + "]", v %></p>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="row">
+        <h4>Individual Market</h4>
+        <% @current_settings["contact_center"].each do |k,v| %>
+          <%= field_set_tag do %>
+            <p><%= label_tag "contact_center[" + k + "]", mixed_case(k.humanize) %></p>
+            <p><%= text_field_tag "contact_center[" + k + "]", v %></p>
+          <% end %>
+        <% end %>
+      </div>
+
+      <p><%= @current_settings["site"]["short_name"] %></p>
+      <p><%= @current_settings %></p>
+
+  <div class="actions">
+    <%= submit_tag  %>
+  </div>
+<% end %>
+</div>

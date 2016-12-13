@@ -1,0 +1,38 @@
+general:
+  - id:     :state_name
+    type:   :string
+    title:  US State Name
+    value:  Alaska
+    group:  general
+    tip:    The state in which the system operates
+
+  - id:     :state_abbreviation
+    type:   :string
+    title:  US State Abbreviation
+    value:  AK
+    group:  general
+    tip:    The two letter abbreviation for the state in which the system operates
+
+aca_shop_market_eligibility:
+  - id:     :small_market_employee_count_maximum
+    type:   :integer
+    title:  Max Small Market Employee Count
+    value:  50
+    group:  aca_shop_market
+    tip:    Max number of employees for a SHOP employer to be eligible
+
+  - id:     :employee_participation_ratio_minimum
+    type:   :float
+    title:  Min Employee Participation Ratio
+    value:  <%= 2 / 3.0 %>
+    group:  aca_shop_market
+    tip:    Minimum proportion of Employees who must enroll or waive to be eligible
+
+aca_shop_market_enrollment:
+  - id:     :retroactive_coverage_termination_maximum
+    title:  
+    type:   :day
+    value:  -60
+    group:  aca_shop_market
+    tip:    Max retroactive time to terminate 
+

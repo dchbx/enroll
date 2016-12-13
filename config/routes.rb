@@ -19,6 +19,11 @@ Rails.application.routes.draw do
   end
 
   namespace :exchanges do
+    resource  :hbx_setting, only: [:show, :edit, :update]
+
+    resources :hbx_reports, only: [:index]
+    resources :hbx_admins,  only: [:index]
+
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection

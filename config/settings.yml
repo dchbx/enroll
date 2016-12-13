@@ -1,4 +1,308 @@
 #
+
+# general.id.short_name
+
+# 
+# SettingsValue.general.id
+# SettingsValue.general.short_name
+# SettingsValue.general.type
+# SettingsValue.general.title
+# SettingsValue.general.group
+# SettingsValue.general.tip
+
+general:
+  - id:     :state_name
+    type:   :string
+    title:  US State Name
+    value:  District of Columbia
+    group:  general
+    tip:    The state in which the system operates
+
+  - id:     :state_abbreviation
+    type:   :string
+    title:  US State Abbreviation
+    value:  DC
+    group:  general
+    tip:    The two letter abbreviation for the state in which the system operates
+
+  - id:     :site_short_name
+    type:   :string
+    title:  Short Name
+    value:  DC Health Link
+    group:  general
+    tip:    The system branding in abbreviated form
+
+  - id:     :site_long_name
+    title:  Long Name
+    type:   :integer
+    value:  
+    group:  general
+    tip:    The full system brand name
+
+  - id:     :site_header_message
+    title:  Header Message
+    type:   :string
+    value:  Welcome to the District's Health Insurance Marketplace
+    group:  general
+    tip:    The Web site's greeting text
+
+  - id:     :site_byline
+    title:  byline
+    type:   :string
+    value:  DC's Online Health Insurance Marketplace
+    group:  general
+    tip:    The Web site's slogan or ownership text
+
+  - id:     :site_logo_file_name
+    title:  Logo File Name
+    type:   :string
+    value:  logo.png
+    group:  general
+    tip:    The year when site was initially copyrighted
+
+  - id:     :site_home_url
+    title:  Web Site Address
+    type:   :string
+    value:  https://www.dchealthlink.com/
+    group:  general
+    tip:    The site's World Wide Web address
+
+  - id:     :site_copyright_period_start
+    title:  Copyright Period Start
+    type:   :integer
+    value:  2013
+    group:  general
+    tip:    The year when site was initially copyrighted
+
+  - id:     :facebook_url
+    title:  Facebook URL
+    type:   :string
+    value:  
+    group:  general
+    tip:    The organization's Facebook Web site address
+
+  - id:     :twitter_username
+    title:  Twitter Username
+    type:   :string
+    value:  
+    group:  general
+    tip:    The organization's Twitter Username
+
+customer_service_center:
+  - id:     :csc_name
+    title:  Name
+    type:   :string
+    value:  DC Health Link's Customer Care Center
+    group:  customer_service_center
+    tip:    Customer service center brand name
+
+  - id:     :csc_alt_name
+    title:  Alternative Name
+    type:   :string
+    value:  DC Health Link Customer Service
+    group:  customer_service_center
+    tip:    Alternative name for customer service center
+
+  - id:     :csc_phone_number
+    title:  Phone Number
+    type:   :string
+    value:  1-855-532-5465
+    group:  customer_service_center
+    tip:    Main telephone number for the customer service center
+
+  - id:     :csc_tty_number
+    title:  TTY Number
+    type:   :string
+    value:  1-855-532-5465
+    group:  customer_service_center
+    tip:    TeleTYpewriter phone number for the customer service center
+
+  - id:     :csc_alt_phone_number
+    title:  Alternate Phone Number
+    type:   :string
+    value:  1-855-532-LINK
+    group:  customer_service_center
+    tip:    Alternative representation for the Customer service center phone number, e.g. 1-800-FOR-HELP
+
+  - id:     :csc_email_address
+    title:  Email
+    type:   :string
+    value:  info@dchealthlink.com
+    group:  customer_service_center
+    tip:    Email address for the Contact Center
+
+aca_individual_market_eligibility:
+  - id:     :verification_outstanding_window
+    title:  
+    type:   day
+    value:  0
+    group:  aca_individual_market
+    tip:    Number of days to retry calling the FedHub for citizenship and VLP status
+
+
+aca_individual_market_enrollment:
+  - id:     :monthly_enrollment_due_on
+    title:  Enrollment Day of Month Deadline
+    type:   :integer
+    value:  15
+    group:  aca_individual_market
+    tip:    Last day of month to enroll for first of next month effective date
+
+
+aca_individual_market_enrollment:
+  - id:     :benefit_year
+    value:  2016
+    type:   :integer
+    title:  Benefit year
+    tip:    Year that benefits begin under this Open Enrollment
+
+    date_range:
+      - id:     :start_on
+        title:  Start Date
+        type:   :time
+        value:  <%= Date.new(2015,11,1) %>
+        group:  aca_open_enrollment_periods
+        tip:    Date Individual Market Open Enrollment begins
+
+      - id:     :end_on
+        title:  Start Date
+        type:   :time
+        value:  <%= Date.new(2016,1,31) %>
+        group:  aca_open_enrollment_periods
+        tip:    Date Individual Market Open Enrollment ends
+
+  - id:     :benefit_year
+    value:  2017
+    type:   :integer
+    title:  Benefit year
+    tip:    Year that benefits begin under this Open Enrollment
+
+    date_range:
+      - id:     :start_on
+        title:  Start Date
+        type:   :time
+        value:  <%= Date.new(2016,11,1) %>
+        group:  aca_open_enrollment_periods
+        tip:    Date Individual Market Open Enrollment begins
+
+      - id:     :end_on
+        title:  Start Date
+        type:   :time
+        value:  <%= Date.new(2017,1,31) %>
+        group:  aca_open_enrollment_periods
+        tip:    Date Individual Market Open Enrollment ends
+
+aca_shop_market_eligibility:
+  - id:     :small_market_employee_count_maximum
+    type:   :integer
+    title:  Max Small Market Employee Count
+    value:  50
+    group:  aca_shop_market
+    tip:    Max number of employees for a SHOP employer to be eligible
+
+  - id:     :employer_contribution_percent_minimum
+    type:   :integer
+    title:  Min Employer Contribution Percent
+    value:  50
+    group:  aca_shop_market
+    tip:    Min percentage of employee's premium cost an employer must cover to be eligible
+
+  - id:     :employee_participation_ratio_minimum
+    type:   :float
+    title:  Min Employee Participation Ratio
+    value:  <%= 2 / 3.0 %>
+    group:  aca_shop_market
+    tip:    Minimum proportion of Employees who must enroll or waive to be eligible
+
+  - id:     :non_owner_participation_count_minimum
+    type:   :integer
+    title:  Min non-owner count
+    value:  1
+    group:  aca_shop_market
+    tip:    Min number of non-owner employees who must enroll or waive to be eligible
+
+  - id:     :binder_payment_due_on
+    type:   :integer
+    title:
+    value:  15
+    group:  aca_shop_market
+    tip:    
+
+    benefit_period:
+      length_minimum:
+        year: 1
+      length_maximum:
+        year: 1
+
+aca_shop_market_enrollment:
+  - id:     :earliest_enroll_prior_to_effective_on
+    title:  
+    type:   :day
+    value:  -30
+    group:  aca_shop_market_open_enrollment
+    tip:    
+
+  - id:     :latest_enroll_after_effective_on
+    title:  
+    type:   :day
+    value:  30
+    group:  aca_shop_market_open_enrollment
+    tip:    
+
+  - id:     :latest_enroll_after_employee_roster_correction_on
+    title:  
+    type:   :day
+    value:  30
+    group:  aca_shop_market_open_enrollment
+    tip:    
+
+  - id:     :retroactive_coverage_termination_maximum
+    title:  
+    type:   :day
+    value:  -60
+    group:  aca_shop_market_open_enrollment
+    tip:    
+
+  - id:     :retroactive_coverage_termination_maximum
+    title:  
+    type:   :day
+    value:  -60
+    group:  aca_shop_market_open_enrollment
+    tip:    
+
+
+
+    initial_application:
+      earliest_start_prior_to_effective_on:
+        months: -3
+      appeal_period_after_application_denial:
+        days: 30
+      # After submitting an ineligible plan year application, time period an Employer must wait
+      ineligible_period_after_application_denial:
+        days: 90
+
+    renewal_application:
+      earliest_start_prior_to_effective_on:
+        months: -3
+      monthly_open_enrollment_end_on: 13
+      open_enrollment:
+        minimum_length:
+          days: 3
+
+    open_enrollment:
+      monthly_start_on: 1
+      monthly_end_on: 10
+
+      minimum_length:
+        days: 5
+      maximum_length:
+        months: 2
+
+
+
+
+
+
 site:
   short_name: "DC Health Link"
   byline: "DC's Online Health Insurance Marketplace"
