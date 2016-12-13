@@ -132,6 +132,38 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     expect(Household::ImmediateFamily.include?('stepchild')).to eq true
   end
 
+  context "eligibility determinations for a household" do
+    #let!(:tax_household1) {FactoryGirl.create(:tax_household }
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:household) {FactoryGirl.create(:household, family: family)}
+    let(:tax_household1) {FactoryGirl.create(:tax_household, household: household)}
+    let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
+    let(:tax_household3) {FactoryGirl.create(:tax_household, household: household)}
+    let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1)}
+    let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2)}
+    let(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household3)}
+
+    it "should return all the eligibility determinations across all tax households when there is one eligibility determination per tax household" do
+      tax_household1.eligibility_determinations = [eligibility_determination1]
+      tax_household2.eligibility_determinations = [eligibility_determination2]
+      household.tax_households = [tax_household1, tax_household2]
+      expect(household.all_eligibility_determinations.size).to eq 2
+      household.all_eligibility_determinations.each do |ed|
+        expect(household.all_eligibility_determinations).to include(ed)
+      end
+    end
+
+    it "should return all the eligibility determinations across all tax households when there is more than one eligibility determination in some tax household" do
+      tax_household1.eligibility_determinations = [eligibility_determination1, eligibility_determination3]
+      tax_household2.eligibility_determinations = [eligibility_determination2]
+      household.tax_households = [tax_household1, tax_household2]
+      expect(household.all_eligibility_determinations.size).to eq 3
+      household.all_eligibility_determinations.each do |ed|
+        expect(household.all_eligibility_determinations).to include(ed)
+      end
+    end
+  end
+
   # context "with an enrolled hbx enrollment" do
   #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
   #   let(:hbx_enrollments) { [mock_hbx_enrollment] }

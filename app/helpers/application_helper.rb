@@ -622,4 +622,5 @@ module ApplicationHelper
   def find_plan_name(hbx_id)
     HbxEnrollment.find(hbx_id).try(:plan).try(:name)
   end
+
 end

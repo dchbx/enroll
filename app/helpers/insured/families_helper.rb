@@ -109,21 +109,35 @@ module Insured::FamiliesHelper
     employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
   end
 
+  def has_writing_agent?(employee_role)
+    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  end
+
   def disable_make_changes_button?(hbx_enrollment)
     # return false if IVL
     return false if hbx_enrollment.census_employee.blank?
-
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
       # 3) qle enrolmlent period check
-
     return false if hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
     return false if hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
     return false if hbx_enrollment.is_special_enrollment? && hbx_enrollment.special_enrollment_period.present? && hbx_enrollment.special_enrollment_period.contains?(TimeKeeper.date_of_record)
 
     # Disable only  if non of the above conditions match
     return true
+  end
+
+  def all_active_enrollment_with_aptc(family)
+    family.active_household.hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
+  end
+
+  def hbx_member_names(hbx_enrollment_members)
+    member_names = Array.new
+    hbx_enrollment_members.each do |hem|
+      member_names.push(Person.find(hem.family_member.person_id.to_s).full_name)
+    end
+    return member_names.join(", ")
   end
 
   def has_writing_agent?(employee_role_or_person)

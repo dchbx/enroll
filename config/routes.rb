@@ -4,6 +4,10 @@ Rails.application.routes.draw do
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
+
+  match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
+  match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
+  match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
 
   namespace :users do
@@ -43,6 +47,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :assister_index
         get :request_help
+        get :aptc_csr_family_index
         get :binder_index
         get :binder_index_datatable
         post :binder_paid

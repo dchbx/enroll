@@ -154,6 +154,7 @@ class SpecialEnrollmentPeriod
     end
   end
 
+
   def first_of_month_effective_date
     if @reference_date.day <= Setting.individual_market_monthly_enrollment_due_on
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
