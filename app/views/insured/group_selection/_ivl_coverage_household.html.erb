@@ -12,6 +12,7 @@
           @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
           errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
         end
+
         #TEMPORARY CODE DO NOT COPY  TODO
         %>
         <tr class="<%='ineligible_row' unless is_coverage%>">

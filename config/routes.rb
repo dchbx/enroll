@@ -4,6 +4,10 @@ Rails.application.routes.draw do
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
+
+  match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
+  match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
+  match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
 
   namespace :users do
@@ -19,17 +23,23 @@ Rails.application.routes.draw do
   end
 
   namespace :exchanges do
+
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
     end
     resources :agents_inboxes, only: [:show, :destroy]
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
       collection do
         get :family_index
+        get :family_index_dt
+        post :families_index_datatable
         get :employer_index
+        get :employer_poc
+        post :employer_poc_datatable
         get :employer_invoice
         post :employer_invoice_datatable
         post :generate_invoice
@@ -43,15 +53,27 @@ Rails.application.routes.draw do
         get :staff_index
         get :assister_index
         get :request_help
+        get :aptc_csr_family_index
         get :binder_index
         get :binder_index_datatable
         post :binder_paid
         get :verification_index
         get :verifications_index_datatable
+        get :cancel_enrollment
+        post :update_cancel_enrollment
+        get :terminate_enrollment
+        post :update_terminate_enrollment
+        post :add_new_sep
+        get :update_effective_date
+        get :calculate_sep_dates
+        get :add_sep_form
+        get :hide_form
+        get :show_sep_history
       end
 
       member do
         post :transmit_group_xml
+        get :transmit_group_xml
         get :home
         get :inbox
       end
@@ -165,6 +187,7 @@ Rails.application.routes.draw do
     root 'families#home'
 
     resources :family_members
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -199,6 +222,7 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       get 'show_profile'
+      get 'link_from_quote'
       get 'consumer_override'
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
@@ -293,6 +317,50 @@ Rails.application.routes.draw do
       end
       member do
         get :favorite
+      end
+    end
+
+
+    resources :broker_roles do
+
+      resources :quotes do
+        root 'quotes#index'
+        collection do
+          post :quotes_index_datatable
+          get :new_household, :format => "js"
+          post :update_benefits
+          post :publish_quote
+          get :get_quote_info
+          get :copy
+          get :set_plan
+          get :publish
+          get :criteria
+          get :plan_comparison
+          get :health_cost_comparison
+          get :dental_cost_comparison
+          get 'published_quote/:id', to: 'quotes#view_published_quote'
+          get :export_to_pdf
+          get :download_pdf
+          get :dental_plans_data
+          get :my_quotes
+        end
+        member do
+          get :upload_employee_roster
+          post :build_employee_roster
+          get :delete_quote #fits with our dropdown ajax pattern
+          get :download_employee_roster
+          post :delete_member
+          delete :delete_household
+          post :delete_benefit_group
+          get :delete_quote_modal
+        end
+
+        resources :quote_benefit_groups do
+          get :criteria
+          get :get_quote_info
+          post :update_benefits
+          get :plan_comparison
+        end
       end
     end
   end

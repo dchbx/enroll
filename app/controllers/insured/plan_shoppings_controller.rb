@@ -69,7 +69,6 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-
     if @enrollment.is_special_enrollment?
       sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
       @enrollment.update_current(special_enrollment_period_id: sep_id)
@@ -160,7 +159,6 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'

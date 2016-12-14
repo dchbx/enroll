@@ -585,12 +585,42 @@ module ApplicationHelper
     broker_agency_profile.default_general_agency_profile == general_agency_profile
   end
 
+  def asset_data_base64(path)
+    asset = Rails.application.assets.find_asset(path)
+    throw "Could not find asset '#{path}'" if asset.nil?
+    base64 = Base64.encode64(asset.to_s).gsub(/\s+/, "")
+    "data:#{asset.content_type};base64,#{Rack::Utils.escape(base64)}"
+  end
+
+  def find_plan_name(hbx_id)
+    HbxEnrollment.find(hbx_id).try(:plan).try(:name)
+  end
+
+  def has_new_hire_enrollment_period?(census_employee)
+    census_employee.new_hire_enrollment_period.present?
+  end
+
   def eligibility_criteria(employer)
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
-      ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      eligibility_text = ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      if text == "Yes"
+        "Eligible"
+      else
+        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+      end
+    else
+      "Ineligible"
+    end
+  end
+
+  def eligibility_criteria_for_export(employer)
+    if employer.show_plan_year.present?
+      @participation_count == 0 && @non_owner_participation_rule == true ? "Eligible" : "Ineligible"
+    else
+      "Ineligible"
     end
   end
 
@@ -612,14 +642,5 @@ module ApplicationHelper
     end
   end
 
-  def asset_data_base64(path)
-    asset = Rails.application.assets.find_asset(path)
-    throw "Could not find asset '#{path}'" if asset.nil?
-    base64 = Base64.encode64(asset.to_s).gsub(/\s+/, "")
-    "data:#{asset.content_type};base64,#{Rack::Utils.escape(base64)}"
-  end
 
-  def find_plan_name(hbx_id)
-    HbxEnrollment.find(hbx_id).try(:plan).try(:name)
-  end
 end

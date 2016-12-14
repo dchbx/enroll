@@ -44,6 +44,16 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_next_year_premium_tables do
+      transient do
+        next_year_premium_tables_count 48
+      end
+      active_year {TimeKeeper.date_of_record.next_year.year}
+      after(:create) do |plan, evaluator|
+        create_list(:next_year_premium_table, evaluator.next_year_premium_tables_count, plan: plan)
+      end
+    end
+
     factory :active_individual_health_plan,       traits: [:individual_health, :this_year, :with_premium_tables]
     factory :active_shop_health_plan,             traits: [:shop_health, :this_year, :with_premium_tables]
     factory :active_individual_dental_plan,       traits: [:individual_dental, :this_year, :with_premium_tables]
@@ -71,8 +81,27 @@ FactoryGirl.define do
         silver: 100.00,
         gold: 90.00,
         platinum: 80.00,
+        dental: 10.00,
       }
       pt.update_attribute(:cost, (pt.age * 1001.00) / metal_hash[:"#{pt.plan.metal_level}"] )
+    end
+  end
+
+  factory(:next_year_premium_table, {class: PremiumTable}) do
+    sequence(:age, (19..66).cycle)
+    start_on  {TimeKeeper.date_of_record.beginning_of_year.next_year}
+    end_on    {TimeKeeper.date_of_record.beginning_of_year.next_year + 1.year - 1.day}
+    cost {(age * 1001.00) / 100.00}
+
+    after :create do |pt|
+      metal_hash = {
+        bronze: 110.00,
+        silver: 100.00,
+        gold: 90.00,
+        platinum: 80.00,
+        dental: 10.00,
+      }
+      pt.update_attribute(:cost, (pt.age * 1500.50) / (metal_hash[:"#{pt.plan.metal_level}"] || 110.0)  )
     end
   end
 end

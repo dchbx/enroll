@@ -2,10 +2,7 @@
 
   <%if not @dont_allow_change%>
 
-    <div class="row">
-    </span><h3 class="title-inline">DOB / SSN Update Successful</h3>
-    </div>
-    <div>
+    <h4 class="title">DOB / SSN Update Successful</h4>
       <table class="table table-border">
         <thead></thead>
         <tbody>
@@ -35,8 +32,7 @@
     <h5>Please resolve the match issue.</h5>
 
   <%end%>
-  <br />
 
 </div>
 
-<%= link_to "Back to Edit", edit_dob_ssn_path(id: @person.id), remote: true, class: 'btn btn-default' %>
+<%#= link_to "Back to Edit", edit_dob_ssn_path(id: @person.id), remote: true, class: 'btn btn-default' %>

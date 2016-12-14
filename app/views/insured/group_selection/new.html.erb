@@ -19,13 +19,11 @@
         <h1 class="darkblue">Choose Coverage for your Household</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
         <h3>Who Needs Coverage?</h3>
-
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.id) if @employee_role %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
-
 
           <% if can_shop_shop?(@person) %>
             <div id="shop-coverage-household" class="<%= 'dn' if @market_kind == 'individual' %>">
@@ -137,12 +135,13 @@
 
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
+            <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
             <br/>
             <h3>What would you like to do?</h3>
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), 
+              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
               class: ('btn btn-primary ' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
           <% else %>

@@ -35,6 +35,7 @@
 //= require consumer_role
 //= require plan_year_selection
 //= require bootstrap-slider
+//= require aptc
 //= require announcement
 //= require bootstrap-hooks
 //= require general_agency
@@ -42,6 +43,7 @@
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require freebies
 //= require responsive
+//= require effective_datatables
 //= require_tree .
 
 $(document).on('ready page:load', function () {
@@ -531,6 +533,7 @@ $(document).ready(function () {
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
+  $(".mask-csl").mask("9999999999");
 
   $(document).on('focusout', "#person_ssn, .mask-ssn", function(){
     var ssn_val = $(this).val();
@@ -777,3 +780,22 @@ $(document).on('click', '#address_info + span.form-action', function(){
     $('.mailing-div .label-floatlabel').hide();
   }
 });
+
+
+  //toggling of divs that show APTC Enrollments
+  $('.nav-toggle').click(function(){
+    //get collapse content selector
+    var collapse_content_selector = $(this).attr('href');         
+        
+    //make the collapse content to be shown or hide
+    var toggle_switch = $(this);
+    $(collapse_content_selector).slideToggle('fast', function(){
+      if($(this).css('display')=='none'){
+        toggle_switch.html('View Enrollment(s) <i class="fa fa-chevron-down fa-lg">');
+        //$(collapse_content_selector).animate({top: "0px"}, 500);
+      }else{
+        toggle_switch.html('Hide Enrollment(s) <i class="fa fa-chevron-up fa-lg">');
+        //$(collapse_content_selector).animate({top: "0px"}, 500);
+      }
+    });
+  });

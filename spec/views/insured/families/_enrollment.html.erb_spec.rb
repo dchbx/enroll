@@ -34,6 +34,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                       :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
     ) }
 
+
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
     #let(:employer_profile) { FactoryGirl.create(:employer_profile) }
@@ -76,6 +77,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector('strong', text: 'Effective date:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
+
 
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')
@@ -164,6 +166,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector('label', text: 'APTC amount:')
       expect(rendered).to have_selector('strong', text: '$100')
     end
+
 
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')

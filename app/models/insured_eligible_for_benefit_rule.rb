@@ -36,7 +36,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def satisfied?
-    if @role.class.name == "ConsumerRole"
+    if @role.class.name == "ConsumerRole" 
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
         if self.public_send("is_#{element}_satisfied?")

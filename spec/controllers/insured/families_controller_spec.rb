@@ -48,7 +48,7 @@ RSpec.describe Insured::FamiliesController do
   let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
-
+  let(:sep) { double("SpecialEnrollmentPeriod") }
 
   before :each do
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
@@ -71,6 +71,7 @@ RSpec.describe Insured::FamiliesController do
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
+      allow(family).to receive(:active_admin_seps).and_return([sep])
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
       allow(user).to receive(:has_employee_role?).and_return(true)
@@ -96,16 +97,18 @@ RSpec.describe Insured::FamiliesController do
     context "for SHOP market" do
 
       let(:employee_roles) { double }
-      let(:employee_role) { [double("EmployeeRole", bookmark_url: "/families/home")] }
+      let(:employee_role) { FactoryGirl.create(:employee_role, bookmark_url: "/families/home") }
+      let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
 
       before :each do
         FactoryGirl.create(:announcement, content: "msg for Employee", audiences: ['Employee'])
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
-        allow(person).to receive(:employee_roles).and_return(employee_role)
+        allow(person).to receive(:employee_roles).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return nil
+        allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
         sign_in user
         get :home
       end
@@ -196,6 +199,8 @@ RSpec.describe Insured::FamiliesController do
       let(:employee_roles) { double }
       let(:employee_role) { double("EmployeeRole", bookmark_url: "/families/home") }
       let(:enrollments) { double }
+      let(:employee_role2) { FactoryGirl.create(:employee_role) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role2.id) }
 
       before :each do
         sign_in user
@@ -214,14 +219,18 @@ RSpec.describe Insured::FamiliesController do
         allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
         allow(family).to receive(:check_for_consumer_role).and_return true
         allow(controller).to receive(:update_changing_hbxs).and_return(true)
+        allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
       end
 
       context "with waived_hbx when display_hbx is employer_sponsored" do
         let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
         let(:display_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
+        let(:employee_role) { FactoryGirl.create(:employee_role) }
+        let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
           allow(family).to receive(:active_family_members).and_return(family_members)
+          allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
           get :home
         end
         it "should be a success" do
@@ -246,9 +255,12 @@ RSpec.describe Insured::FamiliesController do
       context "with waived_hbx when display_hbx is individual" do
         let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
         let(:display_hbx) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
+        let(:employee_role) { FactoryGirl.create(:employee_role) }
+        let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
         before :each do
           allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
           allow(family).to receive(:active_family_members).and_return(family_members)
+          allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
           get :home
         end
         it "should be a success" do
@@ -382,6 +394,7 @@ RSpec.describe Insured::FamiliesController do
     let(:user) { double(identity_verified?: true, idp_verified?: true) }
     let(:employee_roles) { double }
     let(:employee_role) { [double("EmployeeRole")] }
+    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
 
     before :each do
       allow(person).to receive(:user).and_return(user)
@@ -390,6 +403,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
+      allow(family).to receive_message_chain("special_enrollment_periods.where").and_return([special_enrollment_period])
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 

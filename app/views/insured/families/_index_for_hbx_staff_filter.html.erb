@@ -1,0 +1,47 @@
+ <% ivl_category =
+     [
+       ['all', 'All', ],
+       ['assisted', 'Assisted', ],
+       ['unassisted', 'Unassisted', ],
+       ['sep_eligible', 'SEP Eligible', ],
+     ]
+ ivl_state =
+     [
+       ['all', 'All', ivl_category ],
+       ['enrolled', 'Enrolled', ivl_category],
+       ['renewing', 'Renewing', ivl_category],
+       ['waived', 'Waived', ivl_category],
+     ]
+ ee_category =
+    [
+     ['all', 'All', ivl_category ],
+     ['active', 'Active', ],
+     ['renewing', 'Renewing'],
+     ['cobra', 'Cobra'],
+     ['terminated', 'Terminated'],
+    ]
+
+  ee_state =
+   [
+     ['all', 'All', ee_category],
+     ['enrolled', 'Enrolled', ee_category],
+     ['renewing', 'Renewing', ee_category],
+     ['waived', 'Waived'],
+     ['terminated', 'Terminated'],
+     ['sep_eligible', 'SEP Eligible', ee_category],
+   ]
+
+  filters =
+   [
+	   ['all', 'All'],
+	   ['individual_enrolled', 'Individual Enrolled', ivl_state],
+	   ['employer_sponsored', 'Employer Sponsored Coverage', ee_state],
+	   ['non_enrolled', 'Non-Enrolled',  ]  #maybe no sub menu?
+   ]
+
+
+
+     %>
+<div class='custom_filter'>
+   <%= render partial: '/datatables/shared/filter', locals: {filters: filters} %>
+ </div>

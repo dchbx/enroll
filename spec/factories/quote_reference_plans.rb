@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :resident_role do
+  factory :quote_reference_plan do
     
   end
 

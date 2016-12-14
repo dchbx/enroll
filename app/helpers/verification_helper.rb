@@ -160,4 +160,3 @@ module VerificationHelper
     end
   end
 end
-

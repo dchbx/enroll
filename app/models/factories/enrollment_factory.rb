@@ -169,7 +169,7 @@ module Factories
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on
     end
-    
+
     def self.migrate_census_employee_contact_to_person(census_employee, person)
       if census_employee
         if census_employee.address
@@ -195,7 +195,7 @@ module Factories
       elsif person_new
         person.delete
       end
-      
+
       return role, family
     end
 
@@ -210,7 +210,7 @@ module Factories
       end
       return family
     end
-
+    
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,

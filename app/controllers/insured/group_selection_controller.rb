@@ -16,9 +16,9 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars
+
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
-
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
@@ -47,12 +47,13 @@ class Insured::GroupSelectionController < ApplicationController
       employee_role: @employee_role,
       benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
       benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
+    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
-
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
     raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
@@ -80,7 +81,8 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
-
+    # Set effective_on if this is a case of QLE with date options available.
+    hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan

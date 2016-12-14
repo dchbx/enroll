@@ -1,0 +1,46 @@
+:ruby
+  effective_datatable_params = {
+    id: "#{datatable.to_param}-table-#{Time.zone.now.nsec}",
+    class: "#{datatable.table_html_class}",
+    data: {
+      'searching' => datatable.global_search?.to_s,
+      'effective-form-inputs' => defined?(EffectiveFormInputs),
+      'bulk-actions' => datatable_bulk_actions(datatable),
+      'columns' => datatable_columns(datatable),
+      'input-js-options' => local_assigns[:input_js_options],
+      'simple' => datatable.simple?.to_s,
+      'source' => effective_datatables.datatable_path(datatable, {format: 'json'}.merge(attributes: datatable.attributes)).chomp('?'),
+      'default-order' => datatable_default_order(datatable),
+      'display-entries' => datatable.display_entries,
+      'display-records' => (datatable.to_json[:recordsFiltered] || 0),
+      'total-records' => (datatable.to_json[:recordsTotal] || 0)
+    }
+  }
+
+- effective_model = effective_datatable_params[:id].split('-table')[0].camelcase
+- effective_model_class = "Effective::Datatables::#{effective_model}"
+- effective_filter = effective_model_class.constantize.new.try(:nested_filter_definition)
+
+.container
+  - if effective_filter
+    = render partial: '/datatables/shared/filter', locals: {filters: effective_filter}
+  #effective_datatable_wrapper
+    .row
+      %table.effective-datatable{effective_datatable_params}
+        %thead
+          %tr
+            - datatable.table_columns.each do |name, opts|
+              %th= opts[:label] || name
+
+        %tbody
+          - datatable.to_json[:data].each do |row|
+            %tr
+              - row.each do |col|
+                %td= col.to_s.html_safe
+
+        - if datatable.aggregates.present?
+          %tfoot
+            - datatable.to_json[:aggregates].each do |row|
+              %tr
+                - row.each do |col|
+                  %td= col.to_s.html_safe
