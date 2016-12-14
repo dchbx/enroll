@@ -127,15 +127,15 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
     context "invoice_formated_date" do
       it "should return Month-Year format for a giving date" do
-        expect(helper.invoice_formated_date(Date.new(2001,2,10))).to eq "02/10/2001"
-        expect(helper.invoice_formated_date(Date.new(2016,4,14))).to eq "04/14/2016"
+        expect(helper.invoice_formated_date(Date.new(2001,2,10))).to eq "02/08/2001"
+        expect(helper.invoice_formated_date(Date.new(2016,4,14))).to eq "04/12/2016"
       end
     end
 
     context "invoice_coverage_date" do
       it "should return Month-Date-Year format for a giving date" do
-        expect(helper.invoice_coverage_date(Date.new(2001,2,10))).to eq "Mar 2001"
-        expect(helper.invoice_coverage_date(Date.new(2016,4,14))).to eq "May 2016"
+        expect(helper.invoice_coverage_date(Date.new(2001,2,10))).to eq "Feb 2001"
+        expect(helper.invoice_coverage_date(Date.new(2016,4,14))).to eq "Apr 2016"
       end
     end
 
