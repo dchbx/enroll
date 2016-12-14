@@ -225,7 +225,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   context "is_family_relationships_satisfied?" do
     let(:consumer_role) {double}
     let(:benefit_package) {double}
-    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,enrollment_kind:'sep')}
+    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)}
 
     it "should return true for relationship other than child" do
       allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'self'
@@ -235,14 +235,12 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     it "should return true" do
       allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
       allow(rule).to receive(:is_child_age_satisfied?).and_return true
-      allow(rule).to receive(:is_child_26_with_sep_satisfied?).and_return true
       expect(rule.is_family_relationships_satisfied?).to eq true
     end
 
     it "should return false" do
       allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
       allow(rule).to receive(:is_child_age_satisfied?).and_return false
-      allow(rule).to receive(:is_child_26_with_sep_satisfied?).and_return false
       expect(rule.is_family_relationships_satisfied?).to eq false
     end
   end
@@ -250,68 +248,19 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   context "is_child_age_satisfied?" do
     let(:consumer_role) {double}
     let(:benefit_package) {double}
-    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,enrollment_kind:'sep')}
+    let(:new_effective_on) {TimeKeeper.date_of_record}
+    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,new_effective_on:new_effective_on)}
 
-    it "should return true when age <= 25" do
+    it "should return true when new_effective_on is before child crossed 26 years" do
       allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
       allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 20.years
       expect(rule.is_child_age_satisfied?).to eq true
     end
 
-    it "should return false when age >= 25" do
+    it "should return false when new_effective_on is after child entered 26 years" do
       allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
       allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 30.years
       expect(rule.is_child_age_satisfied?).to eq false
-    end
-  end
-
-  context "is_child_26_with_sep_satisfied?" do
-    let(:family_member) {double}
-    let(:special_enrollment_periods) {double}
-    let(:family) {double(family_members: double(active: [family_member]))}
-    let(:person) {double(families: [family])}
-    let(:consumer_role) {double(person: person)}
-    let(:benefit_package) {double}
-    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,enrollment_kind:'sep')}
-    let(:dob) {TimeKeeper.date_of_record - 26.years}
-    let(:effective_on) {TimeKeeper.date_of_record}
-
-    it "should return true when age = 26 && age 26 turned in current year with sepcial enrollment effective date to current year" do
-      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
-      allow(consumer_role).to receive(:dob).and_return dob
-      allow(dob).to receive(:year).and_return 1990
-      allow(person).to receive(:families).and_return ([family])
-      allow(family).to receive(:special_enrollment_periods).and_return ([special_enrollment_periods])
-      allow(special_enrollment_periods).to receive(:effective_on).and_return (effective_on)
-      allow(effective_on).to receive(:year).and_return 2016
-      expect(rule.is_child_26_with_sep_satisfied?).to eq true
-    end
-
-    it "should return false when age = 26 and open enrollment" do
-      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,enrollment_kind:'')
-      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
-      allow(consumer_role).to receive(:dob).and_return dob
-      allow(dob).to receive(:year).and_return 1990
-      expect(rule.is_family_relationships_satisfied?).to eq false
-    end
-
-    it "should return false when age = 26 && age 26 turned in current year with sepcial enrollment effective date not to current year" do
-      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
-      allow(consumer_role).to receive(:dob).and_return dob
-      allow(dob).to receive(:year).and_return 1990
-      allow(person).to receive(:families).and_return ([family])
-      allow(family).to receive(:special_enrollment_periods).and_return ([special_enrollment_periods])
-      allow(special_enrollment_periods).to receive(:effective_on).and_return (effective_on)
-      allow(effective_on).to receive(:year).and_return 2017
-      expect(rule.is_child_26_with_sep_satisfied?).to eq false
-    end
-
-    it "should return false when age = 26 && age 26 not turned in current year" do
-      dob= TimeKeeper.date_of_record - (26.years+11.months)
-      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
-      allow(consumer_role).to receive(:dob).and_return dob
-      allow(dob).to receive(:year).and_return(1989)
-      expect(rule.is_child_26_with_sep_satisfied?).to eq false
     end
   end
 
