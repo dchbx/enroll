@@ -7,7 +7,7 @@
         if @market_kind == 'individual' || can_shop_both_markets?(@person)
           #TEMPORARY CODE DO NOT COPY   TODO
           role = family_member.person.consumer_role
-          rule = InsuredEligibleForBenefitRule.new(role, @benefit, coverage_kind: @coverage_kind, enrollment_kind:@enrollment_kind)
+          rule = InsuredEligibleForBenefitRule.new(role, @benefit, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on)
           is_coverage, errors = rule.satisfied?
           @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
           errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
