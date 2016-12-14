@@ -1,6 +1,6 @@
 require 'csv'
 
-filename = "8905_migration_required_enrollments.csv"
+filename = "Redmine-7326_enrollments.csv"
 
 def select_benefit_package(title, benefit_coverage_period)
   benefit_coverage_period.benefit_packages.each do |benefit_package|
@@ -94,6 +94,25 @@ end
 def select_employee_role(employer_profile_id, employee_roles)
   correct_employee_role = employee_roles.detect{|employee_role| employee_role.employer_profile_id == employer_profile_id}
   return correct_employee_role
+end
+
+def set_aasm_state(hbx_enrollment,end_date,benefit_group_assignment)
+  unless end_date.blank?
+    coverage_end_date = format_date(data_row["Benefit End Date"])
+    hbx_enrollment.update_attribute(:terminated_on, end_date)
+    if hbx_enrollment.benefit_group.plan_year.end_on != coverage_end_date
+      hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
+    elsif hbx_enrollment.start_on == coverage_end_date
+      hbx_enrollment.cancel_coverage! if hbx_enrollment.may_terminate_coverage?
+    elsif benefit_group_assignment.send(:can_be_expired?)
+      hbx_enrollment.expire_coverage! if hbx_enrollment.may_terminate_coverage?
+    end
+  else
+    if benefit_group_assignment.send(:can_be_expired?)
+      hbx_enrollment.expire_coverage! if hbx_enrollment.may_terminate_coverage?
+    end
+  end
+  return hbx_enrollment
 end
 
 ## Just for clarification
@@ -288,6 +307,7 @@ CSV.foreach(filename, headers: :true) do |row|
   end
 
   start_date = format_date(data_row["Benefit Begin Date"])
+  end_date = data_row["Benefit End Date"]
   plan = Plan.where(hios_id: data_row["HIOS ID"], active_year: data_row["Plan Year"].strip).first
 
   if plan.blank?
@@ -315,6 +335,8 @@ CSV.foreach(filename, headers: :true) do |row|
   en.hbx_id = data_row["Enrollment Group ID"]
 
   en.save!
+
+  en = set_aasm_state(en,end_date,benefit_group_assignment)
 
   true
 
