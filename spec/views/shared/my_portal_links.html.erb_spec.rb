@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "shared/_my_portal_links.html.haml" do
   before :each do
-
+    DatabaseCleaner.clean
   end
 
   context "with employee role" do
@@ -26,7 +26,7 @@ describe "shared/_my_portal_links.html.haml" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["employee", "employer_staff"]) }
     let(:person) { FactoryGirl.create(:person, :with_employee_role, :with_employer_staff_role)}
 
-    it "should have two portal links and popover" do
+    it "should have one portal links and popover" do
       all_er_profile = FactoryGirl.create(:employer_profile)
       all_census_ee = FactoryGirl.create(:census_employee, employer_profile: all_er_profile)
       person.employee_roles.first.census_employee = all_census_ee
@@ -37,7 +37,6 @@ describe "shared/_my_portal_links.html.haml" do
       expect(rendered).to have_content(all_er_profile.legal_name)
       expect(rendered).to have_selector('.dropdown-menu')
       expect(rendered).to have_selector('.dropdown-menu')
-      expect(rendered).to have_selector('.dropdown[data-toggle="popover"]')
       expect(rendered).to match(/Insured/)
     end
   end
@@ -46,7 +45,7 @@ describe "shared/_my_portal_links.html.haml" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["employee", "employer_staff"]) }
     let(:person) { FactoryGirl.create(:person, :with_employee_role, :with_employer_staff_role)}
 
-    it "should have two portal links and popover" do
+    it "should have one portal links and popover" do
       all_er_profile = FactoryGirl.create(:employer_profile)
       all_er_profile.organization.update_attributes(legal_name: 'Second Company') # not always Turner
       all_census_ee = FactoryGirl.create(:census_employee, employer_profile: all_er_profile)
@@ -60,7 +59,6 @@ describe "shared/_my_portal_links.html.haml" do
       expect(rendered).to have_content('Second Company')
       expect(rendered).to have_selector('.dropdown-menu')
       expect(rendered).to have_selector('.dropdown-menu')
-      expect(rendered).to have_selector('.dropdown[data-toggle="popover"]')
       expect(rendered).to match(/Insured/)
     end
   end

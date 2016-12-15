@@ -3,8 +3,12 @@
 <div class="panel panel-default min-h">
 
   <div class="panel-heading">
-    <h4><%= plan.active_year %> <%= plan.coverage_kind.capitalize %> Coverage <span class="separator">DCHL</span></h4>
-    <hr>
+    <h4>
+      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind.capitalize %> Coverage
+      <span class="separator">
+        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
+      </span>
+    </h4>
   </div>
 
   <div class="panel-body">

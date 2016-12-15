@@ -23,7 +23,6 @@ class User
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
-  
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)

@@ -102,19 +102,19 @@ describe EmployerProfile, dbclean: :after_each do
     end
   end
 
-  context "can_transmit_xml?" do
+  context "is_transmit_xml_button_disabled?" do
     context "for new employer" do
       let(:new_plan_year){ FactoryGirl.build(:plan_year) }
       let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
 
       it "should return true if its new employer and does not have binder paid status" do
-        expect(employer_profile.can_transmit_xml?).to be_truthy
+        expect(employer_profile.is_transmit_xml_button_disabled?).to be_truthy
       end
 
       it "should return false if employer has binder paid status" do
         employer_profile.aasm_state = "binder_paid"
         employer_profile.save
-        expect(employer_profile.can_transmit_xml?).to be_falsey
+        expect(employer_profile.is_transmit_xml_button_disabled?).to be_falsey
       end
     end
 
@@ -123,7 +123,7 @@ describe EmployerProfile, dbclean: :after_each do
       let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year]) }
 
       it "should return false if its renewing employer" do
-        expect(employer_profile.can_transmit_xml?).to be_falsey
+        expect(employer_profile.is_transmit_xml_button_disabled?).to be_falsey
       end
     end
   end

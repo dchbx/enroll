@@ -1,0 +1,16 @@
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">
+ <div class="panel panel-default">
+   <div class="panel-heading" role="tab" id="quote-mgmt-header">
+       <a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-mgmt" aria-expanded="true" aria-controls="quote-mgmt">
+         <b>Quote/Roster Management</b>
+         <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+
+       </a>
+   </div>
+   <div id="quote-mgmt" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="">
+
+     <%=render "my_quotes" , quote_results: @quote_results %>
+
+   </div>
+ </div>
+ <br>

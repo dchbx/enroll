@@ -334,7 +334,7 @@ ivl_notice_triggers = [
       {
         name: 'September Projected Renewal Notice - UQHP',
         notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::VariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR8',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -355,7 +355,7 @@ ivl_notice_triggers = [
       {
         name: 'December Final Insurance Enrollment Notice',
         notice_template: 'notices/ivl/IVLR9_UQHP_final_renewal_december',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR9',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -376,7 +376,7 @@ ivl_notice_triggers = [
       {
         name: 'December Final Insurance Enrollment Notice',
         notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR10',
         notice_trigger_element_group: {
           market_places: ['individual'],

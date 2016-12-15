@@ -9,11 +9,13 @@ class Insured::FamiliesController < FamiliesController
   before_action :find_or_build_consumer_role, only: [:home]
 
   def home
+    build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
+    @active_admin_sep = @family.active_admin_seps.last
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
-    
+
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
     @enrollment_filter = @family.enrollments_for_display
@@ -31,6 +33,11 @@ class Insured::FamiliesController < FamiliesController
     @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
     update_changing_hbxs(@hbx_enrollments)
 
+    if @person.active_employee_roles.count > 1 && (@hbx_enrollments.present? || @waived_hbx_enrollments.present?)
+      @hbx_enrollments = @hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
+      @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
+    end
+
     # Filter out enrollments for display only
     @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
     @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
@@ -41,13 +48,29 @@ class Insured::FamiliesController < FamiliesController
       memo
     end
 
+    #@last_active_sep_by_admin = @family.active_admin_seps.last
 
     @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
     @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
 
-    @employee_role = @person.active_employee_roles.first
-    @tab = params['tab'] 
+    @tab = params['tab']
     @family_members = @family.active_family_members
+
+    if @employee_role.present?
+      @ce = CensusEmployee.find(@employee_role.census_employee_id)
+    end
+    #if @employee_role.present?
+     # ce = CensusEmployee.find(@employee_role.census_employee_id)
+      # checking for future hire
+      #if ce.hired_on > ce.created_at
+       # @future_hire = true
+
+     # else
+
+      #  @future_hire = false
+
+      #end
+    #end
     respond_to do |format|
       format.html
     end
@@ -78,12 +101,10 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
-
-
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
-
+    @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first unless params.key?(:shop_for_plan)
     render :layout => 'application'
   end
 
@@ -124,6 +145,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def verification
+    @family_members = @person.primary_family.family_members.active
+  end
+
+  def upload_application
     @family_members = @person.primary_family.family_members.active
   end
 
@@ -214,7 +239,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     doc_uri = Aws::S3Storage.save(file_path, 'notices')
-    
+
     if doc_uri.present?
       notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
                                       format: file_content_type})
@@ -253,7 +278,21 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_employee_role
-    @employee_role = @person.active_employee_roles.first
+    employee_role_id = (params[:employee_id].present? && params[:employee_id].include?('employee_role')) ? params[:employee_id].gsub("employee_role_", "") : nil
+
+    @employee_role = employee_role_id.present? ? @person.active_employee_roles.detect{|e| e.id.to_s == employee_role_id} : @person.active_employee_roles.first
+  end
+
+  def build_employee_role_by_census_employee_id
+    census_employee_id = (params[:employee_id].present? && params[:employee_id].include?('census_employee')) ? params[:employee_id].gsub("census_employee_", "") : nil
+    return if census_employee_id.nil?
+
+    census_employee = CensusEmployee.find_by(id: census_employee_id)
+    if census_employee.present?
+      census_employee.construct_employee_role_for_match_person
+      @employee_role = census_employee.employee_role
+      @person.reload
+    end
   end
 
   def find_or_build_consumer_role
@@ -358,4 +397,5 @@ class Insured::FamiliesController < FamiliesController
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
   end
+
 end

@@ -6,6 +6,7 @@ class InboxesController < ApplicationController
 
   def new
     @new_message = @inbox_provider.inbox.messages.build
+    @element_to_replace_id = params[:family_actions_id]
   end
 
   def create

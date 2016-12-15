@@ -98,6 +98,10 @@ class Organization
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
          "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
          { name: "active_broker_accounts_writing_agent" })
+
+
+  index({"employer_profile.general_agency_accounts._id" => 1})
+
   before_save :generate_hbx_id
 
   default_scope                               ->{ order("legal_name ASC") }
@@ -115,6 +119,31 @@ class Organization
   scope :all_employers_renewing,              ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
   scope :all_employers_renewing_published,    ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING_PUBLISHED_STATE) }
   scope :all_employers_non_renewing,          ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
+
+  # Enrolling Scopes
+  scope :employer_profiles_enrolling,         ->{ where(:"employer_profile.plan_years.aasm_state".in => PlanYear::INITIAL_ENROLLING_STATE + PlanYear::RENEWING) }
+  scope :employer_profiles_initial_eligible,  ->{ where(:"employer_profile.aasm_state" => "registered") }
+  scope :employer_profiles_renewing,          ->{ where(:"employer_profile.plan_years.aasm_state".in => PlanYear::RENEWING) }
+  scope :employer_profiles_open_enrollment,   ->{ where(:"employer_profile.plan_years.aasm_state".in => PlanYear::OPEN_ENROLLMENT_STATE) }
+  scope :employer_profiles_binder_pending,    ->{ where(:"employer_profile.plan_years.aasm_state" => "invoice_generated") }
+  scope :employer_profiles_binder_paid,       ->{ where(:"employer_profile.aasm_state" => "binder_paid") }
+
+  # Enrolled Scopes
+  scope :employer_profiles_enrolled,          ->{ where(:"employer_profile.aasm_state".in => EmployerProfile::ENROLLED_STATE) }
+  scope :employer_profiles_suspended,         ->{ where(:"employer_profile.aasm_state" => "suspended") }
+
+  # Applicant Scopes
+  scope :employer_profiles_applicants,        ->{ where(:"employer_profile.aasm_state" => "applicant") }
+
+  # Open enrollments
+  scope :employer_profiles_renewing_open_enrollment,  -> { where(:"employer_profile.plan_years.aasm_state" => "renewing_enrolling") }
+  scope :employer_profiles_initial_open_enrollment,  -> { where(:"employer_profile.plan_years.aasm_state" => "enrolling") }
+
+  # Applicantion Pending
+  scope :employer_profiles_renewing_application_pending,  -> { where(:"employer_profile.plan_years.aasm_state" => "renewing_publish_pending") }
+  scope :employer_profiles_initial_application_pending,  -> { where(:"employer_profile.plan_years.aasm_state" => "publish_pending") }
+
+
   scope :all_employers_enrolled,              ->{ unscoped.where(:"employer_profile.plan_years.aasm_state" => "enrolled") }
   scope :all_employer_profiles,               ->{ unscoped.exists(employer_profile: true) }
   scope :invoice_view_all,                    ->{ unscoped.where(:"employer_profile.plan_years.aasm_state".in => EmployerProfile::INVOICE_VIEW_RENEWING + EmployerProfile::INVOICE_VIEW_INITIAL, :"employer_profile.plan_years.start_on".gte => TimeKeeper.date_of_record.next_month.beginning_of_month) }
@@ -132,6 +161,9 @@ class Organization
         }
       })
   }
+  scope :datatable_search, ->(query) { where(legal_name: Regexp.new(Regexp.escape(query), true)) }
+  scope :datatable_search_fein, ->(query) { where(fein: Regexp.new(Regexp.escape(query), true)) }
+  scope :datatable_search_employer_profile_source, ->(query) { where("employer_profile.profile_source" => query) }
 
   def self.generate_fein
     loop do

@@ -1,0 +1,16 @@
+<table class="table table-wrapper module filter-header panel panel-default">
+  <tr>
+    <td align="right"><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span></td>
+    <td align="left">
+      <%= select_tag('year', options_for_select(@year_options, @current_year), onchange: "APTCModule.change_year()") %>
+    </td>
+    <td align="center" class="calculate_available_aptc">
+      <a href="" class='btn btn-info' id='calculate_available_aptc' data-toggle="modal" data-target="#loading-modal" style="display:none">Calculate Available APTC</a>
+    </td>
+    <td align="right" style='width:300px;'><div id="reset-aptc"></div></td>
+    <td align="right">
+      <a href="javascript:void(0)" class='btn btn-warning reset_aptc_change' id='reset_aptc_changes' onclick="APTCModule.resetFormData()">Reset</a>
+    </td>  
+  </tr>
+</table>
+<br />

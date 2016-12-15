@@ -244,7 +244,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
   end
 
-
+  let(:family) { FactoryGirl.build(:family, :with_primary_family_member) }
+  let(:primary_applicant) { double }
+  let(:person) { FactoryGirl.create(:person, :with_employee_role) }
   let(:event_date) { TimeKeeper.date_of_record }
   let(:expired_event_date) { TimeKeeper.date_of_record - 1.year }
   let(:first_of_following_month) { TimeKeeper.date_of_record.end_of_month + 1 }
@@ -258,8 +260,11 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     let(:sep) { SpecialEnrollmentPeriod.new }
     let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop') }
 
+    
     context "SHOP QLE and event date are specified" do
       it "should set start_on date to date of event" do
+        allow(family).to receive(:primary_applicant).and_return(primary_applicant)
+        allow(primary_applicant).to receive(:person).and_return(person)
         expect(sep_effective_date.start_on).to eq event_date
       end
 

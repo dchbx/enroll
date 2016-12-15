@@ -1,0 +1,72 @@
+<style>
+  td#firstcol {max-width:67%;}
+</style>
+
+<div class="panel panel-info">  
+  <div class="panel-heading">
+    <h2 class="panel-title">
+      <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse">    <i class="fa fa-users" aria-hidden="true"></i>   </a>&nbsp;<b>Active Enrollment <%=enrollment_count%></b>
+      <div style="float:right">
+        <div id="loading-<%=hbx_id%>-aptc"></div>
+      </div>
+    </h2>
+  </div>
+  <div id="<%='enrollment_' + hbx_id.to_s%>" class="collapse in">
+
+    <div class="panel-body">
+      <%= render 'enrollment_header.html.erb', :hbx_id => hbx_id, :hbx_values => hbx_values, :enrollment_count => enrollment_count%>
+
+      <hr style="margin:  2px 2px;"/>
+      <table class="table table-border module edit-aptc-csr-table">
+        <thead>
+          <th>Member APTC</th>
+          <% $months_array.each do |month| %>
+            <th style="text-align:center"><%=month.capitalize%></th>
+          <%end%>
+        </thead>  
+        <tbody>
+          
+          <!-- BREAKDOWN OF APTC APPLIED PER MEMBER FOR THE ABOVE ENROLLMENT -->
+          <%hbx_values["aptc_applied_per_member"].each do |member_id, aptc_values|%>
+            <tr>
+              <td width="140px;"><%= full_name_of_person(member_id)%></td>
+              <% aptc_values.each do |month, val| %>  <!-- month and the corresponding values -->
+                <td class="<%=aptc_csr_data_type(@current_year, month)%>"> 
+                  <%= label_tag "#{member_id.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
+                </td>
+              <%end%>
+            </tr>
+
+          <%end%>
+          <!--Total from all members / for Enrollment-->
+
+            <tr>
+              <td width="140px;">Totals</td>
+                <%hbx_values["aptc_applied"].each do |month, aptc_value|%>
+                <td class="<%=aptc_csr_data_type(@current_year, month)%>"> 
+                  <%= label_tag "aptc_month_#{hbx_id.to_s+"_"+month.to_s}", aptc_value, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
+                </td>
+              <%end%>
+            </tr>
+           
+          <!--
+          <tr>
+            <th colspan = "4">Member(s) Enrolled</th>
+            <th colspan = "9">Eligible?</th>
+          </tr>
+          <%#HbxEnrollment.find(hbx_id).hbx_enrollment_members.each do |hbx_member|%>
+            <tr>
+              <td colspan = "4"><span class="glyphicon glyphicon-user"></span> &nbsp;&nbsp;&nbsp;<%#=full_name_of_person(hbx_member.family_member.person_id)%><%#if primary_member(hbx_member.family_member.person_id.to_s)%> &nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-asterisk" title="Primary Family Member"></span>  <%#end%></td>
+              <td colspan = "9"><%#=check_box_tag "#{hbx_id}_#{hbx_member.family_member.person_id.to_s}", 'accepted', placeholder: '', class: 'form-control', readonly: true, disabled: true, style: 'text-align:right;'%></td>
+            </tr>
+          <%#end%>
+          -->
+          
+        </tbody> 
+      </table>
+
+    </div>
+
+  </div> <!--collapse div-->
+</div>
+

@@ -316,6 +316,26 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                               end
                           end
 
+                          context ".terminate_future_scheduled_census_employees" do
+                            it "should terminate the census employee on the day of the termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 2.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
+
+                            it "should not terminate the census employee if today's date < termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 1.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
+                            end
+
+                            it "should return the existing state of the census employee if today's date > termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employment_terminated")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 3.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
+                          end
+
                           context "and the termination date is within the retroactive reporting time period" do
                             before { initial_census_employee.terminate_employment!(earliest_valid_employment_termination_date) }
 
@@ -757,21 +777,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "construct_employee_role_for_match_person" do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
     let(:census_employee1) { FactoryGirl.build(:census_employee) }
 
     it "should return false when not match person" do
       expect(census_employee1.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has active employee role" do
+    it "should return false when match person which has active employee role for current census employee" do
+      census_employee.update_attributes(employer_profile_id: employer_profile.id)
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    census_employee_id: census_employee.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has no active employee role" do
-      person.employee_roles.destroy_all
-      allow(Factories::EnrollmentFactory).to receive(:build_employee_role).and_return true
+    it "should return true when match person has no active employee roles for current census employee" do
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
   end

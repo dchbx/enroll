@@ -1,0 +1,72 @@
+<br/>
+<div class = "table-responsive table-override"> 
+  <table class = "table table-striped table-bordered border-override" style="table-layout: fixed;">
+    <h3 class='title'>SEP HISTORY</h3>
+    <div class="row">      
+      <% @family.special_enrollment_periods.to_a.reverse_each do |f| %>
+        <thead>              
+          <tr>
+            <th>SEP REASON</th>
+            <th>EFFECTIVE DATE RULE</th> 
+            <th>EVENT DATE</th>
+            <th>SEP START DATE</th>
+            <th>SEP END DATE</th>
+            <th>NEXT POSSIBLE <br /> START DATE</th>
+            <th>OPTION DATES</th>
+            <th>CSL#</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center"><%=f.title %></td>
+
+            <% if f.effective_on_kind.present? %>
+              <% if f.effective_on_kind == 'first_of_month' %>
+                <td class="text-center">15th of month</td>
+              <% elsif f.effective_on_kind == 'first_of_next_month' %>
+                <td class="text-center">End of Month</td>
+              <% else %>
+                <td class="text-center"><%=f.effective_on_kind.humanize %></td>
+              <% end %>
+            <% else %>
+              <td class="text-center">N/A</td>
+            <% end %>
+            
+            <td class="text-center"><%=f.qle_on%></td>
+            <td class="text-center"><%=f.start_on%></td>
+            <td class="text-center"><%=f.end_on%></td>
+            
+            <% if f.next_poss_effective_date.present? %>
+              <td class="text-center"><%=f.next_poss_effective_date %></td>
+            <% else %>
+              <td class="text-center">N/A</td>
+            <% end %>
+
+            <% if f.optional_effective_on.length > 0 %>
+                <td class="text-center"><%=f.optional_effective_on.join(", ") %></td>
+            <% else %>
+              <td class="text-center">N/A</td>
+            <% end %>
+
+            <% if f.csl_num.present? %>
+              <td class="text-center"><%=f.csl_num %></td>
+            <% else %>
+              <td class="text-center">N/A</td>
+            <% end %>
+
+          </tr>
+          <div class="col-md-12 col-sm-12 col-xs-12">            
+            <tr class="admin_margin">
+              <% if f.comments.present? %>
+                <td colspan = "8"> <b>Admin Comment: </b> <%= f.comments.first.content %> </td>
+              <% else %>
+                <td colspan = "8"><b>Admin Comment:</b> N/A </td>
+              <% end %>
+            </tr>
+          </div>
+      </tbody>
+    <% end %>
+    </div>
+  </table>
+</div>
+<br/>

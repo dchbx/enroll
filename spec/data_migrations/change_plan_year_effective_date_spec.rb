@@ -23,6 +23,7 @@ describe ChangePlanYearEffectiveDate do
       allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
       allow(ENV).to receive(:[]).with("py_new_start_on").and_return(plan_year.start_on - 1.month)
       allow(ENV).to receive(:[]).with("referenece_plan_hios_id").and_return(plan.hios_id)
+      allow(ENV).to receive(:[]).with("ref_plan_active_year").and_return(plan.active_year)
       allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
     end
 

@@ -9,7 +9,7 @@ module PortalHeaderHelper
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path, class: "portal"
     elsif current_user.person && current_user.person.active_employee_roles.any?
-      link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe, family_account_path, class: "portal"
+      link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an #{controller=='employer_profiles'? 'Employer': 'Employee'}".html_safe, family_account_path, class: "portal"
     elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?))
       if current_user.identity_verified_date.present?
         link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, family_account_path, class: "portal"

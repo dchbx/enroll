@@ -511,3 +511,25 @@ Then /^they should see that employee's details$/ do
   wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end
+When(/^the employer goes to benefits tab$/) do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
+end
+
+When(/^the employer clicks on claim quote$/) do
+  find('.interaction-click-control-claim-quote').click
+end
+
+Then(/^the employer enters claim code for his quote$/) do
+  person = FactoryGirl.create(:person, :with_broker_role)
+  @quote=FactoryGirl.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
+  @quote.publish!
+  fill_in "claim_code", :with => @quote.claim_code
+end
+
+When(/^the employer clicks claim code$/) do
+  find('.interaction-click-control-claim-code').click
+end
+
+Then(/^the employer sees a successful message$/) do
+  expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
+end

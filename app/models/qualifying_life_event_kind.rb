@@ -71,6 +71,7 @@ class QualifyingLifeEventKind
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean
+  field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
 
@@ -179,8 +180,16 @@ class QualifyingLifeEventKind
       where(:market_kind => "individual").and(:is_self_attested.ne => false).active.to_a
     end
 
+    def individual_market_non_self_attested_events
+      where(:market_kind => "individual").and(:is_self_attested.ne => true).active.to_a
+    end
+
     def shop_market_events_admin
       where(:market_kind => "shop").active.to_a
+    end
+
+    def shop_market_non_self_attested_events
+      where(:market_kind => "shop").and(:is_self_attested.ne => true).active.to_a
     end
 
     def individual_market_events_admin
@@ -188,4 +197,9 @@ class QualifyingLifeEventKind
     end
   end
 
+  def date_hint
+    start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
+    end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
+      "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+  end
 end
