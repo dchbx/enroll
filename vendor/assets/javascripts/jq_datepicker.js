@@ -60,7 +60,9 @@ function applyJQDatePickerSetup(ele) {
     onSelect: function(dateText, dpInstance) {
       $(this).datepicker("hide");
       $(this).trigger('change');
-      if($(this).attr("id")=='jq_datepicker_ignore_person_dob'){
+      var string = $(this).attr("id");
+      if(string.indexOf('dob')>0){
+
 
       var date = $(this).val();
       var entered_dob = $(this).val();
@@ -72,11 +74,12 @@ function applyJQDatePickerSetup(ele) {
       var todays_month = todays_date.getMonth() + 1;
       var todays_day = todays_date.getDate();
       
-      if (entered_year > todays_year) {
-        alert("Please enter a birthdate that does not take place in the future.");
-        $(this).val("");
-        $(this).focus();
-      } else if (entered_year == todays_year) {
+      // if (entered_year > todays_year) {
+      //   alert("Please enter a birthdate that does not take place in the future.");
+      //   $(this).val("");
+      //   $(this).focus();
+      //}  
+      if (entered_year == todays_year) {
 
         if (entered_month == todays_month) {
 
@@ -88,13 +91,14 @@ function applyJQDatePickerSetup(ele) {
           } else {
 
           }
-        } else if (entered_month > todays_month) {
-
-          alert("Please enter a birthdate that does not take place in the future.");
-          $(this).val("");
-          $(this).focus();
-          
         }
+        // } else if (entered_month > todays_month) {
+
+        //   alert("Please enter a birthdate that does not take place in the future.");
+        //   $(this).val("");
+        //   $(this).focus();
+          
+        // }
       }
     }
     
