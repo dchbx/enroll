@@ -74,11 +74,7 @@ function applyJQDatePickerSetup(ele) {
       var todays_month = todays_date.getMonth() + 1;
       var todays_day = todays_date.getDate();
       
-      // if (entered_year > todays_year) {
-      //   alert("Please enter a birthdate that does not take place in the future.");
-      //   $(this).val("");
-      //   $(this).focus();
-      //}  
+
       if (entered_year == todays_year) {
 
         if (entered_month == todays_month) {
@@ -92,13 +88,7 @@ function applyJQDatePickerSetup(ele) {
 
           }
         }
-        // } else if (entered_month > todays_month) {
-
-        //   alert("Please enter a birthdate that does not take place in the future.");
-        //   $(this).val("");
-        //   $(this).focus();
-          
-        // }
+        
       }
     }
     
