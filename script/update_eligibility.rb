@@ -55,46 +55,53 @@ def check_and_run
   ran = []
   not_run = []
   running = []
+  invalid_ivl = []
 
   CSV.foreach("spec/test_data/cne.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr = row_with_ssn
-    if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
-      ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
-      person = Person.by_ssn(ssn).first rescue nil
-    end
-
-    unless person
-      person = Person.by_hbx_id(hbx_id).first rescue nil
-    end
-
-    if person
-      unless person.primary_family
-        not_run << {no_family: ssn}
-        puts "Person with ssn: #{ssn} has no family."
-        next
+    begin
+      if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
+        ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
+        person = Person.by_ssn(ssn).first rescue nil
       end
-      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).try(:latest_eligibility_determination)
-      if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
-        deter.update_attributes(max_aptc: aptc)
-        deter.csr_percent_as_integer = csr
-        deter.save
-        ran << person.hbx_id
-        print 'r'
+
+      unless person
+        person = Person.by_hbx_id(hbx_id).first rescue nil
+      end
+
+      if person
+        unless person.primary_family
+          not_run << {no_family: ssn}
+          puts "Person with ssn: #{ssn} has no family."
+          next
+        end
+        deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).try(:latest_eligibility_determination)
+        if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
+          deter.update_attributes(max_aptc: aptc)
+          deter.csr_percent_as_integer = csr
+          deter.save
+          ran << person.hbx_id
+          print 'r'
+        else
+          row=[person.hbx_id, aptc, csr]
+          update_aptc(row)
+          running << person.hbx_id
+          print '#'
+        end
       else
-        row=[person.hbx_id, aptc, csr]
-        update_aptc(row)
-        running << person.hbx_id
-        print '#'
+        not_run << {not_found: ssn}
+        puts "Person with ssn: #{ssn} can't be found."
       end
-    else
-      not_run << {not_found: ssn}
-      puts "Person with ssn: #{ssn} can't be found."
+    rescue => e
+      invalid_ivl << ssn
+      print 'x'
     end
   end
 
   [ran: {count: ran.count, rs: ran},
    not_run: {count: not_run.count, rs: not_run},
-   running: {count: running.count, rs: running}]
+   running: {count: running.count, rs: running},
+   invalid: {count: invalid_ivl.count, rs: invalid_ivl}]
 end
 
 def update_aptc(row)
