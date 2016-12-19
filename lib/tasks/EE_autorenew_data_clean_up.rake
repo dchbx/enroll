@@ -21,8 +21,8 @@ namespace :update_enroll do
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
       census_employees.each do |census_employee|
-        person=census_employee.employee_role.person
-        benefit_group_assignments=census_employee.benefit_group_assignments.detect { |assignment| assignment.aasm_state== "coverage_waived" }.to_a
+        person=census_employee.try(:employee_role).try(:person)
+        benefit_group_assignments=census_employee.try(:benefit_group_assignments).detect { |assignment| assignment.aasm_state== "coverage_waived" }.to_a
 
         benefit_group_assignments.each do |benefit_group_assignment|
 
@@ -43,8 +43,8 @@ namespace :update_enroll do
         end
       end
     end
-      puts "There are #{total_count} EE such that benefit group assignment is currently in the coverage_waived state and the person is associated to an enrollment in any state other than canceled."
       end
+      puts "There are #{total_count} EE such that benefit group assignment is currently in the coverage_waived state and the person is associated to an enrollment in any state other than canceled."
     end
   end
 end
