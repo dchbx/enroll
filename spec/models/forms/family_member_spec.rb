@@ -397,6 +397,17 @@ describe Forms::FamilyMember, "relationship validation" do
     allow(family_members).to receive(:where).and_return([family_member])
   end
 
+  context "child dob" do
+    let(:relationship) {"child"}
+    let(:dob) { "1985-06-09" }
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => relationship, :dob => dob })) }
+    it "should fail with child's age 26 or more" do
+      allow(family_member).to receive(:relationship).and_return("child")
+      expect(subject.valid?).to be false
+      expect(subject.errors.to_hash[:base]).to include("can not have child's age 26 or more")
+    end
+  end
+
   context "spouse" do
     let(:relationship) { "spouse" }
     subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
