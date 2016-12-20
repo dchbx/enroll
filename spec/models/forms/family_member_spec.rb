@@ -397,7 +397,7 @@ describe Forms::FamilyMember, "relationship validation" do
     allow(family_members).to receive(:where).and_return([family_member])
   end
 
-  context "child dob" do
+  context "child's date of birth should be invalid" do
     let(:relationship) {"child"}
     let(:dob) { "1985-06-09" }
     subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => relationship, :dob => dob })) }
@@ -405,6 +405,24 @@ describe Forms::FamilyMember, "relationship validation" do
       allow(family_member).to receive(:relationship).and_return("child")
       expect(subject.valid?).to be false
       expect(subject.errors.to_hash[:base]).to include("can not have child's age 26 or more")
+    end
+  end
+
+  context "child's date of birth should be valid" do
+    let(:relationship) {"child"}
+    let(:dob) { "2016-06-09" }
+    it "should success" do
+      allow(family_member).to receive(:relationship).and_return("child")
+      allow(family_member).to receive(:reactivate!).and_return(true)
+      allow(family_member).to receive(:is_primary_applicant?).and_return(true)
+      allow(family_member).to receive(:is_active?).and_return(true)
+      allow(FamilyMember).to receive(:find).and_return(family_member)
+
+      dependent = Forms::FamilyMember.find(family_member.id)
+      dependent.update_attributes(person_properties.merge({:family_id => family.id, :relationship => relationship, :id => family_member.id, :dob => dob }))
+
+      expect(dependent.valid?).to be true
+      expect(dependent.errors[:base].any?).to be_falsey
     end
   end
 
