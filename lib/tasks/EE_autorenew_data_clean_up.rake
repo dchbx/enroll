@@ -28,18 +28,20 @@ namespace :update_enroll do
 
           benefit_group_assignment.hbx_enrollments.each do |hbx_enrollment|
             unless HbxEnrollment::TERMINATED_STATUSES.include?(hbx_enrollment.aasm_state)
-              csv << [
-                  person.hbx_id,
-                  person.first_name,
-                  person.last_name,
-                  census_employee.employer_profile.legal_name,
-                  census_employee.employer_profile.fein,
-                  census_employee.employer_profile.dba,
-                  benefit_group_assignment.id,
-                  census_employee.employer_profile.aasm_state,
-                  hbx_enrollment.submitted_at
-              ]
-              total_count=total_count+1
+              unless person.nil?
+                csv << [
+                    person.hbx_id,
+                    person.first_name,
+                    person.last_name,
+                    census_employee.employer_profile.legal_name,
+                    census_employee.employer_profile.fein,
+                    census_employee.employer_profile.dba,
+                    benefit_group_assignment.id,
+                    census_employee.employer_profile.aasm_state,
+                    hbx_enrollment.submitted_at
+                ]
+                total_count=total_count+1
+              end
         end
       end
     end
