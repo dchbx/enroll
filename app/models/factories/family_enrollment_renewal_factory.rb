@@ -194,6 +194,14 @@ module Factories
       end
     end
 
+    def renewal_offered_relationship(renewal_enrollment)
+      benefit_group = @census_employee.renewal_benefit_group_assignment.benefit_group
+      if renewal_enrollment.coverage_kind == "health"
+        benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
+      else
+        benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
+      end
+    end
     # Validate enrollment membership against benefit package-covered relationships
     def family_eligibility(active_enrollment, renewal_enrollment)
 
