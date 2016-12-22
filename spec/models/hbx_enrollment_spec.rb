@@ -816,22 +816,33 @@ describe HbxProfile, "class methods", type: :model do
     let(:family1) {FactoryGirl.create(:family, :with_primary_family_member, :person => person1)}
     let(:household) {FactoryGirl.create(:household, family: family1)}
     let(:date){ TimeKeeper.date_of_record }
-    let(:plan_year){ PlanYear.new(start_on: date) }
-    let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
     let!(:carrier_profile1) {FactoryGirl.build(:carrier_profile)}
     let!(:carrier_profile2) {FactoryGirl.create(:carrier_profile, organization: organization)}
     let!(:organization) { FactoryGirl.create(:organization, legal_name: "CareFirst", dba: "care")}
     let(:plan1){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile1) }
     let(:plan2){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile2) }
 
-    let(:hbx_enrollment1){ HbxEnrollment.new(benefit_group: benefit_group, kind: "unassisted_qhp", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
-    let(:hbx_enrollment2){ HbxEnrollment.new(benefit_group: benefit_group, kind: "unassisted_qhp", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: TimeKeeper.date_of_record) }
+    let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
+    let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: TimeKeeper.date_of_record) }
 
     it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
-      hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 10.days
+    hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 1.day
+    hbx_enrollment2.effective_on = TimeKeeper.date_of_record
+    # This gets processed on 31st Dec
+    if hbx_enrollment1.effective_on.year != hbx_enrollment2.effective_on.year
+      hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 2.day
+      hbx_enrollment2.effective_on = TimeKeeper.date_of_record + 1.day
+    end
+    hbx_enrollment2.select_coverage!
+    expect(hbx_enrollment1.coverage_canceled?).to be_truthy
+    expect(hbx_enrollment2.coverage_selected?).to be_truthy
+  end
 
+    it "should not cancel hbx enrollemnt of previous plan year enrollment" do
+      hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 1.year
+      hbx_enrollment2.effective_on = TimeKeeper.date_of_record
       hbx_enrollment2.select_coverage!
-      expect(hbx_enrollment1.coverage_canceled?).to be_truthy
+      expect(hbx_enrollment1.coverage_canceled?).to be_falsy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
@@ -842,7 +853,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
       expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
-    
+
   end
 
   context "can_terminate_coverage?" do
