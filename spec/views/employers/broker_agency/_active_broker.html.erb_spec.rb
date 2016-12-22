@@ -7,6 +7,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
   let(:user) { FactoryGirl.create(:user, person: person) }
 
   before :each do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
     sign_in user
     employer_profile.broker_agency_profile = broker_agency_account.broker_agency_profile
     employer_profile.save
