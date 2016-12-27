@@ -11,7 +11,6 @@ class Person
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
 
-
   GENDER_KINDS = %W(male female)
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
@@ -141,8 +140,8 @@ class Person
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
 
   # Employer role index
-  index({"employer_staff_role._id" => 1})
-  index({"employer_staff_role.employer_profile_id" => 1})
+  index({"employer_staff_roles._id" => 1})
+  index({"employer_staff_roles.employer_profile_id" => 1})
 
   # Consumer child model indexes
   index({"consumer_role._id" => 1})
@@ -171,7 +170,7 @@ class Person
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
-  scope :all_employer_staff_roles,    -> { exists(employer_staff_role: true) }
+  scope :all_employer_staff_roles,    -> { exists(employer_staff_roles: true) }
 
   #scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
   scope :all_broker_roles,            -> { exists(broker_role: true) }

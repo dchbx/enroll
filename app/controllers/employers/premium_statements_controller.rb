@@ -8,8 +8,8 @@ class Employers::PremiumStatementsController < ApplicationController
     @employer_profile = EmployerProfile.find(params.require(:id))
     authorize @employer_profile, :list_enrollments?
     set_billing_date
-    @hbx_enrollments = @employer_profile.enrollments_for_billing(@billing_date)
-
+    query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
+    @hbx_enrollments = query.execute.hbx_enrollments unless query.execute == nil
     respond_to do |format|
       format.html
       format.js

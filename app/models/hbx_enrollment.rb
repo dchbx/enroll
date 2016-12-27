@@ -1225,19 +1225,24 @@ class HbxEnrollment
     benefit_group_assignment_valid?(coverage_effective_date)
   end
 
+  def assign_cost_decorator(decorator)
+    @cost_decorator = decorator
+  end
+
   def decorated_hbx_enrollment
+    return @cost_decorator if @cost_decorator
     if plan.present? && benefit_group.present?
       if benefit_group.is_congress #is_a? BenefitGroupCongress
-        PlanCostDecoratorCongress.new(plan, self, benefit_group)
+        @cost_decorator = PlanCostDecoratorCongress.new(plan, self, benefit_group)
       else
         reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
-        PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
+        @cost_decorator = PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
       end
     elsif plan.present? && consumer_role.present?
-      UnassistedPlanCostDecorator.new(plan, self)
+      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
-      OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end
   end
 
