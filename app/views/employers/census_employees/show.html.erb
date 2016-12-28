@@ -51,15 +51,16 @@
       </div>
     </h1>
     <div class="vertically-aligned-row auto-width">
-      <div class="text-right col-xs-8">
+      <div class="text-right col-xs-4">
         <div class="row">
-          <span><strong>Hired:</strong>
+          <span></span>
+          <span><strong><%= (@census_employee.coverage_terminated_on.present?  && @census_employee.is_eligible?)? "Rehired:" : "Hired:" %></strong>
           <%= format_date @census_employee.hired_on %></span>&nbsp;&nbsp;
           <% if @census_employee.coverage_terminated_on.blank? %>
           <span><strong>Added to Roster:</strong>
             <%= format_date @census_employee.created_at %></span>&nbsp;&nbsp;
             <% end %>
-          <% if @census_employee.coverage_terminated_on.present? %>
+          <% if @census_employee.coverage_terminated_on.present?  && !@census_employee.is_eligible?%>
             <span><strong>Terminated:</strong>
             <%= format_date @census_employee.coverage_terminated_on %></span>&nbsp;&nbsp;
           <% end %>
