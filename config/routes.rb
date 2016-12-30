@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-
+  require 'resque/server' 
+  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
