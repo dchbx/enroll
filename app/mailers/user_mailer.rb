@@ -73,7 +73,6 @@ class UserMailer < ApplicationMailer
 
   def notice_error_message(first_name, hbx_id, email)
     if email.present?
-      binding.pry
       message = mail({to: email, subject: "DC HealthLink", from: 'no-reply@individual.dchealthlink.com'}) do |format|
         format.html {render "error_message_shop", locals: {first_name: first_name, hbx_id: hbx_id}}
       end
