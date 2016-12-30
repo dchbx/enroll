@@ -71,6 +71,15 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def notice_error_message(first_name, hbx_id, email)
+    if email.present?
+      binding.pry
+      message = mail({to: email, subject: "DC HealthLink", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+        format.html {render "error_message_shop", locals: {first_name: first_name, hbx_id: hbx_id}}
+      end
+    end
+  end
+
   def generic_notice_alert(first_name, notice_subject, email)
     message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
