@@ -35,6 +35,7 @@ class CensusEmployeeImport
       city
       state
       zip
+      newly_designated
     )
 
   CENSUS_MEMBER_RECORD_TITLES = [
@@ -122,6 +123,18 @@ class CensusEmployeeImport
           break
         else
           census_employee = add_or_update_census_member(record)
+        end
+      end
+
+      if record[:newly_designated] == '1'
+        begin
+          census_employee.newly_designate
+        rescue Exception => e
+          self.errors.add :base, "employee can't transition to newly designate state #{e.to_s}"
+        end
+      elsif record[:newly_designated] == '0'
+        if census_employee.may_rebase_new_designee?
+          census_employee.rebase_new_designee
         end
       end
 
@@ -228,6 +241,7 @@ class CensusEmployeeImport
     city = parse_text(row["city"])
     state = parse_text(row["state"])
     zip = parse_text(row["zip"])
+    newly_designated = parse_boolean(row["newly_designated"])
     {
         employer_assigned_family_id: employer_assigned_family_id,
         employee_relationship: employee_relationship,
@@ -248,7 +262,8 @@ class CensusEmployeeImport
         address_1: address_1,
         city: city,
         state: state,
-        zip: zip
+        zip: zip,
+        newly_designated: newly_designated
     }
   end
 
@@ -264,7 +279,7 @@ class CensusEmployeeImport
 
   def column_header_valid?(column_header_row)
     clean_header = column_header_row.reduce([]) { |memo, header_text| memo << sanitize_value(header_text) }
-    clean_header == CENSUS_MEMBER_RECORD
+    clean_header == CENSUS_MEMBER_RECORD || clean_header == CENSUS_MEMBER_RECORD[0..-2]
   end
 
   def parse_relationship(cell)
@@ -324,7 +339,7 @@ class CensusEmployeeImport
   def save
 
     if imported_census_employees.map(&:valid?).all?
-      if !self.valid?
+      if !self.valid? || self.errors.present?
         return false
       end
 

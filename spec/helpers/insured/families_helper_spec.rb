@@ -1,4 +1,4 @@
-require "rails_helper"
+  require "rails_helper"
 
 RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
@@ -102,10 +102,21 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   describe "has_writing_agent?" do
     let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:person) { FactoryGirl.build(:person) }
 
-    it "should return false" do
+    it "should return false when employee_role is passwed with out writing_agent" do
       expect(helper.has_writing_agent?(employee_role)).to eq false
     end
+
+    it "should return false when person is passwed with out writing_agent" do
+      expect(helper.has_writing_agent?(person)).to eq false
+    end
+
+    it "should return true when employee_role is passed with out writing_agent" do
+      allow(person).to receive_message_chain(:primary_family,:current_broker_agency,:writing_agent).and_return(true)
+      expect(helper.has_writing_agent?(person)).to eq true
+    end
+
   end
 
   describe "display_aasm_state?" do
@@ -114,8 +125,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
-    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "any_state"]
-    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated"]
+    states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "auto_renewing", "any_state"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing"]
 
     context "IVL market" do
       before :each do
@@ -141,4 +152,51 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
     end
   end
+
+  describe "ShopForPlan using SEP" do
+    let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
+    let(:person) {FactoryGirl.create(:person, :with_employee_role, :with_family)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month ) }
+    let(:qle_with_date_options_available) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month, date_options_available: true ) }
+    let(:sep_without_date_options) { 
+      sep = family.special_enrollment_periods.new
+      sep.effective_on_kind = 'first_of_month'
+      sep.qualifying_life_event_kind= qle_first_of_month
+      sep.qualifying_life_event_kind_id = qle_first_of_month.id
+      sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 04, 14)
+      sep.admin_flag = true
+      sep
+    }
+
+    let(:sep_with_date_options) { 
+      sep = family.special_enrollment_periods.new
+      sep.effective_on_kind = 'first_of_month'
+      sep.qualifying_life_event_kind= qle_first_of_month
+      sep.qualifying_life_event_kind_id = qle_with_date_options_available.id
+      sep.qle_on = qle_on
+      sep.optional_effective_on = [qle_on+5.days, qle_on+6.days, qle_on+7.days]
+      sep.admin_flag = true
+      sep
+    }
+    context "when building ShopForPlan link" do
+
+        it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
+          expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
+        end
+
+        it "should be a link to 'insured/family_members' for a QLE type without date options available" do
+          expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
+        end
+    end
+
+    context "find QLE for SEP" do
+      it "needs to return the right QLE for a given SEP" do
+        expect(find_qle_for_sep(sep_with_date_options)).to eq qle_with_date_options_available
+        expect(find_qle_for_sep(sep_without_date_options)).to eq qle_first_of_month
+      end
+    end
+
+  end
+
 end

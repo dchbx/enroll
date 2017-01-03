@@ -4,13 +4,10 @@
 		<%=error%>
 	<%end%>
 <%else%>
-	Invoices for the following employer ID generated successfully.
-	<%=
-  params[:employerId].inspect
-%>
+	Invoices for the following employer ID generated successfully.<br>
+
 <% @organizations.each do |organization| %>
-	<%=organization.fein %>
-	<%=organization.legal_name %>
+	<%=organization.fein %> - <%=organization.legal_name %><br>
 <%end%>
 
 <%end%>

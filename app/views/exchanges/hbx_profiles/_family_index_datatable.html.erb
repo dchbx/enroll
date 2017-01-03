@@ -1,0 +1,36 @@
+<p id="notice"><%= notice %></p>
+
+<div class='container'>
+  <h1> Families </h1>
+  <%#= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
+</div>
+<%= raw render_datatable(@datatable) %>
+
+<div class="container">
+  <div class="col-sm-12 col-md-12">
+  <%=pundit_span Family, :updateable? %>
+    <div class="row">
+         <ul class='col-xs-12 col-md-5 col-lg-5'>
+          <li> <%=link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(
+          original_application_type: 'phone')  %> <br/></li>
+
+          <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(
+          original_application_type: 'paper')  %> <br/></li>
+         </ul>
+    </span>
+    </div>
+
+    <div class="row">
+      <p> After working on an enrollment return to this page via the person icon in the header </p>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+ initializeDataTables();
+ <% if @selector == 'assited' %>
+    $('#Tab\\:by_enrollment_individual_market').click();
+    $('#Tab\\:by_enrollment_individual_market-all_assistance_receiving').addClass('active');
+  <% end %>
+</script>

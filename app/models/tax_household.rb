@@ -39,6 +39,10 @@ class TaxHousehold
     latest_eligibility_determination.csr_eligibility_kind
   end
 
+  def current_csr_percent
+    latest_eligibility_determination.csr_percent
+  end
+
   def current_max_aptc
     eligibility_determination = latest_eligibility_determination
     #TODO need business rule to decide how to get the max aptc
@@ -118,6 +122,10 @@ class TaxHousehold
     end
 
     aptc_available_amount_hash
+  end
+
+  def total_aptc_available_amount
+    aptc_available_amount_by_member.present? ? aptc_available_amount_by_member.values.sum : 0
   end
 
   # Pass a list of tax_household_members and get amount of APTC available

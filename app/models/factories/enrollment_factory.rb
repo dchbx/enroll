@@ -169,7 +169,7 @@ module Factories
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on
     end
-    
+
     def self.migrate_census_employee_contact_to_person(census_employee, person)
       if census_employee
         if census_employee.address
@@ -187,6 +187,7 @@ module Factories
       self.link_census_employee(census_employee, role, employer_profile)
       family, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
       family.family_members.map(&:__association_reload_on_person)
+      family.save_relevant_coverage_households
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         census_employee.save
@@ -194,7 +195,7 @@ module Factories
       elsif person_new
         person.delete
       end
-      
+
       return role, family
     end
 
@@ -209,7 +210,7 @@ module Factories
       end
       return family
     end
-
+    
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,

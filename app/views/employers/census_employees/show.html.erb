@@ -89,6 +89,7 @@
     </div>
   </div>
   <div class="row">
+  <% if !@census_employee.is_linked? || !@census_employee.address.present? %>
     <div class="col-md-6 col-sm-12">
       <h3>
         <%= @census_employee.address.kind.capitalize if @census_employee.address.present?  %>
@@ -97,13 +98,16 @@
       <div class="panel panel-default module census-employee-address">
         <div class="panel-body">
           <div class="address">
-            <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
+            <% census_employee_address = @census_employee.address.present? ? @census_employee.address : @census_employee.build_address%>
+            <%= f.fields_for :address, census_employee_address, errors: {}, fieldset: false do |address| %>
             <%= render 'address_fields', f: address %>
             <% end %>
           </div>
         </div>
       </div>
     </div>
+  <% end %>
+    <% @census_employee.email = Email.new if @census_employee.email.blank? %>
     <div class="col-md-6 col-sm-12">
       <h3>
         Email
@@ -124,7 +128,7 @@
       <h3>
         <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
       </h3>
-      <% if @census_employee.census_dependents.present? && @census_employee.census_dependents.all?(&:valid?) %>
+      <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
         <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
           <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
           <%= render 'shared/add_dependents', { f: f } if census_dependent.index + 1 == @census_employee.census_dependents.size %>

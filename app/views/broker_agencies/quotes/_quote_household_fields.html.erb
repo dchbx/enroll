@@ -1,0 +1,73 @@
+	<%= fields_for :quote_households do |qhh| %>
+	<% index= "#{(Time.now.to_f * 1000).to_i}" %>
+		<div class="panel panel-default">
+			<div id="family-panel">
+				<div class="panel-heading" role="tab" id="headingOne">
+					<h4 class="panel-title">
+						<%= qhh.text_field :family_id , {:name =>"quote[quote_households_attributes][#{index}][family_id]", :value => "1"}  %>
+						<button id="btn_add_emp" onclick="addFamilyMemberRow(this)" data-index="<%=index%>" type="button" class="btn btn-default" aria-label="Left Align">
+							<span class="glyphicon glyphicon-user" aria-hidden="true"></span> Add member to this family
+						</button>
+						<button type="button" href="#" id="remove_household_button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</h4>
+				</div>
+				<div id="col" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading">
+					<div class="panel-body" id="family">
+						<%= qhh.fields_for :quote_members do |qm| %>
+						<div class="row form-inline">
+							<!-- Dynamically add the quote memeber -->
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+		</div>
+<% end %>
+
+<script>
+var counter= 1;
+$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true});
+var date_handler = function() {
+	    $(this).datepicker();
+	    $(this).datepicker("show");
+	};
+
+var remove_member_handler = function(){
+	$(this).parent().parent().remove();
+}
+
+var remove_household_handler = function(){
+	if(this.getAttribute("data-household-id") != undefined){
+	 $.ajax({
+        type: "POST",
+        url: "/broker_agencies/quotes/" + this.getAttribute("data-quote-id")  +"/delete_household/?household_id=" +this.getAttribute("data-household-id"),
+        dataType: "js",
+        data: {"_method":"delete"},
+        success: function(){
+          console.log("Deleted successfully");
+        }
+    });
+	}
+  $(this).parent().parent().parent().parent().remove();
+};
+
+$('button#remove_household_button').click(remove_household_handler);
+
+var addFamilyMemberRow= function(button){
+		var idx = $(button).attr("data-index");
+		var relation_options = '<select id="select-relationship" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][employee_relationship]"><option value="spouse">Spouse</option><option value="domestic_partner">Domestic partner</option><option value="child_under_26">child</option></select>';
+
+		table_row = $('<div class="row form-inline">'
+								+ '<div class="form-group col-sm-4">DOB: <input type="text" class="uidatepicker" id="date-of-birth'+$.now()+'" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][dob]"/></div><div class="form-group col-sm-4">Name: <input type="text" class="quote-member" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][first_name]"  /></div><div class="form-group col-sm-3">' + relation_options + '</div>' +
+									'<div class="form-group col-sm-1"><button type="button" id="remove_member_button" data-quote-id="" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+									+ '</div>');
+
+								counter += 1 ;
+								$(button).parent().parent().parent().find("div#col div#family").append(table_row);
+
+								$(".uidatepicker").focus(date_handler);
+								$('button#remove_member_button').click(remove_member_handler);
+								$('select').selectric('refresh')
+
+	};// add emp click end
+</script>

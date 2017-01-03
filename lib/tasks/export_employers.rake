@@ -93,7 +93,7 @@ namespace :employers do
                 row = []
 
                 puts employer.legal_name + " - Plan Year " + plan_year.id.to_s + " : no workflow state transitions" if plan_year.workflow_state_transitions.size == 0
-                plan_year_transition_at = plan_year.workflow_state_transitions.size > 0 ? plan_year.workflow_state_transitions.order(transition_at: :desc).first : ""
+                plan_year_transition_at = plan_year.workflow_state_transitions.size > 0 ? plan_year.workflow_state_transitions.order(transition_at: :desc).first.transition_at : ""
 
                 begin
                   row += [benefit_group.relationship_benefits[0].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[0].offered, benefit_group.relationship_benefits[1].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[1].offered, benefit_group.relationship_benefits[2].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[2].offered, benefit_group.relationship_benefits[3].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[3].offered, benefit_group.relationship_benefits[4].premium_pct.try(:to_f).try(:round), benefit_group.relationship_benefits[4].offered]

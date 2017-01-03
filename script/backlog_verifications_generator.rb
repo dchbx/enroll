@@ -7,21 +7,12 @@ end
 
 families = Family.where({
   "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    # "aasm_state" => {
-    #   "$in" => ["enrolled_contingent", "unverified"]
-    #   },
-      "kind" => { "$ne" => "employer_sponsored" },
-      "$or" => [
-        {:terminated_on => nil },
-        {:terminated_on.gt => TimeKeeper.date_of_record}
-      ]
-    }  
-  }
-})
-
-# 19744754, 19745447
-# families = [18941570].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
+    "$elemMatch" => {
+      "aasm_state" => { "$in" => ["enrolled_contingent"] },
+      "effective_on" => { "$gte" => Date.new(2016,1,1)},
+      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+  } }
+}).to_a
 
 mailing_address_missing = []
 coverage_not_found = []
@@ -43,36 +34,20 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   counter = 0
 
   families.each do |family|
+
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lt => Date.new(2016,10,26)).present?
     counter += 1
-
-    # next unless family.id.to_s == "5619ca5554726532e58b2201"
-    next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
-
-
     begin
       person = family.primary_applicant.person
 
-    # if person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?
-    #   puts "already notified!!"
-    #   next
-    # end
+      if person.consumer_role.blank?
+        count += 1
+        next
+      end
 
-    if person.consumer_role.blank?
-      count += 1
-      next
-    end
-
-    next if person.inbox.blank?
-    next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
-    if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
-      next if secure_message.created_at > 35.days.ago
-    end
-
-      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
-      # event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
 
       notice_trigger = event_kind.notice_triggers.first 
-
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
         template: notice_trigger.notice_template, 

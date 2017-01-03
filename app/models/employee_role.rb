@@ -96,7 +96,15 @@ class EmployeeRole
   alias_method :census_employee, :new_census_employee
 
   def coverage_effective_on
-    benefit_group.effective_on_for(census_employee.hired_on)
+    if benefit_group.present?
+      effective_on_date = benefit_group.effective_on_for(census_employee.hired_on)
+
+      if census_employee.newly_designated_eligible? || census_employee.newly_designated_linked?
+        effective_on_date = [effective_on_date, census_employee.newly_eligible_earlist_eligible_date].max
+      end
+    end
+    
+    effective_on_date
   end
 
   def can_enroll_as_new_hire?    

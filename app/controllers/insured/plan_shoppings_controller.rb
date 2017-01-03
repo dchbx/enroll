@@ -52,7 +52,7 @@ class Insured::PlanShoppingsController < ApplicationController
         @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
       end
 
-      @employer_profile = @person.active_employee_roles.first.employer_profile
+      @employer_profile = @enrollment.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
@@ -69,7 +69,6 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-
     if @enrollment.is_special_enrollment?
       sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
       @enrollment.update_current(special_enrollment_period_id: sep_id)
@@ -84,7 +83,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       end
-      @employer_profile = @person.active_employee_roles.first.employer_profile
+      @employer_profile = @enrollment.employer_profile
     else
       get_aptc_info_from_session(@enrollment)
       if can_apply_aptc?(@plan)
@@ -116,7 +115,7 @@ class Insured::PlanShoppingsController < ApplicationController
       employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
       coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
       waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-
+      waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
       waived_enrollment.generate_hbx_signature
 
       if waived_enrollment.save!
@@ -160,11 +159,9 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health"
+    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
       @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc

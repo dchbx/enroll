@@ -1,14 +1,15 @@
 When(/^\w+ visits? the Insured portal during open enrollment$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
-  FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period, :ivl_2015_benefit_package)
-  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual") #pull out for sep
+  FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+
   Caches::PlanDetails.load_record_cache!
   screenshot("individual_start")
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
-  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
   Caches::PlanDetails.load_record_cache!
 
@@ -61,6 +62,7 @@ Then(/^user should see heading labeled personal information/) do
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
+  wait_for_ajax
   expect(page).to have_button("CONTINUE", visible: false)
   find('.btn', text: 'CONTINUE').click
 end
@@ -96,10 +98,22 @@ Then (/Individual sees previously saved address/) do
   find('.btn', text: 'CONTINUE').click
 end
 
+When /^Individual clicks on Individual and Family link should be on privacy agreeement page/ do
+  wait_for_ajax
+  find('.interaction-click-control-individual-and-family').trigger('click')
+  expect(page).to have_content('Authorization and Consent')
+end
+
 Then(/^\w+ agrees? to the privacy agreeement/) do
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
+end
+
+When /^Individual clicks on Individual and Family link should be on verification page/ do
+  wait_for_ajax
+  find('.interaction-click-control-individual-and-family').trigger('click')
+  expect(page).to have_content('Verify Identity')
 end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
@@ -163,8 +177,54 @@ And(/I click on continue button on household info form/) do
   click_link "Continue"
 end
 
+Then(/Individual creates a new HBX account$/) do
+  click_button 'Create account', :wait => 10
+  fill_in "user[oim_id]", :with => "testflow@test.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
+  screenshot("create_account")
+  click_button "Create account"
+end
+
+When(/I click on none of the situations listed above apply checkbox$/) do
+  expect(page).to have_content 'None of the situations listed above apply'
+  find('#no_qle_checkbox').click
+  expect(page).to have_content 'To enroll before open enrollment'
+end
+
+And(/I click on back to my account button$/) do
+  expect(page).to have_content "To enroll before open enrollment, you must qualify for a special enrollment period"
+  find('.interaction-click-control-back-to-my-account').click
+end
+
+Then(/I should land on home page$/) do
+  expect(page).to have_content 'My DC Health Link'
+end
+
+And(/I click on log out link$/) do
+  find('.interaction-click-control-logout').click
+end
+
+And(/I click on sign in existing account$/) do
+  expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
+  find('.interaction-click-control-sign-in-existing-account').click
+end
+
+And(/I signed in$/) do
+  fill_in "user[login]", :with => "testflow@test.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  click_button 'Sign in'
+end
+
+
 When(/^I click on continue button on group selection page during a sep$/) do
+  expect(page).to have_content "Choose Coverage for your Household"
   click_button "CONTINUE"
+end
+
+Then(/I click on back to my account$/) do
+  expect(page).to have_content "Choose Coverage for your Household"
+  find('.interaction-click-control-back-to-my-account').click
 end
 
 And(/^I click on continue button on group selection page$/) do
@@ -269,11 +329,12 @@ Then(/^Second user should see a form to enter personal information$/) do
 end
 
 Then(/Individual asks for help$/) do
+  expect(page).to have_content "Help"
   find('.container .row div div.btn', text: 'Help').click
-
   wait_for_ajax
+  expect(page).to have_content "Help"
   click_link "Help from a Customer Service Representative"
-
+  wait_for_ajax(5,2.5)
   expect(page).to have_content "First name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"

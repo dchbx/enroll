@@ -104,12 +104,16 @@ describe "shared/_comparison.html.erb" do
       expect(rendered).to_not have_selector('th', text: 'Out of Network')
     end
 
-    it "should have coinsurance text" do
-      expect(rendered).to have_selector('th', text: 'COINSURANCE')
+    it "should have cost sharing text" do
+      expect(rendered).to have_selector('th', text: 'COST SHARING')
     end
 
-    it "should have copay text" do
-      expect(rendered).to have_selector('th', text: 'CO-PAY')
+    it "should not have copay text" do
+      expect(rendered).to_not have_selector('th', text: 'CO-PAY')
+    end
+
+    it "should have title text" do
+      expect(rendered).to match("Once you meet your deductible, you'll share the costs for any covered services you receive until you reach your out-of-pocket limit. Copayments are a fixed dollar amount you pay for a covered service, usually when you receive the service. Coinsurance is calculated as a percent of the allowed amount for a covered service.")
     end
 
     it "should have plan data" do
@@ -131,7 +135,7 @@ describe "shared/_comparison.html.erb" do
     it "should have rx formulary url coverage_kind = health" do
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{mock_plan.rx_formulary_url}/)
-      expect(rendered).to match("PROVIDER DIRECTORY")
+      expect(rendered).to match("DOCTOR DIRECTORY")
     end
 
     it "should not have rx_formulary_url coverage_kind = dental" do

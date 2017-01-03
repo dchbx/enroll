@@ -491,10 +491,18 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.tax_household_members.select{|thm| thm.is_primary_applicant?}.first.family_member).to eq person.primary_family.primary_family_member
       end
 
-      it "has 2 coverage households with 2 members each" do
+      it "has 2 coverage households with 4 members in immediate family" do
         expect(tax_household_db.household.coverage_households.length).to eq 2
-        expect(tax_household_db.household.coverage_households.first.coverage_household_members.length).to eq 2
+        expect(tax_household_db.household.coverage_households.where(is_immediate_family: true).first.coverage_household_members.length).to eq 4
         expect(tax_household_db.household.coverage_households.first.coverage_household_members.select{|thm| thm.is_subscriber?}.first.family_member).to eq person.primary_family.primary_family_member
+      end
+
+      it "has 2 coverage households with 0 members in non-immediate family" do
+        expect(tax_household_db.household.coverage_households.where(is_immediate_family: false).first.coverage_household_members.length).to eq 0
+      end
+
+      it "should has the following relations under primary family person" do
+        expect(family_db.family_members.map(&:primary_relationship)).to eq ["self", "spouse", "child", "child"]
       end
 
       it "updates all consumer role verifications" do

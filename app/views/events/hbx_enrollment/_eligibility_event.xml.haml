@@ -1,4 +1,7 @@
 %eligibility_event
-  %event_kind= "urn:dc0:terms:v1:qualifying_life_event#" + eligibility_event.eligibility_event_kind
+  - if eligibility_event.eligibility_event_kind == 'relocate'
+    %event_kind= "urn:dc0:terms:v1:qualifying_life_event#location_change"
+  - else
+    %event_kind= "urn:dc0:terms:v1:qualifying_life_event#" + eligibility_event.eligibility_event_kind
   - if eligibility_event.eligibility_event_has_date?
     %event_date= simple_date_for(eligibility_event.eligibility_event_date)

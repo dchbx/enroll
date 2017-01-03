@@ -230,6 +230,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group) }
     let(:hbx_enrollment) {HbxEnrollment.new}
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
     before :each do
       assign :person, person
@@ -240,6 +241,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
@@ -285,7 +287,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:person) { instance_double("Person", id: "Person.id") }
     let(:coverage_household_members) {[double("new coverage household member", family_member: new_family_member), double("new coverage household member 1", family_member: new_family_member_1)]}
     let(:coverage_household) { double("coverage household", coverage_household_members: coverage_household_members) }
-    let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: nil) }
+    let(:employer_profile) {FactoryGirl.build(:employer_profile)}
+    let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: nil, employer_profile: employer_profile) }
     let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: nil)}
 
     before :each do
@@ -316,6 +319,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
     let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
     before :each do
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
@@ -330,6 +334,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
 
@@ -505,6 +510,37 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to_not have_selector('h3', text: 'Marketplace')
     end
   end
+
+
+
+
+  context "change plan with ee role" do
+    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:coverage_household) { double("coverage household", coverage_household_members: []) }
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :market_kind, 'shop'
+      assign :change_plan, 'change_by_qle'
+      assign :hbx_enrollment, hbx_enrollment
+      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+    end
+
+    it "shouldn't see waiver button" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).not_to have_text('Waiver Coverage')
+    end
+  end
+
 
   context "change plan with both roles" do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }

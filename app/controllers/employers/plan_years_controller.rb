@@ -7,7 +7,6 @@ class Employers::PlanYearsController < ApplicationController
   def new
     @plan_year = build_plan_year
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
-    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
   end
 
   def dental_reference_plans
@@ -227,7 +226,6 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
-    @dental_plans = Plan.by_active_year(2016).shop_market.dental_coverage.all
     @just_a_warning = false
     if plan_year.publish_pending?
       plan_year.withdraw_pending!
@@ -389,7 +387,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_dental_carriers_and_plans
-
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
     @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
@@ -403,8 +400,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def updateable?
     authorize EmployerProfile, :updateable?
-  end  
-
+  end
 
   def build_employee_costs_for_benefit_group
     plan = @benefit_group.reference_plan

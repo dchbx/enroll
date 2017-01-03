@@ -130,6 +130,8 @@ module Subscribers
               pr.subject_individual_id == verified_primary_family_member.id
           end.first.relationship_uri.split('#').last
 
+          relationship = PersonRelationship::InverseMap[relationship]
+
           if existing_person.present?
             find_or_build_consumer_role(existing_person)
             update_vlp_for_consumer_role(existing_person.consumer_role, verified_family_member)

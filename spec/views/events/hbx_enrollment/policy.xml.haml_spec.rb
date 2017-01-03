@@ -7,7 +7,7 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb" do
   let(:employee_role) { FactoryGirl.build(:employee_role, census_employee: census_employee) }
   let(:benefit_group_assignment) { employee_role.census_employee.benefit_group_assignments.first }
   let(:benefit_group) { benefit_group_assignment.benefit_group }
-  let(:hbx_enrollment) {  HbxEnrollment.new(plan:plan, employee_role: employee_role) }
+  let(:hbx_enrollment) {  HbxEnrollment.new(plan:plan, employee_role: employee_role, created_at: Time.now) }
 
   before :each do
     allow(hbx_enrollment).to receive(:broker_agency_account).and_return(nil)

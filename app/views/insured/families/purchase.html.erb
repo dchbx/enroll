@@ -10,6 +10,9 @@
       <p>Your enrollment is not complete until you purchase your plan selection below.</p>
     <% end %>
     <p>
+      <% if @enrollment.employer_profile.present? %>
+        <strong><%= @enrollment.employer_profile.legal_name %></strong><br>
+      <% end %>
       <strong><%= @plan.name %></strong><br>
       Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
     </p>

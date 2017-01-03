@@ -33,6 +33,27 @@ class Household
 
   # after_build :build_irs_group
 
+  def active_hbx_enrollments
+    actives = hbx_enrollments.collect() do |list, enrollment|
+      if enrollment.plan.present? &&
+         (enrollment.plan.active_year >= TimeKeeper.date_of_record.year) &&
+         (HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state))
+
+        list << enrollment
+      end
+      list
+    end
+    actives.sort! { |a,b| a.submitted_at <=> b.submitted_at }
+  end
+
+  def renewing_hbx_enrollments
+    active_hbx_enrollments.reject { |en| !HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) }
+  end
+
+  def renewing_individual_market_hbx_enrollments
+    renewing_hbx_enrollments.reject { |en| en.enrollment_kind != 'individual' }
+  end
+
   def add_household_coverage_member(family_member)
     if ImmediateFamily.include?(family_member.primary_relationship)
       immediate_family_coverage_household.add_coverage_household_member(family_member)
@@ -122,7 +143,7 @@ class Household
       family_member: family_member,
       is_subscriber: false,
       is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
-      )
+    )
     th.save!
   end
 
@@ -131,9 +152,9 @@ class Household
     return if effective_ending_on.nil?
     return if effective_starting_on.nil?
 
-      if effective_ending_on < effective_starting_on
-        self.errors.add(:base, "The effective end date should be earlier or equal to effective start date")
-      end
+    if effective_ending_on < effective_starting_on
+      self.errors.add(:base, "The effective end date should be earlier or equal to effective start date")
+    end
   end
 
   def parent
@@ -167,7 +188,7 @@ class Household
   end
 
   def latest_active_tax_household_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year) 
+    tax_households = self.tax_households.tax_household_with_year(year)
     if TimeKeeper.date_of_record.year == year
       tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
     end
@@ -177,6 +198,10 @@ class Household
     else
       tax_households.entries.last
     end
+  end
+
+  def latest_tax_household_with_year(year)
+    tax_households.tax_household_with_year(year).try(:last)
   end
 
   def applicant_ids
@@ -288,7 +313,25 @@ class Household
     hbx_enrollments.enrolled
   end
 
-  def hbx_enrollments_with_aptc_by_year(year)
+  def active_hbx_enrollments_with_aptc_by_year(year)
     hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
+  end
+
+  def hbx_enrollments_with_aptc_by_date(date)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(date.year).gte(effective_on: date)
+  end
+
+  def hbx_enrollments_with_aptc_by_year(year)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
+  end
+
+  def eligibility_determinations_for_year(year)
+    eds = []
+    tax_households.tax_household_with_year(year).each do |th|
+      th.eligibility_determinations.each do |ed|
+        eds << ed
+      end
+    end
+    eds
   end
 end

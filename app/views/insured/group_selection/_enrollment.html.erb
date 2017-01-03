@@ -3,8 +3,12 @@
 <div class="panel panel-default min-h">
 
   <div class="panel-heading">
-    <h4><%= plan.active_year %> <%= plan.coverage_kind.capitalize %> Coverage <span class="separator">DCHL</span></h4>
-    <hr>
+    <h4>
+      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind.capitalize %> Coverage
+      <span class="separator">
+        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
+      </span>
+    </h4>
   </div>
 
   <div class="panel-body">
@@ -56,7 +60,7 @@
           </div>
           <div class="col-xs-4">
             <a href="#">
-              <i class="fa fa-phone fa-2x pull-left"></i><div class="fa-icon-label">Carrier Contact Info</div>
+              <i class="fa fa-phone fa-2x pull-left"></i><div class="fa-icon-label">Plan Contact Info</div>
             </a>
           </div>
           <div class="col-xs-4">

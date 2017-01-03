@@ -1,0 +1,48 @@
+<table class="table table-striped">
+  <%if @result[:success].present?%>
+
+    <h4>Enrollments cancelled sucessfully</h4>
+    <tr>
+      <th>HBX ID</th>
+      <th>Plan</th>
+      <th>Effective Date</th>
+      <th>Cancellation Date</th>
+      <th>Cancelled ?</th>
+    </tr>
+    <% @result[:success].each do |hbx| %>
+      <tr>
+        <td><%= hbx.hbx_id %></td>
+        <td><%= hbx.plan.name %></td>
+        <td><%= hbx.effective_on %></td>
+        <td><%= hbx.effective_on %></td>
+        <td><i class="fa fa-check" aria-hidden="true"></i></td>
+      </tr>
+    <% end %>
+
+  <%elsif @result[:failure].present? %>
+    
+    <tr>
+      <th>HBX ID</th>
+      <th>Plan</th>
+      <th>Effective Date</th>
+      <th>Cancellation Date</th>
+      <th>Cancelled ?</th>
+    </tr>
+    <h4>Enrollments failed to cancel</h4>
+    <% @result[:failure].each do |hbx| %>
+      <tr>
+        <td><%= hbx.hbx_id %></td>
+        <td><%= hbx.plan.name %></td>
+        <td><%= hbx.effective_on %></td>
+        <td><%= hbx.effective_on %></td>
+      </tr>
+    <% end %>
+
+  <% else %>
+
+    <h4>No enrollments selected for cancellation</h4>
+
+  <% end %>
+</table>
+
+<%= link_to "Close", hide_form_exchanges_hbx_profiles_path(family_id: @family_id, family_actions_id: "family_actions_#{@family_id.to_s}"), class: "btn btn-info", remote: true %>

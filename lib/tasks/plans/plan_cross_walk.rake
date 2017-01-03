@@ -93,7 +93,7 @@ namespace :xml do
           puts "Old #{previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{current_year} plan hios_id: #{new_plan.hios_id}"
           @updated_hios_ids_list << old_plan.hios_id
         else
-          puts "Old #{previous_year} plan hios_id #{old_plan_hios_id} not present."
+          puts "Old #{previous_year} plan hios_id #{@old_hios_id}-#{new_plan.csr_variant_id} not present."
         end
       end
     end

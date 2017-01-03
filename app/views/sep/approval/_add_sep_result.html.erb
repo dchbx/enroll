@@ -1,0 +1,3 @@
+<h4><%=@message_for_partial%></h4> 
+<%= link_to "Close", hide_form_exchanges_hbx_profiles_path(family_id: @family.id, family_actions_id: "family_actions_#{@family.id.to_s}"), class: "btn btn-info", remote: true %>
+<br />

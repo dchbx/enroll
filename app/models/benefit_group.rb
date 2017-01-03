@@ -435,12 +435,12 @@ class BenefitGroup
       if effective_on_offset == 1
         date_of_hire.end_of_month + 1.day
       else
-      if (date_of_hire + effective_on_offset.days).day == 1
-        (date_of_hire + effective_on_offset.days)
-      else
-        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        if (date_of_hire + effective_on_offset.days).day == 1
+          (date_of_hire + effective_on_offset.days)
+        else
+          (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        end
       end
-    end
     end
   end
 
@@ -468,10 +468,11 @@ private
     self.plan_option_kind = "metal_level"
     self.default = true
 
+    # 2017 contribution schedule
     self.contribution_pct_as_int   = 75
-    self.employee_max_amt = 462.30 if employee_max_amt == 0
-    self.first_dependent_max_amt = 998.88 if first_dependent_max_amt == 0
-    self.over_one_dependents_max_amt = 1058.42 if over_one_dependents_max_amt == 0
+    self.employee_max_amt = 480.29 if employee_max_amt == 0
+    self.first_dependent_max_amt = 1030.88 if first_dependent_max_amt == 0
+    self.over_one_dependents_max_amt = 1094.64 if over_one_dependents_max_amt == 0
   end
 
   def dollars_to_cents(amount_in_dollars)

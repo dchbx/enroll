@@ -32,7 +32,7 @@
   </div>
 <br>
 <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-default mz' %>
-  <a class='btn btn-default' data-toggle='modal' data-target='#downloadCsv'>Download</a>
+<%= button_to 'Download', employers_premium_statement_path(@employer_profile, format: :csv), method: :get, params: { billing_date: @billing_date.strftime("%m/%d/%Y")}, class: 'btn btn-default' %>
 </div>
 
 <script>

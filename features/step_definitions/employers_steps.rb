@@ -149,6 +149,7 @@ end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
   click_link 'Employees'
+  wait_for_ajax
   within '.census-employees-table' do
     find('.top').click
   end
@@ -281,13 +282,16 @@ end
 
 And(/^.+ should see a button to create new plan year$/) do
   screenshot("employer_plan_year")
-  plan = FactoryGirl.create :plan, :with_premium_tables, market: 'shop', coverage_kind: 'health', deductible: 4000
+  #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+  year = (Date.today + 2.months).year
+  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
+  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
   find('a.interaction-click-control-add-plan-year').click
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{Date.today.year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -317,7 +321,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax
   find('.carriers-tab a').click
-  wait_for_ajax
+  wait_for_ajax(10,2)
   find('.reference-plans label').click
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
@@ -453,7 +457,7 @@ And /^clicks on terminate employee$/ do
   page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
   find('.interaction-click-control-terminate-employee').click
   expect(page).to have_content 'Employee Roster'
-  wait_for_ajax
+  wait_for_ajax(2,2)
 end
 
 Then /^employer clicks on terminated filter$/ do
@@ -470,6 +474,51 @@ end
 
 And /^employer clicks on terminated employee$/ do
   expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "employee_role_linked")
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should not see the address on the roster$/ do
+  expect(page).not_to have_content /Address/
+end
+
+And /^employer clicks on linked employee without address$/ do
+  employees.first.address.delete
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should see the address on the roster$/ do
+  expect(page).to have_content /Address/
+end
+
+And /^employer populates the address field$/ do
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
+  fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[contains(., 'GA')]").click
+
+  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+end
+
+And /^employer clicks on update employee$/ do
+  find('.interaction-click-control-update-employee').click
+end
+
+And /^employer clicks on non-linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "eligible")
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on non-linked employee without address$/ do
+  employees.first.address.delete
+  employees.first.update_attributes(aasm_state: "eligible")
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
 
@@ -504,5 +553,28 @@ Then /^employer should not see termination date column$/ do
 end
 
 Then /^they should see that employee's details$/ do
+  wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
+end
+When(/^the employer goes to benefits tab$/) do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
+end
+
+When(/^the employer clicks on claim quote$/) do
+  find('.interaction-click-control-claim-quote').click
+end
+
+Then(/^the employer enters claim code for his quote$/) do
+  person = FactoryGirl.create(:person, :with_broker_role)
+  @quote=FactoryGirl.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
+  @quote.publish!
+  fill_in "claim_code", :with => @quote.claim_code
+end
+
+When(/^the employer clicks claim code$/) do
+  find('.interaction-click-control-claim-code').click
+end
+
+Then(/^the employer sees a successful message$/) do
+  expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
 end

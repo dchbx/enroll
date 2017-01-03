@@ -49,6 +49,7 @@ class Exchanges::AgentsController < ApplicationController
     #   redirect_to bookmark_url_path(employee_role.bookmark_url + "?employee_role_id=#{employee_role.id}")
     # elsif consumer_role && consumer_role.bookmark_url
     person.set_consumer_role_url
+    
     if consumer_role && consumer_role.bookmark_url
 
       redirect_to bookmark_url_path(consumer_role.bookmark_url)
@@ -87,7 +88,3 @@ class Exchanges::AgentsController < ApplicationController
     return bookmark_path
   end
 end
-
-
-
-

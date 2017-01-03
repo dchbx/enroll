@@ -95,6 +95,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with all required attributes" do
       let(:params)                  { valid_params }
       let(:initial_census_employee) { CensusEmployee.new(**params) }
+      let(:dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
+      let(:dependent2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333, dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
 
       it "should be valid" do
         expect(initial_census_employee.valid?).to be_truthy
@@ -102,6 +104,18 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should save" do
         expect(initial_census_employee.save).to be_truthy
+      end
+      
+      it "allow dependent ssn's to be updated to nil" do
+        initial_census_employee.census_dependents = [dependent]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match(nil)
+      end
+      
+      it "ignores depepent ssn's if ssn not nil" do
+        initial_census_employee.census_dependents = [dependent2]
+        initial_census_employee.save!
+        expect(initial_census_employee.census_dependents.first.ssn).to match("333333333")
       end
 
       context "with duplicate ssn's on dependents" do
@@ -114,15 +128,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "with duplicate blank ssn's on dependents" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
         let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
-
+        
         it "should not have errors" do
           initial_census_employee.census_dependents = [child1,child2]
           expect(initial_census_employee.valid?).to be_truthy
-          expect(initial_census_employee.save).to be_truthy
         end
       end
 
@@ -135,7 +148,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
-
+      
       context "and it is saved" do
         before { initial_census_employee.save }
 
@@ -301,6 +314,32 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                               it "is in termination pending state" do
                                 expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
                               end
+                          end
+
+                          context ".terminate_future_scheduled_census_employees" do
+                            it "should terminate the census employee on the day of the termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 2.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
+
+                            it "should not terminate the census employee if today's date < termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 1.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
+                            end
+
+                            it "should return the existing state of the census employee if today's date > termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employment_terminated")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 3.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
+
+                            it "should also terminate the census employees if termination date is in the past" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record - 3.days, aasm_state: "employee_termination_pending")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
                           end
 
                           context "and the termination date is within the retroactive reporting time period" do
@@ -744,21 +783,28 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "construct_employee_role_for_match_person" do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
     let(:census_employee1) { FactoryGirl.build(:census_employee) }
 
     it "should return false when not match person" do
       expect(census_employee1.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has active employee role" do
+    it "should return false when match person which has active employee role for current census employee" do
+      census_employee.update_attributes(employer_profile_id: employer_profile.id)
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    census_employee_id: census_employee.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq false
     end
 
-    it "should return false when match person which has no active employee role" do
-      person.employee_roles.destroy_all
-      allow(Factories::EnrollmentFactory).to receive(:build_employee_role).and_return true
+    it "should return true when match person has no active employee roles for current census employee" do
+      person.employee_roles.create!(ssn: census_employee.ssn,
+                                    employer_profile_id: census_employee.employer_profile.id,
+                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
   end
@@ -1170,6 +1216,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       aasm_state: 'auto_renewing'
       )
     }
+    
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: shop_family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
 
     context 'when current and renewing coverages present' do
 
@@ -1219,5 +1273,105 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.errors[:hired_on].any?).to be_truthy
       expect(census_employee.errors[:hired_on].to_s).to match /date can't be before  date of birth/
     end
+  end
+
+  context '.renewal_benefit_group_assignment' do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment_two)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    before do
+      benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
+      benefit_group_assignment_one.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+      benefit_group_assignment_two.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+    end
+
+    it "should select the latest renewal benefit group assignment" do
+      expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
+    end
+  end
+
+  context "and congressional newly designated employees are added" do
+    let(:employer_profile_congressional)  { plan_year.employer_profile }
+    let(:plan_year)                       { FactoryGirl.create(:next_month_plan_year, :with_benefit_group_congress) }
+    let(:benefit_group)                   { plan_year.benefit_groups.first }
+    let(:benefit_group_assignment)        { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: civil_servant) }
+    let(:civil_servant)                   { FactoryGirl.build(:census_employee, employer_profile: employer_profile_congressional) }
+    let(:initial_state)                   { "eligible" }
+    let(:eligible_state)                  { "newly_designated_eligible" }
+    let(:linked_state)                    { "newly_designated_linked" }
+    let(:employee_linked_state)           { "employee_role_linked" }
+
+    specify { expect(civil_servant.aasm_state).to eq initial_state }
+
+    it "should transition to newly designated eligible state" do
+      expect { civil_servant.newly_designate! }.to change(civil_servant, :aasm_state).to eq eligible_state
+    end
+
+    context "and the census employee is associated with an employee role" do
+      before do
+        civil_servant.benefit_group_assignments = [benefit_group_assignment]
+        civil_servant.newly_designate
+      end
+
+      it "should transition to newly designated linked state" do
+        expect { civil_servant.link_employee_role! }.to change(civil_servant, :aasm_state).to eq linked_state
+      end
+
+      context "and the link to employee role is removed" do
+        before do
+          civil_servant.benefit_group_assignments = [benefit_group_assignment]
+          civil_servant.aasm_state = linked_state
+          civil_servant.save!
+        end
+
+        it "should revert to 'newly designated eligible' state" do
+          expect { civil_servant.delink_employee_role! }.to change(civil_servant, :aasm_state).to eq eligible_state
+        end
+      end
+    end
+
+    context "and multiple newly designated employees are present in database" do
+      let(:second_civil_servant)  { FactoryGirl.build(:census_employee, employer_profile: employer_profile_congressional) }
+
+      before do
+        civil_servant.benefit_group_assignments = [benefit_group_assignment]
+        civil_servant.newly_designate!
+
+        second_civil_servant.benefit_group_assignments = [benefit_group_assignment]
+        second_civil_servant.save!
+        second_civil_servant.newly_designate!
+        second_civil_servant.link_employee_role!
+      end
+
+      it "the scope should find them all" do
+        expect(CensusEmployee.newly_designated.size).to eq 2
+      end
+
+      it "the scope should find the eligible census employees" do
+        expect(CensusEmployee.eligible.size).to eq 1
+      end
+
+      it "the scope should find the linked census employees" do
+        expect(CensusEmployee.linked.size).to eq 1
+      end
+
+      context "and new plan year begins, ending 'newly designated' status" do
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
+          TimeKeeper.set_date_of_record(Date.today.end_of_year + 1.day)
+        end
+
+        it "should transition 'newly designated eligible' status to initial state" do
+          expect(civil_servant.aasm_state).to eq eligible_state
+        end
+
+        xit "should transition 'newly designated linked' status to linked state" do
+          expect(second_civil_servant.aasm_state).to eq employee_linked_state
+        end
+      end
+
+    end
+
+
   end
 end

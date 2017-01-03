@@ -4,7 +4,14 @@ describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
-
+  let(:enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: household,
+                       coverage_kind: "health",
+                       enrollment_kind: "open_enrollment",
+                       aasm_state: 'shopping'
+    )
+  }
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
   let(:family_member_dependent) { FamilyMember.new(person: dependent) }
 
@@ -26,6 +33,23 @@ describe Family, "given a primary applicant and a dependent" do
     end
   end
 
+  context "#any_unverified_enrollments?" do
+
+  end
+
+  context "enrollments_for_display" do
+    let(:expired_enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: household,
+                       coverage_kind: "health",
+                       enrollment_kind: "open_enrollment",
+                       aasm_state: 'coverage_expired'
+    )}
+
+    it "should not return expired enrollment" do
+      expect(subject.enrollments_for_display.to_a).to eq []
+    end
+  end
 end
 
 describe Family, type: :model, dbclean: :after_each do
@@ -884,7 +908,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one ivl open enrollment period" do
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
 
     it "should be in open enrollment" do
       expect(family.is_under_open_enrollment?).to be_truthy
@@ -912,7 +936,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one shop and one ivl open enrollment period" do
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
 
     let!(:benefit_group) do
       bg = FactoryGirl.create(:benefit_group)
@@ -970,7 +994,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "multiple shop and one ivl open enrollment periods" do
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
 
     let!(:benefit_group) do
       bg = FactoryGirl.create(:benefit_group)
@@ -1222,7 +1246,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     family_member_dependent.family.check_for_consumer_role
     expect(family_member_dependent.person.consumer_role).to eq nil
   end
- 
+
   it "should build the consumer role for the dependents when primary has a consumer role" do
     person.consumer_role = FactoryGirl.create(:consumer_role)
     person.save
@@ -1240,5 +1264,5 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     expect(family_member_dependent.person.consumer_role).to eq cr
     family_member_dependent.family.check_for_consumer_role
     expect(family_member_dependent.person.consumer_role).to eq cr
-  end  
+  end
 end

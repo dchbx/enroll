@@ -90,7 +90,7 @@ class Family
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
 
   index({"irs_groups.hbx_assigned_id" => 1})
-
+  index({"family_members.person_id" => 1, hbx_assigned_id: 1})
   # index("households.tax_households_id")
 
   validates :renewal_consent_through_year,
@@ -113,15 +113,29 @@ class Family
 
   scope :all_current_households,              ->{ exists(households: true).order_by(:start_on.desc).limit(1).only(:_id, :"households._id") }
   scope :all_tax_households,                  ->{ exists(:"households.tax_households" => true) }
+  scope :all_aptc_hbx_enrollments,            ->{ unscoped.where(:"households.hbx_enrollments.applied_aptc_amount.cents".gt => 0)}
+
   scope :by_writing_agent_id,                 ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
   scope :by_broker_agency_profile_id,         -> (broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
   scope :by_general_agency_profile_id,         -> (general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
   scope :all_assistance_applying,       ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
                                                    :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
+  scope :all_unassisted,                ->{ exists(:"households.tax_households.eligibility_determinations" => false) }
+
+  scope :all_eligible_for_assistance,   ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
+
   scope :all_assistance_receiving,      ->{ unscoped.where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
                                                   :"households.tax_households.eligibility_determinations.determined_at".desc) }
-  scope :active_assistance_receiving,   ->{ all_assistance_receiving.exists(:"households.tax_households.effective_ending_on" => false) }
+
+  scope :all_active_assistance_receiving_for_current_year, ->{ unscoped.where( :"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
+                                                                        :"households.tax_households.eligibility_determinations.determined_at".desc).and(
+                                                                        :"households.tax_households.effective_ending_on" => nil ).and(
+                                                                        :"households.tax_households.effective_starting_on".gte => Date.new(TimeKeeper.date_of_record.year)).and(
+                                                                        :"households.tax_households.effective_starting_on".lte => Date.new(TimeKeeper.date_of_record.year).end_of_year)
+                                                      }
+
+  scope :active_assistance_receiving,   ->{ all_assistance_receiving.where(:"households.tax_households.effective_ending_on" => nil) }
   scope :all_plan_shopping,             ->{ exists(:"households.hbx_enrollments" => true) }
 
 
@@ -142,6 +156,9 @@ class Family
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
+  scope :non_enrolled,                        ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :sep_eligible,                        ->{ where(:"active_seps.count".gt => 0) }
+  scope :coverage_waived,                     ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
 
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
@@ -180,7 +197,6 @@ class Family
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments
-
   end
 
   def primary_family_member
@@ -328,6 +344,11 @@ class Family
     special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
 
+  def active_admin_seps
+    special_enrollment_periods.find_all { |sep| sep.is_active? && sep.admin_flag }
+  end
+
+
   # single SEP with latest end date from list of active SEPs
   def current_sep
     active_seps.max { |sep| sep.end_on }
@@ -445,6 +466,10 @@ class Family
     broker_agency_accounts.detect { |account| account.is_active? }
   end
 
+  def any_unverified_enrollments?
+    enrollments.verification_needed.any?
+  end
+
   class << self
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
@@ -523,7 +548,7 @@ class Family
       end
     end
   end
-
+  
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end
@@ -586,8 +611,10 @@ class Family
       {"$unwind" => '$households'},
       {"$unwind" => '$households.hbx_enrollments'},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'inactive'} }},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => 'void'} }},
       {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
       {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_canceled"}}},
+      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$ne" => "coverage_expired"}}},
       {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
       {"$group" => {'_id' => {
                   'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
@@ -595,6 +622,7 @@ class Family
                   'day' => { "$dayOfMonth" => '$households.hbx_enrollments.effective_on'},
                   'subscriber_id' => '$households.hbx_enrollments.enrollment_signature',
                   'provider_id'   => '$households.hbx_enrollments.carrier_profile_id',
+                  'benefit_group_id' => '$households.hbx_enrollments.benefit_group_id',
                   'state' => '$households.hbx_enrollments.aasm_state',
                   'market' => '$households.hbx_enrollments.kind',
                   'coverage_kind' => '$households.hbx_enrollments.coverage_kind'},
@@ -623,6 +651,7 @@ class Family
   def generate_family_search
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
+
 private
   def build_household
     if households.size == 0

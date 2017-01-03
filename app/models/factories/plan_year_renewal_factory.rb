@@ -135,7 +135,7 @@ module Factories
         relationship_benefits: active_group.relationship_benefits,
         reference_plan_id: reference_plan_id,
         elected_plan_ids: elected_plan_ids,
-        is_congress: false
+        is_congress: active_group.is_congress
       })
     end
 

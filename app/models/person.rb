@@ -11,7 +11,6 @@ class Person
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
 
-
   GENDER_KINDS = %W(male female)
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
@@ -73,7 +72,8 @@ class Person
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
-  embeds_one :responsible_party, cascade_callbacks: true, validate: true
+  #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
+
   embeds_one :csr_role, cascade_callbacks: true, validate: true
   embeds_one :assister_role, cascade_callbacks: true, validate: true
   embeds_one :inbox, as: :recipient
@@ -89,7 +89,7 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
 
-  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
+  accepts_nested_attributes_for :consumer_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
@@ -140,8 +140,8 @@ class Person
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
 
   # Employer role index
-  index({"employer_staff_role._id" => 1})
-  index({"employer_staff_role.employer_profile_id" => 1})
+  index({"employer_staff_roles._id" => 1})
+  index({"employer_staff_roles.employer_profile_id" => 1})
 
   # Consumer child model indexes
   index({"consumer_role._id" => 1})
@@ -162,14 +162,17 @@ class Person
   index({"person_relationship.relative_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
-  index({"hbx_responsible_party_role._id" => 1})
+
+  #index({"hbx_responsible_party_role._id" => 1})
+
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
-  scope :all_employer_staff_roles,    -> { exists(employer_staff_role: true) }
-  scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
+  scope :all_employer_staff_roles,    -> { exists(employer_staff_roles: true) }
+
+  #scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
   scope :all_broker_roles,            -> { exists(broker_role: true) }
   scope :all_hbx_staff_roles,         -> { exists(hbx_staff_role: true) }
   scope :all_csr_roles,               -> { exists(csr_role: true) }
@@ -202,12 +205,44 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  def contact_addresses
+    existing_addresses = addresses.to_a
+    home_address = existing_addresses.detect { |addy| addy.kind == "home" }
+    return existing_addresses if home_address
+    add_employee_home_address(existing_addresses)
+  end
+
+  def add_employee_home_address(existing_addresses)
+    return existing_addresses unless employee_roles.any?
+    employee_contact_address = employee_roles.sort_by(&:hired_on).map(&:census_employee).compact.map(&:address).compact.first
+    return existing_addresses unless employee_contact_address
+    existing_addresses + [employee_contact_address]
+  end
+
+  def contact_phones
+    phones.reject { |ph| ph.full_phone_number.blank? }
+  end
+
+  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
+  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+  delegate :all_types_verified?, :to => :consumer_role
+
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } ) if need_to_notify?
+  end
+
+  def need_to_notify?
+    changed_fields = changed_attributes.keys
+    changed_fields << consumer_role.changed_attributes.keys if consumer_role.present?
+    changed_fields << employee_roles.map(&:changed_attributes).map(&:keys) if employee_roles.present?
+    changed_fields << employer_staff_roles.map(&:changed_attributes).map(&:keys) if employer_staff_roles.present?
+    changed_fields = changed_fields.flatten.compact.uniq
+    notify_fields = changed_fields.reject{|field| ["bookmark_url", "updated_at"].include?(field)}
+    notify_fields.present?
   end
 
   def is_aqhp?
@@ -254,10 +289,6 @@ class Person
     end
     true
   end
-
-  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
-
-  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
@@ -369,7 +400,8 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'Social Security Number' if self.ssn
+    verification_types << 'Social Security Number' if ssn
+    verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
     if self.us_citizen
       verification_types << 'Citizenship'
     else
@@ -480,11 +512,21 @@ class Person
   end
 
   def has_employer_benefits?
-    active_employee_roles.present? && active_employee_roles.first.benefit_group.present?
+    active_employee_roles.present? && active_employee_roles.any?{|r| r.benefit_group.present?}
   end
 
   def active_employee_roles
     employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
+  end
+
+  def has_multiple_active_employers?
+    active_census_employees.count > 1
+  end
+
+  def active_census_employees
+    census_employees = CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
+    ces = census_employees.select { |ce| ce.is_active? }
+    (ces + active_employee_roles.map(&:census_employee)).uniq
   end
 
   def has_active_employer_staff_role?
@@ -497,6 +539,12 @@ class Person
 
   def has_multiple_roles?
     consumer_role.present? && active_employee_roles.present?
+  end
+
+  def has_active_employee_role_for_census_employee?(census_employee)
+    if census_employee
+      (active_employee_roles.detect { |employee_role| employee_role.census_employee == census_employee }).present?
+    end
   end
 
   def residency_eligible?
@@ -599,7 +647,7 @@ class Person
       active_enrolled_hbxs = person.primary_family.active_household.hbx_enrollments.active.enrolled_and_renewal
 
       # Iterate over each enrollment and check if there is a Premium Implication based on the following rule:
-      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the 
+      # Rule: There are Implications when DOB changes makes anyone in the household a different age on the day coverage started UNLESS the
       #       change is all within the 0-20 age range or all within the 61+ age range (20 >= age <= 61)
       active_enrolled_hbxs.each do |hbx|
         new_temp_person = person.dup
@@ -687,7 +735,7 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s}
+      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s && !role.is_closed?}
         role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
