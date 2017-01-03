@@ -126,7 +126,7 @@ class BenefitCoveragePeriod
     benefit_packages.each do |bg|
       satisfied = true
       hbx_enrollment_members.map(&:person).map(&:consumer_role).each do |consumer_role|
-        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind)
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind:coverage_kind)
         satisfied = false and break unless rule.satisfied?[0]
       end
       ivl_bgs << bg if satisfied
