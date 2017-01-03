@@ -819,9 +819,7 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    resource_mapping = ApplicationEventMapper.map_resource(self.class)
-    event_name = "acapi.info.events.employer.#{event}"
-    notify(event_name, {resource_mapping.identifier_key => self.send(resource_mapping.identifier_method).to_s})
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
 private
