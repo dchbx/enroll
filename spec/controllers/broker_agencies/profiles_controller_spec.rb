@@ -201,6 +201,98 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
+   describe "get employers_api" do
+    let(:broker_role) {FactoryGirl.build(:broker_role)}
+    let(:person) {double("person", broker_role: broker_role)}
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
+    let(:organization) {
+      o = FactoryGirl.create(:employer)
+      o.primary_office_location.address.address_1 = '500 Employers-Api Avenue'      
+      o.primary_office_location.address.address_2 = '#555' 
+      o.primary_office_location.phone = Phone.new(:kind => 'main', :area_code => '202', :number => '555-9999')
+      o.save
+      o
+    }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+
+    let(:staff_user) { FactoryGirl.create(:user) }
+    let(:staff) do
+      s = FactoryGirl.create(:person, :with_work_email, :male)
+      s.user = staff_user
+      s.first_name = "Seymour"
+      s.emails.clear
+      s.emails << ::Email.new(:kind => 'work', :address => 'seymour@example.com')
+      s.phones << ::Phone.new(:kind => 'mobile', :area_code => '202', :number => '555-0000')
+      s.save
+      s
+    end
+
+    let(:staff_user2) { FactoryGirl.create(:user) }
+    let(:staff2) do
+      s = FactoryGirl.create(:person, :with_work_email, :male)
+      s.user = staff_user2
+      s.first_name = "Beatrice"
+      s.emails.clear
+      s.emails << ::Email.new(:kind => 'work', :address => 'beatrice@example.com')
+      s.phones << ::Phone.new(:kind => 'work', :area_code => '202', :number => '555-0001')
+      s.phones << ::Phone.new(:kind => 'mobile', :area_code => '202', :number => '555-0002')
+      s.save
+      s
+    end
+
+    let (:broker_agency_account) { FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile) }
+    let (:employer_profile) do 
+      e = FactoryGirl.create(:employer_profile, organization: organization) 
+      e.broker_agency_accounts << broker_agency_account 
+      e.save   
+      e
+    end
+    
+    it "should get details for employers where broker_agency_account is active" do
+
+      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_return(
+        [
+          double("enrollment", :total_premium => 500, :total_employee_cost => 200, :total_employer_contribution => 300 ),
+          double("enrollment",  :total_premium => 5000, :total_employee_cost => 2000, :total_employer_contribution => 3000 )
+        ]
+      )
+
+      staff.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
+      staff2.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
+      sign_in user
+      xhr :get, :employers_api, id: broker_agency_profile.id, format: :json
+      expect(response).to have_http_status(:success)
+      details = assigns[:employer_details]
+      detail = details[0]
+      expect(details.count).to eq 1
+      expect(detail[:profile]).to eq employer_profile
+      expect(detail[:total_premium]).to eq 5500
+      expect(detail[:employee_contribution]).to eq 2200
+      expect(detail[:employer_contribution]).to eq 3300
+      contacts = detail[:contacts]
+
+      seymour = contacts.detect { |c| c.first == 'Seymour' }
+      beatrice = contacts.detect { |c| c.first == 'Beatrice' }
+      office = contacts.detect { |c| c.first == 'Primary' }
+      expect(seymour.mobile).to eq '(202) 555-0000'
+      expect(seymour.phone).to eq ''
+      expect(beatrice.phone).to eq '(202) 555-0001'
+      expect(beatrice.mobile).to eq '(202) 555-0002'
+      expect(seymour.emails).to include('seymour@example.com')
+      expect(beatrice.emails).to include('beatrice@example.com')
+      expect(office.phone).to eq '(202) 555-9999'
+      expect(office.address_1).to eq '500 Employers-Api Avenue'
+      expect(office.address_2).to eq '#555'
+      expect(office.city).to eq 'Washington'
+      expect(office.state).to eq 'DC'
+      expect(office.zip).to eq '11117'
+
+      
+      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_call_original
+    end
+  end
+
   describe "family_index" do
     before :all do
       org = FactoryGirl.create(:organization)
