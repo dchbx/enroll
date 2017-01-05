@@ -4,7 +4,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :employers_api, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -38,6 +38,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
      @provider = current_user.person
      @staff_role = current_user.has_broker_agency_staff_role?
      @id=params[:id]
+
+      respond_to do |format|
+      format.html {}
+      format.json { render json: {id: @id, first: @provider.first_name } }
+    end
   end
 
   def edit
@@ -136,6 +141,37 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
+
+
+  def employers_api
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+    else
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.by_broker_role(broker_role_id)
+    end
+    @employer_profiles = @orgs.map {|o| o.employer_profile}
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
+
+    @renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
+
+    @employer_details = @employer_profiles.map do |er| 
+        enrollments = er.enrollments_for_billing
+        premium_amt_total   = enrollments.map(&:total_premium).sum
+        employee_cost_total = enrollments.map(&:total_employee_cost).sum
+        employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+        staff = Person.staff_for_employer_including_pending(er)
+        result = {
+          :profile => er,
+          :total_premium => premium_amt_total,
+          :employee_contribution => employee_cost_total,
+          :employer_contribution => employer_contribution_total,
+          :emails => staff.map { |s| s.work_email_or_best } || []
+        }
+    end    
+  end
+
 
   def general_agency_index
     @broker_role = current_user.person.broker_role || nil

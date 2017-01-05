@@ -1,0 +1,55 @@
+{
+    "broker_agency" : "<%= @broker_agency_profile.legal_name %>",
+    "broker_clients" : [<% 
+      first_element = true
+      @employer_details.each do |detail| 
+        er = detail[:profile] 
+        year = er.show_plan_year 
+    %><%= ',' unless first_element %>
+      {
+         "employer_name" : "<%= er.legal_name %>",
+         "employees_total": "<%= er.roster_size %>",
+      <%if year %>   
+         "employees_enrolled" : "<%= year.total_enrolled_count %>",
+         "employees_waived": "<%= year.waived_count %>",
+         "open_enrollment_begins" : "<%= year.open_enrollment_start_on %>",
+         "open_enrollment_ends" : "<%= year.open_enrollment_end_on %>",
+         "plan_year_begins" : "<%= year.start_on %>",
+         "renewal_in_progress": "<%= year.is_renewing? %>",
+         "renewal_application_available": "<%= year.start_on >> @renewals_offset_in_months %>",
+         "renewal_application_due": "<%= year.due_date_for_publish %>",
+         "binder_payment_due": "",
+         "minimum_participation_required": "<%= year.minimum_enrolled_count %>",
+      <% else %>
+         "employees_enrolled" : null,
+         "employees_waived": null,
+         "open_enrollment_begins" : null,
+         "open_enrollment_ends" : null,
+         "plan_year_begins" : null,
+         "renewal_in_progress": null,
+         "renewal_application_available": null,
+         "renewal_application_due": null,
+         "binder_payment_due": null,
+         "minimum_participation_required": null,
+      <% end %>
+         "estimated_premium": {
+            "employee_contribution": <%= detail[:employee_contribution] %>,
+            "employer_contribution": <%= detail[:employer_contribution] %>
+         },
+         "contact_info": {
+                <% office = er.organization.primary_office_location %>
+               "phone": "<%= office.phone.area_code %>-<%= office.phone.number %>",
+               "emails": <%= detail[:emails].to_json.html_safe %>,
+               "address_1": "<%= office.address.address_1 %>",
+               "address_2": "<%= office.address.address_2 %>",
+               "city": "<%= office.address.city %>",
+               "state": "<%= office.address.state %>",
+               "zip": "<%= office.address.zip %>"
+         },
+          "active_general_agency": "<%= er.active_general_agency_legal_name %>"
+      }<% 
+
+        first_element = false
+      end %>
+    ]
+} 

@@ -201,6 +201,52 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
+   describe "get employers_api" do
+    let(:broker_role) {FactoryGirl.build(:broker_role)}
+    let(:person) {double("person", broker_role: broker_role)}
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
+    let(:organization) {FactoryGirl.create(:organization)}
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+
+    let(:staff_user) { FactoryGirl.create(:user) }
+    let(:staff) do
+      s = FactoryGirl.create(:person, :with_work_email, :male)
+      s.user = staff_user
+      s
+    end
+
+    let (:broker_agency_account) { FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile) }
+    let (:employer_profile) do 
+      e = FactoryGirl.create(:employer_profile) 
+      e.broker_agency_accounts << broker_agency_account      
+      e
+    end
+    
+    it "should get details for employers where broker_agency_account is active" do
+
+      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_return(
+        [
+          double("enrollment", :total_premium => 500, :total_employee_cost => 200, :total_employer_contribution => 300 ),
+          double("enrollment",  :total_premium => 5000, :total_employee_cost => 2000, :total_employer_contribution => 3000 )
+        ]
+      )
+
+      staff.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
+      sign_in user
+      xhr :get, :employers_api, id: broker_agency_profile.id, format: :json
+      expect(response).to have_http_status(:success)
+      expect(assigns(:employer_details).count).to eq 1
+      expect(assigns(:employer_details)[0][:emails]).to include(staff.work_email.address)
+      expect(assigns(:employer_details)[0][:profile]).to eq employer_profile
+      expect(assigns(:employer_details)[0][:total_premium]).to eq 5500
+      expect(assigns(:employer_details)[0][:employee_contribution]).to eq 2200
+      expect(assigns(:employer_details)[0][:employer_contribution]).to eq 3300
+
+      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_call_original
+    end
+  end
+
   describe "family_index" do
     before :all do
       org = FactoryGirl.create(:organization)
