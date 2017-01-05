@@ -27,6 +27,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :is_disabled, type: Boolean, default: false
 
   before_save :clear_blank_fields
  #after_save :generate_family_search
@@ -96,8 +97,7 @@ class Family
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
             :allow_nil => true
-
-  validates :e_case_id, uniqueness: true, allow_nil: true
+            
   validate :family_integrity
 
   after_initialize :build_household
@@ -150,8 +150,8 @@ class Family
   scope :all_enrollments,                     ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id, ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id, ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
-  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".ne => "employer_sponsored") }
-  scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind" => "employer_sponsored") }
+  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
+  scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_enrollment_renewing,              ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
@@ -244,7 +244,7 @@ class Family
   def current_eligible_open_enrollments
     current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
   end
-
+  
   def current_ivl_eligible_open_enrollments
     eligible_open_enrollments = []
 
@@ -470,6 +470,11 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def ivl_unverified_enrollments
+    return [] if enrollments.empty?
+    enrollments.individual_market.verification_needed
+  end
+
   class << self
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
@@ -548,7 +553,7 @@ class Family
       end
     end
   end
-  
+
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
   end

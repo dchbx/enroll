@@ -200,8 +200,8 @@ class BrokerAgencies::QuotesController < ApplicationController
       update_params[:quote_benefit_groups_attributes] = update_params[:quote_benefit_groups_attributes].select {|k,v| update_params[:quote_benefit_groups_attributes][k][:id].present?}
       insert_params[:quote_benefit_groups_attributes] = insert_params[:quote_benefit_groups_attributes].select {|k,v| insert_params[:quote_benefit_groups_attributes][k][:id].blank?}
     end
-    if params[:commit] == "Add Family"
-      notice_message = "New family added."
+    if params[:commit] == "Add Employee"
+      notice_message = "New employee added."
       scrollTo = 1
     elsif params[:commit] == "Save Changes"
       notice_message = "Successfully saved quote/employee roster."
@@ -365,7 +365,6 @@ class BrokerAgencies::QuotesController < ApplicationController
      status: quote.aasm_state.capitalize,
      plan_name: bg.plan && bg.plan.name || 'None',
      dental_plan_name: "bg.dental_plan && bg.dental_plan.name" || 'None',
-     deductible_value: bg.deductible_for_ui,
     }
     bg.quote_relationship_benefits.each{|bp| bp_hash[bp.relationship] = bp.premium_pct}
     bg.quote_dental_relationship_benefits.each{|bp| bp_dental_hash[bp.relationship] = bp.premium_pct}

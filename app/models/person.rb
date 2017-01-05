@@ -50,7 +50,7 @@ class Person
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
-  field :no_ssn, type: String #ConsumerRole TODO TODOJF
+  field :no_ssn, type: String #ConsumerRole TODO / Enumeration is from the form wtf?
   # Login account
   belongs_to :user
 

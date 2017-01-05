@@ -15,7 +15,7 @@ class EmployeeRole
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
-  field :contact_method, type: String, default: "Only Paper communication"
+  field :contact_method, type: String, default: "Only Electronic communications"
   field :language_preference, type: String, default: "English"
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
@@ -95,6 +95,14 @@ class EmployeeRole
   alias_method :census_employee=, :new_census_employee=
   alias_method :census_employee, :new_census_employee
 
+  def is_cobra_status?
+    if census_employee.present?
+      census_employee.is_cobra_status?
+    else
+      false
+    end
+  end
+
   def coverage_effective_on
     if benefit_group.present?
       effective_on_date = benefit_group.effective_on_for(census_employee.hired_on)
@@ -109,6 +117,10 @@ class EmployeeRole
 
   def can_enroll_as_new_hire?    
     census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
+  end
+
+  def hired_on
+    census_employee.try(:hired_on) || (read_attribute(:hired_on).present? ? Date.parse(read_attribute(:hired_on).strftime('%Y/%m/%d')) : nil)
   end
 
   def is_active?

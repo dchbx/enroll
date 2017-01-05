@@ -112,6 +112,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     before do
       census_employee.census_dependents = [census_dependent]
       census_employee.save
+      #sick hackery
       plan_year.update_attributes({:aasm_state => 'published'})
     end
 
@@ -348,6 +349,290 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
 
       it "second family should be the first family" do
         expect(@second_census_employee).to eq @first_family
+      end
+    end
+  end
+
+  describe "initialize_dependents" do
+    let(:census_dependent){FactoryGirl.build(:census_dependent)}
+    let(:primary_applicant) {@family.primary_applicant}
+    let(:params) {valid_params}
+
+    before do
+      census_employee.census_dependents = [census_dependent]
+      census_employee.save
+      plan_year.publish!
+      #more sick hackery
+      plan_year.update_attributes({:aasm_state => 'published'})
+    end
+
+    context "and prior dependent exists with same dob and ssn" do
+      before do
+        @user = FactoryGirl.create(:user)
+        @person = FactoryGirl.create(:person, first_name: census_dependent.first_name, last_name: census_dependent.last_name,
+                                      dob: census_dependent.dob, ssn: census_dependent.ssn)
+
+        valid_person_params = {
+          user: @user,
+          first_name: census_employee.first_name,
+          last_name: census_employee.last_name,
+        }
+        valid_employee_params = {
+          ssn: census_employee.ssn,
+          gender: census_employee.gender,
+          dob: census_employee.dob,
+          hired_on: census_employee.hired_on
+        }
+        valid_params = { employer_profile: employer_profile }.merge(
+          valid_person_params
+        ).merge(valid_employee_params)
+        params = valid_params
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+        @primary_applicant = @family.primary_applicant
+      end
+
+      it "should have a family" do
+        expect(@family).to be_a Family
+      end
+
+      it "should be the primary applicant" do
+        expect(@employee_role.person).to eq @primary_applicant.person
+      end
+
+      it "should have linked the family" do
+        expect(CensusEmployee.find(census_employee.id).employee_role).to eq @employee_role
+      end
+
+      it "should have all family_members" do
+        expect(@family.family_members.count).to eq (census_employee.census_dependents.count + 1)
+      end
+
+      it "should contain a family member of the existing person" do
+        expect(@family.dependents.first.person).to eq @person
+      end
+
+      it "should set a home email" do
+        email = @employee_role.person.emails.first
+        expect(email.address).to eq @user.email
+        expect(email.kind).to eq "home"
+      end
+    end
+
+    context "and prior dependent exists with different dob and same ssn" do
+      before do
+        @user = FactoryGirl.create(:user)
+        @person = FactoryGirl.create(:person, first_name: census_dependent.first_name, last_name: census_dependent.last_name,
+                                      dob: census_employee.dob, ssn: census_dependent.ssn)
+
+        valid_person_params = {
+          user: @user,
+          first_name: census_employee.first_name,
+          last_name: census_employee.last_name,
+        }
+        valid_employee_params = {
+          ssn: census_employee.ssn,
+          gender: census_employee.gender,
+          dob: census_employee.dob,
+          hired_on: census_employee.hired_on
+        }
+        valid_params = { employer_profile: employer_profile }.merge(
+          valid_person_params
+        ).merge(valid_employee_params)
+        params = valid_params
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+        @primary_applicant = @family.primary_applicant
+      end
+
+      it "should have a family" do
+        expect(@family).to be_a Family
+      end
+
+      it "should be the primary applicant" do
+        expect(@employee_role.person).to eq @primary_applicant.person
+      end
+
+      it "should have linked the family" do
+        expect(CensusEmployee.find(census_employee.id).employee_role).to eq @employee_role
+      end
+
+      it "should have all family_members" do
+        expect(@family.family_members.count).to eq (census_employee.census_dependents.count + 1)
+      end
+
+      it "should not contain a family member of the existing person with different ssn" do
+        expect(@family.dependents.first.person).not_to eq @person
+      end
+
+      it "should create a new person with ssn and dob of census_dependent" do
+        expect(@family.dependents.first.person.ssn).to eq nil
+        expect(@family.dependents.first.person.dob).to eq census_dependent.dob
+      end
+
+      it "should set a home email" do
+        email = @employee_role.person.emails.first
+        expect(email.address).to eq @user.email
+        expect(email.kind).to eq "home"
+      end
+    end
+
+    context "and prior dependent does not match a person on ssn" do
+      before do
+        @user = FactoryGirl.create(:user)
+
+        valid_person_params = {
+          user: @user,
+          first_name: census_employee.first_name,
+          last_name: census_employee.last_name,
+        }
+        valid_employee_params = {
+          ssn: census_employee.ssn,
+          gender: census_employee.gender,
+          dob: census_employee.dob,
+          hired_on: census_employee.hired_on
+        }
+        valid_params = { employer_profile: employer_profile }.merge(
+          valid_person_params
+        ).merge(valid_employee_params)
+        params = valid_params
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+        @primary_applicant = @family.primary_applicant
+      end
+
+      it "should have a family" do
+        expect(@family).to be_a Family
+      end
+
+      it "should be the primary applicant" do
+        expect(@employee_role.person).to eq @primary_applicant.person
+      end
+
+      it "should have linked the family" do
+        expect(CensusEmployee.find(census_employee.id).employee_role).to eq @employee_role
+      end
+
+      it "should have all family_members" do
+        expect(@family.family_members.count).to eq (census_employee.census_dependents.count + 1)
+      end
+
+      it "should create a new person with ssn and dob of census_dependent" do
+        expect(@family.dependents.first.person.ssn).to eq census_dependent.ssn
+        expect(@family.dependents.first.person.dob).to eq census_dependent.dob
+      end
+
+      it "should set a home email" do
+        email = @employee_role.person.emails.first
+        expect(email.address).to eq @user.email
+        expect(email.kind).to eq "home"
+      end
+    end
+
+    context "and prior dependent exists with no ssn and matches on dob last/first name" do
+      let(:census_dependent){FactoryGirl.build(:census_dependent, ssn: nil)}
+
+      before do
+        @user = FactoryGirl.create(:user)
+
+        valid_person_params = {
+          user: @user,
+          first_name: census_employee.first_name,
+          last_name: census_employee.last_name,
+        }
+        valid_employee_params = {
+          ssn: census_employee.ssn,
+          gender: census_employee.gender,
+          dob: census_employee.dob,
+          hired_on: census_employee.hired_on
+        }
+        valid_params = { employer_profile: employer_profile }.merge(
+          valid_person_params
+        ).merge(valid_employee_params)
+        params = valid_params
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+        @primary_applicant = @family.primary_applicant
+      end
+
+      it "should have a family" do
+        expect(@family).to be_a Family
+      end
+
+      it "should be the primary applicant" do
+        expect(@employee_role.person).to eq @primary_applicant.person
+      end
+
+      it "should have linked the family" do
+        expect(CensusEmployee.find(census_employee.id).employee_role).to eq @employee_role
+      end
+
+      it "should have all family_members" do
+        expect(@family.family_members.count).to eq (census_employee.census_dependents.count + 1)
+      end
+
+      it "should create a new person with ssn and dob of census_dependent" do
+        expect(@family.dependents.first.person.ssn).to eq census_dependent.ssn
+        expect(@family.dependents.first.person.dob).to eq census_dependent.dob
+      end
+
+      it "should set a home email" do
+        email = @employee_role.person.emails.first
+        expect(email.address).to eq @user.email
+        expect(email.kind).to eq "home"
+      end
+    end
+
+    context "and prior dependent does not match a person on dob last/first name" do
+      before do
+        @user = FactoryGirl.create(:user)
+        @person = FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_dependent.last_name,
+                                      dob: census_employee.dob, ssn: census_dependent.ssn)
+
+        valid_person_params = {
+          user: @user,
+          first_name: census_employee.first_name,
+          last_name: census_employee.last_name,
+        }
+        valid_employee_params = {
+          ssn: census_employee.ssn,
+          gender: census_employee.gender,
+          dob: census_employee.dob,
+          hired_on: census_employee.hired_on
+        }
+        valid_params = { employer_profile: employer_profile }.merge(
+          valid_person_params
+        ).merge(valid_employee_params)
+        params = valid_params
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+        @primary_applicant = @family.primary_applicant
+      end
+
+      it "should have a family" do
+        expect(@family).to be_a Family
+      end
+
+      it "should be the primary applicant" do
+        expect(@employee_role.person).to eq @primary_applicant.person
+      end
+
+      it "should have linked the family" do
+        expect(CensusEmployee.find(census_employee.id).employee_role).to eq @employee_role
+      end
+
+      it "should have all family_members" do
+        expect(@family.family_members.count).to eq (census_employee.census_dependents.count + 1)
+      end
+
+      it "should not contain a family member of the existing person with different ssn" do
+        expect(@family.dependents.first.person).not_to eq @person
+      end
+
+      it "should create a new person with ssn and dob of census_dependent" do
+        expect(@family.dependents.first.person.ssn).to eq nil
+        expect(@family.dependents.first.person.dob).to eq census_dependent.dob
+      end
+
+      it "should set a home email" do
+        email = @employee_role.person.emails.first
+        expect(email.address).to eq @user.email
+        expect(email.kind).to eq "home"
       end
     end
   end

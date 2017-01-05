@@ -216,6 +216,16 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
+  def enable_or_disable_link  
+     getActionParams
+     @family.update_attribute(:is_disabled, !@family.is_disabled)
+     @element_to_replace_id = params[:family_actions_id]
+     flash[:notice] = (@family.is_disabled? ? 'Disabled' : 'Enabled') + " user " + @family.primary_family_member.person.full_name
+     respond_to do |format|
+       format.js { render inline: "location.reload();"  }
+     end
+  end
+
   def update_effective_date
     @qle = QualifyingLifeEventKind.find(params[:id])
     respond_to do |format|

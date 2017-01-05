@@ -186,6 +186,7 @@ When(/^the broker selects the Reference Dental Plan$/) do
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
+  wait_for_ajax
   click_button 'Publish Quote'
 end
 
@@ -196,4 +197,17 @@ end
 
 When(/^the broker clicks Dental Features$/) do
   find('.interaction-click-control-dental-features-and-cost-criteria').trigger 'click'
+end
+
+
+Then(/^the broker should see avaliable Quotes$/) do
+  find('#Tab\\:all').visible?
+  end
+
+When(/^the broker clicks on Actions\.$/) do
+  find_button('Actions').click
+end
+
+Then(/^view publish quote should be disabled\.$/) do
+  find_link('View Published Quote')['disabled'].should == 'disabled'
 end

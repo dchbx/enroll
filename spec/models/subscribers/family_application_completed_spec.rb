@@ -101,20 +101,6 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(subject).not_to receive(:log)
           subject.call(nil, nil, nil, nil, message)
         end
-
-        context "imports a payload with a different e_case_id/integrated_case_id" do
-
-          it "should log an error saying integrated_case_id does not match family " do
-            subject.call(nil, nil, nil, nil, message)
-            expect(subject).to receive(:log) do |arg1, arg2|
-              expect(arg1).to eq(message["body"])
-              expect(arg2[:error_message]).to match(/Integrated case id does not match existing family/)
-              expect(arg2[:severity]).to eq('critical')
-            end
-            family.update_attribute(:e_case_id, "some_other_id")
-            subject.call(nil, nil, nil, nil, message)
-          end
-        end
       end
 
       context "with another valid single person family" do

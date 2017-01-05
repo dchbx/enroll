@@ -146,7 +146,8 @@ $('button#remove_benefit_group_button').click(remove_benefit_group_handler);
 
 
 function addEmployeeRowToFamily(family, idx) {
-	var relation_options = '<select class="custom_selectric" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][employee_relationship]"><option value="employee">Employee</option><option value="spouse">Spouse</option><option value="domestic_partner">Domestic partner</option><option value="child_under_26">Child</option></select>';
+	var emp_option = $('#family-' + family).find('option:selected').text().includes('Employee')
+	var relation_options = '<select class="custom_selectric" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][employee_relationship]">'+isEmpSelected(emp_option)+'<option value="spouse">Spouse</option><option value="domestic_partner">Domestic partner</option><option value="child_under_26">Child</option></select>';
 	table_row = $('<div class="row form-inline">'
 								+ '<div class="form-group col-sm-3">DOB: <input type="text" class="uidatepicker" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][dob]" placeholder="Date of Birth (DOB)"/></div><div class="form-group col-sm-5">Name: <input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][first_name]" placeholder="First Name"/>&nbsp;<input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][last_name]" placeholder="Last Name"/></div><div class="form-group col-sm-3">' + relation_options + '</div>' +
 									'<div class="form-group col-sm-1"><button type="button" id="remove_member_button" data-quote-id="" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
@@ -159,6 +160,13 @@ function addEmployeeRowToFamily(family, idx) {
 									//$('select').selectric('refresh');
 }
 
+function isEmpSelected(emp_option){
+	if(emp_option){
+		return ''
+	}else{
+		return '<option value="employee">Employee</option>'
+	}
+}
 
 var duplicate_household = function() {
 	var url = '<%= Rails.application.routes.url_helpers.edit_broker_agencies_broker_role_quote_path(@broker.id, @quote.id) %>';

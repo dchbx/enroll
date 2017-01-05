@@ -35,4 +35,11 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb"  do
   it "should not have button of change plan" do
     expect(rendered).not_to have_selector('a', text: 'Change Plan')
   end
+
+  it "should show plan contact information" do
+    expect(rendered).to have_selector('div',text: 'Plan Contact Info')
+  end
+  it "should not show carrier contact information" do
+    expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
+  end
 end

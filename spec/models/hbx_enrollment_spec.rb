@@ -63,7 +63,6 @@ describe HbxEnrollment do
       expect(employer_profile.census_employees.size).to eq fte_count
     end
 
-
     context "and employees create employee roles and families" do
       let(:blue_collar_employee_roles) do
         bc_employees = blue_collar_census_employees.collect do |census_employee|
@@ -681,6 +680,42 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
   end
+
+  context "#propogate_waiver", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:census_employee) { FactoryGirl.create(:census_employee)}
+    let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
+    let(:enrollment_two) { FactoryGirl.create(:hbx_enrollment, :shop, household: family.active_household)}
+    before do
+      benefit_group_assignment.update_attribute(:hbx_enrollment_id, enrollment_two.id)
+      enrollment_two.update_attributes(benefit_group_id: benefit_group_assignment.benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id)
+    end
+    it "should return false if it is an ivl enrollment" do
+      expect(enrollment.propogate_waiver).to eq false
+    end
+
+    it "should return true for shop enrollment" do
+      expect(enrollment_two.propogate_waiver).to eq true
+    end
+
+    it "should waive the benefit group assignment if enrollment belongs to health & shop" do
+      enrollment_two.propogate_waiver
+      expect(enrollment_two.benefit_group_assignment.aasm_state).to eq "coverage_waived"
+    end
+
+    it "should not waive the benefit group assignment if enrollment belongs to dental" do
+      enrollment_two.update_attribute(:coverage_kind, "dental")
+      enrollment_two.propogate_waiver
+      expect(enrollment_two.benefit_group_assignment.aasm_state).not_to eq "coverage_waived"
+    end
+
+    it "should cancel the shop enrollment" do
+      enrollment_two.propogate_waiver
+      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
+    end
+  end
 end
 
 describe HbxProfile, "class methods", type: :model do
@@ -987,7 +1022,7 @@ describe HbxEnrollment, dbclean: :after_each do
   context ".effective_date_for_enrollment" do
     context 'when new hire' do
 
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record.beginning_of_month, created_at: TimeKeeper.date_of_record ) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record, created_at: TimeKeeper.date_of_record ) }
 
       it 'should return new hire effective date' do
         expect(employee_role.can_enroll_as_new_hire?).to be_truthy
@@ -1054,6 +1089,7 @@ describe HbxEnrollment, dbclean: :after_each do
     context 'when under open enrollment' do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
+        allow(employee_role.census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       end
 
       it "should return benefit group and assignment" do
@@ -1905,6 +1941,54 @@ context "A cancelled external enrollment", :dbclean => :after_each do
   end
 end
 
+context "for cobra", :dbclean => :after_each do
+  let(:enrollment) { HbxEnrollment.new }
+
+  context "is_cobra_status?" do
+    it "should return false" do
+      expect(enrollment.is_cobra_status?).to be_falsey
+    end
+
+    it "should return true" do
+      enrollment.kind = 'employer_sponsored_cobra'
+      expect(enrollment.is_cobra_status?).to be_truthy
+    end
+  end
+
+  context "future_enrollment_termination_date" do
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:coverage_termiante_date) { TimeKeeper.date_of_record + 1.months }
+
+    it "should return blank if not coverage_termination_pending" do
+      expect(enrollment.future_enrollment_termination_date).to eq ""
+    end
+
+    it "should return coverage_termiante_date by census_employee" do
+      census_employee.coverage_terminated_on = coverage_termiante_date
+      employee_role.census_employee = census_employee
+      enrollment.employee_role = employee_role
+      enrollment.aasm_state = "coverage_termination_pending"
+      expect(enrollment.future_enrollment_termination_date).to eq coverage_termiante_date
+    end
+  end
+
+  it "can_select_coverage?" do
+    enrollment.kind = 'employer_sponsored_cobra'
+    expect(enrollment.can_select_coverage?).to be_truthy
+  end
+
+  context "benefit_package_name" do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_package) { BenefitPackage.new(title: 'benefit package title') }
+    it "for shop" do
+      enrollment.kind = 'employer_sponsored'
+      enrollment.benefit_group = benefit_group
+      expect(enrollment.benefit_package_name).to eq benefit_group.title
+    end
+  end
+end
+
 context '.process_verification_reminders' do
   context "when family exists with pending outstanding verifications" do
 
@@ -2143,6 +2227,18 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
       end
     end
   end
+
+  context "market_name" do
+    it "for shop" do
+      enrollment.kind = 'employer_sponsored'
+      expect(enrollment.market_name).to eq 'Employer Sponsored'
+    end
+
+    it "for individual" do
+      enrollment.kind = 'individual'
+      expect(enrollment.market_name).to eq 'Individual'
+    end
+  end
 end
 
 describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all do
@@ -2192,6 +2288,42 @@ describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all
         expect(HbxEnrollment.find(hbx_enrollment.id).terminate_reason).to be_nil
       end
     end
+  end
+end
+
+describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :after_all do
+  let(:family)          { FactoryGirl.build(:individual_market_family) }
+  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, kind: 'individual') }
+
+  context "open enrollment" do
+    before do
+      hbx_enrollment.update(enrollment_kind: 'open_enrollment')
+    end
+
+    it "should return true when auto_renewing" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'auto_renewing')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return true when renewing_coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'renewing_coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return false when coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+    end
+  end
+
+  it "should return false when it is not open_enrollment" do
+    hbx_enrollment.update(enrollment_kind: 'special_enrollment')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+  end
+
+  it "should return false when it is individual" do
+    hbx_enrollment.update(kind: 'employer_sponsored')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
   end
 end
 

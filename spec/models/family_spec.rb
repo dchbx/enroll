@@ -4,14 +4,11 @@ describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
-  let(:enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
-                       household: household,
-                       coverage_kind: "health",
-                       enrollment_kind: "open_enrollment",
-                       aasm_state: 'shopping'
-    )
-  }
+  let(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+                           household: household,
+                           coverage_kind: "health",
+                           enrollment_kind: "open_enrollment",
+                           aasm_state: 'shopping') }
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
   let(:family_member_dependent) { FamilyMember.new(person: dependent) }
 
@@ -31,10 +28,6 @@ describe Family, "given a primary applicant and a dependent" do
     it "enrolled hbx enrollments should come from latest household" do
       expect(subject.enrolled_hbx_enrollments).to eq subject.latest_household.enrolled_hbx_enrollments
     end
-  end
-
-  context "#any_unverified_enrollments?" do
-
   end
 
   context "enrollments_for_display" do

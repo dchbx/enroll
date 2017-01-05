@@ -115,6 +115,25 @@
     </div>
     <% end %>
     <% end %>
+    <% if hbx_enrollment.future_enrollment_termination_date.present? %>
+      <div class="col-xs-12 vertically-aligned-row">
+        <div class="enrollment-effective info">
+          <p>
+            <strong>Future enrollment termination date: </strong>
+            <%= hbx_enrollment.future_enrollment_termination_date %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="col-xs-12 vertically-aligned-row">
+      <div class="enrollment-effective info">
+        <p>
+          <strong>Market Type: </strong>
+          <%= show_market_name_by_enrollment hbx_enrollment %>
+        </p>
+      </div>
+    </div>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">
         <p>
@@ -166,7 +185,7 @@
     </div>
     <div>
       <a class="vertically-aligned-row" data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
-        <i class="fa fa-phone fa-2x pull-left"></i>
+        <i class="fa fa-phone fa-2x pull-right"></i>
         <span>Plan Contact Info</span>
       </a>
       <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>

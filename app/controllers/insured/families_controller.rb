@@ -108,6 +108,17 @@ class Insured::FamiliesController < FamiliesController
     render :layout => 'application'
   end
 
+  # def generate_out_of_pocket_url
+  #   @person = Person.find(params[:id])
+  #   if @person && @person.has_active_employee_role?
+  #     census_employee=@person.active_employee_roles.first.census_employee
+  #     cs= ::CheckbookServices::PlanComparision.new(census_employee)
+  #     url = cs.generate_url
+  #     redirect_to url
+  #   else
+  #   end
+  # end
+
   def record_sep
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])

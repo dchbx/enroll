@@ -149,6 +149,31 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         end
       end
 
+      context "check_cobra_begin_date" do
+        it "should not have errors when existing_cobra is false" do
+          initial_census_employee.cobra_begin_date = initial_census_employee.hired_on - 5.days
+          initial_census_employee.existing_cobra = false
+          expect(initial_census_employee.save).to be_truthy
+        end
+
+        context "when existing_cobra is true" do
+          before do
+            initial_census_employee.existing_cobra = 'true'
+          end
+
+          it "should not have errors when hired_on earlier than cobra_begin_date" do
+            initial_census_employee.cobra_begin_date = initial_census_employee.hired_on + 5.days
+            expect(initial_census_employee.save).to be_truthy
+          end
+
+          it "should have errors when hired_on later than cobra_begin_date" do
+            initial_census_employee.cobra_begin_date = initial_census_employee.hired_on - 5.days
+            expect(initial_census_employee.save).to be_falsey
+            expect(initial_census_employee.errors[:cobra_begin_date].to_s).to match(/must be after Hire Date/)
+          end
+        end
+      end
+
       context "and it is saved" do
         before { initial_census_employee.save }
 
@@ -391,6 +416,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 end
 
+              end
+
+              context "and a roster match by dependents SSN and DOB is performed" do
+                before do
+                  initial_census_employee.census_dependents = [FactoryGirl.build(:census_dependent)]
+                  initial_census_employee.save
+                end
+
+                context "using non-matching dependent ssn and dob" do
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_census_dependents('000000000', Date.new(1700,01,01))).to eq []
+                  end
+                end
+
+                context "using matching dependent ssn and dob" do
+                  let(:valid_census_dependent) { initial_census_employee.census_dependents.first }
+
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_census_dependents(valid_census_dependent.ssn, valid_census_dependent.dob).to_a).to eq [initial_census_employee]
+                  end
+                end
               end
 
             end
@@ -649,6 +695,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     it "should success" do
+      census_employee.hired_on = TimeKeeper.date_of_record - 30.days
       census_employee.employment_terminated_on = TimeKeeper.date_of_record - 1.day
       expect(census_employee.valid?).to be_truthy
       expect(census_employee.errors[:employment_terminated_on].any?).to be_falsey
@@ -853,6 +900,50 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
   end
+
+  context "generate_and_deliver_checkbook_url" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
+    let(:plan){FactoryGirl.create(:plan)}
+    let(:builder){instance_double("ShopNotices::OutOfPocketNotice",:deliver => true)}
+    let(:notice_triggers){double("notice_triggers")}
+    let(:notice_trigger){instance_double("NoticeTrigger",:notice_template => "template",:mpi_indicator => "mpi_indicator")}
+
+    before do
+      allow(employer_profile).to receive(:plan_years).and_return([plan_year])
+      allow(census_employee).to receive(:employer_profile).and_return(employer_profile)
+      allow(census_employee).to receive_message_chain(:employer_profile,:plan_years).and_return([plan_year])
+      allow(census_employee).to receive_message_chain(:active_benefit_group,:reference_plan).and_return(plan)
+      allow(notice_triggers).to receive(:first).and_return(notice_trigger)
+      allow(notice_trigger).to receive_message_chain(:notice_builder,:camelize,:constantize,:new).and_return(builder)
+      allow(notice_trigger).to receive_message_chain(:notice_trigger_element_group,:notice_peferences).and_return({})
+      allow(ApplicationEventKind).to receive_message_chain(:where,:first).and_return(double("ApplicationEventKind",{:notice_triggers => notice_triggers,:title => "title"}))
+      allow_any_instance_of(CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
+    end
+    context "#generate_and_deliver_checkbook_url" do
+      it "should create a builder and deliver without expection" do
+        expect{census_employee.generate_and_deliver_checkbook_url}.not_to raise_error
+      end
+
+      it 'should trigger deliver' do
+        expect(builder).to receive(:deliver)
+        census_employee.generate_and_deliver_checkbook_url
+      end
+    end
+
+    context "#generate_and_save_to_temp_folder " do
+      it "should builder and save without expection" do
+        expect{census_employee.generate_and_save_to_temp_folder}.not_to raise_error
+      end
+
+       it 'should not trigger deliver' do
+        expect(builder).not_to receive(:deliver)
+        census_employee.generate_and_save_to_temp_folder
+      end
+    end
+  end
+
 
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
@@ -1117,6 +1208,176 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "current_state" do
+    let(:census_employee) { CensusEmployee.new }
+
+    context "existing_cobra is true" do
+      before :each do
+        census_employee.existing_cobra = 'true'
+      end
+
+      it "should return cobra_terminated" do
+        census_employee.aasm_state = CensusEmployee::COBRA_STATES.last
+        expect(census_employee.current_state).to eq CensusEmployee::COBRA_STATES.last.humanize
+      end
+    end
+
+    context "existing_cobra is false" do
+      it "should return aasm_state" do
+        expect(census_employee.current_state).to eq 'eligible'.humanize
+      end
+    end
+  end
+
+  context "is_cobra_status?" do
+    let(:census_employee) { CensusEmployee.new }
+
+    context 'when existing_cobra is true' do
+      before :each do
+        census_employee.existing_cobra = 'true'
+      end
+
+      it "should return true" do
+        expect(census_employee.is_cobra_status?).to be_truthy
+      end
+
+      it "aasm_state should be cobra_eligible" do
+        expect(census_employee.aasm_state).to eq 'cobra_eligible'
+      end
+    end
+
+    context "when existing_cobra is false" do
+      before :each do
+        census_employee.existing_cobra = false
+      end
+
+      it "should return false when aasm_state not equal cobra" do
+        census_employee.aasm_state = 'eligible'
+        expect(census_employee.is_cobra_status?).to be_falsey
+      end
+
+      it "should return true when aasm_state equal cobra_linked" do
+        census_employee.aasm_state = 'cobra_linked'
+        expect(census_employee.is_cobra_status?).to be_truthy
+      end
+    end
+  end
+
+  context "existing_cobra" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+
+    it "should return true" do
+      CensusEmployee::COBRA_STATES.each do |state|
+        census_employee.aasm_state = state
+        expect(census_employee.existing_cobra).to be_truthy
+      end
+    end
+  end
+
+  context "have_valid_date_for_cobra?" do
+    let(:hired_on) { TimeKeeper.date_of_record }
+    let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: hired_on) }
+    before :each do
+      census_employee.terminate_employee_role!
+    end
+
+    it "can cobra employee_role" do
+      census_employee.cobra_begin_date = hired_on + 10.days
+      census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
+      census_employee.cobra_begin_date = TimeKeeper.date_of_record
+      expect(census_employee.may_elect_cobra?).to be_truthy
+    end
+
+    it "can not cobra employee_role" do
+      census_employee.cobra_begin_date = hired_on + 10.days
+      census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months - 5.days
+      census_employee.cobra_begin_date = TimeKeeper.date_of_record
+      expect(census_employee.may_elect_cobra?).to be_falsey
+    end
+
+    context "current date is less then 6 months after coverage_terminated_on" do
+      before :each do
+        census_employee.cobra_begin_date = hired_on + 10.days
+        census_employee.coverage_terminated_on = TimeKeeper.date_of_record - Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
+      end
+
+      it "when cobra_begin_date is early than coverage_terminated_on" do
+        census_employee.cobra_begin_date = census_employee.coverage_terminated_on - 5.days
+        expect(census_employee.may_elect_cobra?).to be_falsey
+      end
+
+      it "when cobra_begin_date is later than 6 months after coverage_terminated_on" do
+        census_employee.cobra_begin_date = census_employee.coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months + 5.days
+        expect(census_employee.may_elect_cobra?).to be_falsey
+      end
+    end
+
+    it "can not cobra employee_role" do
+      census_employee.cobra_begin_date = hired_on - 10.days
+      expect(census_employee.may_elect_cobra?).to be_falsey
+    end
+
+    it "can not cobra employee_role without cobra_begin_date" do
+      census_employee.cobra_begin_date = nil
+      expect(census_employee.may_elect_cobra?).to be_falsey
+    end
+  end
+
+  context "can_elect_cobra?" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should return false when aasm_state is eligible" do
+      expect(census_employee.can_elect_cobra?).to be_falsey
+    end
+
+    it "should return true when aasm_state is employment_terminated" do
+      census_employee.aasm_state = 'employment_terminated'
+      expect(census_employee.can_elect_cobra?).to be_truthy
+    end
+
+    it "should return true when aasm_state is cobra_terminated" do
+      census_employee.aasm_state = 'cobra_terminated'
+      expect(census_employee.can_elect_cobra?).to be_falsey
+    end
+  end
+
+  context "has_hbx_enrollments?" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+
+    it "should return flase without employee_role" do
+      allow(census_employee).to receive(:employee_role).and_return nil
+      expect(census_employee.has_hbx_enrollments?).to be_falsey
+    end
+
+    it "should return true" do
+      allow(census_employee).to receive(:employee_role).and_return employee_role
+      allow(census_employee).to receive(:benefit_group_assignments).and_return [benefit_group_assignment]
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return hbx_enrollment
+      expect(census_employee.has_hbx_enrollments?).to be_truthy
+    end
+  end
+
+  context "is_linked?" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should return true when aasm_state is employee_role_linked" do
+      census_employee.aasm_state = 'employee_role_linked'
+      expect(census_employee.is_linked?).to be_truthy
+    end
+
+    it "should return true when aasm_state is cobra_linked" do
+      census_employee.aasm_state = 'cobra_linked'
+      expect(census_employee.is_linked?).to be_truthy
+    end
+
+    it "should return false" do
+      expect(census_employee.is_linked?).to be_falsey
+    end
+  end
+
   context '.enrollments_for_display' do
 
     let!(:employer_profile)          { FactoryGirl.create(:employer_profile) }
@@ -1260,7 +1521,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.ssn).not_to eq person.ssn
       expect(census_employee.dob).not_to eq person.dob
     end
-
   end
 
   context "check_hired_on_before_dob" do
@@ -1373,5 +1633,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
 
+  end
+  describe "search_hash" do
+    context 'census search query' do
+      it "should return query string for census employee name" do
+        employee_search = "test1"
+        expected_result = {"$or"=>[{"first_name"=>/test1/i}, {"last_name"=>/test1/i}, {"encrypted_ssn"=>"+MZq0qWj9VdyUd9MifJWpQ=="}]}
+        result=CensusEmployee.search_hash(employee_search)
+        expect(result).to eq expected_result
+      end
+    end
   end
 end

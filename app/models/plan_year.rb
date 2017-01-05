@@ -3,11 +3,12 @@ class PlanYear
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   embedded_in :employer_profile
 
   PUBLISHED = %w(published enrolling enrolled active suspended)
-  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled)
+  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated ineligible expired renewing_canceled migration_expired)
@@ -519,6 +520,12 @@ class PlanYear
     %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active).include? aasm_state
   end
 
+  def application_warnings
+    if !is_application_valid?
+      application_eligibility_warnings.each_pair(){ |key, value| self.errors.add(:base, value) }
+    end
+  end
+
   class << self
     def find(id)
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
@@ -720,14 +727,15 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid? , :after => :trigger_renew_notice
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_renew_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_renew_notice]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
-    # Returns plan to draft state for edit
+    # Returns plan to draft state (or) renewing draft for edit
     event :withdraw_pending, :after => :record_transition do
       transitions from: :publish_pending, to: :draft
+      transitions from: :renewing_publish_pending, to: :renewing_draft
     end
 
     # Plan as submitted failed eligibility check
@@ -738,8 +746,8 @@ class PlanYear
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
 
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => :trigger_auto_renew_notice
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => [:accept_application, :trigger_auto_renew_notice]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_valid?, :after => [:trigger_auto_renew_notice]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -923,23 +931,12 @@ private
 
   def trigger_renew_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3a').first
-    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
-                                                  :subject => "PlanYear Renewal Notice(3A)",
-                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
-                                                  :template => application_event.notice_triggers.first.notice_template})
-    shop_notice.deliver
+    self.employer_profile.trigger_notices("planyear_renewal_3a")
   end
 
   def trigger_auto_renew_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    application_event = ApplicationEventKind.where(:event_name => 'planyear_renewal_3b').first
-    shop_notice =ShopNotices::EmployerNotice.new({:employer_profile=> employer_profile,
-                                                  :subject => "PlanYear Renewal Notice(3B)",
-                                                  :trigger_type => "auto",
-                                                  :mpi_indicator => application_event.notice_triggers.first.mpi_indicator,
-                                                  :template => application_event.notice_triggers.first.notice_template})
-    shop_notice.deliver
+    self.employer_profile.trigger_notices("planyear_renewal_3b")
   end
 
   def record_transition

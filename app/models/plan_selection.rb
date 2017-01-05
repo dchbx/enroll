@@ -35,6 +35,7 @@ class PlanSelection
       sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id : hbx_enrollment.family.earliest_effective_ivl_sep.id
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
+    hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
     hbx_enrollment.select_coverage!
   end
 

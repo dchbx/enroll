@@ -66,6 +66,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:employee_role) { EmployeeRole.new }
   let(:household) {double("Household", hbx_enrollments: hbx_enrollments)}
   let(:hbx_enrollments) {double("HbxEnrollment")}
+  let(:coverage_household) {double("CoverageHousehold", is_immediate_family: true)}
 
   context "POST checkout" do
     before do
@@ -382,6 +383,44 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         post :waive, id: hbx_enrollment.id, waiver_reason: "waiver"
         expect(wavied_enrollment.coverage_kind).to eq 'health'
       end
+    end
+  end
+
+  context "POST waive without shopping state" do
+    before :each do
+      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_return(true)
+      allow(hbx_enrollment).to receive(:shopping?).and_return(false)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:active_household).and_return(household)
+      allow(household).to receive(:coverage_households).and_return(coverage_household)
+      allow(household).to receive(:immediate_family_coverage_household).and_return coverage_household
+      allow(coverage_household).to receive(:household).and_return household
+      sign_in user
+    end
+    it "should get success flash message if new_hbx_enrollment_from not raise an error" do
+      allow(household).to receive(:new_hbx_enrollment_from).and_return hbx_enrollment
+      allow(hbx_enrollment).to receive(:generate_hbx_signature).and_return hbx_enrollment
+      allow(hbx_enrollment).to receive(:save!).and_return(true)
+      allow(hbx_enrollment).to receive(:household).and_return household
+      allow(household).to receive(:reload).and_return hbx_enrollment
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:save).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(true)
+      allow(hbx_enrollment).to receive(:coverage_kind=).with("health")
+      allow(hbx_enrollment).to receive(:coverage_kind).and_return("health")
+      post :waive, id: "hbx_id", waiver_reason: "waiver"
+      expect(flash[:notice]).to eq "Waive Coverage Successful"
+      expect(response).to be_redirect
+    end
+
+    it "should get failure flash message if new_hbx_enrollment_from raise an error" do
+      allow(household).to receive(:new_hbx_enrollment_from).and_raise "You may not enroll until you're eligible under an enrollment period."
+      post :waive, id: "hbx_id", waiver_reason: "waiver"
+      expect(flash[:alert]).to eq "Waive Coverage Failed"
+      expect(response).to be_redirect
     end
   end
 

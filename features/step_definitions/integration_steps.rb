@@ -94,7 +94,22 @@ def people
       ssn: defined?(@u) ? @u.ssn : "761234567",
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
-
+    },
+    "Jack Cobra" => {
+      first_name: "Jack",
+      last_name: "Cobra",
+      dob: "08/10/1960",
+      ssn: "196008107",
+      email: "jack@cobra.com",
+      password: 'aA1!aA1!aA1!'
+    },
+    "Jack Employee" => {
+      first_name: "Jack",
+      last_name: "Employee",
+      dob: "08/10/1960",
+      ssn: "196008111",
+      email: "jack@employee.com",
+      password: 'aA1!aA1!aA1!'
     },
     "Tim Wood" => {
       first_name: "Tim",
@@ -160,6 +175,19 @@ def default_office_location
   city: "Washington",
   state: "DC",
   zip: "20001",
+  phone_area_code: "202",
+  phone_number: "1110000",
+  phone_extension: "1111"
+  }
+end
+
+def non_dc_office_location
+  {
+  address1: "623a Spalding Ct",
+  address2: "Suite 200",
+  city: "Falls Church",
+  state: "VA",
+  zip: "22045",
   phone_area_code: "202",
   phone_number: "1110000",
   phone_extension: "1111"
@@ -286,7 +314,20 @@ When(/^.+ enters? office location for (.+)$/) do |location|
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
 end
 
-When(/^(.+) creates? a new employer profile$/) do |named_person|
+When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
+  old_add = eval(old_add) if old_add.class == String
+  new_add = eval(new_add) if new_add.class == String
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => new_add[:address1]
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => new_add[:address2]
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => new_add[:city]
+
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), '#{old_add[:state]}')]]").click
+  find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{new_add[:state]}')]").click
+
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => new_add[:zip]
+end
+
+When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, primary_location|
   employer = people[named_person]
   fill_in 'organization[first_name]', :with => employer[:first_name]
   fill_in 'organization[last_name]', :with => employer[:last_name]
@@ -302,7 +343,7 @@ When(/^(.+) creates? a new employer profile$/) do |named_person|
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
 
   find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
-  step "I enter office location for #{default_office_location}"
+  step "I enter office location for #{primary_location}"
   fill_in 'organization[email]', :with => Forgery('email').address
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
@@ -358,7 +399,7 @@ Given(/^(.+) has not signed up as an HBX user$/) do |actor|
   step "I use unique values"
 end
 
-When(/^I visit the Employer portal$/) do
+When(/^.* visit the Employer portal$/) do
   visit "/"
   page.click_link 'Employer Portal'
   screenshot("employer_start")

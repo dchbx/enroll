@@ -69,6 +69,7 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :enable_or_disable_link
       end
 
       member do
@@ -134,6 +135,7 @@ Rails.application.routes.draw do
       member do
         post 'unblock'
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -229,6 +231,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        post 'generate_checkbook_urls'
       end
       collection do
         get 'welcome'
@@ -267,6 +270,8 @@ Rails.application.routes.draw do
         get :delink
         get :terminate
         get :rehire
+        get :cobra
+        get :cobra_reinstate
         get :benefit_group, on: :member
       end
     end

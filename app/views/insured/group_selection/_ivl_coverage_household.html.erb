@@ -8,7 +8,7 @@
           #TEMPORARY CODE DO NOT COPY   TODO
           role = family_member.person.consumer_role
           family = family_member.family
-          rule = InsuredEligibleForBenefitRule.new(role, @benefit, family: family)
+          rule = InsuredEligibleForBenefitRule.new(role, @benefit, {coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, family: family})
           is_coverage, errors = rule.satisfied?
           @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
           errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}

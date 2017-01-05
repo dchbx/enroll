@@ -433,4 +433,24 @@ RSpec.describe Organization, dbclean: :after_each do
       end
     end
   end
+
+  describe "notify_legal_or_fein_change" do
+
+    context "notify update" do
+      let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+      let(:organization) {FactoryGirl.create(:organization, employer_profile:employer_profile)}
+
+      it "notify if legal name updated" do
+        expect(organization).to receive(:notify).exactly(1).times
+        organization.legal_name = "test1"
+        organization.save!
+      end
+
+      it "notify if fein updated" do
+        expect(organization).to receive(:notify).exactly(1).times
+        organization.fein ="000000001"
+        organization.save
+      end
+    end
+  end
 end

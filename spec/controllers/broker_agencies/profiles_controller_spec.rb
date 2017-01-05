@@ -204,8 +204,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "family_index" do
     before :all do
       org = FactoryGirl.create(:organization)
-      broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: org)
-      broker_role = FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id)
+      @broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization: org,aasm_state:'active')
+      broker_role = FactoryGirl.create(:broker_role, broker_agency_profile_id: @broker_agency_profile1.id, aasm_state:'active')
       person = broker_role.person
       @current_user = FactoryGirl.create(:user, person: person, roles: [:broker])
       families = []
@@ -220,10 +220,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
 
     it 'should render 21 familes' do
-      current_user = @current_user
-      allow(current_user).to receive(:has_broker_role?).and_return(true)
-      sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id
+      sign_in @current_user
+      xhr :get, :family_index, id: @broker_agency_profile1.id
       expect(assigns(:families).count).to eq(21)
       expect(assigns(:page_alphabets).count).to eq(2)
       expect(assigns(:page_alphabets)).to include("J")
@@ -234,7 +232,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, page: 'J'
+      broker_agency_profile.update_attributes!(aasm_state:'active')
+      xhr :get, :family_index, id: @broker_agency_profile1.id, page: 'J'
       expect(assigns(:families).count).to eq(3)
     end
 
@@ -242,7 +241,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, q: 'Smith'
+      broker_agency_profile.update_attributes!(aasm_state:'active')
+      xhr :get, :family_index, id: @broker_agency_profile1.id, q: 'Smith'
       expect(assigns(:families).count).to eq(27)
     end
 
@@ -250,7 +250,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, q: 'jones3'
+      xhr :get, :family_index, id: @broker_agency_profile1.id, q: 'jones3'
       expect(assigns(:families).count).to eq(1)
     end
   end

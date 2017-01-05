@@ -3,6 +3,8 @@ class Organization
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Acapi::Notifiers
+  extend Acapi::Notifiers
 
   extend Mongorder
 
@@ -17,6 +19,8 @@ class Organization
     "governmental_employer",
     "foreign_embassy_or_consulate"
   ]
+
+  FIELD_AND_EVENT_NAMES = {"legal_name" => "name_changed", "fein" => "fein_changed"}
 
   field :hbx_id, type: String
 
@@ -103,6 +107,7 @@ class Organization
   index({"employer_profile.general_agency_accounts._id" => 1})
 
   before_save :generate_hbx_id
+  after_update :notify_legal_or_fein_change
 
   default_scope                               ->{ order("legal_name ASC") }
   scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -192,6 +197,15 @@ class Organization
   def primary_office_location
     office_locations.detect(&:is_primary?)
   end
+
+  def mailing_address
+    mailing_address.select{|office| office.address.kind == 'mailing'}.first
+  end
+
+  # def billing_address
+  #   primary_office_location
+  # end
+
 
   def self.search_by_general_agency(search_content)
     Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
@@ -322,6 +336,33 @@ class Organization
     end
   end
 
+  def notify_legal_or_fein_change
+    return unless self.employer_profile.present?
+    changed_fields = changed_attributes.keys
+    FIELD_AND_EVENT_NAMES.each do |feild, event_name|
+      if changed_fields.include?(feild)
+        notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
+      end
+    end
+  end
+
+  def notify_address_change(old_address_attribute,new_address_attribute)
+    changed_address = []
+    old_address_dup = old_address_attribute.clone
+    new_address_attribute["office_locations_attributes"].each_value do |address|
+      old_address = old_address_dup.select{|s| s["address"]["kind"] == address["address_attributes"]["kind"]}
+      old_address_dup.delete_if{|s| s["address"]["kind"] == address["address_attributes"]["kind"]}
+      keys = address["address_attributes"].keys
+      new_address_values = address["address_attributes"].values
+      old_addres_values = old_address.present? ? keys.map{|k| old_address[0]["address"]["#{k}"]} : []
+      changed_address << (new_address_values == old_addres_values)
+    end
+    changed_address << false if old_address_dup.present?
+    unless changed_address.all?
+      notify("acapi.info.events.employer.address_changed", {employer_id: self.hbx_id, event_name: "address_changed"})
+    end
+
+  end
 
   class << self
     def employer_profile_renewing_starting_on(date_filter)

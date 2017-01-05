@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe TimeHelper, :type => :helper do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
   let(:enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
 

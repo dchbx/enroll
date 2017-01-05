@@ -28,6 +28,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
+    allow_any_instance_of(PlanYear).to receive(:trigger_renew_notice).and_return(true)
   end
 
   context ".new" do
@@ -107,6 +109,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
+
+    it "contains the correct renewing states" do
+      expect(PlanYear::RENEWING).to eq %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
+    end
 
     it "census employees should not be matchable" do
       expect(plan_year.is_eligible_to_match_census_employees?).to be_falsey
@@ -2426,6 +2432,7 @@ describe PlanYear, "plan year schedule changes" do
     context 'on force publish date' do
 
       before do
+        allow_any_instance_of(PlanYear).to receive(:trigger_auto_renew_notice).and_return(true)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 

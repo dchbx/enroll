@@ -12,6 +12,9 @@
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
   </div>
+  <%#if @person.has_active_employee_role? %>
+    <%#=render partial: 'out_of_pocket_calculator'%> <br/>
+  <% #end %> 
   <div class="row">
     <div class="col-md-8">
       <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>

@@ -37,6 +37,14 @@ RSpec.describe HbxAdminHelper, :type => :helper do
         expect(helper.aptc_csr_data_type(current_year, Date::ABBR_MONTHNAMES[current_month])).to eq "current-aptc-csr-data"
       end
     end
+
+    context "returns inactive enrollments" do
+      it "returns all cancelled and terminated enrollments" do
+        expect(helper.inactive_enrollments(family, TimeKeeper.date_of_record.year)).to be_an_instance_of Mongoid::Criteria
+        expect(helper.inactive_enrollments(family, TimeKeeper.date_of_record.year).selector["aasm_state"]["$in"]).to include("coverage_canceled", "coverage_terminated")
+      end
+    end
+
   end
 
 end

@@ -181,15 +181,12 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   fill_in 'census_employee[first_name]', :with => 'Patrick'
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
   fill_in 'census_employee[ssn]', :with => '786120965'
-  find('.darkblue').click
+  find('.census-employee-add').click
   find(:xpath, '//p[@class="label"][contains(., "GA")]').click
   find(:xpath, "//li[contains(., 'VA')]").click
 
-  fill_in 'census_employee[census_dependents_attributes][0][first_name]', :with => "Mariah"
+  fill_in 'census_employee[first_name]', :with => "Mariah"
   find('label[for=census_employee_is_business_owner]').click
-
-  find('.selectric-interaction-choice-control-census-employee-census-dependents-attributes-0-employee-relationship').click
-  find('.label', text: 'Child').click
 
   screenshot("update_census_employee_with_data")
   click_button 'Update Employee'
@@ -211,6 +208,19 @@ When(/^.+ clicks on terminate button for a census family$/) do
   @browser.a(text: /Submit/).wait_until_present
   @browser.a(text: /Submit/).click
 end
+
+When(/^.+ clicks on terminate button for a census family for invalid case$/) do
+ wait_for_ajax
+ find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[7]/i').click
+ find(".date-picker").set(TimeKeeper.date_of_record - 75.days)
+ # fill_in ".date-picker", :with => TimeKeeper.date_of_record - 75.days
+ find('h1', text: "Employee Roster").click
+ find(".delete_confirm").click
+ expect(find('.alert')).to have_content('Census Employee could not be terminated: Termination date must be within the past 60 days.')
+ expect(page).to have_content("John")
+
+end
+
 
 When(/^.+ clicks on terminate button for rehired census employee$/) do
   @browser.a(text: /Terminate/).wait_until_present
@@ -377,7 +387,11 @@ When(/^.+ clicks? on publish plan year$/) do
   find('.interaction-click-control-publish-plan-year').click
 end
 
-Then(/^.+ should see Publish Plan Year Modal with warnings$/) do
+Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
+  expect(find('.modal-body')).to have_content('Primary office must be located in District of Columbia')
+end
+
+Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
   expect(find('.modal-body')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
 end
 
@@ -385,9 +399,19 @@ Then(/^.+ clicks? on the Cancel button$/) do
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 
+Then(/^.+ should be on the business info page with warnings$/) do
+  expect(page).to have_content 'Primary Office Location'
+  expect(find('.alert-error')).to have_content('Primary office must be located in District of Columbia')
+end
+
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   expect(page).to have_css('#plan_year')
   expect(find('.alert-plan-year')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
+end
+
+Then(/^.+ updates the address location with correct address$/) do
+  step "I updates office location from #{non_dc_office_location} to #{default_office_location}"
+  find('.interaction-click-control-save').click
 end
 
 Then(/^.+ updates? the FTE field with valid input and save plan year$/) do

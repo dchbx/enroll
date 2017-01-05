@@ -43,8 +43,6 @@ QuotePageLoad = (function() {
       if ((criteria_type == 'nationwide') && (criteria_value != String(plan['nationwide']))) {result=false; break; }
       if ((criteria_type == 'dc_in_network') && (criteria_value != String(plan['dc_in_network']))) {result=false; break; }
     }
-    if (parseInt(plan['deductible']) > parseInt(deductible_value)) {result=false}
-
     return result
   }
   var _set_plan_counts = function() {
@@ -59,10 +57,10 @@ QuotePageLoad = (function() {
   var toggle_plans = function(criteria){
     if(criteria.length== 0){
         $.each($('.plan_selectors .active'), function() {
-            var criteria_type = this.parentNode.id
+            var criteria_type = this.parentNode.parentNode.id
             var criteria_value = this.id
             if (criteria_value != 'any') {criteria.push([criteria_type,criteria_value])}
-     })
+       })
     }
     else{
       _turn_off_criteria()
@@ -88,7 +86,7 @@ QuotePageLoad = (function() {
         broker_role_id: $('#broker_role_id').val(),
         benefit_id: $('#benefit_group_select option:selected').val(),
         criteria_for_ui: JSON.stringify(criteria),
-        deductible_for_ui: deductible_value },
+      },
       url: '/broker_agencies/broker_roles/'+$('#broker_role_id').val()+'/quotes/criteria.js'
     })
   }
@@ -142,9 +140,6 @@ QuotePageLoad = (function() {
               roster_premiums = response['roster_premiums']
               dental_roster_premiums = response['dental_roster_premiums']
               _turn_off_criteria()
-              deductible_value = parseInt(response['summary']['deductible_value'])
-              $('#ex1').bootstrapSlider('setValue', deductible_value)
-              $('#ex1_input').val(deductible_value)
               toggle_plans(response['criteria'])
               _set_benefits()
               Quote.set_plan_costs()
@@ -195,11 +190,42 @@ QuotePageLoad = (function() {
     })
   }
 
+  var disable_nationwide_if_dc_selected = function(selected) {
+    var criteria_id = selected.parentNode.parentNode.id
+    if (criteria_id == 'dc_in_network') {
+      if (selected.id == 'true' && selected.checked) {
+        $('#nationwide #any').prop('checked', true).addClass('active')
+        $('#nationwide #true').prop('checked', false).removeClass('active')
+        $('#nationwide #false').prop('checked', false).removeClass('active')
+        $('#nationwide').addClass('blocking')
+      }
+      else if ($('#nationwide').hasClass('blocking')) {
+        $('#nationwide #any').prop('checked', true).addClass('active')
+        $('#nationwide #true').prop('checked', false).removeClass('active')
+        $('#nationwide #false').prop('checked', false).removeClass('active')
+        $('#nationwide').removeClass('blocking')
+      }
+    }
+  }
+
   var page_load_listeners = function() {
       $('.plan_selectors .criteria').on('click',function(){
-          selected=this; sibs = $(selected).siblings();
-          $.each(sibs, function(){ this.className='criteria' }) ;
-          selected.className='active';
+          console.log(this)
+          selected=this;
+          sibs = $(selected.parentNode).siblings();
+          $.each(sibs, function(){
+            var cousins = $(this).children()
+            if(typeof(cousins[0]) != 'undefined') {
+              classList = cousins[0].classList
+              if(classList.length > 0 && classList.value.indexOf('active') > 0) {
+                this.checked = false
+                $(cousins[0]).removeClass('active')
+                $(cousins[0]).prop('checked', false)
+              };
+            };
+          });
+          if (selected.checked)  this.classList.add('active');
+          disable_nationwide_if_dc_selected(selected);
           toggle_plans([])
           reset_selected_plans()
       })
@@ -279,8 +305,6 @@ QuotePageLoad = (function() {
       page_load_listeners: page_load_listeners,
       configure_benefit_group: configure_benefit_group,
       view_details: view_details,
-      toggle_plans: toggle_plans,
-      reset_selected_plans: reset_selected_plans,
       set_select_health_plans: set_select_health_plans,
       relationship_benefits: function(){return relationship_benefits},
       dental_relationship_benefits: function(){return dental_relationship_benefits},
