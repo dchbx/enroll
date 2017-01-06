@@ -51,6 +51,15 @@ module Subscribers
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
       throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
+      new_person_flag = false
+      if active_household.tax_households.size == 0
+        if active_verified_tax_households.present?
+          primary_tax_household_member = active_verified_tax_households.first.tax_household_members.detect{ |th| th.id.split('#').last == active_verified_tax_households.first.primary_applicant_id}
+           if primary_tax_household_member.is_medicaid_chip_eligible == false && active_verified_tax_households.first.eligibility_determinations.present?
+             new_person_flag = true
+          end
+        end
+      end
       family.e_case_id = verified_family.integrated_case_id if family.e_case_id.blank? || (family.e_case_id.include? "curam_landing")
       begin
         active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
@@ -84,6 +93,7 @@ module Subscribers
       end
       family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
       family.save!
+      UserMailer.plan_shopping_initiated(primary_person).deliver_now if new_person_flag
     end
 
     def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
