@@ -118,7 +118,6 @@ class Exchanges::ResidentsController < ApplicationController
   def update
     # need to add @resident_role to pundit?
     # authorize @resident_role, :update?
-    binding.pry
     save_and_exit =  params['exit_after_method'] == 'true'
     if save_and_exit
       respond_to do |format|

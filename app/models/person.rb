@@ -91,7 +91,7 @@ class Person
   embeds_many :documents, as: :documentable
 
 
-  accepts_nested_attributes_for :consumer_role, :resident_role, :responsible_party, :broker_role, :hbx_staff_role,
+  accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
