@@ -30,13 +30,6 @@
     <%= hidden_field_tag 'person_id', @person.try(:id) %>
     <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) %>
     <%= hidden_field_tag 'shop_for_plans', 'shop_for_plans' %>
-        <% if @hbx_enrollments.present? %>
-        <%= hidden_field_tag 'change_plan', 'change_plan' %>
-        <% end %>
-
-        <%= hidden_field_tag 'person_id', @person.try(:id) %>
-        <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) %>
-        <%= hidden_field_tag 'shop_for_plans', 'shop_for_plans' %>
 
         <div class="panel panel-default" id='shop-for-plans-widget'>
           <div class="panel-body">
@@ -47,12 +40,6 @@
                 </div>
                 <strong>Shop for health and dental plans</strong>
               </div>
-              <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%>">
-                <%= submit_tag 'Shop for Plans', class: "btn btn-default pull-right" %>
-              </div>
-            </div>
-            <strong>Shop for health and dental plans</strong>
-          </div>
           <% if @family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)%>
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%> ">
               <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
@@ -69,6 +56,7 @@
     </div>
   <% end %>
 <% end %>
+
 <div aria-labelledby="myModalLabel" class="modal fade" id="choose_flow" role="dialog" tabindex="-1">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
