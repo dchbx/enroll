@@ -35,7 +35,7 @@
 
     <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 right-section">
       <% if @change_plan.blank? %>
-        <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: true, button_continue: false} %>
+        <%= render partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: true, button_continue: false} %>
       <% else %>
         <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '1'} %>
       <% end %>

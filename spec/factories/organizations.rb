@@ -18,10 +18,12 @@ FactoryGirl.define do
         organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization, registered_on: Date.new(2015,12,1)
       end
       after :create do |organization, evaluator|
-        expired_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :expired, :start_on => Date.new(2015,10,1), :end_on => Date.new(2016,9,30),
-          :open_enrollment_start_on => Date.new(2015,8,11), :open_enrollment_end_on => Date.new(2015, 9, 13), fte_count: 5
-        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :active, :start_on => Date.new(2016,10,1), :end_on => Date.new(2017,9,30),
-          :open_enrollment_start_on => Date.new(2016,8,11), :open_enrollment_end_on => Date.new(2016,9,13), fte_count: 5
+        start_on = (TimeKeeper.date_of_record - 1.month).beginning_of_month - 1.year
+        expired_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "expired",
+          :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5
+        start_on = (TimeKeeper.date_of_record - 1.month).beginning_of_month
+        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "active",
+          :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5
         expired_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: expired_plan_year
         active_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
       end
@@ -32,10 +34,11 @@ FactoryGirl.define do
         organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization
       end
       after :create do |organization, evaluator|
-        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :active, :start_on => Date.new(2016 - 1, 5, 1), :end_on => Date.new(2016, 4, 30),
-        :open_enrollment_start_on => Date.new(2016 - 1, 4, 1), :open_enrollment_end_on => Date.new(2016 - 1, 4, 10), fte_count: 5
-        renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(2016, 5, 1), :end_on => Date.new(2016+1, 4, 30),
-        :open_enrollment_start_on => Date.new(2016, 4, 1), :open_enrollment_end_on => Date.new(2016, 4, 10), fte_count: 5
+        start_on = (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year
+        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "active",
+          :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5
+        start_on = (TimeKeeper.date_of_record + 2.months).beginning_of_month
+        renewing_plan_year = FactoryGirl.create(:future_plan_year, employer_profile: organization.employer_profile, aasm_state: "renewing_enrolling")
         benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
         renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
       end
@@ -108,6 +111,20 @@ FactoryGirl.define do
       end
     end
   end
+
+  factory :broker, class: Organization do
+    sequence(:legal_name) {|n| "Broker Agency#{n}" }
+    sequence(:dba) {|n| "Broker Agency#{n}" }
+    sequence(:fein, 200000000)
+    home_page   "http://www.example.com"
+    office_locations  { [FactoryGirl.build(:office_location, :primary),
+                         FactoryGirl.build(:office_location)] }
+
+    before :create do |organization, evaluator|
+      organization.broker_agency_profile = FactoryGirl.build :broker_agency_profile, organization: organization
+    end
+  end
+
 
   factory :general_agency, class: Organization do
     legal_name { Forgery(:name).company_name }

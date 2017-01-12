@@ -1,6 +1,7 @@
 - step = (defined? step) ? step.to_i : 1
 - no_purchase = (defined? no_purchase) ? no_purchase : false
 - kind = (defined? kind) ? kind : 'employer_sponsored'
+-show_button=(defined? show_button) ? show_button : 'false'
 
 - percent_complete = 0
 - percent_complete = (step == 1) ? 25 : ((step == 2) ? 50 : ((step == 3) ? 75 : ((step == 4) ? 100: 0)))
@@ -24,8 +25,7 @@
     .vertical-line-progress
     Complete
 
-
-- if @market_kind == 'shop'
+- if @market_kind == 'shop' &&step == 2 && show_button=='true'
   = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if @hbx_enrollment and @hbx_enrollment.employee_role.present?
 
 

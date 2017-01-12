@@ -37,11 +37,13 @@ RSpec.describe Employers::PremiumStatementsController do
   }
 
   context "GET show" do
+    let(:query_result) { double(:hbx_enrollments => hbx_enrollments) }
+    let(:query) { double(:execute => query_result) }
 
     before do
       allow(user).to receive(:person).and_return(person)
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-      allow(employer_profile).to receive(:enrollments_for_billing).and_return(hbx_enrollments)
+      allow(Queries::EmployerPremiumStatement).to receive(:new).with(employer_profile, TimeKeeper.date_of_record.next_month.beginning_of_month).and_return(query)
       allow(census_employee).to receive(:is_active?).and_return(true)
       hbx_enrollments.each do |hbx_enrollment|
         allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
@@ -56,10 +58,14 @@ RSpec.describe Employers::PremiumStatementsController do
   end
 
   context "csv export" do
+    let(:query_result) { double(:hbx_enrollments => hbx_enrollments) }
+    let(:query) { double(:execute => query_result) }
+
     before do
       allow(user).to receive(:person).and_return(person)
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
-      allow(employer_profile).to receive(:enrollments_for_billing).and_return(hbx_enrollments)
+      allow(Queries::EmployerPremiumStatement).to receive(:new).with(employer_profile, TimeKeeper.date_of_record.next_month.beginning_of_month).and_return(query)
+      allow(census_employee).to receive(:is_active?).and_return(true)
       @hbx_enrollment = hbx_enrollments.first
       employee_role = employee_roles.first
       allow(@hbx_enrollment).to receive(:subscriber).and_return(subscriber)

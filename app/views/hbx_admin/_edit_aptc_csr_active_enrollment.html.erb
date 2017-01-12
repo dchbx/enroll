@@ -1,0 +1,49 @@
+<div class="container bottom-pd">
+  <div class="row"> <h4 class="title-inline">Editing APTC / CSR for:</h4> </div>
+  <%= render 'demographics_info.html.erb'%>
+  
+  <div class="row input-no-pd">
+    <%= form_for @person, remote: true, url: update_aptc_csr_path, method: "post", class: "form" do |f|%>
+      <%= f.hidden_field :person_id, value: @person.id %>
+      <%= f.hidden_field :family_id, value: @family.id %>
+      <%= f.hidden_field :hbx_enrollment_id, value: @hbx.id if @hbx.present?%>
+
+      <%= render 'global_filter_header.html.erb'%>
+
+      <div id = "validation-error"></div>
+      
+      <%= render 'household_level_info.html.erb'%>
+
+      <% if inactive_and_without_aptc_enrollments(@family, @current_year).present? %>
+        <div align="right">
+           <a data-toggle="modal" href="##terminated-hbx-modal" class="button">View Inactive & non APTC Enrollments</a>
+        </div> <br />
+      <% end %>
+      
+      <div id = "enrollmentsDiv">
+        <%count =0%>
+        <%@enrollments_info.each do |enrollment_info_key, enrollment_info_value|%>
+          <%count = count+1%>
+          <%= render 'enrollment_level_info.html.erb', :hbx_id => enrollment_info_key.to_s, :hbx_values => enrollment_info_value, :max_aptc  => @max_aptc, :enrollment_count => count%>
+        <%end%>
+      </div>
+      
+
+
+      <div align = "right" id = "update-btn">
+        <tr>
+          <td>
+            <%#= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, aptc_csr_family_index_exchanges_hbx_profiles_path(q: params[:search_query], families_page: params[:pg_no]), remote: true,  class: 'btn btn-default btn-lg', "aria-expanded" => "true" %>
+            <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, family_index_dt_exchanges_hbx_profiles_path, remote: true,  class: 'btn btn-default btn-lg', "aria-expanded" => "true" %>
+          </td>
+          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td><%= f.submit "Update", data: { confirm: 'This may result in new Eligibility Determination and/or creation of enrollments with the updated APTC values. Are you sure ? ' } , class: "btn btn-primary btn-lg"%></td>
+        </tr>
+      </div>
+
+    <% end %>
+  </div>
+
+</div>
+
+<%= render 'terminated_cancelled_aptc_enrollments'%>

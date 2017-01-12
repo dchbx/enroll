@@ -1,0 +1,24 @@
+<%= form_tag family_account_path, method: :get do %>
+  <div id="employers" class='row no-buffer'>
+    <h3>Employers</h3>
+    <div class="n-radio-group">
+      <% @person.active_census_employees.each do |census_employee| %>
+        <div class="n-radio-row">
+          <label class="n-radio" for="census_employee_<%= census_employee.id %>">
+            <% if census_employee.employee_role.present? %>
+              <%= radio_button_tag 'employee_id', "employee_role_#{census_employee.employee_role_id}", @employee_role.census_employee_id == census_employee.id, id: "census_employee_#{census_employee.id}", class: 'n-radio' %>
+            <% else %>
+              <%= radio_button_tag 'employee_id', "census_employee_#{census_employee.id}", @employee_role.try(:census_employee_id) == census_employee.id, id: "census_employee_#{census_employee.id}", class: 'n-radio' %>
+            <% end %>
+            <span class="n-radio">
+            </span>
+            <%= census_employee.employer_profile.legal_name %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <%= submit_tag 'Submit', class: "btn btn-default pull-right" %>
+<% end %>
+
+<hr />

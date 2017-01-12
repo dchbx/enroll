@@ -76,6 +76,34 @@ RSpec.describe SamlController do
           expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
         end
 
+        context "with no email attribute passed" do
+          let(:name_id) { "someuser"}
+          let(:attributes_double) { { } }
+
+          it "should claim the invitation" do
+            expect(::IdpAccountManager).to receive(:update_navigation_flag).with(name_id, attributes_double['mail'], ::IdpAccountManager::ENROLL_NAVIGATION_FLAG)
+            post :login, :SAMLResponse => sample_xml
+            expect(response).to redirect_to(search_insured_consumer_role_index_path)
+            expect(flash[:notice]).to eq "Signed in Successfully."
+            expect(User.where(oim_id: name_id).first.oim_id).to eq name_id
+            expect(User.where(oim_id: name_id).first.idp_verified).to be_truthy
+          end
+
+          context "with a user that already has an empty e-mail" do
+            let(:name_id) { "someotheruser"}
+            let(:attributes_double) { { } }
+
+            it "should claim the invitation" do
+              expect(::IdpAccountManager).to receive(:update_navigation_flag).with(name_id, attributes_double['mail'], ::IdpAccountManager::ENROLL_NAVIGATION_FLAG)
+              post :login, :SAMLResponse => sample_xml
+              expect(response).to redirect_to(search_insured_consumer_role_index_path)
+              expect(flash[:notice]).to eq "Signed in Successfully."
+              expect(User.where(oim_id: name_id).first.oim_id).to eq name_id
+              expect(User.where(oim_id: name_id).first.idp_verified).to be_truthy
+            end
+          end
+        end
+
         context "with relay state" do
           let(:attributes_double) { { 'mail' => "another_new@user.com"} }
           let(:relay_state_url) { "/insured/employee/search" }

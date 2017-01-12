@@ -3,24 +3,25 @@
     <div class="checkbox-filter-wrapper">
       <% if !@hbx_enrollment.is_shop? %>
       <h4>
-        <%= link_to 'Estimate Your Costs', 'https://dc.checkbookhealth.org/hie/dc/2016/index.cfm?data=eyJGT1JNVkFMVUVTIjp7fSwiVVJMVkFMVUVTIjp7IkNPVkVSQUdFIjoiSW5kaXZpZHVhbCIsImRhdGEiOiIifX0%3D', target: '_blank' %>
+        <%= link_to 'Estimate Your Costs', "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank' %>
       </h4>
       <% end %>
       <h4>
-        <%= link_to 'Find Your Doctor', 'https://dc.checkbookhealth.org/dc/', target: '_blank' %>
+        <%= find_my_doctor %>
       </h4>
     </div>
   <h3 class="header-title">Filter Results</h3>
   <% if @market_kind == "individual" || @benefit_group.try(:plan_option_kind) == "single_carrier" %>
   <div class="checkbox-filter-wrapper">
-    <h5><strong>Metal Level</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+    <h5><strong>Metal Level</strong> <a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.
+    Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
     <ul class="list-unstyled">
       <li>
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-bronze" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-bronze" type="checkbox" data-plan-metal-level-filter="bronze">
-            <label for="plan-metal-level-bronze" class="checkbox-custom-label">Bronze</label>
+            <label for="plan-metal-level-bronze" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Bronze means the plan is expected to pay 60% of medical expenses for the average population of consumers. Bronze plans generally have low premiums, but you pay more when you get covered services.">Bronze</span></label>
           </label>
         </div>
       </li>
@@ -28,7 +29,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-silver" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-silver" type="checkbox" data-plan-metal-level-filter="silver">
-            <label for="plan-metal-level-silver" class="checkbox-custom-label">Silver</label>
+            <label for="plan-metal-level-silver" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Silver means the plan is expected to pay 70% of medical expenses for the average population of consumers. Silver plans generally have lower premiums, but you pay more when you get covered services.">Silver</span></label>
           </label>
         </div>
       </li>
@@ -36,7 +37,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-gold" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-gold" type="checkbox" data-plan-metal-level-filter="gold">
-            <label for="plan-metal-level-gold" class="checkbox-custom-label">Gold</label>
+            <label for="plan-metal-level-gold" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Gold means the plan is expected to pay 80% of medical expenses for the average population of consumers. Gold plans typically have higher premiums, but you pay less when you get covered services." >Gold</span></label>
           </label>
         </div>
       </li>
@@ -44,7 +45,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-platinum" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-platinum" type="checkbox" data-plan-metal-level-filter="platinum">
-            <label for="plan-metal-level-platinum" class="checkbox-custom-label">Platinum</label>
+            <label for="plan-metal-level-platinum" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Platinum means the plan is expected to pay 90% of medical expenses for the average population of consumers. Platinum plans typically have high premiums, but you pay less when you get covered services.">Platinum</span></label>
           </label>
         </div>
       </li>
@@ -52,7 +53,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-catastrophic" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-catastrophic" type="checkbox" data-plan-metal-level-filter="catastrophic">
-            <label for="plan-metal-level-catastrophic" class="checkbox-custom-label">Catastrophic</label>
+            <label for="plan-metal-level-catastrophic" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="While not a metal level plan, catastrophic plans are another group of plans that have low monthly premiums and high annual deductibles. The plans are designed to protect consumers from worst case situations like a serious illness or an accident. Catastrophic plans are only available to people under 30 or people with a hardship exemption.">Catastrophic</span></label>
           </label>
         </div>
       </li>
@@ -68,14 +69,14 @@
       </div>
       <% end %>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>Plan Type</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong>Plan Type</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
         <ul class="list-unstyled">
           <li>
             <div class="checkbox">
               <label>
                 <input id="checkbox-10" class="plan-type-selection-filter checkbox-custom" name="checkbox-10" type="checkbox" data-plan-category-filter="hmo">
-                <label for="checkbox-10" class="checkbox-custom-label">HMO</label>
+                <label for="checkbox-10" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won't cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.">HMO</span></label>
               </label>
             </div>
           </li>
@@ -83,7 +84,7 @@
             <div class="checkbox">
               <label>
                 <input id="checkbox-11" class="plan-type-selection-filter checkbox-custom" name="checkbox-11" type="checkbox" data-plan-category-filter="ppo">
-                <label for="checkbox-11" class="checkbox-custom-label">PPO</label>
+                <label for="checkbox-11" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="A PPO (Preferred Provider Organization) plan covers care from in-network and out-of-network providers. You pay less if you use providers that belong to the plan’s network. You can use providers outside of the network for an additional cost.">PPO</span></label>
               </label>
             </div>
           </li>
@@ -91,21 +92,21 @@
             <div class="checkbox">
               <label>
                 <input id="checkbox-12" class="plan-type-selection-filter checkbox-custom" name="checkbox-12" type="checkbox" data-plan-category-filter="pos">
-                <label for="checkbox-12" class="checkbox-custom-label">POS</label>
+                <label for="checkbox-12" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="A POS (Point-of-Service) plan is a combination of an HMO and a PPO. Typically it has a network that functions like an HMO – you pick a primary care doctor, who manages and coordinates your care within the network. Similar to a PPO, POS plans usually also allow you to use a provider who is not in the network.">POS</span></label>
               </label>
             </div>
           </li>
         </ul>
       </div>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>Network</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong>Network</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="Doctors, specialists, other providers, facilities and suppliers that a health insurance company contracts with to provide health care services to plan members."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
         <ul class="list-unstyled">
           <li>
             <div class="checkbox">
               <label>
                 <input id="checkbox-13" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-13" type="checkbox" data-plan-metal-network-filter="nationwide">
-                <label for="checkbox-13" class="checkbox-custom-label">Nationwide</label>
+                <label for="checkbox-13" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">Nationwide</span></label>
               </label>
             </div>
           </li>
@@ -113,7 +114,7 @@
             <div class="checkbox">
               <label>
                 <input id="checkbox-14" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-14" type="checkbox" data-plan-metal-network-filter="dc metro">
-                <label for="checkbox-14" class="checkbox-custom-label">DC-Metro</label>
+                <label for="checkbox-14" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a local network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">DC-Metro</span></label>
               </label>
             </div>
           </li>
@@ -130,7 +131,7 @@
         </ul>
       </div>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>HSA Eligibility</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Filter by the status of HSA eligibility"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong>HSA Eligible</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <ul class="list-unstyled">
           <li>
             <div class="filter-input-block">
@@ -157,7 +158,7 @@
           <%= hidden_field_tag :max_deductible, (@max_deductible || 5000) %>
         </div>
       </div>
-      <% if @person.has_active_consumer_role? && @tax_household.present? %>
+      <% if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual" %>
       <div class="aptc">
         <hr />
         <div class="row">

@@ -2,13 +2,21 @@
     <div class="module market-selection">
       <div class="btn-group btn-group-justified">
         <div class="btn-group">
-          <span type="button" class="btn btn-primary<% if @manually_picked_role == 'shop_market_events' %> active<% end %>">
-            <%=	link_to "Employee", family_account_path(tab: 'home', market: "shop_market_events") %>
+          <span type="button" class="btn btn-primary<% if @manually_picked_role == 'shop_market_events' %> active <% end %>">
+            <% if controller.action_name == "find_sep" %>
+              <%= link_to "Employee", find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "shop_market_events") %>
+            <% else %>
+              <%= link_to "Employee", family_account_path(tab: 'home', market: "shop_market_events") %>
+            <% end %>
           </span>
         </div>
         <div class="btn-group">
-          <span type="button" class="btn btn-primary<% if @manually_picked_role == 'individual_market_events' %> active<% end %>">
-            <%=	link_to "Individual", family_account_path(tab: 'home', market: "individual_market_events") %>
+          <span type="button" class="btn btn-primary<% if @manually_picked_role == 'individual_market_events' %> active <% end %>">
+            <% if controller.action_name == "find_sep" %>
+              <%= link_to "Individual", find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "individual_market_events") %>
+            <% else %>
+              <%= link_to "Individual", family_account_path(tab: 'home', market: "individual_market_events") %>
+            <% end %> 
           </span>
         </div>
       </div>

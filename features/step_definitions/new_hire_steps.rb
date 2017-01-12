@@ -28,7 +28,14 @@ Given(/Employee new hire enrollment window is closed/) do
 end
 
 And(/Employee has current hired on date/) do
-  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
+  CensusEmployee.where(:first_name => /Soren/i, 
+                       :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
+end
+
+And(/Current hired on date all employments/) do
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).each do |census_employee|
+    census_employee.update_attributes(:hired_on => TimeKeeper.date_of_record)
+  end
 end
 
 And(/Employee has past hired on date/) do
@@ -65,7 +72,7 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
   if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
   else
-    find('.interaction-click-control-shop-for-new-plan', wait: 10).click
+    find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
   end
 end
 
@@ -110,6 +117,7 @@ When(/Employee enters Qualifying Life Event/) do
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link "CONTINUE"
   click_button "Continue"
+  screenshot("completing SEP")
 end
 
 When(/Employee clicks continue on the family members page/) do

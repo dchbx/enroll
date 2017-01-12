@@ -122,6 +122,10 @@ class Address
     end
   end
 
+  def mailing?
+    kind.to_s == "mailing"
+  end
+
   def home?
     "home" == self.kind.to_s
   end

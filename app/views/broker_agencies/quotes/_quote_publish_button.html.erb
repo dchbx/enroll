@@ -1,0 +1,6 @@
+<%if quote.aasm_state == "draft" %>
+  <%= form_tag("/broker_agencies/broker_roles/#{@broker.id}/quotes/publish_quote", method: "post") do %>
+    <%= hidden_field_tag(:id, quote.id) %>
+    <%= submit_tag "Publish Quote", class: 'btn btn-primary' %>
+  <% end %>
+<% end %>

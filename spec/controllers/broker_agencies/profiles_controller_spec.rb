@@ -245,6 +245,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
       xhr :get, :family_index, id: broker_agency_profile.id, q: 'Smith'
       expect(assigns(:families).count).to eq(27)
     end
+
+    it "should render families named jones3" do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id, q: 'jones3'
+      expect(assigns(:families).count).to eq(1)
+    end
   end
 
   describe "eligible_brokers" do

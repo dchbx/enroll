@@ -1,6 +1,5 @@
 <div class="employer-edit-tab">
     <h1>Business Info</h1>
-
       <% if @organization.errors.any? %>
         <div class="alert alert-error">
           <h4>
@@ -26,6 +25,17 @@
           </ul>
         </div>
       <% end %>
+
+      <% if @plan_year.present? %>
+        <div class="alert alert-error">
+          <% @plan_year.application_eligibility_warnings.each do |msg| %>
+            <li>
+              <%= msg[1] %>
+            </li>
+          <% end %>
+        </div>
+      <% end %>
+
       <div class="module employer-staff-table <%= pundit_class(EmployerProfile, :updateable?)%>">
         <h4>
           Point of Contact - Employer Staff

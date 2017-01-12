@@ -131,7 +131,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           post :match, :person => person_parameters
         end
 
-        it "render employee role match tempalte" do
+        it "render employee role match template" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template('insured/employee_roles/match')
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
@@ -330,7 +330,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         allow(user).to receive(:person).and_return(person)
         allow(person).to receive(:consumer_role?).and_return(true)
         allow(person).to receive(:consumer_role).and_return(consumer_role)
-        allow(person).to receive(:completed_identity_verification?).and_return(true) 
+        allow(person).to receive(:completed_identity_verification?).and_return(true)
         get "ridp_agreement"
       end
 
@@ -346,7 +346,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
       before :each do
         allow(user).to receive(:person).and_return(person)
-        allow(person).to receive(:completed_identity_verification?).and_return(false) 
+        allow(person).to receive(:completed_identity_verification?).and_return(false)
         get "ridp_agreement"
       end
 

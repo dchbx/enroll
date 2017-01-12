@@ -6,5 +6,5 @@
   %is_dental_only= elected_plan.is_dental_only?
   = render :partial=> "events/v2/shared/carrier", :object=> elected_plan.carrier_profile, as: :carrier
   %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{elected_plan.metal_level}"
-  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{elected_plan.coverage_kind} "
+  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{elected_plan.coverage_kind}"
   %ehb_percent= elected_plan.ehb*100

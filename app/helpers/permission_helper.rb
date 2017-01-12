@@ -16,4 +16,8 @@ module PermissionHelper
     result = policy_helper(pundit_object).send(pundit_method) ? ' no-op ' : '  blocking '
     raw result
   end
+
+  def pundit_allow pundit_object, pundit_method
+    result = policy_helper(pundit_object).send(pundit_method)
+  end
 end

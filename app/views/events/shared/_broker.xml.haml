@@ -1,6 +1,10 @@
-%broker
-  %id= broker_agency_account.writing_agent.npn
-  %name= broker_agency_account.writing_agent.person.full_name
-  - if !broker_agency_account.broker_agency_profile.dba.blank?
-    %dba= broker_agency_account.broker_agency_profile.dba
-  %dislay_name= broker_agency_account.broker_agency_profile.legal_name
+- if hbx_enrollment.broker_agency_account.writing_agent
+  - broker_agency_account = hbx_enrollment.broker_agency_account
+  - writing_agent = broker_agency_account.writing_agent
+  %broker
+    %id
+      %id= writing_agent.npn
+    %name= writing_agent.person.full_name
+    - if !broker_agency_account.broker_agency_profile.dba.blank?
+      %dba= broker_agency_account.broker_agency_profile.dba
+    %display_name= broker_agency_account.broker_agency_profile.legal_name

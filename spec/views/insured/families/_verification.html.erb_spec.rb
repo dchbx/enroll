@@ -49,4 +49,36 @@ describe "insured/families/verification/_verification.html.erb" do
       expect(rendered).not_to match /Send documents for review/
     end
   end
+
+  context "show documents due date message" do
+    before :each do
+      allow(view).to receive(:all_family_members_verified).and_return true
+      allow(view).to receive(:enrollment_group_unverified?).and_return true
+      allow(view).to receive(:verification_needed?).and_return true
+      allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return true
+      stub_template "insured/families/verification/_verification_docs_table.html.erb" => "content"
+      stub_template "insured/families/verification/_unverified_person.html.erb" => "content"
+      render 'insured/families/verification/verification.html.erb'
+    end
+
+    it "shows dues date" do
+      expect(rendered).to match /Document Due Date/
+    end
+  end
+
+  context "doesn't show documents due date message" do
+    before :each do
+      allow(view).to receive(:all_family_members_verified).and_return true
+      allow(view).to receive(:enrollment_group_unverified?).and_return false
+      allow(view).to receive(:verification_needed?).and_return true
+      allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return true
+      stub_template "insured/families/verification/_verification_docs_table.html.erb" => "content"
+      stub_template "insured/families/verification/_unverified_person.html.erb" => "content"
+      render 'insured/families/verification/verification.html.erb'
+    end
+
+    it "doesn't show dues date" do
+      expect(rendered).not_to match /Document Due Date/
+    end
+  end
 end

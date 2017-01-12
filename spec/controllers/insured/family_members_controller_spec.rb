@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController do
-
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
   let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
@@ -15,6 +14,7 @@ RSpec.describe Insured::FamilyMembersController do
     employer_profile.plan_years << published_plan_year
     employer_profile.save
   end
+
 
   describe "GET index" do
     context 'normal' do
@@ -224,6 +224,8 @@ RSpec.describe Insured::FamilyMembersController do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
+      allow(dependent).to receive(:family_id).and_return(test_family.id)
+      allow(Family).to receive(:find).with(test_family.id).and_return(test_family)
       allow(address).to receive(:is_a?).and_return(true)
       allow(dependent).to receive(:same_with_primary=)
       allow(dependent).to receive(:addresses=)

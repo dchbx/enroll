@@ -89,6 +89,7 @@
     </div>
   </div>
   <div class="row">
+  <% if !@census_employee.is_linked? || !@census_employee.address.present? %>
     <div class="col-md-6 col-sm-12">
       <h3>
         <%= @census_employee.address.kind.capitalize if @census_employee.address.present?  %>
@@ -105,6 +106,7 @@
         </div>
       </div>
     </div>
+  <% end %>
     <% @census_employee.email = Email.new if @census_employee.email.blank? %>
     <div class="col-md-6 col-sm-12">
       <h3>
@@ -126,7 +128,7 @@
       <h3>
         <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
       </h3>
-      <% if @census_employee.census_dependents.present? && @census_employee.census_dependents.all?(&:valid?) %>
+      <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
         <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
           <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
           <%= render 'shared/add_dependents', { f: f } if census_dependent.index + 1 == @census_employee.census_dependents.size %>

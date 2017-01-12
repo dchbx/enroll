@@ -1,4 +1,6 @@
 %person_relationship
-  %subject_individual= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{person_relationship.relative.hbx_id}"
+  %subject_individual 
+    %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{person_relationship.relative.hbx_id}"
   %relationship_uri= "urn:openhbx:terms:v1:individual_relationship##{person_relationship.kind}"
-  %object_individual= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{person_relationship.parent.hbx_id}"
+  %object_individual
+    %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{person_relationship.parent.hbx_id}"

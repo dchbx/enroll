@@ -86,6 +86,15 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to have_selector('a', text:'Summary of Benefits and Coverage')
       expect(rendered).to match(/#{file_param}/)
     end
+
+    it "should have the see details selector" do
+      expect(rendered).to have_selector('a', text: /See Details/)
+    end
+
+    it "should have title text for standard plan " do
+      expect(rendered).to match /Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what's best for them./i
+    end
+
   end
 
   context "with aptc" do
@@ -171,6 +180,7 @@ context "with tax household and eligibility determination of csr_94" do
     assign(:carrier_names_map, {})
     allow(plan).to receive(:total_employee_cost).and_return 100
     allow(plan).to receive(:is_csr?).and_return false
+    allow(view).to receive(:params).and_return :market_kind => 'individual'
       family = person.primary_family
       active_household = family.households.first
       tax_household = FactoryGirl.create(:tax_household, household: active_household )
@@ -180,6 +190,30 @@ context "with tax household and eligibility determination of csr_94" do
 
     it "should have hidden modal for csr elibility reminder" do
       expect(rendered).to have_css("#csrEligibleReminder-#{plan.id}", :visible => false)
+    end
+  end
+
+  context "with tax household and eligibility determination of csr_94 plan shopping in 'shop' market" do
+    before :each do
+      sign_in(user)
+      allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+      assign(:person, person)
+      assign(:plan_hsa_status, plan_hsa_status)
+      assign(:hbx_enrollment, hbx_enrollment)
+      assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
+      assign(:carrier_names_map, {})
+      allow(plan).to receive(:total_employee_cost).and_return 100
+      allow(plan).to receive(:is_csr?).and_return false
+      allow(view).to receive(:params).and_return :market_kind => 'shop'
+      family = person.primary_family
+      active_household = family.households.first
+      tax_household = FactoryGirl.create(:tax_household, household: active_household )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+      render "insured/plan_shoppings/plan_details", plan: plan
+    end
+
+    it "should not have csr elibility modal in shop market" do
+      expect(rendered).to_not have_css("#csrEligibleReminder-#{plan.id}")
     end
   end
 

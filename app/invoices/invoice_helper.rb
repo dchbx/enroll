@@ -67,7 +67,7 @@ module InvoiceHelper
     @pdf.text_box "Washington, DC 20090", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
 
-    address = @organization.try(:office_locations).first.address 
+    address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x_pos, address_y_pos]
     if address
       @pdf.text_box "#{address.address_1}, #{address.address_2}", :at => [address_x_pos, address_y_pos-12]
@@ -262,7 +262,7 @@ module InvoiceHelper
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
-    address = @organization.try(:office_locations).first.address
+    address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 620]
     if address
       @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 608]
@@ -305,7 +305,7 @@ module InvoiceHelper
     @pdf.text_box "PO Box 97022", :at => [320,  36]
     @pdf.text_box "Washington, DC 20090", :at => [320,  24]
 
-    address = @organization.try(:office_locations).first.address
+    address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 48]
     if address
       @pdf.move_down lineheight_y
@@ -313,6 +313,12 @@ module InvoiceHelper
       @pdf.move_down lineheight_y
       @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 24]
     end
+  end
+
+  def mailing_or_primary_address(organization)
+    office_locations = organization.try(:office_locations)
+    mailing_office_locations, primary_office_locations = office_locations.partition { |ol| ol.address.mailing? }
+    mailing_office_locations.present? ? mailing_office_locations.first.address : primary_office_locations.first.address
   end
 
   def payment_page_for_conversion_employer
@@ -347,7 +353,7 @@ module InvoiceHelper
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
-    address = @organization.try(:office_locations).first.address
+    address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 632]
     if address
       @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 620]
@@ -393,7 +399,7 @@ module InvoiceHelper
     @pdf.text_box "PO Box 97022", :at => [320,  36]
     @pdf.text_box "Washington, DC 20090", :at => [320,  24]
 
-    address = @organization.try(:office_locations).first.address
+    address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 48]
     if address
       @pdf.move_down lineheight_y
@@ -436,7 +442,7 @@ module InvoiceHelper
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
-    address = @organization.try(:office_locations).first.address
+    address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 585]
     if address
       @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 573]
@@ -479,7 +485,7 @@ module InvoiceHelper
     @pdf.text_box "PO Box 97022", :at => [320,  60]
     @pdf.text_box "Washington, DC 20090", :at => [320,  48]
 
-    address = @organization.try(:office_locations).first.address
+    address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 72]
     if address
       @pdf.move_down lineheight_y

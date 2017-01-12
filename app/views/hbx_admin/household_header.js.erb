@@ -1,0 +1,8 @@
+$("#household-header").html("<%= escape_javascript(render partial: 'household_header', locals: { max_aptc: @max_aptc, csr_percent_as_integer: @csr_percent_as_integer } ) %>");
+$("#loading-household-aptc").html("");
+$("#validation-error").html("<%= escape_javascript(render partial: 'validation_error', locals: { aptc_errors: @aptc_errors}) %>");
+$("[id^=loading]").html("");
+// Hide the Update Button  and replace with a message if there is an validation_error
+$("#update-btn").html("<i class='fa fa-info-circle' aria-hidden='true'> Please fix the validation errors before updating your changes.</i>");
+// Add error class to  input fields with error
+$("[id^=aptc_applied]").addClass("error-styling");

@@ -51,7 +51,7 @@
           <% qhps.each do |qhp|%>
             <th colspan="2">
               <% if qhp.plan.nationwide %>
-                <%= link_to "PROVIDER DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
+                <%= link_to "DOCTOR DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
               <% end %>
             </th>
           <% end %>
@@ -64,7 +64,7 @@
           <% qhps.each do |qhp|%>
             <th colspan="2">
               <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
-                <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
+                <%= link_to "DRUG LIST", qhp.plan.rx_formulary_url, target: "_blank" %>
               <% end %>
             </th>
           <% end %>
@@ -75,8 +75,7 @@
         <tr>
           <th>PLAN BENEFITS <br> (In Network)</th>
           <% qhps.each do |qhp|%>
-            <th colspan="1"> CO-PAY </th>
-            <th colspan="1"> COINSURANCE </th>
+            <th colspan="2" data-toggle="tooltip" data-container="body" title="Once you meet your deductible, you'll share the costs for any covered services you receive until you reach your out-of-pocket limit. Copayments are a fixed dollar amount you pay for a covered service, usually when you receive the service. Coinsurance is calculated as a percent of the allowed amount for a covered service."> COST SHARING </th>
           <% end %>
         </tr>
         <%= render partial: "shared/plan_shoppings/plan_visit_types" %>

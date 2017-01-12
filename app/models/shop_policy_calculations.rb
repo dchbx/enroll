@@ -15,6 +15,8 @@ module ShopPolicyCalculations
       member_provider.hbx_enrollment_members
     when CensusEmployee
       [member_provider] + member_provider.census_dependents
+    when QuoteHousehold
+      member_provider.quote_members
     end
   end
 

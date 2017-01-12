@@ -1,0 +1,26 @@
+!!! XML
+%enrollment_event{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance" }
+  %header
+    %hbx_id= hbx_enrollment.household.family.hbx_assigned_id
+    %submitted_timestamp= hbx_enrollment.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
+  %event
+    %body
+      %enrollment_event_body
+        - affected_members = hbx_enrollment.hbx_enrollment_members # this is only for sample generation
+        - if affected_members.present? && affected_members.size > 0
+          %affected_members
+            = render :partial => "events/shared/affected_member", :collection => affected_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }
+          - tix = transaction_id
+          %transaction_id= tix
+          %is_trading_partner_publishable= hbx_enrollment.valid?
+          %enrollment
+            %transaction_id
+              %id= tix
+            %type= "urn:openhbx:terms:v1:enrollment#initial" ## this is hardcoded for now but needs to be changed once we have the proper models
+            -if %w(unassisted_qhp insurance_assisted_qhp individual).include?(hbx_enrollment.kind)
+              %market= "urn:openhbx:terms:v1:aca_marketplace#individual"
+            -elsif hbx_enrollment.kind == 'employer_sponsored'
+              %market= "urn:openhbx:terms:v1:aca_marketplace#shop"
+            -elsif hbx_enrollment.kind == 'coverall'
+              %market= "urn:openhbx:terms:v1:aca_marketplace#coverall"
+            = render "events/hbx_enrollment/policy", :formats => ["xml"], :hbx_enrollment => hbx_enrollment

@@ -64,7 +64,7 @@
         <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
         <% elsif @change_plan == "change_by_qle" %>
-          <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
+          <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:'true'} %>
         <% elsif @change_plan == "change_plan" %>
           <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
             <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
