@@ -854,6 +854,61 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "has_active_health_coverage?" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
+
+    it "should return false without benefit_group_assignment" do
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return BenefitGroupAssignment.new
+      expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
+    end
+
+    context "with active benefit_group_assignment" do
+      before do
+        census_employee.add_benefit_group_assignment(benefit_group)
+      end
+
+      it "should return false without hbx_enrollment" do
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return []
+        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
+      end
+
+      it "should return true when has health hbx_enrollment" do
+        allow(HbxEnrollment).to receive(:find_shop_and_health_by_benefit_group_assignment).and_return [hbx_enrollment]
+        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_truthy
+      end
+    end
+  end
+
+  context "terminated employment should terminate enrollments" do
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:hbx_enrollment_health) { HbxEnrollment.new(coverage_kind: 'health', aasm_state: 'coverage_selected') }
+    let(:hbx_enrollment_dental) { HbxEnrollment.new(coverage_kind: 'dental', aasm_state: 'coverage_selected') }
+
+
+    context "with active benefit_group_assignment" do
+      before do
+        census_employee.add_benefit_group_assignment(benefit_group)
+      end
+
+      it "should return false without hbx_enrollment" do
+        allow(HbxEnrollment).to receive(:find_shop_by_benefit_group_assignment).and_return []
+        expect(census_employee.has_active_health_coverage?(benefit_group.plan_year)).to be_falsey
+      end
+
+      it "should terminate both dental and health" do
+        allow(HbxEnrollment).to receive(:find_shop_by_benefit_group_assignment).and_return [hbx_enrollment_health,hbx_enrollment_dental]
+        expect(hbx_enrollment_health.schedule_coverage_termination(TimeKeeper.date_of_record)).to be_truthy
+        expect(hbx_enrollment_dental.schedule_coverage_termination(TimeKeeper.date_of_record)).to be_truthy
+        expect(hbx_enrollment_health.coverage_termination_pending?).to be_truthy
+        expect(hbx_enrollment_dental.coverage_termination_pending?).to be_truthy
+        expect(census_employee.terminate_employment!(TimeKeeper.date_of_record)).to be_truthy
+      end
+    end
+  end
+
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}
