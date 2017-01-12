@@ -86,6 +86,7 @@ function applyJQDatePickerSetup(ele) {
     el.datepicker('option', 'minDate', dateMin);
     el.datepicker('option', 'maxDate', dateMax);
   }
+
   el.datepicker("refresh");
   el.addClass("jq_datepicker_already_applied");
 }
@@ -98,3 +99,4 @@ function applyJQDatePickers() {
     }
   });
 }
+
