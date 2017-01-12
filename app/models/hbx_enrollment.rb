@@ -17,7 +17,7 @@ class HbxEnrollment
 
   Authority           = [:open_enrollment]
 
-  Kinds               = %w(individual employer_sponsored unassisted_qhp insurance_assisted_qhp streamlined_medicaid
+  Kinds               = %w(individual employer_sponsored coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid
                               emergency_medicaid hcr_chip
                             )
 
@@ -904,7 +904,7 @@ class HbxEnrollment
       enrollment.resident_role = resident_role
       enrollment.benefit_package_id = benefit_package.try(:id)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      
+
       if qle && enrollment.family.is_under_special_enrollment_period?
         enrollment.effective_on = enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"

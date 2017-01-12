@@ -17,9 +17,11 @@
           <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(
           original_application_type: 'paper')  %> <br/></li>
 
-          <li> <%=link_to 'New DC Resident Application', begin_resident_enrollment_exchanges_residents_path(
+          <% if policy(:family).hbx_super_admin_visible? %>
+            <li> <%=link_to 'New DC Resident Application', begin_resident_enrollment_exchanges_residents_path(
                  original_application_type: 'paper')  %> </li>
-         </ul>
+          <% end %>
+          </ul>
     </span>
     </div>
 
