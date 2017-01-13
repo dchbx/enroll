@@ -1,0 +1,61 @@
+<%notice.census_employees.each do |census_employee| %>
+  <%= render partial: 'notices/shared/logo' %>
+
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td><h3>Employee Plan Match </h3></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "For eligible employees office:   #{notice.legal_name.capitalize.titleize}"} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Plan year  :    #{notice.start_on} "} %>
+
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Benefit Package:    #{notice.benefit_group_package_name.capitalize.titleize}"} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "<strong>WHICH HEALTH PLAN IS RIGHT FOR YOU BASED ON YOUR NEEDS AND BUDGET?</strong>"} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Plan Match, DC HEALTH LINK's health plan comparison tool powered by Consumers' CHECKBOOK takes you through a few simple steps to find the best health plan for you, or you and your family."} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "The health information you provide is anonymous and isn't  shared with DC Health Link. With this tool, you can find every plan available to you through DC Health Link, and compare on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more. Consumers' CHECKBOOK has over 35 years of experience helping consumers choose the best plans."} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "To use the Plan Match tool, you'll need to provide some basic information about your employer's plan offerings."} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Either use this personalized link to have this information pre-completed on your behalf: <br> <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>"}%>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Or you can enter your employer's plan year information yourself using the details below:" } %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "1.Your employer's plan year start date  : #{notice.start_on}"} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "2.Your employer's plan offerings  : #{notice.metal_leval.capitalize.titleize}"} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums  : #{notice.carrier} - #{notice.plan_year} "} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "4.The percentage of your employer contributes towards your premiums: "} %>
+
+  <% premium_benefit_contributions = "" ; notice.family_contribution.each do |relationship_benefit| %>
+  	<% if relationship_benefit.premium_pct >0%>
+  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
+  	<%else%>
+  		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: Not Available <br></	br>" %>
+  	<%end%>
+  <%end%>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>
+  <div class="page-break-before"/>
+<%end%>

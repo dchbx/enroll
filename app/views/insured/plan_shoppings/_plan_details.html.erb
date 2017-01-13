@@ -37,7 +37,7 @@
     <br>
 
     <div class="row">
-      <div class="col-md-9">
+      <div class="col-md-12">
         <table class="table gn-10">
           <thead>
           <tr>
@@ -54,7 +54,7 @@
             <% plan_level = plan.metal_level.humanize %>
             <td><span class="<%= plan_level.downcase %>-icon"><%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize %></span></td>
             <td><%= plan.nationwide ? "Nationwide" : "DC-Metro" %></td>
-            <td><%= plan.deductible %></td>
+            <td><%= plan.family_deductible %></td>
           </tr>
           </tbody>
         </table>

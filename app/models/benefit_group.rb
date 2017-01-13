@@ -97,11 +97,14 @@ class BenefitGroup
       message: "%{value} is not a valid effective date offset kind"
     }
 
+  # validates :dental_reference_plan_id, presence: true, if: :has_elected_dental_plan_ids?
+
   validate :plan_integrity
   validate :check_employer_contribution_for_employee
   validate :check_offered_for_employee
 
   before_save :set_congress_defaults
+  before_destroy :delete_benefit_group_assignments_and_enrollments
 
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
@@ -133,6 +136,10 @@ class BenefitGroup
 
   def is_offering_dental?
     dental_reference_plan_id.present? && elected_dental_plan_ids.any?
+  end
+
+  def has_elected_dental_plan_ids?
+    elected_dental_plan_ids.any?
   end
 
   def is_open_enrollment?
@@ -445,7 +452,7 @@ class BenefitGroup
   end
 
   ## Conversion employees are not allowed to buy coverage through off-exchange plan year
-  def valid_plan_year    
+  def valid_plan_year
     if employer_profile.is_coversion_employer?
       plan_year.coverage_period_contains?(employer_profile.registered_on) ? plan_year.employer_profile.renewing_plan_year : plan_year
     else
@@ -459,6 +466,18 @@ class BenefitGroup
 
   def first_of_month_effective_on_for(date_of_hire)
     [valid_plan_year.start_on, eligible_on(date_of_hire)].max
+  end
+
+  def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
+    self.employer_profile.census_employees.each do |ce|
+      benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
+      benefit_group_assignments.each do |bga|
+        bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+        bga.destroy
+      end
+      benefit_groups = self.plan_year.benefit_groups.reject { |bg| bg.id == self.id}
+      ce.find_or_build_benefit_group_assignment(benefit_groups.first)
+    end
   end
 
 private

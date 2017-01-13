@@ -3,17 +3,6 @@
 <% end %>
 <div class="container group-selection">
   <div class="row">
-    <% if @aptc_blocked.present? && @aptc_blocked %>
-      <br />
-      <div class="alert alert-danger" role="alert">
-        <p>
-          We need a bit of additional information to redetermine your eligibility. Please call us at <%= Settings.contact_center.phone_number %>.
-        </p>
-        <br>
-        <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
-      </div>
-    <% else %>
-
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
@@ -172,7 +161,6 @@
           <% end %>
         </div>
       </div>
-    <% end %>
     <% end %>
   </div>
   <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? && (@hbx_enrollment.employee_role.present? || @hbx_enrollment.benefit_group.present?)) %>

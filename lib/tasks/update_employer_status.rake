@@ -1,7 +1,7 @@
 #8354, updating the aasm_state of this employer(Anytime Canine) because this employer was created manually.
 namespace :update do
-  task :employer_status_to_enrolled => :environment do
-    organization = Organization.where(legal_name: /Anytime Canine/)
+  task :employer_status_to_enrolled, [:name] => :environment do |task, args|
+    organization = Organization.where(legal_name: /#{args["name"]}/)
     empr = organization.last.employer_profile
     puts "*"*80
     puts "found employer : #{empr.legal_name} "

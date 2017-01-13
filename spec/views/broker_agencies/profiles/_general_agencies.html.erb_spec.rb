@@ -77,6 +77,10 @@ context "without default_general_agency_profile, not updateable" do
       render template: "broker_agencies/profiles/_general_agencies.html.erb"
     end
 
+    it "should have general_agency_list area" do
+      expect(rendered).to have_selector('div#general_agency_list')
+    end
+
     it 'should have title' do
       expect(rendered).to have_selector('h3', text: 'General Agencies')
     end
@@ -92,6 +96,10 @@ context "without default_general_agency_profile, not updateable" do
 
     it "should show Default GA" do
       expect(rendered).to have_selector('td', text: 'Default GA')
+    end
+
+    it "should not has btn class for select default ga" do
+      expect(rendered).not_to have_selector('table a.btn.btn-min')
     end
 
     it "should have hint msg for select default GA" do

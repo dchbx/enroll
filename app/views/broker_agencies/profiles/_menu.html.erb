@@ -46,7 +46,7 @@
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Assign"></span>
          <% end %>
         </li>
-        <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab").present? || "class=hide" %>>
+        <li role="presentation" id="employee-roster-tab" <%= menu_tab_class(active_tab, "employee-roster-tab") %>>
          <%= link_to my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
             <span class="hidden-xs">Roster Quoting Tool</span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Roster Quoting Tool"></span>

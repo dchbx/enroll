@@ -1,0 +1,4 @@
+%employer_profile
+  %business_entity_kind= "urn:openhbx:terms:v1:employers##{employer.entity_kind}"
+  %employer_census_families
+    = render :partial => "events/census_employee/employer_census_family", :collection => census_employees, as: :census_employee

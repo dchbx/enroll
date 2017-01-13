@@ -178,3 +178,100 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   #   end
   # end
 end
+
+describe "building tax household and tax household members" do
+  let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample.xml")) }
+  let(:verified_family) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample.xml"))).first }
+  let(:verified_primary_family_member) { verified_family.family_members.detect{ |fm| fm.id == verified_family.primary_family_member_id } }
+  let(:person_params) do {
+    addresses: [],
+    phones: [],
+    emails: [],
+    person: {
+      "first_name" => verified_primary_family_member.person.name_first.upcase,
+      "last_name" => verified_primary_family_member.person.name_last.downcase,
+      "middle_name" => verified_primary_family_member.person.name_middle,
+      "name_pfx" => verified_primary_family_member.person.name_pfx,
+      "name_sfx" => verified_primary_family_member.person.name_sfx,
+      "dob" => verified_primary_family_member.person_demographics.birth_date,
+      "ssn" => verified_primary_family_member.person_demographics.ssn,
+      "no_ssn" => "1",
+      "gender" => verified_primary_family_member.person_demographics.sex.split('#').last
+    }
+  }
+  end
+  let(:user) { FactoryGirl.create(:user) }
+  let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(person_params, user) }
+  let(:primary_person) { consumer_role.person }
+  let(:active_verified_household) { verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first }
+  let(:verified_tax_household) { active_verified_household.tax_households.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }.first }
+  let(:verified_primary_tax_household_member) { verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first }
+  let(:household) {primary_person.primary_family.active_household}
+  let(:hbx_profile) {double}
+  let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, current_benefit_coverage_period: bcp) }
+  let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, slcsp: slcsp_plan, slcsp_id: slcsp_plan.id) }
+  let(:slcsp_plan) { FactoryGirl.build(:plan) }
+
+
+  context "build_or_update_tax_household_from_primary - Tests the creation of Tax Houshold and the Primary Tax Houshold Member" do
+    before :each do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
+      allow(bcp).to receive(:slcsp).and_return(slcsp_plan.id)
+      allow(bcp).to receive(:slcsp_id).and_return(slcsp_plan.id)
+    end
+
+    it "should create a new tax_household" do
+      expect(primary_person.primary_family.active_household.tax_households.size).to eq 0
+      household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+      expect(primary_person.primary_family.active_household.tax_households.size).to eq 1
+    end
+
+    it "should create tax_household_members with a primary (subscriber) family member" do
+      household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.size).to eq 1
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.first.person).to eq primary_person
+    end
+
+    it "should populate the is_ia_eligible as read from the active_verified_houshold" do
+      household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.first.is_ia_eligible).to eq verified_primary_tax_household_member.is_insurance_assistance_eligible
+    end
+
+    it "should populate the is_medicaid_chip_eligible as read from the active_verified_houshold" do
+      household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.first.is_medicaid_chip_eligible).to eq verified_primary_tax_household_member.is_medicaid_chip_eligible
+    end
+  end
+
+  context "add_tax_household_family_member - Tests the creation of Tax Household Members for the dependents." do
+    let(:verified_non_primary_tax_household_member) { verified_tax_household.tax_household_members.select{|thm| thm.id != verified_primary_family_member.id }.first }
+    let(:person) { Person.new }
+    let(:family_member) { FamilyMember.new(is_primary_applicant: false, person: person) }
+    before :each do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
+      allow(bcp).to receive(:slcsp).and_return(slcsp_plan.id)
+      allow(bcp).to receive(:slcsp_id).and_return(slcsp_plan.id)
+      household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household) # this has to happen before!
+    end
+    it "should create tax_household_members with a non primary (non subscriber) family member" do
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.size).to eq 1
+      household.add_tax_household_family_member(family_member, verified_non_primary_tax_household_member)
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.size).to eq 2
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.last.is_subscriber).to eq false
+    end
+
+    it "should populate the is_ia_eligible as read from the active_verified_houshold" do
+      household.add_tax_household_family_member(family_member, verified_non_primary_tax_household_member)
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.last.is_ia_eligible).to eq verified_primary_tax_household_member.is_insurance_assistance_eligible
+    end
+
+    it "should populate the is_medicaid_chip_eligible as read from the active_verified_houshold" do
+      household.add_tax_household_family_member(family_member, verified_non_primary_tax_household_member)
+      expect(primary_person.primary_family.active_household.latest_active_tax_household.tax_household_members.last.is_medicaid_chip_eligible).to eq verified_primary_tax_household_member.is_medicaid_chip_eligible
+    end
+  end
+end

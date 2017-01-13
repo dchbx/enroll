@@ -26,6 +26,9 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 
+# Background Jobs with Resque
+gem 'resque'
+
 # JS graph API
 # gem 'highcharts-rails', '~> 4.1', '>= 4.1.9'
 
@@ -102,6 +105,9 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
+
+# Httparty
+gem 'httparty'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

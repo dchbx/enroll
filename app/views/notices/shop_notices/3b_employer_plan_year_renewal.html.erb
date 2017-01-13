@@ -19,14 +19,9 @@
   </tbody>
 </table>
 
-<% if notice.trigger_type.try(:downcase) == 'auto' %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph', :locals => {
     content: "DC Health Link finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>."} %>
-<% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Thank you for finalizing your plan offerings to your employees through #{Settings.site.short_name}."} %>
-<%end%>
-
+    
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}."} %>
 <br>

@@ -20,7 +20,12 @@
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
+            <% if @enrollment.benefit_package_name.present? %>
+              <strong>Benefit Package: <%= @enrollment.benefit_package_name %></strong><br>
+            <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
+            Benefit: <%= @enrollment.coverage_kind %><br>
+            Market: <%= show_market_name_by_enrollment @enrollment %><br>
             Metal level : <%= display_dental_metal_level @plan %>
           </p>
 
@@ -28,6 +33,10 @@
           <%= render "insured/plan_shoppings/coverage_information" %>
           <%else%>
           <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
+          <% end %>
+
+          <% if @enrollment.is_cobra_status? %>
+            <p>* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.</p>
           <% end %>
         </div>
         <% if @enrollment.employee_role.present? %>

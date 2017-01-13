@@ -469,6 +469,12 @@ module ApplicationHelper
     end
   end
 
+  def is_readonly(object)
+    return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
+    return true if object.try(:linked?)  # cannot edit, employer census roster
+    return !(object.new_record? or object.try(:eligible?)) # employer census roster
+  end
+
   def may_update_census_employee?(census_employee)
     if current_user.roles.include?("hbx_staff") || census_employee.new_record? || census_employee.is_eligible?
       true
@@ -488,6 +494,10 @@ module ApplicationHelper
     notice.enrollments.inject([]) do |enrollees, enrollment|
       enrollees += enrollment.enrollees
     end.uniq
+  end
+
+  def show_oop_pdf_link(aasm_state)
+    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
   end
 
   def calculate_age_by_dob(dob)

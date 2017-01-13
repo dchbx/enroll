@@ -73,6 +73,7 @@ class ConsumerRole
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
+  field :hub_retrigger_count, type: Integer, default: 0
   field :native_update_reason, type: String
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
@@ -579,6 +580,11 @@ class ConsumerRole
     lawful_presence_determination.verification_outstanding?
   end
 
+  def count_hub_calls
+    count = hub_retrigger_count + 1
+    self.update_attributes(:hub_retrigger_count => count)
+  end
+
   def lawful_presence_authorized?
     lawful_presence_determination.verification_successful?
   end
@@ -641,8 +647,7 @@ class ConsumerRole
   end
 
   def record_partial_pass(*args)
-    lawful_presence_determination.citizen_status = "non_native_not_lawfully_present_in_us"
-    lawful_presence_determination.citizenship_result = "ssn_pass_citizenship_fails_with_SSA"
+    lawful_presence_determination.update_attributes!(:citizenship_result => "ssn_pass_citizenship_fails_with_SSA")
   end
 
   def fail_lawful_presence(*args)
@@ -655,6 +660,11 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
+  end
+
+  #check if consumer purchased a coverage and no response from hub in 24 hours
+  def processing_hub_24h?
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
   end
 
   def all_types_verified?
@@ -670,6 +680,7 @@ class ConsumerRole
       else
         lawful_presence_verified?
     end
+
   end
 
   def ensure_validation_states

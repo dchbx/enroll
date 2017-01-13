@@ -76,22 +76,13 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def delete_benefit_group
-    plan_year = params[:plan_year_id]
-    plan_year = PlanYear.find(plan_year)
-    benefit_group_id = params[:benefit_group_id]
-    benefit_groups = plan_year.benefit_groups
-    if benefit_groups.count > 1
-      bg = benefit_groups.find(benefit_group_id)
-      bg_title = bg.title
-      invalid_benefit_group_assignments = @employer_profile.benefit_group_assignments.select { |bga| bga.benefit_group_id.to_s == benefit_group_id }
-      invalid_benefit_group_assignments.each do |invalid_benefit_group_assignment|
-        census_employee = invalid_benefit_group_assignment.census_employee
-        invalid_benefit_group_assignment.delete
-        census_employee.save
-      end
-      bg.delete
+    plan_year = PlanYear.find(params[:plan_year_id])
+    if plan_year.benefit_groups.count > 1
+      benefit_group = plan_year.benefit_groups.find(params[:benefit_group_id])
+      benefit_group.destroy!
+
       if plan_year.save
-        flash[:notice] = "Benefit Group: #{bg.title} successfully deleted."
+        flash[:notice] = "Benefit Group: #{benefit_group.title} successfully deleted."
       end
     else
       flash[:error] = "Benefit package can not be deleted because it is the only benefit package remaining in the plan year."

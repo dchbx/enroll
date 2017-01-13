@@ -27,6 +27,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :is_disabled, type: Boolean, default: false
 
   before_save :clear_blank_fields
  #after_save :generate_family_search
@@ -149,8 +150,8 @@ class Family
   scope :all_enrollments,                     ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id, ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id, ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
-  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".ne => "employer_sponsored") }
-  scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind" => "employer_sponsored") }
+  scope :by_enrollment_individual_market,     ->{ where(:"households.hbx_enrollments.kind".nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
+  scope :by_enrollment_shop_market,           ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_enrollment_renewing,              ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
@@ -243,7 +244,7 @@ class Family
   def current_eligible_open_enrollments
     current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
   end
-
+  
   def current_ivl_eligible_open_enrollments
     eligible_open_enrollments = []
 
@@ -469,12 +470,16 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def ivl_unverified_enrollments
+    return [] if enrollments.empty?
+    enrollments.individual_market.verification_needed
+  end
+
   class << self
     def expire_individual_market_enrollments
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      expiration_date_limit = (current_benefit_period.start_on - 61.days) # Don't expire enrollments with effective less than 60 days
       query = {
-          :effective_on.lt => expiration_date_limit,
+          :effective_on.lt => current_benefit_period.start_on,
           :kind => 'individual',
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
       }
@@ -585,33 +590,6 @@ class Family
   def has_aptc_hbx_enrollment?
     enrollments = latest_household.hbx_enrollments.active rescue []
     enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
-  end
-
-  def update_aptc_block_status
-    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    eligibility_determinations = latest_household.latest_active_tax_household.eligibility_determinations rescue nil
-
-    if eligibility_determinations.present? && has_aptc_hbx_enrollment?
-      self.set(status: "aptc_block")
-    end
-  end
-
-  def aptc_blocked?
-    status == "aptc_block"
-  end
-
-  def is_blocked_by_qle_and_assistance?(qle=nil, assistance=nil)
-    return false if qle.present?
-    return false if assistance.blank? #or qle.blank?
-    return false if status == "aptc_unblock"
-    return true if status == "aptc_block"
-
-    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    #if max_aptc > 0 && qle.individual? && qle.family_structure_changed?
-    #  true
-    #else
-    #  false
-    #end
   end
 
   def self.by_special_enrollment_period_id(special_enrollment_period_id)

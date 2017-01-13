@@ -14,7 +14,7 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.kind == 'employer_sponsored'
+    if hbx_enrollment.is_shop?
       hbx_enrollment.total_employee_cost
     else
       hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
@@ -163,7 +163,7 @@ module Insured::FamiliesHelper
     if enrollment.is_shop?
       true
     else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing'].include?(enrollment.aasm_state.to_s)
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state.to_s)
     end
   end
 

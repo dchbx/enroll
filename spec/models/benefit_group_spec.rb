@@ -169,6 +169,32 @@ describe BenefitGroup, "instance methods" do
   end
 end
 
+describe BenefitGroup, type: :model do
+
+  context 'deleting the benefit group' do
+    let(:plan_year) { FactoryGirl.create(:plan_year)}
+    let!(:benefit_group_one) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "1st one") }
+    let!(:benefit_group_two) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "2nd one")}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: benefit_group_one.plan_year.employer_profile)}
+    
+    it "should have a default benefit group assignment with 1st benefit group" do
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 1
+    end
+
+    it "should delete the benfit group assignments under the 1st benefit group" do
+      benefit_group_one.destroy!
+      census_employee.reload
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 0
+    end
+
+    it "should create new benefit group assignment for census employee with 2nd benefit group" do
+      benefit_group_one.destroy!
+      census_employee.reload
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 1
+    end
+  end
+end
+
 
 describe BenefitGroup, type: :model do
 

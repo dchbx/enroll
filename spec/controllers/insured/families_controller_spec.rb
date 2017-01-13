@@ -653,22 +653,7 @@ RSpec.describe Insured::FamiliesController do
         expect(family.current_broker_agency).to be nil
       end
     end
-
-    context "post unblock" do
-      let(:family) { FactoryGirl.build(:family) }
-      before :each do
-        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
-        allow(Family).to receive(:find).and_return family
-      end
-
-      it "should be a success" do
-        xhr :post, :unblock, id: family.id, format: :js
-        expect(response).to have_http_status(:success)
-        expect(assigns(:family).status).to eq "aptc_unblock"
-      end
-    end
   end
-
 
   describe "GET upload_notice_form" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff"]) }
