@@ -23,7 +23,7 @@ RSpec.describe HbxProfile, :type => :model do
       end
     end
 
-    context "with all required data", dbclean: :before do
+    context "with all required data" do
       let(:params)        { valid_params }
       let(:hbx_profile)   { HbxProfile.new(**params) }
       before :all do
@@ -48,7 +48,26 @@ RSpec.describe HbxProfile, :type => :model do
         it "should be findable by ID" do
           expect(HbxProfile.find(saved_hbx_profile._id)).to eq saved_hbx_profile
         end
+      end
 
+      context ".search_random", dbclean: :after_each do
+        let(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile)}
+        let(:broker_agency_profile2) { FactoryGirl.create(:broker_agency_profile)}
+
+        before do
+          broker_agency_profile1.organization.update_attributes(legal_name: "legal yo1")
+          broker_agency_profile2.organization.update_attributes(legal_name: "legal yo2")
+        end
+
+        it "should return all the broker agencies profiles" do
+          expect(HbxProfile.search_random(nil).size).to eq 2
+          expect(HbxProfile.search_random(nil).first.class).to eq BrokerAgencyProfile
+        end
+
+        it "should return the  searched broker agency instances" do
+          expect(HbxProfile.search_random(broker_agency_profile1.organization.legal_name).size).to eq 1
+          expect(HbxProfile.search_random(broker_agency_profile1.organization.legal_name).first.class).to eq BrokerAgencyProfile
+        end
       end
     end
   end

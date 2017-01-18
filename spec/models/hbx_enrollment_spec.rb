@@ -495,7 +495,7 @@ describe HbxEnrollment, dbclean: :after_all do
             benefit_group_assignment: @mikes_benefit_group_assignments
         )
         @enrollment7.save
-        @enrollment7.cancel_previous(2016)
+        @enrollment7.cancel_previous(TimeKeeper.date_of_record.year)
       end
 
       it "should cancel an auto renewing enrollment" do
@@ -681,6 +681,42 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
   end
+
+  context "#propogate_waiver", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:census_employee) { FactoryGirl.create(:census_employee)}
+    let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
+    let(:enrollment_two) { FactoryGirl.create(:hbx_enrollment, :shop, household: family.active_household)}
+    before do
+      benefit_group_assignment.update_attribute(:hbx_enrollment_id, enrollment_two.id)
+      enrollment_two.update_attributes(benefit_group_id: benefit_group_assignment.benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id)
+    end
+    it "should return false if it is an ivl enrollment" do
+      expect(enrollment.propogate_waiver).to eq false
+    end
+
+    it "should return true for shop enrollment" do
+      expect(enrollment_two.propogate_waiver).to eq true
+    end
+
+    it "should waive the benefit group assignment if enrollment belongs to health & shop" do
+      enrollment_two.propogate_waiver
+      expect(enrollment_two.benefit_group_assignment.aasm_state).to eq "coverage_waived"
+    end
+
+    it "should not waive the benefit group assignment if enrollment belongs to dental" do
+      enrollment_two.update_attribute(:coverage_kind, "dental")
+      enrollment_two.propogate_waiver
+      expect(enrollment_two.benefit_group_assignment.aasm_state).not_to eq "coverage_waived"
+    end
+
+    it "should cancel the shop enrollment" do
+      enrollment_two.propogate_waiver
+      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
+    end
+  end
 end
 
 describe HbxProfile, "class methods", type: :model do
@@ -823,31 +859,39 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan2){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile2) }
 
     let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
-    let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: TimeKeeper.date_of_record) }
+    let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
+
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1
+    end
 
     it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
-    hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 1.day
-    hbx_enrollment2.effective_on = TimeKeeper.date_of_record
-    # This gets processed on 31st Dec
-    if hbx_enrollment1.effective_on.year != hbx_enrollment2.effective_on.year
-      hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 2.day
-      hbx_enrollment2.effective_on = TimeKeeper.date_of_record + 1.day
+      hbx_enrollment1.effective_on = date + 1.day
+      hbx_enrollment2.effective_on = date
+      # This gets processed on 31st Dec
+      if hbx_enrollment1.effective_on.year != hbx_enrollment2.effective_on.year
+        hbx_enrollment1.effective_on = date + 2.day
+        hbx_enrollment2.effective_on = date + 1.day
+      end
+      hbx_enrollment2.select_coverage!
+      expect(hbx_enrollment1.coverage_canceled?).to be_truthy
+      expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
-    hbx_enrollment2.select_coverage!
-    expect(hbx_enrollment1.coverage_canceled?).to be_truthy
-    expect(hbx_enrollment2.coverage_selected?).to be_truthy
-  end
 
     it "should not cancel hbx enrollemnt of previous plan year enrollment" do
-      hbx_enrollment1.effective_on = TimeKeeper.date_of_record + 1.year
-      hbx_enrollment2.effective_on = TimeKeeper.date_of_record
+      hbx_enrollment1.effective_on = date + 1.year
+      hbx_enrollment2.effective_on = date
       hbx_enrollment2.select_coverage!
       expect(hbx_enrollment1.coverage_canceled?).to be_falsy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
     it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
-      hbx_enrollment1.effective_on = TimeKeeper.date_of_record - 10.days
+      hbx_enrollment1.effective_on = date - 10.days
       hbx_enrollment2.select_coverage!
       expect(hbx_enrollment1.coverage_terminated?).to be_truthy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
@@ -2138,10 +2182,9 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 end
 
 describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all do
-
   let!(:hbx_profile)    { FactoryGirl.create(:hbx_profile) }
   let(:family)          { FactoryGirl.build(:individual_market_family) }
-  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household ) }
+  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record ) }
 
   context "Enrollment is in active state" do
     it "enrollment is in coverage_selected state" do

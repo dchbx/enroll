@@ -260,7 +260,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     let(:sep) { SpecialEnrollmentPeriod.new }
     let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop') }
 
-    
+
     context "SHOP QLE and event date are specified" do
       it "should set start_on date to date of event" do
         allow(family).to receive(:primary_applicant).and_return(primary_applicant)
@@ -382,17 +382,17 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
 
   context "is reporting a qle before the employer plan start_date" do
-    let(:plan_year_start_on) { Date.new(TimeKeeper.date_of_record.year, 06, 01) }
-    let(:sep_effective_on) { Date.new(TimeKeeper.date_of_record.year, 04, 01) }
+    let(:plan_year_start_on) { Date.new(TimeKeeper.date_of_record.year, 04, 01) }
+    let(:sep_effective_on) { Date.new(TimeKeeper.date_of_record.year, 02, 01) }
     let!(:published_plan_year) { FactoryGirl.create(:plan_year, start_on: plan_year_start_on) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(TimeKeeper.date_of_record.year, 04, 14)) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(TimeKeeper.date_of_record.year, 03, 14)) }
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member)  }
 
     let(:sep){
       sep = shop_family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
-      sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 04, 14)
+      sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 03, 14)
       sep
     }
 
@@ -406,7 +406,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
 
     it "should return a sep with an effective date that equals to employers plan year start-date when sep_effective_date  < plan_year_start_on" do
-       expect(sep.effective_on).to eq published_plan_year.start_on
+      expect(sep.effective_on).to eq published_plan_year.start_on
     end
   end
 

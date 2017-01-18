@@ -6,11 +6,11 @@ FactoryGirl.define do
     benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship) }
 
     trait :open_enrollment_coverage_period do
-       benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship, :open_enrollment_coverage_period) }
+      benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship, :open_enrollment_coverage_period) }
     end
 
     trait :single_open_enrollment_coverage_period do
-       benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship, :single_open_enrollment_coverage_period) }
+      benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship, :single_open_enrollment_coverage_period) }
     end
 
     trait :no_open_enrollment_coverage_period do

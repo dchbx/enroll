@@ -14,8 +14,8 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: renewal_year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
     }
 
-    let!(:organization) { 
-      org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+    let!(:organization) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryGirl.create :employer_profile, organization: org
       FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
       org.reload
@@ -32,12 +32,12 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
       employee.add_renew_benefit_group_assignment renewal_benefit_group
     }
-      
+
     let(:open_enrollment_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
     let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 12.days }
     let(:start_on) { open_enrollment_start_on + 2.months }
     let(:end_on) { start_on + 1.year - 1.day }
-  
+
     let(:active_plan_year) {
       FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, fte_count: 2, aasm_state: :published
     }
@@ -55,16 +55,16 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
     }
 
 
-    let(:generate_passive_renewal) {
+    def generate_passive_renewal
       factory = Factories::FamilyEnrollmentRenewalFactory.new
-      factory.family = family
-      factory.census_employee = ce
-      factory.employer = employer_profile
-      factory.renewing_plan_year = employer_profile.renewing_plan_year
+      factory.family = family.reload
+      factory.census_employee = ce.reload
+      factory.employer = employer_profile.reload
+      factory.renewing_plan_year = employer_profile.renewing_plan_year.reload
       factory.renew
-    }
+    end
 
-    context 'with active coverage' do 
+    context 'with active coverage' do
 
       let!(:family) {
         person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
@@ -88,8 +88,8 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
         family_rec.reload
       }
 
-      context 'when employer offering the renewing plan' do 
-        it 'should receive passive renewal' do 
+      context 'when employer offering the renewing plan' do
+        it 'should receive passive renewal' do
           expect(family.enrollments.size).to eq 1
           expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
           generate_passive_renewal
@@ -119,7 +119,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       end
     end
 
-    context 'with no active coverage' do 
+    context 'with no active coverage' do
 
       let!(:family) {
         person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
@@ -147,7 +147,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
       context 'when employer enters renewal open enrollment' do
 
-        it 'should recieve passive waiver' do 
+        it 'should recieve passive waiver' do
           expect(family.active_household.hbx_enrollments.size).to eq 1
           expect(family.active_household.hbx_enrollments.first.aasm_state).to eq 'coverage_terminated'
           generate_passive_renewal
@@ -168,7 +168,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
     #     family_rec.reload
     #   }
 
-    #   context 'when employer enters renewal open enrollment' do 
+    #   context 'when employer enters renewal open enrollment' do
     #     it 'should recieve passive waiver' do
     #       expect(family.active_household.hbx_enrollments.size).to eq 0
     #       generate_passive_renewal
@@ -177,8 +177,8 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
     #     end
     #   end
     # end
-    
-    context 'with no active/waived coverage' do 
+
+    context 'with no active/waived coverage' do
 
       let!(:family) {
         person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
@@ -188,7 +188,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
         family_rec.reload
       }
 
-      context 'when employer enters renewal open enrollment' do 
+      context 'when employer enters renewal open enrollment' do
         it 'should recieve passive waiver' do
           expect(family.active_household.hbx_enrollments.size).to eq 0
           generate_passive_renewal
@@ -306,6 +306,73 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       it "should not return hbx_enrollment_members if member relationship not offered in renewal plan year" do
         allow(subject).to receive(:is_relationship_offered_and_member_covered?).and_return(false)
         expect(subject.clone_enrollment_members(active_enrollment, renewal_enrollment).length).to eq 0
+      end
+    end
+
+    context 'with active coverage' do
+      let!(:new_renewal_plan) {
+        FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: renewal_year, hios_id: "11111111122301-01", csr_variant_id: "01")
+      }
+
+      let!(:family) {
+        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+        ce.update_attributes({employee_role: employee_role})
+        family_rec = Family.find_or_build_from_employee_role(employee_role)
+
+        FactoryGirl.create(:hbx_enrollment,
+          household: person.primary_family.active_household,
+          coverage_kind: "health",
+          effective_on: ce.active_benefit_group_assignment.benefit_group.start_on,
+          enrollment_kind: "open_enrollment",
+          kind: "employer_sponsored",
+          submitted_at: ce.active_benefit_group_assignment.benefit_group.start_on - 20.days,
+          benefit_group_id: ce.active_benefit_group_assignment.benefit_group.id,
+          employee_role_id: person.active_employee_roles.first.id,
+          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+          plan_id: plan.id
+          )
+
+        family_rec.reload
+      }
+
+      context 'when passive renewal already exists and employer changed plan offerings' do
+
+        it 'should be canceld' do
+          generate_passive_renewal
+          passive_renewal = family.active_household.hbx_enrollments.renewing.first
+          expect(passive_renewal.auto_renewing?).to be_truthy
+
+          renewal_benefit_group.reference_plan_id = new_renewal_plan.id
+          renewal_benefit_group.elected_plans= [new_renewal_plan]
+          renewal_benefit_group.save!
+
+          generate_passive_renewal
+          passive_renewal.reload
+
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+        end
+      end
+
+      context 'passive renewal not exists and employer changed plan offerings' do
+
+        it 'should generate passive renewal' do
+          renewal_benefit_group.reference_plan_id = new_renewal_plan.id
+          renewal_benefit_group.elected_plans= [new_renewal_plan]
+          renewal_benefit_group.save!
+
+          generate_passive_renewal
+          expect(family.active_household.hbx_enrollments.renewing.blank?).to be_truthy
+
+          renewal_benefit_group.reference_plan_id = renewal_plan.id
+          renewal_benefit_group.elected_plans= [renewal_plan]
+          renewal_benefit_group.save!
+
+          generate_passive_renewal
+
+          passive_renewal = family.active_household.hbx_enrollments.renewing.first
+          expect(passive_renewal.auto_renewing?).to be_truthy
+        end
       end
     end
   end

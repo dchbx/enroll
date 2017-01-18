@@ -1266,3 +1266,74 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     expect(family_member_dependent.person.consumer_role).to eq cr
   end
 end
+
+
+describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
+  let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
+  let(:sep_effective_date) { Date.new(current_effective_date.year - 1, 11, 1) }
+  let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
+  let!(:prev_year_plan) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01") }
+  let!(:dental_plan) { FactoryGirl.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year - 1)}
+  let!(:two_years_old_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year - 2, hios_id: "11111111122302-01", csr_variant_id: "01") }
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+  let!(:enrollments) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: current_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: plan.id
+    )
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: current_effective_date - 1.year,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: prev_year_plan.id
+    )
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "dental",
+                       effective_on: sep_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: dental_plan.id
+    )
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "dental",
+                       effective_on: current_effective_date - 2.years,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: two_years_old_plan.id
+    )
+  }
+  context 'when family exists with current & previous year coverages' do
+    before do
+      Family.expire_individual_market_enrollments
+      family.reload
+    end
+    it "should expire previous year coverages" do
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 1.year).first
+      expect(enrollment.coverage_expired?).to be_truthy
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 2.years).first
+      expect(enrollment.coverage_expired?).to be_truthy
+    end
+    it "should not expire coverage with begin date less than 60 days" do
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => sep_effective_date).first
+      expect(enrollment.coverage_expired?).to be_falsey
+    end
+    it "should not expire coverage for current year" do
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date).first
+      expect(enrollment.coverage_expired?).to be_falsey
+    end
+  end
+end

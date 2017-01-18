@@ -164,6 +164,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @employer_profile = @organization.employer_profile
     @staff = Person.staff_for_employer_including_pending(@employer_profile)
     @add_staff = params[:add_staff]
+    @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
   end
 
   def create
@@ -324,7 +325,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                        else
                          @employer_profile.census_employees.active.sorted
                        end
-    census_employees = census_employees.search_by(params.slice(:employee_name))
+    if params["employee_search"].present?
+      query_string = CensusEmployee.search_hash(params["employee_search"])
+      census_employees = census_employees.any_of(query_string)
+    end
     @page_alphabets = page_alphabets(census_employees, "last_name")
 
     if params[:page].present?

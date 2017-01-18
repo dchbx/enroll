@@ -377,7 +377,11 @@ When(/^.+ clicks? on publish plan year$/) do
   find('.interaction-click-control-publish-plan-year').click
 end
 
-Then(/^.+ should see Publish Plan Year Modal with warnings$/) do
+Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
+  expect(find('.modal-body')).to have_content('Primary office must be located in District of Columbia')
+end
+
+Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
   expect(find('.modal-body')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
 end
 
@@ -385,9 +389,19 @@ Then(/^.+ clicks? on the Cancel button$/) do
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 
+Then(/^.+ should be on the business info page with warnings$/) do
+  expect(page).to have_content 'Primary Office Location'
+  expect(find('.alert-error')).to have_content('Primary office must be located in District of Columbia')
+end
+
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   expect(page).to have_css('#plan_year')
   expect(find('.alert-plan-year')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
+end
+
+Then(/^.+ updates the address location with correct address$/) do
+  step "I updates office location from #{non_dc_office_location} to #{default_office_location}"
+  find('.interaction-click-control-save').click
 end
 
 Then(/^.+ updates? the FTE field with valid input and save plan year$/) do

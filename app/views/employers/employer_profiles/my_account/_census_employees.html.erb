@@ -13,7 +13,7 @@
           <%= hidden_field_tag(:status, 'active') %>
           <%= hidden_field_tag(:search, true) %>
           <div class="input-group">
-            <%= text_field_tag(:employee_name, params[:employee_name], placeholder: 'Employee Name', class: 'form-control') %>
+            <%= text_field_tag(:employee_search, params[:employee_search], placeholder: 'Employee Name, SSN', class: 'form-control') %>
             <div class="input-group-btn">
               <div class="btn btn-default" id='census_employee_search_clear'>
                 <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>

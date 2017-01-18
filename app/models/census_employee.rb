@@ -607,6 +607,17 @@ class CensusEmployee < CensusMember
       end
     end
 
+    # Search query string on census employee with first name,last name,SSN.
+    def search_hash(s_rex)
+      search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+      {
+          "$or" => ([
+              {"first_name" => search_rex},
+              {"last_name" => search_rex},
+              {"encrypted_ssn" => encrypt_ssn(s_rex)}
+          ])
+      }
+    end
   end
 
   aasm do

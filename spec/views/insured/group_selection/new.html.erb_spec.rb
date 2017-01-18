@@ -91,10 +91,10 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         residency_status:     ["state_resident"],
         ethnicity:            ["any"]
     ))}
-
-    let(:family_member2) { instance_double("FamilyMember",id: "family_member", primary_relationship: "child", dob: Date.new(2010,11,18), full_name: "cgukd", is_primary_applicant: false, person: person2) }
-    let(:family_member3) { instance_double("FamilyMember",id: "family_member", primary_relationship: "spouse", dob: Date.new(1991,9,21), full_name: "spouse", is_primary_applicant: false, person: person3) }
-    let(:family_member4) { instance_double("FamilyMember",id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,28), full_name: "inmsr", is_primary_applicant: true, person: jail_person) }
+    let(:family) {double}
+    let(:family_member2) { instance_double("FamilyMember",id: "family_member", primary_relationship: "child", dob: Date.new(2010,11,18), full_name: "cgukd", is_primary_applicant: false, person: person2, family: family) }
+    let(:family_member3) { instance_double("FamilyMember",id: "family_member", primary_relationship: "spouse", dob: Date.new(1991,9,21), full_name: "spouse", is_primary_applicant: false, person: person3, family: family) }
+    let(:family_member4) { instance_double("FamilyMember",id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,28), full_name: "inmsr", is_primary_applicant: true, person: jail_person, family: family) }
 
     let(:coverage_household_members) {[double("coverage household member 2", family_member: family_member2), double("coverage household member 3", family_member: family_member3), double("coverage household member 4", family_member: family_member4)]}
 

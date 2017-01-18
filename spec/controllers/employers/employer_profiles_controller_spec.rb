@@ -162,6 +162,39 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:census_employees)).to eq [census_employee]
     end
 
+    it "census_employee record not found" do
+      employer_profile.census_employees.delete_all
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test1",
+                                           last_name: "test1")
+
+      params ={commit: "search", status: "active", employee_search: "test11", search: true,id: employer_profile.id.to_s}
+      xhr :get,:show, params
+      expect(assigns(:census_employees).count).to eq 0
+      expect(assigns(:census_employees)).to eq []
+    end
+
+    it "should return census_employee when searching with name" do
+      employer_profile.census_employees.delete_all
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test1",
+                                           last_name: "test1")
+      census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "test11",
+                                            last_name: "test11")
+      params ={commit: "search", status: "active", employee_search: "test11", search: true,id: employer_profile.id.to_s}
+      xhr :get,:show, params
+      expect(assigns(:census_employees).count).to eq 1
+      expect(assigns(:census_employees)).to eq [census_employee1]
+    end
+
+    it "should return census_employee when searching with ssn" do
+      employer_profile.census_employees.delete_all
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "123456789")
+      census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "987654321")
+      params ={commit: "search", status: "active", employee_search: "123456789", search: true,id: employer_profile.id.to_s}
+      xhr :get,:show, params
+      expect(assigns(:census_employees).count).to eq 1
+      expect(assigns(:census_employees)).to eq [census_employee]
+    end
+
     #it "get avaliable_employee_names for autocomplete employee name" do
     #  xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
     #  expect(assigns(:avaliable_employee_names)).to eq employer_profile.census_employees.sorted.map(&:full_name).uniq

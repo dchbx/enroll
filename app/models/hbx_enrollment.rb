@@ -405,18 +405,21 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    if benefit_group_assignment.may_waive_coverage?
-      cancel_previous(self.effective_on.year)
-      benefit_group_assignment.try(:waive_coverage!) if benefit_group_assignment
-    else
-      return false
+    return false if kind != 'employer_sponsored' # there is no concept of waiver in ivl case
+    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
+    shop_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
     end
-
+    if coverage_kind == 'health' && benefit_group_assignment.present?
+      benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
+    end
+    return true
   end
 
   def waive_coverage_by_benefit_group_assignment(waiver_reason)
-    update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
-    propogate_waiver
+    update_current(waiver_reason: waiver_reason)
+    waive_coverage!
   end
 
   def cancel_previous(year)
@@ -1206,8 +1209,9 @@ class HbxEnrollment
   end
 
   def can_be_expired?
-    (benefit_group.present?) && (benefit_group.end_on <= TimeKeeper.date_of_record)
+    benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
   end
+
 
   def can_select_coverage?
     return true unless is_shop?

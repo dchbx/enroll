@@ -815,6 +815,8 @@ describe EmployerProfile, "Renewal Queries" do
   let(:calender_year) { TimeKeeper.date_of_record.year }
 
   before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today+1.month) if TimeKeeper.date_of_record.month == 1
+
     plan_years = organization1.employer_profile.plan_years.to_a
     plan_years.first.update_attributes({ aasm_state: :renewing_published,
       :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
@@ -844,6 +846,10 @@ describe EmployerProfile, "Renewal Queries" do
       :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
       :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10)
       })
+  end
+
+  after do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1
   end
 
   context '.organizations_for_open_enrollment_begin', dbclean: :after_each do

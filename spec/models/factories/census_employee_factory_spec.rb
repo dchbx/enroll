@@ -2,13 +2,21 @@ require 'rails_helper'
 
 RSpec.describe Factories::CensusEmployeeFactory, type: :model, dbclean: :after_each do
 
-  context "When Census Employe don't have benefit group assignment" do 
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
+  end
+
+  after do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
+  context "When Census Employe don't have benefit group assignment" do
     let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
-    let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") } 
+    let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
     let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record, employer_profile: employer_profile) }
-    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }  
+    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
     let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
     let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
     let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
@@ -22,21 +30,21 @@ RSpec.describe Factories::CensusEmployeeFactory, type: :model, dbclean: :after_e
       expect(census_employee.active_benefit_group_assignment.benefit_group).to eq renewal_benefit_group
     end
   end
-  
-  context "When ER offers both health and dental in a plan year" do 
+
+  context "When ER offers both health and dental in a plan year" do
     let(:calender_year) { TimeKeeper.date_of_record.year }
-    let(:organization) { 
-      org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+    let(:organization) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryGirl.create :employer_profile, organization: org
       active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
       :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5
       renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5 
+      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5
       benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
       renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
       owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
       2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
-      employer_profile.census_employees.each do |ce| 
+      employer_profile.census_employees.each do |ce|
         ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
         ce.add_renew_benefit_group_assignment(renewing_benefit_group)
         person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)

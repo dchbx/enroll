@@ -226,13 +226,9 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
-    @just_a_warning = false
-    if plan_year.publish_pending?
-      plan_year.withdraw_pending!
-      if !plan_year.is_application_valid?
-        @just_a_warning = true
-        plan_year.application_eligibility_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
-      end
+    if params[:publish]
+      @just_a_warning = !plan_year.is_application_valid? ? true : false
+      plan_year.application_warnings
     end
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
@@ -326,12 +322,14 @@ class Employers::PlanYearsController < ApplicationController
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     @plan_year.publish! if @plan_year.may_publish?
-    if @plan_year.publish_pending?
+    if @plan_year.publish_pending? || @plan_year.renewing_publish_pending?
+      @plan_year.withdraw_pending!
       respond_to do |format|
         format.js
       end
     else
       if (@plan_year.published? || @plan_year.enrolling? || @plan_year.renewing_published? || @plan_year.renewing_enrolling?)
+
         if @plan_year.assigned_census_employees_without_owner.present?
           flash[:notice] = "Plan Year successfully published."
         else

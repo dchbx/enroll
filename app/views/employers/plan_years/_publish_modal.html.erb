@@ -13,7 +13,8 @@
       </div>
       <div class="modal-footer">
         <%= link_to 'Force Publish', employers_employer_profile_plan_year_force_publish_path(@employer_profile,plan_year), method: :post, :class => 'btn btn-danger' %>
-        <%= link_to 'Cancel', edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), method: :get, :class => 'btn btn-default' %>
+        <% error_page = plan_year.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile.organization, plan_year_id: plan_year.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, publish: true) %>
+        <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
       </div>
     </div>
   </div>

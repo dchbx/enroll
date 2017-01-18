@@ -8,8 +8,8 @@ describe QhpRateBuilder do
   it "should return qhp builder object" do
     @rates_hash = {
       items: [{
-        :effective_date => "2016-01-01",
-        :expiration_date => "2016-12-31",
+        :effective_date => "#{TimeKeeper.date_of_record.year}-01-01",
+        :expiration_date => "#{TimeKeeper.date_of_record.year}-12-31",
         :plan_id => plan.hios_id,
         :age_number => 20,
         :primary_enrollee => 256.41

@@ -108,6 +108,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
+    it "contains the correct renewing states" do
+      expect(PlanYear::RENEWING).to eq %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
+    end
+
     it "census employees should not be matchable" do
       expect(plan_year.is_eligible_to_match_census_employees?).to be_falsey
     end
@@ -730,6 +734,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the employer doesn't request eligibility review" do
             context "and more than 90 days have elapsed since the ineligible application was submitted" do
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 90.days)
               end
@@ -742,6 +747,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the applicant requests eligibility review" do
             context "and 30 days or less have elapsed since application was submitted" do
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 10.days)
                 workflow_plan_year_with_benefit_group.request_eligibility_review!
@@ -752,6 +758,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and review overturns ineligible application determination" do
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
                 before { workflow_plan_year_with_benefit_group.grant_eligibility! }
 
                 it "should transition application into published status" do
@@ -764,6 +771,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and review affirms ineligible application determination" do
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
                 before { workflow_plan_year_with_benefit_group.deny_eligibility! }
 
                 it "should transition application back into published_invalid status" do
@@ -773,6 +781,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             end
 
             context "and more than 30 days have elapsed since application was submitted" do
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 31.days)
               end
@@ -782,6 +791,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and 90 days have elapsed since the ineligible application was submitted" do
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
                 before do
                   TimeKeeper.set_date_of_record(submit_date + Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.days)
                 end
@@ -820,6 +830,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           it "employees should be able to browse, but not purchase plans"
 
           context "and open enrollment begins" do
+            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
             before do
               # $start_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on
               TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
@@ -886,6 +897,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 context "and three of the six employees have enrolled" do
+                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
                   before do
                     census_employees[0..2].each do |ee|
                       if ee.active_benefit_group_assignment.may_select_coverage?
@@ -1033,6 +1045,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and today is the day following close of open enrollment" do
+          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
           before do
             TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
           end
@@ -2165,10 +2178,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context '.adjust_open_enrollment_date' do
     let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
     let(:calender_year) { TimeKeeper.date_of_record.year }
-    let(:plan_year_start_on) { Date.new(calender_year, 6, 1) }
-    let(:plan_year_end_on) { Date.new(calender_year + 1, 5, 31) }
-    let(:open_enrollment_start_on) { Date.new(calender_year, 4, 3) }
-    let(:open_enrollment_end_on) { Date.new(calender_year, 5, 13) }
+    let(:plan_year_start_on) { Date.new(calender_year, 4, 1) }
+    let(:plan_year_end_on) { Date.new(calender_year + 1, 3, 31) }
+    let(:open_enrollment_start_on) { Date.new(calender_year, 2, 3) }
+    let(:open_enrollment_end_on) { Date.new(calender_year, 3, 13) }
     let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
@@ -2189,6 +2202,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on + 10.days)
     end
 
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     it 'should reset open enrollment date when published plan year' do
       plan_year.publish!
       expect(plan_year.aasm_state).to eq 'renewing_enrolling'
@@ -2202,10 +2219,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context 'publishes renewal draft' do
       let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       let(:calender_year) { TimeKeeper.date_of_record.year }
-      let(:plan_year_start_on) { Date.new(calender_year, 6, 1) }
-      let(:plan_year_end_on) { Date.new(calender_year + 1, 5, 31) }
-      let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
-      let(:open_enrollment_end_on) { Date.new(calender_year, 5, 13) }
+      let(:plan_year_start_on) { Date.new(calender_year, 4, 1) }
+      let(:plan_year_end_on) { Date.new(calender_year + 1, 3, 31) }
+      let(:open_enrollment_start_on) { Date.new(calender_year, 2, 1) }
+      let(:open_enrollment_end_on) { Date.new(calender_year, 3, 13) }
       let!(:plan_year) { FactoryGirl.create(:plan_year,
                                               start_on: plan_year_start_on,
                                               end_on: plan_year_end_on,
@@ -2331,6 +2348,36 @@ describe PlanYear, "which has the concept of export eligibility" do
         expect(subject.eligible_for_export?).to eq true
       end
     end
+  end
+end
+
+describe PlanYear, "filter_active_enrollments_by_date" do
+  let(:plan_year) { FactoryGirl.create(:plan_year)}
+  let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+  let(:benefit_group_assignment) { double("benefit_group_assignment", id: "bga") }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:health_enrollment) { FactoryGirl.create(:hbx_enrollment, coverage_kind: 'health', household: family.active_household)}
+  let(:dental_enrollment) { FactoryGirl.create(:hbx_enrollment, coverage_kind: 'dental', household: family.active_household)}
+
+  before do
+    health_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id, effective_on: plan_year.start_on, benefit_group_id: benefit_group.id)
+    dental_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id, effective_on: plan_year.start_on, benefit_group_id: benefit_group.id)
+  end
+
+  it 'should return an array of openstruct' do
+    result = plan_year.filter_active_enrollments_by_date(plan_year.start_on)
+    expect(result.class).to eq Array
+    expect(result.first.class).to eq OpenStruct
+  end
+
+  it 'should return both health & dental enrollment ids' do
+    result = plan_year.filter_active_enrollments_by_date(plan_year.start_on)
+    expect(result.map(&:hbx_enrollment_id)).to eq [dental_enrollment.id, health_enrollment.id]
+  end
+
+  it 'should return both health & dental plan ids' do
+    result = plan_year.filter_active_enrollments_by_date(plan_year.start_on)
+    expect(result.map(&:plan_id)).to eq [dental_enrollment.plan.id, health_enrollment.plan.id]
   end
 end
 
