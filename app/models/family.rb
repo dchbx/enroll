@@ -448,7 +448,9 @@ class Family
 
   def hire_broker_agency(broker_role_id)
     return unless broker_role_id
-    existing_agency = current_broker_agency
+    existing_active_agencies = current_broker_agency
+ 
+
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
     fire_broker_agency(existing_agency) if existing_agency
     start_on = Time.now
@@ -467,6 +469,16 @@ class Family
 
   def any_unverified_enrollments?
     enrollments.verification_needed.any?
+  end
+
+  def all_active_broker_agencies
+    broker_agency_accounts.select { |account| account.is_active? }
+  end
+
+  def ivl_broker_agency
+  end
+
+  def shop_broker_agency
   end
 
   class << self

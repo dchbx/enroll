@@ -25,5 +25,38 @@ module Insured
         benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
+
+    def current_user_can_shop_for_ivl?(person)
+      if current_user.has_broker_role?
+        return the_writing_agent(person) == current_user.person && can_shop_individual?(person)
+      else
+        return can_shop_individual?(person)
+      end
+    end
+
+    def the_writing_agent(employee_role_or_person)
+      if employee_role_or_person.has_active_employee_role?
+        employee_role_or_person.active_employee_roles.first.employer_profile.active_broker_agency_account.writing_agent.person
+      elsif employee_role_or_person.has_active_consumer_role?
+        employee_role_or_person.primary_family.current_broker_agency.writing_agent.person
+      elsif employee_role_or_person.dual_role?
+      end
+    end
+
+    def current_user_can_shop_for_employee?(person)
+      if current_user.has_broker_role?
+        return the_writing_agent(person) == current_user.person && can_shop_shop?(person)
+      else
+        return can_shop_shop?(person)
+      end
+    end
+
+    def is_eligible_market?(market_kind,person)
+      if market_kind == "shop"
+        return current_user_can_shop_for_employee?(person)
+      else
+        return current_user_can_shop_for_ivl?(person)
+      end
+    end
   end
 end
