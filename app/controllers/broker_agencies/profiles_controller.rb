@@ -125,16 +125,22 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employers
-    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
-      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
-    else
-      broker_role_id = current_user.person.broker_role.id
-      @orgs = Organization.by_broker_role(broker_role_id)
-    end
-    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
+
+
     @memo = {}
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
+
+    @datatable = Effective::Datatables::BrokerAgencyEmployersDatatable.new( :current_user => current_user,
+                                                                            :broker_agency_profile_id => @broker_agency_profile._id,
+                                                                            :controller_name => controller_name,
+                                                                            :general_agency_profiles => @general_agency_profiles
+                                                                            )
+
+
+    respond_to do |format|
+      format.js {}
+    end
   end
 
   def general_agency_index
