@@ -82,8 +82,17 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_family_relationships_satisfied?
-    age = age_on_next_effective_date(@role.dob)
-    relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
+    return true unless relation_ship_with_primary_applicant == 'child'
+    is_child_age_satisfied?
+  end
+
+  def is_child_age_satisfied?
+    unless @new_effective_on.nil?
+      relation_ship_with_primary_applicant == 'child' && @new_effective_on.kind_of?(Date) && @new_effective_on < @role.dob+26.years ? true : false
+    else
+      age = age_on_next_effective_date(@role.dob)
+      relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
+    end
   end
 
   def is_benefit_categories_satisfied?
