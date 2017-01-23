@@ -1,7 +1,13 @@
 <% content_for :navigation do %>
     <%= render 'navigation' %>
 <% end %>
-<h1 class="darkblue no-buffer">Documents</h1>
+<div class="module">
+<div class="vertically-aligned-row">
+	<h1 class="darkblue no-buffer">Documents</h1>
+	<span class='text-right'>
+	  <%= link_to "Download Tax Documents", download_tax_docs_insured_families_path(), class: "btn btn-primary" if current_user.has_hbx_staff_role? %>
+	</span>
+</div>
 <div class="documents-tab">
   <% if @person && @person.consumer_role %>
       <h4 class="starter">We verify the information you give us using electronic data sources.
