@@ -105,6 +105,27 @@ shop_notice_triggers = [
       }
     ] 
   },
+  {
+    hbx_id: 'SHOP_Out_of_pocket_notice',
+    title: 'Out of pocket calculator',
+    description: 'Out of pocket calculator notifier',
+    resource_name: 'employer',
+    event_name: 'out_of_pocker_url_notifier',
+    notice_triggers: [
+      {
+        name: 'Out of pocket Notice',
+        notice_template: "notices/shop_notices/out_of_pocket_notice.html.erb",
+        notice_builder: 'ShopNotices::OutOfPocketNotice',
+        mpi_indicator: 'MPI',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: [""],
+          primary_recipient_delivery_method: ["email"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
 ]
 
 

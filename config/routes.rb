@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -134,6 +133,7 @@ Rails.application.routes.draw do
       member do
         post 'unblock'
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -229,6 +229,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        post 'generate_checkbook_urls'
       end
       collection do
         get 'welcome'

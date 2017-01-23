@@ -12,6 +12,7 @@
   <div class="my-account-page">
     <h1>My <%= Settings.site.short_name %></h1>
   </div>
+   
   <div class="row">
     <div class="col-md-8">
       <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>

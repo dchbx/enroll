@@ -1,12 +1,11 @@
 class ShopNotices::EmployerNotice < ShopNotice
 
-  attr_accessor :employer_profile,:trigger_type
+  attr_accessor :employer_profile
 
   Required= ShopNotice::Required + [:employer_profile]
 
   def initialize(args = {})
     self.employer_profile=args[:employer_profile]
-    self.trigger_type = args[:trigger_type]
     args[:recipient] = employer_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployerNotice.new
@@ -29,7 +28,6 @@ class ShopNotices::EmployerNotice < ShopNotice
   end
 
   def build
-    notice.trigger_type = self.trigger_type
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = employer_profile.hbx_id

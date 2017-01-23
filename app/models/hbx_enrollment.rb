@@ -106,6 +106,8 @@ class HbxEnrollment
   field :review_status, type: String, default: "incomplete"
   field :special_verification_period, type: DateTime
   field :termination_submitted_on, type: DateTime
+  # Checkbook url
+  field :checkbook_url , type: String
 
 
   # An external enrollment is one which we keep for recording purposes,

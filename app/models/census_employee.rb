@@ -1,3 +1,5 @@
+require 'services/checkbook_services'
+
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
@@ -376,12 +378,44 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def generate_and_save_to_temp_folder
+
+    begin
+      url = Settings.checkbook_services.url
+      event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+      notice_trigger = event_kind.notice_triggers.first
+      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
+        mpi_indicator: notice_trigger.mpi_indicator,
+        data: url
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+      builder.build_and_save
+   rescue Exception => e
+     Rails.logger.warn("Unable to build checkbook notice for #{e}")
+   end
+  end
+
+  def generate_and_deliver_checkbook_url
+    begin
+      url = Settings.checkbook_services.url
+      event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+      notice_trigger = event_kind.notice_triggers.first
+      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
+        mpi_indicator: notice_trigger.mpi_indicator,
+        data: url
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+      builder.deliver
+   rescue Exception => e
+      Rails.logger.warn("Unable to deliver checkbook url #{e}")
+    end
+  end
+
   def terminate_employment!(employment_terminated_on)
-
     if employment_terminated_on < TimeKeeper.date_of_record
-
       if may_terminate_employee_role?
-
         unless employee_termination_pending?
 
           self.employment_terminated_on = employment_terminated_on
@@ -392,7 +426,6 @@ class CensusEmployee < CensusMember
 
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on)  }
-
         end
         terminate_employee_role!
         perform_employer_plan_year_count
@@ -413,7 +446,6 @@ class CensusEmployee < CensusMember
 
           census_employee_hbx_enrollment = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(renewal_benefit_group_assignment)
           census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
-
       end
     end
 
@@ -421,7 +453,6 @@ class CensusEmployee < CensusMember
   end
 
   def earliest_coverage_termination_on(employment_termination_date, submitted_date = TimeKeeper.date_of_record)
-
     employment_based_date = employment_termination_date.end_of_month
     submitted_based_date  = TimeKeeper.date_of_record.
                               advance(Settings.

@@ -343,7 +343,7 @@ class EmployerProfile
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -806,6 +806,16 @@ class EmployerProfile
 
   def is_conversion?
     self.profile_source == "conversion"
+  end
+
+  def generate_and_deliver_checkbook_urls_for_employees
+    census_employees.each do |census_employee|
+      census_employee.generate_and_deliver_checkbook_url
+    end
+  end
+
+  def generate_checkbook_notices
+    OutofpocketNotifierJob.perform_later(self.id.to_s)
   end
 
 private
