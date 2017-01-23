@@ -152,6 +152,8 @@ Rails.application.routes.draw do
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
+        get 'download_tax_docs'
+        get 'download'
         post 'upload_notice'
       end
 

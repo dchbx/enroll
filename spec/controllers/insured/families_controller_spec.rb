@@ -824,3 +824,32 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 end
+
+
+RSpec.describe Insured::FamiliesController do
+  let(:hbx_enrollment) { HbxEnrollment.new }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+    context "Failed Download" do
+      it "fails with an error message" do
+        allow_any_instance_of(Insured::FamiliesController).to receive(:download)
+        sign_in user
+        get :download, key:"sample-key"
+        expect(flash[:error]).to be_nil
+      end
+    end
+
+    context "Successful Download" do
+      it "downloads a file" do
+        allow_any_instance_of(Insured::FamiliesController).to receive(:download)
+        allow_any_instance_of(Insured::FamiliesController).to receive(:send_data).with(nil, {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
+                                                                             @controller.render nothing: true # to prevent a 'missing template' error
+                                                                           }
+        sign_in user
+        get :download, key:"sample-key"
+        expect(flash[:error]).to be_nil
+        expect(response.status).to eq(302)
+      end
+    end
+  end

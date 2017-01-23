@@ -6,6 +6,7 @@
     <h1 class="darkblue no-buffer">Messages</h1>
     <span class='text-right'>
       <%= link_to "Upload Notices", upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank' if current_user.has_hbx_staff_role? %>
+      <%= link_to "Download Tax Documents", 'https://www.dchealthlink.com/individuals/tax-documents', class: "btn btn-primary  pull-right", target: '_blank' if @person.try(:consumer_role).present? && @person.try(:ssn).present? %>
     </span>
   </div>
   <%= render 'inbox', provider: @person %>
