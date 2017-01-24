@@ -349,6 +349,9 @@ class Family
     special_enrollment_periods.find_all { |sep| sep.is_active? && sep.admin_flag }
   end
 
+  def find_sep(sep_id)
+    special_enrollment_periods.find(sep_id) rescue nil
+  end
 
   # single SEP with latest end date from list of active SEPs
   def current_sep

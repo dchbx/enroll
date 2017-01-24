@@ -58,6 +58,7 @@ RSpec.describe Insured::FamiliesController do
     allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
     allow(family).to receive_message_chain("family_members.active").and_return(family_members)
+    allow(family).to receive(:find_sep)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
@@ -273,6 +274,18 @@ RSpec.describe Insured::FamiliesController do
           expect(assigns(:employee_role)).to eq(employee_role)
         end
       end
+    end
+  end
+
+  describe "GET existing_sep_opt_date" do
+    it "should be success" do
+      get :existing_sep_opt_date, format: :js
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders verification template" do
+      get :existing_sep_opt_date, format: :js
+      expect(response).to render_template("existing_sep_opt_date")
     end
   end
 

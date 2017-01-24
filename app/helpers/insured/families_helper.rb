@@ -87,15 +87,15 @@ module Insured::FamiliesHelper
     link_to qle.title, "javascript:void(0)", options
   end
 
-  def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
-    options = {class: 'existing-sep-item'}
+  def qle_link_generator_for_an_existing_qle(qle, sep, link_title=nil)
+    options = {class: 'existing-sep-item', remote: true }
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     }
     options.merge!(data: data)
-    link_to link_title.present? ? link_title: "Shop for Plans", "javascript:void(0)", options
+    link_to link_title.present? ? link_title : "Shop for Plans", existing_sep_opt_date_insured_families_path(qle: qle, sep_id: sep.id), options
   end
 
   def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
@@ -189,13 +189,13 @@ module Insured::FamiliesHelper
 
   def build_link_for_sep_type(sep, link_title=nil)
     return if sep.blank?
-    qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
+    qle = find_qle_for_sep(sep)
     if qle.date_options_available && sep.optional_effective_on.present?
       # Take to the QLE like flow of choosing Option dates if available
-       qle_link_generator_for_an_existing_qle(qle, link_title)
+       qle_link_generator_for_an_existing_qle(qle, sep, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
-      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
+      link_to link_title.present? ? link_title : 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
     end
   end
 

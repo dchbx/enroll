@@ -40,12 +40,6 @@ RSpec.describe "insured/families/home.html.erb" do
     expect(rendered).to have_selector('div#plan-summary')
   end
 
-  it "should display 'existing SEP - Eligible to enroll' partial if there is an active admin SEP" do
-    assign(:active_admin_sep, sep)
-    render file: "insured/families/home.html.erb"
-    expect(rendered).to have_selector('div#qle-details-for-existing-sep')
-  end
-
   it "should not display 'existing SEP - Eligible to enroll' partial if there is no active admin SEP" do
     assign(:active_admin_sep, [])
     render file: "insured/families/home.html.erb"

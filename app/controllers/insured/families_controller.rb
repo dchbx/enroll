@@ -35,14 +35,19 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def manage_family
+  def existing_sep_opt_date
+    @user_pick_sep = @family.find_sep(params[:sep_id])
+    @qle = QualifyingLifeEventKind.find(@user_pick_sep.qualifying_life_event_kind_id) if @user_pick_sep
+    respond_to do |format|
+      format.js
+    end
+  end
 
+  def manage_family
     set_bookmark_url
     @family_members = @family.active_family_members
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
-
-
     respond_to do |format|
       format.html
     end
@@ -50,7 +55,6 @@ class Insured::FamiliesController < FamiliesController
 
   def brokers
     @tab = params['tab']
-
     if @person.active_employee_roles.present?
       @employee_role = @person.active_employee_roles.first
     end
@@ -61,7 +65,6 @@ class Insured::FamiliesController < FamiliesController
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
-
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
     @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first unless params.key?(:shop_for_plan)
     render :layout => 'application'
@@ -87,7 +90,6 @@ class Insured::FamiliesController < FamiliesController
 
   def personal
     @tab = params['tab']
-
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
@@ -151,7 +153,6 @@ class Insured::FamiliesController < FamiliesController
       if @enrollment.is_shop?
         @benefit_group = @enrollment.benefit_group
         @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
-
         if @benefit_group.is_congress
           @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
         else
@@ -160,15 +161,12 @@ class Insured::FamiliesController < FamiliesController
       else
         @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
       end
-
       begin
         @plan.name
       rescue => e
         log("#{e.message};  #3742 plan: #{@plan}, family_id: #{@family.id}, hbx_enrollment_id: #{@enrollment.id}", {:severity => "error"})
       end
-
       @enrollable = @family.is_eligible_to_enroll?
-
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
       @terminate_date = @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
@@ -186,7 +184,6 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-
     if (!params.permit![:file]) || (!params.permit![:subject])
       flash[:error] = "File or Subject not provided"
       redirect_to(:back)
@@ -196,12 +193,9 @@ class Insured::FamiliesController < FamiliesController
       redirect_to(:back)
       return
     end
-
     doc_uri = Aws::S3Storage.save(file_path, 'notices')
-
     if doc_uri.present?
-      notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri,
-                                      format: file_content_type})
+      notice_document = Document.new({title: file_name, creator: "hbx_staff", subject: "notice", identifier: doc_uri, format: file_content_type})
       begin
         @person.documents << notice_document
         @person.save!
@@ -213,7 +207,6 @@ class Insured::FamiliesController < FamiliesController
     else
       flash[:error] = "Could not save file."
     end
-
     redirect_to(:back)
     return
   end
@@ -238,14 +231,12 @@ class Insured::FamiliesController < FamiliesController
 
   def check_employee_role
     employee_role_id = (params[:employee_id].present? && params[:employee_id].include?('employee_role')) ? params[:employee_id].gsub("employee_role_", "") : nil
-
     @employee_role = employee_role_id.present? ? @person.active_employee_roles.detect{|e| e.id.to_s == employee_role_id} : @person.active_employee_roles.first
   end
 
   def build_employee_role_by_census_employee_id
     census_employee_id = (params[:employee_id].present? && params[:employee_id].include?('census_employee')) ? params[:employee_id].gsub("census_employee_", "") : nil
     return if census_employee_id.nil?
-
     census_employee = CensusEmployee.find_by(id: census_employee_id)
     if census_employee.present?
       census_employee.construct_employee_role_for_match_person

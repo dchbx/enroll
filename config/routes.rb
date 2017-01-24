@@ -145,6 +145,7 @@ Rails.application.routes.draw do
         get 'verification'
         get 'document_upload'
         get 'find_sep'
+        get 'existing_sep_opt_date'
         post 'record_sep'
         get 'check_qle_date'
         get 'check_move_reason'
