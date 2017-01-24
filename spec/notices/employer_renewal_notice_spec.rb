@@ -11,6 +11,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
                             :title => "Renewal/Conversion Employer Publishes Plan"})
                           }
     let(:valid_parmas) {{
+        :employer_profile => employer_profile,
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
         :template => application_event.notice_template
@@ -22,7 +23,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
     end
     context "valid params" do
       it "should initialze" do 
-        expect{ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopNotices::EmployerRenewalNotice.new(valid_parmas)}.not_to raise_error
       end
     end
 
@@ -30,7 +31,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopNotices::EmployerRenewalNotice.new(valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -39,7 +40,7 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopNotices::EmployerRenewalNotice.new(valid_parmas)
     end
     it "should build notice with all necessory info" do
       @employer_notice.build
