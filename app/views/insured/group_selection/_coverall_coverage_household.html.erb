@@ -3,20 +3,18 @@
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
         <%
         is_primary = false
-        if @market_kind == 'individual' || can_shop_both_markets?(@person)
+        if @market_kind == 'coverall'
           #TEMPORARY CODE DO NOT COPY   TODO
-          role = family_member.person.consumer_role
-          rule = InsuredEligibleForBenefitRule.new(role, @benefit)
+          role = family_member.person.resident_role
+          family = family_member.family
+          rule = InsuredEligibleForBenefitRule.new(role, @benefit, family: family)
           is_coverage, errors = rule.satisfied?
           @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
           errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
         end
-
-        if can_shop_resident?(@person)
-          is_coverage = true
-        end
         #TEMPORARY CODE DO NOT COPY  TODO
         %>
+        
         <tr class="<%='ineligible_row' unless is_coverage%>">
           <td width="20">
             <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>

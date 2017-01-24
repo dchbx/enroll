@@ -9,7 +9,6 @@ module Aws
     # If success, return URI which has the s3 bucket key
     # else return nil
     def save(file_path, bucket_name, key=SecureRandom.uuid)
-      #binding.pry
       bucket_name = env_bucket_name(bucket_name)
       uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}"
       begin

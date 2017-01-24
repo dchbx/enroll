@@ -41,7 +41,7 @@
               <% end %>
             </div>
           <% end %>
-
+        
           <% if can_shop_individual?(@person) %>
             <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
               <div class="module group-selection-table">
