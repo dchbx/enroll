@@ -5,23 +5,26 @@ class Employers::PremiumStatementsController < ApplicationController
   include Employers::PremiumStatementHelper
 
   def show
-    @employer_profile = EmployerProfile.find(params.require(:id))
+    @employer_profile = EmployerProfile.find(params[:id])
     authorize @employer_profile, :list_enrollments?
     set_billing_date
-    query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
-    @hbx_enrollments = query.execute.hbx_enrollments unless query.execute == nil
+    scopes={ id: params.require(:id), billing_date: @billing_date}
+    @datatable = Effective::Datatables::PremiumBillingReportDataTable.new(scopes)
+
     respond_to do |format|
       format.html
       format.js
       format.csv do
-        send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
+        send_data(csv_for, type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
       end
     end
   end
 
   private
 
-  def csv_for(hbx_enrollments)
+  def csv_for
+    query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
+    hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments   
     (output = "").tap do
       CSV.generate(output) do |csv|
         csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",

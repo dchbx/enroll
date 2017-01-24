@@ -57,6 +57,7 @@ RSpec.describe Employers::PremiumStatementsController do
     end
   end
 
+
   context "csv export" do
     let(:query_result) { double(:hbx_enrollments => hbx_enrollments) }
     let(:query) { double(:execute => query_result) }
@@ -108,3 +109,4 @@ RSpec.describe Employers::PremiumStatementsController do
   end
 
 end
+
