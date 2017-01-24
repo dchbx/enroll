@@ -2,8 +2,10 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
 
   attr_accessor :employer_profile
 
-  def initialize(employer_profile , args = {})
-    self.employer_profile=employer_profile
+  Required= ShopNotice::Required + [:employer_profile]
+
+  def initialize(args = {})
+    self.employer_profile=args[:employer_profile]
     args[:recipient] = employer_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployerNotice.new
@@ -38,4 +40,4 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
       })
   end
 
-end 
+end

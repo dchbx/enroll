@@ -1,0 +1,22 @@
+<div id="cobra_info" class="row module">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+        <div class="checkbox">
+          <label>
+            <%= f.check_box :existing_cobra, {onclick: 'EmployerProfile.viewCobraDateField()'}, true, false %> Check the box if this person is already in enrolled into COBRA/Continuation outside of DC Health Link
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer <%= 'hidden' unless f.object.existing_cobra %>" id='cobra_begin_date_field'>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd cobra-label">
+        <label>COBRA Begin Date</label>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= datepicker_control f, :cobra_begin_date, {:class => "floatlabel form-control interaction-field-control-census-employee-cobra_begin_date", :placeholder => "mm/dd/yyyy", :'data-date-max' => "+0", :onchange => 'EmployerProfile.validateCobraBeginDate()'} %>
+      </div>
+    </div>
+  </div>
+</div>

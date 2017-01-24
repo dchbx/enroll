@@ -22,7 +22,7 @@ module Queries
     end
 
     def evaluate
-      Family.collection.aggregate(@pipeline)
+      Family.collection.aggregate(@pipeline, {allow_disk_use: true})
     end
 
     def count

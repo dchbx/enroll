@@ -571,6 +571,39 @@ describe EmployeeRole, dbclean: :after_each do
       expect(employee_role.can_select_coverage?).to eq false
     end
   end
+
+  context "is_cobra_status?" do
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should return false when without census_employee" do
+      allow(employee_role).to receive(:census_employee).and_return nil
+      expect(employee_role.is_cobra_status?).to be_falsey
+    end
+
+    context "with census_employee" do
+      before :each do
+        allow(employee_role).to receive(:census_employee).and_return census_employee
+      end
+
+      it "should return cobra state of census_employee" do
+        expect(employee_role.is_cobra_status?).to eq census_employee.is_cobra_status?
+      end
+    end
+  end
+
+  context "hired_on date field" do
+    let(:different_hired_date) { employee_role.hired_on + 2.days }
+
+    it 'should use census employee record data' do
+      expect(employee_role.hired_on).to eq census_employee.hired_on
+      employee_role.hired_on = different_hired_date
+      employee_role.save
+      employee_role.reload
+      expect(employee_role.hired_on).to eq census_employee.hired_on
+      expect(Date.parse(employee_role.read_attribute(:hired_on).strftime('%Y/%m/%d'))).to eq different_hired_date
+    end
+  end
 end
 
 describe EmployeeRole do

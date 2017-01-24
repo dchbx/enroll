@@ -2,7 +2,8 @@
   <tr>
     <td align="right"><span class="glyphicon glyphicon-calendar" style="padding-RIGHT: 5px;"></span></td>
     <td align="left">
-      <%= select_tag('year', options_for_select(@year_options, @current_year), onchange: "APTCModule.change_year()") %>
+      <%#= select_tag('year', options_for_select(@year_options, @current_year), onchange: "APTCModule.change_year()", disabled: true) %>
+      <%= select_tag('year', options_for_select([@current_year], @current_year), disabled: true) %>
     </td>
     <td align="center" class="calculate_available_aptc">
       <a href="" class='btn btn-info' id='calculate_available_aptc' data-toggle="modal" data-target="#loading-modal" style="display:none">Calculate Available APTC</a>

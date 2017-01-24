@@ -491,7 +491,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         allow(plan_year_proxy).to receive(:renewing_enrolling?).and_return(false)
         allow(plan_year_proxy).to receive(:may_publish?).and_return(false)
         allow(plan_year_proxy).to receive(:application_errors).and_return({:values => []})
-        allow(plan_year_proxy).to receive(:enrollment_period_errors).and_return([])
+        allow(plan_year_proxy).to receive(:open_enrollment_date_errors).and_return({})
       end
 
       it "should redirect with errors" do

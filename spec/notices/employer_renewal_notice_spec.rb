@@ -48,5 +48,4 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
       expect(@employer_notice.notice.primary_identifier).to eq employer_profile.hbx_id
     end
   end
-
 end

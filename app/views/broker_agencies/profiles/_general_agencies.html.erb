@@ -1,4 +1,4 @@
-<div class="container" id="inbox_provider_form">
+<div class="container" id="general_agency_list">
   <div class="row">
     <div class="col-md-12">
       <h3 class="title-inline">General Agencies</h3>
@@ -55,7 +55,7 @@
                 <div class="ga_status">Default GA</div>
               <% else %>
                 <%= pundit_span HbxProfile, :modify_admin_tabs? %>
-                  <%= link_to 'Select Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+                  <%= link_to 'Select Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true %>
                 </span>
               <% end %>
             </td>

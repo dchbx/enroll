@@ -28,7 +28,7 @@ Given(/Employee new hire enrollment window is closed/) do
 end
 
 And(/Employee has current hired on date/) do
-  CensusEmployee.where(:first_name => /Soren/i, 
+  CensusEmployee.where(:first_name => /Soren/i,
                        :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
 end
 

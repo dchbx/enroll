@@ -62,15 +62,15 @@ module VerificationHelper
   end
 
   def verification_needed?(person)
-    person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
+    person.primary_family.ivl_unverified_enrollments.any? if person.primary_family
   end
 
   def verification_due_date(family)
-    if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
+    if family.ivl_unverified_enrollments.any?
+      if family.ivl_unverified_enrollments.first.special_verification_period
+        family.ivl_unverified_enrollments.first.special_verification_period.to_date
       else
-        family.active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
+        family.ivl_unverified_enrollments.first.submitted_at.to_date + 95.days
       end
     else
       TimeKeeper.date_of_record.to_date + 95.days
@@ -85,6 +85,10 @@ module VerificationHelper
     true if member.person.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
   end
 
+  def member_has_uploaded_paper_applications(member)
+    true if member.person.resident_role.try(:paper_applications).any? { |doc| doc.identifier }
+  end
+
   def docs_uploaded_for_all_types(member)
     member.person.verification_types.all? do |type|
       member.person.consumer_role.vlp_documents.any?{ |doc| doc.identifier && doc.verification_type == type }
@@ -97,10 +101,10 @@ module VerificationHelper
   end
 
   def review_button_class(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.review_status == "ready"
+    if family.ivl_unverified_enrollments.any?
+      if family.ivl_unverified_enrollments.first.review_status == "ready"
         "success"
-      elsif family.active_household.hbx_enrollments.verification_needed.first.review_status == "in review"
+      elsif family.ivl_unverified_enrollments.first.review_status == "in review"
         "info"
       else
         "default"
@@ -113,8 +117,8 @@ module VerificationHelper
   end
 
   def hbx_enrollment_incomplete
-    if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete"
+    if @person.primary_family.ivl_unverified_enrollments.any?
+      @person.primary_family.ivl_unverified_enrollments.first.review_status == "incomplete"
     end
   end
 
@@ -123,13 +127,9 @@ module VerificationHelper
     person.try(:consumer_role).try(:vlp_documents).select{|doc| doc.identifier}.all?{|doc| doc.status == "rejected"}
   end
 
-  def no_enrollments
-    @person.primary_family.active_household.hbx_enrollments.empty?
-  end
-
   def enrollment_incomplete
-    if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete"
+    if @person.primary_family.ivl_unverified_enrollments.any?
+      @person.primary_family.ivl_unverified_enrollments.first.review_status == "incomplete"
     end
   end
 
@@ -138,8 +138,8 @@ module VerificationHelper
   end
 
   def review_status(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      family.active_household.hbx_enrollments.verification_needed.first.review_status
+    if family.ivl_unverified_enrollments.any?
+      family.ivl_unverified_enrollments.first.review_status
     else
       "no enrollment"
     end
@@ -158,5 +158,49 @@ module VerificationHelper
       else
         person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
     end
+  end
+
+  def text_center(v_type, person)
+    (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+  end
+
+  def ssa_response_any?(f_member)
+    f_member.try(:consumer_role).try(:lawful_presence_determination).try(:ssa_responses).try(:any?)
+  end
+
+  def dhs_response_any?(f_member)
+    f_member.try(:consumer_role).try(:lawful_presence_determination).try(:vlp_responses).try(:any?)
+  end
+
+  def ssa_received_date(f_member)
+    ssa_response(f_member).received_at.to_date
+  end
+
+  def dhs_received_date(f_member)
+    vlp_response(f_member).received_at.to_date
+  end
+
+  def ssn_status_ssa_hub(f_member)
+    ssa_response(f_member).parse_ssa.first ? "verified" : "failed"
+  end
+
+  def citizenship_status_ssa_hub(f_member)
+    ssa_response(f_member).parse_ssa.last ? "verified" : "failed"
+  end
+
+  def response_dhs_hub(f_member)
+    vlp_response(f_member).parse_dhs.first
+  end
+
+  def legal_status_dhs_hub(f_member)
+    vlp_response(f_member).parse_dhs.last
+  end
+
+  def ssa_response(f_member)
+    f_member.consumer_role.lawful_presence_determination.ssa_responses.sort_by(&:received_at).last
+  end
+
+  def vlp_response(f_member)
+    f_member.consumer_role.lawful_presence_determination.vlp_responses.sort_by(&:received_at).last
   end
 end

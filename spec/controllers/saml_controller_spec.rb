@@ -40,6 +40,8 @@ RSpec.describe SamlController do
       end
 
       describe "with an existing user" do
+        let!(:person) {FactoryGirl.create(:person, user: user)}
+
         it "should redirect back to their last portal" do
           expect(::IdpAccountManager).to receive(:update_navigation_flag).with(name_id, attributes_double['mail'], ::IdpAccountManager::ENROLL_NAVIGATION_FLAG)
           post :login, :SAMLResponse => sample_xml
@@ -63,7 +65,7 @@ RSpec.describe SamlController do
         end
       end
 
-      describe "with a new user" do
+      describe "with a new user", dbclean: :after_each do
         let(:name_id) { attributes_double['mail'] }
         let(:attributes_double) { { 'mail' => "new@user.com"} }
 
@@ -74,6 +76,19 @@ RSpec.describe SamlController do
           expect(flash[:notice]).to eq "Signed in Successfully."
           expect(User.where(email: attributes_double['mail']).first.oim_id).to eq name_id
           expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
+        end
+
+        context "who has a headless user with same email but different username" do
+          let!(:email_matched_user) { FactoryGirl.create(:user, email: attributes_double['mail'])}
+
+          it "should claim the invitation" do
+            expect(::IdpAccountManager).to receive(:update_navigation_flag).with(name_id, attributes_double['mail'], ::IdpAccountManager::ENROLL_NAVIGATION_FLAG)
+            post :login, :SAMLResponse => sample_xml
+            expect(response).to redirect_to(search_insured_consumer_role_index_path)
+            expect(flash[:notice]).to eq "Signed in Successfully."
+            expect(User.where(email: attributes_double['mail']).first.oim_id).to eq name_id
+            expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
+          end
         end
 
         context "with no email attribute passed" do

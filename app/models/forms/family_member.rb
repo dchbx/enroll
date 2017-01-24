@@ -3,7 +3,7 @@ module Forms
     include ActiveModel::Model
     include ActiveModel::Validations
 
-    attr_accessor :id, :family_id, :is_consumer_role, :vlp_document_id
+    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
     attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary
     attr_writer :family
@@ -75,6 +75,8 @@ module Forms
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
           family_member.family.build_consumer_role(family_member)
+        elsif self.is_resident_role == "true"
+          family_member.build_resident_role(family_member)
         end
         assign_person_address(existing_person)
         family_member.save!
@@ -86,6 +88,8 @@ module Forms
       family_member = family.relate_new_member(person, self.relationship)
       if self.is_consumer_role == "true"
         family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
+      elsif self.is_resident_role == "true"
+        family_member.family.build_resident_role(family_member)
       end
       assign_person_address(person)
       family.save_relevant_coverage_households
@@ -261,6 +265,8 @@ module Forms
       if attr["is_consumer_role"] == "true"
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
         return false unless assign_person_address(family_member.person)
+      elsif attr["is_resident_role"] == "true"
+        family_member.family.build_resident_role(family_member)
       end
       assign_person_address(family_member.person)
       family_member.update_relationship(relationship)

@@ -850,6 +850,7 @@
                      </ns0:eligibility_determination>
                   </ns0:eligibility_determinations>
                   <ns0:start_date>20151004</ns0:start_date>
+                  <ns0:end_date>20161004</ns0:end_date>
                   <ns0:submitted_at>2015-10-13T12:48:30.000000</ns0:submitted_at>
                   <ns0:is_active>true</ns0:is_active>
                   <ns0:created_at>2015-10-13T12:48:30.000000</ns0:created_at>

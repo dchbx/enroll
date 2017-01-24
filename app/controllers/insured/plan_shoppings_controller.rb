@@ -32,6 +32,7 @@ class Insured::PlanShoppingsController < ApplicationController
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
     plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
+    plan_selection.set_eligibility_and_effective_dates_to_previous_eligibility_dates(previous_enrollment_id)
     plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
     session.delete(:pre_hbx_enrollment_id)
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
@@ -106,28 +107,32 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def waive
-    person = @person
-    hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    waiver_reason = params[:waiver_reason]
+    begin
+      person = @person
+      hbx_enrollment = HbxEnrollment.find(params.require(:id))
+      waiver_reason = params[:waiver_reason]
 
-    # Create a new hbx_enrollment for the waived enrollment.
-    unless hbx_enrollment.shopping?
-      employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
-      coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
-      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-      waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
-      waived_enrollment.generate_hbx_signature
+      # Create a new hbx_enrollment for the waived enrollment.
+      unless hbx_enrollment.shopping?
+        employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
+        coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
+        waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+        waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
+        waived_enrollment.generate_hbx_signature
 
-      if waived_enrollment.save!
-        hbx_enrollment = waived_enrollment
-        hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+        if waived_enrollment.save!
+          hbx_enrollment = waived_enrollment
+          hbx_enrollment.household.reload # Make sure we reload the household to reflect the newly created HbxEnrollment
+        end
       end
-    end
 
-    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
-      hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
-      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
-    else
+      if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+        hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
+        redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+      else
+        redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
+      end
+    rescue Exception => e
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
   rescue => e
@@ -156,6 +161,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def show
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
+    set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -196,6 +202,16 @@ class Insured::PlanShoppingsController < ApplicationController
       sort_by_standard_plans(@plans)
       @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
     end
+
+    if @person.primary_family.active_household.latest_active_tax_household.present?
+      member_ids = @hbx_enrollment.hbx_enrollment_members.collect(&:applicant_id)
+      true_count = @person.primary_family.active_household.latest_active_tax_household.tax_household_members.any_in(:applicant_id => member_ids, :is_medicaid_chip_eligible => false).count
+      if true_count < 1
+        csr_variant_ids = [ "01", "02"]
+        @plans = @plans.select { |p| p.csr_variant_id.blank? || csr_variant_ids.include?(p.csr_variant_id)}
+      end
+    end
+
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -241,6 +257,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
+    effective_on_option_selected = session[:effective_on_option_selected].present? ? session[:effective_on_option_selected] : nil
     if @person.nil?
       @enrolled_hbx_enrollment_plan_ids = []
     else
@@ -256,7 +273,9 @@ class Insured::PlanShoppingsController < ApplicationController
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
+      elsif @market_kind == 'coverall'
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, nil, @market_kind)
       end
     end
     # for carrier search options

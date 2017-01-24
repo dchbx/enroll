@@ -46,6 +46,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
   end
 
   def employer_contribution_for(member)
+    return 0 if @member_provider.present? && @member_provider.is_cobra_status?
     (total_employer_contribution * (premium_for(member)/total_premium)).round(2)
     # premium_for(member) * ( total_employer_contribution / total_premium )
   end
@@ -55,6 +56,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
   end
 
   def total_employer_contribution
+    return 0 if @member_provider.present? && @member_provider.is_cobra_status?
     ([total_premium * employer_contribution_percent / 100.00, total_max_employer_contribution.cents/100.00].min).round(2)
   end
 

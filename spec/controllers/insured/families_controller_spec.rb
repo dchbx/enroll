@@ -23,6 +23,33 @@ RSpec.describe Insured::FamiliesController do
       expect(response).to be_redirect
     end
   end
+
+  context "#check_for_address_info" do
+    let(:user) { double("User") }
+    let(:person) { double("Person", user: user) }
+    let(:family) { double("Family") }
+    let(:consumer_role) { double("ConsumerRole") }
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:identity_verified?).and_return(false)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(person).to receive(:has_multiple_roles?).and_return(false)
+      allow(person).to receive(:has_active_employee_role?).and_return(false)
+      allow(person).to receive(:has_active_consumer_role?).and_return(true)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(person).to receive(:active_employee_roles).and_return([])
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(person).to receive(:addresses).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to ridp page if user has not verified identity" do
+      get :home
+      expect(response).to redirect_to("/insured/consumer_role/ridp_agreement")
+    end
+  end
+
   context "set_current_user  as agent" do
     let(:user) { double("User", last_portal_visited: "test.com", id: 77, email: 'x@y.com', person: person) }
     let(:person) { FactoryGirl.create(:person) }
@@ -45,6 +72,7 @@ RSpec.describe Insured::FamiliesController do
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
+  let(:resident_role) { FactoryGirl.create(:resident_role) }
   let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
@@ -60,6 +88,8 @@ RSpec.describe Insured::FamiliesController do
     allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+    allow(person).to receive(:has_active_resident_role?).and_return(true)
+    allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
   end
@@ -246,10 +276,6 @@ RSpec.describe Insured::FamiliesController do
           expect(assigns(:hbx_enrollments)).to eq([display_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
         end
-
-        it "waived should be false" do
-          expect(assigns(:waived)).to eq false
-        end
       end
 
       context "with waived_hbx when display_hbx is individual" do
@@ -275,10 +301,6 @@ RSpec.describe Insured::FamiliesController do
           expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
           expect(assigns(:hbx_enrollments)).to eq([display_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
-        end
-
-        it "waived should be true" do
-          expect(assigns(:waived)).to eq true
         end
       end
     end
@@ -653,22 +675,7 @@ RSpec.describe Insured::FamiliesController do
         expect(family.current_broker_agency).to be nil
       end
     end
-
-    context "post unblock" do
-      let(:family) { FactoryGirl.build(:family) }
-      before :each do
-        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
-        allow(Family).to receive(:find).and_return family
-      end
-
-      it "should be a success" do
-        xhr :post, :unblock, id: family.id, format: :js
-        expect(response).to have_http_status(:success)
-        expect(assigns(:family).status).to eq "aptc_unblock"
-      end
-    end
   end
-
 
   describe "GET upload_notice_form" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff"]) }

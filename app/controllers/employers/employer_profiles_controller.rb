@@ -1,8 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote]
-
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
@@ -29,11 +28,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -214,6 +211,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @organization.save(validate: false)
 
       if @organization.update_attributes(employer_profile_params)
+        @organization.notify_address_change(@organization_dup,employer_profile_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -253,7 +251,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def bulk_employee_upload_form
+  end
 
+  def generate_checkbook_urls
+    @employer_profile.generate_checkbook_notices
+    flash[:notice] = "Generating and delivering checkbook notice to employer"
+    redirect_to action: :show, :tab => :employees
   end
 
   def download_invoice
@@ -273,8 +276,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
     rescue Exception => e
-      @census_employee_import.errors.add(:base, e.message)
-      render "employers/employer_profiles/employee_csv_upload_errors"
+      if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
+        render "employers/employer_profiles/_download_new_template"
+      else
+        @census_employee_import.errors.add(:base, e.message)
+        render "employers/employer_profiles/employee_csv_upload_errors"
+      end
     end
 
 
@@ -314,14 +321,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     status_params = params.permit(:id, :status, :search)
     @status = status_params[:status] || 'active'
     @search = status_params[:search] || false
-    #@avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-    #@avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-
+    
     census_employees = case @status
                        when 'terminated'
                          @employer_profile.census_employees.terminated.sorted
                        when 'all'
                          @employer_profile.census_employees.sorted
+                       when 'cobra'
+                         @employer_profile.census_employees.by_cobra.sorted
                        else
                          @employer_profile.census_employees.active.sorted
                        end
@@ -334,11 +341,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
       @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
-      #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      @total_census_employees_quantity = @census_employees.count
     else
       @total_census_employees_quantity = census_employees.count
-      @census_employees = census_employees.limit(20).to_a
-      #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      @census_employees = census_employees.page(params[:pagina]).per(20)
     end
   end
 

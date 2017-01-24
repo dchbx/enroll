@@ -1,0 +1,70 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
+      <h1 class="darkblue">Special Enrollment Period</h1>
+      <div class="seps-panel panel panel-default">
+        <div class="panel-heading" style="margin-bottom: 10px;">
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
+              <h4><strong>Have you or anyone in your household recently experienced any of the following events?</strong></h4>
+            </div>
+          </div>
+          <hr>
+        </div>
+
+        <div class="panel-body">
+          <div id="qle-menu">
+            <div class="row">
+              <%= render 'qles_carousel' %>
+            </div>
+          </div>
+        </div>
+      </div
+
+      <%#= form_tag(:insured_plan_shopping) do %>
+      <%= hidden_field_tag 'id', @hbx_enrollment_id %>
+      <%= hidden_field_tag 'market_kind', @market_kind %>
+      <%= hidden_field_tag 'coverage_kind', @coverage_kind %>
+      <div style="text-align: center; margin-bottom: 15px;">
+        <input type="checkbox" id="no_qle_checkbox" name="no_qualifying_event" value="true"> None of the situations listed above apply.
+      </div>
+      <%# end %>
+
+      <%= render 'qle_detail' %>
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 right-section">
+      <% if @change_plan.blank? %>
+        <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: true, button_continue: false} %>
+      <% else %>
+        <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '1'} %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="outside-open-enrollment" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Outside Open Enrollment</h4>
+      </div>
+      <div class="modal-body">
+        <p>Open enrollment starts on <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y")%>. To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e")%>.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <%= link_to 'Back To My Account', family_account_path, class: 'btn btn-primary' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    $('.carousel').carousel({
+      interval: false
+    })
+  });
+</script>

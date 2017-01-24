@@ -217,7 +217,7 @@ class VitalSign
 
   def all_shop_enrollments
     all_enrollments unless defined? @all_enrollments
-    @all_enrollments.select { |enrollment| enrollment.kind == "employer_sponsored" }
+    @all_enrollments.select { |enrollment| ['employer_sponsored', 'employer_sponsored_cobra'].include? enrollment.kind }
   end
 
   def all_individual_enrollments

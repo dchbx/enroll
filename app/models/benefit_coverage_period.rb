@@ -33,6 +33,7 @@ class BenefitCoveragePeriod
 
   before_save :set_title
 
+  scope :by_date, ->(date) { where({:"start_on".lte => date, :"end_on".gte => date}) }
 
   def second_lowest_cost_silver_plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a?(Plan)
@@ -128,7 +129,12 @@ class BenefitCoveragePeriod
       family = hbx_enrollment_members.first.hbx_enrollment.family
       hbx_enrollment_members.map(&:family_member).each do |family_member|
         consumer_role = family_member.person.consumer_role
-        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind: coverage_kind, family: family)
+        resident_role = family_member.person.resident_role
+        unless resident_role.nil?
+          rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family)
+        else
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, {coverage_kind:coverage_kind, family: family, new_effective_on: hbx_enrollment_members.first.hbx_enrollment.effective_on})
+        end
         satisfied = false and break unless rule.satisfied?[0]
       end
       ivl_bgs << bg if satisfied

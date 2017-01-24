@@ -12,6 +12,10 @@ FactoryGirl.define do
     association :email, strategy: :build
     association :employer_profile, strategy: :build
 
+    before(:create) do |instance|
+      FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+    end
+
     trait :owner do
       is_business_owner  true
     end

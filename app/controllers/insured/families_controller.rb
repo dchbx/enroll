@@ -2,7 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
+  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
@@ -17,60 +17,20 @@ class Insured::FamiliesController < FamiliesController
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
-
     @enrollment_filter = @family.enrollments_for_display
-
-    @waived_enrollment_filter = @family.waivers_for_display
 
     valid_display_enrollments = Array.new
     @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
 
-    valid_display_waived_enrollments = Array.new
-    @waived_enrollment_filter.each  { |e| valid_display_waived_enrollments.push e['hbx_enrollment']['_id'] }
-
-
-    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| hbx.plan.blank?}
-    @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
+    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.plan.blank?}
     update_changing_hbxs(@hbx_enrollments)
 
-    if @person.active_employee_roles.count > 1 && (@hbx_enrollments.present? || @waived_hbx_enrollments.present?)
-      @hbx_enrollments = @hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
-      @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
-    end
+    @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
-    # Filter out enrollments for display only
-    @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
-    @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
-
-    hbx_enrollment_kind_and_years = @hbx_enrollments.inject(Hash.new { [] }) do |memo, enrollment|
-      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected' && enrollment.is_shop?
-      memo[enrollment.coverage_kind].compact
-      memo
-    end
-
-    #@last_active_sep_by_admin = @family.active_admin_seps.last
-
-    @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
-    @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
-
+    @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
-
-    if @employee_role.present?
-      @ce = CensusEmployee.find(@employee_role.census_employee_id)
-    end
-    #if @employee_role.present?
-     # ce = CensusEmployee.find(@employee_role.census_employee_id)
-      # checking for future hire
-      #if ce.hired_on > ce.created_at
-       # @future_hire = true
-
-     # else
-
-      #  @future_hire = false
-
-      #end
-    #end
+  
     respond_to do |format|
       format.html
     end
@@ -80,6 +40,7 @@ class Insured::FamiliesController < FamiliesController
 
     set_bookmark_url
     @family_members = @family.active_family_members
+    @resident = @person.has_active_resident_role?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -101,12 +62,29 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
+
+    @resident_role_id = params[:resident_role_id]
+
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
-    @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first unless params.key?(:shop_for_plan)
+    if (params[:resident_role_id].present? && params[:resident_role_id])
+      @market_kind = "coverall"
+    end
+
     render :layout => 'application'
   end
+
+  # def generate_out_of_pocket_url
+  #   @person = Person.find(params[:id])
+  #   if @person && @person.has_active_employee_role?
+  #     census_employee=@person.active_employee_roles.first.census_employee
+  #     cs= ::CheckbookServices::PlanComparision.new(census_employee)
+  #     url = cs.generate_url
+  #     redirect_to url
+  #   else
+  #   end
+  # end
 
   def record_sep
     if params[:qle_id].present?
@@ -132,6 +110,8 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
+    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
+    @resident = @person.resident_role.present?
     respond_to do |format|
       format.html
     end
@@ -159,7 +139,6 @@ class Insured::FamiliesController < FamiliesController
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      @qle_aptc_block = @family.is_blocked_by_qle_and_assistance?(@qle, session["individual_assistance_path"])
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
@@ -218,11 +197,6 @@ class Insured::FamiliesController < FamiliesController
     else
       redirect_to :back
     end
-  end
-
-  def unblock
-    @family = Family.find(params[:id])
-    @family.set(status: "aptc_unblock")
   end
 
   # admin manually uploads a notice for person
@@ -344,7 +318,7 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && (!@person.user.identity_verified? && !@person.user.idp_verified?)
+      elsif @person.user && !@person.user.identity_verified? 
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end

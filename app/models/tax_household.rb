@@ -21,6 +21,7 @@ class TaxHousehold
 
   field :effective_starting_on, type: Date
   field :effective_ending_on, type: Date
+  field :curam_import_end_date, type: Date
   field :submitted_at, type: DateTime
 
   embeds_many :tax_household_members
@@ -75,7 +76,7 @@ class TaxHousehold
 
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
-    aptc_members.each do |member|
+    aptc_members.select { |thm| thm.is_medicaid_chip_eligible == false }.each do |member|
       #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium

@@ -204,8 +204,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "family_index" do
     before :all do
       org = FactoryGirl.create(:organization)
-      broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: org)
-      broker_role = FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id)
+      @broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization: org,aasm_state:'active')
+      broker_role = FactoryGirl.create(:broker_role, broker_agency_profile_id: @broker_agency_profile1.id, aasm_state:'active')
       person = broker_role.person
       @current_user = FactoryGirl.create(:user, person: person, roles: [:broker])
       families = []

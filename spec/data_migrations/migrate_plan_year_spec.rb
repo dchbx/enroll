@@ -27,7 +27,7 @@ describe MigratePlanYear do
       it "should change its aasm state when active" do
         subject.migrate
         plan_year.reload
-        expect(plan_year.aasm_state).to eq "migration_expired"
+        expect(plan_year.aasm_state).to eq "conversion_expired"
       end
 
       it "should not change it's state" do

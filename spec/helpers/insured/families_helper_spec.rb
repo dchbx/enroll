@@ -126,7 +126,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "auto_renewing", "any_state"]
-    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing", "renewing_coverage_selected"]
 
     context "IVL market" do
       before :each do
@@ -159,7 +159,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month ) }
     let(:qle_with_date_options_available) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month, date_options_available: true ) }
-    let(:sep_without_date_options) { 
+    let(:sep_without_date_options) {
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
@@ -169,7 +169,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       sep
     }
 
-    let(:sep_with_date_options) { 
+    let(:sep_with_date_options) {
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month

@@ -105,6 +105,27 @@ shop_notice_triggers = [
       }
     ] 
   },
+  {
+    hbx_id: 'SHOP_Out_of_pocket_notice',
+    title: 'Out of pocket calculator',
+    description: 'Out of pocket calculator notifier',
+    resource_name: 'employer',
+    event_name: 'out_of_pocker_url_notifier',
+    notice_triggers: [
+      {
+        name: 'Out of pocket Notice',
+        notice_template: "notices/shop_notices/out_of_pocket_notice.html.erb",
+        notice_builder: 'ShopNotices::OutOfPocketNotice',
+        mpi_indicator: 'MPI',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: [""],
+          primary_recipient_delivery_method: ["email"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
 ]
 
 
@@ -260,6 +281,28 @@ ivl_notice_triggers = [
   },
 
   {
+    hbx_id: 'IVLR1',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals with UQHP(Unassisted)-Remaining Batch',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_1_remaining_list',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_builder: 'IvlNotices::IvlRenewalNoticeForRemainingBatch',
+        mpi_indicator: 'MPI_IVLR1',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
     hbx_id: 'IVLR2',
     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
     description: 'Notice to be sent out to individuals staying in APTC only',
@@ -378,6 +421,27 @@ ivl_notice_triggers = [
         notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
         notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR10',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_CAT16',
+    title: 'Important Tax Information about your Catastrophic Health Coverage',
+    description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
+    resource_name: 'consumer_role',
+    event_name: 'final_catastrophic_plan_2016',
+    notice_triggers: [
+      {
+        name: 'Final Catastrophic Plan Notice',
+        notice_template: 'notices/ivl/final_catastrophic_plan_letter',
+        notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
+        mpi_indicator: 'MPI_CAT16',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],

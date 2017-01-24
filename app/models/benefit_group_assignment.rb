@@ -91,6 +91,22 @@ class BenefitGroupAssignment
     end
   end
 
+  def latest_hbx_enrollment_for_cobra
+    families = Family.where({
+      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+      })
+
+    hbx_enrollments = families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.enrollments_for_cobra.select do |enrollment| 
+          enrollment.benefit_group_assignment_id == self.id
+        end.to_a
+      end
+      enrollments
+    end
+    hbx_enrollments.detect{ |hbx| !hbx.is_cobra_status? }
+  end
+
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
 

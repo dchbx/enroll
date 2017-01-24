@@ -1,0 +1,4 @@
+<% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
+<%= render "shared/race_and_ethnicity_options", f: f %>
+<%= hidden_field_tag :form_for_resident_role, f.object.is_a?(Person) || f.object.is_a?(FamilyMember) %>
+<%= f.hidden_field :is_resident_role, value: 'true' %>

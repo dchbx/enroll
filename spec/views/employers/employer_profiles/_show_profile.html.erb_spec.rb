@@ -9,8 +9,9 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
   before :each do
     @employer_profile = employer_profile
     stub_template "shared/alph_paginate" => ''
-    assign(:census_employees, [census_employee1, census_employee2, census_employee3])
+    assign(:census_employees, CensusEmployee.all.page(1).per(20))
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, list_enrollments?: nil))
+    allow(view).to receive(:generate_checkbook_urls_employers_employer_profile_path).and_return('/')
     sign_in user
   end
 

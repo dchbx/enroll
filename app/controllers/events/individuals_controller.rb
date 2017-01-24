@@ -8,32 +8,38 @@ module Events
       individual_id = headers.stringify_keys["individual_id"]
       individual = Person.by_hbx_id(individual_id).first
       if !individual.nil?
-        response_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
-        with_response_exchange(connection) do |ex|
-          ex.publish(
-            response_payload,
-            {
-              :routing_key => reply_to,
-              :headers => {
-                :return_status => "200",
-                :individual_id => individual_id
-              }
-            }
+        begin
+          response_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
+          reply_with(connection, reply_to, "200", response_payload, individual_id)
+        rescue Exception => e
+          reply_with(
+            connection,
+            reply_to,
+            "500",
+            JSON.dump({
+              exception: e.inspect,
+              backtrace: e.backtrace.inspect
+            }),
+            individual_id
           )
         end
       else
-        with_response_exchange(connection) do |ex|
-          ex.publish(
-            "",
-            {
-              :routing_key => reply_to,
-              :headers => {
-                :return_status => "404",
-                :individual_id => individual_id
-              }
+        reply_with(connection, reply_to, "404", "", individual_id)
+      end
+    end
+
+    def reply_with(connection, reply_to, return_status, body, individual_id)
+      with_response_exchange(connection) do |ex|
+        ex.publish(
+          body,
+          {
+            :routing_key => reply_to,
+            :headers => {
+              :return_status => return_status,
+              :individual_id => individual_id
             }
-          )
-        end
+          }
+        )
       end
     end
   end

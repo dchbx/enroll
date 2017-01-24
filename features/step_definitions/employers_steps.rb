@@ -181,15 +181,12 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   fill_in 'census_employee[first_name]', :with => 'Patrick'
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
   fill_in 'census_employee[ssn]', :with => '786120965'
-  find('.darkblue').click
+  find('.census-employee-add').click
   find(:xpath, '//p[@class="label"][contains(., "GA")]').click
   find(:xpath, "//li[contains(., 'VA')]").click
 
-  fill_in 'census_employee[census_dependents_attributes][0][first_name]', :with => "Mariah"
+  fill_in 'census_employee[first_name]', :with => "Mariah"
   find('label[for=census_employee_is_business_owner]').click
-
-  find('.selectric-interaction-choice-control-census-employee-census-dependents-attributes-0-employee-relationship').click
-  find('.label', text: 'Child').click
 
   screenshot("update_census_employee_with_data")
   click_button 'Update Employee'
@@ -211,6 +208,19 @@ When(/^.+ clicks on terminate button for a census family$/) do
   @browser.a(text: /Submit/).wait_until_present
   @browser.a(text: /Submit/).click
 end
+
+When(/^.+ clicks on terminate button for a census family for invalid case$/) do
+ wait_for_ajax
+ find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[7]/i').click
+ find(".date-picker").set(TimeKeeper.date_of_record - 75.days)
+ # fill_in ".date-picker", :with => TimeKeeper.date_of_record - 75.days
+ find('h1', text: "Employee Roster").click
+ find(".delete_confirm").click
+ expect(find('.alert')).to have_content('Census Employee could not be terminated: Termination date must be within the past 60 days.')
+ expect(page).to have_content("John")
+
+end
+
 
 When(/^.+ clicks on terminate button for rehired census employee$/) do
   @browser.a(text: /Terminate/).wait_until_present
@@ -323,7 +333,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find('.carriers-tab a').click
   wait_for_ajax(10,2)
   find('.reference-plans label').click
-  wait_for_ajax
+  wait_for_ajax(10,2)
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 

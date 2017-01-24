@@ -133,6 +133,9 @@ class BrokerAgencies::QuotesController < ApplicationController
   def edit
     #find quote to edit
     @quote = Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
 
     max_family_id = @quote.quote_households.max(:family_id).to_i
 
@@ -200,8 +203,8 @@ class BrokerAgencies::QuotesController < ApplicationController
       update_params[:quote_benefit_groups_attributes] = update_params[:quote_benefit_groups_attributes].select {|k,v| update_params[:quote_benefit_groups_attributes][k][:id].present?}
       insert_params[:quote_benefit_groups_attributes] = insert_params[:quote_benefit_groups_attributes].select {|k,v| insert_params[:quote_benefit_groups_attributes][k][:id].blank?}
     end
-    if params[:commit] == "Add Family"
-      notice_message = "New family added."
+    if params[:commit] == "Add Employee"
+      notice_message = "New employee added."
       scrollTo = 1
     elsif params[:commit] == "Save Changes"
       notice_message = "Successfully saved quote/employee roster."
@@ -252,6 +255,9 @@ class BrokerAgencies::QuotesController < ApplicationController
   def build_employee_roster
     @employee_roster = parse_employee_roster_file
     @quote= Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     @quote_benefit_group_dropdown = @quote.quote_benefit_groups
     if @employee_roster.is_a?(Hash)
       @employee_roster.each do |family_id , members|
@@ -365,7 +371,6 @@ class BrokerAgencies::QuotesController < ApplicationController
      status: quote.aasm_state.capitalize,
      plan_name: bg.plan && bg.plan.name || 'None',
      dental_plan_name: "bg.dental_plan && bg.dental_plan.name" || 'None',
-     deductible_value: bg.deductible_for_ui,
     }
     bg.quote_relationship_benefits.each{|bp| bp_hash[bp.relationship] = bp.premium_pct}
     bg.quote_dental_relationship_benefits.each{|bp| bp_dental_hash[bp.relationship] = bp.premium_pct}
@@ -473,6 +478,31 @@ class BrokerAgencies::QuotesController < ApplicationController
     render partial: 'my_dental_plans'
   end
 
+   def employees_list
+ 
+    employer_profile = EmployerProfile.find(params[:employer_profile_id])
+    @employees = employer_profile.census_employees.non_terminated
+
+    @quote = Quote.new
+    # # Create place holder for new member of household
+    quote = Quote.find(params[:quote_id])
+    households = quote.quote_households.destroy_all
+    @employees.each do |x|
+     max_family_id = @quote.quote_households.max(:family_id).to_i
+     qhh = QuoteHousehold.new(family_id: max_family_id + 1)
+     qhh.quote_members << QuoteMember.new(dob: x.dob, first_name: x.first_name, last_name:x.last_name)
+     @quote.quote_households << qhh
+    end 
+    qbg = QuoteBenefitGroup.new
+    @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
+    @quote.quote_benefit_groups << qbg    
+
+    respond_to do |format|
+      # format.html 
+      format.js
+    end  
+  end  
+
 
 private
 
@@ -497,6 +527,9 @@ private
                     :quote_name,
                     :start_on,
                     :broker_role_id,
+                    :employer_type,
+                    :employer_name,
+                    :employer_profile_id,
                     :quote_benefit_groups_attributes => [:id, :title],
                     :quote_households_attributes => [ :id, :family_id , :quote_benefit_group_id,
                                        :quote_members_attributes => [ :id, :first_name, :last_name ,:dob,
@@ -632,7 +665,8 @@ private
   end
 
   def set_qhp_variables
-    @active_year = Date.today.year
+    @quote = Quote.find(params['quote_id'])
+    @active_year = @quote.plan_year
     @coverage_kind = "health"
     @visit_types = @coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
   end

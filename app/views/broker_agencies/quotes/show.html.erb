@@ -6,15 +6,11 @@
    <input name='child_under_26' value='0' type='hidden'>
     <%= form_tag(broker_agencies_broker_role_quote_path, method: :get) do  %>
 
-    <h2>Quote Calculator</h2>
-
-             <input type="hidden" id="quote_id" value="<%= params[:id] %>">
+      <h2>Quote Calculator</h2>
+      <input type="hidden" id="quote_id" value="<%= params[:id] %>">
       <input type="hidden" id="broker_role_id" value="<%= @broker.id %>">
 
-
       <%= render partial: 'broker_agencies/quotes/panels/my_features' if @q.can_edit? %>
-
-      <%= render partial: 'broker_agencies/quotes/panels/my_plans' if false %>
 
       <% end %>
       <%= render partial: 'broker_agencies/quotes/panels/dental'  if @q.can_edit? %>

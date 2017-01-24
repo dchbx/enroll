@@ -8,7 +8,7 @@ module BrokerWorld
 
   def broker_agency(*traits)
     attributes = traits.extract_options!
-    @broker_agency ||= FactoryGirl.create :broker , *traits, attributes
+    @broker_agency ||= FactoryGirl.create :broker, *traits, attributes
   end
 
 end
@@ -18,6 +18,11 @@ World(BrokerWorld)
 Given (/^that a broker exists$/) do
   broker_agency
   broker :with_family, :broker_with_person, organization: broker_agency
+  broker_agency_profile = broker_agency.broker_agency_profile
+  broker_agency_account = FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_agency_profile.primary_broker_role.id)
+  employer_profile = FactoryGirl.create(:employer_profile)
+  employer_profile.broker_agency_accounts << broker_agency_account
+  employer_profile.save!
 end
 
 And(/^the broker is signed in$/) do
@@ -62,8 +67,16 @@ Then(/^the broker enters the quote effective date$/) do
   select "#{(Date.today+3.month).strftime("%B %Y")}", :from => "quote_start_on"
 end
 
+When(/^the broker selects employer type$/) do
+  find('.selectric-interaction-choice-control-quote-employer-type').click
+  find('.interaction-choice-control-quote-employer-profile-id-2', match: :first).click
+  fill_in 'quote[employer_name]', with: "prospect test Employee"
+end
+
 When(/^broker enters valid information$/) do
   fill_in 'quote[quote_name]', with: 'Test Quote'
+  select "Prospect", :from => "quote_employer_type"
+  fill_in 'quote_employer_name', with: "prospect employer sample"
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][dob]', with: "11/11/1991"
   select "Employee", :from => "quote_quote_households_attributes_0_quote_members_attributes_0_employee_relationship"
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][first_name]', with: "John"
@@ -106,9 +119,18 @@ Then(/^the quote should be deleted$/) do
   expect(page).to have_content(/No data available in table/)
 end
 
+Then(/^adds a benefit group$/) do
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
+  find('.interaction-click-control-save-changes').trigger 'click'
+end
+
 Then(/^adds a new benefit group$/) do
   fill_in "quote[quote_benefit_groups_attributes][1][title]", with: 'My Benefit Group'
   find('.interaction-click-control-save-changes').trigger 'click'
+end
+
+Then(/^Click on Add Benefit Group Button to add benefit group$/) do
+  click_button 'Add benefit Group'
 end
 
 Then(/^the broker assigns the benefit group to the family$/) do
@@ -186,6 +208,7 @@ When(/^the broker selects the Reference Dental Plan$/) do
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
+  wait_for_ajax
   click_button 'Publish Quote'
 end
 
@@ -196,4 +219,17 @@ end
 
 When(/^the broker clicks Dental Features$/) do
   find('.interaction-click-control-dental-features-and-cost-criteria').trigger 'click'
+end
+
+
+Then(/^the broker should see avaliable Quotes$/) do
+  find('#Tab\\:all').visible?
+  end
+
+When(/^the broker clicks on Actions\.$/) do
+  find_button('Actions').click
+end
+
+Then(/^view publish quote should be disabled\.$/) do
+  find_link('View Published Quote')['disabled'].should == 'disabled'
 end
