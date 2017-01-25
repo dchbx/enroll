@@ -653,6 +653,12 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
+  def tax_documents
+    documents.select do |doc|
+      (doc.subject == '1095A') && (doc.is_a? TaxDocument)
+    end
+  end
+
 private
   def build_household
     if households.size == 0

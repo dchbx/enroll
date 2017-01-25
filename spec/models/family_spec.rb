@@ -1337,3 +1337,29 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
     end
   end
 end
+
+describe Family, ".tax_documents", dbclean: :after_each do
+  let(:family) { FactoryGirl.build(:family)}
+
+  context "had no tax documents" do
+    before do
+      family.documents = []
+    end
+
+    it "should return no documents" do
+      expect(family.tax_documents).to eq([])
+    end
+  end
+
+  context "had a tax document" do
+    let(:tax_document) { FactoryGirl.build(:tax_document)}
+
+    before do
+      family.documents = [tax_document]
+    end
+
+    it "should return 1 documents" do
+      expect(family.tax_documents).to eq([tax_document])
+    end
+  end
+end
