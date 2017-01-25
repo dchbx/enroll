@@ -33,7 +33,7 @@ class IdpAccountManager
     else
       account_role_val = account_role
     end
-    provider.create_account({
+    account_params = {
       :email => email,
       :username => username,
       :password => password,
@@ -41,10 +41,13 @@ class IdpAccountManager
       :last_name => personish.last_name,
       :account_role => account_role_val,
       :system_flag => system_flag
-    }, timeout)
+    }
+    ForgeRock.new(params, personish.user).create_forgerock_account
+    provider.create_account(account_params, timeout)
   end
 
   def update_navigation_flag(lu, email, flag)
+    ForgeRock.new({username: lu, email: email, system_flag: flag}, "").update_forgerock_account
     provider.update_navigation_flag(lu, email, flag)
   end
 

@@ -104,6 +104,8 @@ class User
     end
   end
 
+  field :forgerock_uuid, type: String
+
   field :hints, type: Boolean, default: true
   # for i18L
   field :preferred_language, type: String, default: "en"
