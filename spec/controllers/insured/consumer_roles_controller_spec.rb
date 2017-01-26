@@ -158,16 +158,14 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
       allow(consumer_role).to receive(:person).and_return(person)
+      allow_any_instance_of(ForgeRock).to receive(:make_create_request).and_return({})
     end
     it "should create new person/consumer role object" do
       sign_in user
       post :create, person: person_params
       expect(response).to have_http_status(:redirect)
     end
-
-
   end
-
 
   context "POST create with failed construct_employee_role" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}

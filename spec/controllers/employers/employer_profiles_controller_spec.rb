@@ -410,6 +410,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
     describe 'updateable organization' do
       before(:each) do
+        allow_any_instance_of(ForgeRock).to receive(:make_create_request).and_return({})
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in @user
         post :create, :organization => organization_params
@@ -479,7 +480,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
       sign_in @user
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
-      
+      allow_any_instance_of(ForgeRock).to receive(:make_create_request).and_return({})
       allow(@user).to receive(:switch_to_idp!)
 #      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
 #      allow(found_employer).to receive(:organization).and_return(organization)
