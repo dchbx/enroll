@@ -1,7 +1,8 @@
 class ResidentRole
   include Mongoid::Document
   include Mongoid::Timestamps
-
+  include AASM
+  
   embedded_in :person
 
   delegate :hbx_id,           to: :person, allow_nil: true
