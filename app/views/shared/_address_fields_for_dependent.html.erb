@@ -94,11 +94,3 @@
 <% else %>
   <span class="form-action btn btn-default">Add Mailing Address</span>
 <% end %>
-
-<script>
-$(document).ready(function () {
-  $('#state_id').change(function(){
-    if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}
-  });
-});
-</script>
