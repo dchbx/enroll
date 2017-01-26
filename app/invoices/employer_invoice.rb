@@ -67,7 +67,7 @@ class EmployerInvoice
 		save
 		save_to_cloud
     send_to_print_vendor
-		send_email_notice
+		# send_email_notice
 		clear_tmp(invoice_absolute_file_path)
 	end
 
