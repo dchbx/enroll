@@ -116,7 +116,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
           allow(plan_year).to receive(:withdraw_pending!)
           allow(plan_year).to receive(:is_application_valid?).and_return(false)
           allow(plan_year).to receive(:application_eligibility_warnings).and_return(warnings)
-          get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
+          get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id, publish: true
         end
 
         it "should set warnings flag" do
@@ -440,6 +440,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(plan_year_proxy).to receive(:draft?).and_return(false)
       allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
+      allow(plan_year_proxy).to receive(:renewing_publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:application_errors)
     end
 
@@ -471,6 +472,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     context "plan year did not publish due to warnings" do
       before :each do
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
+        allow(plan_year_proxy).to receive(:withdraw_pending!).and_return(true)
         allow(plan_year_proxy).to receive(:application_eligibility_warnings)
       end
 
@@ -535,7 +537,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "POST force publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish: double)}
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
@@ -547,6 +549,46 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
     it "should redirect" do
       expect(response).to have_http_status(:redirect)
+    end
+  end
+
+  describe "POST delete_benefit_group" do
+    let(:save_result) { true }
+    let(:plan_year_id) { "plan_year_id"}
+    let(:benefit_group_id) { "benefit_group_id"}
+    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', destroy!: true, title: 'bg_one'), double('bg_two')]) }
+
+    before :each do
+      sign_in user
+      allow(PlanYear).to receive(:find).with(plan_year_id).and_return plan_year_proxy
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      benefit_group = plan_year_proxy.benefit_groups[0]
+      allow(plan_year_proxy.benefit_groups).to receive(:find).with(benefit_group_id).and_return benefit_group
+      allow(plan_year_proxy).to receive(:save).and_return save_result
+      post :delete_benefit_group, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id, benefit_group_id: benefit_group_id
+    end
+
+    context "when plan year has more than 1 benefit group" do
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should return success notice" do
+        expect(flash[:notice]).to match(/Benefit Group: bg_one successfully deleted./)
+      end
+    end
+
+    context "when plan year has one benefit group" do
+      let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one')])}
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should return error notice" do
+        expect(flash[:error]).to match(/Benefit package can not be deleted because it is the only benefit package remaining in the plan year/)
+      end
     end
   end
 

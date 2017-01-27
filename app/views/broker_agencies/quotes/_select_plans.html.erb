@@ -1,0 +1,53 @@
+<div class="container-fluid">
+    <div class='plan_selectors'>
+
+        <div  id='carriers' style='width: 148px;'>
+            <b>Carriers</b><br/>
+            <%- @health_selectors[:carriers].each do |carrier| %>
+                   <div id="<%=carrier[1]%>"  class="criteria <%=carrier[0]=='any' && 'active'%>" style='width: 148px;'><%=carrier[0] %> </div>
+             <% end %>
+        </div>
+
+        <div id='metals'>
+            <b>Metal Levels</b> </br>
+            <%- @health_selectors[:metals].each do |metal| %>
+                <div id="<%=metal%>"  class="criteria <%=metal=='any' && 'active'%>"> <%= metal %> </div>
+            <% end %>
+        </div>
+
+        <div id='plan_types'>
+            <b>Plan Types</b> <br>
+            <%- @health_selectors[:plan_types].each do |type| %>
+                <div id="<%=type%>" class="criteria <%=type=='any' && 'active'%>"> <%= type %> </div>
+            <% end %>
+        </div>
+
+        <div id='dc_in_network'>
+             <b>DC Network</b> <br>
+          <%- @health_selectors[:dc_network].each do |choice| %>
+            <div  id="<%=choice%>" class="criteria <%=choice=='any' && 'active'%>"> <%= choice %> </div>
+          <% end %>
+        </div>
+
+        <div id='nationwide'>
+            <b>Nationwide</b> <br>
+          <%- @health_selectors[:nationwide].each do |choice| %>
+            <div id="<%=choice%>" class="criteria <%=choice=='any' && 'active'%>"><%= choice %> </div>
+          <% end %>
+        </div>
+    </div>
+
+    
+      <div class='left'>
+      <b>Limit maximum deductible 0-$6000</b>
+        <div class='row'>
+          <div class='col-sm-1'>
+            <%= number_field_tag 'ex1_input', '6000', {  class: "slider_input hidden-param", style: 'margin-top:3%;min-width:75px;' } %>
+          </div>
+          <div class='col-sm-4' style='margin-top:1%;'>
+            <input id="ex1" data-slider-id='ex1Slider' class='slider' type="text" data-slider-min="0" data-slider-max="6000" data-slider-step="1" data-slider-value="6000" style='width:350px;'/>
+          </div>
+            <div style='margin-top:1%;'><span id='ex1_label' class="slide-label" style='margin-left:2%;'>$6000</span></div>
+        </div>
+      </div>
+</div>

@@ -1,5 +1,7 @@
 class BenefitGroupCongress < BenefitGroup
 
+  EFFECTIVE_ON_KINDS = EFFECTIVE_ON_KINDS << "newly_designated"
+
   field :contribution_pct_as_int, type: Integer, default: 75
   field :employee_max_amt_in_cents, type: Money, default: 0
   field :first_dependent_max_amt_in_cents, type: Integer, default: 0
@@ -8,6 +10,37 @@ class BenefitGroupCongress < BenefitGroup
   field :effective_on_kind, type: String, default: "first_of_month"
   field :plan_option_kind, type: String, default: "metal_level"
   field :default, type: Boolean, default: true
+
+
+  ## Must prevent newly_designated from obtaining SEP before initial enrollment
+  ## This should be automatic??
+
+  # Override parent method
+  def effective_on_for(date_of_hire)
+    case effective_on_kind
+    when "newly_designated"
+      date_of_hire_effective_on_for(date_of_hire)
+    when "first_of_month"
+      first_of_month_effective_on_for(date_of_hire)
+    end
+  end
+
+  # Override parent method
+  def eligible_on(date_of_hire)
+    if effective_on_kind == "newly_designated"
+      date_of_hire
+    else
+      if effective_on_offset == 1
+        date_of_hire.end_of_month + 1.day
+      else
+        if (date_of_hire + effective_on_offset.days).day == 1
+          (date_of_hire + effective_on_offset.days)
+        else
+          (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        end
+      end
+    end
+  end
 
   def set_bounding_cost_plans
     plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
@@ -71,5 +104,10 @@ class BenefitGroupCongress < BenefitGroup
     "employee_plus_many"  => 1058.42
   }
 
+  employer_contribution_max_2017 = {
+    "employee_only"       => 480.29,
+    "employee_plus_one"   => 1030.88,
+    "employee_plus_many"  => 1094.64
+  }
 
 end

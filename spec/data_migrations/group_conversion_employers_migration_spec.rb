@@ -35,17 +35,17 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
       end
 
       it "should migrate the 2015 plan year" do
-        expect(organization.employer_profile.plan_years.where(:start_on => Date.new(2015,10,1)).first.aasm_state).to eq "expired"
+        expired_plan_year = organization.employer_profile.plan_years.where(:aasm_state => "expired").first
         subject.migrate
-        organization.reload
-        expect(organization.employer_profile.plan_years.where(:start_on => Date.new(2015,10,1)).first.aasm_state).to eq "migration_expired"
+        expired_plan_year.reload
+        expect(expired_plan_year.aasm_state).to eq "migration_expired"
       end
 
       it "should cancel the 2016 plan year" do
-        expect(organization.employer_profile.plan_years.where(:start_on => Date.new(2016,10,1)).first.aasm_state).to eq "active"
+        active_plan_year = organization.employer_profile.plan_years.where(:aasm_state => "active").first
         subject.migrate
-        organization.reload
-        expect(organization.employer_profile.plan_years.where(:start_on => Date.new(2016,10,1)).first.aasm_state).to eq "canceled"
+        active_plan_year.reload
+        expect(active_plan_year.aasm_state).to eq "canceled"
       end
 
       it "should cancel the enrollments" do

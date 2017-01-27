@@ -81,10 +81,6 @@ module Factories
       unless TimeKeeper.date_of_record <= @employer_profile.active_plan_year.end_on
         raise PlanYearRenewalFactoryError, "Renewal time period has expired.  You must submit a new application"
       end
-
-      unless @employer_profile.is_primary_office_local?
-        raise PlanYearRenewalFactoryError, "Employer primary address must be located in #{Settings.aca.state_name}"
-      end
     end
 
     def renew_benefit_groups
@@ -135,7 +131,7 @@ module Factories
         relationship_benefits: active_group.relationship_benefits,
         reference_plan_id: reference_plan_id,
         elected_plan_ids: elected_plan_ids,
-        is_congress: false
+        is_congress: active_group.is_congress
       })
     end
 

@@ -152,7 +152,7 @@ class QhpBuilder
     plans_to_update.each do |up_plan|
       nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
-          name: @qhp.plan_marketing_name.squish!,
+          # name: @qhp.plan_marketing_name.squish!,
           hios_id: up_plan.coverage_kind == "dental" ? up_plan.hios_id.split("-").first : up_plan.hios_id,
           hios_base_id: up_plan.hios_id.split("-").first,
           # csr_variant_id: up_plan.hios_id.include?("-") ? up_plan.hios_id.split("-").last : "",
@@ -193,7 +193,7 @@ class QhpBuilder
             csr_variant_id: csr_variant_id).to_a
           next if plan.present?
           new_plan = Plan.new(
-            name: @qhp.plan_marketing_name.squish!,
+            name: cost_share_variance.plan_marketing_name.squish!,
             hios_id: cost_share_variance.hios_plan_and_variant_id,
             hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
             csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,

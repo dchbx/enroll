@@ -107,15 +107,46 @@ $(function () {
     };
 
     $('#qle-details').removeClass('hidden');
+    $('#qle-details-for-existing-sep').addClass('hidden');
   });
 
-	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
+
+  $(document).on('click', 'a.existing-sep-item', function() {
+    $('#choose_flow').modal('hide');
+    //window.scrollTo(0, 0);
+    $('html,body').animate({scrollTop: 0});
+    init_qle_message();
+    $('.seps-panel').addClass('hidden');
+    $('#no_qle_checkbox').parent().addClass('hidden');
+    $('#qle_flow_info #qle-menu').hide();
+    $('.qle-details-title').html($(this).data('title'));
+    $('.qle-label').html($(this).data('label'));
+    $('#change_plan').val($(this).data('title'));
+    $('#qle_id').val($(this).data('id'));
+    $('#qle_reason .special_qle_reasons').addClass('hidden');
+    $('#qle-date-chose').show();
+    var is_self_attested = $(this).data('is-self-attested');
+
+    $('#qle-details-for-existing-sep').removeClass('hidden');
+    $('#qle-details').addClass('hidden');
+
+  });
+
+  $(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
     init_qle_message();
 		$('#qle-details').addClass('hidden');
 		$('#qle_flow_info #qle-menu').show();
 	});
 
-	// Disable form submit on pressing Enter, instead click Submit link
+  $(document).on('click', '#qle-details-for-existing-sep .close-popup, #qle-details-for-existing-sep .cancel', function() {
+    //init_qle_message();
+    //$('.seps-panel').removeClass('hidden');
+    //$('#no_qle_checkbox').parent().removeClass('hidden');
+    $('#qle-details-for-existing-sep').addClass('hidden');
+    //$('#qle_flow_info #qle-menu').show();
+  });
+
+  // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keyup keypress', function(e) {
     var code = e.keyCode || e.which;
     if (code == 13) {

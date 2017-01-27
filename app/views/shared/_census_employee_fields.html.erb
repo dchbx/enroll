@@ -1,7 +1,7 @@
 <div class="module census-employee-fields forms">
   <div class="row row-form-wrapper no-buffer">
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= datepicker_control f, :hired_on, {:class => "interaction-field-control-census-employee-hired-on floatlabel form-control", :placeholder => "HIRE DATE", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: is_readonly(f.object)} %>
+      <%= datepicker_control f, :hired_on, {:class => "interaction-field-control-census-employee-hired-on floatlabel form-control", :placeholder => "HIRE DATE", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: !may_update_census_employee?(f.object)} %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg">
       <div class="owner checkbox">

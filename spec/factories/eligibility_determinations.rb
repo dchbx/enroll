@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :eligibility_determination do
     tax_household
     determined_on TimeKeeper.datetime_of_record
+    determined_at TimeKeeper.datetime_of_record
     max_aptc  225.13
     csr_percent_as_integer 87
     csr_eligibility_kind "csr_94"

@@ -1,7 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe User, :type => :model do
-
+RSpec.describe User, :type => :model, dbclean: :after_each do
   let(:gen_pass) { User.generate_valid_password }
 
   let(:valid_params) do
@@ -16,7 +15,6 @@ RSpec.describe User, :type => :model do
   end
 
   describe 'user' do
-
     context "when all params are valid" do
       let(:params){valid_params}
       it "should not have errors on create" do
@@ -219,39 +217,12 @@ RSpec.describe User, :type => :model do
       end
     end
   end
-end
 
-describe User do
-  subject { User.new(:identity_final_decision_code => decision_code_value) }
-
-  describe "with no identity final decision code" do
-    let(:decision_code_value) { nil }
-    it "should not be considered identity_verified" do
-      expect(subject.identity_verified?).to eq false
-    end
-  end
-
-  describe "with a non-successful final decision code" do
-    let(:decision_code_value) { "lkdsjfaoifudjfnnkadjlkfajlafkl;f" }
-    it "should not be considered identity_verified" do
-      expect(subject.identity_verified?).to eq false
-    end
-  end
-
-  describe "with a successful decision code" do
-    let(:decision_code_value) { User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE }
-    it "should be considered identity_verified" do
-      expect(subject.identity_verified?).to eq true
-    end
-  end
-end
-
-describe User do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, person: person) }
   context "get_announcements_by_roles_and_portal" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+
     before :each do
-      Announcement.destroy_all
       Announcement::AUDIENCE_KINDS.each do |kind|
         FactoryGirl.create(:announcement, content: "msg for #{kind}", audiences: [kind])
       end
@@ -319,17 +290,12 @@ describe User do
     end
   end
 
-describe "orphans" do
+  context "orphans" do
     let(:person) { create :person }
     let(:user) { create :user, person: person }
 
-    before do
-      User.destroy_all
-    end
-
     context "when users have person associated" do
       it "should return no orphans" do
-        user.save!
         expect(User.orphans).to eq []
       end
     end
@@ -362,7 +328,35 @@ describe "orphans" do
     end
   end
 
-  describe "can_change_broker?" do
+  describe User, dbclean: :after_each do
+    subject { User.new(:identity_final_decision_code => decision_code_value) }
+
+    describe "with no identity final decision code" do
+      let(:decision_code_value) { nil }
+      it "should not be considered identity_verified" do
+        expect(subject.identity_verified?).to eq false
+      end
+    end
+
+    describe "with a non-successful final decision code" do
+      let(:decision_code_value) { "lkdsjfaoifudjfnnkadjlkfajlafkl;f" }
+      it "should not be considered identity_verified" do
+        expect(subject.identity_verified?).to eq false
+      end
+    end
+
+    describe "with a successful decision code" do
+      let(:decision_code_value) { User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE }
+      it "should be considered identity_verified" do
+        expect(subject.identity_verified?).to eq true
+      end
+    end
+  end
+
+  describe "can_change_broker?", dbclean: :after_each do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+
     context "with user" do
       it "should return true when hbx staff" do
         user.roles = ['hbx_staff']

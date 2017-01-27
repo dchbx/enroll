@@ -1,14 +1,15 @@
 When(/^\w+ visits? the Insured portal during open enrollment$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
-  FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period, :ivl_2015_benefit_package)
-  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual") #pull out for sep
+  FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+
   Caches::PlanDetails.load_record_cache!
   screenshot("individual_start")
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
-  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
   Caches::PlanDetails.load_record_cache!
 
@@ -97,10 +98,22 @@ Then (/Individual sees previously saved address/) do
   find('.btn', text: 'CONTINUE').click
 end
 
+When /^Individual clicks on Individual and Family link should be on privacy agreeement page/ do
+  wait_for_ajax
+  find('.interaction-click-control-individual-and-family').trigger('click')
+  expect(page).to have_content('Authorization and Consent')
+end
+
 Then(/^\w+ agrees? to the privacy agreeement/) do
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
+end
+
+When /^Individual clicks on Individual and Family link should be on verification page/ do
+  wait_for_ajax
+  find('.interaction-click-control-individual-and-family').trigger('click')
+  expect(page).to have_content('Verify Identity')
 end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
@@ -321,7 +334,7 @@ Then(/Individual asks for help$/) do
   wait_for_ajax
   expect(page).to have_content "Help"
   click_link "Help from a Customer Service Representative"
-  wait_for_ajax
+  wait_for_ajax(5,2.5)
   expect(page).to have_content "First name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
@@ -434,7 +447,7 @@ Given(/^Company Tronics is created with benefits$/) do
   step "Tronics creates an HBX account"
   step "Tronics should see a successful sign up message"
   step "I should click on employer portal"
-  step "Tronics creates a new employer profile"
+  step "Tronics creates a new employer profile with default_office_location"
   step "Tronics creates and publishes a plan year"
   step "Tronics should see a published success message without employee"
 end

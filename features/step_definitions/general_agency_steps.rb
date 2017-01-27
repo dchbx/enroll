@@ -1,6 +1,6 @@
 When(/^.+ visit the HBX General Agency Registration form$/) do
   visit '/'
-  find(".interaction-click-control-general-agency-registration").click
+  find(".interaction-click-control-general-agency-registration", wait: 10).click
 end
 
 Then(/^.+ should see the New General Agency form/) do
@@ -167,7 +167,7 @@ Then(/^.+ should see list of employers and assign portal$/) do
 end
 
 When(/^.+ assign employer to general agency$/) do
-  find("input#employer_ids_").click
+  find("input[id^='broker_dt_employer_ids_']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Housecare Inc')]").click
   find("#assign_general_agency").click

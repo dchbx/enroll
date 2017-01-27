@@ -135,6 +135,23 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           expect(response).to redirect_to('/exchanges/hbx_profiles')
         end
       end
+
+      context 'when application is re-certified' do
+        before :each do
+          broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
+          broker_role.approve!
+          broker_role.decertify!
+          put :update, id: broker_role.person.id, recertify: true, format: :js
+          broker_role.reload
+        end
+
+        it "should change applicant status to active" do
+          expect(assigns(:broker_applicant))
+          expect(broker_role.aasm_state).to eq 'active'
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to('/exchanges/hbx_profiles')
+        end
+      end
     end
   end
 end

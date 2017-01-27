@@ -1,24 +1,16 @@
+<% if hbx_enrollment.is_coverage_waived? %>
+  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
+<% else %>
 <% plan = hbx_enrollment.plan %>
-<% if plan.present? %>
 <div class="module hbx-enrollment-panel panel panel-default">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="no-buffer">
       <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
       <span class="separator">
-        <%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
+        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
       </span>
     </h3>
-    <% if hbx_enrollment.coverage_terminated? %>
-    <h4 style="font-size: 18px; color: #909090;">Terminated</h4>
-    <% elsif hbx_enrollment.coverage_canceled?  %>
-    <div class="text-right">
-      <span class="label label-success canceled">
-        Canceled
-      </span>
-    </div>
-    <% else %>
     <%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>
-    <% end %>
   </div>
 
   <div class="panel-body">
@@ -38,20 +30,20 @@
             <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
           </p>
         </div>
-        <% if hbx_enrollment.coverage_terminated? %>
+        <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? %>
         <div class="enrollment-effective info vertical-align-top">
           <strong>Effective Date:
           </strong>
           <%= hbx_enrollment.effective_on %>
         </div>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Coverage end:
+          <strong>Coverage End:
           </strong>
-          <%= hbx_enrollment.terminated_on %>
+          <%= enrollment_coverage_end(hbx_enrollment) %>
         </div>
         <% else %>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Effective date:
+          <strong>Effective Date:
           </strong>
           <%= hbx_enrollment.effective_on %>
         </div>
@@ -167,7 +159,7 @@
     <div>
       <a class="vertically-aligned-row" data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
         <i class="fa fa-phone fa-2x pull-left"></i>
-        <span>Carrier Contact Info</span>
+        <span>Plan Contact Info</span>
       </a>
       <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
     </div>
@@ -190,6 +182,4 @@
   </div>
 </div>
 </div>
-<% else %>
-<%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
 <% end %>

@@ -1,6 +1,6 @@
 When(/^.+ visits the HBX Broker Registration form$/) do
   visit '/'
-  find(".interaction-click-control-broker-registration").click
+  find(".interaction-click-control-broker-registration", wait: 10).click
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do

@@ -2,6 +2,12 @@
   %member
     %id
       %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{hbx_enrollment_member.person.hbx_id}"
+    - if hbx_enrollment_member.person.primary_family.present?
+      %primary_family_id
+        %id=hbx_enrollment_member.person.primary_family.hbx_assigned_id
+    - if hbx_enrollment_member.person.primary_family.present? && hbx_enrollment_member.person.primary_family.active_household.latest_active_tax_household.present?
+      %tax_household_id
+        %id=hbx_enrollment_member.person.primary_family.active_household.latest_active_tax_household.hbx_assigned_id
     = render :partial=> "events/individuals/person", :object => hbx_enrollment_member.person, as: :person
     - if subscriber
       - if subscriber.person.person_relationship_for(hbx_enrollment_member.person).present?
@@ -10,16 +16,17 @@
     - else 
       %person_relationships
         = render :partial => "events/individuals/person_relationship", :object => hbx_enrollment.family.primary_family_member.person.person_relationship_for(hbx_enrollment_member.person)
-    %person_demographics
-      %ssn= hbx_enrollment_member.person.ssn
-      %sex= "urn:openhbx:terms:v1:gender##{hbx_enrollment_member.person.gender}"
-      %birth_date= simple_date_for(hbx_enrollment_member.person.dob)
-      - if !hbx_enrollment_member.person.is_incarcerated.present?
-        %is_incarcerated= "false"
-      - else
-        %is_incarcerated= hbx_enrollment_member.person.is_incarcerated.to_s
-      - if !hbx_enrollment_member.person.race.blank?
-        %race= hbx_enrollment_member.person.race
+    = render :partial => "events/individuals/person_demographics", :object => hbx_enrollment_member.person, as: :person_demographics
+    - unless hbx_enrollment_member.family_member.is_primary_applicant.blank?
+      %is_primary_applicant= hbx_enrollment_member.family_member.is_primary_applicant
+    - unless hbx_enrollment_member.family_member.is_coverage_applicant.blank?
+      %is_coverage_applicant= hbx_enrollment_member.family_member.is_coverage_applicant
+    - unless hbx_enrollment_member.person.is_disabled.blank? && hbx_enrollment_member.person.is_tobacco_user.blank?
+      %person_health
+        - unless hbx_enrollment_member.person.is_tobacco_user.blank?
+          %is_tobacco_user= hbx_enrollment_member.person.is_tobacco_user
+        - unless hbx_enrollment_member.person.is_disabled.blank?
+          %is_disabled= hbx_enrollment_member.person.is_disabled
   %is_subscriber= hbx_enrollment_member.is_subscriber
   %benefit
     %premium_amount= (hbx_enrollment.premium_for(hbx_enrollment_member).round(2))

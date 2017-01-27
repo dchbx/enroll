@@ -1,41 +1,45 @@
 <div class="" id="inbox_provider_form">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <h3 class="title-inline">Broker Agencies</h3>
+      <div class="form-inline button-group-wrapper">
+        <div class="col-xs-12 input-group search-wp">
+          <%= render 'shared/search', url: broker_agency_index_exchanges_hbx_profiles_path, q: @q, placeholder: "Name", remote: true %>
+        </div>
+      </div>
     </div>
   </div>
-
   <div class="row">
     <div class="col-md-12">
-    <div class="table-border table-responsive">
-      <table class="table">
-      <% if @broker_agency_profiles.present? %>
-        <thead>
-          <th>Legal Name</th>
-          <th>dba</th>
-          <th>Fein</th>
-          <th>Entity Kind</th>
-          <th>Market Kind</th>
-          <th></th>
-        </thead>
-        <% @broker_agency_profiles.each do |broker_agency_profile| %>
-          <tbody>
-            <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
-            <td><%= broker_agency_profile.dba %></td>
-            <td><%= broker_agency_profile.fein %></td>
-            <td><%= broker_agency_profile.entity_kind.titleize %></td>
-            <td><%= broker_agency_profile.market_kind.titleize %></td>
-              <td>
+      <div class="table-border table-responsive">
+        <table class="table">
+          <% if @broker_agency_profiles.present? %>
+            <thead>
+              <th>Legal Name</th>
+              <th>dba</th>
+              <th>Fein</th>
+              <th>Entity Kind</th>
+              <th>Market Kind</th>
+              <th></th>
+            </thead>
+            <% @broker_agency_profiles.each do |broker_agency_profile| %>
+              <tbody>
+                <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
+                <td><%= broker_agency_profile.dba %></td>
+                <td><%= broker_agency_profile.fein %></td>
+                <td><%= broker_agency_profile.entity_kind.titleize %></td>
+                <td><%= broker_agency_profile.market_kind.titleize %></td>
+                <td>
                 <%= link_to 'Send Secure Message'.html_safe,
               new_broker_agencies_inbox_path(id: broker_agency_profile.id, profile_id: @profile._id), class: "btn btn-default" + pundit_class(HbxProfile, :modify_admin_tabs?), remote: true %>
-              </td>
-          </tbody>
-        <% end %>
-      <% else %>
-        <tr><td>No Broker Agency Profiles found.</td></tr>
-      <% end %>
-      </table>
+                </td>
+              </tbody>
+              <% end %>
+              <% else %>
+                <tr><td>No Broker Agency Profiles found.</td></tr>
+              <% end %>
+        </table>
+      </div>
     </div>
-   </div>
   </div>
 </div>

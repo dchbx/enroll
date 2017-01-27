@@ -16,20 +16,23 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars
+
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
-
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?))
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
-      hbx = HbxProfile.current_hbx
-      bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
-      pkgs = bc_period.benefit_packages
-      benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
-      @benefit = benefit_package.first
+      correct_effective_on = HbxEnrollment.calculate_effective_on_from(
+        market_kind: 'individual',
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        family: @family,
+        employee_role: nil,
+        benefit_group: nil,
+        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+      @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
       @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
     if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
@@ -44,12 +47,13 @@ class Insured::GroupSelectionController < ApplicationController
       employee_role: @employee_role,
       benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
       benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
+    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
-
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
     raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
@@ -77,7 +81,8 @@ class Insured::GroupSelectionController < ApplicationController
 
 
     hbx_enrollment.coverage_kind = @coverage_kind
-
+    # Set effective_on if this is a case of QLE with date options available.
+    hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
@@ -128,12 +133,17 @@ class Insured::GroupSelectionController < ApplicationController
   def build_hbx_enrollment
     case @market_kind
     when 'shop'
-      if @hbx_enrollment.present?
-        benefit_group = @hbx_enrollment.benefit_group
-        benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
-        @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
-      end
       @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+      if @hbx_enrollment.present?
+        @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
+        if @employee_role == @hbx_enrollment.employee_role
+          benefit_group = @hbx_enrollment.benefit_group
+          benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
+        else
+          benefit_group = @employee_role.benefit_group
+          benefit_group_assignment = @employee_role.census_employee.active_benefit_group_assignment
+        end
+      end
       @coverage_household.household.new_hbx_enrollment_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,

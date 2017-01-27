@@ -43,7 +43,7 @@ Feature: Create Primary Broker and Broker Agency
     Then Tim Wood creates an HBX account
     Then Tim Wood should see a successful sign up message
     Then I should click on employer portal
-    And Tim Wood creates a new employer profile
+    And Tim Wood creates a new employer profile with default_office_location
     When Employer clicks on the Brokers tab
     Then Employer should see no active broker
     When Employer click on Browse Brokers button

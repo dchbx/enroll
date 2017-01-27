@@ -167,6 +167,13 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
         expect(assigns[:families]).to eq [family]
       end
 
+      it "should get family with full_name" do
+        full_name = family.primary_applicant.person.full_name
+        xhr :get, :families, id: general_agency_profile.id, q: full_name
+        expect(response).to render_template("families")
+        expect(assigns[:families]).to eq [family]
+      end
+
       it "should not get family" do
         page = family.primary_applicant.person.last_name.first
         xhr :get, :families, id: general_agency_profile.id, page: '1'

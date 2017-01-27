@@ -176,7 +176,7 @@ RSpec.describe TaxHousehold, type: :model do
       allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 100
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(decorated_plan)
       allow(decorated_plan).to receive(:premium_for).and_return(100)
-      allow(household).to receive(:hbx_enrollments_with_aptc_by_year).and_return([hbx_enrollment])
+      allow(household).to receive(:hbx_enrollments_with_aptc_by_date).and_return([hbx_enrollment])
     end
 
     it "can return result when plan is individual" do

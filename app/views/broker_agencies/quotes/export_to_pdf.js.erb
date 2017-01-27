@@ -1,0 +1,5 @@
+window.location.href = '<%= @pdf_url %>' + $.param({ plans: selected_plans(), 
+                                                     sort_by: $('#current_sort').val(), 
+                                                     plan_keys: $('#plan_ids').val(),
+                                                     export_to_pdf: true 
+                                                   });

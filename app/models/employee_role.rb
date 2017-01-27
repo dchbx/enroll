@@ -15,7 +15,7 @@ class EmployeeRole
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
-  field :contact_method, type: String, default: "Only Paper communication"
+  field :contact_method, type: String, default: "Only Electronic communications"
   field :language_preference, type: String, default: "English"
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
@@ -96,7 +96,15 @@ class EmployeeRole
   alias_method :census_employee, :new_census_employee
 
   def coverage_effective_on
-    benefit_group.effective_on_for(census_employee.hired_on) if benefit_group.present?
+    if benefit_group.present?
+      effective_on_date = benefit_group.effective_on_for(census_employee.hired_on)
+
+      if census_employee.newly_designated_eligible? || census_employee.newly_designated_linked?
+        effective_on_date = [effective_on_date, census_employee.newly_eligible_earlist_eligible_date].max
+      end
+    end
+    
+    effective_on_date
   end
 
   def can_enroll_as_new_hire?    

@@ -122,7 +122,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                                             employer_profile: employer_profile,
                                             benefit_group_assignments: [benefit_group_assignment]
                                           ) }
-
+      let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
       before do
         plan_year.publish!
         # allow_any_instance_of(CensusEmployee).to receive(:has_active_health_coverage?).and_return(true)
@@ -157,6 +157,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
         context "and plan year hasn't started" do
           context "and binder premium payment is reversed" do
+            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
             before do
               new_employer_profile_account.reverse_coverage_period!
             end
@@ -172,6 +173,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
         end
 
         context "and plan year has started" do
+          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
           before do
             TimeKeeper.set_date_of_record(plan_year.start_on)
           end
@@ -193,6 +195,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
           end
 
           context "they pay the invoice on the 5th" do
+            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
             before do
               TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 5.days)
               persisted_new_employer_profile_account.advance_coverage_period!
@@ -203,6 +206,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
             end
 
             context "they miss their next payment" do
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
               before do
                 TimeKeeper.set_date_of_record((TimeKeeper.date_of_record + 2.months).beginning_of_month)
               end
@@ -212,6 +216,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
               end
 
               context "and a second billing period advances without a premium payment" do
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
                 before do
                   TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.month)
                 end
@@ -221,6 +226,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                 end
 
                 context "and a third billing period advances without a premium payment" do
+                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
                   before do
                     TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.month)
                   end
@@ -264,6 +270,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                   end
 
                   context "and a fourth (final) billing period advances without a premium payment" do
+                    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
                     before do
                       TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.month)
                     end
@@ -284,6 +291,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
       end
 
       context "and employer doesn't pay the premium binder before effective date" do
+        let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
         before do
           TimeKeeper.set_date_of_record(plan_year.start_on)
           # new_employer_profile_account.advance_billing_period

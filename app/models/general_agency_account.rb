@@ -32,6 +32,14 @@ class GeneralAgencyAccount
     @general_agency_profile = GeneralAgencyProfile.find(self.general_agency_profile_id) unless self.general_agency_profile_id.blank?
   end
 
+
+  def ga_name
+    Rails.cache.fetch("general-agency-name-#{self.general_agency_profile_id}", expires_in: 12.hour) do
+      legal_name
+    end
+  end
+
+
   def legal_name
     general_agency_profile.present? ? general_agency_profile.legal_name : ""
   end
@@ -52,6 +60,7 @@ class GeneralAgencyAccount
     end
     (start_on >= ba_account.start_on)
   end
+
 
   aasm do
     state :active, initial: true

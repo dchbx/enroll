@@ -8,7 +8,7 @@ class BrokerAgencyAccount
 
   # Begin date of relationship
   field :start_on, type: DateTime
-  
+
   # End date of relationship
   field :end_on, type: DateTime
   field :updated_by, type: String
@@ -36,6 +36,18 @@ class BrokerAgencyAccount
     return @broker_agency_profile if defined? @broker_agency_profile
     @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless self.broker_agency_profile_id.blank?
   end
+
+  def ba_name
+    Rails.cache.fetch("broker-agency-name-#{self.broker_agency_profile_id}", expires_in: 12.hour) do
+      legal_name
+    end
+  end
+
+
+  def legal_name
+    broker_agency_profile.present? ? broker_agency_profile.legal_name : ""
+  end
+
 
   # belongs_to writing agent (broker)
   def writing_agent=(new_writing_agent)

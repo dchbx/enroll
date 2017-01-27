@@ -48,7 +48,7 @@ class Insured::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
-    if @employee_role.present? && @employee_role.try(:census_employee).try(:employee_role_linked?)
+    if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
       create_sso_account(current_user, @employee_role.person, 15,"employee") do

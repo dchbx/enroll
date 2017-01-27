@@ -24,10 +24,10 @@
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= datepicker_control f, :dob, {:class => "floatlabel form-control interaction-field-control-census-employee-dob", :placeholder => "DATE OF BIRTH",
-                                         :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: is_readonly(f.object)} %>
+                                         :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: !may_update_census_employee?(f.object)} %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}, required: true, readonly: is_readonly(f.object) %>
+        <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}, required: true, readonly: !may_update_census_employee?(f.object) %>
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd no-border-xs">

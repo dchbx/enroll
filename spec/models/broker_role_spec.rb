@@ -121,7 +121,7 @@ describe BrokerRole, dbclean: :after_each do
             registered_broker_role.decertify
           end
 
-          it "should transition to active status" do
+          it "should transition to decertified status" do
             expect(registered_broker_role.aasm_state).to eq "decertified"
           end
 
@@ -129,6 +129,22 @@ describe BrokerRole, dbclean: :after_each do
             expect(registered_broker_role.workflow_state_transitions.size).to eq 3
             expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "active"
             expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "decertified"
+          end
+
+          context "should be able to recertify" do
+            before do
+              registered_broker_role.recertify
+            end
+
+            it "should transition to active status" do
+              expect(registered_broker_role.aasm_state).to eq "active"
+            end
+
+            it "should record the transition" do
+              expect(registered_broker_role.workflow_state_transitions.size).to eq 4
+              expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "decertified"
+              expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "active"
+            end
           end
         end
       end
@@ -138,7 +154,7 @@ describe BrokerRole, dbclean: :after_each do
           registered_broker_role.deny
         end
 
-        it "should transition to active status" do
+        it "should transition to denied status" do
           expect(registered_broker_role.aasm_state).to eq "denied"
         end
 
@@ -146,6 +162,23 @@ describe BrokerRole, dbclean: :after_each do
           expect(registered_broker_role.workflow_state_transitions.size).to eq 2
           expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "applicant"
           expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "denied"
+        end
+      end
+
+      context "broker agency pending" do
+        before do
+          allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
+          registered_broker_role.pending
+        end
+
+        it "should transition to pending status" do
+          expect(registered_broker_role.aasm_state).to eq "broker_agency_pending"
+        end
+
+        it "should record the transition" do
+          expect(registered_broker_role.workflow_state_transitions.size).to eq 2
+          expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "applicant"
+          expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "broker_agency_pending"
         end
       end
     end

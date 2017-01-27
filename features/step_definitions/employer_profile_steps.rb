@@ -160,7 +160,7 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   visit '/'
   portal_class = '.interaction-click-control-hbx-portal'
   find(portal_class).click
-  find('.interaction-click-control-sign-in-existing-account').click
+  find('.interaction-click-control-sign-in-existing-account', wait: 10).click
   step "Admin signs in to portal"
   tab_class = '.interaction-click-control-employers'
   find(tab_class).click

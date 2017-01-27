@@ -40,10 +40,6 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
       expect(rendered).to match(/General Agencies/)
     end
 
-    it "should  have a blocked button for ga assign" do
-      expect(rendered).to have_selector('.blocking #assign_general_agency')
-    end
-
     it "should have checkbox for employer_profile" do
       expect(rendered).to have_selector("input[type='checkbox']")
     end

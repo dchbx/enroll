@@ -51,6 +51,8 @@ describe "coverage_effective_on" do
   context "when benefit group present" do
     it "should return coverage_effective_on" do
       allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(employee_role.hired_on)
+      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_eligible?).and_return(false)
+      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_linked?).and_return(false)
       allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(effective_on)
       expect(employee_role.coverage_effective_on).to eq effective_on
     end
@@ -59,6 +61,8 @@ describe "coverage_effective_on" do
   context "when benefit group doesn't exists" do
     it "coverage_effective_on should be nil" do
       allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(effective_on)
+      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_eligible?).and_return(false)
+      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_linked?).and_return(false)
       allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(nil)
       expect(employee_role.coverage_effective_on).to eq nil
     end

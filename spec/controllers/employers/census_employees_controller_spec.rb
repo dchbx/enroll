@@ -263,7 +263,13 @@ RSpec.describe Employers::CensusEmployeesController do
                          aasm_state: 'coverage_terminated'
       )
     end
-
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
     it "should be render show template" do
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
@@ -500,6 +506,18 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       post :benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to render_template("benefit_group")
+    end
+  end
+  
+  describe "Update census member email" do
+    it "expect census employee to have a email present" do 
+      expect(census_employee.email.present?).to eq true
+    end
+    
+    it "should allow emails to be updated to nil" do
+      census_employee.email.update(address:'', kind:'')
+      expect(census_employee.email.kind).to eq ''
+      expect(census_employee.email.address).to eq ''
     end
   end
 end

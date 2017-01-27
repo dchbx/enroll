@@ -26,7 +26,7 @@
         <%- link_to image_tag('delete.png'), 'javascript:void(0)', class: 'close-2' %>
       </div>
     </div>
-  <% flag= @census_employee.aasm_state == "employee_role_linked" %>
+  <% flag = @census_employee.is_linked? && @census_employee.address.present? %>
     <div class="row row-form-wrapper no-buffer address-row">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <%= f.hidden_field :kind, value: address_kind %>

@@ -13,7 +13,7 @@
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to verification_insured_families_path(tab: 'verification') do %>
             Documents
-          <% if enrollment_group_unverified?(@person) %>
+          <% if enrollment_group_unverified?(@person) && verification_needed?(@person) && !documents_uploaded %>
             <span class="badge message-unread">Action Needed</span>
           <% end %>
         <% end %>

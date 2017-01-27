@@ -35,7 +35,7 @@ class Household
 
   def active_hbx_enrollments
     actives = hbx_enrollments.collect() do |list, enrollment|
-      if enrollment.plan.present? && 
+      if enrollment.plan.present? &&
          (enrollment.plan.active_year >= TimeKeeper.date_of_record.year) &&
          (HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state))
 
@@ -200,6 +200,10 @@ class Household
     end
   end
 
+  def latest_tax_household_with_year(year)
+    tax_households.tax_household_with_year(year).try(:last)
+  end
+
   def applicant_ids
     th_applicant_ids = tax_households.inject([]) do |acc, th|
       acc + th.applicant_ids
@@ -309,7 +313,25 @@ class Household
     hbx_enrollments.enrolled
   end
 
-  def hbx_enrollments_with_aptc_by_year(year)
+  def active_hbx_enrollments_with_aptc_by_year(year)
     hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
+  end
+
+  def hbx_enrollments_with_aptc_by_date(date)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(date.year).gte(effective_on: date)
+  end
+
+  def hbx_enrollments_with_aptc_by_year(year)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
+  end
+
+  def eligibility_determinations_for_year(year)
+    eds = []
+    tax_households.tax_household_with_year(year).each do |th|
+      th.eligibility_determinations.each do |ed|
+        eds << ed
+      end
+    end
+    eds
   end
 end

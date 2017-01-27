@@ -102,6 +102,7 @@ class BenefitGroup
   validate :check_offered_for_employee
 
   before_save :set_congress_defaults
+  before_destroy :delete_benefit_group_assignments_and_enrollments
 
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
@@ -435,12 +436,12 @@ class BenefitGroup
       if effective_on_offset == 1
         date_of_hire.end_of_month + 1.day
       else
-      if (date_of_hire + effective_on_offset.days).day == 1
-        (date_of_hire + effective_on_offset.days)
-      else
-        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        if (date_of_hire + effective_on_offset.days).day == 1
+          (date_of_hire + effective_on_offset.days)
+        else
+          (date_of_hire + effective_on_offset.days).end_of_month + 1.day
+        end
       end
-    end
     end
   end
 
@@ -461,6 +462,22 @@ class BenefitGroup
     [valid_plan_year.start_on, eligible_on(date_of_hire)].max
   end
 
+  def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
+    self.employer_profile.census_employees.each do |ce|
+      benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
+      benefit_group_assignments.each do |bga|
+        bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+        bga.destroy
+      end
+      benefit_groups = self.plan_year.benefit_groups.reject { |bg| bg.id == self.id}
+      bga = ce.find_or_build_benefit_group_assignment(benefit_groups.first)
+      if bga.blank?
+        existing_bga = ce.benefit_group_assignments.where(:benefit_group_id => benefit_groups.first.id).first
+        existing_bga.update_attributes(is_active: true) if self.plan_year.aasm_state == 'draft' && existing_bga.is_active == false
+      end
+    end
+  end
+
 private
 
   def set_congress_defaults
@@ -468,10 +485,11 @@ private
     self.plan_option_kind = "metal_level"
     self.default = true
 
+    # 2017 contribution schedule
     self.contribution_pct_as_int   = 75
-    self.employee_max_amt = 462.30 if employee_max_amt == 0
-    self.first_dependent_max_amt = 998.88 if first_dependent_max_amt == 0
-    self.over_one_dependents_max_amt = 1058.42 if over_one_dependents_max_amt == 0
+    self.employee_max_amt = 480.29 if employee_max_amt == 0
+    self.first_dependent_max_amt = 1030.88 if first_dependent_max_amt == 0
+    self.over_one_dependents_max_amt = 1094.64 if over_one_dependents_max_amt == 0
   end
 
   def dollars_to_cents(amount_in_dollars)

@@ -377,7 +377,11 @@ When(/^.+ clicks? on publish plan year$/) do
   find('.interaction-click-control-publish-plan-year').click
 end
 
-Then(/^.+ should see Publish Plan Year Modal with warnings$/) do
+Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
+  expect(find('.modal-body')).to have_content('Primary office must be located in District of Columbia')
+end
+
+Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
   expect(find('.modal-body')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
 end
 
@@ -385,9 +389,19 @@ Then(/^.+ clicks? on the Cancel button$/) do
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 
+Then(/^.+ should be on the business info page with warnings$/) do
+  expect(page).to have_content 'Primary Office Location'
+  expect(find('.alert-error')).to have_content('Primary office must be located in District of Columbia')
+end
+
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   expect(page).to have_css('#plan_year')
   expect(find('.alert-plan-year')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
+end
+
+Then(/^.+ updates the address location with correct address$/) do
+  step "I updates office location from #{non_dc_office_location} to #{default_office_location}"
+  find('.interaction-click-control-save').click
 end
 
 Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
@@ -477,6 +491,51 @@ And /^employer clicks on terminated employee$/ do
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
 
+And /^employer clicks on linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "employee_role_linked")
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should not see the address on the roster$/ do
+  expect(page).not_to have_content /Address/
+end
+
+And /^employer clicks on linked employee without address$/ do
+  employees.first.address.delete
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should see the address on the roster$/ do
+  expect(page).to have_content /Address/
+end
+
+And /^employer populates the address field$/ do
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
+  fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[contains(., 'GA')]").click
+
+  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+end
+
+And /^employer clicks on update employee$/ do
+  find('.interaction-click-control-update-employee').click
+end
+
+And /^employer clicks on non-linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "eligible")
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on non-linked employee without address$/ do
+  employees.first.address.delete
+  employees.first.update_attributes(aasm_state: "eligible")
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
 And /^employer clicks on back button$/ do
   expect(page).to have_content "Details"
   find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
@@ -510,4 +569,26 @@ end
 Then /^they should see that employee's details$/ do
   wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
+end
+When(/^the employer goes to benefits tab$/) do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
+end
+
+When(/^the employer clicks on claim quote$/) do
+  find('.interaction-click-control-claim-quote').click
+end
+
+Then(/^the employer enters claim code for his quote$/) do
+  person = FactoryGirl.create(:person, :with_broker_role)
+  @quote=FactoryGirl.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
+  @quote.publish!
+  fill_in "claim_code", :with => @quote.claim_code
+end
+
+When(/^the employer clicks claim code$/) do
+  find('.interaction-click-control-claim-code').click
+end
+
+Then(/^the employer sees a successful message$/) do
+  expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
 end

@@ -14,14 +14,14 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  BROKER_CARRIER_APPOINTMENTS = {:aetna_health_inc => nil,
-    :aetna_life_insurance_company => nil,
-     :carefirst_bluechoice_inc => nil,
-     :group_hospitalization_and_medical_services_inc => nil,
-     :kaiser_foundation => nil,
-     :optimum_choice => nil,
-     :united_health_care_insurance => nil,
-     :united_health_care_mid_atlantic => nil}
+  BROKER_CARRIER_APPOINTMENTS = {"Aetna Health Inc" => nil,
+    "Aetna Life Insurance Company" => nil,
+     "Carefirst Bluechoice Inc" => nil,
+     "Group Hospitalization and Medical Services Inc" => nil,
+     "Kaiser Foundation" => nil,
+     "Optimum Choice" => nil,
+     "United Health Care Insurance" => nil,
+     "United Health Care Mid Atlantic" => nil}
 
   embedded_in :person
 
@@ -235,6 +235,7 @@ class BrokerRole
 
     event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
+      transitions from: :broker_agency_pending, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
 
     event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do
@@ -266,6 +267,11 @@ class BrokerRole
     # Moves between broker agency organizations that don't require HBX re-certification
     event :transfer, :after => :record_transition  do
       transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
+    end
+
+    # Not currently supported in UI.   Datafix only person.broker_role.recertify! refs #12398
+    event :recertify, :after => :record_transition do
+      transitions from: :decertified, to: :active
     end
   end
 

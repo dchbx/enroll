@@ -8,6 +8,13 @@ module Factories
       benefit_group = (census_employee.active_benefit_group_assignment || census_employee.renewal_benefit_group_assignment).benefit_group
       hired_on = census_employee.hired_on
       employer = census_employee.employer_profile
+
+      effective_on_date = benefit_group.effective_on_for(census_employee.hired_on)
+
+      if census_employee.newly_designated_eligible? || census_employee.newly_designated_linked?
+        effective_on_date = [effective_on_date, census_employee.newly_eligible_earlist_eligible_date].max
+      end
+
       ::Forms::EmploymentRelationship.new({
         :employer_name => employer.legal_name,
         :first_name => employee_candidate.first_name,
@@ -18,7 +25,7 @@ module Factories
         :gender => employee_candidate.gender,
         :census_employee_id => census_employee.id,
         :hired_on => hired_on,
-        :eligible_for_coverage_on => benefit_group.effective_on_for(hired_on)
+        :eligible_for_coverage_on => effective_on_date
       })
     end
 

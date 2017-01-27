@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -12,6 +12,29 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
+
+  def link_from_quote
+    claim_code = params[:claim_code].upcase
+    import_roster = params[:import_roster] == "yes" ? true : false
+
+    claim_code_status = Quote.claim_code_status?(claim_code)
+
+    if claim_code_status == "invalid"
+      flash[:error] = 'Quote claim code not found.'
+    elsif claim_code_status == "claimed"
+      flash[:error] = 'Quote claim code already claimed.'
+    else
+      if @employer_profile.build_plan_year_from_quote(claim_code, import_roster)
+        flash[:notice] = 'Code claimed with success. Your Plan Year has been created.'
+      else
+        flash[:error] = 'There was issue claiming this quote.'
+      end
+
+    end
+
+    redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
+
+  end
 
   def index
     if params[:broker_agency_id].blank?
@@ -141,6 +164,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @employer_profile = @organization.employer_profile
     @staff = Person.staff_for_employer_including_pending(@employer_profile)
     @add_staff = params[:add_staff]
+    @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
   end
 
   def create
@@ -301,7 +325,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                        else
                          @employer_profile.census_employees.active.sorted
                        end
-    census_employees = census_employees.search_by(params.slice(:employee_name))
+    if params["employee_search"].present?
+      query_string = CensusEmployee.search_hash(params["employee_search"])
+      census_employees = census_employees.any_of(query_string)
+    end
     @page_alphabets = page_alphabets(census_employees, "last_name")
 
     if params[:page].present?

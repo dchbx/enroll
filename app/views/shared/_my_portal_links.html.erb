@@ -13,30 +13,31 @@
       <%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' if broker %>
       <span> | </span>
     </span>
-    <% elsif portal_count > 1 %>
-      <span class="dropdown" <% if current_user.hints == true %>title='<i class="fa fa-question-circle fa-3x text-center" aria-hidden="true" style="display: block;"></i><h3 class="darkblue no-buffer text-center">Did You Know?</h3>' data-html="true" data-toggle='popover' data-placement='bottom' data-content="You can move between your <%= get_portals_text(insured, employer, broker) %> accounts using this &quot;My Portals&quot; link."<% end %>>
-        <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <% if insured %>
+    <%elsif portal_count > 1 %>
+    <span>
+      <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <% if current_user.hints == true %>
+          <li>
+            <i class="fa fa-question-circle fa-3x text-center" aria-hidden="true" style="display: block;"></i>
+            <h3 class="darkblue no-buffer text-center">Did You Know?</h3>
+              <div class="panel panel-default">
+                <div class="panel-body">You can move between your insured, employer, broker accounts using this My Portals link.</div>
+              </div>
+          </li>
+        <% end %>
+        <% if insured %>
           <li><%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'header-text' %></li>
-          <% end %>
-          <% employer_staff.each do |employer_staff_role|  %>
-            <% id = employer_staff_role.employer_profile_id %>
+        <% end %>
+        <% employer_staff.each do |employer_staff_role|  %>
+          <% id = employer_staff_role.employer_profile_id %>
             <% employer = EmployerProfile.find(id) %>
             <li><%= link_to employer.legal_name, employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
-          <% end %>
-          <% if broker %>
+        <% end %>
+        <% if broker %>
           <li><%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' %></li>
-          <% end %>
-        </ul>
+        <% end %>
+      </ul>
       <span> | </span>
     </span>
-  <% end %>
-
-  <% if current_user.hints == true %>
-    <script>
-      $(document).on('ready page:load', function() {
-        Hints.myPortalsLinkReminder();
-      });
-    </script>
   <% end %>

@@ -15,6 +15,7 @@
  *= require font-awesome
  *= require bootstrap-slider
  *= require bootstrap-multiselect
+ *= require effective_datatables
  *= require_self
  */
 
@@ -44,14 +45,35 @@
 .clear {
   clear: both;
 }
+
 .cna {
   cursor: not-allowed;
   display: none;
 }
+
+.disabled-input {
+  background-color: #eee !important;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 .dn {
   display: none;
 }
- .starter {
+.dn-1 {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+.custom-textarea {
+  max-width: 100% !important; 
+  width: 100% !important; 
+  height: 100% !important; 
+  resize: none;
+  overflow-y: hidden;
+}
+
+.starter {
    max-width: 660px;
  }
  .clear {

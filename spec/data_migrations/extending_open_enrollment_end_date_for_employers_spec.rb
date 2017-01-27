@@ -41,9 +41,9 @@ describe ExtendingOpenEnrollmentEndDateForEmployers do
     end
 
     context "for initial employer" do
-      let(:organization) { FactoryGirl.create(:organization, employer_profile: employer_profile)}
-      let(:employer_profile) { FactoryGirl.create(:employer_profile)}
-      let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state: "active", employer_profile: employer_profile)}
+      let(:organization) { employer_profile.organization }
+      let(:employer_profile) { plan_year.employer_profile }
+      let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state: "active") }
 
       before(:each) do
         allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.plan_years.first.start_on)
