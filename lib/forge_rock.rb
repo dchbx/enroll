@@ -1,4 +1,4 @@
-require 'httparty'
+require 'faraday'
 
 class ForgeRock
 
@@ -39,26 +39,27 @@ class ForgeRock
 
   def make_create_request
     load_forgerock_config
-    HTTParty.post(
-      @config['forgerock']['url'],
-      :body => json_data,
-      :headers => headers
-    )
-  end
-
-  def create_forgerock_account
     if Rails.env.production?
-      response = make_create_request
-      if response.has_key?("code") # error is present
-      else
-        @user.forgerock_uuid = response["_id"]
-        @user.save
+      Faraday.post do |request|
+        request.url @config['forgerock']['url']
+        request.headers = headers
+        request.body = json_data
       end
-      response
     end
   end
 
-  def query
+  def create_forgerock_account
+    response = make_create_request
+    return if response.nil?
+    if response.has_key?("code") # error is present
+    else
+      @user.forgerock_uuid = response["_id"]
+      @user.save
+    end
+    response
+  end
+
+  def query_params
     {
       "_action" => "patch",
       "_queryId" => "for-userName",
@@ -68,8 +69,14 @@ class ForgeRock
 
   def json_patch_data
     data = []
-    input_hash = {"mail" => @email, 'statusFlag' => @status_flag,
-      'sn' => @last_name, 'givenName' => @first_name, 'userType' => @account_role}
+
+    input_hash = {
+      'givenName' => @first_name,
+      'sn' => @last_name,
+      'mail' => @email,
+      'userType' => @account_role,
+      'statusFlag' => @status_flag
+    }
 
     input_hash.each do |key, value|
       if value.present?
@@ -81,22 +88,24 @@ class ForgeRock
 
   def make_update_request
     load_forgerock_config
-    HTTParty.post(
-      @config['forgerock']['url'],
-      :query => query,
-      :body => json_patch_data,
-      :headers => headers
-    )
+
+    if Rails.env.production?
+      Faraday.post do |request|
+        request.url @config['forgerock']['url']
+        request.headers = headers
+        request.params = query_params
+        request.body = json_patch_data
+      end
+    end
   end
 
   def update_forgerock_account
-    if Rails.env.production?
-      response = make_update_request
-      if response.has_key?("code") # what to do here?
-      else
-      end
-      response
+    response = make_update_request
+    return if response.nil?
+    if response.has_key?("code") # what to do here?
+    else
     end
+    response
   end
 
 end
