@@ -45,6 +45,7 @@ RSpec.describe Insured::FamiliesController do
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
+  let(:resident_role) { FactoryGirl.create(:resident_role) }
   let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
@@ -60,6 +61,8 @@ RSpec.describe Insured::FamiliesController do
     allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+    allow(person).to receive(:has_active_resident_role?).and_return(true)
+    allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
   end

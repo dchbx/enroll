@@ -129,7 +129,12 @@ class BenefitCoveragePeriod
       family = hbx_enrollment_members.first.hbx_enrollment.family
       hbx_enrollment_members.map(&:family_member).each do |family_member|
         consumer_role = family_member.person.consumer_role
-        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind: coverage_kind, family: family)
+        resident_role = family_member.person.resident_role
+        unless resident_role.nil?
+          rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family)
+        else
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind: coverage_kind, family: family)
+        end
         satisfied = false and break unless rule.satisfied?[0]
       end
       ivl_bgs << bg if satisfied

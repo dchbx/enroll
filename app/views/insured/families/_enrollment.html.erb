@@ -7,7 +7,7 @@
     <h3 class="no-buffer">
       <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
       <span class="separator">
-        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
+        <%= hbx_enrollment.kind == 'employer_sponsored'? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
       </span>
     </h3>
     <%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>

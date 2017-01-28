@@ -15,7 +15,10 @@ class Insured::ConsumerRolesController < ApplicationController
     @val = params[:aqhp] || params[:uqhp]
     @key = params.key(@val)
     @search_path = {@key => @val}
-    if @person.try(:consumer_role?)
+    if @person.try(:resident_role?)
+      bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
+      redirect_to bookmark_url || family_account_path
+    elsif @person.try(:consumer_role?)
       bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
       redirect_to bookmark_url || family_account_path
     end
@@ -78,6 +81,31 @@ class Insured::ConsumerRolesController < ApplicationController
               @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
               if @employment_relationships.present?
                 format.html { render 'insured/employee_roles/match' }
+              end
+            end
+          end
+
+          @resident_candidate = Forms::ResidentCandidate.new(@person_params)
+          if @resident_candidate.valid?
+            found_person = @resident_candidate.match_person
+            if found_person.present?
+              begin
+                @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+                if @resident_role.present?
+                  @person = @resident_role.person
+                  session[:person_id] = @person.id
+                else
+                # not logging error because error was logged in construct_consumer_role
+                  render file: 'public/500.html', status: 500
+                  return
+                end
+              rescue Exception => e
+                flash[:error] = set_error_message(e.message)
+                redirect_to search_exchanges_consumers_path
+                return
+              end
+              create_sso_account(current_user, @person, 15, "resident") do
+                format.html { redirect_to family_account_path }
               end
             end
           end
@@ -223,6 +251,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,
@@ -241,7 +270,10 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def check_consumer_role
     set_current_person(required: false)
-    if @person.try(:has_active_consumer_role?)
+    # need this check for cover all
+    if @person.try(:has_active_resident_role?)
+      redirect_to @person.resident_role.bookmark_url || family_account_path
+    elsif @person.try(:has_active_consumer_role?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path

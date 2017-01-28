@@ -1,0 +1,126 @@
+<li id="add_member_list_<%= dependent.id %>" class="dependent_list">
+  <div id="add_info_<%= dependent.id %>">
+    <div class="dependent_notice_div_<%= dependent.id%>"></div>
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-4 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">FIRST NAME</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.first_name %></span>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">MIDDLE NAME</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.middle_name %></span>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">LAST NAME</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.last_name %></span>
+          <div class="text-right">
+            <%=
+              link_to edit_resident_dependent_insured_family_member_path(dependent), remote: true, class: 'close close-2' do
+                '<i class="fa fa-pencil"></i>'.html_safe
+              end
+            %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-3 col-sm-3 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">DATE OF BIRTH</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.dob %></span>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-3 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">RELATIONSHIP</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.relationship.try(:humanize) %></span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-3 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">GENDER</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.try(:humanize) %></span>
+        </div>
+      </div>
+    </div>
+
+    <% addresses = get_address_from_dependent(dependent) %>
+    <% addresses.each do |address| %>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-md-2 col-sm-2 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">KIND</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= address.kind.capitalize %></span>
+          </div>
+        </div>
+        <div class="col-md-5 col-sm-5 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">ADDRESS LINE 1</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= address.address_1 %></span>
+          </div>
+        </div>
+        <div class="col-md-5 col-sm-5 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">ADDRESS LINE 2</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= address.address_2 %></span>
+          </div>
+        </div>
+      </div>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-md-4 col-sm-4 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">CITY</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= address.city %></span>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-4 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">STATE</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= address.state %></span>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-4 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">ZIP</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= address.zip %></span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    <% if (@prev_url_include_intractive_identity || @prev_url_include_consumer_role_id) && !@employee_role %>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-md-6 col-sm-6 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">RACE/ETHNICITY</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= parse_ethnicity(dependent.try(:ethnicity)) %></span>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">LANGUAGE</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.language_code.try(:humanize) %></span>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">INCARCERATED?</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.is_incarcerated == true ? "Yes" : "No" %></span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="clearfix"></div>
+  </div>
+  <script>
+    Freebies.floatlabels();
+  </script>
+</li>

@@ -70,6 +70,7 @@ class Person
                 index: true
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
+  embeds_one :resident_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
@@ -89,7 +90,8 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
 
-  accepts_nested_attributes_for :consumer_role, :broker_role, :hbx_staff_role,
+
+  accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
@@ -171,6 +173,7 @@ class Person
   index({"hbx_assister._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
+  scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
   scope :all_employer_staff_roles,    -> { exists(employer_staff_roles: true) }
 
@@ -505,6 +508,10 @@ class Person
     consumer_role.present? and consumer_role.is_active?
   end
 
+  def has_active_resident_role?
+    resident_role.present? and resident_role.is_active?
+  end
+
   def can_report_shop_qle?
     employee_roles.first.census_employee.qle_30_day_eligible?
   end
@@ -753,6 +760,7 @@ class Person
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
   attr_accessor :is_consumer_role
+  attr_accessor :is_resident_role
 
   before_save :assign_citizen_status_from_consumer_role
 
@@ -860,6 +868,11 @@ class Person
       end
     end
   end
+
+
+  #def resident_role
+  #    resident_role ||= ResidentRole.new
+  #end
 
   private
   def is_ssn_composition_correct?
