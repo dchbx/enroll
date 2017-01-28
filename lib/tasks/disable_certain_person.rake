@@ -15,6 +15,7 @@ namespace :person do
 
     disabled_hbxs.each do |hbx|
       Person.by_hbx_id(hbx).entries.each do |people|
+        people.update(last_name: 'Wrong', dob: TimeKeeper.date_of_record)
         people.update(is_active: false) if people.is_active
         puts "person with hbx_id(#{people.hbx_id}) is not active."
         if family
