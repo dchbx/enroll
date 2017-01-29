@@ -4,6 +4,10 @@ require File.join(Rails.root, "app", "reports", "hbx_reports", "destroy_duplicat
 
 describe DestroyDuplicatesWithoutEnr do
 
+  after do
+    File.delete("#{Rails.root}/hbx_report/destroy_duplicates_without_enr.csv") if File.exist?("#{Rails.root}/hbx_report/destroy_duplicates_without_enr.csv")
+  end
+
   let(:given_task_name) { "destroy_duplicates_without_enr" }
   let(:person1) {FactoryGirl.create(:person,
                                     :with_consumer_role,
@@ -43,7 +47,7 @@ describe DestroyDuplicatesWithoutEnr do
   shared_examples_for "returns csv file list with duplicate family members" do |field_name, result|
     before :each do
       subject.migrate
-      @file = "#{Rails.root}/hbx_report/destroy_duplicates_without_.csv"
+      @file = "#{Rails.root}/hbx_report/destroy_duplicates_without_enr.csv"
     end
 
     it "check the records included in file" do
