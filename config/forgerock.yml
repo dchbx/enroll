@@ -1,0 +1,4 @@
+forgerock:
+  url: "http://url"
+  username: "username"
+  password: "password"
