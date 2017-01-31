@@ -967,6 +967,12 @@ private
           Invitation.invite_renewal_employee!(ce)
         end
       end
+    elsif enrolling?
+      benefit_groups.each do |bg|
+        bg.census_employees.non_terminated.each do |ce|
+          Invitation.invite_initial_employee!(ce)
+        end
+      end
     else
       benefit_groups.each do |bg|
         bg.census_employees.non_terminated.each do |ce|
