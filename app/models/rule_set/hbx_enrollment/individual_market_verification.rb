@@ -9,7 +9,7 @@ module RuleSet
 
       def applicable?
         (!hbx_enrollment.plan_id.nil?) &&
-          hbx_enrollment.affected_by_verifications_made_today? && (!hbx_enrollment.benefit_sponsored?)
+          hbx_enrollment.affected_by_verifications_made_today? && (!hbx_enrollment.benefit_sponsored?) && !hbx_enrollment.coverage_expired?
       end
 
       def roles_for_determination
