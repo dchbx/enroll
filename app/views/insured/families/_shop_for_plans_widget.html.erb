@@ -67,27 +67,27 @@
               options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
               options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
             %>
-                    <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
-                    You are not under open enrollment period.
-                    <% else %>
-                    <p>If you enroll today, coverage will begin
-                      <%= format_date ivl_enrollment_effective_date %>. You can
-                      <%= link_to 'click here', new_insured_group_selection_path(options) %>
-                      for Open Enrollment Period.</p>
-                    <% end %>
-                    <br/>
-
-                    <p>Do you need coverage earlier? See if you qualify for a
-                      <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
-                    <% else %>
-                    You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
-                    <div id="shop-for-plans-widget">
-                      <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
-                    </div>
-                    <% end %>
-                  </div>
+              <div class="row">
+                <div class="col-xs-7">
+                 <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
+                Open enrollment for <%= TimeKeeper.date_of_record.year %> has closed. 
+              <% else %>
+                If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. You can
+                  <%= link_to 'click here', new_insured_group_selection_path(options) %>
+                  for Open Enrollment Period.
+                <% end %>
+                You can still enroll if you qualify for a Special Enrollment Period.
                 </div>
+                <div class="col-xs-5">
+                <%= link_to "See if you qualify", find_sep_insured_families_path(options), class: 'btn btn-trans btn-small' %>
+                </div>
+              </br>
               </div>
-            </div>
+            <% else %>
+               You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
+               <div id="shop-for-plans-widget">
+               <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+               </div>
+            <% end %>
           </div>
         </div>
