@@ -52,44 +52,14 @@
       <div class="row">
         <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
-
-
-
                 <% if plan_year.overlapping_published_plan_years.empty? %>
-                   <% unless contain_nonrenewable_ee(plan_year) %>
-                        <!-- Trigger the modal with a button -->
-                        <button type="button" class="btn btn-default pull-right" data-toggle="modal" data-target="#myModal">Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i></button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="myModal" role="dialog">
-                          <div class="modal-dialog">
-
-                            <!-- Modal content-->
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Important Notice</h4>
-                              </div>
-                              <div class="modal-body">
-                                <p> "By clicking "Publish" you understand that one or more of your employees are currently enrolled in a plan that will no longer be offered by your group. Therefore, these employees will actively need to make a new plan selection during the groups open enrollment period or risk being uncovered."</p>
-                              </div>
-                              <div class="modal-footer">
-                                <%= link_to "Continue".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default" %>
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Back</button>
-                              </div>
-                            </div>
-
-                          </div>
-                        </div>
+                  <% if contain_nonrenewable_ee(plan_year) %>
+                    <%= render partial: 'employers/employer_profiles/my_account/publish_without_auto_renwals_notice.html.erb', locals: { plan_year: plan_year } %> 
                   <% else %>
-                         <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
                   <% end %>
+                  <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
                 <% end %>
-
-                <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
-
-
-
             <% end %>  
             <%= pundit_span(EmployerProfile, :revert_application?) %>
                 <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>

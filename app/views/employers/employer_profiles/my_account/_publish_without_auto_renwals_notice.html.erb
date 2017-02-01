@@ -1,0 +1,20 @@
+<button type="button" class="btn btn-default pull-right" data-toggle="modal" data-target="#myModal">Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i></button>
+
+<div class="modal fade" id="myModal" role="dialog">
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"> &times; </button>
+        <h4 class="modal-title">Important Notice</h4>
+      </div>
+      <div class="modal-body">
+        <p> "By clicking "Publish" you understand that one or more of your employees are currently enrolled in a plan that will no longer be offered by your group. Therefore, these employees will actively need to make a new plan selection during the groups open enrollment period or risk being uncovered."</p>
+      </div>
+      <div class="modal-footer">
+        <%= link_to "Continue".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default" %>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Back </button>
+      </div>
+    </div>
+  </div>
+</div>
