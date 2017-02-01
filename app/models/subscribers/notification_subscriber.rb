@@ -13,8 +13,9 @@ module Subscribers
       application_event_kinds.each do |aek|
         begin
           aek.execute_notices(event_name, payload)
-        rescue
+        rescue Exception => e
           # ADD LOGGING AND HANDLING
+          puts "#{e.inspect} #{e.backtrace}"
         end
       end
     end

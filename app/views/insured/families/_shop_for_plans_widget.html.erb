@@ -70,10 +70,8 @@
                     <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
                     You are not under open enrollment period.
                     <% else %>
-                    <p>If you enroll today, coverage will begin
-                      <%= format_date ivl_enrollment_effective_date %>. You can
-                      <%= link_to 'click here', new_insured_group_selection_path(options) %>
-                      for Open Enrollment Period.</p>
+                    <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
+                      <%= format_date ivl_enrollment_effective_date %>.
                     <% end %>
                     <br/>
 
