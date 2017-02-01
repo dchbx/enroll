@@ -4,8 +4,11 @@ site:
   long_name: ""
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
+  login_message: "Log in to DC Health Link"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  login_url: "https://app.dchealthlink.com/"
+  trained_expert_url: "https://www.dchealthlink.com/find-expert"
 
   social_media:
     facebook_url: ""
@@ -17,6 +20,7 @@ contact_center:
   alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
+  psi_number: "1-855-532-5432" # plan-shopping-information
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
@@ -48,7 +52,7 @@ aca:
     employer_contribution_percent_minimum: 50
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
-    binder_payment_due_on: 15
+    binder_payment_due_on: 12
 
     earliest_enroll_prior_to_effective_on:
       days: -30
@@ -94,7 +98,19 @@ aca:
         days: 5
       maximum_length:
         months: 2
+
+    cobra_enrollment_period:
+      months: 6
+
+    group_file:
+      new_enrollment_transmit_on: 16
+      update_transmit_day_of_week: "friday"
+
 paper_notice: 'paper-notices'
+checkbook_services:
+    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
+    base_url:  "https://staging.checkbookhealth.org"
+    url: "https://staging.checkbookhealth.org/shop/dc/"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

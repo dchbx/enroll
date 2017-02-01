@@ -38,4 +38,4 @@ class ShopNotices::EmployerRenewalNotice < ShopNotice
       })
   end
 
-end 
+end

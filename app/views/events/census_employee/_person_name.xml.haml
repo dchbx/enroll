@@ -1,0 +1,7 @@
+%name
+  %person_surname= person_name.last_name
+  %person_given_name= person_name.first_name
+  - if person_name.middle_name.present?
+    %person_middle_name= person_name.middle_name
+  - if person_name.name_sfx.present?
+    %person_name_suffix_text= person_name.name_sfx

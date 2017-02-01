@@ -217,9 +217,12 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
     let(:c1) {FactoryGirl.create(:consumer_role)}
     let(:c2) {FactoryGirl.create(:consumer_role)}
+    let(:r1) {FactoryGirl.create(:resident_role)}
+    let(:r2) {FactoryGirl.create(:resident_role)}
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
-    let(:member1) {double(family_member: family.family_members.where(is_primary_applicant: true).first, hbx_enrollment: double(family: family))}
-    let(:member2) {double(family_member: family.family_members.where(is_primary_applicant: false).first)}
+    let(:member1) {double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member:family.family_members.where(is_primary_applicant: true).first)}
+    let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first)}
+    let(:hbx_enrollment){ HbxEnrollment.new(kind: "individual", plan: plan1, effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true) }
     let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
     let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
     let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }

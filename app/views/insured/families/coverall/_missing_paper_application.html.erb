@@ -1,0 +1,13 @@
+<% person = member.person %>
+<table class="sub-table">
+  <% person.verification_types.each do |v_type| %>
+      <tr>
+          <!-- >>>> hbx admin inclusion -->
+        <td>
+          <%= pundit_span Family, :updateable? %>
+            <%= render partial: 'insured/families/coverall/paper_application_upload', locals: {member: member} %>
+          </span>
+        </td>
+      </tr>
+  <% end %>
+</table>

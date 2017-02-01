@@ -19,7 +19,13 @@ class Quote
 
 
   field :claim_code, type: String
+  field :employer_name, type: String
+  field :employer_type, type: String
+  field :employer_profile_id, type: BSON::ObjectId
+
   associated_with_one :broker_role, :broker_role_id, "BrokerRole"
+  associated_with_one :employer_profile, :employer_profile_id, "EmployerProfile"
+
 
 
   # Quote should now support multiple benefit groups
@@ -46,6 +52,8 @@ class Quote
   index({"quote_benefit_groups._id" => 1}, { unique: true })
 
   scope :datatable_search, ->(query) { where(quote_name: Regexp.new(Regexp.escape(query), true)) }
+  scope :by_client_employer_type, -> { where(employer_type: 'client') }
+  scope :by_prospect_employer_type, -> { where(employer_type: 'prospect') }
 
   after_create :update_default_benefit_group
 

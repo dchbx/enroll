@@ -321,10 +321,43 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
     let(:csr_role) { double("csr_role", cac: false)}
+    let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
     before :each do
       allow(person).to receive(:csr_role).and_return(double("csr_role", cac: false))
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
+    end
+
+    it "should notice user disabled" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(response).to have_http_status(:success)
+       expect(flash[:notice]).to match(/Disabled user/)
+    end
+
+    it "should set is_disabled to true" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(family.reload.is_disabled).to be_truthy
+    end
+
+    it "should notice user Enabled" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(response).to have_http_status(:success)
+       expect(flash[:notice]).to match(/Enabled user/)
+    end
+
+    it "should set is_disabled to false" do 
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(family.reload.is_disabled).to be_falsey
     end
 
     it "renders the 'families index' template for hbx_staff" do
@@ -457,6 +490,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "POST update_dob_ssn" do
 
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:person1) { FactoryGirl.create(:person) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
@@ -481,8 +515,16 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('update_enrollment')
-    end 
+    end
 
+    it "should render update enrollment if the save is successful" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person=>{:pid => person1.id, :ssn => "" , :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      xhr :get, :update_dob_ssn, @params
+      expect(response).to render_template('update_enrollment')
+    end
 
     it "should return authorization error for Non-Admin users" do
       allow(user).to receive(:has_hbx_staff_role?).and_return false

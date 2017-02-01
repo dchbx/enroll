@@ -936,6 +936,53 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end
+
+  describe "notify_broker_update" do
+    context "notify update" do
+      let(:employer_profile)      { FactoryGirl.create(:employer_profile)}
+      let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
+
+      it "notify if broker added to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        employer_profile.hire_broker_agency(broker_agency_profile)
+        employer_profile.save
+      end
+
+      it "notify if broker terminated to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, is_active: 'true')
+        employer_profile.fire_broker_agency
+        employer_profile.save
+      end
+    end
+  end
+
+  describe "notify_general_agent_added" do
+    context "notify update" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:broker_role) { FactoryGirl.create(:broker_role) }
+
+      it "notify if general_agent added to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        employer_profile.hire_general_agency(general_agency_profile, broker_role.id)
+        employer_profile.save
+      end
+    end
+  end
+
+  describe "notify_general_agent_terminated" do
+    context "notify update" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
+      it "notify if general_agent terminated to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+        employer_profile.fire_general_agency!
+        employer_profile.save
+      end
+    end
+  end
 end
 
 # describe "#advance_day" do

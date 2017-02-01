@@ -9,7 +9,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   let(:plan) do
     double(plan_type: "ppo", metal_level: "bronze", is_standard_plan: true,
-      nationwide: "true", total_employee_cost: 100, deductible: 500,
+      nationwide: "true", total_employee_cost: 100, deductible: 500, family_deductible: 1000,
       name: "My Plan", id: "991283912392", carrier_profile: nil,
       carrier_profile_id: carrier_profile.id,
       active_year: TimeKeeper.date_of_record.year, total_premium: 300,
@@ -61,7 +61,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to match(/#{plan.name}/)
       expect(rendered).to match(/#{plan.carrier_profile}/)
       expect(rendered).to match(/#{plan.active_year}/)
-      expect(rendered).to match(/#{plan.deductible}/)
+      expect(rendered).to match(/#{plan.family_deductible}/)
       expect(rendered).to match(/#{plan.is_standard_plan}/)
       expect(rendered).to match(/#{plan.nationwide}/)
       expect(rendered).to match(/#{plan.total_employee_cost}/)

@@ -171,6 +171,7 @@
                     </ns0:eligibility_determination>
                  </ns0:eligibility_determinations>
                  <ns0:start_date>20150910</ns0:start_date>
+                 <ns0:end_date>20160911</ns0:end_date>
                  <ns0:submitted_at>2015-09-10T19:24:44.000000</ns0:submitted_at>
                  <ns0:is_active>true</ns0:is_active>
                  <ns0:created_at>2015-09-10T19:24:44.000000</ns0:created_at>

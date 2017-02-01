@@ -1,4 +1,4 @@
-  require "rails_helper"
+require "rails_helper"
 
 RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
@@ -9,8 +9,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_two]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     let(:hbx_enrollment_member_two) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
-
-
+    
     it "it should return subscribers full name in span with dependent-text class" do
       allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(true)
       allow(hbx_enrollment_member).to receive_message_chain("person.full_name").and_return("Bobby Boucher")
@@ -126,7 +125,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "auto_renewing", "any_state"]
-    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing", "renewing_coverage_selected"]
 
     context "IVL market" do
       before :each do
@@ -159,7 +158,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month ) }
     let(:qle_with_date_options_available) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month, date_options_available: true ) }
-    let(:sep_without_date_options) { 
+    let(:sep_without_date_options) {
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
@@ -169,7 +168,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       sep
     }
 
-    let(:sep_with_date_options) { 
+    let(:sep_with_date_options) {
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
@@ -199,4 +198,77 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   end
 
+  describe "#tax_info_url" do
+    context "production environment" do
+      it "should redirect from production environment" do
+        allow(ENV).to receive(:[]).with("AWS_ENV").and_return("prod")
+        expect(helper.tax_info_url).to eq "https://dchealthlink.com/individuals/tax-documents"
+      end
+    end 
+
+    context "non-production environment" do
+      it "should redirect from test environment" do
+        allow(ENV).to receive(:[]).with("AWS_ENV").and_return("preprod")
+        expect(helper.tax_info_url).to eq "https://staging.dchealthlink.com/individuals/tax-documents"
+      end
+    end
+  end
+
+  describe "show_download_tax_documents_button?" do
+    let(:user) { FactoryGirl.build_stubbed(:user)}
+    let(:person) { FactoryGirl.build_stubbed(:person, user:user)}
+    before do
+      helper.instance_variable_set(:@person, person)
+    end
+    
+    context "as consumer" do
+      context "had a SSN" do
+        before do
+          allow(user).to receive(:has_consumer_role?).and_return true
+          allow(person).to receive(:ssn).and_return '123456789'
+        end   
+        it "should display the download tax documents button" do
+         expect(helper.show_download_tax_documents_button?).to eq true
+        end
+
+        context "current user is hbx staff" do
+          let(:current_user) { FactoryGirl.build(:user, :hbx_staff)}
+          it "should display the download tax documents button" do
+            expect(helper.show_download_tax_documents_button?).to eq true
+          end
+        end
+      end
+
+      context "had no SSN" do
+        before do
+         allow(person).to receive(:ssn).and_return ''
+        end   
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button?).to eq false
+        end
+      end
+
+    end
+
+    context "as employee and has no consumer role" do
+      let(:user) { FactoryGirl.build_stubbed(:user)}
+      let(:person) { FactoryGirl.build_stubbed(:person, user:user)}
+
+      before do
+        allow(user).to receive(:has_employee_role?).and_return true
+        allow(user).to receive(:has_consumer_role?).and_return false
+      end
+
+      context "had a SSN" do
+        before do
+          allow(person).to receive(:ssn).and_return '123456789'
+        end   
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button?).to eq false
+        end
+      end
+
+    end
+
+  end
 end

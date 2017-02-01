@@ -46,19 +46,52 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     it "should displays enrollment state when coverage selected" do
       assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Coverage Selected/)
+      expect(rendered).to match(/Enrolled/)
     end
   end
 
   context 'when employee coverage terminated' do
     before do
       allow(census_employee2).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment2)
+      allow(census_employee2).to receive(:aasm_state).and_return 'employment_terminated'
+      allow(census_employee2).to receive(:can_elect_cobra?).and_return true
+      allow(census_employee2).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record
     end
 
     it "should displays enrollment state as coverage terminated" do
       assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Coverage Terminated/)
+      expect(rendered).to match(/Terminated/)
+    end
+
+    it "should displays rehire function" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_selector('span', text: 'Rehire')
+    end
+
+    it "should displays cobra function" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_selector('span', text: 'COBRA')
+    end
+
+    it "should displays cobra confirm area" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_selector('tr.cobra_confirm')
+    end
+
+    it "should displays termination date when status is all" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
+      expect(rendered).to have_content('Termination Date')
+    end
+
+    it "should displays termination date when status is terminated" do
+      assign(:census_employees, [census_employee2])
+      render "employers/employer_profiles/my_account/employees_by_status", :status => "terminated"
+      expect(rendered).to have_content('Termination Date')
     end
   end
 
@@ -71,7 +104,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     it "should displays enrollment status as waived" do
       assign(:census_employees, [census_employee3])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Coverage Waived/)
+      expect(rendered).to match(/Waived/)
     end
   end
 

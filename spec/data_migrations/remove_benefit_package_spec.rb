@@ -13,7 +13,6 @@ describe RemoveBenefitPackage do
   end
 
   describe "remove benefit package", dbclean: :after_each do
-
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group_assignment.id, benefit_group_id: benefit_group.id)}
     let(:census_employee) { FactoryGirl.create(:census_employee)}
@@ -30,7 +29,7 @@ describe RemoveBenefitPackage do
       allow(ENV).to receive(:[]).with("existing_bg_id").and_return(benefit_group_two.id)
       allow(ENV).to receive(:[]).with("new_name_for_bg").and_return("new_title")
     end
-    
+
     it "should remove the benefit package" do
       expect(plan_year.benefit_groups.size).to eq 2
       subject.migrate

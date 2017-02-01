@@ -99,4 +99,19 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       expect(rendered).to have_selector("form[action='/insured/families/find_sep']")
     end
   end
+
+  context "without employee or consumer role" do
+    before :each do
+      assign :person, person
+      sign_in(current_user)
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      render "insured/families/shop_for_plans_widget"
+    end
+
+    it "should have text about enrolling in Individual Market" do
+      expect(rendered).to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
+    end
+  end
+
+
 end

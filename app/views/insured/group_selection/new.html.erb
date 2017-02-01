@@ -3,17 +3,6 @@
 <% end %>
 <div class="container group-selection">
   <div class="row">
-    <% if @aptc_blocked.present? && @aptc_blocked %>
-      <br />
-      <div class="alert alert-danger" role="alert">
-        <p>
-          We need a bit of additional information to redetermine your eligibility. Please call us at <%= Settings.contact_center.phone_number %>.
-        </p>
-        <br>
-        <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
-      </div>
-    <% else %>
-
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
@@ -41,7 +30,7 @@
               <% end %>
             </div>
           <% end %>
-
+        
           <% if can_shop_individual?(@person) %>
             <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
               <div class="module group-selection-table">
@@ -81,6 +70,8 @@
 	           <%= hidden_field_tag 'market_kind', 'shop' %>
 	        <% elsif can_shop_individual?(@person) %>
 	           <%= hidden_field_tag 'market_kind', 'individual' %>
+          <% elsif can_shop_resident?(@person) %>
+             <%= hidden_field_tag 'market_kind', 'coverall' %>
           <% else %>
             <% if @market_kind.present? %>
               <%= hidden_field_tag 'market_kind', @market_kind %>
@@ -89,6 +80,18 @@
 
           <% if @employee_role.present? %>
             <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+          <% end %>
+
+          <% if can_shop_resident?(@person) %>
+            <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
+              <div class="module group-selection-table">
+                <div class="table-responsive table-border health">
+                  <% @show_residency_alert = false %>
+
+                  <%= render 'coverall_coverage_household' %>
+                </div>
+              </div>
+            </div>
           <% end %>
 
           <div id="coverage_kinds" class='row no-buffer'>
@@ -159,6 +162,8 @@
             <% else %>
               <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
             <% end %>
+          <% elsif @change_plan.blank? && can_shop_resident?(@person) %>
+            <%= render partial: 'shared/coverall_progress', locals: {step: '4'} %>
           <% elsif @change_plan.blank? %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
           <% elsif @change_plan == "change_by_qle" %>
@@ -172,7 +177,6 @@
           <% end %>
         </div>
       </div>
-    <% end %>
     <% end %>
   </div>
   <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? && (@hbx_enrollment.employee_role.present? || @hbx_enrollment.benefit_group.present?)) %>

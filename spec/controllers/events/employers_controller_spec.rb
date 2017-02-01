@@ -16,7 +16,7 @@ describe Events::EmployersController do
     before :each do
       allow(Organization).to receive(:employer_by_hbx_id).with(employer_hbx_id).and_return(found_orgs)
       allow(controller).to receive(:render_to_string).with(
-        "updated", {:formats => ["xml"], :locals => {
+        "events/v2/employers/updated", {:formats => ["xml"], :locals => {
          :employer => employer_profile
         }}).and_return(rendered_template)
     end

@@ -70,7 +70,8 @@ module Forms
         :legal_name => legal_name,
         :dba => dba,
         :employer_profile => ::EmployerProfile.new({
-          :entity_kind => entity_kind
+          :entity_kind => entity_kind,
+          :contact_method => contact_method
         }),
         :office_locations => office_locations
       )

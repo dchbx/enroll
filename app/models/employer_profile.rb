@@ -13,6 +13,8 @@ class EmployerProfile
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
+  FIELD_AND_EVENT_NAMES = {"start_on" => "broker_added", "end_on" => "broker_terminated"}
+
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
@@ -31,6 +33,7 @@ class EmployerProfile
 
 
   field :profile_source, type: String, default: "self_serve"
+  field :contact_method, type: String, default: "Only Electronic communications"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
   field :xml_transmitted_timestamp, type: DateTime
 
@@ -208,6 +211,7 @@ class EmployerProfile
 
   def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
     return if active_general_agency_account.blank?
+    notify_general_agent_terminated(general_agency_accounts.active)
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
   end
   alias_method :general_agency_profile=, :hire_general_agency
@@ -215,6 +219,12 @@ class EmployerProfile
   def employee_roles
     return @employee_roles if defined? @employee_roles
     @employee_roles = EmployeeRole.find_by_employer_profile(self)
+  end
+
+  def notify_general_agent_terminated(general_agency_accounts)
+    general_agency_accounts.each do |general_agency|
+    notify("acapi.info.events.employer.general_agent_terminated", {employer_id: general_agency.employer_profile.hbx_id, event_name: "general_agent_terminated"})
+    end
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -343,7 +353,7 @@ class EmployerProfile
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -654,7 +664,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => :notify_binder_paid
+    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
   state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -728,7 +738,7 @@ class EmployerProfile
     end
   end
 
-  after_update :broadcast_employer_update
+  after_update :broadcast_employer_update, :notify_broker_update, :notify_general_agent_added
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
@@ -798,6 +808,26 @@ class EmployerProfile
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
   end
 
+  def notify_initial_binder_paid
+    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
+  end
+
+  def notify_broker_update
+    changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    FIELD_AND_EVENT_NAMES.each do |feild, event_name|
+      if changed_fields.present? && changed_fields.include?(feild)
+        notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
+      end
+    end
+  end
+
+  def notify_general_agent_added
+    changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? && changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.general_agent_added", {employer_id: self.hbx_id, event_name: "general_agent_added"})
+    end
+  end
+
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
@@ -806,6 +836,16 @@ class EmployerProfile
 
   def is_conversion?
     self.profile_source == "conversion"
+  end
+
+  def generate_and_deliver_checkbook_urls_for_employees
+    census_employees.each do |census_employee|
+      census_employee.generate_and_deliver_checkbook_url
+    end
+  end
+
+  def generate_checkbook_notices
+    OutofpocketNotifierJob.perform_later(self.id.to_s)
   end
 
   def trigger_notices(event)
@@ -866,6 +906,6 @@ private
   end
 
   def plan_year_publishable?
-    published_plan_year.is_application_valid?
+    !published_plan_year.is_application_unpublishable? 
   end
 end

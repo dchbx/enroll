@@ -5,7 +5,7 @@ module HbxAdminHelper
   end
 
   def ehb_percent_for_enrollment(hbx_id)
-  	ehb = HbxEnrollment.find(hbx_id).plan.ehb
+    ehb = find_enrollment(hbx_id).plan.ehb
   	enb_percent = (ehb*100).round(2)
   end
   
@@ -14,7 +14,7 @@ module HbxAdminHelper
   	#2 Get APTC ratio for each of these members
   	#3 Max APTC for Enrollment => Sum all (ratio * max_aptc) for each members
   	max_aptc_for_enrollment = 0
-  	hbx = HbxEnrollment.find(hbx_id)
+    hbx = find_enrollment(hbx_id)
   	hbx_enrollment_members = hbx.hbx_enrollment_members
   	aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_household.aptc_ratio_by_member
   	hbx_enrollment_members.each do |hem|
@@ -42,12 +42,15 @@ module HbxAdminHelper
     ((aptc_applied/max_aptc)*100).round
   end
 
-  def inactive_and_without_aptc_enrollments(family, year)
-    family.active_household.hbx_enrollments.canceled_and_terminated.with_plan.with_aptc.by_year(TimeKeeper.date_of_record.year) +
-    family.active_household.hbx_enrollments.with_plan.without_aptc.by_year(TimeKeeper.date_of_record.year)
+  def inactive_enrollments(family, year)
+    family.active_household.hbx_enrollments.canceled_and_terminated.with_plan.by_year(year)
   end
 
   def primary_member(person_id)
     Person.find(person_id).try(:primary_family).try(:primary_family_member).try(:person) == Person.find(person_id)
+  end
+
+  def find_enrollment(hbx_id)
+    HbxEnrollment.find(hbx_id)
   end
 end

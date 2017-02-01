@@ -429,7 +429,6 @@ module InvoiceHelper
     logo_x = 360
     cheque_amount_path_x = 350
     @pdf.move_down 36
-
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
       invoice_header_data = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],

@@ -4,14 +4,11 @@ describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
-  let(:enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
-                       household: household,
-                       coverage_kind: "health",
-                       enrollment_kind: "open_enrollment",
-                       aasm_state: 'shopping'
-    )
-  }
+  let(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+                           household: household,
+                           coverage_kind: "health",
+                           enrollment_kind: "open_enrollment",
+                           aasm_state: 'shopping') }
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
   let(:family_member_dependent) { FamilyMember.new(person: dependent) }
 
@@ -31,10 +28,6 @@ describe Family, "given a primary applicant and a dependent" do
     it "enrolled hbx enrollments should come from latest household" do
       expect(subject.enrolled_hbx_enrollments).to eq subject.latest_household.enrolled_hbx_enrollments
     end
-  end
-
-  context "#any_unverified_enrollments?" do
-
   end
 
   context "enrollments_for_display" do
@@ -1082,87 +1075,6 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 end
 
-describe Family, "is_blocked_by_qle_and_assistance" do
-  let(:qle) {FactoryGirl.build(:qualifying_life_event_kind)}
-  let(:family) {Family.new}
-  let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
-  let(:eligibility_determination) {double(max_aptc: 0)}
-
-  it "return false without parameters" do
-    expect(family.is_blocked_by_qle_and_assistance?()).to eq false
-    expect(family.is_blocked_by_qle_and_assistance?(qle)).to eq false
-  end
-
-  it "return true when status is aptc_block" do
-    family.status = "aptc_block"
-    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq true
-  end
-
-  it "return false when status is aptc_block" do
-    family.status = "aptc_unblock"
-    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq false
-  end
-
-  #context "when max_aptc greater than 0" do
-  #  before :each do
-  #    allow(family).to receive(:latest_household).and_return household
-  #    allow(eligibility_determination).to receive(:max_aptc).and_return 100
-  #  end
-
-  #  it "return false when qle is not individual" do
-  #    allow(qle).to receive(:individual?).and_return false
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #  end
-
-  #  it "return false when qle is not family_structure_changed" do
-  #    allow(qle).to receive(:individual?).and_return true
-  #    allow(qle).to receive(:family_structure_changed?).and_return false
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #  end
-
-  #  it "return true" do
-  #    allow(qle).to receive(:individual?).and_return true
-  #    allow(qle).to receive(:family_structure_changed?).and_return true
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
-  #  end
-  #end
-
-  #it "return false when max_aptc is 0" do
-  #  allow(family).to receive(:latest_household).and_return household
-  #  allow(eligibility_determination).to receive(:max_aptc).and_return 0
-  #  expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #end
-end
-
-describe Family, "aptc_blocked?" do
-  let(:family) {Family.new}
-
-  it "return false" do
-    expect(family.aptc_blocked?).to eq false
-  end
-
-  it "return true" do
-    family.status = "aptc_block"
-    expect(family.aptc_blocked?).to eq true
-  end
-end
-
-describe Family, "update_aptc_block_status" do
-  let(:family) {Family.new}
-  let(:eligibility_determination) {double(max_aptc: 0)}
-  #let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
-  let(:household) { double(latest_active_tax_household: double(eligibility_determinations: [eligibility_determination])) }
-
-  it "set aptc_block" do
-    allow(family).to receive(:latest_household).and_return household
-    #allow(eligibility_determination).to receive(:max_aptc).and_return 100
-    #allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-    allow(family).to receive(:has_aptc_hbx_enrollment?).and_return true
-    family.update_aptc_block_status
-    expect(family.status).to eq "aptc_block"
-  end
-end
-
 describe Family, 'coverage_waived?' do
   let(:family) {Family.new}
   let(:household) {double}
@@ -1346,7 +1258,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
   let!(:dental_plan) { FactoryGirl.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year)}
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-  
+
   let!(:enrollments) {
     FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
@@ -1358,7 +1270,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
                        plan_id: plan.id,
                        aasm_state: 'auto_renewing'
     )
-  
+
     FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "dental",
@@ -1369,7 +1281,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
                        plan_id: dental_plan.id,
                        aasm_state: 'auto_renewing'
     )
-   
+
   }
   context 'when family exists with passive renewals ' do
     before do
@@ -1385,6 +1297,32 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     it "should begin coverage on dental passive renewal" do
       enrollment = family.active_household.hbx_enrollments.where(:coverage_kind => 'dental').first
       expect(enrollment.coverage_selected?).to be_truthy
+    end
+  end
+end
+
+describe Family, ".tax_documents", dbclean: :after_each do
+  let(:family) { FactoryGirl.build(:family)}
+
+  context "had no tax documents" do
+    before do
+      family.documents = []
+    end
+
+    it "should return no documents" do
+      expect(family.tax_documents).to eq([])
+    end
+  end
+
+  context "had a tax document" do
+    let(:tax_document) { FactoryGirl.build(:tax_document)}
+
+    before do
+      family.documents = [tax_document]
+    end
+
+    it "should return 1 documents" do
+      expect(family.tax_documents).to eq([tax_document])
     end
   end
 end

@@ -1,8 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote]
-
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
@@ -29,11 +28,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -214,6 +211,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @organization.save(validate: false)
 
       if @organization.update_attributes(employer_profile_params)
+        @organization.notify_address_change(@organization_dup,employer_profile_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -253,7 +251,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def bulk_employee_upload_form
+  end
 
+  def generate_checkbook_urls
+    @employer_profile.generate_checkbook_notices
+    flash[:notice] = "Generating and delivering checkbook notice to employer"
+    redirect_to action: :show, :tab => :employees
   end
 
   def download_invoice
@@ -273,8 +276,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
     rescue Exception => e
-      @census_employee_import.errors.add(:base, e.message)
-      render "employers/employer_profiles/employee_csv_upload_errors"
+      if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
+        render "employers/employer_profiles/_download_new_template"
+      else
+        @census_employee_import.errors.add(:base, e.message)
+        render "employers/employer_profiles/employee_csv_upload_errors"
+      end
     end
 
 
@@ -322,6 +329,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                          @employer_profile.census_employees.terminated.sorted
                        when 'all'
                          @employer_profile.census_employees.sorted
+                       when 'cobra'
+                         @employer_profile.census_employees.by_cobra.sorted
                        else
                          @employer_profile.census_employees.active.sorted
                        end
@@ -412,7 +421,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},

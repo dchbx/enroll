@@ -97,6 +97,8 @@ class BenefitGroup
       message: "%{value} is not a valid effective date offset kind"
     }
 
+  # validates :dental_reference_plan_id, presence: true, if: :has_elected_dental_plan_ids?
+
   validate :plan_integrity
   validate :check_employer_contribution_for_employee
   validate :check_offered_for_employee
@@ -134,6 +136,10 @@ class BenefitGroup
 
   def is_offering_dental?
     dental_reference_plan_id.present? && elected_dental_plan_ids.any?
+  end
+
+  def has_elected_dental_plan_ids?
+    elected_dental_plan_ids.any?
   end
 
   def is_open_enrollment?
@@ -446,7 +452,7 @@ class BenefitGroup
   end
 
   ## Conversion employees are not allowed to buy coverage through off-exchange plan year
-  def valid_plan_year    
+  def valid_plan_year
     if employer_profile.is_coversion_employer?
       plan_year.coverage_period_contains?(employer_profile.registered_on) ? plan_year.employer_profile.renewing_plan_year : plan_year
     else

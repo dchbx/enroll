@@ -44,6 +44,18 @@ RSpec.describe CensusEmployeeImport, :type => :model do
     it "should save the employee with address" do
       expect(subject.save).to be_truthy
       expect(subject.load_imported_census_employees.first.address.present?).to be_truthy
+      expect(subject.load_imported_census_employees.first.address.address_2.present?).to be_truthy
+    end
+
+    it "should save the employee & dependent with correct attributes" do
+      expect(subject.save).to be_truthy
+      expect(subject.load_imported_census_employees.first.first_name).to eq "test"
+      expect(subject.load_imported_census_employees.first.last_name).to eq "test"
+      expect(subject.load_imported_census_employees.first.gender).to eq "male"
+      expect(subject.load_imported_census_employees.first.census_dependents.first.first_name).to eq "test2"
+      expect(subject.load_imported_census_employees.first.census_dependents.first.last_name).to eq "test2"
+      expect(subject.load_imported_census_employees.first.census_dependents.first.employee_relationship).to eq "spouse"
+      expect(subject.load_imported_census_employees.first.census_dependents.first.gender).to eq "female"
     end
   end
 
@@ -66,6 +78,7 @@ RSpec.describe CensusEmployeeImport, :type => :model do
       expect(subject.load_imported_census_employees.count).to eq(1) # 1 employee + no dependents
       expect(subject.load_imported_census_employees.first).to be_a CensusEmployee
       expect(subject.load_imported_census_employees.first.census_dependents.count).to eq(0)
+      expect(subject.load_imported_census_employees.first.last_name).to eq "panther1"
     end
 
     it "should not save successfully" do

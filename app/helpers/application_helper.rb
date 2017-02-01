@@ -457,7 +457,7 @@ module ApplicationHelper
         end
 
         if eligible > 2
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minumum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
 
@@ -467,6 +467,12 @@ module ApplicationHelper
         end)
       end
     end
+  end
+
+  def is_readonly(object)
+    return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
+    return true if object.try(:linked?)  # cannot edit, employer census roster
+    return !(object.new_record? or object.try(:eligible?)) # employer census roster
   end
 
   def may_update_census_employee?(census_employee)
@@ -488,6 +494,10 @@ module ApplicationHelper
     notice.enrollments.inject([]) do |enrollees, enrollment|
       enrollees += enrollment.enrollees
     end.uniq
+  end
+
+  def show_oop_pdf_link(aasm_state)
+    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
   end
 
   def calculate_age_by_dob(dob)

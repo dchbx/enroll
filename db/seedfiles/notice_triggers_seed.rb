@@ -105,6 +105,27 @@ shop_notice_triggers = [
       }
     ] 
   },
+  {
+    hbx_id: 'SHOP_Out_of_pocket_notice',
+    title: 'Out of pocket calculator',
+    description: 'Out of pocket calculator notifier',
+    resource_name: 'employer',
+    event_name: 'out_of_pocker_url_notifier',
+    notice_triggers: [
+      {
+        name: 'Out of pocket Notice',
+        notice_template: "notices/shop_notices/out_of_pocket_notice.html.erb",
+        notice_builder: 'ShopNotices::OutOfPocketNotice',
+        mpi_indicator: 'MPI',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: [""],
+          primary_recipient_delivery_method: ["email"],
+          secondary_recipients: []
+        }
+      }
+    ] 
+  },
 ]
 
 
@@ -249,6 +270,28 @@ ivl_notice_triggers = [
         notice_template: 'notices/ivl/ivlr1_notice_second_batch_without_ea_data',
         notice_builder: 'IvlNotices::IvlRenewalNotice',
         mpi_indicator: 'MPI_IVLR1B',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVLR1',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals with UQHP(Unassisted)-Remaining Batch',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_1_remaining_list',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_builder: 'IvlNotices::IvlRenewalNoticeForRemainingBatch',
+        mpi_indicator: 'MPI_IVLR1',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],

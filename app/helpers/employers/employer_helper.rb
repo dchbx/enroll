@@ -6,17 +6,21 @@ module Employers::EmployerHelper
   def employee_state_format(employee_state=nil, termination_date=nil)
     if employee_state == "employee_termination_pending" && termination_date.present?
       return "Termination Pending " + termination_date.to_s
+    elsif employee_state == 'employee_role_linked'
+      return 'Account Linked'
+    elsif employee_state == 'eligible'
+      return 'No Account Linked'
     else
       return employee_state.humanize
     end
   end
-
+  
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
   end
 
   def humanize_enrollment_states(benefit_group_assignment)
@@ -113,13 +117,67 @@ module Employers::EmployerHelper
     return benefit_groups, (renewing_benefit_groups || [])
   end
 
+  def cobra_effective_date(census_employee)
+    disabled = current_user.has_hbx_staff_role? ? false : true
+    content_tag(:div) do 
+     content_tag(:span,"COBRA/Continuation Effective Date:  ") +
+      content_tag(:span, :class=>"confirm-cobra" ,:style=>"display:inline;") do 
+        content_tag(:input, nil, :type => "text" ,:class => "text-center date-picker", :value => census_employee.suggested_cobra_effective_date , :disabled => disabled ) 
+      end
+    end.html_safe
+  end
+
+  def cobra_button(census_employee)
+    disabled = current_user.has_hbx_staff_role? == true || census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
+    if census_employee.employer_profile.present? && !census_employee.employer_profile.is_conversion?
+      disabled = true unless census_employee.has_hbx_enrollments?
+    end
+    button_text = 'COBRA'
+    toggle_class = ".cobra_confirm_"
+    if census_employee.cobra_terminated? 
+      button_text = 'COBRA REINSTATE' 
+      toggle_class = ".cobra_reinstate_"
+      disabled = !current_user.has_hbx_staff_role?
+    end
+    content_tag(:a, :class => "show_confirm show_cobra_confirm btn btn-primary" , :id => "show_cobra_confirm_#{census_employee.id}" ,:disabled => disabled) do 
+      content_tag(:span, button_text, :class => "hidden-xs hidden-sm visible-md visible-lg", 
+        :onclick => "$(this).closest('tr').nextAll('#{toggle_class}#{census_employee.id}').toggle()")
+    end
+  end
+
+  def show_cobra_fields?(employer_profile, user)
+    return true if user && user.has_hbx_staff_role?
+    return false if employer_profile.blank?
+
+    plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year rescue nil
+    return false if plan_year.blank?
+
+    if employer_profile.is_coversion_employer?
+      return false if employer_profile.plan_years.count > 2
+    else
+      return false if plan_year.is_renewing?
+    end
+
+    plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
+  def rehire_date_min(census_employee)
+    return 0 if census_employee.blank?
+
+    if census_employee.employment_terminated?
+      (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1
+    elsif census_employee.cobra_eligible? || census_employee.cobra_linked? || census_employee.cobra_terminated?
+      (census_employee.cobra_begin_date - TimeKeeper.date_of_record).to_i + 1
+    else
+      0
+    end
+  end
+
   def display_families_tab(user)
     if user.present?
       user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_active_broker?(@employer_profile)
     end
   end
-
-
 
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
@@ -128,4 +186,13 @@ module Employers::EmployerHelper
     links = "#{link_to("Rehire", "javascript:;", data: { "content": "#{content}" }, onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))", class: "manual")} #{link_to("COBRA", "javascript:;", onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))")}" if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
     return [links, content]
   end
+
+  def is_rehired(ce)
+    (ce.coverage_terminated_on.present?  && (ce.is_eligible? || ce.employee_role_linked?))
+  end
+
+  def is_terminated(ce)
+    (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
+  end
+
 end

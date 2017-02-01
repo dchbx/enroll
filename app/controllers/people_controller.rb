@@ -198,7 +198,6 @@ class PeopleController < ApplicationController
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
-
       redirect_path = family_account_path
     end
 
@@ -367,13 +366,14 @@ private
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       :naturalized_citizen,
       :eligible_immigration_status,
       :indian_tribe_member,
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason, 
+      :no_dc_address_reason,
       :id
     ]
   end

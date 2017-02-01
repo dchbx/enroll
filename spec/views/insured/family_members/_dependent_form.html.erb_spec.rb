@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe "insured/family_members/_dependent_form.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
+  let(:consumer_role) { FactoryGirl.create(:consumer_role)}
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:family) { Family.new }
   let(:family_member) { family.family_members.new }
@@ -9,6 +10,8 @@ describe "insured/family_members/_dependent_form.html.erb" do
 
   context "with consumer_role_id" do
     before :each do
+      person.consumer_role = consumer_role
+      person.save
       sign_in user
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
       allow(person).to receive(:has_active_consumer_role?).and_return true
@@ -36,6 +39,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should have no_ssn label" do
+      #allow(person).to receive(:has_active_consumer_role?).and_return true
       expect(rendered).to have_selector('span.no_ssn')
       expect(rendered).to match /have an SSN/
     end

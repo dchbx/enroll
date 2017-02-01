@@ -1,0 +1,5 @@
+!!! XML
+%employers{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance", "xsi:type" => "EmployerProfilesListType"}
+  - employer_profiles_hash = census_employees.group_by do |census_employee| census_employee.employer_profile end
+  - employer_profiles_hash.each do |employer_profile, census_employees|
+    = render :partial => "events/census_employee/employer_organization", locals: { employer: employer_profile, census_employees: census_employees }

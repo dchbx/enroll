@@ -40,27 +40,58 @@ RSpec.describe Insured::EmployeeRolesHelper, :type => :helper do
   describe "#coverage_relationship_check" do
     let(:orb) {["employee", "spouse", "child_under_26"]}
     let(:spouse) { double(primary_relationship: "ex-spouse") }
+    let(:new_effective_on) {TimeKeeper.date_of_record}
     let(:domestic_partner) { double(primary_relationship: "life_partner") }
     let(:child) {double(primary_relationship: "ward", dob: TimeKeeper.date_of_record)}
 
     it "offered_relationship_benefits include the relationship of family_member" do
-      expect(helper.coverage_relationship_check(orb, spouse)).to be_truthy
+      expect(helper.coverage_relationship_check(orb, spouse, new_effective_on)).to be_truthy
     end
 
     it "offered_relationship_benefits not include the relationship of family_member" do
-      expect(helper.coverage_relationship_check(orb, domestic_partner)).to be_falsey
+      expect(helper.coverage_relationship_check(orb, domestic_partner, new_effective_on)).to be_falsey
     end
 
     context "with child" do
       it "and age over 26" do
         allow(helper).to receive(:calculate_age_by_dob).and_return(30)
-        expect(helper.coverage_relationship_check(orb, child)).to be_falsey
+        expect(helper.coverage_relationship_check(orb, child, new_effective_on)).to be_falsey
       end
 
       it "and age under 26" do
         allow(helper).to receive(:calculate_age_by_dob).and_return(10)
-        expect(helper.coverage_relationship_check(orb, child)).to be_truthy
+        expect(helper.coverage_relationship_check(orb, child, new_effective_on)).to be_truthy
       end
+
+      it "child age under 26 enrollment effective_on is after child entered 26 years" do
+        allow(helper).to receive(:calculate_age_by_dob).and_return(25)
+        allow(child).to receive(:dob).and_return TimeKeeper.date_of_record - 26.years
+        expect(helper.coverage_relationship_check(orb, child, new_effective_on)).to be_falsey
+      end
+
+    end
+  end
+
+  describe "#show_market_name_by_enrollment" do
+    let(:enrollment) { HbxEnrollment.new }
+    context "for shop" do
+      it "under employer_sponsored_cobra" do
+        enrollment.kind = 'employer_sponsored_cobra'
+        expect(helper.show_market_name_by_enrollment(enrollment)).to eq 'Employer Sponsored COBRA/Continuation'
+      end
+
+      it "under employer_sponsored" do
+        enrollment.kind = 'employer_sponsored'
+        expect(helper.show_market_name_by_enrollment(enrollment)).to eq 'Employer Sponsored'
+      end
+    end
+
+    it "for individual" do
+      expect(helper.show_market_name_by_enrollment(enrollment)).to eq 'Individual'
+    end
+
+    it "with nil" do
+      expect(helper.show_market_name_by_enrollment(nil)).to eq ''
     end
   end
 end
