@@ -64,6 +64,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       sign_in(user)
       allow(benefit_group).to receive(:reference_plan).and_return(plan)
       allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])
+      allow(plan_year.employer_profile).to receive(:active_plan_year).and_return published_plan_year
       allow(benefit_group).to receive(:effective_on_offset).and_return 30
       assign(:plan_years, [plan_year,published_plan_year])
       assign(:employer_profile, employer_profile)
