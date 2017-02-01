@@ -242,7 +242,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:plan) {FactoryGirl.create(:plan)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :last_years_coverage_period) }
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
-    let(:end_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year + 1.year - 1.day }
+    let(:end_on) { TimeKeeper.date_of_record.prev_year.end_of_year }
     let(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
 
