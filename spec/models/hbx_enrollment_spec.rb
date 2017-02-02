@@ -1,3 +1,4 @@
+
 require 'rails_helper'
 require 'aasm/rspec'
 
@@ -736,6 +737,38 @@ describe HbxProfile, "class methods", type: :model do
       enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false, submitted_at: nil)
       enrollment.save
       expect(enrollment.submitted_at).not_to be_nil
+    end
+  end
+
+  context "is reporting a qle before the employer plan start_date and having a expired plan year" do
+    let(:coverage_household) { double}
+    let(:coverage_household_members) {double}
+    let(:household) {FactoryGirl.create(:household, family: family)}
+    let(:qle_effective_date) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+    let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
+    let(:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:sep){
+      sep = family.special_enrollment_periods.new
+      sep.effective_on_kind = 'date_of_event'
+      sep.qualifying_life_event_kind= qle_effective_date
+      sep.qle_on= Date.new(2016,8,26)
+      sep
+    }
+
+    before do
+      allow(coverage_household).to receive(:household).and_return family.active_household
+      allow(coverage_household).to receive(:coverage_household_members).and_return []
+      allow(sep).to receive(:is_active?).and_return true
+      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+      census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
+      census_employee.update_attribute(:ssn, census_employee.employee_role.person.ssn)
+    end
+    it "should return a sep with an effective date that equals to sep date" do
+       enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
+       expect(enrollment.effective_on).to eq sep.qle_on
     end
   end
 
