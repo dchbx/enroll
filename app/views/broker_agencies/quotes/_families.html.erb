@@ -1,0 +1,5 @@
+<% if type == 'client' %>
+<%= select(:quote, :employer_profile_id, options_for_select(@employer_profiles, @quote.employer_profile.try(:id) ), {:include_blank => 'SELECT EMPLOYERS'}, {data: {url: employees_list_broker_agencies_broker_role_quotes_path},:class => 'client employer_profile selectpicker', :prompt =>true, required: true}) %>
+<% elsif type == 'prospect' %>
+<%= text_field :quote, :employer_name, {size: 20,required: true, :placeholder => 'Employer Name', class: 'employer_profile',data: {url: employees_list_broker_agencies_broker_role_quotes_path}} %>
+<% end %>

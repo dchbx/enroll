@@ -18,3 +18,18 @@
   </div>
 </div>
 <%end%>
+
+<script type="text/javascript">
+	$('#quote_employer_type').on('change', function() {
+	  var params = 'type=' + this.value + '&id=' + '<%= @quote.id %>';
+	  $.ajax({
+	    url: "<%=employee_type_broker_agencies_broker_role_quotes_path%>",
+	    data: params,
+	      complete: function(response){
+	        if (response) {
+	        	$('.employer_profile').trigger('change');
+	        }
+	      }
+	  });
+});
+</script>
