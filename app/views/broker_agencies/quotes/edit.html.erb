@@ -8,7 +8,7 @@
 						disable_class = @quote.is_complete? ? " disabled" : ""
 					%>
 			    <%= submit_tag "Save Changes", class: "btn btn-primary #{disable_class}" %>
-					<%= submit_tag "Add Family", class: "btn btn-primary #{disable_class}" %>
+					<%= submit_tag "Add Employee", class: "btn btn-primary #{disable_class}" %>
 					<%= link_to 'Upload Roster' , upload_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}", remote: true  ,id: "upload_employees" %>
 					<%= link_to 'Download Roster' , download_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}",id: "download_employees" %> <br>
 				</div>
