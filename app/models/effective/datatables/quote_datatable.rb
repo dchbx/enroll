@@ -18,7 +18,7 @@ module Effective
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown= [
             ['Edit Roster',edit_broker_agencies_broker_role_quote_path(broker_role_id: QuoteDatatable.broker_role_id, id: row.id),'static'],
-            ['View Published Quote',publish_broker_agencies_broker_role_quotes_path(broker_role_id: QuoteDatatable.broker_role_id, quote_id: row.id, :format => :pdf),'static'],
+            ['View Published Quote',publish_broker_agencies_broker_role_quotes_path(broker_role_id: QuoteDatatable.broker_role_id, quote_id: row.id, :format => :pdf), draft_quote_publish_disabled?(row)],
             ['Delete Quote',delete_quote_broker_agencies_broker_role_quote_path(broker_role_id: QuoteDatatable.broker_role_id, id: row.id), 'ajax'],
             ['Copy Quote',copy_broker_agencies_broker_role_quotes_path(broker_role_id: QuoteDatatable.broker_role_id, quote_id: row.id), 'ajax'],
           ]
@@ -55,6 +55,14 @@ module Effective
             {scope: 'prospect', label: 'Prospect', subfilter: :states},
           ],
         }
+      end
+
+      def draft_quote_publish_disabled?(row)
+        if row.aasm_state == 'draft'
+          return 'disabled'
+        else
+          return 'static'
+        end
       end
 
       class << self
