@@ -300,6 +300,10 @@ class User
     end
   end
 
+  def identity_or_idp_verified?
+    identity_verified? || idp_verified?
+  end
+
   def agent_title
     if has_agent_role?
       if has_role?(:assister)

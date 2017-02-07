@@ -553,6 +553,10 @@ class Person
     no_dc_address and no_dc_address_reason.present?
   end
 
+  def has_address_or_reason?
+    addresses.present? || no_dc_address.present? || no_dc_address_reason.present?
+  end
+
   def is_dc_resident?
     return false if no_dc_address == true && no_dc_address_reason.blank?
     return true if no_dc_address == true && no_dc_address_reason.present?

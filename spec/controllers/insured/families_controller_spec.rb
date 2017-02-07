@@ -39,7 +39,7 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true, user: nil) }
   let(:family) { double("Family", active_household: household) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
@@ -173,6 +173,25 @@ RSpec.describe Insured::FamiliesController do
         expect(assigns(:qualifying_life_events)).to eq QualifyingLifeEventKind.individual_market_events
       end
 
+      context "who does not have an address" do
+        let(:user) { FactoryGirl.create(:user) }
+
+        before do
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:active_employee_roles).and_return([])
+          allow(person).to receive(:addresses).and_return([])
+          sign_in user
+          get :home
+        end
+
+        it "should be a redirect to add an address" do
+          expect(response).to have_http_status(:redirect)
+          expect(user).to redirect_to(edit_insured_consumer_role_path(person.consumer_role))
+        end
+      end
+
       context "who has not passed ridp" do
         let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false) }
         let(:user) { FactoryGirl.create(:user) }
@@ -189,8 +208,32 @@ RSpec.describe Insured::FamiliesController do
           get :home
         end
 
-        it "should be a redirect" do
+        it "should be a redirect to submit RIDP verification" do
           expect(response).to have_http_status(:redirect)
+          expect(user).to redirect_to(ridp_agreement_insured_consumer_role_index_path )
+        end
+      end
+
+      context "who does not have an address and has not passed RIDP verification" do
+        let(:user) { double(identity_verified?: false, last_portal_visited: '', idp_verified?: false) }
+        let(:user) { FactoryGirl.create(:user) }
+
+        before do
+          allow(user).to receive(:idp_verified?).and_return false
+          allow(user).to receive(:identity_verified?).and_return false
+          allow(user).to receive(:last_portal_visited).and_return ''
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:active_employee_roles).and_return([])
+          allow(person).to receive(:addresses).and_return([])
+          sign_in user
+          get :home
+        end
+
+        it "should be a redirect to add an address" do
+          expect(response).to have_http_status(:redirect)
+          expect(user).to redirect_to(edit_insured_consumer_role_path(person.consumer_role))
         end
       end
     end
