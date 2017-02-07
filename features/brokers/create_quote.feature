@@ -9,11 +9,9 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
-    When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
-    
-
+    Then the broker should see a successful message
 
   Scenario: Broker should be able to add employees to the employee roster using Upload Employee Roster button
     Given that a broker exists
@@ -23,9 +21,8 @@ Feature: Create Employee Roster
     And click on the Upload Employee Roster button
     When the broker clicks on the Select File to Upload button
     Then the broker clicks upload button
-    And the broker should see the data in the table
-    When the broker selects employer type
     Then the broker enters the quote effective date
+    And the broker should see the data in the table
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
     And Broker logs out
@@ -36,7 +33,6 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
-    When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
@@ -54,7 +50,6 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
-    When the broker selects employer type
     Then broker enters valid information
     And adds a new benefit group
     Then the broker assigns the benefit group to the family
@@ -68,7 +63,6 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
-    When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
@@ -87,18 +81,15 @@ Feature: Create Employee Roster
     And the broker sees that the Quote is published
     And Broker logs out
 
-   Scenario: Check for disable View Publish Quote link in Actions for Draft Quotes.
+  Scenario: Broker should be able to assign benefit group to a family, Check with Add Benefit Group button fucntionality
     Given that a broker exists
-    And the Plans exist
     And the broker is signed in
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
-    And broker enters valid information
-    When the broker clicks on the Save Changes button
-    Then the broker should see a successful message
-    When the broker clicks on Back to Quotes button
-    Then the broker should see avaliable Quotes
-    When the broker clicks on Actions.
-    Then view publish quote should be disabled.
+    Then broker enters valid information
+    And Click on Add Benefit Group Button to add benefit group
+    And adds a new benefit group
+    Then the broker assigns the benefit group to the family
+    And the broker saves the quote
     And Broker logs out

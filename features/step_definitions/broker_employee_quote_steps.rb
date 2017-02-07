@@ -8,7 +8,7 @@ module BrokerWorld
 
   def broker_agency(*traits)
     attributes = traits.extract_options!
-    @broker_agency ||= FactoryGirl.create :broker, *traits, attributes
+    @broker_agency ||= FactoryGirl.create :broker , *traits, attributes
   end
 
 end
@@ -18,11 +18,6 @@ World(BrokerWorld)
 Given (/^that a broker exists$/) do
   broker_agency
   broker :with_family, :broker_with_person, organization: broker_agency
-  broker_agency_profile = broker_agency.broker_agency_profile
-  broker_agency_account = FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_agency_profile.primary_broker_role.id)
-  employer_profile = FactoryGirl.create(:employer_profile)
-  employer_profile.broker_agency_accounts << broker_agency_account
-  employer_profile.save!
 end
 
 And(/^the broker is signed in$/) do
@@ -56,8 +51,8 @@ end
 
 Then(/^the broker should see the data in the table$/) do
   expect(page).to have_selector("input#quote_quote_households_attributes_0_family_id[value=\"1\"]")
-  # expect(page).to have_selector("input#quote_quote_households_attributes_1_family_id[value=\"2\"]")
-  expect(page).to have_selector('#quote_quote_households_attributes_0_quote_members_attributes_0_dob', count: 1)
+  expect(page).to have_selector("input#quote_quote_households_attributes_1_family_id[value=\"2\"]")
+  expect(page).to have_selector('div.panel.panel-default div input.uidatepicker', count: 10)
   expect(page).to have_selector("#quote_quote_households_attributes_0_quote_members_attributes_0_dob[value=\"06/01/1980\"]")
   expect(page).to have_selector("input#quote_quote_households_attributes_2_quote_members_attributes_0_first_name[value=\"John\"]")
   expect(page).to have_selector("input#quote_quote_households_attributes_1_quote_members_attributes_0_last_name[value=\"Ba\"]")
@@ -65,12 +60,6 @@ end
 
 Then(/^the broker enters the quote effective date$/) do
   select "#{(Date.today+3.month).strftime("%B %Y")}", :from => "quote_start_on"
-end
-
-When(/^the broker selects employer type$/) do
-  find('.selectric-interaction-choice-control-quote-employer-type').click
-  select "Prospect", :from => "quote_employer_type"
-  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
 When(/^broker enters valid information$/) do
@@ -118,8 +107,12 @@ Then(/^the quote should be deleted$/) do
 end
 
 Then(/^adds a new benefit group$/) do
-  fill_in "quote[quote_benefit_groups_attributes][1][title]", with: 'My Benefit Group'
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
   find('.interaction-click-control-save-changes').trigger 'click'
+end
+
+Then(/^Click on Add Benefit Group Button to add benefit group$/) do
+  click_button 'Add benefit Group'
 end
 
 Then(/^the broker assigns the benefit group to the family$/) do
@@ -207,17 +200,4 @@ end
 
 When(/^the broker clicks Dental Features$/) do
   find('.interaction-click-control-dental-features-and-cost-criteria').trigger 'click'
-end
-
-
-Then(/^the broker should see avaliable Quotes$/) do
-  find('#Tab\\:all').visible?
-  end
-
-When(/^the broker clicks on Actions\.$/) do
-  find_button('Actions').click
-end
-
-Then(/^view publish quote should be disabled\.$/) do
-  find_link('View Published Quote')['disabled'].should == 'disabled'
 end

@@ -20,7 +20,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
     it "set date to current day" do
       link = employers_employer_profile_broker_agency_terminate_path(employer_profile.id, employer_profile.broker_agency_profile.id, termination_date: TimeKeeper.date_of_record, direct_terminate: true)
       render "employers/broker_agency/active_broker", direct_terminate: true
-      expect(rendered).to have_link('Terminate Broker', href: link)
+      expect(rendered).to have_link('Terminate Broker')
     end
 
     it "set date to the day before current" do
