@@ -219,39 +219,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
       families[2].primary_applicant.person.update_attributes!(last_name: 'jones3')
     end
 
-    it 'should render 21 familes' do
+    it "renders the families_index template" do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
       xhr :get, :family_index, id: broker_agency_profile.id
-      expect(assigns(:families).count).to eq(21)
-      expect(assigns(:page_alphabets).count).to eq(2)
-      expect(assigns(:page_alphabets)).to include("J")
-      expect(assigns(:page_alphabets)).to include("S")
-    end
-
-    it "should render families starting with J" do
-      current_user = @current_user
-      allow(current_user).to receive(:has_broker_role?).and_return(true)
-      sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, page: 'J'
-      expect(assigns(:families).count).to eq(3)
-    end
-
-    it "should render families named Smith" do
-      current_user = @current_user
-      allow(current_user).to receive(:has_broker_role?).and_return(true)
-      sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, q: 'Smith'
-      expect(assigns(:families).count).to eq(27)
-    end
-
-    it "should render families named jones3" do
-      current_user = @current_user
-      allow(current_user).to receive(:has_broker_role?).and_return(true)
-      sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id, q: 'jones3'
-      expect(assigns(:families).count).to eq(1)
+      expect(response).to render_template("broker_agencies/profiles/family_index")
     end
   end
 

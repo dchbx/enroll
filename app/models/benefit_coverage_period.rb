@@ -33,6 +33,7 @@ class BenefitCoveragePeriod
 
   before_save :set_title
 
+  scope :by_date, ->(date) { where({:"start_on".lte => date, :"end_on".gte => date}) }
 
   def second_lowest_cost_silver_plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a?(Plan)

@@ -17,60 +17,19 @@ class Insured::FamiliesController < FamiliesController
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
-
     @enrollment_filter = @family.enrollments_for_display
-
-    @waived_enrollment_filter = @family.waivers_for_display
 
     valid_display_enrollments = Array.new
     @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
 
-    valid_display_waived_enrollments = Array.new
-    @waived_enrollment_filter.each  { |e| valid_display_waived_enrollments.push e['hbx_enrollment']['_id'] }
-
-
-    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| hbx.plan.blank?}
-    @waived_hbx_enrollments = @family.active_household.hbx_enrollments.waived.to_a
+    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.plan.blank?}
     update_changing_hbxs(@hbx_enrollments)
 
-    if @person.active_employee_roles.count > 1 && (@hbx_enrollments.present? || @waived_hbx_enrollments.present?)
-      @hbx_enrollments = @hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
-      @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| (h.is_shop? && h.employee_role_id == @employee_role.id) || !h.is_shop?}
-    end
-
-    # Filter out enrollments for display only
-    @hbx_enrollments = @hbx_enrollments.reject { |r| !valid_display_enrollments.include? r._id }
-    @waived_hbx_enrollments = @waived_hbx_enrollments.each.reject { |r| !valid_display_waived_enrollments.include? r._id }
-
-    hbx_enrollment_kind_and_years = @hbx_enrollments.inject(Hash.new { [] }) do |memo, enrollment|
-      memo[enrollment.coverage_kind] += [ enrollment.effective_on.year ] if enrollment.aasm_state == 'coverage_selected' && enrollment.is_shop?
-      memo[enrollment.coverage_kind].compact
-      memo
-    end
-
-    #@last_active_sep_by_admin = @family.active_admin_seps.last
-
-    @waived_hbx_enrollments = @waived_hbx_enrollments.select {|h| !hbx_enrollment_kind_and_years[h.coverage_kind].include?(h.effective_on.year) }
-    @waived = @family.coverage_waived? && @waived_hbx_enrollments.present?
+    @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
     @tab = params['tab']
     @family_members = @family.active_family_members
-
-    if @employee_role.present?
-      @ce = CensusEmployee.find(@employee_role.census_employee_id)
-    end
-    #if @employee_role.present?
-     # ce = CensusEmployee.find(@employee_role.census_employee_id)
-      # checking for future hire
-      #if ce.hired_on > ce.created_at
-       # @future_hire = true
-
-     # else
-
-      #  @future_hire = false
-
-      #end
-    #end
+  
     respond_to do |format|
       format.html
     end
@@ -344,7 +303,7 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && (!@person.user.identity_verified? && !@person.user.idp_verified?)
+      elsif @person.user && !@person.user.identity_verified? 
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end

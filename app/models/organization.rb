@@ -93,7 +93,7 @@ class Organization
 
   index({"employer_profile.broker_agency_accounts._id" => 1})
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
-         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 },
+         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1},
          { name: "active_broker_accounts_broker_agency" })
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
          "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
@@ -101,6 +101,10 @@ class Organization
 
 
   index({"employer_profile.general_agency_accounts._id" => 1})
+  index({"employer_profile.broker_agency_accounts.is_active" => 1,
+         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1,
+         "fein" => 1, "legal_name" => 1, "dba" => 1},
+         { name: "broker_agency_employer_search_index" })
 
   before_save :generate_hbx_id
 

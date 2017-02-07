@@ -434,49 +434,6 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
-    context "find_by_benefit_group_assignments" do
-      before :all do
-        3.times.each do
-          enrollment = household.create_hbx_enrollment_from(
-            employee_role: mikes_employee_role,
-            coverage_household: coverage_household,
-            benefit_group: mikes_benefit_group,
-            benefit_group_assignment: @mikes_benefit_group_assignments
-          )
-          enrollment.save
-        end
-      end
-
-      it "should find more than 3 hbx_enrollments" do
-        expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).count).to be >= 3
-      end
-
-      it "should return empty array without params" do
-        expect(HbxEnrollment.find_by_benefit_group_assignments().count).to eq 0
-        expect(HbxEnrollment.find_by_benefit_group_assignments()).to eq []
-      end
-
-    end
-
-    context "find_by_benefit_group_assignments" do
-      before :all do
-        enrollment = household.create_hbx_enrollment_from(
-          employee_role: mikes_employee_role,
-          coverage_household: coverage_household,
-          benefit_group: mikes_benefit_group,
-          benefit_group_assignment: @mikes_benefit_group_assignments
-        )
-        enrollment.aasm_state = "auto_renewing"
-        enrollment.is_active = false
-        enrollment.save
-      end
-
-      it "should return an auto renewing enrollment if there exists one" do
-        expect(HbxEnrollment.find_by_benefit_group_assignments([@mikes_benefit_group_assignments]).map(&:aasm_state)).to include "auto_renewing"
-      end
-
-    end
-
     context "should cancel previous auto renewing enrollment" do
       before :all do
         @enrollment6 = household.create_hbx_enrollment_from(
@@ -1831,22 +1788,21 @@ describe HbxEnrollment, 'dental shop calculation related', type: :model, dbclean
     it "should return the hbx_enrollments with the benefit group assignment" do
       enrollment.aasm_state = 'coverage_selected'
       enrollment.save
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
+      rs = HbxEnrollment.find_enrollments_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to include enrollment
     end
 
     it "should be empty while the enrollment is not health and status is not showing" do
       enrollment.aasm_state = 'shopping'
       enrollment.save
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
+      rs = HbxEnrollment.find_enrollments_by_benefit_group_assignment(enrollment.benefit_group_assignment)
       expect(rs).to be_empty
     end
 
     it "should not return the hbx_enrollments while the enrollment is dental and status is not showing" do
-      enrollment.coverage_kind = 'dental'
-      enrollment.save
-      rs = HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(enrollment.benefit_group_assignment)
-      expect(rs).to be_empty
+      enrollment.update_attributes(coverage_kind: 'dental', aasm_state: 'coverage_selected')
+      rs = HbxEnrollment.find_enrollments_by_benefit_group_assignment(enrollment.benefit_group_assignment)
+      expect(rs).to include enrollment
     end
   end
 
@@ -2251,6 +2207,7 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :enrolled_contingent, :coverage_selected, :move_to_enrolled!
     it_behaves_like "state machine transitions", :coverage_selected, :coverage_selected, :move_to_enrolled!
     it_behaves_like "state machine transitions", :auto_renewing, :auto_renewing, :move_to_enrolled!
+    it_behaves_like "state machine transitions", :coverage_expired, :coverage_expired, :move_to_enrolled!
   end
 
   context "move_to_contingent event" do
@@ -2263,6 +2220,7 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :enrolled_contingent, :enrolled_contingent, :move_to_contingent!
     it_behaves_like "state machine transitions", :coverage_enrolled, :enrolled_contingent, :move_to_contingent!
     it_behaves_like "state machine transitions", :auto_renewing, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :coverage_expired, :coverage_expired, :move_to_contingent!
   end
 
   context "move_to_pending event" do
@@ -2275,5 +2233,6 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :enrolled_contingent, :unverified, :move_to_pending!
     it_behaves_like "state machine transitions", :coverage_enrolled, :unverified, :move_to_pending!
     it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
+    it_behaves_like "state machine transitions", :coverage_expired, :coverage_expired, :move_to_pending!
   end
 end

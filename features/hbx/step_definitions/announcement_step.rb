@@ -73,7 +73,7 @@ When(/^Consumer click the link of homepage$/) do
 end
 
 Given(/^Consumer role exists$/) do
-  user = FactoryGirl.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX', idp_verified: true
+  user = FactoryGirl.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX' ,identity_final_decision_code: 'acc'
   FactoryGirl.create(:consumer_role, person: user.person)
 end
 

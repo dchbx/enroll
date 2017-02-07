@@ -1327,13 +1327,64 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
       enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 2.years).first
       expect(enrollment.coverage_expired?).to be_truthy
     end
-    it "should not expire coverage with begin date less than 60 days" do
+    it "should expire coverage with begin date less than 60 days" do
       enrollment = family.active_household.hbx_enrollments.where(:effective_on => sep_effective_date).first
-      expect(enrollment.coverage_expired?).to be_falsey
+      expect(enrollment.coverage_expired?).to be_truthy
     end
     it "should not expire coverage for current year" do
       enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date).first
       expect(enrollment.coverage_expired?).to be_falsey
+    end
+  end
+end
+
+describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
+
+  let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+  let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
+  let!(:dental_plan) { FactoryGirl.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year)}
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+  
+  let!(:enrollments) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: current_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: plan.id,
+                       aasm_state: 'auto_renewing'
+    )
+  
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "dental",
+                       effective_on: current_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: dental_plan.id,
+                       aasm_state: 'auto_renewing'
+    )
+   
+  }
+  context 'when family exists with passive renewals ' do
+    before do
+      Family.begin_coverage_for_ivl_enrollments
+      family.reload
+    end
+
+    it "should begin coverage on health passive renewal" do
+      enrollment = family.active_household.hbx_enrollments.where(:coverage_kind => 'health').first
+      expect(enrollment.coverage_selected?).to be_truthy
+    end
+
+    it "should begin coverage on dental passive renewal" do
+      enrollment = family.active_household.hbx_enrollments.where(:coverage_kind => 'dental').first
+      expect(enrollment.coverage_selected?).to be_truthy
     end
   end
 end

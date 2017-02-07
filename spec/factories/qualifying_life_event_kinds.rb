@@ -24,10 +24,8 @@ FactoryGirl.define do
       title "Married"
       edi_code "32-MARRIAGE"
       reason "marriage"
-      effective_on_kinds ["first_of_month"]
+      effective_on_kinds ["first_of_next_month"]
       tool_tip "Enroll or add a family member because of marriage"
     end
-
   end
-
 end

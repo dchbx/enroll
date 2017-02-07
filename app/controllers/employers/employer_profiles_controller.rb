@@ -273,8 +273,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
     rescue Exception => e
-      @census_employee_import.errors.add(:base, e.message)
-      render "employers/employer_profiles/employee_csv_upload_errors"
+      if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
+        render "employers/employer_profiles/_download_new_template"
+      else
+        @census_employee_import.errors.add(:base, e.message)
+        render "employers/employer_profiles/employee_csv_upload_errors"
+      end
     end
 
 

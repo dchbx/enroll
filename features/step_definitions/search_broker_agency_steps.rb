@@ -1,10 +1,10 @@
 Then(/^Hbx Admin should see searchbox$/) do
-  page.find('#q')
+  wait_for_ajax
+  page.find("input[type='search']").visible?
 end
 
 When(/^he enters an broker agency name and clicks on the search button$/) do
-  page.fill_in('q', :with => "ACME Agency")
-  page.find(:xpath, '//button[@type="submit"]').click
+  page.find("input[type='search']").set("ACME Agency")
 end
 
 Then(/^he should see the one result with the agency name$/) do
@@ -13,5 +13,6 @@ Then(/^he should see the one result with the agency name$/) do
 end
 
 Given(/^Hbx Admin click on (.*)$/) do |link_text|
+  find_link(link_text).visible?
   click_link(link_text)
 end

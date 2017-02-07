@@ -390,7 +390,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     let(:sep){
       sep = shop_family.special_enrollment_periods.new
-      sep.effective_on_kind = 'first_of_month'
+      sep.effective_on_kind = 'first_of_next_month'
       sep.qualifying_life_event_kind= qle_first_of_month
       sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 03, 14)
       sep

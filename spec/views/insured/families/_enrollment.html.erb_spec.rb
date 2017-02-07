@@ -38,7 +38,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
     #let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:hbx_enrollment) {double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  subscriber: nil,
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 2, coverage_terminated?: false,
@@ -50,6 +50,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
@@ -74,7 +76,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective date:')
+      expect(rendered).to have_selector('strong', text: 'Effective Date:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
@@ -112,7 +114,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "when under a special enrollment but hbx_enrollment is missing a special_enrollment_period id" do
       before :each do
         allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(true)
-        allow(hbx_enrollment).to receive(:special_enrollment_period?).and_return(nil)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
       it "should not disable the Make Changes button" do
@@ -121,7 +122,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective date:')
+      expect(rendered).to have_selector('strong', text: 'Effective Date:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
@@ -132,11 +133,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
   end
 
-  context "with consumer_role" do
+  context "with consumer_role", dbclean: :before_each do
     let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
-    let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
@@ -146,10 +147,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
-      allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
@@ -188,6 +190,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
+      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
@@ -202,6 +206,77 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')
     end
+  end
 
+  context "when the enrollment is coverage_terminated" do
+    let(:plan) {FactoryGirl.create(:plan)}
+    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       aasm_state: 'coverage_terminated',
+                       plan_id: plan.id
+    )}
+
+    before :each do
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should not display status as Coverage Terminated" do
+      expect(rendered).not_to have_text(/Coverage Terminated/)
+    end
+
+    it "should display as Terminated" do
+      expect(rendered).to have_text(/Terminated/)
+    end
+  end
+
+  context "when the enrollment is coverage_expired" do
+    let(:plan) {FactoryGirl.create(:plan)}
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :last_years_coverage_period) }
+    let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
+    let(:end_on) { TimeKeeper.date_of_record.prev_year.end_of_year }
+    let(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+    let(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: start_on,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       aasm_state: 'coverage_expired',
+                       plan_id: plan.id
+    )}
+
+    before :each do
+      DatabaseCleaner.clean
+      hbx_profile.save!
+      family.save!
+      enrollment.save!
+      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should not display status as Coverage Expired" do
+      expect(rendered).not_to have_text(/Coverage Expired/)
+    end
+
+    it "should display coverage_expired enrollment as Coverage Period Ended" do
+      expect(rendered).to have_text(/Coverage Period Ended/)
+    end
+
+    it "should display coverage end date for expired enrollment" do
+      expect(rendered).to have_text(/Coverage End/)
+      expect(rendered).to have_text(/#{end_on.strftime("%m/%d/%Y")}/)
+    end
   end
 end

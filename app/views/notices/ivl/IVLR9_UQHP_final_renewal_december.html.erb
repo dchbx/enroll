@@ -28,19 +28,19 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {content: "The following people in insurance coverage beginning January 1, 2017."} %>
   <br>
-  <% if notice.renewal_health_enrollment.present? %>   
+  <% if notice.current_health_enrollment.present? %>
     <table width=75% align=center>
-      <tr><td><%= notice.renewal_health_enrollment.enrollees[0] %></td><td><%= notice.renewal_health_enrollment.enrollees[4] %></td></tr>
-      <tr><td><%= notice.renewal_health_enrollment.enrollees[1] %></td><td><%= notice.renewal_health_enrollment.enrollees[5] %></td></tr>
-      <tr><td><%= notice.renewal_health_enrollment.enrollees[2] %></td><td><%= notice.renewal_health_enrollment.enrollees[6] %></td></tr>
-      <tr><td><%= notice.renewal_health_enrollment.enrollees[3] %></td><td><%= notice.renewal_health_enrollment.enrollees[7] %></td></tr>
+      <tr><td><%= notice.current_health_enrollment.enrollees[0] %></td><td><%= notice.current_health_enrollment.enrollees[4] %></td></tr>
+      <tr><td><%= notice.current_health_enrollment.enrollees[1] %></td><td><%= notice.current_health_enrollment.enrollees[5] %></td></tr>
+      <tr><td><%= notice.current_health_enrollment.enrollees[2] %></td><td><%= notice.current_health_enrollment.enrollees[6] %></td></tr>
+      <tr><td><%= notice.current_health_enrollment.enrollees[3] %></td><td><%= notice.current_health_enrollment.enrollees[7] %></td></tr>
     </table>  
-  <% elsif notice.renewal_dental_enrollment.present? && notice.renewal_health_enrollment.blank? %>
+  <% elsif notice.current_dental_enrollment.present? && notice.current_health_enrollment.blank? %>
     <table width=75% align=center>
-      <tr><td><%= notice.renewal_dental_enrollment.enrollees[0] %></td><td><%= notice.renewal_dental_enrollment.enrollees[4] %></td></tr>
-      <tr><td><%= notice.renewal_dental_enrollment.enrollees[1] %></td><td><%= notice.renewal_dental_enrollment.enrollees[5] %></td></tr>
-      <tr><td><%= notice.renewal_dental_enrollment.enrollees[2] %></td><td><%= notice.renewal_dental_enrollment.enrollees[6] %></td></tr>
-      <tr><td><%= notice.renewal_dental_enrollment.enrollees[3] %></td><td><%= notice.renewal_dental_enrollment.enrollees[7] %></td></tr>
+      <tr><td><%= notice.current_dental_enrollment.enrollees[0] %></td><td><%= notice.current_dental_enrollment.enrollees[4] %></td></tr>
+      <tr><td><%= notice.current_dental_enrollment.enrollees[1] %></td><td><%= notice.current_dental_enrollment.enrollees[5] %></td></tr>
+      <tr><td><%= notice.current_dental_enrollment.enrollees[2] %></td><td><%= notice.current_dental_enrollment.enrollees[6] %></td></tr>
+      <tr><td><%= notice.current_dental_enrollment.enrollees[3] %></td><td><%= notice.current_dental_enrollment.enrollees[7] %></td></tr>
     </table>  
   <% end %>
 
@@ -62,10 +62,10 @@
  contents: [""],
    heading: '2017 Plan Enrollment', sub_heading: ''} %>
 
-<% if notice.renewal_health_enrollment.present? %>
+<% if notice.current_health_enrollment.present? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='text-decoration:underline;'>Health Plan: #{notice.renewal_health_enrollment.plan.plan_name}</span>"} %>
+  content: "<span style='text-decoration:underline;'>Health Plan: #{notice.current_health_enrollment.plan.plan_name}</span>"} %>
   <br>
   <table style='margin: 0px auto;' width='80%'>
     <tr>
@@ -73,17 +73,17 @@
         <strong>Your monthly premium:</strong>
       </td>
       <td align=right>
-        <strong>$ <%= notice.renewal_health_enrollment.premium %></strong>
+        <strong>$ <%= notice.current_health_enrollment.premium %></strong>
       </td>
     </tr>
   </table>
 
 <% end %>
 
-<% if notice.renewal_dental_enrollment.present? %>
+<% if notice.current_dental_enrollment.present? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='text-decoration:underline;'>Dental Plan: #{notice.renewal_dental_enrollment.plan.plan_name}</span>"} %>
+  content: "<span style='text-decoration:underline;'>Dental Plan: #{notice.current_dental_enrollment.plan.plan_name}</span>"} %>
   <br>
   <table style='margin: 0px auto;' width='80%'>
     <tr>
@@ -91,7 +91,7 @@
         <strong>Your monthly premium:</strong>
       </td>
       <td align=right>
-        <strong>$ <%= notice.renewal_dental_enrollment.premium %></strong>
+        <strong>$ <%= notice.current_dental_enrollment.premium %></strong>
       </td>
     </tr>
   </table>

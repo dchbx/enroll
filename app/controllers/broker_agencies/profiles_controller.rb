@@ -1,10 +1,11 @@
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
+  include DataTablesAdapter
 
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -91,6 +92,38 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def family_datatable
+    id = params[:id]
+
+    is_search = false
+
+    dt_query = extract_datatable_parameters
+
+    if current_user.has_broker_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_hbx_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
+    else
+      redirect_to new_broker_agencies_profile_path
+      return
+    end
+
+    query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
+
+    @total_records = query.total_count    
+    @records_filtered = query.filtered_count
+
+    @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
+    primary_member_ids = @families.map do |fam|
+      fam.primary_family_member.person_id
+    end
+    @primary_member_cache = {}
+    Person.where(:_id => { "$in" => primary_member_ids }).each do |pers|
+      @primary_member_cache[pers.id] = pers
+    end
+    @draw = dt_query.draw
+  end
+
   def family_index
     @q = params.permit(:q)[:q]
     id = params.permit(:id)[:id]
@@ -103,22 +136,22 @@ class BrokerAgencies::ProfilesController < ApplicationController
       redirect_to new_broker_agencies_profile_path
       return
     end
-
-    total_families = @broker_agency_profile.families
-    @total = total_families.count
-    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
-    if page.present?
-      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
-    elsif @q.present?
-      query= Regexp.escape(@q)
-      query_args= query.split("\\ ")
-      reg_ex = query_args.join('(.*)?')
-      @families = total_families.select{|v| v.primary_applicant.person.full_name =~ /#{reg_ex}/i }
-    else
-      @families = total_families[0..20]
-    end
-
-    @family_count = @families.count
+    #
+    # total_families = @broker_agency_profile.families
+    # @total = total_families.count
+    # @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
+    # if page.present?
+    #   @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
+    # elsif @q.present?
+    #   query= Regexp.escape(@q)
+    #   query_args= query.split("\\ ")
+    #   reg_ex = query_args.join('(.*)?')
+    #   @families = total_families.select{|v| v.primary_applicant.person.full_name =~ /#{reg_ex}/i }
+    # else
+    #   @families = total_families[0..20]
+    # end
+    #
+    # @family_count = @families.count
     respond_to do |format|
       format.js {}
     end
@@ -131,7 +164,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       broker_role_id = current_user.person.broker_role.id
       @orgs = Organization.by_broker_role(broker_role_id)
     end
-    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     @memo = {}
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
@@ -165,6 +197,49 @@ class BrokerAgencies::ProfilesController < ApplicationController
     respond_to do |format|
       format.js
     end
+  end
+
+  def employer_datatable
+    cursor        = params[:start]  || 0
+    page_size     = params[:length] || 10
+
+    is_search = false
+
+    dt_query = extract_datatable_parameters
+
+    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
+      @orgs = Organization.unscoped.by_broker_agency_profile(@broker_agency_profile._id)
+    else
+      broker_role_id = current_user.person.broker_role.id
+      @orgs = Organization.unscoped.by_broker_role(broker_role_id)
+    end
+
+    total_records = @orgs.count
+
+    if params[:search][:value].present?
+      @orgs = @orgs.where(legal_name: /.*#{dt_query.search_string}.*/i)
+      is_search = true
+    end
+
+    employer_profiles = @orgs.skip(dt_query.skip).limit(dt_query.take).map { |o| o.employer_profile } unless @orgs.blank?
+    employer_ids = employer_profiles.map(&:id)
+    @census_totals = Hash.new(0)
+    census_member_counts = CensusMember.collection.aggregate([
+      { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
+      { "$group" => {"_id" => "$employer_profile_id", "count" => {"$sum" => 1}}}
+    ])
+    census_member_counts.each do |cmc|
+      @census_totals[cmc["_id"]] = cmc["count"]
+    end
+    @memo = {}
+
+    @records_filtered = is_search ? @orgs.count : total_records
+    @total_records = total_records
+    broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
+    @draw = dt_query.draw
+    @employer_profiles = employer_profiles
+    render
   end
 
   def assign

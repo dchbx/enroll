@@ -126,6 +126,7 @@ class Person
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name: 1})
+  index({first_name: 1, last_name: 1, hbx_id: 1, encrypted_ssn: 1}, {name: "person_searching_index"})
 
   index({encrypted_ssn: 1}, {sparse: true, unique: true})
   index({dob: 1}, {sparse: true})
@@ -151,6 +152,7 @@ class Person
   # Employee child model indexes
   index({"employee_roles._id" => 1})
   index({"employee_roles.employer_profile_id" => 1})
+  index({"employee_roles.census_employee_id" => 1})
   index({"employee_roles.benefit_group_id" => 1})
   index({"employee_roles.is_active" => 1})
 

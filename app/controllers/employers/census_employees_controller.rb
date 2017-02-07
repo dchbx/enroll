@@ -183,7 +183,6 @@ class Employers::CensusEmployeesController < ApplicationController
     flash.keep(:error)
     flash.keep(:notice)
     render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: params[:status])}'"
-
   end
 
   def show

@@ -51,27 +51,31 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def employers
-    @employers = @general_agency_profile.employer_clients || []
+    @datatable = Effective::Datatables::GeneralAgencyDataTable.new({id: params[:id]})
   end
 
   def families
-    page = params.permit([:page])[:page]
-    @q = params.permit(:q)[:q]
-
-    total_families = @general_agency_profile.families
-    @total = total_families.count
-    @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
-    if page.present?
-      @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
-    elsif @q.present?
-      query= Regexp.escape(@q)
-      query_args= query.split("\\ ")
-      reg_ex = query_args.join('(.*)?')
-      @families = total_families.select {|v| v.primary_applicant.person.full_name =~ /#{reg_ex}/i}
-    else
-      @families = total_families[0..20]
-    end
+    @datatable = Effective::Datatables::GeneralAgencyFamilyDataTable.new({id: params[:id]})
   end
+
+  # def families
+  #   page = params.permit([:page])[:page]
+  #   @q = params.permit(:q)[:q]
+
+  #   total_families = @general_agency_profile.families
+  #   @total = total_families.count
+  #   @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
+  #   if page.present?
+  #     @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
+  #   elsif @q.present?
+  #     query= Regexp.escape(@q)
+  #     query_args= query.split("\\ ")
+  #     reg_ex = query_args.join('(.*)?')
+  #     @families = total_families.select {|v| v.primary_applicant.person.full_name =~ /#{reg_ex}/i}
+  #   else
+  #     @families = total_families[0..20]
+  #   end
+  # end
 
   def staffs
     @staffs = @general_agency_profile.general_agency_staff_roles

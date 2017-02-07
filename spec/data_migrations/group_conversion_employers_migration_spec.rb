@@ -21,6 +21,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
     let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: Date.new(2016,10,1))}
     before do
+      allow(Time).to receive(:now).and_return(Time.parse("2016-10-15 00:00:00"))
       organization.employer_profile.update_attributes(profile_source: "conversion", aasm_state: "eligible")
       census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
       hbx_enrollment.update_attribute(:benefit_group_id, organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first.id)
@@ -38,7 +39,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
         expired_plan_year = organization.employer_profile.plan_years.where(:aasm_state => "expired").first
         subject.migrate
         expired_plan_year.reload
-        expect(expired_plan_year.aasm_state).to eq "migration_expired"
+        expect(expired_plan_year.aasm_state).to eq "conversion_expired"
       end
 
       it "should cancel the 2016 plan year" do

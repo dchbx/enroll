@@ -491,7 +491,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         allow(plan_year_proxy).to receive(:renewing_enrolling?).and_return(false)
         allow(plan_year_proxy).to receive(:may_publish?).and_return(false)
         allow(plan_year_proxy).to receive(:application_errors).and_return({:values => []})
-        allow(plan_year_proxy).to receive(:enrollment_period_errors).and_return([])
+        allow(plan_year_proxy).to receive(:open_enrollment_date_errors).and_return({})
       end
 
       it "should redirect with errors" do
@@ -549,6 +549,46 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
     it "should redirect" do
       expect(response).to have_http_status(:redirect)
+    end
+  end
+
+  describe "POST delete_benefit_group" do
+    let(:save_result) { true }
+    let(:plan_year_id) { "plan_year_id"}
+    let(:benefit_group_id) { "benefit_group_id"}
+    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', destroy!: true, title: 'bg_one'), double('bg_two')]) }
+
+    before :each do
+      sign_in user
+      allow(PlanYear).to receive(:find).with(plan_year_id).and_return plan_year_proxy
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      benefit_group = plan_year_proxy.benefit_groups[0]
+      allow(plan_year_proxy.benefit_groups).to receive(:find).with(benefit_group_id).and_return benefit_group
+      allow(plan_year_proxy).to receive(:save).and_return save_result
+      post :delete_benefit_group, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id, benefit_group_id: benefit_group_id
+    end
+
+    context "when plan year has more than 1 benefit group" do
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should return success notice" do
+        expect(flash[:notice]).to match(/Benefit Group: bg_one successfully deleted./)
+      end
+    end
+
+    context "when plan year has one benefit group" do
+      let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one')])}
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should return error notice" do
+        expect(flash[:error]).to match(/Benefit package can not be deleted because it is the only benefit package remaining in the plan year/)
+      end
     end
   end
 

@@ -131,7 +131,7 @@ class HbxProfile
 
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension
-  IndividualEnrollmentDueDayOfMonth = 17
+  IndividualEnrollmentDueDayOfMonth = 19
   IndividualEnrollmentTerminationMinimum = 14.days
 
   ## Carriers

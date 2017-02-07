@@ -323,7 +323,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find('.carriers-tab a').click
   wait_for_ajax(10,2)
   find('.reference-plans label').click
-  wait_for_ajax
+  wait_for_ajax(10,2)
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 

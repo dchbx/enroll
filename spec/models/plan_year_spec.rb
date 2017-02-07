@@ -28,6 +28,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
   context ".new" do
@@ -320,8 +321,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           end
 
           it "should fail validation on publish" do
-            expect(plan_year.enrollment_period_errors.present?).to be_truthy
-            expect(plan_year.enrollment_period_errors.last).to match(/open enrollment must end on or before/)
+            expect(plan_year.open_enrollment_date_errors.present?).to be_truthy
+            expect(plan_year.open_enrollment_date_errors[:open_enrollment_period].first).to match(/Open enrollment must end on or before/i)
           end
         end
       end
@@ -377,9 +378,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it 'should error out' do
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
-        expect(plan_year.enrollment_period_errors).to include("open enrollment period is less than minumum: #{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days")
+        expect(plan_year.open_enrollment_date_errors.values.flatten).to include("Open Enrollment period is shorter than minimum (#{Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days} days)")
       end
     end
+
 
     context "when open enrollment period end date not satisfy business rule" do
       before do
@@ -390,7 +392,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it 'should error out' do
         plan_year.publish!
         expect(plan_year.renewing_draft?).to be_truthy
-        expect(plan_year.enrollment_period_errors).to include("open enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
+        expect(plan_year.open_enrollment_date_errors.values.flatten).to include("Open Enrollment must end on or before the #{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on.ordinalize} day of the month prior to effective date")
       end
     end
   end
@@ -430,8 +432,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       it "and should provide relevant warnings" do
-        expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
-        expect(plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+        expect(plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
+        expect(plan_year_with_benefit_group.application_errors[:publish]).to include(/Plan year starting on #{plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
       end
 
       it "and plan year should be in publish pending state" do
@@ -474,7 +476,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       it "and should provide relevent warning message" do
         expect(workflow_plan_year.application_errors[:benefit_groups].present?).to be_truthy
-        expect(workflow_plan_year.application_errors[:benefit_groups]).to match(/You must create at least one benefit group/)
+        expect(workflow_plan_year.application_errors[:benefit_groups]).to include(/You must create at least one benefit group/)
       end
 
       it "should be in draft status" do
@@ -506,7 +508,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_errors[:benefit_groups].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_errors[:benefit_groups]).to match(/Every employee must be assigned to a benefit group/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:benefit_groups]).to include(/Every employee must be assigned to a benefit group/)
         end
       end
 
@@ -541,7 +543,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent error message" do
           expect(workflow_plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to match(/You may only have one published plan year at a time/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to include(/You may only have one published plan year at a time/)
         end
       end
 
@@ -557,7 +559,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_errors[:employer_profile].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_errors[:employer_profile]).to match(/This employer is ineligible to enroll for coverage at this time/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:employer_profile]).to include(/This employer is ineligible to enroll for coverage at this time/)
         end
       end
 
@@ -568,7 +570,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "application should not be valid" do
-          expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_falsey
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
         end
 
         it "and should provide relevent warning message" do
@@ -577,14 +579,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
-      context "and the number of FTEs exceeds the maximum size on initial application" do
+      context "and the number of employees exceeds the maximum size count" do
         before do
           workflow_plan_year_with_benefit_group.fte_count = invalid_fte_count
           workflow_plan_year_with_benefit_group.publish
         end
 
         it "application should not be valid" do
-          expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_falsey
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
         end
 
         it "and should provide relevent warning message" do
@@ -609,8 +611,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "and should provide relevant warnings" do
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:publish]).to match(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
+          expect(workflow_plan_year_with_benefit_group.application_errors[:publish].present?).to be_truthy
+          expect(workflow_plan_year_with_benefit_group.application_errors[:publish]).to include(/Plan year starting on #{workflow_plan_year_with_benefit_group.start_on.strftime("%m-%d-%Y")} must be published by #{workflow_plan_year_with_benefit_group.due_date_for_publish.strftime("%m-%d-%Y")}/)
         end
 
         it "and plan year should be in publish pending state" do
@@ -658,7 +660,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           end
 
           it "application should not be valid" do
-            expect(invalid_plan_year.is_application_valid?).to be_falsey
+            expect(invalid_plan_year.is_application_eligible?).to be_falsey
           end
 
           it "and should provide relevent warning message" do
@@ -698,7 +700,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "application should not be valid" do
-          expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_falsey
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
         end
 
         it "should transition into publish pending status" do
@@ -811,7 +813,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           workflow_plan_year_with_benefit_group.publish!
         end
 
-        it "application should not be valid" do
+        it "application should be valid" do
           expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_truthy
         end
 
@@ -1014,7 +1016,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
-      context "and employer submits a valid plan year application with open enrollment before today" do
+      context "and employer submits a valid plan year application with open enrollment start before today" do
         before do
           TimeKeeper.set_date_of_record_unprotected!(Date.current.beginning_of_month - 1.month)
           workflow_plan_year_with_benefit_group.open_enrollment_start_on = TimeKeeper.date_of_record
@@ -1067,277 +1069,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               # expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count].present?).to be_truthy
               expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
             end
-
-            ## TODO - Re-enable
-            # it "should advance state to canceled" do
-            #   expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).aasm_state).to eq "canceled"
-            # end
           end
-
-          # context "and enrollment the minimum enrollment ratio isn't met" do
-          #   let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-          #
-          #   before do
-          #     non_owner_census_families.each do |census_employee|
-          #       census_employee.add_benefit_group_assignment(benefit_group, workflow_plan_year_with_benefit_groupstart_on)
-          #       census_employee.save!
-          #     end
-          #   end
-          #
-          #   context "and the effective date is January 1" do
-          #     before do
-          #       workflow_plan_year_with_benefit_groupstart_on = TimeKeeper.date_of_record.beginning_of_year
-          #       non_owner_census_families.each do |census_employee|
-          #         benefit_group_assignment = census_employee.benefit_group_assignments.first
-          #         benefit_group_assignment.start_on = workflow_plan_year_with_benefit_groupstart_on
-          #         hbx_enrollment = instance_double("HbxEnrollment", :_id => 12345, :benefit_group_id => benefit_group.id, :employee_role_id => census_employee.employee_role_id)
-          #         allow(hbx_enrollment).to receive(:is_a?).with(HbxEnrollment).and_return(true)
-          #         benefit_group_assignment.hbx_enrollment = hbx_enrollment
-          #         benefit_group_assignment.select_coverage
-          #         census_employee.save!
-          #       end
-          #       employer_profile.advance_enrollment_date
-          #     end
-          #
-          #     it "enrollment should be valid" do
-          #       expect(workflow_plan_year_with_benefit_groupis_enrollment_valid?).to be_truthy
-          #     end
-          #
-          #     it "should advance state to binder pending" do
-          #       expect(employer_profile.binder_pending?).to be_truthy
-          #     end
-          #   end
-          #
-          #   context "and the effective date isn't January 1" do
-          #     before do
-          #       workflow_plan_year_with_benefit_groupstart_on = TimeKeeper.date_of_record.beginning_of_year.next_month
-          #       non_owner_census_families.each do |census_employee|
-          #         census_employee.benefit_group_assignments.first.start_on = workflow_plan_year_with_benefit_groupstart_on
-          #         census_employee.save!
-          #       end
-          #
-          #       employer_profile.advance_enrollment_date
-          #     end
-          #
-          #     it "enrollment should be invalid" do
-          #       expect(workflow_plan_year_with_benefit_groupis_enrollment_valid?).to be_falsey
-          #       expect(workflow_plan_year_with_benefit_groupenrollment_errors[:enrollment_ratio].present?).to be_truthy
-          #       expect(workflow_plan_year_with_benefit_groupenrollment_errors[:enrollment_ratio]).to match(/less than minimum required/)
-          #     end
-          #
-          #     it "should advance state to canceled" do
-          #       expect(workflow_plan_year_with_benefit_group.canceled?).to be_truthy
-          #     end
-          #   end
-          # end
-          #
-          # context "and the number of enrollments for first month is 0" do
-          #   it "should be compliant"
-          #   it "should advance to enrolled state without requirement for binder premium"
-          # end
         end
       end
 
     end
   end
-
-
-  # context "has registered and enters initial application process" do
-  #   let(:benefit_group)         { FactoryGirl.build(:benefit_group)}
-  #   let(:plan_year)             { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
-  #   let!(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-  #   let(:min_non_owner_count )  { Settings.aca.shop_market.non_owner_participation_count_minimum }
-
-  #   it "should initialize in applicant status" do
-  #     expect(employer_profile.applicant?).to be_truthy
-  #   end
-
-  #   context "a plan year application is submitted with tomorrow as start open enrollment" do
-  #     before do
-  #       TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
-  #       plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
-  #       plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-  #       plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
-  #       plan_year.end_on = plan_year.start_on + 1.year - 1.day
-  #       plan_year.publish!
-  #     end
-
-  #     it "should transition to registered state" do
-  #       expect(employer_profile.registered?).to be_truthy
-  #     end
-  #   end
-
-  #   context "and employer submits a valid plan year application with today as start open enrollment" do
-  #     before do
-  #       TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
-  #       plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
-  #       plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
-  #       plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
-  #       plan_year.end_on = plan_year.start_on + 1.year - 1.day
-  #       TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.day)
-  #       plan_year.publish!
-  #     end
-
-  #     it "should transition directly to enrolling state" do
-  #       expect(employer_profile.aasm_state).to eq("enrolling")
-  #     end
-
-  #     context "and employer has enrolled" do
-
-  #       context "and today is the day following close of open enrollment" do
-  #         before do
-  #           TimeKeeper.set_date_of_record(plan_year.open_enrollment_end_on + 1.day)
-  #         end
-
-  #         context "and employer's enrollment is non-compliant" do
-
-  #           context "because enrollment non-owner participation minimum not met" do
-  #             let(:invalid_non_owner_count) { min_non_owner_count - 1 }
-  #             let!(:owner_census_employee) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-  #             let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, invalid_non_owner_count, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-
-  #             before do
-  #               owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-  #               owner_census_employee.save!
-  #               # non_owner_census_families.each do |census_employee|
-  #               #   owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-  #               #   owner_census_employee.save!
-  #               # end
-
-  #               employer_profile.advance_enrollment_date
-  #             end
-
-  #             it "enrollment should be invalid" do
-  #               expect(plan_year.is_enrollment_valid?).to be_falsey
-  #               expect(plan_year.enrollment_errors[:non_business_owner_enrollment_count].present?).to be_truthy
-  #               expect(plan_year.enrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
-  #             end
-
-  #             it "should advance state to canceled" do
-  #               expect(employer_profile.canceled?).to be_truthy
-  #             end
-  #           end
-
-  #           context "or the minimum enrollment ratio isn't met" do
-  #             let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-
-  #             before do
-  #               non_owner_census_families.each do |census_employee|
-  #                 census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-  #                 census_employee.save!
-  #               end
-  #             end
-
-  #             context "and the effective date isn't January 1" do
-  #               before do
-  #                 plan_year.start_on = TimeKeeper.date_of_record.beginning_of_year.next_month
-  #                 non_owner_census_families.each do |census_employee|
-  #                   census_employee.benefit_group_assignments.first.start_on = plan_year.start_on
-  #                   census_employee.save!
-  #                 end
-
-  #                 employer_profile.advance_enrollment_date
-  #               end
-
-  #               it "enrollment should be invalid" do
-  #                 expect(plan_year.is_enrollment_valid?).to be_falsey
-  #                 expect(plan_year.enrollment_errors[:enrollment_ratio].present?).to be_truthy
-  #                 expect(plan_year.enrollment_errors[:enrollment_ratio]).to match(/less than minimum required/)
-  #               end
-
-  #               it "should advance state to canceled" do
-  #                 expect(employer_profile.canceled?).to be_truthy
-  #               end
-  #             end
-
-  #             context "and the effective date is January 1" do
-  #               before do
-  #                 plan_year.start_on = TimeKeeper.date_of_record.beginning_of_year
-  #                 non_owner_census_families.each do |census_employee|
-  #                   benefit_group_assignment = census_employee.benefit_group_assignments.first
-  #                   benefit_group_assignment.start_on = plan_year.start_on
-  #                   hbx_enrollment = instance_double("HbxEnrollment", :_id => 12345, :benefit_group_id => benefit_group.id, :employee_role_id => census_employee.employee_role_id)
-  #                   allow(hbx_enrollment).to receive(:is_a?).with(HbxEnrollment).and_return(true)
-  #                   benefit_group_assignment.hbx_enrollment = hbx_enrollment
-  #                   benefit_group_assignment.select_coverage
-  #                   census_employee.save!
-  #                 end
-  #                 employer_profile.advance_enrollment_date
-  #               end
-
-  #               it "enrollment should be valid" do
-  #                 expect(plan_year.is_enrollment_valid?).to be_truthy
-  #               end
-
-  #               it "should advance state to binder pending" do
-  #                 expect(employer_profile.binder_pending?).to be_truthy
-  #               end
-  #             end
-  #           end
-  #         end
-
-  #         context "the number of enrollments for first month is 0" do
-  #           it "should advance to enrolled state without requirement for binder premium"
-  #         end
-
-  #         context "and employer enrollment is compliant when the effective date isn't January 1" do
-  #           let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-
-  #           before do
-  #             plan_year.start_on = plan_year.start_on.next_month if plan_year.start_on.month == 1
-  #             non_owner_census_families.each do |census_employee|
-  #               census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-  #               benefit_group_assignment = census_employee.benefit_group_assignments.first
-  #               hbx_enrollment = instance_double("HbxEnrollment", :_id => 12345, :benefit_group_id => benefit_group.id, :employee_role_id => census_employee.employee_role_id)
-  #               allow(hbx_enrollment).to receive(:is_a?).with(HbxEnrollment).and_return(true)
-  #               benefit_group_assignment.hbx_enrollment = hbx_enrollment
-  #               benefit_group_assignment.select_coverage
-  #               census_employee.save!
-  #             end
-  #             employer_profile.advance_enrollment_date!
-  #           end
-
-  #           it "enrollment should be valid" do
-  #             expect(plan_year.is_enrollment_valid?).to be_truthy
-  #           end
-
-  #           it "should advance state to binder pending" do
-  #             expect(employer_profile.binder_pending?).to be_truthy
-  #           end
-
-  #           it "should initialize a employer profile account" do
-  #             expect(employer_profile.employer_profile_account).to be
-  #           end
-
-  #           it "should be waiting for binder payment" do
-  #             expect(employer_profile.employer_profile_account.binder_pending?).to be_truthy
-  #           end
-
-  #         end
-  #       end
-  #     end
-  #   end
-
-  #   context "and today is the day following this month's deadline for start of open enrollment" do
-  #     before do
-  #       # employer_profile.advance_enrollment_period
-  #     end
-
-  #     context "and employer profile is in applicant state" do
-  #       context "and effective date is next month" do
-  #         it "should change status to canceled"
-  #       end
-
-  #       context "and effective date is later than next month" do
-  #         it "should not change state"
-  #       end
-  #     end
-
-  #     context "and employer is in ineligible or ineligible_appealing state" do
-  #       it "what should be done?"
-  #     end
-  #   end
-  # end
 
   context "application is submitted to be published" do
     let(:plan_year)                   { PlanYear.new(aasm_state: "draft", **valid_params) }
@@ -1362,7 +1099,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         it "application should not be valid" do
-          expect(plan_year.is_application_valid?).to be_falsey
+          expect(plan_year.is_application_eligible?).to be_falsey
         end
 
         it "and should provide relevent warning message" do
@@ -1407,7 +1144,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       it "and application should not be valid" do
-        expect(plan_year.is_application_valid?).to be_falsey
+        expect(plan_year.is_application_eligible?).to be_falsey
       end
 
       it "and plan year should be in publish pending state" do
@@ -1512,18 +1249,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       # end
     end
   end
-
-  # context "has registered and enters initial application process" do
-  #   let(:benefit_group)         { FactoryGirl.build(:benefit_group)}
-  #   let(:plan_year)             { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
-  #   let!(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-  #   let(:min_non_owner_count )  { Settings.aca.shop_market.non_owner_participation_count_minimum }
-
-  #   it "should initialize in applicant status" do
-  #     expect(employer_profile.applicant?).to be_truthy
-  #   end
-
-
 
   context "and a published plan year application is reset to unpublished state", :dbclean => :after_all do
     let(:coverage_effective_date)   { TimeKeeper.date_of_record.end_of_month + 1.day }
@@ -1640,21 +1365,21 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
 
   context "check_start_on" do
-    it "should fail when start on is not the first day of the month" do
+    it "should fail when effective date is not the first day of the month" do
       start_on = (TimeKeeper.date_of_record + 2.month).beginning_of_month + 10.days
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"
       expect(rsp[:msg]).to eq "start on must be first day of the month"
     end
 
-    it "should valid" do
+    it "should be valid when effective date is the first day of month" do
       start_on = (TimeKeeper.date_of_record + 2.month).beginning_of_month
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "ok"
       expect(rsp[:msg]).to eq ""
     end
 
-    it "should failure when current date more than open_enrollment_latest_start_on" do
+    it "should fail when current date is later than open_enrollment_latest_start_on" do
       TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
       start_on = (TimeKeeper.date_of_record + 1.month).beginning_of_month
       rsp = PlanYear.check_start_on(start_on)
@@ -1825,14 +1550,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
-    context "on the tenth of the month" do
-    end
-
-    context "on the twelfth of the month" do
-    end
-
-    context "on the last day of the month" do
-    end
   end
 
   context "map binder_payment_due_date" do
@@ -2213,10 +1930,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-  describe 'sends employee invitation email when .is_renewal?', focus: true do
+  describe 'sends employee invitation email', focus: true do
     include_context 'MailSpecHelper'
 
-    context 'publishes renewal draft' do
+    context 'when .is_renewal?' do
       let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       let(:calender_year) { TimeKeeper.date_of_record.year }
       let(:plan_year_start_on) { Date.new(calender_year, 4, 1) }
@@ -2270,6 +1987,34 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           end
         end
       end
+
+      context "enrolling" do
+        before do
+          refresh_mailbox
+          plan_year.open_enrollment_end_on = Date.new(calender_year, 3, 10)
+          plan_year.aasm_state = "draft"
+          plan_year.publish!
+          TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on + 5.days)
+        end
+
+        it 'the plan should be in enrolling' do
+          expect(plan_year.enrolling?).to be_truthy
+          expect(plan_year.aasm_state).to eq('enrolling')
+        end
+
+        it 'should send invitations to benefit group census employees' do
+          deliveries = ActionMailer::Base.deliveries
+          expect(deliveries).not_to be_empty
+          expect(deliveries.count).to eq(benefit_group.census_employees.count)
+          expect(deliveries.map(&:subject).uniq.join('')).to eq(user_mailer_renewal_invitation_subject)
+          expect(deliveries.flat_map(&:to)).to eq(benefit_group.census_employees.map(&:email_address))
+          benefit_group.census_employees.each do |census_employee_recepient|
+            user_mailer_initial_employee_invitation_body(census_employee_recepient).each do |body_line|
+              deliveries.each { |delivery| expect(delivery.body.raw_source).to include(body_line) }
+            end
+          end
+        end
+      end
     end
   end
 
@@ -2303,14 +2048,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "this should trigger a state transition" do
       it "should change its aasm state" do
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
-        workflow_plan_year_with_benefit_group.migration_expire!
-        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "migration_expired"
+        workflow_plan_year_with_benefit_group.conversion_expire!
+        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "conversion_expired"
       end
 
       it "should not change its aasm state" do
         workflow_plan_year_with_benefit_group.aasm_state = "enrolled"
         workflow_plan_year_with_benefit_group.save
-        expect { workflow_plan_year_with_benefit_group.migration_expire!}.to raise_error(AASM::InvalidTransition)
+        expect { workflow_plan_year_with_benefit_group.conversion_expire!}.to raise_error(AASM::InvalidTransition)
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolled"
       end
 
@@ -2318,7 +2063,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         workflow_plan_year_with_benefit_group.employer_profile.registered_on = TimeKeeper.date_of_record + 45.days
         workflow_plan_year_with_benefit_group.save
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
-        expect { workflow_plan_year_with_benefit_group.migration_expire!}.to raise_error(AASM::InvalidTransition)
+        expect { workflow_plan_year_with_benefit_group.conversion_expire!}.to raise_error(AASM::InvalidTransition)
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
       end
     end
@@ -2349,6 +2094,70 @@ describe PlanYear, "which has the concept of export eligibility" do
       end
     end
   end
+
+
+  describe PlanYear, "state machine transitions -- unhappy path" do
+
+    context "an initial employer publishes a valid application and begins open enrollment" do
+
+      let(:benefit_group) { FactoryGirl.build(:benefit_group) }
+      let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
+
+      let(:valid_plan_year_start_on)        { Date.new(2016, 11, 1) }
+      let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+      let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
+      let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
+
+      let!(:plan_year) do
+        py = PlanYear.new({
+          employer_profile: employer_profile,
+          start_on: valid_plan_year_start_on,
+          end_on: valid_plan_year_end_on,
+          open_enrollment_start_on: valid_open_enrollment_start_on,
+          open_enrollment_end_on: valid_open_enrollment_end_on
+          })
+
+        py.aasm_state = "draft"
+        py.benefit_groups = [benefit_group]
+        py.save
+        py
+      end
+
+      let!(:owner) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
+      let!(:non_owner) { FactoryGirl.create_list(:census_employee, 2, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
+        
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(valid_open_enrollment_start_on)
+        plan_year.publish!
+      end
+
+      it "plan year should be in enrolling state" do
+        expect(plan_year.enrolling?).to be_truthy
+        expect(plan_year.employer_profile.registered?).to be_truthy
+      end
+
+      context "and open enrollment ends, but eligibility requirements are not met" do
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(valid_open_enrollment_end_on + 1.day)
+          plan_year.advance_date!
+        end
+
+        it "should fail to meet the employee_participation_ratio_minimum" do
+          expect(plan_year.enrollment_errors[:enrollment_ratio].present?).to be_truthy
+        end
+
+        it "should transition application to ineligible state" do
+          expect(plan_year.application_ineligible?).to be_truthy 
+        end
+
+        it "should transition employer to applicant state" do
+          expect(employer_profile.applicant?).to be_truthy
+        end
+      end
+    end
+  end
+
 end
 
 describe PlanYear, "filter_active_enrollments_by_date" do
@@ -2469,6 +2278,7 @@ describe PlanYear, "plan year schedule changes" do
     context 'on force publish date' do
 
       before do
+        allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 

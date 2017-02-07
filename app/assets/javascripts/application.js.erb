@@ -24,6 +24,7 @@
 //= require override_confirm
 //= require floatlabels
 //= require jq_datepicker
+//= require dob_validation.js
 //= require date
 //= require formhelpers
 //= require insured
@@ -47,9 +48,9 @@
 //= require_tree .
 
 $(document).on('ready page:load', function () {
-	Freebies.fadeElement($("body"));
-	Freebies.allFreebies();
-	Responsive.setSizeListeners();
+  Freebies.fadeElement($("body"));
+  Freebies.allFreebies();
+  Responsive.setSizeListeners();
 });
 
 function applyMultiLanguageSelect() {
@@ -147,38 +148,6 @@ $(document).ready(function () {
             $(this).focus();
         }
     });
-
-        // check that dob entered is not a future date
-  $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"]', function() {
-    var entered_dob = $(this).val();
-    var entered_year = entered_dob.substring(entered_dob.length -4);
-    var entered_month = entered_dob.substring(0, 2);
-    var entered_day = entered_dob.substring(3, 5);
-    var todays_date = dchbx_enroll_date_of_record();
-    var todays_year = todays_date.getFullYear();
-    var todays_month = todays_date.getMonth() + 1;
-    var todays_day = todays_date.getDate();
-    if (entered_year > todays_year) {
-      alert("Please enter a birthdate that does not take place in the future.");
-      $(this).val("");
-      $(this).focus();
-    }
-    else if (entered_year == todays_year) {
-      if (entered_month == todays_month) {
-        if (entered_day > todays_day) {
-          alert("Please enter a birthdate that does not take place in the future.");
-          $(this).val("");
-          $(this).focus();
-        } else {
-        }
-      }
-      else if (entered_month > todays_month) {
-        alert("Please enter a birthdate that does not take place in the future.");
-        $(this).val("");
-        $(this).focus();
-      }
-    }
-  });
 
   // mimic jquery toggle function
   $.fn.toggleClick=function(){

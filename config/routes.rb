@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-
+  require 'resque/server' 
+  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -302,6 +303,8 @@ Rails.application.routes.draw do
         post :clear_assign_for_employer
         get :assign
         post :update_assign
+        post :employer_datatable
+        post :family_datatable
         post :set_default_ga
       end
 

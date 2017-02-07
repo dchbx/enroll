@@ -16,5 +16,9 @@ FactoryGirl.define do
     trait :no_open_enrollment_coverage_period do
       benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship, :no_open_enrollment_coverage_period) }
     end
+
+    trait :last_years_coverage_period do
+      benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship, :last_years_coverage_period) }
+    end
   end
 end
