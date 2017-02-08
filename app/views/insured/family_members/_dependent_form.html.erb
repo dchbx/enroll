@@ -49,12 +49,11 @@
             </div>
           </div>
         </div>
-
         <div class="row row-form-wrapper no-buffer">
           <div class="col-md-3 col-sm-3 no-pd">
             <div class="form-group form-group-lg">
               <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
-               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}"}, dependent.dob %>
+               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}", onchange: "ManageFamilies.appendDependentQuestions(this)"}, dependent.dob %>
              </div>
            </div>
 
@@ -117,7 +116,10 @@
               <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
             </div>
           </div>
+
         <% elsif @person.has_active_employee_role? %>
+        <%= render 'shared/primary_caregiver_question_for_dependent', f: f , initial_show: show_has_primary_caregiver(f.object)%>
+        <%= render 'shared/disability_question_for_dependent', f: f, initial_show: show_is_disabled(f.object) %>
           <%= f.hidden_field :same_with_primary, value: 'false' %>
           <%= render 'shared/address_fields_for_dependent', f: f %>
         <% end %>
@@ -153,6 +155,11 @@
       if($("input#dependent_same_with_primary").is(":checked")){
         $("#address_info .address_required").removeAttr('required');
       };
+    });
+
+    // Initialize Selectric and bind to 'change' event
+    $('#dependent_relationship').selectric().on('change', function() {
+      ManageFamilies.appendDependentQuestions(this);
     });
   </script>
 </li>

@@ -15,6 +15,9 @@ class BenefitGroup
     :spouse,
     :domestic_partner,
     :child_under_26,
+    :child_26_and_over_with_disability,
+    :grandchild,
+    :nephew_or_niece,
     :child_26_and_over
   ]
 

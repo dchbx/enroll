@@ -115,6 +115,67 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
   end
 
+
+  context "#is_family_relationships_satisfied?" do
+    let(:consumer_role) {double}
+    let(:benefit_package) {double}
+    let(:person){FactoryGirl.create :person}
+
+    context "has primary caregiver" do
+      before do  
+        allow(person).to receive(:has_primary_caregiver).and_return(true)
+        allow(consumer_role).to receive(:person).and_return(person)
+        allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:primary_applicant).and_return(false)
+      end
+
+      ["grandchild", 'nephew_or_niece','child'].each do |relationship|
+        it "should return true when has_primary_caregiver and less than 26 years" do
+          allow(consumer_role).to receive(:dob).and_return(1.year.ago)
+          allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:relation_ship_with_primary_applicant).and_return(relationship)
+          allow(benefit_package).to receive(:benefit_categories).and_return(['health', 'dental'])
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'dental')
+          expect(rule.is_family_relationships_satisfied?).to eq true
+        end
+
+        it "should return false when has_primary_caregiver and over 26 years" do
+          allow(consumer_role).to receive(:dob).and_return(36.year.ago)
+          allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:relation_ship_with_primary_applicant).and_return(relationship)
+          allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'dental')
+          expect(rule.is_family_relationships_satisfied?).to be_falsey
+        end
+      end
+    end
+
+    context "is_disabled" do
+      before do  
+        allow(person).to receive(:is_disabled).and_return(true)
+        allow(person).to receive(:has_primary_caregiver).and_return(true)
+        allow(consumer_role).to receive(:person).and_return(person)
+        allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:primary_applicant).and_return(false)
+      end
+
+      ["grandchild", 'nephew_or_niece','child'].each do |relationship|
+
+        it "should return true when disabled and age less than 26 years" do
+          allow(consumer_role).to receive(:dob).and_return(1.year.ago)
+          allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:relation_ship_with_primary_applicant).and_return(relationship)
+          allow(benefit_package).to receive(:benefit_categories).and_return(['health', 'dental'])
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'dental')
+          expect(rule.is_family_relationships_satisfied?).to eq true
+        end
+
+        it "should return false when disabled and over 26 years" do
+          allow(consumer_role).to receive(:dob).and_return(36.year.ago)
+          allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:relation_ship_with_primary_applicant).and_return(relationship)
+          allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, 'dental')
+          expect(rule.is_family_relationships_satisfied?).to be_falsey
+        end
+      end
+    end
+  end
+
   context "is_cost_sharing_satisfied?" do
     include_context "BradyBunchAfterAll"
     before :all do

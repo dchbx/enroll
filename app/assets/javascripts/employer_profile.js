@@ -459,9 +459,9 @@ $(document).on('change', '.dependent_info input.dob-picker', function(){
   selected_option_index = $(target).get(0).selectedIndex
 
   if (mydate > dchbx_enroll_date_of_record()){
-    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_under_26'>Child</option>";
+    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_under_26'>Child</option><option value='nephew_or_niece'>Nephew or Niece</option><option value='grandchild'>Grandchild</option>";
   }else{
-    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_26_and_over'>Child</option>";
+    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_26_and_over'>Child</option><option value='nephew_or_niece'>Nephew or Niece</option><option value='grandchild'>Grandchild</option>";
   }
   $(target).html(data);
   $(target).prop('selectedIndex', selected_option_index).selectric('refresh');

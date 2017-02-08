@@ -185,6 +185,24 @@ describe Person do
         end
       end
 
+      context "with disability" do
+        let(:params) {valid_params.deep_merge({is_disabled: true})}
+
+        it "should return disabled true" do
+          person = Person.create(**params)
+          expect(person.is_disabled).to be_truthy
+        end
+      end
+
+      context "has primary caregiver" do
+        let(:params) {valid_params.deep_merge({has_primary_caregiver: true})}
+
+        it "should return true" do
+          person = Person.create(**params)
+          expect(person.has_primary_caregiver).to be_truthy
+        end
+      end
+
       context "with date of birth" do
         let(:dob){ 25.years.ago }
         let(:params) {valid_params.deep_merge({dob: dob})}

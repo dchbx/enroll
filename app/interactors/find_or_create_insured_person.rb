@@ -47,6 +47,8 @@ class FindOrCreateInsuredPerson
           no_ssn: context.no_ssn,
           dob: context.dob,
           gender: context.gender,
+          is_disabled: context.is_disabled,
+          has_primary_caregiver: context.has_primary_caregiver
         ), true
       end
     else

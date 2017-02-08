@@ -24,6 +24,7 @@ RSpec.describe CensusDependent, :type => :model do
         employee_relationship: employee_relationship
       )
   }
+  it { is_expected.to validate_inclusion_of(:employee_relationship).to_allow(CensusDependent::EMPLOYEE_RELATIONSHIP_KINDS) }
 
   it 'properly instantiates the class' do
     expect(dependent.first_name).to eq first_name
