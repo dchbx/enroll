@@ -32,9 +32,9 @@ module Importers
     def validate_is_conversion_employer
       found_employer = find_employer
       return true unless found_employer
-      if plan_years_are_active?(found_employer.plan_years) 
-        errors.add(:fein, "already has active plan years")
-      end
+      # if plan_years_are_active?(found_employer.plan_years)
+      #   errors.add(:fein, "already has active plan years")
+      # end
     end
 
     def validate_new_coverage_policy
@@ -135,7 +135,7 @@ module Importers
         rescue Exception => e
           raise "\n#{employer.fein} - #{employer.legal_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
         end
-        map_employees_to_benefit_groups(employer, record)
+        # map_employees_to_benefit_groups(employer, record)
       end
       return save_result
     end
