@@ -62,9 +62,10 @@
 
               <div class="n-radio-group">
                 <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
+                
                   <div class="n-radio-row">
                     <label class="n-radio" for="market_kind_<%= kind %>">
-                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: (@market_kind == kind), disabled: (@disable_market_kind == kind) %>
+                      <%= radio_button_tag 'market_kind', kind, is_eligible_market?(kind,@person), id: "market_kind_#{kind}", required: true, class: "n-radio", checked: (@market_kind == kind), disabled: (@disable_market_kind == kind) %>
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>

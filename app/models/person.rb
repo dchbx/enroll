@@ -256,6 +256,10 @@ class Person
     end
   end
 
+  def dual_role?
+    consumer_role && active_employee_roles.present?
+  end
+
   def check_households family
     family.households.present? ? true : false
   end

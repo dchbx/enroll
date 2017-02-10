@@ -42,8 +42,12 @@ class Exchanges::AgentsController < ApplicationController
     consumer_role = person.consumer_role
     employee_role = person.employee_roles.last
     person.set_consumer_role_url
-    
-    if consumer_role && consumer_role.bookmark_url
+
+    if consumer_role && employee_role && person.primary_family.current_broker_agency && person.primary_family.current_broker_agency.writing_agent.person == current_user.person
+      redirect_to bookmark_url_path(consumer_role.bookmark_url + "?consumer_role_id=#{consumer_role.id}")
+    elsif consumer_role && employee_role && person.active_employee_roles.first.employer_profile.active_broker == current_user.person
+      redirect_to bookmark_url_path(employee_role.bookmark_url + "?employee_role_id=#{employee_role.id}")
+    elsif consumer_role && consumer_role.bookmark_url
       redirect_to bookmark_url_path(consumer_role.bookmark_url)
     elsif employee_role && employee_role.bookmark_url
       redirect_to bookmark_url_path(employee_role.bookmark_url)
