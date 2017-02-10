@@ -485,18 +485,18 @@ class Plan
       plans = shop_plans coverage_kind, year
       selectors = {}
       if coverage_kind == 'dental'
-        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.append('any')
+        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.unshift('any')
       else
-        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.append('any')
+        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.unshift('any')
       end
       selectors[:carriers] = plans.map{|p|
         id = p.carrier_profile_id
         carrier_profile = CarrierProfile.find(id)
         [ carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id ]
-        }.uniq.append(['any','any'])
-      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.append('any')
-      selectors[:dc_network] =  ['true', 'false', 'any']
-      selectors[:nationwide] =  ['true', 'false', 'any']
+        }.uniq.unshift(['any','any'])
+      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.unshift('any')
+      selectors[:dc_network] =  ['any', 'true', 'false']
+      selectors[:nationwide] =  ['any', 'true', 'false']
       selectors
     end
 
