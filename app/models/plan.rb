@@ -166,6 +166,8 @@ class Plan
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
+  scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
+  scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
