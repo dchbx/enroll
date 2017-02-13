@@ -80,7 +80,7 @@ end
 
 Then(/^the broker clicks on Back to Quotes button$/) do
   sleep 2
-  find('.interaction-click-control-back-to-quotes').trigger 'click'
+  find('.interaction-click-control-home').trigger 'click'
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
