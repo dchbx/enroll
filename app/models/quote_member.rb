@@ -42,7 +42,7 @@ class QuoteMember
   private
 
   def valid_dob
-    if(dob && dob > TimeKeeper.date_of_record)
+    if(dob && dob > Date.today)
       errors.add(:dob, "Please verify your date of birth.")
     end
   end
