@@ -7,7 +7,7 @@ class QuoteHousehold
   embeds_many :quote_members
 
 
-  field :family_id, type: String
+  field :family_id, type: Integer
 
   # Quote Benefit Group ID for this employee on the roster
   field :quote_benefit_group_id, type: BSON::ObjectId

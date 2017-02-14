@@ -323,6 +323,8 @@ QuotePageLoad = (function() {
           broker_role_id = $("#broker_role_id").val()
           benefit_group_id = $(this).val()
           configure_benefit_group(quote_id, broker_role_id, benefit_group_id)
+          $('#benefit_plan_comparison_frame').html('');
+          $('#plan_comparison_frame').html('');
       })
       $('#reset_selected').on('click', reset_selected_plans)
       $('#CostComparison').on('click', _get_health_cost_comparison)

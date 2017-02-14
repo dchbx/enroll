@@ -157,11 +157,12 @@ class BrokerAgencies::QuotesController < ApplicationController
 
     # Increment family id so the new place holder contains max + 1
     qhh.family_id = max_family_id + 1
-
     # Create place holder for new member of household
-    qm = QuoteMember.new
-    qhh.quote_members << qm
-    @quote.quote_households << qhh
+    if params[:new_family].present?
+      qm = QuoteMember.new
+      qhh.quote_members << qm
+      @quote.quote_households << qhh
+    end
     @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
     @quote.quote_benefit_groups << qbg
 
@@ -203,25 +204,27 @@ class BrokerAgencies::QuotesController < ApplicationController
       insert_params[:quote_benefit_groups_attributes] = insert_params[:quote_benefit_groups_attributes].select {|k,v| insert_params[:quote_benefit_groups_attributes][k][:id].blank?}
     end
     if params[:commit] == "Add Employee"
+      new_family = true
       notice_message = "New employee added."
       scrollTo = 1
     elsif params[:commit] == "Save Changes"
+      new_family = nil
       notice_message = "Successfully saved quote/employee roster."
       scrollTo = 0
+    elsif params[:commit] == "Save"
+      new_family = @quote.quote_households.count > 0 ? '' : true
     end
-
     if (params[:quote][:employer_type] == 'prospect' && @quote.employer_type != 'prospect') || (params[:quote][:employer_type] == 'client' && @quote.employer_profile_id != params[:employer_profile_id])
       @quote.quote_households if @quote.quote_households.present?
       @quote.update_attributes(employer_profile_id: nil)
     end
-
     if (@quote.update_attributes(update_params) && @quote.update_attributes(insert_params))
       duplicate_household = @quote.quote_households.where(family_id: params[:duplicate_household]).first.try(:id).try(:to_str)
       num_of_dup = duplicate_household ? params[:num_of_dup] : nil
       if params[:commit] == "Create Quote"
         redirect_to broker_agencies_broker_role_quote_path(params[:broker_role_id],params[:id])
       else
-        redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, scrollTo: scrollTo,duplicate_household: duplicate_household ,num_of_dup: num_of_dup),  :flash => { :notice => notice_message }
+        redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, new_family: new_family, scrollTo: scrollTo,duplicate_household: duplicate_household ,num_of_dup: num_of_dup),  :flash => { :notice => notice_message }
       end
     else
       redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote) ,  :flash => { :error => "Unable to update the employee roster." }
@@ -508,17 +511,7 @@ class BrokerAgencies::QuotesController < ApplicationController
       end
        @employee_present = true
     else
-      @quote = Quote.new
-      qbg = QuoteBenefitGroup.new
-      # Create place holder for a new household and new member for the roster
-      qhh = QuoteHousehold.new
-      # Increment family id so the new place holder contains max + 1
-      max_family_id = @quote.quote_households.max(:family_id).to_i
-      qhh.family_id = max_family_id + 1
-      # Create place holder for new member of household
-      qm = QuoteMember.new
-      qhh.quote_members << qm
-      @quote.quote_households << qhh
+      tmp_households
       @employee_present = false
     end
     respond_to do |format|
@@ -533,6 +526,9 @@ class BrokerAgencies::QuotesController < ApplicationController
     @orgs = Organization.by_broker_role(broker_role_id)
     @employer_profiles =  @orgs.blank? ? [] : @orgs.map {|o| o.employer_profile}.collect{|e| [e.legal_name, e.id]}
     @employee_type = params[:type]
+    if @quote.employer_type == 'client' && params[:type] == 'prospect'
+      @quote.quote_households.destroy_all
+    end
   end
 
 
@@ -715,6 +711,20 @@ private
 
   def validate_roles
     current_user.has_broker_role? || current_user.has_hbx_staff_role?
+  end
+
+  def tmp_households
+    @quote = Quote.new
+    qbg = QuoteBenefitGroup.new
+    # Create place holder for a new household and new member for the roster
+    qhh = QuoteHousehold.new
+    # Increment family id so the new place holder contains max + 1
+    max_family_id = @quote.quote_households.max(:family_id).to_i
+    qhh.family_id = max_family_id + 1
+    # Create place holder for new member of household
+    qm = QuoteMember.new
+    qhh.quote_members << qm
+    @quote.quote_households << qhh
   end
 
 end

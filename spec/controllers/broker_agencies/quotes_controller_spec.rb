@@ -45,7 +45,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
         post :create, broker_role_id: person.broker_role.id , quote: quote_attributes
         expect(assigns(:quote)).to be_a(Quote)
         expect(assigns(:quote).quote_households.size).to eq 1
-        expect(assigns(:quote).quote_households.first.family_id).to eq quote_household_attributes[:family_id]
+        expect(assigns(:quote).quote_households.first.family_id.to_s).to eq quote_household_attributes[:family_id].to_s
       end
       it "should save household member attributes" do
         post :create, broker_role_id: person.broker_role.id , quote: quote_attributes
