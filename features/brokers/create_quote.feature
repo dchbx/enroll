@@ -19,11 +19,11 @@ Feature: Create Employee Roster
     And the broker is signed in
     When he visits the Roster Quoting tool
     And click on the New Quote button
+    When the broker selects employer type
+    Then the broker enters the quote effective date
     And click on the Upload Employee Roster button
     When the broker clicks on the Select File to Upload button
     Then the broker clicks upload button
-    When the broker selects employer type
-    Then the broker enters the quote effective date
     When the broker clicks on the Save Changes button
     And the broker should see the data in the table
     Then the broker should see a successful message
