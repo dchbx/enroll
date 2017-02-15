@@ -56,6 +56,11 @@ end
 
 Then(/^the broker should see the data in the table$/) do
   expect(page).to have_selector("input#quote_quote_households_attributes_0_family_id[value=\"1\"]")
+  expect(page).to have_selector("input#quote_quote_households_attributes_1_family_id[value=\"2\"]")
+  expect(page).to have_selector('div.panel.panel-default div input.uidatepicker', count: 10)
+  expect(page).to have_selector("#quote_quote_households_attributes_0_quote_members_attributes_0_dob[value=\"06/01/1980\"]")
+  expect(page).to have_selector("input#quote_quote_households_attributes_2_quote_members_attributes_0_first_name[value=\"John\"]")
+  expect(page).to have_selector("input#quote_quote_households_attributes_1_quote_members_attributes_0_last_name[value=\"Ba\"]")
 end
 
 Then(/^the broker enters the quote effective date$/) do
