@@ -24,8 +24,8 @@ Feature: Create Employee Roster
     Then the broker clicks upload button
     When the broker selects employer type
     Then the broker enters the quote effective date
-    And the broker should see the data in the table
     When the broker clicks on the Save Changes button
+    And the broker should see the data in the table
     Then the broker should see a successful message
     And Broker logs out
 
