@@ -9,7 +9,7 @@
 					%>
 			    <%= submit_tag "Save Changes", class: "btn btn-primary #{disable_class}" %>
 					<%= submit_tag "Add Employee", class: "btn btn-primary #{disable_class}" %>
-					<%= link_to 'Upload Roster' , upload_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}", remote: true  ,id: "upload_employees" %>
+					<%= link_to 'Upload Roster' , "" , class: "btn btn-primary #{disable_class}", "data-url" => upload_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote)  ,id: "upload_employees" %>
 					<%= link_to 'Download Roster' , download_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}",id: "download_employees" %>
 				</div>
 				<div class="col-8">
@@ -34,4 +34,25 @@
 	      }
 	  });
 });
+
+	$('#upload_employees').on('click', function() {
+	var employer_type = $('#quote_employer_type').val();
+	var employer_name = $('#quote_employer_name').val();
+	var effective_date = $('#quote_start_on').val();
+	var quote_name = $('#quote_quote_name').val();
+	var employer_profile = $('#quote_employer_profile_id').val();
+	var employer = employer_type == 'prospect' ? employer_name : employer_profile
+
+	var params = 'type=' + employer_type  + '&id=' + '<%= @quote.id %>' + '&name=' + employer_name + '&effective_date=' +  effective_date + '&quote_name=' +  quote_name + '&profile_id=' + employer_profile ;
+
+	 if(employer_type.length > 0 && effective_date.length > 0 ){
+		  $.ajax({
+		    url: $(this).data('url'),
+		    data: params,
+		      complete: function(response){
+			}
+		});
+
+	}
+ });
 </script>

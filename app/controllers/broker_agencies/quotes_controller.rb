@@ -284,10 +284,13 @@ class BrokerAgencies::QuotesController < ApplicationController
         @quote.save!
       end
     end
-    render "edit"
+    redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote)
   end
 
   def upload_employee_roster
+    @quote = Quote.find(params[:id])
+    emp = params[:type] == 'prospect' ? { employer_name: params[:name] } : {employer_profile_id: params[:profile_id]}
+    @quote.update_attributes({employer_type: params[:type], start_on: params[:effective_date], quote_name: params[:quote_name]}.merge(emp))
   end
 
   def download_employee_roster
