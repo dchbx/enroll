@@ -18,15 +18,15 @@
 							<% if f.object.start_on.present? && !plan_year_start_dates.any?{|set| set[1] == f.object.start_on.try(:to_s, :db) } %>
 								<% plan_year_start_dates << [f.object.start_on.strftime("%m/%d/%Y"), f.object.start_on.try(:to_s, :db)]%>
 							<% end %>
-							<%= f.select(:start_on, options_for_select(plan_year_start_dates, selected: f.object.start_on.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, {:class => "floatlabel custom_selectric", :prompt => true, required: true}) %>
-							
+							<%= f.select(:start_on, options_for_select(plan_year_start_dates, selected: f.object.start_on.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, {:class => "floatlabel custom_selectric form-control", :prompt => true, required: true}) %>
+
 						</div>
 					</div>
 				</div>
 				<div class="panel-body" id="quote-info">
 					<div class="row form-inline">
 						<div class="form-group col-sm-6">Type:
-							<%= f.select(:employer_type, options_for_select([["Client", "client"],["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel employer_type", :prompt => true, required: true}) %>
+							<%= f.select(:employer_type, options_for_select([["Client", "client"],["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel custom_selectric form-control employer_type", :prompt => true, required: true}) %>
 						</div>
 						<div class="form-group col-sm-6">Employer Name:
 							<div class="type">
