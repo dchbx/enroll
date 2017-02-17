@@ -68,9 +68,9 @@ Then(/^the broker enters the quote effective date$/) do
 end
 
 When(/^the broker selects employer type$/) do
-  find('.selectric-interaction-choice-control-quote-employer-type').click()
-  find('.selectric-hide-select .interaction-choice-control-quote-employer-type-2').select_option
-  fill_in 'quote[employer_name]', with: "prospect test Employee"
+ find('.interaction-choice-control-quote-employer-type').click()
+ find('.interaction-choice-control-quote-employer-type-2').select_option
+ fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
 When(/^broker enters valid information$/) do

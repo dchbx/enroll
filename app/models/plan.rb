@@ -168,6 +168,9 @@ class Plan
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
   scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
+  scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in dental_level) }
+  scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in plan_type) }
+
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -272,6 +275,7 @@ class Plan
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
   scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
+  scope :by_carrier_profile_for_bqt,                    ->(carrier_profile_id) { where(:carrier_profile_id.in carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }

@@ -269,19 +269,34 @@ QuotePageLoad = (function() {
           reset_selected_plans()
       })
       $('.dental_carrier, .dental_metal, .dental_plan_type, .dc_network, .nationwide').on('click', function(){
+
         class_name = $(this).attr('class').split(' ')[0]
-        $("." + class_name).each(function(){
+        if (this.checked){
+          $(this).addClass('active1')
+        }else{
           $(this).removeClass('active1')
-          $(this).prop('checked', false)
-        });
-        $(this).addClass('active1')
-        $(this).prop('checked', true)
+        }
         disable_dental_nationwide_if_dc_selected(this)
-        carrier_id = $('#dental-carriers').find('.active1').attr('data-carrier')
-        dental_level = $('#dental-metals').find('.active1').attr('id')
-        plan_type = $('#dental-plan_types').find('.active1').attr('id')
-        dc_network = $('#dental-dc_in_network').find('.active1').attr('id')
-        nationwide = $('#dental-nationwide').find('.active1').attr('id')
+        carrier_id = []
+        $('#dental-carriers').find('.active1').each(function(){
+         carrier_id.push($(this).data('carrier'))
+        })
+        dental_level = []
+        $('#dental-metals').find('.active1').each(function(){
+         dental_level.push(this.id)
+        })
+        plan_type = []
+        $('#dental-plan_types').find('.active1').each(function(){
+         plan_type.push(this.id)
+        })
+        dc_network = []
+        $('#dental-dc_in_network').find('.active1').each(function(){
+         dc_network.push(this.id)
+        })
+        nationwide = []
+        $('#dental-nationwide').find('.active1').each(function(){
+         nationwide.push(this.id)
+        })
         quote = $('#quote').val()
         $.ajax({
           type: 'GET',
@@ -324,6 +339,7 @@ QuotePageLoad = (function() {
           benefit_group_id = $(this).val()
           configure_benefit_group(quote_id, broker_role_id, benefit_group_id)
           $('#benefit_plan_comparison_frame').html('');
+          $('#dental_plan_comparison_frame').html('');
           $('#plan_comparison_frame').html('');
       })
       $('#reset_selected').on('click', reset_selected_plans)

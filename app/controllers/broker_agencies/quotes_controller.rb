@@ -43,7 +43,6 @@ class BrokerAgencies::QuotesController < ApplicationController
     @health_plans = Plan.shop_health_plans @q.plan_year
     @health_selectors = Plan.build_plan_selectors('shop', 'health', @q.plan_year)
     @health_plan_quote_criteria  = Plan.build_plan_features('shop', 'health', @q.plan_year).to_json
-
     @dental_plans = Plan.shop_dental_plans @q.plan_year
     @dental_selectors = Plan.build_plan_selectors('shop', 'dental', @q.plan_year)
     dental_plan_quote_criteria  = Plan.build_plan_features('shop', 'dental',@q.plan_year) .to_json
@@ -703,13 +702,18 @@ private
   end
 
   def set_dental_plans
-    @dental_plans = Plan.shop_dental_by_active_year(2016)
-    @dental_plans_count = Plan.shop_dental_by_active_year(2016).count
-    @dental_plans = @dental_plans.by_carrier_profile(params[:carrier_id]) if params[:carrier_id].present? && params[:carrier_id] != 'any'
-    @dental_plans = @dental_plans.by_dental_level(params[:dental_level]) if params[:dental_level].present? && params[:dental_level] != 'any'
-    @dental_plans = @dental_plans.by_plan_type(params[:plan_type]) if params[:plan_type].present? && params[:plan_type] != 'any'
-    @dental_plans = @dental_plans.by_dc_network(params[:dc_network]) if params[:dc_network].present? && params[:dc_network] != 'any'
-    @dental_plans = @dental_plans.by_nationwide(params[:nationwide]) if params[:nationwide].present? && params[:nationwide] != 'any'
+    @dental_plans = Plan.shop_dental_by_active_year(2017)
+    @dental_plans_count = Plan.shop_dental_by_active_year(2017).count
+    carrier = params[:carrier_id].nil? ? [] : params[:carrier_id]
+    dental_level = params[:dental_level].nil? ? [] : params[:dental_level]
+    plan_type = params[:plan_type].nil? ? [] : params[:plan_type]
+    dc_network = params[:dc_network].nil?  ? [] : params[:dc_network]
+    nationwide = params[:nationwide].nil? ? [] : params[:nationwide]
+    @dental_plans = @dental_plans.by_carrier_profile_for_bqt(params[:carrier_id]) unless  carrier.empty? || carrier.include?('')
+    @dental_plans = @dental_plans.by_dental_level_for_bqt(params[:dental_level])  unless  dental_level.empty? || dental_level.include?('')
+    @dental_plans = @dental_plans.by_plan_type_for_bqt(params[:plan_type])   unless  plan_type.empty? || plan_type.include?('')
+    @dental_plans = @dental_plans.by_dc_network(params[:dc_network])  unless  dc_network.empty? || dc_network.include?('')
+    @dental_plans = @dental_plans.by_nationwide(params[:nationwide])  unless  nationwide.empty? || nationwide.include?('')
   end
 
   def validate_roles
