@@ -51,7 +51,6 @@ class Insured::ConsumerRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
-
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
     respond_to do |format|

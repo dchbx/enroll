@@ -227,8 +227,9 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :language_code => "english",
       :is_incarcerated => "no",
       :tribal_id => "test",
-      :no_dc_address=>nil,
-      :no_dc_address_reason=>nil
+      :no_dc_address => nil,
+      :no_dc_address_reason => nil,
+      :is_applying_coverage => true
     }
   }
 
@@ -315,7 +316,8 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
-      tribal_id: "test"
+      tribal_id: "test",
+      :is_applying_coverage => true
     }
   }
   let(:person) { double(:errors => double(:has_key? => false), home_address: nil) }

@@ -5,7 +5,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary
+    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -164,7 +164,8 @@ module Forms
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
-        :no_dc_address_reason => no_dc_address_reason
+        :no_dc_address_reason => no_dc_address_reason,
+        :is_applying_coverage => is_applying_coverage
       }
     end
 

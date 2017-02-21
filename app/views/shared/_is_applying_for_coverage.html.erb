@@ -1,0 +1,16 @@
+<div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+  <label class="pull-right" style="margin-right: 10px;">Is this person applying for coverage? </label>
+</div>
+
+<div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
+  <div class="radio">
+    <%= f.radio_button :is_applying_coverage, true, class: "required floatlabel", id: 'is_applying_coverage_true'%>
+    <label for="is_applying_coverage_true"><span>YES</span></label>
+  </div>
+</div>
+<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+  <div class="radio">
+    <%= f.radio_button :is_applying_coverage, false, class: "required floatlabel", id: 'is_applying_coverage_false' %>
+    <label for="is_applying_coverage_false"><span>NO</span></label>
+  </div>
+</div>

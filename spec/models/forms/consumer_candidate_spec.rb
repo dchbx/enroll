@@ -3,7 +3,7 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
 
   subject {
     Forms::ConsumerCandidate.new({
-                                     :dob => "2012-10-12",
+                                     :dob => "1982-10-12",
                                      :ssn => "123-45-6789",
                                      :first_name => "yo",
                                      :last_name => "guy",
@@ -32,6 +32,39 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
       allow(person).to receive(:user).and_return(false)
       subject.uniq_ssn
       expect(subject.errors[:base]).to eq []
+    end
+
+    describe "applying for coverage" do
+      before do
+        allow(subject).to receive(:is_applying_coverage?).and_return true
+        subject.ssn_or_checkbox
+      end
+      it "pass validation" do
+        expect(subject).to be_valid
+      end
+
+      it "fails validation with ssn or ssn checkbox" do
+        allow(subject).to receive(:ssn).and_return(nil)
+        allow(subject).to receive(:no_ssn).and_return("0")
+        expect(subject).not_to be_valid
+        expect(subject.errors[:base]).to eq ["Check No SSN box or enter a valid SSN"]
+      end
+    end
+
+    describe "NOT applying for coverage" do
+      before do
+        allow(subject).to receive(:is_applying_coverage?).and_return false
+        subject.ssn_or_checkbox
+      end
+      it "pass validation" do
+        expect(subject).to be_valid
+      end
+
+      it "fails validation with ssn or ssn checkbox" do
+        allow(subject).to receive(:ssn).and_return(nil)
+        allow(subject).to receive(:no_ssn).and_return("0")
+        expect(subject).to be_valid
+      end
     end
 
   end
