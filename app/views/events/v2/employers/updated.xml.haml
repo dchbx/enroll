@@ -8,8 +8,6 @@
   -#%display_name= " " filed doesn't exists
   -#%abbreviation= " " filed doesn't exists
   %fein= employer.fein.strip
-  -  logger.info "employer_office_locations #{employer.organization.office_locations}"
-  -  logger.info "employer_legal_name #{employer.legal_name}"
   %office_locations
     = render :partial => "events/v2/organizations/office_location", :collection => employer.organization.office_locations
   - if !employer.organization.home_page.blank?
