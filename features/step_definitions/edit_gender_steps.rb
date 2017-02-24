@@ -1,5 +1,7 @@
 Given(/^I am a consumer$/) do
+  @user = FactoryGirl.create(:user, :consumer)
   @person_all = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role, :male)
+  @user.person = @person_all
   @family_all = @person_all.primary_family
   FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period)
   qle_all = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
@@ -17,11 +19,18 @@ Given(/^my gender is set to male$/) do
 end
 
 When(/^I visit the Families Home Page$/) do
-  begin
-    find_button('Manage Family').visible?
-  rescue Exception=>e
-    binding.pry
-  end
+  visit "/users/sign_in"
+  screenshot("pre-fill")
+  fill_in "user[login]", :with => user[:email]
+  find('#user_login').set(user[:email])
+  fill_in "user[password]", :with => user.password
+  fill_in "user[login]", :with => user[:email] unless find(:xpath, '//*[@id="user_login"]').value == user[:email]
+  screenshot("post-fill")
+  blah = find('.interaction-click-control-sign-in').click
+  binding.pry
+  puts blah.class
+  screenshot("post-click")
+  find_button('Manage Family').visible?
 end
 
 When(/^then I click on the Manage Family link\.$/) do
