@@ -238,6 +238,22 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
           expect(renewal_benefit_groups).to be_empty
         end
       end
+
+      context 'for renewing employer' do 
+        let!(:employer_profile)  { FactoryGirl.create(:employer_profile, 
+                                    plan_years: [expired_plan_year, active_plan_year, draft_plan_year, renewing_plan_year]) }
+
+        it 'should return false for renewing draft plan year' do
+          current_benefit_groups, renewal_benefit_groups = helper.get_benefit_groups_for_census_employee
+          expect(helper.contain_nonrenewable_ee(renewing_plan_year)).to be_falsey
+        end
+        
+        it 'should return true for draft plan year' do
+          current_benefit_groups, renewal_benefit_groups = helper.get_benefit_groups_for_census_employee
+          expect(helper.contain_nonrenewable_ee(draft_plan_year)).to be_falsey
+        end
+      end
+
     end
   end
 end

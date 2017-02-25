@@ -119,8 +119,6 @@ module Employers::EmployerHelper
     end
   end
 
-
-
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
@@ -128,4 +126,24 @@ module Employers::EmployerHelper
     links = "#{link_to("Rehire", "javascript:;", data: { "content": "#{content}" }, onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))", class: "manual")} #{link_to("COBRA", "javascript:;", onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))")}" if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
     return [links, content]
   end
+
+  def contain_nonrenewable_ee(plan_year)
+    if plan_year.renewing_draft?
+      elected_plans = []
+      plan_year.benefit_groups.each do |benefit_group|
+          elected_plans += benefit_group.elected_plans.map(&:hios_id)
+      end
+      enrollments=plan_year.employer_profile.active_plan_year.hbx_enrollments
+      enrollments.each do |enrollment|
+        plan=enrollment.plan
+        hios_id=plan.hios_id
+        unless elected_plans.include?(hios_id)
+          return true
+        end
+      end
+      return false
+    end
+    return false
+  end
+
 end

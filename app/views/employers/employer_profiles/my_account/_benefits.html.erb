@@ -53,7 +53,11 @@
         <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
                 <% if plan_year.overlapping_published_plan_years.empty? %>
-                <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+                  <% if contain_nonrenewable_ee(plan_year) %>
+                    <%= render partial: 'employers/employer_profiles/my_account/publish_without_auto_renwals_notice', locals: { plan_year: plan_year } %> 
+                  <% else %>
+                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+                  <% end %>
                 <% end %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
             <% end %>  
