@@ -135,7 +135,6 @@ RSpec.describe Employers::EmployerProfilesController do
       end
       xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:total_census_employees_quantity)).to eq employer_profile.census_employees.active.count
-      expect(assigns(:census_employees).count).to eq 20
       expect(assigns(:census_employees)).to eq employer_profile.census_employees.active.sorted.search_by(employee_name: '').to_a.first(20)
     end
 

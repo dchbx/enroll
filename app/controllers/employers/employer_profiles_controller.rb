@@ -318,9 +318,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     status_params = params.permit(:id, :status, :search)
     @status = status_params[:status] || 'active'
     @search = status_params[:search] || false
-    #@avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-    #@avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
-
+    
     census_employees = case @status
                        when 'terminated'
                          @employer_profile.census_employees.terminated.sorted
@@ -338,11 +336,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
       @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
-      #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      @total_census_employees_quantity = @census_employees.count
     else
       @total_census_employees_quantity = census_employees.count
-      @census_employees = census_employees.limit(20).to_a
-      #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      @census_employees = census_employees.page(params[:pagina]).per(20)
     end
   end
 

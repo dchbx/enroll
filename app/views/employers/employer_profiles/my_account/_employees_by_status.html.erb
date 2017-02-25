@@ -107,15 +107,16 @@
        </tbody>
       </table>
     </div>
-  <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
+  <%= paginate @census_employees, param_name: :pagina, remote: true if @census_employees.present? %>
   <div class="row">
     <div class="col-md-9">
-      <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
+      <% if (@total_census_employees_quantity.present? || !params[:page].nil?) %>
       <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
       <% end %>
     </div>
     <div class="col-md-3 text-right content-bottom">
-      <h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
+      <h4>
+        <%= "#{[@census_employees.offset_value+@census_employees.limit_value,@census_employees.total_count].min} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
     </div>
   </div>
 </div>
