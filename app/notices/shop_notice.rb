@@ -8,6 +8,7 @@ class ShopNotice < Notice
 
   def deliver
     generate_pdf_notice
+    attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
   end
@@ -26,6 +27,10 @@ class ShopNotice < Notice
         zip: "20005"
       })
     })
+  end
+
+  def attach_envelope
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
   end
 
   def append_broker(broker)
