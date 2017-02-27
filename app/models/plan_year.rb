@@ -729,7 +729,7 @@ class PlanYear
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
-    state :renewing_draft
+    state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -985,6 +985,12 @@ private
     elsif event_name == "force_publish"
       self.employer_profile.trigger_notices("planyear_renewal_3b")
     end
+  end
+
+  def renewal_group_notice
+    event_name = aasm.current_event.to_s.gsub(/!/, '')
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || self.employer_profile.is_conversion? || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
+    self.employer_profile.trigger_notices("group_renewal_5")
   end
 
   def record_transition

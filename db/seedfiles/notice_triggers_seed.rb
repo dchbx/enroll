@@ -105,6 +105,27 @@ shop_notice_triggers = [
       }
     ] 
   },
+  {
+    hbx_id: 'SHOP5',
+    title: 'Group Renewal Available',
+    description: 'Notice will be sent to the Renewal Groups three months prior to their plan year renewing',
+    resource_name: 'employer',
+    event_name: 'group_renewal_5',
+    notice_triggers: [
+      {
+        name: 'Group Renewal Notice',
+        notice_template: 'notices/shop_notices/5_employer_renewal_notice',
+        notice_builder: 'ShopNotices::RenewalGroupNotice',
+        mpi_indicator: 'MPI_SHOP5',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
