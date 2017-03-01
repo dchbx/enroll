@@ -1,15 +1,15 @@
-require 'autoinc'
+# A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
+# when determining eligibility for Insurance Assistance and Medicaid
 
 class TaxHousehold
+  require 'autoinc'
+
   include Mongoid::Document
-  include SetCurrentUser
   include Mongoid::Timestamps
+  include Mongoid::Autoinc
   include HasFamilyMembers
   include Acapi::Notifiers
-  include Mongoid::Autoinc
-
-  # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
-  # when determining eligibility for Insurance Assistance and Medicaid
+  include SetCurrentUser
 
   embedded_in :household
 
