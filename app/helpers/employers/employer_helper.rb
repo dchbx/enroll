@@ -128,4 +128,13 @@ module Employers::EmployerHelper
     links = "#{link_to("Rehire", "javascript:;", data: { "content": "#{content}" }, onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))", class: "manual")} #{link_to("COBRA", "javascript:;", onclick: "EmployerProfile.changeCensusEmployeeStatus($(this))")}" if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
     return [links, content]
   end
+
+  def is_rehired(ce)
+    (ce.coverage_terminated_on.present?  && (ce.is_eligible? || ce.employee_role_linked?))
+  end
+
+  def is_terminated(ce)
+    (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
+  end
+
 end

@@ -272,6 +272,27 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       end
     end
 
+    context "Employee status" do
+        let(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible", hired_on: Time.now-15.days, employer_profile: employer_profile) }
+      before :each do
+        census_employee.terminate_employment(TimeKeeper.date_of_record - 10.days) && census_employee.save
+        census_employee.coverage_terminated_on = nil
+        census_employee.rehire_employee_role
+        census_employee.aasm_state = :rehired
+        census_employee.save
+      end
+
+      it "should display the rehired date and not the hired date" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).to match /Rehired/i
+      end
+
+      it "if rehired then it shouldnot display the termination date" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).not_to match /Terminated:/i
+      end
+    end
+
     context "Hiding Address in CensusEmployee page if linked and populated" do
       let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: Time.now-15.days, employer_profile: employer_profile, employer_profile_id: employer_profile.id) }
       before :each do
@@ -279,7 +300,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
         census_employee.save!
         census_employee.reload
       end
-      it "should not show address fields" do 
+      it "should not show address fields" do
         allow(census_employee).to receive(:address).and_return(address)
         render template: "employers/census_employees/show.html.erb"
         expect(rendered).not_to match /#{address.address_1}/
@@ -288,6 +309,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
         expect(rendered).not_to match /#{address.state}/i
         expect(rendered).not_to match /#{address.zip}/
       end
+
     end
   end
 end

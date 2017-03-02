@@ -1,7 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_qles.html.erb" do
+  let(:person) { FactoryGirl.create(:person, :with_family ) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:resident_role) { FactoryGirl.create(:resident_role) }
+
   before :each do
+    assign(:person, person)
+    person.resident_role = resident_role
+    person.save
     QualifyingLifeEventKind.delete_all
     10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
     FactoryGirl.create(:qualifying_life_event_kind, tool_tip: "")

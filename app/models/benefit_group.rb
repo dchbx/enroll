@@ -465,20 +465,20 @@ class BenefitGroup
   def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
     self.employer_profile.census_employees.each do |ce|
       benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
-      benefit_group_assignments.each do |bga|
-        bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
-        bga.destroy
-      end
-      benefit_groups = self.plan_year.benefit_groups.reject { |bg| bg.id == self.id}
-      bga = ce.find_or_build_benefit_group_assignment(benefit_groups.first)
-      if bga.blank?
-        existing_bga = ce.benefit_group_assignments.where(:benefit_group_id => benefit_groups.first.id).first
-        existing_bga.update_attributes(is_active: true) if self.plan_year.aasm_state == 'draft' && existing_bga.is_active == false
+
+      if benefit_group_assignments.present?
+        benefit_group_assignments.each do |bga|
+          bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+          bga.destroy
+        end
+
+        benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
+        ce.find_or_build_benefit_group_assignment(benefit_groups.first)
       end
     end
   end
 
-private
+  private
 
   def set_congress_defaults
     return true unless is_congress

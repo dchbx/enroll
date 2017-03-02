@@ -175,7 +175,7 @@ describe BenefitGroup, type: :model do
     let(:plan_year) { FactoryGirl.create(:plan_year)}
     let!(:benefit_group_one) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "1st one") }
     let!(:benefit_group_two) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "2nd one")}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: benefit_group_one.plan_year.employer_profile)}
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: benefit_group_one.plan_year.employer_profile)}
     
     it "should have a default benefit group assignment with 1st benefit group" do
       expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 1
@@ -193,23 +193,22 @@ describe BenefitGroup, type: :model do
       expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 1
     end
 
-
     context 'when deleting the new benefit group & EE already has bga with old benefit group in inactive state' do
-
       before do
-        census_employee.benefit_group_assignments.each { |bga| bga.is_active = false }
+        census_employee.add_benefit_group_assignment(benefit_group_two, benefit_group_two.start_on)
       end
 
       it "should have one benefit group assignment with 1st benefit group & in inactive status" do
-        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id, is_active: false).size).to eq 1
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_falsy
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).first.is_active).to be_truthy
       end
 
       it "should move the existing benefit group assignment from inactive to active" do
-        bga = census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id, is_active: false).first
         benefit_group_two.destroy!
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.id).to eq bga.id
-        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to eq true
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 0
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 1
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_truthy
       end
     end
   end

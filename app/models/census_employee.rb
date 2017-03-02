@@ -135,31 +135,31 @@ class CensusEmployee < CensusMember
   end
 
   def assign_default_benefit_package
-    self.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING + ['draft']).order_by(:start_on.asc).each do |py|
-      if self.benefit_group_assignments.detect{|bg_assign| py.benefit_groups.map(&:id).include?(bg_assign.benefit_group_id) }.blank?
+
+    ### Assign Active Benefit Group Assignment
+    py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
+    if py.present?
+      if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
         find_or_build_benefit_group_assignment(py.benefit_groups.first)
+      end
+    end
+
+    ### Assign Renewing Benefit Group Assignment
+    if py = employer_profile.plan_years.renewing.first
+      if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
+        add_renew_benefit_group_assignment(py.benefit_groups.first)
       end
     end
   end
 
   def find_or_build_benefit_group_assignment(benefit_group)
-    return unless benefit_group
-    return if self.benefit_group_assignments.where(:benefit_group_id => benefit_group.id).present?
+    assignment = benefit_group_assignments.where(:benefit_group_id => benefit_group.id).order_by(:'created_at'.desc).first
 
-    active = false
-    if active_benefit_group_assignment.blank?
-      active = true
+    if assignment.present?
+      assignment.make_active
     else
-      if PlanYear::PUBLISHED.include?(benefit_group.plan_year.aasm_state)
-        self.benefit_group_assignments = self.benefit_group_assignments.map do |bg_assignment|
-          bg_assignment.is_active = false
-          bg_assignment
-        end
-        active = true
-      end
+      add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
     end
-
-    self.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: benefit_group, start_on: benefit_group.start_on, is_active: active)
   end
 
   def find_or_create_benefit_group_assignment(benefit_group)
@@ -603,13 +603,17 @@ class CensusEmployee < CensusMember
 
     # Search query string on census employee with first name,last name,SSN.
     def search_hash(s_rex)
-      search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+      clean_str = s_rex.strip.split.map{|i| Regexp.escape(i)}.join("|")
+      action = s_rex.strip.split.size > 1 ? "$and" : "$or"
+      search_rex = Regexp.compile(clean_str, true)
       {
-          "$or" => ([
-              {"first_name" => search_rex},
-              {"last_name" => search_rex},
-              {"encrypted_ssn" => encrypt_ssn(s_rex)}
-          ])
+          "$or" => [
+              {action => [
+                  {"first_name" => search_rex},
+                  {"last_name" => search_rex}
+              ]},
+              {"encrypted_ssn" => encrypt_ssn(clean_str)}
+          ]
       }
     end
   end

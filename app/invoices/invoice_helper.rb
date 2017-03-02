@@ -437,8 +437,8 @@ module InvoiceHelper
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
-        ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
-        # ["DATE DUE:", "#{PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")}"]
+        # ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
+        ["DATE DUE:", "#{PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 

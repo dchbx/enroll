@@ -31,6 +31,16 @@ Rails.application.routes.draw do
     end
     resources :agents_inboxes, only: [:show, :destroy]
 
+    resources :residents, only: [:create, :edit, :update] do
+      get :search, on: :collection
+      post :match, on: :collection
+      post :build, on: :collection
+      get :begin_resident_enrollment, on: :collection
+      get :resume_resident_enrollment, on: :collection
+      get :ridp_bypass, on: :collection
+      get :find_sep, on: :collection
+    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -113,6 +123,9 @@ Rails.application.routes.draw do
     get 'verification_documents/upload', to: 'verification_documents#upload'
     post 'verification_documents/upload', to: 'verification_documents#upload'
     get 'verification_documents/download/:key', to: 'verification_documents#download'
+    get 'paper_applications/upload', to: 'paper_applications#upload'
+    post 'paper_applications/upload', to: 'paper_applications#upload'
+    get 'paper_applications/download/:key', to: 'paper_applications#download'
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -144,6 +157,7 @@ Rails.application.routes.draw do
         get 'inbox'
         get 'brokers'
         get 'verification'
+        get 'upload_application'
         get 'document_upload'
         get 'find_sep'
         post 'record_sep'
@@ -187,8 +201,13 @@ Rails.application.routes.draw do
 
     root 'families#home'
 
-    resources :family_members
-
+    resources :family_members do
+      get :resident_index, on: :collection
+      get :new_resident_dependent, on: :collection
+      get :edit_resident_dependent, on: :member
+      get :show_resident_dependent, on: :member
+    end
+    
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate

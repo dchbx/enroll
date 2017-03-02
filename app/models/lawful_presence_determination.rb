@@ -7,7 +7,7 @@ class LawfulPresenceDetermination
   include AASM
   include Acapi::Notifiers
 
-  embedded_in :consumer_role
+  embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
   embeds_many :vlp_responses, class_name:"EventResponse"
 
@@ -53,11 +53,11 @@ class LawfulPresenceDetermination
   end
 
   def start_ssa_process
-    notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.consumer_role.person})
+    notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person})
   end
 
   def start_vlp_process(requested_start_date)
-    notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.consumer_role.person, :coverage_start_date => requested_start_date})
+    notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
   end
 
   private
@@ -68,13 +68,13 @@ class LawfulPresenceDetermination
     if approval_information.citizen_status
       self.citizenship_result = approval_information.citizen_status
     else
-      self.consumer_role.is_native? ? self.citizenship_result = "us_citizen" : self.citizenship_result = "non_native_citizen"
+      self.ivl_role.is_native? ? self.citizenship_result = "us_citizen" : self.citizenship_result = "non_native_citizen"
     end
     if ["ssa", "curam"].include?(approval_information.vlp_authority)
-      if self.consumer_role
-        if self.consumer_role.person
-          unless self.consumer_role.person.ssn.blank?
-            self.consumer_role.ssn_validation = "valid"
+      if self.ivl_role
+        if self.ivl_role.person
+          unless self.ivl_role.person.ssn.blank?
+            self.ivl_role.ssn_validation = "valid"
           end
         end
       end

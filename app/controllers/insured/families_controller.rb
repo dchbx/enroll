@@ -27,18 +27,19 @@ class Insured::FamiliesController < FamiliesController
 
     @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
+    @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
-  
+
     respond_to do |format|
       format.html
     end
   end
 
   def manage_family
-
     set_bookmark_url
     @family_members = @family.active_family_members
+    @resident = @person.has_active_resident_role?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -60,10 +61,20 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
+
+    if (params[:resident_role_id].present? && params[:resident_role_id])
+      @resident_role_id = params[:resident_role_id]
+    else
+      @resident_role_id = @person.try(:resident_role).try(:id)
+    end
+
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
-    @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first unless params.key?(:shop_for_plan)
+    if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
+      @market_kind = "coverall"
+    end
+
     render :layout => 'application'
   end
 
@@ -91,6 +102,8 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
+    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
+    @resident = @person.resident_role.present?
     respond_to do |format|
       format.html
     end
@@ -129,6 +142,11 @@ class Insured::FamiliesController < FamiliesController
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
+
+    if @person.resident_role?
+      @resident_role_id = @person.resident_role.id
+    end
+
   end
 
   def check_move_reason
@@ -355,6 +373,11 @@ class Insured::FamiliesController < FamiliesController
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
+
+    if @person.resident_role?
+      @resident_role_id = @person.resident_role.id
+    end
+
   end
 
 end

@@ -3,6 +3,12 @@ require "rails_helper"
 RSpec.describe Employers::EmployerHelper, :type => :helper do
   describe "#enrollment_state" do
 
+    let(:benefit_group)    { plan_year.benefit_groups.first }
+    let(:plan_year)        do
+      py = FactoryGirl.create(:plan_year_not_started)
+      bg = FactoryGirl.create(:benefit_group, plan_year: py)
+      PlanYear.find(py.id)
+    end
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
     let(:benefit_group_assignment) { double }
@@ -28,6 +34,46 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(employee_role).to receive(:person).and_return(person)
       allow(person).to receive(:primary_family).and_return(primary_family)
+    end
+
+    context "census_employee states" do
+
+      it "should return false for rehired state" do
+        expect(helper.is_rehired(census_employee)).not_to be_truthy
+      end
+
+      it "should return false for terminated state" do
+        expect(helper.is_terminated(census_employee)).not_to be_truthy
+      end
+
+      context "census_employee terminated state" do
+        let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+        before do
+          allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+          census_employee.terminate_employment!(TimeKeeper.date_of_record - 45.days)
+        end
+
+        it "should return true for terminated state" do
+          expect(helper.is_terminated(census_employee)).to be_truthy
+        end
+
+        it "should return false for rehired state" do
+          expect(helper.is_rehired(census_employee)).not_to be_truthy
+        end
+      end
+
+      context "and the terminated employee is rehired" do
+        let!(:census_employee) {
+          ce = FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)
+          ce.terminate_employment!(TimeKeeper.date_of_record - 45.days)
+          ce
+        }
+        let!(:rehired_census_employee) { census_employee.replicate_for_rehire }
+
+        it "should return true for rehired state" do
+          expect(helper.is_rehired(rehired_census_employee)).to be_truthy
+        end
+      end
     end
 
     context ".enrollment_state" do

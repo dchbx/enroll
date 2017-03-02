@@ -41,6 +41,7 @@
               <%= hidden_field_tag 'change_plan' %>
               <%= hidden_field_tag 'qle_id' %>
               <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
+              <%= hidden_field_tag 'resident_role_id', @person.try(:resident_role).try(:id) %>
               <div class="alert alert-success no-buffer" role="alert">
                 <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br>
               </div>

@@ -1,14 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe ShopNotices::EmployerRenewalNotice do
-  let(:employer_profile){ create :employer_profile}
-  let(:person){ create :person}
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
+  let!(:employer_profile){ create :employer_profile}
+  let!(:person){ create :person}
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
+  let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
+  let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
+  let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'PlanYear Renewal',
-                            :notice_template => 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
+                            :name =>'Conversion, Group Renewal Available',
+                            :notice_template => 'notices/shop_notices/6_conversion_group_renewal_notice',
                             :notice_builder => 'ShopNotices::EmployerRenewalNotice',
-                            :mpi_indicator => 'MPI_SHOPRA',
-                            :title => "Renewal/Conversion Employer Publishes Plan"})
+                            :mpi_indicator => 'MPI_SHOP6',
+                            :title => "Welcome to DC Health Link, Group Renewal Available"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
@@ -46,6 +51,20 @@ RSpec.describe ShopNotices::EmployerRenewalNotice do
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
       expect(@employer_notice.notice.primary_identifier).to eq employer_profile.hbx_id
+    end
+  end
+
+  describe "append data" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)
+    end
+    it "should append data" do
+      renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_draft").first
+      @employer_notice.append_data
+      expect(@employer_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on
+      expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq renewing_plan_year.open_enrollment_end_on
+      expect(@employer_notice.notice.plan_year.carrier_name).to eq renewing_plan_year.benefit_groups.first.reference_plan.carrier_profile.legal_name
     end
   end
 

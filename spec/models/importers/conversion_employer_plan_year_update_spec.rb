@@ -85,8 +85,11 @@ RSpec.describe Importers::ConversionEmployerPlanYearUpdate, dbclean: :after_each
       it 'should update both current and renewing plan year with new reference plans' do
         record = ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => plan_year.start_on}))
         record.save
-        expect(PlanYear.find(plan_year.id).benefit_groups.first.reference_plan_id).to eq(new_current_health_plan.id)
-        expect(PlanYear.find(renewing_plan_year.id).benefit_groups.first.reference_plan_id).to eq(new_renewal_health_plan.id)
+        expect(EmployerProfile.all.count).to eq 1
+        expect(EmployerProfile.first.plan_years.map(&:aasm_state)).to eq ["active", "renewing_draft"]
+        expect(EmployerProfile.first.plan_years.map{|py| py.benefit_groups.count}).to eq [1,1]
+        expect(EmployerProfile.first.plan_years.where(aasm_state: "active").first.benefit_groups.first.reference_plan_id).to eq(new_current_health_plan.id)
+        expect(EmployerProfile.first.plan_years.where(aasm_state: "renewing_draft").first.benefit_groups.first.reference_plan_id).to eq(new_renewal_health_plan.id)
       end
     end
   end

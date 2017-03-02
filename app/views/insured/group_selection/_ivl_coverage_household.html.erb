@@ -8,14 +8,14 @@
           #TEMPORARY CODE DO NOT COPY   TODO
           role = family_member.person.consumer_role
           family = family_member.family
-          rule = InsuredEligibleForBenefitRule.new(role, @benefit, family: family)
+          rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on})
           is_coverage, errors = rule.satisfied?
           @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
           errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
         end
-
         #TEMPORARY CODE DO NOT COPY  TODO
         %>
+
         <tr class="<%='ineligible_row' unless is_coverage%>">
           <td width="20">
             <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>

@@ -225,7 +225,7 @@ class Family
     else
       add_family_member(new_primary_family_member, is_primary_applicant: true)
     end
-    
+
     primary_family_member
   end
 
@@ -612,6 +612,21 @@ class Family
     if primary_applicant.person.consumer_role.present?
       active_family_members.each do |family_member|
         build_consumer_role(family_member)
+      end
+    end
+  end
+
+  def build_resident_role(family_member, opts = {})
+    person = family_member.person
+    return if person.resident_role.present?
+    person.build_resident_role({:is_applicant => false}.merge(opts))
+    person.save!
+  end
+
+  def check_for_resident_role
+    if primary_applicant.person.resident_role.present?
+      active_family_members.each do |family_member|
+        build_resident_role(family_member)
       end
     end
   end

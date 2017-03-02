@@ -85,7 +85,9 @@ RSpec.describe Employers::EmployerProfilesController do
     ) }
     let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
     let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
+    
+    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+    let(:plan_year)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
     let(:employer_profile) { plan_year.employer_profile}
 
     let(:policy) {double("policy")}

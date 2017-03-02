@@ -1,0 +1,34 @@
+<div class="container">
+  <div id="new_person_wrapper">
+    <div class="row">
+      <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+      <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
+        <h1 class="darkblue">Personal Information</h1>
+        <p>Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.</p>
+        <p class='memo'>* = required field</p>
+        <%= render "shared/error_messages", object: f.object %>
+        <%= render 'shared/person/resident_information', f: f %>
+        <br>
+        <%= render 'shared/resident_fields', f: f %>
+        <br>
+        <%= render 'shared/resident_home_address_fields', f: f %><br>
+        <%= render 'shared/phone_fields', f: f %><br>
+
+        <div id="email_info" class="row row-form-wrapper no-buffer">
+          <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+            <%= render 'shared/email_fields', f: email %>
+          <% end %>
+        </div>
+        <br>
+        <%= render 'shared/contact_preferences', {f: f, role: :resident_role} %>
+      </div>
+
+
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+        <%= render  partial: 'shared/resident_progress', locals: {step: '1'} %>
+        <%= render partial: 'shared/help_me_sign_up' %>
+      </div>
+    </div>
+  </div>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+</div>

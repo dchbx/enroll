@@ -73,7 +73,7 @@ shop_notice_triggers = [
       {
         name: 'PlanYear Renewal',
         notice_template: 'notices/shop_notices/3a_employer_plan_year_renewal',
-        notice_builder: 'ShopNotices::EmployerRenewalNotice',
+        notice_builder: 'ShopNotices::RenewalEmployerEligibilityNotice',
         mpi_indicator: 'MPI_SHOPRA',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -94,7 +94,7 @@ shop_notice_triggers = [
       {
         name: 'PlanYear Renewal Auto-Published',
         notice_template: 'notices/shop_notices/3b_employer_plan_year_renewal',
-        notice_builder: 'ShopNotices::EmployerRenewalNotice',
+        notice_builder: 'ShopNotices::RenewalEmployerEligibilityNotice',
         mpi_indicator: 'MPI_SHOPRB',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -104,6 +104,50 @@ shop_notice_triggers = [
         }
       }
     ] 
+  },
+
+  {
+    hbx_id: 'SHOP5',
+    title: 'Group Renewal Available',
+    description: 'Notice will be sent to the Renewal Groups three months prior to their plan year renewing',
+    resource_name: 'employer',
+    event_name: 'group_renewal_5',
+    notice_triggers: [
+      {
+        name: 'Group Renewal Notice',
+        notice_template: 'notices/shop_notices/5_employer_renewal_notice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
+        mpi_indicator: 'MPI_SHOP5',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'SHOP6',
+    title: 'Welcome to DC Health Link, Group Renewal Available',
+    description: 'Renewing Your Health Insurance Coverage for Your Small Business on November 1, 2016',
+    resource_name: 'employer',
+    event_name: 'conversion_group_renewal',
+    notice_triggers: [
+      {
+        name: 'Conversion, Group Renewal Available',
+        notice_template: 'notices/shop_notices/6_conversion_group_renewal_notice',
+        notice_builder: 'ShopNotices::EmployerRenewalNotice',
+        mpi_indicator: 'MPI_SHOP6',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
   },
 ]
 

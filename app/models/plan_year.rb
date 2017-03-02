@@ -689,7 +689,32 @@ class PlanYear
         "2016-10-01" => '2016,9,13',
         "2016-11-01" => '2016,10,12',
         "2016-12-01" => '2016,11,14',
-        "2017-01-01" => '2016,12,13'}.each_pair do |k, v|
+        "2017-01-01" => '2016,12,13',
+        "2017-02-01" => '2017,1,12',
+        "2017-03-01" => '2017,2,14',
+        "2017-04-01" => '2017,3,14',
+        "2017-05-01" => '2017,4,12',
+        "2017-06-01" => '2017,5,12',
+        "2017-07-01" => '2017,6,13',
+        "2017-08-01" => '2017,7,12',
+        "2017-09-01" => '2017,8,14',
+        "2017-10-01" => '2017,9,12',
+        "2017-11-01" => '2017,10,12',
+        "2017-12-01" => '2017,11,14',
+        "2018-01-01" => '2017,12,12',
+        "2018-02-01" => '2018,1,12',
+        "2018-03-01" => '2018,2,13',
+        "2018-04-01" => '2018,3,13',
+        "2018-05-01" => '2018,4,12',
+        "2018-06-01" => '2018,5,14',
+        "2018-07-01" => '2018,6,12',
+        "2018-08-01" => '2018,7,12',
+        "2018-09-01" => '2018,8,14',
+        "2018-10-01" => '2018,9,12',
+        "2018-11-01" => '2018,10,12',
+        "2018-12-01" => '2018,11,13',
+        "2019-01-01" => '2018,12,12',
+        }.each_pair do |k, v|
           dates_map[k] = Date.strptime(v, '%Y,%m,%d')
         end
 
@@ -729,7 +754,7 @@ class PlanYear
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
-    state :renewing_draft
+    state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -984,6 +1009,16 @@ private
       self.employer_profile.trigger_notices("planyear_renewal_3a")
     elsif event_name == "force_publish"
       self.employer_profile.trigger_notices("planyear_renewal_3b")
+    end
+  end
+
+  def renewal_group_notice
+    event_name = aasm.current_event.to_s.gsub(/!/, '')
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
+    if self.employer_profile.is_conversion?
+      self.employer_profile.trigger_notices("conversion_group_renewal")
+    else
+      self.employer_profile.trigger_notices("group_renewal_5")
     end
   end
 

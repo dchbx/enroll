@@ -367,6 +367,7 @@ private
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       :naturalized_citizen,
       :eligible_immigration_status,
       :indian_tribe_member,

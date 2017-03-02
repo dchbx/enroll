@@ -16,6 +16,8 @@ module Insured::FamiliesHelper
   def current_premium hbx_enrollment
     if hbx_enrollment.kind == 'employer_sponsored'
       hbx_enrollment.total_employee_cost
+    elsif hbx_enrollment.kind == 'coverall'
+      hbx_enrollment.total_premium
     else
       hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
     end
