@@ -193,7 +193,7 @@ class CensusEmployee < CensusMember
 
 
   def update_hbx_enrollment_effective_on_by_hired_on
-    if employee_role.present? && hired_on != employee_role.hired_on
+    if employee_role.present? && (employee_role.read_attribute(:hired_on).blank? || hired_on != Date.parse(employee_role.read_attribute(:hired_on).strftime('%Y/%m/%d')))
       employee_role.set(hired_on: hired_on)
       enrollments = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.open_enrollments rescue []
       enrollments.each do |enrollment|

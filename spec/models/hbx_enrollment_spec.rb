@@ -980,7 +980,7 @@ describe HbxEnrollment, dbclean: :after_each do
   context ".effective_date_for_enrollment" do
     context 'when new hire' do
 
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record.beginning_of_month, created_at: TimeKeeper.date_of_record ) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record, created_at: TimeKeeper.date_of_record ) }
 
       it 'should return new hire effective date' do
         expect(employee_role.can_enroll_as_new_hire?).to be_truthy
@@ -1047,6 +1047,7 @@ describe HbxEnrollment, dbclean: :after_each do
     context 'when under open enrollment' do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
+        allow(employee_role.census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       end
 
       it "should return benefit group and assignment" do
