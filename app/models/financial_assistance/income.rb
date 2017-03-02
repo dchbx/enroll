@@ -33,16 +33,25 @@ class FinancialAssistance::Income
   )
 
   FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
+  TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
 
   field :title, type: String
   field :kind, as: :income_type, type: String
   field :hours_per_week, type: Integer, default: 0
   field :amount, type: Integer, default: 0
+  field :amount_tax_exempt, type: Integer, default: 0
   field :frequency_kind, type: String
   field :start_on, type: Date
   field :end_on, type: Date
   field :is_projected, type: Boolean, default: false
+  field :tax_form, type: String
+  field :employer_name, type: String
+  field :has_indicated_income_from_american_indian_or_alaskan_native, type: Boolean
+  field :is_from_distributions_pymnts_ownership_interests_property_usage_rights, type: Boolean
+  field :has_scholarship_income_used_for_education, type: Boolean
   field :submitted_at, type: DateTime
+
+
 
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
@@ -56,6 +65,9 @@ class FinancialAssistance::Income
   validates :frequency_kind,  presence: true,
                               inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
   validates :start_on,        presence: true
+
+  validates :tax_form,       presence: true,
+                              inclusion: { in: TAX_FORM_KINDS, message: "%{value} is not a valid tax form type" }
 
   validate :start_on_must_precede_end_on
 

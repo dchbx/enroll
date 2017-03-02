@@ -15,6 +15,9 @@ class FinancialAssistance::Applicant
   field :is_required_to_file_taxes, type: Boolean, default: true
   field :tax_filer_kind, type: String, default: "tax_filer"
   field :is_joint_tax_filing, type: Boolean, default: false
+  #field :is_claimed_as_tax_dependent, type: Boolean
+  field :is_tax_dep_of_existing_member_filing_taxes, type: Boolean
+  field :is_tax_dep_of_anyone_not_on_application, type: Boolean
 
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
@@ -48,6 +51,12 @@ class FinancialAssistance::Applicant
   field :is_forty_quarters, type: Boolean, default: false
 
   field :non_ssn_apply_reason, type: Boolean
+
+  # 5 Yr. Bar QNs.
+  field :moved_on_or_after_welfare_reformed_law, type: Boolean
+  field :is_veteran_or_active_military, type: Boolean
+  field :is_spouse_or_dep_child_of_veteran_or_active_military, type: Boolean
+  field :is_currently_enrolled_in_health_plan, type: Boolean
 
   embeds_many :incomes,     inverse_of: :income,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  inverse_of: :deduction,  class_name: "::FinancialAssistance::Deduction"
