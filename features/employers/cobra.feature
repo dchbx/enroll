@@ -6,7 +6,7 @@ Feature: COBRA basic
     Then Jack Doe create a new account for employer
     Then I should see a successful sign up message
     Then I should click on employer portal
-    Then Jack Doe creates a new employer profile
+    Then Jack Doe creates a new employer profile with default_office_location
     When I go to the Profile tab
     When Employer goes to the benefits tab I should see plan year information
     And Employer should see a button to create new plan year
