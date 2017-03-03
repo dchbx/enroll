@@ -46,6 +46,7 @@ class FinancialAssistance::Income
   field :is_projected, type: Boolean, default: false
   field :tax_form, type: String
   field :employer_name, type: String
+  field :employer_id, type: Integer
   field :has_indicated_income_from_american_indian_or_alaskan_native, type: Boolean
   field :is_from_distributions_pymnts_ownership_interests_property_usage_rights, type: Boolean
   field :has_scholarship_income_used_for_education, type: Boolean
