@@ -9,6 +9,7 @@ module Forms
     attr_accessor :user_id
     attr_accessor :no_ssn
     attr_accessor :dob_check #hidden input filed for one time DOB warning
+    attr_accessor :is_applying_coverage
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
