@@ -31,7 +31,7 @@ module Factories
       prev_plan_year_end   = @plan_year_start_on - 1.day
 
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
-      shop_enrollments.reject!{|enrollment| !(enrollment.currently_active?) }
+      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? && !enrollment.cobra_future_active? }
 
       if shop_enrollments.present?
         passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
@@ -99,9 +99,10 @@ module Factories
       renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
       renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
-  
+
       renewal_enrollment.waiver_reason = waived_enrollment.try(:waiver_reason) || "I do not have other coverage"
       renewal_enrollment.renew_waived
+      renewal_enrollment.submitted_at = TimeKeeper.datetime_of_record
 
       if renewal_enrollment.save
         return
@@ -146,7 +147,7 @@ module Factories
     end
 
     def assign_common_attributes(active_enrollment, renewal_enrollment)
-      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id 
+      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id
           writing_agent_id original_application_type kind special_enrollment_period_id
         )
       common_attributes.each do |attr|
@@ -192,12 +193,13 @@ module Factories
 
       renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
+      renewal_enrollment.kind = active_enrollment.kind if active_enrollment.is_cobra_status?
       # Set the HbxEnrollment to proper state
 
       # Renew waiver status
-      if active_enrollment.is_coverage_waived? 
+      if active_enrollment.is_coverage_waived?
         renewal_enrollment.waiver_reason = active_enrollment.waiver_reason
-        renewal_enrollment.waive_coverage 
+        renewal_enrollment.waive_coverage
       end
 
       renewal_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment, renewal_enrollment)
@@ -249,7 +251,7 @@ module Factories
     end
 
   end
-  
+
   class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
 

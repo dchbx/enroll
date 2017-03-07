@@ -14,7 +14,7 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.kind == 'employer_sponsored'
+    if hbx_enrollment.is_shop?
       hbx_enrollment.total_employee_cost
     elsif hbx_enrollment.kind == 'coverall'
       hbx_enrollment.total_premium

@@ -303,11 +303,49 @@ var EmployerProfile = ( function( window, undefined ) {
       Freebies.tooltip();
   }
 
+  function validateCobraBeginDate() {
+    var hired_on_str = $('#census_employee_hired_on_jq_datepicker_plain_field').val();
+    var cobra_begin_date_str = $('#census_employee_cobra_begin_date_jq_datepicker_plain_field').val();
+    if($('#census_employee_existing_cobra').prop("checked") == true){
+      if (hired_on_str != '' && cobra_begin_date_str != ''){
+        var hired_on = new Date(hired_on_str);
+        var cobra_begin_date = new Date(cobra_begin_date_str);
+        if (hired_on > cobra_begin_date) {
+          alert('Hire Date must be before Cobra Begin Date.');
+        }
+      }
+    }
+  }
+
+  function submitCobraDate(type, ce_id) {
+    var target = $("tr."+type+'_'+ce_id);
+    var cobra_date = target.find('input.date-picker').val();
+    var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+    $.ajax({
+      type: 'get',
+      datatype : 'js',
+      url: cobra_link,
+      data: {cobra_date: cobra_date},
+    });
+  }
+
+  function viewCobraDateField() {
+    var target = $('#census_employee_existing_cobra');
+    if(target.prop("checked") == true){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').removeClass('hidden');
+    }else if(target.prop("checked") == false){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').addClass('hidden');
+    }
+  }
+
   return {
       changeCensusEmployeeStatus: changeCensusEmployeeStatus,
       validateEditPlanYear : validateEditPlanYear,
       validatePlanYear : validatePlanYear,
-      viewDetails : viewDetails
+      validateCobraBeginDate : validateCobraBeginDate,
+      viewDetails : viewDetails,
+      viewCobraDateField : viewCobraDateField,
+      submitCobraDate : submitCobraDate,
     };
 
 } )( window );
@@ -403,13 +441,6 @@ $(function() {
   })
 })
 
-$(document).on('click', ".show_confirm", function(){
-  var el_id = $(this).attr('id');
-  $( "td." + el_id ).toggle();
-  $( "#confirm-terminate-2" ).hide();
-  return false
-});
-
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
   var link_to_delete = $(this).data('link');
@@ -447,6 +478,7 @@ $(document).on('click', ".rehire_confirm", function(){
     }
   });
 });
+
 
 $(document).on('change', '.dependent_info input.dob-picker', function(){
   var element = $(this).val().split("/");

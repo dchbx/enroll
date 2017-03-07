@@ -278,6 +278,15 @@ class BenefitGroup
     end
   end
 
+  def effective_on_for_cobra(date_of_hire)
+    case effective_on_kind
+    when "date_of_hire"
+      [plan_year.start_on, date_of_hire].max
+    when "first_of_month"
+      [plan_year.start_on, eligible_on(date_of_hire)].max
+    end
+  end
+
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end

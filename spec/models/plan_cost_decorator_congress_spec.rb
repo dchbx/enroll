@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
   let!(:plan_year)          { double("PlanYear", start_on: Date.today.beginning_of_year) }
   let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year, over_one_dependents_max_amt: Money.new("97190"), employee_max_amt: Money.new("43769"), first_dependent_max_amt: Money.new("97190"), contribution_pct_as_int: 75) }
-  let(:hbx_enrollment)      { double("HbxEnrollment", class: HbxEnrollment, hbx_enrollment_members: hbx_enrollment_members) }
+  let(:hbx_enrollment)      { HbxEnrollment.new }
   let!(:hem_employee)       { double("HbxEnrollmentMember_Employee", class: HbxEnrollmentMember, _id: "a", age_on_effective_date: 19, is_subscriber?: true , primary_relationship: "self") }
   let!(:hem_spouse)         { double("HbxEnrollmentMember_Spouse",   class: HbxEnrollmentMember, _id: "b", age_on_effective_date: 20, is_subscriber?: false, primary_relationship: "spouse") }
   let!(:hem_child_1)        { double("HbxEnrollmentMember_Child_1",  class: HbxEnrollmentMember, _id: "c", age_on_effective_date: 18, is_subscriber?: false, primary_relationship: "child") }
@@ -19,6 +19,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
 
   before do
     allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * premium_constant}
+    allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return hbx_enrollment_members
   end
 
   context "when no hbx enrollment members" do

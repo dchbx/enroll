@@ -109,7 +109,7 @@ module InvoiceHelper
 
     enrollment_summary.each do |name, summary| 
       carrier_plan_services_data = [ 
-        ["Last 4 SSN", "Last Name","First Name", "No. of Enrolled (1=EE only)", "Coverage Month", "Employer Cost", "Employee Cost", "Premium"]
+        ["Last Name","First Name", "No. of Enrolled (1=EE only)", "Coverage Month", "Employer Cost", "Employee Cost", "Premium"]
       ]
       @pdf.start_new_page
 
@@ -136,9 +136,9 @@ module InvoiceHelper
 
       summary["enrollments"].each do |enrollment|
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
-        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
+        carrier_plan_services_data << ["#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
       end
-      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{currency_format(summary['total_premium'])}"]
+      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "$#{currency_format(summary['total_premium'])}"]
       dchbx_table_by_plan(carrier_plan_services_data)
     end
 
@@ -223,10 +223,10 @@ module InvoiceHelper
       style(column(1..-1), :align => :center)
       style(columns(-1), :align => :right)
       style(columns(0).row(-1), :width => 80)
+      style(columns(2), :width => 60)
       style(columns(3), :width => 60)
       style(columns(4), :width => 60)
-      style(columns(5), :width => 60)
-      style(columns(6), :width => 70)
+      style(columns(5), :width => 70)
     end
   end
 

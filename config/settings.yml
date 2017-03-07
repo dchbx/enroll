@@ -95,6 +95,9 @@ aca:
       maximum_length:
         months: 2
 
+    cobra_enrollment_period:
+      months: 6
+
     group_file:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"

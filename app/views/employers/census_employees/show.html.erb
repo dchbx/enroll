@@ -53,7 +53,12 @@
     <div class="vertically-aligned-row auto-width">
       <div class="text-right col-xs-4">
         <div class="row">
-          <span></span>
+          <% if @census_employee.is_cobra_status? %>
+            <div id='cobra_bar'>
+              <div class='title'><strong>COBRA/Continuation</strong></div>
+              <div><strong>effective date:</strong><%= format_date @census_employee.cobra_begin_date %></div>
+            </div>
+          <% end %>
           <span><strong><%= is_rehired(@census_employee) ? "Rehired:" : "Hired:" %></strong>
           <%= format_date @census_employee.hired_on %></span>&nbsp;&nbsp;
           <% if @census_employee.coverage_terminated_on.blank? %>
@@ -123,7 +128,50 @@
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Disable COBRA Functionality from this page for now. -->
+    <!--
+    <div class="col-xs-12 row">
+      <br/>
+      <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), class: 'btn btn-default return_to_employee_roster', "aria-expanded" => "true" %>
+      <%if @census_employee.aasm_state == "employment_terminated" %>
+          <a class="show_confirm btn btn-primary" id="show_confirm_<%= @census_employee.id %>">
+              <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$('.cobra_confirm_<%= @census_employee.id %>').toggle();">COBRA</span>
+            </a>
+      <%end%>
+      <% if @census_employee.aasm_state == 'employment_terminated' %>
+            <a class="show_confirm btn btn-primary" id="show_confirm_<%= @census_employee.id %>">
+              <span  class="hidden-xs hidden-sm visible-md visible-lg" onclick="$('.rehire_<%= @census_employee.id %>').toggle();">Rehire</span>
+            </a>
+      <%end%>
+      <div class="unbrd cobra_confirm cobra_confirm_<%= @census_employee.id %> dn">
+          <span class="confirm-terminate-wrapper">
+            <span>Employment Termination Date: </span>
+            <span><%= format_date @census_employee.employment_terminated_on %></span>
+          </span>
+          <span class="confirm-cobra-wrapper" id="enter-date">
+            <%=cobra_effective_date(@census_employee) %>
+          </span>
+         <span>
+            <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id,@census_employee.id) %>" href="javascript:;" id="cobra_<%= @census_employee.id %>">
+              <strong>&nbsp;Submit</strong>
+            </a>
+        </span>
+        </div>
+      <% if @census_employee.aasm_state == 'employment_terminated' %>
+        <div class="unbrd  rehire_<%= @census_employee.id %> dn">
+          <div class="confirm-terminate-wrapper show_confirm_<%= @census_employee.id %>" colspan="11" id="enter-date">
+            <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
+            <span class="confirm-terminate" style="display:inline;">
+              <input class="text-center date-picker" data-date-min="<%= rehire_date_min(@census_employee) %>d" placeholder="e.g. 5/1/2015" type="text">
+              <a class="btn btn-default rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, @census_employee.id) %>" href="javascript:;" id="rehire_<%= @census_employee.id %>">
+                <strong>&nbsp;Submit</strong>
+              </a>
+            </span>
+          </div>
+        </div>
+      <%end%>
+  </div>-->
   <div class="row">
     <div class="col-xs-12">
       <h3>

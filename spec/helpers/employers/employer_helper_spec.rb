@@ -29,6 +29,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                             )}
 
     before do
+      allow(benefit_group_assignment).to receive(:census_employee).and_return(census_employee)
       allow(benefit_group_assignment).to receive(:aasm_state).and_return("coverage_selected")
       allow(census_employee).to receive(:employee_role).and_return(employee_role)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
@@ -283,6 +284,51 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
           expect(current_benefit_groups.include?(draft_plan_year.benefit_groups.first)).to be_truthy
           expect(renewal_benefit_groups).to be_empty
         end
+      end
+    end
+
+    context "show_cobra_fields?" do
+      let(:active_plan_year)  { FactoryGirl.build(:plan_year,
+                                                  start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                  end_on: TimeKeeper.date_of_record.beginning_of_month + 1.year - 1.day,
+                                                  aasm_state: 'active') }
+      let(:renewing_plan_year)  { FactoryGirl.build(:plan_year,
+                                                  start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                  end_on: TimeKeeper.date_of_record.beginning_of_month + 1.year - 1.day,
+                                                  aasm_state: 'renewing_draft') }
+
+      let(:employer_profile_with_active_plan_year) { FactoryGirl.create(:employer_profile, plan_years: [active_plan_year]) }
+      let(:employer_profile_with_renewing_plan_year) { FactoryGirl.create(:employer_profile, plan_years: [active_plan_year, renewing_plan_year]) }
+      let(:conversion_employer_profile_with_renewing_plan_year) { FactoryGirl.create(:employer_profile, profile_source: 'conversion', plan_years: [active_plan_year, renewing_plan_year]) }
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+      let(:user) { FactoryGirl.create(:user) }
+
+      it "should return true when admin" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return true
+        expect(helper.show_cobra_fields?(employer_profile, user)).to eq true
+      end
+
+      it "should return false when employer_profile without active_plan_year" do
+        expect(helper.show_cobra_fields?(employer_profile, user)).to eq false
+      end
+
+      it "should return true when employer_profile with active_plan_year during open enrollment" do
+        allow(active_plan_year).to receive(:open_enrollment_contains?).and_return true
+        expect(helper.show_cobra_fields?(employer_profile_with_active_plan_year, user)).to eq true
+      end
+
+      it "should return false when employer_profile with active_plan_year not during open enrollment" do
+        allow(active_plan_year).to receive(:open_enrollment_contains?).and_return false
+        expect(helper.show_cobra_fields?(employer_profile_with_active_plan_year, user)).to eq false 
+      end
+
+      it "should return false when employer_profile is not conversion and with renewing" do
+        expect(helper.show_cobra_fields?(employer_profile_with_renewing_plan_year, user)).to eq false 
+      end
+
+      it "should return false when employer_profile is conversion and has more than 2 plan_years" do
+        conversion_employer_profile_with_renewing_plan_year.plan_years << active_plan_year
+        expect(helper.show_cobra_fields?(conversion_employer_profile_with_renewing_plan_year, user)).to eq false 
       end
     end
   end

@@ -83,10 +83,10 @@
       <div class="plan-end info vertical-align-top">
         <strong class="text-danger">Plan End:
         </strong>
-        <% if @census_employee.coverage_terminated_on.present? %>
-        <span class="text-danger">
-          <%= @census_employee.coverage_terminated_on.end_of_month %>
-        </span>
+        <% if @census_employee.show_plan_end_date? %>
+          <span class="text-danger">
+            <%= @census_employee.coverage_terminated_on.end_of_month %>
+          </span>
         <% end %>
       </div>
     </div>
@@ -107,6 +107,25 @@
     </div>
     <% end %>
     <% end %>
+    <% if hbx_enrollment.future_enrollment_termination_date.present? %>
+      <div class="col-xs-12 vertically-aligned-row">
+        <div class="enrollment-effective info">
+          <p>
+            <strong>Future enrollment termination date: </strong>
+            <%= hbx_enrollment.future_enrollment_termination_date %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="col-xs-12 vertically-aligned-row">
+      <div class="enrollment-type info">
+        <p>
+          <strong>Market Type: </strong>
+          <%= show_market_name_by_enrollment hbx_enrollment %>
+        </p>
+      </div>
+    </div>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">
         <p>

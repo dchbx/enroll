@@ -53,6 +53,11 @@ FactoryGirl.define do
       aasm_state "coverage_selected"
     end
 
+    trait :cobra_shop do
+      kind "employer_sponsored_cobra"
+      aasm_state "coverage_selected"
+    end
+
     trait :health_plan do
       active_individual_health_plan
     end

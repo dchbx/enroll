@@ -17,12 +17,15 @@
           <th>Renewal Benefit Package</th>
           <% end %>
           <% if ['terminated', 'all'].include?(status) %>
-          <th>Termination Date</th>
+            <th>Termination Date</th>
           <% end %>
           <th>Enrollment Status</th>
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <th>Renewal Enrollment Status</th>
           <% end %>
+          <th>
+            &nbsp;
+          </th>
           <th>
             &nbsp;
           </th>
@@ -51,30 +54,73 @@
           </td>
           <% end %>
           <% if ['terminated', 'all'].include?(status) %>
-          <td><%= format_date census_employee.employment_terminated_on %>
-          </td>
+            <td><%= format_date census_employee.employment_terminated_on %></td>
           <% end %>
           <td><%= enrollment_state(census_employee) %></td>
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <td><%= renewal_enrollment_state(census_employee) %></td>
           <% end %>
-          <td class="table-functions">
-          <% if census_employee.employment_terminated? %>
-            <a class="show_confirm btn btn-green-2" id="show_confirm_#{census_employee.id} <%= pundit_class EmployerProfile, :updateable? %>">
-              <span class="hidden-xs hidden-sm visible-md visible-lg" style="margin-left: -10px;" onclick="$(this).closest('tr').next().show();">Rehire</span>
-            </a>
+          <% if census_employee.aasm_state == 'employment_terminated' %>
+            <td class="table-functions">
+              <a class="show_confirm btn btn-green-2 <%= pundit_class EmployerProfile, :updateable? %>" id="show_confirm_<%= census_employee.id %>">
+                <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$(this).closest('tr').nextAll('.rehire_<%= census_employee.id %>').toggle();">Rehire</span>
+              </a>
+            </td>
+          <% elsif census_employee.may_terminate_employee_role? %>
+            <td class="table-functions">
+              <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
+              <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
+            </td>
           <% else %>
-          <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id, status: status, tab: 'employees') %>
-            <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
+            <td class="table-functions"></td>
           <% end %>
-          </td>
+          <% if census_employee.can_elect_cobra? || census_employee.may_reinstate_eligibility? %>
+            <td class="table-functions">
+             <%= cobra_button(census_employee) %>
+            </td>
+          <% else %>
+            <td class="table-functions"></td>
+          <% end %>
         </tr>
-        <% if census_employee.employment_terminated? %>
+
+        <% if census_employee.can_elect_cobra? %>
+          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+            <td class="confirm-terminate-wrapper" colspan="3">
+              <span>Employment Termination Date: </span>
+              <span><%= format_date census_employee.employment_terminated_on %></span>
+            </td>
+            <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
+              <%=cobra_effective_date(census_employee) %>
+            </td>
+            <td colspan="2">
+              <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
+                <strong>&nbsp;Submit</strong>
+              </a>
+            </td>
+          </tr>
+        <% end %>
+        <% if census_employee.may_reinstate_eligibility? %>
+         <tr class="unbrd cobra_confirm cobra_reinstate_<%= census_employee.id %> dn">
+            <td class="confirm-terminate-wrapper" colspan="3">
+              <span>Employment Termination Date: </span>
+              <span><%= format_date census_employee.employment_terminated_on %></span>
+            </td>
+            <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
+              <%=cobra_effective_date(census_employee) %>
+            </td>
+            <td colspan="2">
+              <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_reinstate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_reinstate', '<%= census_employee.id %>')">
+                <strong>&nbsp;Submit</strong>
+              </a>
+            </td>
+          </tr>
+          <%end%>
+        <% if census_employee.aasm_state == 'employment_terminated' %>
         <tr class="unbrd  rehire_<%= census_employee.id %> dn">
           <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="11" id="enter-date">
             <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
             <span class="confirm-terminate" style="display:inline;">
-              <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text">
+              <input class="text-center date-picker" data-date-min="<%= rehire_date_min(census_employee) %>d" placeholder="e.g. 5/1/2015" type="text">
               <a class="rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="rehire_<%= census_employee.id %>">
                 <strong>&nbsp;Submit</strong>
               </a>
@@ -82,7 +128,7 @@
           </td>
         </tr>
             <tr></tr>
-            <% else %>
+          <% elsif census_employee.may_terminate_employee_role? %>
             <tr class="unbrd  remove_<%= census_employee.id %> dn">
               <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">
                 <div class="confirm-terminate <%=pundit_class EmployerProfile, :updateable?%>">
@@ -90,8 +136,7 @@
                     <br/>
                     <span class="lg fourteen">(termination date must be within the past 60 days)</span>
                   </h5>
-                  <div class="pull-right" style="margin-top: 2px;>
-                  <!--<h5>Enter termination date to remove this employee:</h5>-->
+                  <div class="pull-right" style="margin-top: 2px;">
                   <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
                   <a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">
                   Terminate Employee

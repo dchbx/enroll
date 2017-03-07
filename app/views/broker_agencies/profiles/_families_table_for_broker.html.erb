@@ -15,7 +15,6 @@
         <th>Consumer?</th>
         <th>Employee?</th>
         <th></th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -34,9 +33,6 @@
           <td><%= pp.user.present? ? "Yes" : "No" %></td>
           <td class='consumer_role_present'><%= pp.consumer_role.present?  ? "Yes" : "No" %></td>
           <td class='employee_role_present'><%= pp.active_employee_roles.present?  ? "Yes" : "No" %></td>
-          <td class='unblock'>
-            <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
-          </td>
         </tr>
       <% end %>
     </tbody>

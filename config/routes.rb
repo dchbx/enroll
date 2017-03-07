@@ -146,7 +146,6 @@ Rails.application.routes.draw do
     resources :families, only: [:show] do
       get 'new'
       member do
-        post 'unblock'
         delete 'delete_consumer_broker'
       end
 
@@ -287,6 +286,8 @@ Rails.application.routes.draw do
         get :delink
         get :terminate
         get :rehire
+        get :cobra
+        get :cobra_reinstate
         get :benefit_group, on: :member
       end
     end

@@ -571,6 +571,26 @@ describe EmployeeRole, dbclean: :after_each do
       expect(employee_role.can_select_coverage?).to eq false
     end
   end
+
+  context "is_cobra_status?" do
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should return false when without census_employee" do
+      allow(employee_role).to receive(:census_employee).and_return nil
+      expect(employee_role.is_cobra_status?).to be_falsey
+    end
+
+    context "with census_employee" do
+      before :each do
+        allow(employee_role).to receive(:census_employee).and_return census_employee
+      end
+
+      it "should return cobra state of census_employee" do
+        expect(employee_role.is_cobra_status?).to eq census_employee.is_cobra_status?
+      end
+    end
+  end
 end
 
 describe EmployeeRole do

@@ -2,7 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
+  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
@@ -131,7 +131,6 @@ class Insured::FamiliesController < FamiliesController
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      @qle_aptc_block = @family.is_blocked_by_qle_and_assistance?(@qle, session["individual_assistance_path"])
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
@@ -195,11 +194,6 @@ class Insured::FamiliesController < FamiliesController
     else
       redirect_to :back
     end
-  end
-
-  def unblock
-    @family = Family.find(params[:id])
-    @family.set(status: "aptc_unblock")
   end
 
   # admin manually uploads a notice for person

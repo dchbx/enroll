@@ -94,7 +94,22 @@ def people
       ssn: defined?(@u) ? @u.ssn : "761234567",
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
-
+    },
+    "Jack Cobra" => {
+      first_name: "Jack",
+      last_name: "Cobra",
+      dob: "08/10/1960",
+      ssn: "196008107",
+      email: "jack@cobra.com",
+      password: 'aA1!aA1!aA1!'
+    },
+    "Jack Employee" => {
+      first_name: "Jack",
+      last_name: "Employee",
+      dob: "08/10/1960",
+      ssn: "196008111",
+      email: "jack@employee.com",
+      password: 'aA1!aA1!aA1!'
     },
     "Tim Wood" => {
       first_name: "Tim",
@@ -409,7 +424,7 @@ Given(/^(.+) has not signed up as an HBX user$/) do |actor|
   step "I use unique values"
 end
 
-When(/^I visit the Employer portal$/) do
+When(/^.* visit the Employer portal$/) do
   visit "/"
   page.click_link 'Employer Portal'
   screenshot("employer_start")

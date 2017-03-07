@@ -95,6 +95,14 @@ class EmployeeRole
   alias_method :census_employee=, :new_census_employee=
   alias_method :census_employee, :new_census_employee
 
+  def is_cobra_status?
+    if census_employee.present?
+      census_employee.is_cobra_status?
+    else
+      false
+    end
+  end
+
   def coverage_effective_on
     if benefit_group.present?
       effective_on_date = benefit_group.effective_on_for(census_employee.hired_on)

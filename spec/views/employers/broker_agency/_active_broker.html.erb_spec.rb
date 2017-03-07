@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "employers/broker_agency/_active_broker.html.erb" do
   let(:employer_profile) { broker_agency_account.employer_profile }
-  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account) }
+  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, start_on: TimeKeeper.date_of_record) }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
 
@@ -18,6 +18,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
 
   context "terminate time" do
     it "set date to current day" do
+      allow(broker_agency_account).to receive(:start_on).and_return(TimeKeeper.date_of_record)
       link = employers_employer_profile_broker_agency_terminate_path(employer_profile.id, employer_profile.broker_agency_profile.id, termination_date: TimeKeeper.date_of_record, direct_terminate: true)
       render "employers/broker_agency/active_broker", direct_terminate: true
       expect(rendered).to have_link('Terminate Broker', href: link)
@@ -25,7 +26,6 @@ describe "employers/broker_agency/_active_broker.html.erb" do
 
     it "set date to the day before current" do
       allow(broker_agency_account).to receive(:start_on).and_return(TimeKeeper.date_of_record - 10.days)
-
       link = employers_employer_profile_broker_agency_terminate_path(employer_profile.id, employer_profile.broker_agency_profile.id, termination_date: TimeKeeper.date_of_record - 1.day, direct_terminate: true)
       render "employers/broker_agency/active_broker", direct_terminate: true
       expect(rendered).to have_link('Terminate Broker', href: link)
