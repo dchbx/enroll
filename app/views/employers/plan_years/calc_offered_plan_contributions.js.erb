@@ -34,7 +34,7 @@ $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   $("#<%= @location_id %> .edit-add-dental").fadeIn();
   $("#<%= @location_id %> .dental-plan-offering, #<%= @location_id %> .reference-steps .dental:first").show();
   $("#<%= @location_id %> .select-dental-plan").prev().show();
-  validateEditPlanYear();
+  EmployerProfile.validateEditPlanYear();
   $("#<%= @location_id %> .edit-add-dental, #<%= @location_id %> .dental .nav-tabs").show();
 
 });
@@ -62,7 +62,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
         var url = $(this).attr('href');
         $(this).attr('href', url+"&location_id="+newLocationId);
       });
-      validateEditPlanYear();
+      EmployerProfile.validateEditPlanYear();
     });
     if ( '<%= @plan_option_kind %>' == 'single_plan' ) {
       plan_count = $('#<%= @location_id %> .dent.plan-count').text();
@@ -75,7 +75,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();
       $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
-      validateEditPlanYear();
+      EmployerProfile.validateEditPlanYear();
     });
 
   }
