@@ -4,7 +4,6 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class UpdateInvalidBenefitGroupAssignmentsForEmployer < MongoidMigrationTask
   
   def migrate
-    # organizations = Organization.all.first
     organizations = Organization.where(fein: ENV['fein'])
     if organizations.size !=1
       'Issues with fein'
