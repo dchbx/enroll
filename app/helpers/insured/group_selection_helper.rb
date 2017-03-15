@@ -16,6 +16,10 @@ module Insured
       person.try(:has_active_resident_role?)
     end
 
+    def check_status_census_employee
+        @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental?
+    end
+
     def health_relationship_benefits(employee_role)
       benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
       if benefit_group.present?

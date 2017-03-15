@@ -13,7 +13,6 @@
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
-
           <% if can_shop_shop?(@person) %>
             <div id="shop-coverage-household" class="<%= 'dn' if @market_kind == 'individual' %>">
               <div class="module group-selection-table health">
@@ -21,7 +20,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+              <% if check_status_census_employee %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -30,7 +29,7 @@
               <% end %>
             </div>
           <% end %>
-        
+
           <% if can_shop_individual?(@person) %>
             <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
               <div class="module group-selection-table">
@@ -42,7 +41,6 @@
               </div>
             </div>
           <% end %>
-
 
           <% if can_shop_both_markets?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
@@ -127,6 +125,7 @@
             </div>
           </div>
           <% end %>
+
           <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
           <div class='row top-pd'>
             <div class="col-sm-12">
@@ -202,7 +201,7 @@ function setGroupSelectionHandlers(){
   }
 
 <% if can_shop_both_markets?(@person) %>
-  <% if @market_kind == 'individual' %>
+  <% if @market_kind == "individual" %>
     $('#market_kind_individual').prop("checked", true);
     $('#dental-radio-button').show();
   <% end %>
@@ -232,7 +231,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && check_status_census_employee %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();
