@@ -159,14 +159,19 @@ function addEmployeeRowToFamily(family, idx) {
 									//$('select').selectric('refresh');
 }
 
-
 var duplicate_household = function() {
-	var url = '<%= Rails.application.routes.url_helpers.edit_broker_agencies_broker_role_quote_path(@broker.id, @quote.id) %>';
 	if(confirm("Duplicate this family?")) {
-
-		url = url + "?duplicate_household=" + this.getAttribute("data-household-id") + "&num_of_dup=" + $(this).find("option").filter(":selected").text();
-		console.log(url);
-		window.location.href= url;
+		$('<input>').attr({
+			type: 'hidden',
+			name: 'duplicate_household',
+			value: this.getAttribute("data-family-id")
+		}).appendTo('form');
+		$('<input>').attr({
+			type: 'hidden',
+			name: 'num_of_dup',
+			value: $(this).find("option").filter(":selected").text()
+		}).appendTo('form');
+		$("input[class*='btn btn-primary  interaction-click-control-add-family']").click()
 	}
 };
 

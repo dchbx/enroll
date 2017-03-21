@@ -209,7 +209,9 @@ class BrokerAgencies::QuotesController < ApplicationController
     end
 
     if (@quote.update_attributes(update_params) && @quote.update_attributes(insert_params))
-      redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, scrollTo: scrollTo),  :flash => { :notice => notice_message }
+      duplicate_household = @quote.quote_households.where(family_id: params[:duplicate_household]).first.try(:id).try(:to_str)
+      num_of_dup = duplicate_household ? params[:num_of_dup] : nil
+      redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, scrollTo: scrollTo,duplicate_household: duplicate_household ,num_of_dup: num_of_dup),  :flash => { :notice => notice_message }
     else
       redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote) ,  :flash => { :error => "Unable to update the employee roster." }
     end
