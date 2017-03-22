@@ -162,15 +162,18 @@
       <div class="aptc">
         <hr />
         <div class="row">
+          <div class="col-xs-12"; style="margin-bottom:10px">
+            <strong>MAX APTC:</strong><span style="margin-left:10px"><%= number_to_currency(@current_max_aptc, precision: 2)%> </span>
+          </div>
+        </div>
+        <div class="row">
           <div class="col-xs-6">
-            <p class='title'>APTC</p>
             <p class='title'>Available</p>
-            <p><span><%= number_to_currency(@max_aptc, precision: 2) %></span></p>
+            <p>$ <%= text_field_tag 'available_aptc',  number_to_currency(@max_aptc, precision: 2).remove("$"), disabled: true%></p>
           </div>
           <div class="col-xs-6">
-            <p class='title'><br /></p>
             <p class='title'>Used</p>
-            <p>$ <input type="text" id='elected_aptc' value="<%= number_with_precision(@elected_aptc, precision: 2) %>" /></p>
+            <p>$ <input type="text" id='elected_aptc' value="<%= number_with_precision(@elected_aptc, precision: 2) %>"  ></p>
           </div>
         </div>
         <%= hidden_field_tag :max_aptc, @max_aptc %>
