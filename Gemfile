@@ -62,6 +62,9 @@ gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'mas
 #For Background jobs
 gem 'resque'
 
+#For Background jobs
+gem 'resque'
+
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
 # gem 'bh'
