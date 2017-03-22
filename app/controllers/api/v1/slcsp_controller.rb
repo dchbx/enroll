@@ -16,6 +16,14 @@ module Api
       private
       def find_slcsp(coverage_start)
 
+        # This fix is temporary, the testing team wants to test the ping for 2017 plans, right now
+        # we do not have 2017 ivl plans, so i will be routing the call to return 2016 plan.
+        year = coverage_start.to_date.year
+        if year == 2017
+          coverage_start -= 1.year
+        end
+
+
         benefit_coverage_period = Organization.where(dba:'DCHL').first.hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect do |benefit_coverage_period|
           benefit_coverage_period.start_on <= coverage_start && benefit_coverage_period.end_on >= coverage_start
         end
