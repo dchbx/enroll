@@ -325,6 +325,28 @@ ivl_notice_triggers = [
   },
 
   {
+    hbx_id: 'IVLR1',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals with UQHP(Unassisted)-Remaining Batch',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_1_remaining_list',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_builder: 'IvlNotices::IvlRenewalNoticeForRemainingBatch',
+        mpi_indicator: 'MPI_IVLR1',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
     hbx_id: 'IVLR2',
     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
     description: 'Notice to be sent out to individuals staying in APTC only',
