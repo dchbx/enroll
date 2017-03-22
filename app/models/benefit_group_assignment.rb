@@ -18,6 +18,7 @@ class BenefitGroupAssignment
   field :aasm_state, type: String, default: "initialized"
   field :is_active, type: Boolean, default: true
   field :activated_at, type: DateTime
+  default_scope ->{ exists(benefit_group_id: true) }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
