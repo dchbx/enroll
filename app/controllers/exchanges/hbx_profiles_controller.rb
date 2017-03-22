@@ -66,7 +66,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @organizations.each do |org|
       @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+      #save invoice in the tmp directory to send out to mail house
+      @employer_invoice.save_and_notify
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
