@@ -274,15 +274,18 @@ module Forms
       true
     end
 
-
     def relationship_validation
       return if family.blank? || family.family_members.blank?
-
+      
       relationships = Hash.new
       family.active_family_members.each{|fm| relationships[fm._id.to_s]=fm.relationship}
       relationships[self.id.to_s] = self.relationship
       if relationships.values.count{|rs| rs=='spouse' || rs=='life_partner'} > 1
         self.errors.add(:base, "can not have multiple spouse or life partner")
+      end
+      now = ::TimeKeeper.date_of_record
+      if self.relationship == 'child' && (now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)) >= 26
+        self.errors.add(:base, "can not have child's age 26 or more")
       end
     end
   end
