@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicant_request>
+  <request_person>
+    <person_birth_date>4/22/1980</person_birth_date>
+    <person_given_name>ivl14</person_given_name>
+    <person_middle_name>test</person_middle_name>
+    <person_sur_name>test</person_sur_name>
+    <person_sex_code>m</person_sex_code>
+    <identification_id>198004220</identification_id>
+  </request_person>
+  <insurance_applicant_request>
+    <insurance_applicant_requested_coverage>
+      <start_date>2016-05-16</start_date>
+      <end_date>2016-12-31</end_date>
+    </insurance_applicant_requested_coverage>
+  </insurance_applicant_request>
+  <person_location_state>dc</person_location_state>
+</applicant_request>

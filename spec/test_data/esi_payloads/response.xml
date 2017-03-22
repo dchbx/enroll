@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ESIMECResponse xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0">
+  <applicant_response_set>
+    <applicant_response>
+      <response_person>
+        <identification_id>198004220</identification_id>
+      </response_person>
+      <applicant_MEC_information>
+        <insurance_applicant_requested_coverage>
+          <start_date>2016-05-16</start_date>
+          <end_date>2016-12-31</end_date>
+        </insurance_applicant_requested_coverage>
+        <insurance_applicant_response>
+          <insurance_applicant_eligible_employer_sponsored_insurance_indicator>true</insurance_applicant_eligible_employer_sponsored_insurance_indicator>
+          <insurance_applicant_insured_indicator>true</insurance_applicant_insured_indicator>
+        </insurance_applicant_response>
+        <inconsistency_indicator>true</inconsistency_indicator>
+        <monthly_premium_amount>
+          <employee_premium_amount>
+            <insurance_premium_amount>195.86</insurance_premium_amount>
+          </employee_premium_amount>
+          <family_premium_amount>
+            <insurance_premium_amount>338.82</insurance_premium_amount>
+          </family_premium_amount>
+        </monthly_premium_amount>
+      </applicant_MEC_information>
+    </applicant_response>
+  </applicant_response_set>
+</ESIMECResponse>
