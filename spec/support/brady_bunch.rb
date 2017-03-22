@@ -138,7 +138,7 @@ module BradyBunch
       )
     end
     let(:mikes_benefit_group) {FactoryGirl.build(:benefit_group, plan_year: nil)}
-    let!(:mikes_plan_year) {FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])}
+    let!(:mikes_plan_year) {FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group]) }
 
     let(:carols_work_addr) do
       FactoryGirl.build(:address,
