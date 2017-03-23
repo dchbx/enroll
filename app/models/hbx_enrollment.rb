@@ -202,7 +202,6 @@ class HbxEnrollment
       new_is_subscriber_true = hbx_enrollment_members.min_by { |hbx_member| hbx_member.person.dob }
       new_is_subscriber_true.is_subscriber = true
     end
-    #return new_is_subscriber_true.save
   end
 
   def generate_hbx_signature
