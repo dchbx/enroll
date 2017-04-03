@@ -82,7 +82,8 @@ describe "match a person in db" do
                                      :first_name => search_param_name.first_name,
                                      :last_name => search_param_name.last_name,
                                      :gender => "m",
-                                     :user_id => 20
+                                     :user_id => 20,
+                                     :is_applying_coverage => false
                                  })
   }
 
@@ -128,6 +129,54 @@ describe "match a person in db" do
     it 'does not find the person if payload has a different ssn from the person' do
       subject.ssn = "888891234"
       expect(subject.match_person).to eq nil
+    end
+  end
+end
+
+
+
+describe Forms::ConsumerCandidate, "ssn validations" do
+  let(:person) {FactoryGirl.create(:person)}
+
+  before do
+    allow(Person).to receive(:where).and_return([person])
+    allow(person).to receive(:user).and_return(true)
+  end
+
+  context "is applying coverage is TRUE" do
+    subject { Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
+                                        :gender => "m", :user_id => 20, :is_applying_coverage => "true" })}
+
+    it "add errors when SSN is blank" do
+      allow(subject).to receive(:ssn).and_return("")
+      allow(subject).to receive(:no_ssn).and_return("0")
+      subject.ssn_or_checkbox
+      expect(subject.errors.messages.present?).to eq true
+    end
+
+    it "doesnt add errors when SSN is present" do
+      allow(subject).to receive(:ssn).and_return("453213333")
+      allow(subject).to receive(:no_ssn).and_return("0")
+      expect(subject.errors.messages.present?).to eq false
+    end
+  end
+
+  context "is applying coverage is FALSE" do
+    subject { Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
+                                    :gender => "m", :user_id => 20, :is_applying_coverage => "false" })}
+
+    it "doesnt add errors when SSN is blank" do
+      allow(subject).to receive(:ssn).and_return("")
+      allow(subject).to receive(:no_ssn).and_return("0")
+      subject.ssn_or_checkbox
+      expect(subject.errors.messages.present?).to eq false
+    end
+
+    it "doesnt add errors when SSN is present" do
+      allow(subject).to receive(:ssn).and_return("453213333")
+      allow(subject).to receive(:no_ssn).and_return("0")
+      subject.ssn_or_checkbox
+      expect(subject.errors.messages.present?).to eq false
     end
   end
 end

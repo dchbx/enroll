@@ -9,6 +9,7 @@ module Forms
 
     attr_accessor :user_id
     attr_accessor :dob_check
+    attr_accessor :is_applying_coverage
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil

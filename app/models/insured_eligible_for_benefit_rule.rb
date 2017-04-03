@@ -49,9 +49,20 @@ class InsuredEligibleForBenefitRule
         end
       end
       status = false if is_age_range_satisfied_for_catastrophic? == false
+      status = set_status_and_error_if_not_applying_coverage if is_applying_coverage_status_satisfied? == false
       return status, @errors
     end
     [false]
+  end
+
+  def set_status_and_error_if_not_applying_coverage
+    status = false
+    @errors << ["Did not apply for coverage."]
+    return status
+  end
+
+  def is_applying_coverage_status_satisfied?
+    @role.is_applying_coverage?
   end
 
   def is_age_range_satisfied_for_catastrophic?

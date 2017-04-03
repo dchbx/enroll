@@ -10,6 +10,7 @@ FactoryGirl.define do
     is_applicant 'yes'
     vlp_documents {[FactoryGirl.build(:vlp_document)]}
     bookmark_url nil
+    is_applying_coverage true
   end
 
   factory(:consumer_role_person, {class: ::Person}) do

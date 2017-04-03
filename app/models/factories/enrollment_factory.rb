@@ -91,6 +91,8 @@ module Factories
         return nil
       end
       role = build_consumer_role(person, person_new)
+      role.update_attribute(:is_applying_coverage, person_params["is_applying_coverage"])
+      role
     end
 
     def self.build_consumer_role(person, person_new)

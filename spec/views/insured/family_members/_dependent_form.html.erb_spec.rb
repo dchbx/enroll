@@ -28,6 +28,14 @@ describe "insured/family_members/_dependent_form.html.erb" do
       expect(rendered).not_to have_selector('input[placeholder="SOCIAL SECURITY *"]')
     end
 
+    it "should display the is_applying_coverage field option" do
+      expect(rendered).to match /Is this person applying for coverage?/
+    end
+
+    it "should display the affirmative message" do
+      expect(rendered).to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
+    end
+
     it "should have consumer_fields area" do
       expect(rendered).to have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
       expect(rendered).to have_selector("div#consumer_fields")
@@ -91,6 +99,14 @@ describe "insured/family_members/_dependent_form.html.erb" do
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
       expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+    end
+
+    it "should not display the is_applying_coverage field option" do
+      expect(rendered).not_to match /Is this person applying for coverage?/
+    end
+
+    it "should display the affirmative message" do
+      expect(rendered).not_to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
     end
 
     it "should have address info area" do

@@ -57,6 +57,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
+    @use_person = true #only used to manupulate form data
     respond_to do |format|
       if @consumer_candidate.valid?
         idp_search_result = nil
@@ -197,6 +198,7 @@ class Insured::ConsumerRolesController < ApplicationController
     save_and_exit =  params['exit_after_method'] == 'true'
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}

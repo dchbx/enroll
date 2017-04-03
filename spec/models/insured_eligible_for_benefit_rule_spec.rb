@@ -432,4 +432,31 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       end
     end
   end
+
+  context "rule satisfied?" do
+    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:benefit_package) {double}
+
+    before :each do
+      allow(consumer_role).to receive(:dob).and_return(TimeKeeper.date_of_record - 23.years)
+      allow(benefit_package).to receive(:age_range).and_return((0..30))
+      allow(benefit_package).to receive_message_chain('benefit_coverage_period.end_on').and_return(TimeKeeper.date_of_record + 100.days)
+      allow(benefit_package).to receive_message_chain('benefit_eligibility_element_group.class.fields.keys').and_return([])
+    end
+
+    it "should return a false status if is_applying_coverage is false for the cosumer_role" do
+      allow(consumer_role).to receive(:is_applying_coverage?).and_return(false)
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'health', family: family)
+      status = rule.satisfied?.first
+      expect(status).to eq false
+    end
+
+    it "should return a true status if is_applying_coverage is true for the cosumer_role" do
+      allow(consumer_role).to receive(:is_applying_coverage?).and_return(true)
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'health', family: family)
+      status = rule.satisfied?.first
+      expect(status).to eq true
+    end
+
+  end
 end

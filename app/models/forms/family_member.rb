@@ -5,7 +5,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary
+    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -17,6 +17,7 @@ module Forms
     def initialize(*attributes)
       @addresses = [Address.new(kind: 'home'), Address.new(kind: 'mailing')]
       @same_with_primary = "true"
+      @is_applying_coverage = true
       super
     end
 
@@ -38,7 +39,7 @@ module Forms
     end
 
     def consumer_fields_validation
-      if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+      if (@is_consumer_role.to_s == "true" && is_applying_coverage == "true")#only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
         elsif @us_citizen == false && @eligible_immigration_status.nil?
@@ -146,7 +147,8 @@ module Forms
     def extract_consumer_role_params
       {
         :citizen_status => @citizen_status,
-        :vlp_document_id => vlp_document_id
+        :vlp_document_id => vlp_document_id,
+        :is_applying_coverage => is_applying_coverage
       }
     end
 
