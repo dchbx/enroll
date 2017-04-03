@@ -80,3 +80,19 @@ Feature: Create Employee Roster
     Then the broker clicks Publish Quote button
     And the broker sees that the Quote is published
     And Broker logs out
+
+   Scenario: Check for disable View Publish Quote link in Actions for Draft Quotes.
+    Given that a broker exists
+    And the Plans exist
+    And the broker is signed in
+    When he visits the Roster Quoting tool
+    And click on the New Quote button
+    Then the broker enters the quote effective date
+    And broker enters valid information
+    When the broker clicks on the Save Changes button
+    Then the broker should see a successful message
+    When the broker clicks on Back to Quotes button
+    Then the broker should see avaliable Quotes
+    When the broker clicks on Actions.
+    Then view publish quote should be disabled.
+    And Broker logs out
