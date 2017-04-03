@@ -80,7 +80,7 @@ end
 
 Then(/^the broker clicks on Back to Quotes button$/) do
   sleep 2
-  find('.interaction-click-control-back-to-quotes').trigger 'click'
+  find('.interaction-click-control-home').trigger 'click'
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
@@ -107,8 +107,12 @@ Then(/^the quote should be deleted$/) do
 end
 
 Then(/^adds a new benefit group$/) do
-  fill_in "quote[quote_benefit_groups_attributes][1][title]", with: 'My Benefit Group'
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
   find('.interaction-click-control-save-changes').trigger 'click'
+end
+
+Then(/^Click on Add Benefit Group Button to add benefit group$/) do
+  click_button 'Add benefit Group'
 end
 
 Then(/^the broker assigns the benefit group to the family$/) do

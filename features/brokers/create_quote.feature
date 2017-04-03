@@ -80,3 +80,16 @@ Feature: Create Employee Roster
     Then the broker clicks Publish Quote button
     And the broker sees that the Quote is published
     And Broker logs out
+
+  Scenario: Broker should be able to assign benefit group to a family, Check with Add Benefit Group button fucntionality
+    Given that a broker exists
+    And the broker is signed in
+    When he visits the Roster Quoting tool
+    And click on the New Quote button
+    Then the broker enters the quote effective date
+    Then broker enters valid information
+    And Click on Add Benefit Group Button to add benefit group
+    And adds a new benefit group
+    Then the broker assigns the benefit group to the family
+    And the broker saves the quote
+    And Broker logs out
