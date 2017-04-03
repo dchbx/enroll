@@ -8,7 +8,7 @@ module BrokerWorld
 
   def broker_agency(*traits)
     attributes = traits.extract_options!
-    @broker_agency ||= FactoryGirl.create :broker , *traits, attributes
+    @broker_agency ||= FactoryGirl.create :broker, *traits, attributes
   end
 
 end
@@ -18,6 +18,11 @@ World(BrokerWorld)
 Given (/^that a broker exists$/) do
   broker_agency
   broker :with_family, :broker_with_person, organization: broker_agency
+  broker_agency_profile = broker_agency.broker_agency_profile
+  broker_agency_account = FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_agency_profile.primary_broker_role.id)
+  employer_profile = FactoryGirl.create(:employer_profile)
+  employer_profile.broker_agency_accounts << broker_agency_account
+  employer_profile.save!
 end
 
 And(/^the broker is signed in$/) do
@@ -62,6 +67,12 @@ Then(/^the broker enters the quote effective date$/) do
   select "#{(Date.today+3.month).strftime("%B %Y")}", :from => "quote_start_on"
 end
 
+When(/^the broker selects employer type$/) do
+ find('.interaction-choice-control-quote-employer-type').click()
+ find('.interaction-choice-control-quote-employer-type-2').select_option
+ fill_in 'quote[employer_name]', with: "prospect test Employee"
+end
+
 When(/^broker enters valid information$/) do
   fill_in 'quote[quote_name]', with: 'Test Quote'
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][dob]', with: "11/11/1991"
@@ -78,9 +89,9 @@ Then(/^the broker should see a successful message$/) do
   expect(page).to have_content('Successfully saved quote/employee roster.')
 end
 
-Then(/^the broker clicks on Back to Quotes button$/) do
+Then(/^the broker clicks on Home button$/) do
   sleep 2
-  find('.interaction-click-control-back-to-quotes').trigger 'click'
+  find('.interaction-click-control-home').trigger 'click'
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
@@ -107,12 +118,8 @@ Then(/^the quote should be deleted$/) do
 end
 
 Then(/^adds a new benefit group$/) do
-  fill_in "quote[quote_benefit_groups_attributes][1][title]", with: 'My Benefit Group'
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
   find('.interaction-click-control-save-changes').trigger 'click'
-end
-
-Then(/^the broker assigns the benefit group to the family$/) do
-  select "My Benefit Group", :from => "quote[quote_households_attributes][0][quote_benefit_group_id]"
 end
 
 Then(/^the broker saves the quote$/) do
@@ -186,11 +193,10 @@ When(/^the broker selects the Reference Dental Plan$/) do
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
-  click_button 'Publish Quote'
+   page.find_button("Publish Quote").trigger("click")
 end
 
 Then(/^the broker sees that the Quote is published$/) do
-  wait_for_ajax
   expect(page).to have_content('Your quote has been published')
 end
 

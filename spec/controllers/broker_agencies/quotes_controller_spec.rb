@@ -45,7 +45,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
         post :create, broker_role_id: person.broker_role.id , quote: quote_attributes
         expect(assigns(:quote)).to be_a(Quote)
         expect(assigns(:quote).quote_households.size).to eq 1
-        expect(assigns(:quote).quote_households.first.family_id).to eq quote_household_attributes[:family_id]
+        expect(assigns(:quote).quote_households.first.family_id.to_s).to eq quote_household_attributes[:family_id].to_s
       end
       it "should save household member attributes" do
         post :create, broker_role_id: person.broker_role.id , quote: quote_attributes
@@ -164,6 +164,10 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
   describe "GET edit" do
 
+    before do
+      quote.update_attributes(broker_role_id: person.broker_role.id)
+    end
+
     it "returns http success" do
       get :edit, broker_role_id: person.broker_role.id, id: quote
       expect(response).to have_http_status(:success)
@@ -186,5 +190,39 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
   end
 
+  describe "Creating New Quote " do
+    before do
+      @quote = FactoryGirl.create(:quote,:with_household_and_members)
+      quote_household_attributes.merge!("id" => @quote.quote_households.first.id, "quote_members_attributes" => { "0" => {"first_name" =>"Kevin",
+        "middle_name"=>"M" , "dob" => "07/04/1990", "id" => @quote.quote_households.first.quote_members.first.id } })
+      quote_attributes[:quote_benefit_groups_attributes] = {"0"=>{"title"=>"Default Benefit Package"}}
+      quote_attributes[:quote_households_attributes] = {"0" => quote_household_attributes }
+      put :update, commit: 'Create Quote',broker_role_id: person.broker_role.id, :id => @quote.id  , quote: quote_attributes
+      @quote.reload
+    end
 
+    context "creating a new quote by Create Quote button" do
+      before do
+        put :update, broker_role_id: person.broker_role.id, :id => @quote.id , commit: 'Create Quote' , quote: quote_attributes.merge!({quote_name: "Create Nuote Name", start_on: "2016-09-06"})
+        @quote.reload
+      end
+      it "should create quote new name" do
+        expect(@quote.quote_name).to eq "Create Nuote Name"
+      end
+      it "should create quote name" do
+        expect(@quote.start_on.strftime("%Y-%m-%d")).to eq "2016-09-06"
+      end
+      it "should create quote member first name" do
+        expect(@quote.quote_households.first.quote_members.count).to eq 1
+        expect(@quote.quote_households.first.quote_members.first.first_name).to eq "Kevin"
+      end
+      it "should create quote member dob" do
+        expect(@quote.quote_households.first.quote_members.count).to eq 1
+        expect(@quote.quote_households.first.quote_members.first.dob.strftime("%Y/%m/%d")).to eq "1990/07/04"
+      end
+      it "should redirect to next step and publish" do
+        expect(response).to redirect_to(broker_agencies_broker_role_quote_path(person.broker_role.id,@quote.id))
+      end
+    end
+  end
 end

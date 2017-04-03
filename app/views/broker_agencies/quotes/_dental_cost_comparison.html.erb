@@ -26,8 +26,8 @@
     <tr>
       <td class="quote_detail_results_header" >Plan</td>
       <td class="quote_detail_results_header text-center">Reference</td>
-      <td class="quote_detail_results_header text-center">Lowest / Reference / Highest</td>
-      <td class="quote_detail_results_header text-center">Lowest / Reference / Highest</td>
+      <td class="quote_detail_results_header text-center">Reference</td>
+      <td class="quote_detail_results_header text-center">Reference</td>
     </tr>
     <% i = 0 %>
    <% @quote_results.each do |k,v| %>
@@ -49,13 +49,13 @@
          </td>
          <td class="quote_detail_results text-center dental_publish">
             <div class='btn' id="single_carrier_<%= i %>">
-                $<%= carrier_low %> / $<%= cost %> / $<%= carrier_high %>
+              $<%= cost %>
            </div>
         </td>
          <td class="quote_detail_results text-center dental_publish">
             <div class='btn' id="custom_dental_<%= i %>">
                 <% custom_low, custom_high = @quote_results.map{|k,v| v[:total_employer_cost].ceil}.minmax %>
-                $<%= custom_low %> / $<%= cost %> / $<%= custom_high %>
+              $<%= cost %>
            </div>
         </td>
       </tr>

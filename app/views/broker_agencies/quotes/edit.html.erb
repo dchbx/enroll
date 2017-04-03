@@ -1,20 +1,58 @@
 <div class="container module broker_quote_tool">
 	<%= form_for @quote, url: {action: "update"}, method: "put", :locals => { :broker_role_id => @broker.id }, class: "form-inline" do |f| %>
 	<%= render "edit_form" ,f:f %>
-	<div class="footer navbar-fixed-bottom"></div>
-	  <div class="row sticky-main-nav">
-				<div class="col-sm-10">
+	<div class="footer" style="padding:10px">
+	  <div class="row">
+				<div class="col-sm-9">
 					<%
 						disable_class = @quote.is_complete? ? " disabled" : ""
 					%>
 			    <%= submit_tag "Save Changes", class: "btn btn-primary #{disable_class}" %>
-					<%= submit_tag "Add Family", class: "btn btn-primary #{disable_class}" %>
-					<%= link_to 'Upload Roster' , upload_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}", remote: true  ,id: "upload_employees" %>
-					<%= link_to 'Download Roster' , download_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}",id: "download_employees" %> <br>
+					<%= submit_tag "Add Employee", class: "btn btn-primary #{disable_class}" %>
+					<%= link_to 'Upload Roster' , "" , class: "btn btn-primary #{disable_class}", "data-url" => upload_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote)  ,id: "upload_employees" %>
+					<%= link_to 'Download Roster' , download_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}",id: "download_employees" %>
 				</div>
-				<div class="col-sm-2">
-					<%= link_to "Back to Quotes", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary btn-sm!', data: { no_turbolink: true } %>
+				<div class="col-8">
+					<%= link_to "HOME", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
+					<%= submit_tag "Create Quote", class: "btn btn-primary #{disable_class}" %>
 				</div>
   </div>
 </div>
+</div>
 <%end%>
+
+<script type="text/javascript">
+	$('#quote_employer_type').on('change', function() {
+	  var params = 'type=' + this.value + '&id=' + '<%= @quote.id %>';
+	  $.ajax({
+	    url: "<%=employee_type_broker_agencies_broker_role_quotes_path%>",
+	    data: params,
+	      complete: function(response){
+	        if (response) {
+	        	$('.employer_profile').trigger('change');
+	        }
+	      }
+	  });
+});
+
+	$('#upload_employees').on('click', function() {
+	var employer_type = $('#quote_employer_type').val();
+	var employer_name = $('#quote_employer_name').val();
+	var effective_date = $('#quote_start_on').val();
+	var quote_name = $('#quote_quote_name').val();
+	var employer_profile = $('#quote_employer_profile_id').val();
+	var employer = employer_type == 'prospect' ? employer_name : employer_profile
+
+	var params = 'type=' + employer_type  + '&id=' + '<%= @quote.id %>' + '&name=' + employer_name + '&effective_date=' +  effective_date + '&quote_name=' +  quote_name + '&profile_id=' + employer_profile ;
+
+	 if(employer_type.length > 0 && effective_date.length > 0 ){
+		  $.ajax({
+		    url: $(this).data('url'),
+		    data: params,
+		      complete: function(response){
+			}
+		});
+
+	}
+ });
+</script>

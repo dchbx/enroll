@@ -112,11 +112,6 @@ var QuoteSliders = (function() {
           return 'Contribution Percentage: ' + value + '%';
         }
       });
-
-      $('#ex1').on('slideStop', function(){deductible_value = this.value;
-        QuotePageLoad.toggle_plans([]);
-        QuotePageLoad.reset_selected_plans();
-      })
       $('#pct_employee').on('slideStop', function() {
         val =$('#pct_employee').bootstrapSlider('getValue')
         QuotePageLoad.set_relationship_pct('employee', val)
