@@ -115,6 +115,7 @@ var Quote = ( function() {
         elected_plans_list = selected_plans(coverage_kind)
         inject_plan_into_quote(quote_id, benefit_group_id, plan_id, elected, coverage_kind, elected_plans_list)
         _open_quote()
+        $('#dental-feature-mgmt-header a').trigger('click')
     })
   }
   var show_benefit_group=function(quote_id, benefit_group_id){
