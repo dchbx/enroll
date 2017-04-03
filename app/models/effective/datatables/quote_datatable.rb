@@ -3,6 +3,10 @@ module Effective
     class QuoteDatatable < Effective::MongoidDatatable
 
       datatable do
+        table_column :employer_name, proc: Proc.new { |row| 
+        row.employer_profile.present? ? row.employer_profile.legal_name : row.employer_name
+        }, :sortable => false, :filter => false
+        table_column :employer_type, proc: Proc.new { |row| row.employer_type }, label: 'Employer Type', :sortable => false, :filter => false
       	table_column :quote, proc: Proc.new { |row| 
       	  link_to row.quote_name.titleize, broker_agencies_broker_role_quote_path(
       	    Effective::Datatables::QuoteDatatable.broker_role_id, row),
@@ -24,8 +28,10 @@ module Effective
       
       def collection
         state = attributes['states']
+        type = attributes['employer_types']
         broker_role_id = attributes["collection_scope"] || QuoteDatatable.broker_role_id.to_s
         quotes = Quote.where('broker_role_id'.to_s => broker_role_id.strip)
+        quotes = quotes.where(employer_type: type) if ['client','prospect'].include?(type)
         quotes = quotes.where(aasm_state: state) if ['draft', 'published', 'claimed'].include?(state)
         quotes
       end
@@ -36,12 +42,17 @@ module Effective
 
       def nested_filter_definition
         {
-          top_scope:  :states,
+          top_scope:  :employer_types,
           states: [
             {scope: 'all', label: 'All'},
             {scope: 'draft', label: 'Draft'},
             {scope: 'published', label: 'Published'},
             {scope: 'claimed', label: 'Claimed'},
+          ],
+          employer_types: [
+            {scope: 'all', label: 'All'},
+            {scope: 'client', label: 'Client', subfilter: :states},
+            {scope: 'prospect', label: 'Prospect', subfilter: :states},
           ],
         }
       end

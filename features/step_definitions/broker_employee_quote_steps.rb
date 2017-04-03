@@ -8,7 +8,7 @@ module BrokerWorld
 
   def broker_agency(*traits)
     attributes = traits.extract_options!
-    @broker_agency ||= FactoryGirl.create :broker , *traits, attributes
+    @broker_agency ||= FactoryGirl.create :broker, *traits, attributes
   end
 
 end
@@ -18,6 +18,11 @@ World(BrokerWorld)
 Given (/^that a broker exists$/) do
   broker_agency
   broker :with_family, :broker_with_person, organization: broker_agency
+  broker_agency_profile = broker_agency.broker_agency_profile
+  broker_agency_account = FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_agency_profile.primary_broker_role.id)
+  employer_profile = FactoryGirl.create(:employer_profile)
+  employer_profile.broker_agency_accounts << broker_agency_account
+  employer_profile.save!
 end
 
 And(/^the broker is signed in$/) do
@@ -60,6 +65,12 @@ end
 
 Then(/^the broker enters the quote effective date$/) do
   select "#{(Date.today+3.month).strftime("%B %Y")}", :from => "quote_start_on"
+end
+
+When(/^the broker selects employer type$/) do
+  find('.selectric-interaction-choice-control-quote-employer-type').click
+  find('.interaction-choice-control-quote-employer-profile-id-2', match: :first).click 
+  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
 When(/^broker enters valid information$/) do

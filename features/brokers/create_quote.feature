@@ -9,6 +9,7 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
+    When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
@@ -21,6 +22,7 @@ Feature: Create Employee Roster
     And click on the Upload Employee Roster button
     When the broker clicks on the Select File to Upload button
     Then the broker clicks upload button
+    When the broker selects employer type
     Then the broker enters the quote effective date
     And the broker should see the data in the table
     When the broker clicks on the Save Changes button
@@ -33,6 +35,7 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
+    When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
@@ -50,6 +53,7 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
+    When the broker selects employer type
     Then broker enters valid information
     And adds a new benefit group
     Then the broker assigns the benefit group to the family
@@ -63,6 +67,7 @@ Feature: Create Employee Roster
     When he visits the Roster Quoting tool
     And click on the New Quote button
     Then the broker enters the quote effective date
+    When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
