@@ -5,18 +5,17 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
   let(:person) { create(:person, :with_ssn, user: user) }
 
   let(:params) { {
-    :dob => "2012-10-12",
-    :ssn => person.ssn,
-    :first_name => "yo",
-    :last_name => "guy",
-    :gender => "m",
-    :user_id => 20
-    } }
+      :dob => "2012-10-12",
+      :ssn => person.ssn,
+      :first_name => "yo",
+      :last_name => "guy",
+      :gender => "m",
+      :user_id => 20
+  } }
 
-  let(:subject) { Forms::ConsumerCandidate.new(params) }
+  subject { Forms::ConsumerCandidate.new(params) }
 
   context "uniq ssn" do
-    
     context 'when ssn blank' do
       let(:params) { {:ssn => nil} }
 
@@ -32,7 +31,7 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
       end
     end
 
-    context 'when ssn matches with unclaimed user account' do 
+    context 'when ssn matches with unclaimed user account' do
       let(:person) { create(:person, :with_ssn) }
 
       it "should not add errors" do
@@ -43,7 +42,6 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
   end
 
   context "uniq ssn & dob" do
-
     context 'when ssn blank' do
       let(:params) { {:ssn => nil} }
 
@@ -62,17 +60,15 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
     end
 
     context "does not add errors when ssn & dob matches with existing person record" do
-  
       let(:params) { {:ssn => person.ssn, :dob => person.dob.strftime("%Y-%m-%d")} }
-    
-      it 'should not add errors' do 
+
+      it 'should not add errors' do
         subject.uniq_ssn_dob
         expect(subject.errors[:base]).to eq []
       end
     end
   end
 end
-
 
 describe "match a person in db" do
   let(:subject) {
@@ -131,3 +127,48 @@ describe "match a person in db" do
     end
   end
 end
+
+describe "Is applying for coverage?" do
+  let(:params) { {
+      :dob => "1982-10-12",
+      :first_name => "yo",
+      :last_name => "guy",
+      :gender => "m",
+      :user_id => 20
+  } }
+  subject { Forms::ConsumerCandidate.new(params) }
+
+  context "applying for coverage" do
+    before do
+      allow(subject).to receive(:is_applying_coverage?).and_return true
+      subject.ssn_or_checkbox
+    end
+    it "pass validation" do
+      expect(subject).to be_valid
+    end
+
+    it "fails validation with ssn or ssn checkbox" do
+      allow(subject).to receive(:ssn).and_return(nil)
+      allow(subject).to receive(:no_ssn).and_return("0")
+      expect(subject).not_to be_valid
+      expect(subject.errors[:base]).to eq ["Check No SSN box or enter a valid SSN"]
+    end
+  end
+
+  context "NOT applying for coverage" do
+    before do
+      allow(subject).to receive(:is_applying_coverage?).and_return false
+      subject.ssn_or_checkbox
+    end
+    it "pass validation" do
+      expect(subject).to be_valid
+    end
+
+    it "fails validation with ssn or ssn checkbox" do
+      allow(subject).to receive(:ssn).and_return(nil)
+      allow(subject).to receive(:no_ssn).and_return("0")
+      expect(subject).to be_valid
+    end
+  end
+end
+

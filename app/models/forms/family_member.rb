@@ -5,7 +5,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary
+    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -146,7 +146,8 @@ module Forms
     def extract_consumer_role_params
       {
         :citizen_status => @citizen_status,
-        :vlp_document_id => vlp_document_id
+        :vlp_document_id => vlp_document_id,
+        :is_applying_coverage => is_applying_coverage
       }
     end
 
@@ -252,6 +253,7 @@ module Forms
     end
 
     def try_update_person(person)
+      person.consumer_role.update_attributes(:is_applying_coverage => is_applying_coverage) if person.consumer_role
       person.update_attributes(extract_person_params).tap do
         bubble_person_errors(person)
       end

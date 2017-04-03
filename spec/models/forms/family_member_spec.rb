@@ -227,8 +227,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :language_code => "english",
       :is_incarcerated => "no",
       :tribal_id => "test",
-      :no_dc_address=>nil,
-      :no_dc_address_reason=>nil
+      :no_dc_address => nil,
+      :no_dc_address_reason => nil
     }
   }
 
@@ -359,6 +359,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the relationship of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
+      allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
@@ -366,6 +367,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the attributes of the person" do
       expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
+      allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
       subject.update_attributes(update_attributes)
     end
   end
