@@ -170,6 +170,7 @@ QuotePageLoad = (function() {
       success: function(response) {
         $('#plan_comparison_frame').html(response);
         Quote.load_publish_listeners();
+        Quote.sort_plans();
       }
     })
   }
@@ -259,9 +260,6 @@ QuotePageLoad = (function() {
       $('#reset_selected').on('click', reset_selected_plans)
       $('#CostComparison').on('click', _get_health_cost_comparison)
       $('#DentalCostComparison').on('click', _get_dental_cost_comparison)
-      $('#PlanComparison').on('click', function(){
-         Quote.sort_plans()
-      })
   }
   var view_details=function($thisObj) {
     if ( $thisObj.hasClass('view') ) {

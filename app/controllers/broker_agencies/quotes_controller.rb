@@ -632,7 +632,8 @@ private
   end
 
   def set_qhp_variables
-    @active_year = Date.today.year
+    @quote = Quote.find(params['quote_id'])
+    @active_year = @quote.plan_year
     @coverage_kind = "health"
     @visit_types = @coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
   end
