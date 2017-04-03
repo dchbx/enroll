@@ -4,11 +4,11 @@
       <div class="row">
 				<div class="col-md-3">Family Id: <%= qhh.text_field :family_id, { size: 2, style: "width: 50px;", type: "number" } %></div>
         <div class="col-md-3"><%= qhh.collection_select :quote_benefit_group_id, @quote_benefit_group_dropdown, :id, :title, {}, {:class => "floatlabel custom_selectric", :prompt => true}   %></div>
-				<div class="col-md-3"><button type="button" class="btn btn-default" aria-label="Left Align" onclick="addEmployeeRowToFamily('<%=qhh.object.id.to_s%>','<%= qhh.index %>')">
+				<div class="col-md-5"><button type="button" style="float: right"  class="btn btn-primary interaction-click-control-add-member-to-this-family" aria-label="Left Align" onclick="addEmployeeRowToFamily('<%=qhh.object.id.to_s%>','<%= qhh.index %>')">
 					<span class="glyphicon glyphicon-user" aria-hidden="true"></span> Add member to this family
 				</button>
 			</div>
-			<div class="col-md-2">
+			<div class="col-md-1">
 				<% if qhh.object.persisted? %>
           <select id="duplicate-family-id-<%=qhh.object.id%>" data-household-id="<%= qhh.object.id %>" class="custom_selectric">
             <option>Duplicate this family by:</option>
