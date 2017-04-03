@@ -1,0 +1,9 @@
+<% if @employee_present %>
+		$('#family-container').html("<%= j render(partial: 'employees_list', locals:{employee: @employee_present} ) %>");
+<% else %>
+	'<%= form_for @quote, url: {action: "my_quotes"}, method: "put" do |f| %>'
+		$('#family-container').html("<%= escape_javascript(render( 'employees_list' )) %>");
+	'<% end %>'
+<% end %>
+$('.dropdown-toggle').dropdown();
+$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'});

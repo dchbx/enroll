@@ -49,9 +49,9 @@ var Quote = ( function() {
     $.ajax({
       type: "GET",
       url: "/broker_agencies/broker_roles/"+$('#broker_role_id').val()+"/quotes/plan_comparison",
-      data: {plans: plans, sort_by: sort_by.substring(0, sort_by.length-2)},
+      data: {plans: plans, sort_by: sort_by.substring(0, sort_by.length-2), quote_id: $('#quote_id').val()},
       success: function(response) {
-        $('#plan_comparison_frame').html(response);
+        $('#benefit_plan_comparison_frame').html(response);
         $('#compare_plans_table').dragtable({dragaccept: '.movable'});
         $('.cost_sort').on('click', sort_plans);
         _export_compare_plans_listener();
@@ -115,6 +115,7 @@ var Quote = ( function() {
         elected_plans_list = selected_plans(coverage_kind)
         inject_plan_into_quote(quote_id, benefit_group_id, plan_id, elected, coverage_kind, elected_plans_list)
         _open_quote()
+        $('#dental-feature-mgmt-header a').trigger('click')
     })
   }
   var show_benefit_group=function(quote_id, benefit_group_id){

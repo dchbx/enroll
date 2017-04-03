@@ -1,0 +1,9 @@
+<%#= form_for @quote, :url => "index", :locals => { :broker_role_id => @broker.id }, class: "form-inline" do |f| %>
+<%= fields_for @quote do |f| %>
+	<%= f.fields_for :quote_households do |qhh| %>
+		<%= render "quote_household", qhh:qhh %>
+	<% end %>
+<% end %>
+
+
+

@@ -1,4 +1,4 @@
-<%if @q.can_quote_be_published? %>
+<%if @q.all_households_have_benefit_groups? && !@q.quote_benefit_groups.map(&:plan).compact.empty? %>
   <div class="module container broker_quote_tool published">
     <div class="row">
       <div class="col-md-12">
@@ -9,6 +9,7 @@
         <p>Costs are based on the roster associated with this quote of <b><%= @q.quote_households.count %></b> families:</p>
         <br>
         <% @q.quote_benefit_groups.each do |benefit_group| %>
+        <%  unless benefit_group.plan.nil? %>
         <div class="panel-body">
           <div class="panel benefitgroup col-xs-12">
             <div class="col-xs-12">
@@ -144,10 +145,7 @@
                   <td><%= member.dob%></td>
                 </tr>
                 <% end %>
-                <tr>
-                  <td colspan="4">&nbsp;</td>
-                </tr>
-                 <% end %>
+                <% end %>
               <% end %>
             </table>
           </div>
@@ -267,6 +265,7 @@
         </div>
         <br>
         <% end%>
+        <% end %>
         <br>
         <p>**Actual costs may vary.</p>
           <%= render :partial => "quote_publish_button" , :locals => { :quote => @q } %>
