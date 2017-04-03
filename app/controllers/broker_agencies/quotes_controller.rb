@@ -200,8 +200,8 @@ class BrokerAgencies::QuotesController < ApplicationController
       update_params[:quote_benefit_groups_attributes] = update_params[:quote_benefit_groups_attributes].select {|k,v| update_params[:quote_benefit_groups_attributes][k][:id].present?}
       insert_params[:quote_benefit_groups_attributes] = insert_params[:quote_benefit_groups_attributes].select {|k,v| insert_params[:quote_benefit_groups_attributes][k][:id].blank?}
     end
-    if params[:commit] == "Add Family"
-      notice_message = "New family added."
+    if params[:commit] == "Add Employee"
+      notice_message = "New employee added."
       scrollTo = 1
     elsif params[:commit] == "Save Changes"
       notice_message = "Successfully saved quote/employee roster."
