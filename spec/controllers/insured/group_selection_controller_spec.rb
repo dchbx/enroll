@@ -156,6 +156,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
+
+      it "should set a session variable effective_on_option_selected to effective_on_option_selected if present" do
+        sign_in user
+        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", effective_on_option_selected: Date.new(TimeKeeper.date_of_record.year,12,06)
+        expect(session[:effective_on_option_selected]).to eq Date.new(TimeKeeper.date_of_record.year,12,06)
+      end
     end
   end
 

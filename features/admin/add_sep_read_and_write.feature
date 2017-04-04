@@ -10,7 +10,7 @@ Feature: Add Sep with read and write permissions
     And the Hbx Admin clicks on the Action button
 
   Scenario: Click on Add Sep
-    Then the Add SEP option should be disabled
+    Then the Add SEP option should be enabled
 
   Scenario: Click on Cancel Enrollment
     Then the Cancel Enrollment option should be disabled
@@ -18,4 +18,4 @@ Feature: Add Sep with read and write permissions
   Scenario: Click on Terminate Enrollment
     Then the Terminate Enrollment option should be disabled
 
-  #TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented  
+  #TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented

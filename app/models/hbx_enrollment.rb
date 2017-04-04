@@ -768,12 +768,12 @@ class HbxEnrollment
   #   return @benefit_coverage_period if defined? @benefit_coverage_period
   # end
 
-  def decorated_elected_plans(coverage_kind, market=nil)
+  def decorated_elected_plans(coverage_kind, effective_on_option_selected=nil, market=nil)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
-      special_enrollment_id = family.current_special_enrollment_periods.first.id
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+      special_enrollment_id = family.current_special_enrollment_periods.first.id # shouldn't this be the last current sep instead of first ?
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(effective_on_option_selected || family.current_sep.effective_on) # use 'effective_on_option_selected' to take precedence in case it exists.
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
@@ -815,9 +815,9 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.calculate_effective_on_from(market_kind: 'shop', qle: false, family: nil, employee_role: nil, benefit_group: nil, benefit_sponsorship: HbxProfile.current_hbx.benefit_sponsorship)
+  def self.calculate_effective_on_from(market_kind: 'shop', qle: false, family: nil, employee_role: nil, benefit_group: nil, benefit_sponsorship: HbxProfile.current_hbx.benefit_sponsorship, effective_on_option_selected: nil)
     return nil if family.blank?
-
+    return effective_on_option_selected if effective_on_option_selected.present?
     case market_kind
     when 'shop'
       if qle && family.is_under_special_enrollment_period?
