@@ -79,7 +79,8 @@
           <% end %>
 
           <% if @employee_role.present? %>
-            <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+            <!-- <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3> -->
+            <%= render partial: 'insured/families/employers_selection' %>
           <% end %>
 
           <% if can_shop_resident?(@person) %>
