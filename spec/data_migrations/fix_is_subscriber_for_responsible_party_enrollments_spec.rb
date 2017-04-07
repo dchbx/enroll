@@ -33,15 +33,15 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
     let(:hbx_enrollment_member_1) {
       FactoryGirl.create(:hbx_enrollment_member,
         is_subscriber: false,
-        applicant_id: dependent_1.id,
+        applicant_id: family_member_1.id,
         hbx_enrollment: hbx_enrollment,
         eligibility_date: TimeKeeper.date_of_record.beginning_of_month,
         coverage_start_on: TimeKeeper.date_of_record.beginning_of_month)
     }
-    let(:hbx_enrollment_member_2) {
+    let(:oldest_hbx_enrollment_member) {
       FactoryGirl.create(:hbx_enrollment_member,
         is_subscriber: false,
-        applicant_id: dependent_2.id,
+        applicant_id: family_member_2.id,
         hbx_enrollment: hbx_enrollment,
         eligibility_date: TimeKeeper.date_of_record.beginning_of_month,
         coverage_start_on: TimeKeeper.date_of_record.beginning_of_month)
@@ -54,19 +54,20 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
 
     before :each do
       allow(hbx_enrollment_member_1).to receive(:family_member).and_return(family_member_1)
-      allow(hbx_enrollment_member_2).to receive(:family_member).and_return(family_member_2)
-      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_1, hbx_enrollment_member_2])
+      allow(oldest_hbx_enrollment_member).to receive(:family_member).and_return(family_member_2)
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_1, oldest_hbx_enrollment_member])
     end
 
     it "should set is_subscriber to true for the oldest applicant" do
       hbx_enrollment.hbx_enrollment_members.each do |member|
         expect(member.is_subscriber).to be(false)
       end
+
       subject.migrate
-      hbx_enrollment.reload
-      # hbx = HbxEnrollment.find(hbx_enrollment.id)
-      expect(hbx_enrollment.hbx_enrollment_members.first.is_subscriber).to be(false)
-      expect(hbx_enrollment.hbx_enrollment_members.last.is_subscriber).to eq(true)
+      oldest_hbx_enrollment_member.reload
+      hbx_enrollment_member_1.reload
+      expect(oldest_hbx_enrollment_member.is_subscriber).to be(true)
+      expect(hbx_enrollment_member_1.is_subscriber).to be(false)
     end
   end
 end

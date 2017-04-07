@@ -24,7 +24,6 @@ class FixIsSubscriberForResponsiblePartyEnrollments < MongoidMigrationTask
           'households.hbx_enrollments.external_enrollment' => {'$ne' => true}
         }},
         {'$match' => {
-          'households.hbx_enrollments.consumer_role_id' => {'$ne' => nil},
           'households.hbx_enrollments.aasm_state' => {'$ne' => 'shopping'}
         }},
         {'$match' => {
