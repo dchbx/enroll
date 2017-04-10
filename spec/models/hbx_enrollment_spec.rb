@@ -2137,11 +2137,14 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 
   let(:person) { family.primary_applicant.person }
 
+  let(:enrollment_effective_on) { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+  let(:new_enrollment_effective_on) { TimeKeeper.date_of_record.beginning_of_month.next_month }
+
   let!(:enrollment) {
     FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "health",
-                       effective_on: current_benefit_group.start_on,
+                       effective_on: enrollment_effective_on,
                        enrollment_kind: "open_enrollment",
                        kind: "employer_sponsored",
                        submitted_at: current_benefit_group.start_on - 20.days,
@@ -2152,13 +2155,11 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
                        )
   }
 
-  context 'When family has active coverage and makes changes for their coverage' do
-
-    let(:new_enrolllment) {
+  let(:new_enrollment) {
       FactoryGirl.create(:hbx_enrollment,
                          household: family.active_household,
                          coverage_kind: "health",
-                         effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                         effective_on: new_enrollment_effective_on,
                          enrollment_kind: "open_enrollment",
                          kind: "employer_sponsored",
                          submitted_at: TimeKeeper.date_of_record,
@@ -2169,19 +2170,43 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
                          aasm_state: 'shopping'
                          )
     }
-    before do
-      allow(new_enrolllment).to receive(:plan_year_check).with(ce.employee_role).and_return false
-    end
 
-    it 'should terminate their existing coverage' do
+  context 'When both existing and new enrollments have same effective_on date' do
+    let(:enrollment_effective_on) { TimeKeeper.date_of_record.beginning_of_month.next_month }
+    let(:new_enrollment_effective_on) { TimeKeeper.date_of_record.beginning_of_month.next_month }
+
+    it 'should cancel existing coverage' do
       expect(enrollment.coverage_selected?).to be_truthy
       expect(enrollment.terminated_on).to be_nil
-      new_enrolllment.select_coverage!
-      expect(enrollment.coverage_terminated?).to be_truthy
-      expect(enrollment.terminated_on).to eq(new_enrolllment.effective_on - 1.day)
+      new_enrollment.select_coverage!
+      expect(enrollment.coverage_canceled?).to be_truthy
+      expect(enrollment.terminated_on).to be_nil
     end
   end
 
+  context 'When new coverage triggers past termination' do
+    let(:enrollment_effective_on) { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+    let(:new_enrollment_effective_on) { TimeKeeper.date_of_record }
+
+    it 'should cancel existing coverage' do
+      expect(enrollment.coverage_selected?).to be_truthy
+      expect(enrollment.terminated_on).to be_nil
+      new_enrollment.select_coverage!
+      expect(enrollment.coverage_terminated?).to be_truthy
+      expect(enrollment.terminated_on).to eq(new_enrollment_effective_on - 1.day)
+    end
+  end
+
+  context 'When new coverage triggers future termination' do
+
+    it 'should move coverage into termination pending' do
+      expect(enrollment.coverage_selected?).to be_truthy
+      expect(enrollment.terminated_on).to be_nil
+      new_enrollment.select_coverage!
+      expect(enrollment.coverage_termination_pending?).to be_truthy
+      expect(enrollment.terminated_on).to eq(new_enrollment.effective_on - 1.day)
+    end
+  end
 
   context 'When family has passive renewal and selected a coverage' do
 
@@ -2255,7 +2280,7 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
         new_enrollment.reload
 
         expect(new_enrollment.coverage_selected?).to be_truthy
-        expect(passive_renewal.coverage_terminated?).to be_truthy
+        expect(passive_renewal.coverage_termination_pending?).to be_truthy
         expect(passive_renewal.terminated_on).to eq(new_enrollment.effective_on - 1.day)
       end
     end

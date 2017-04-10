@@ -481,23 +481,23 @@ class HbxEnrollment
 
   def update_existing_shop_coverage
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
-    shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
-
-    terminate_proc = lambda do |enrollment|
-      if enrollment.may_terminate_coverage?
-        enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-        enrollment.terminate_coverage!
-      end
-    end
+    shop_enrollments = household.hbx_enrollments.ne(id: id).shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
 
     shop_enrollments.each do |enrollment|
-      if enrollment.currently_active? && enrollment.may_terminate_coverage?
-        terminate_proc.call(enrollment)
-      elsif enrollment.future_active?
-        if enrollment.effective_on >= self.effective_on
-          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-        else
-          terminate_proc.call(enrollment)
+
+
+      if enrollment.effective_on >= self.effective_on
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      else
+        termination_date = (self.effective_on - 1.day)
+        
+        if termination_date < TimeKeeper.date_of_record
+          if enrollment.may_terminate_coverage?
+            enrollment.update_current(terminated_on: termination_date)
+            enrollment.terminate_coverage!
+          end
+        elsif enrollment.may_schedule_coverage_termination?
+          enrollment.schedule_coverage_termination!(termination_date)
         end
       end
     end
