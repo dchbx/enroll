@@ -203,6 +203,24 @@ class HbxEnrollment
     end
   end
 
+  def hbx_enrolled_members(current_user, cover_kind, family_member_ids)
+    self.hbx_enrollment_members = self.hbx_enrollment_members.select{ |member| family_member_ids.include? member.applicant_id }
+    self.writing_agent_id = current_user.person.try(:broker_role).try(:id)
+    broker_role = current_user.person.broker_role
+    self.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
+    self.coverage_kind = cover_kind
+  end
+
+  def hbx_enrollment_plan(hbx_enroll)
+    sep_id = hbx_enroll.is_shop? ? hbx_enroll.family.earliest_effective_shop_sep.id : hbx_enroll.family.earliest_effective_ivl_sep.id
+    self.special_enrollment_period_id = sep_id
+    self.plan = hbx_enroll.plan
+  end
+
+  def update_relationship
+    return unless self.benefit_group_assignment.present?
+    self.benefit_group_assignment.update(hbx_enrollment_id: self.id)
+  end
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(

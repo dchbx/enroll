@@ -1,28 +1,22 @@
 class Insured::GroupSelectionController < ApplicationController
-  before_action :initialize_common_vars, only: [:create, :terminate_selection]
+  before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :is_under_open_enrollment, only: [:new]
 
   def select_market(person, params)
+    debugger
     return params[:market_kind] if params[:market_kind].present?
-    if @person.try(:has_active_employee_role?)
-      'shop'
-    elsif @person.try(:has_active_consumer_role?)
-      'individual'
-    elsif @person.try(:has_active_resident_role?)
-      'coverall'
-    else
-      nil
-    end
+    return 'shop' if person.has_active_employee_role?
+    return 'individual' if person.has_active_consumer_role?
+    return 'coverall' if person.has_active_resident_role?
+    nil
   end
 
   def new
     set_bookmark_url
-    initialize_common_vars
-
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
-    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
+    if @market_kind == 'individual' || (@person.has_active_employee_role? && @person.has_active_consumer_role?) || @resident
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
@@ -62,29 +56,19 @@ class Insured::GroupSelectionController < ApplicationController
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
     raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
+
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
-
-    hbx_enrollment = build_hbx_enrollment
+    hbx_enrollment = @person.build_hbx_enrollment(@market_kind, @employee_role, @person, @hbx_enrollment, @change_plan, @coverage_household, @enrollment_kind)
     if (keep_existing_plan && @hbx_enrollment.present?)
-      sep_id = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep.id : @hbx_enrollment.family.earliest_effective_ivl_sep.id
-      hbx_enrollment.special_enrollment_period_id = sep_id
-      hbx_enrollment.plan = @hbx_enrollment.plan
-    end
-
-    hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
-      family_member_ids.include? member.applicant_id
+      hbx_enrollment.hbx_enrollment_plan(@hbx_enrollment)
     end
     hbx_enrollment.generate_hbx_signature
 
+    hbx_enrollment.hbx_enrolled_members(current_user, @coverage_kind, family_member_ids)
     @family.hire_broker_agency(current_user.person.broker_role.try(:id))
-    hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
     hbx_enrollment.original_application_type = session[:original_application_type]
-    broker_role = current_user.person.broker_role
-    hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
-
-    hbx_enrollment.coverage_kind = @coverage_kind
 
     if @employee_role.present? && @employee_role.is_cobra_status?
       hbx_enrollment.kind = 'employer_sponsored_cobra'
@@ -96,7 +80,6 @@ class Insured::GroupSelectionController < ApplicationController
 
     # Set effective_on if this is a case of QLE with date options available.
     hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
-
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
@@ -106,7 +89,7 @@ class Insured::GroupSelectionController < ApplicationController
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       else
         # FIXME: models should update relationships, not the controller
-        hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
+        hbx_enrollment.update_relationship
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       end
     else
@@ -144,43 +127,6 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
 
-  def build_hbx_enrollment
-    case @market_kind
-    when 'shop'
-      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
-      if @hbx_enrollment.present?
-        @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
-        if @employee_role == @hbx_enrollment.employee_role
-          benefit_group = @hbx_enrollment.benefit_group
-          benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
-        else
-          benefit_group = @employee_role.benefit_group(qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-          benefit_group_assignment = @employee_role.census_employee.active_benefit_group_assignment
-        end
-      end
-      @coverage_household.household.new_hbx_enrollment_from(
-        employee_role: @employee_role,
-        resident_role: @person.resident_role,
-        coverage_household: @coverage_household,
-        benefit_group: benefit_group,
-        benefit_group_assignment: benefit_group_assignment,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-    when 'individual'
-      @coverage_household.household.new_hbx_enrollment_from(
-        consumer_role: @person.consumer_role,
-        resident_role: @person.resident_role,
-        coverage_household: @coverage_household,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-    when 'coverall'
-      @coverage_household.household.new_hbx_enrollment_from(
-        consumer_role: @person.consumer_role,
-        resident_role: @person.resident_role,
-        coverage_household: @coverage_household,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-    end
-  end
-
-
   def initialize_common_vars
     person_id = params.require(:person_id)
     @person = Person.find(person_id)
@@ -212,7 +158,6 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
-  private
   def generate_coverage_family_members_for_cobra
     if @market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_cobra_status?
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }

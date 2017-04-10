@@ -297,6 +297,42 @@ class Person
     true
   end
 
+  def build_hbx_enrollment(market_kind, employee_role, person, hbx_enrollment, change_plan, coverage_household, enrollment_kind)
+    case market_kind
+    when 'shop'
+      employee_role = person.active_employee_roles.first if employee_role.blank? and person.has_active_employee_role?
+      if hbx_enrollment.present?
+        change_plan = 'change_by_qle' if hbx_enrollment.is_special_enrollment?
+        if employee_role == hbx_enrollment.employee_role
+          benefit_group = hbx_enrollment.benefit_group
+          benefit_group_assignment = hbx_enrollment.benefit_group_assignment
+        else
+          benefit_group = employee_role.benefit_group
+          benefit_group_assignment = employee_role.census_employee.active_benefit_group_assignment
+        end
+      end
+      coverage_household.household.new_hbx_enrollment_from(
+        employee_role: employee_role,
+        resident_role: person.resident_role,
+        coverage_household: coverage_household,
+        benefit_group: benefit_group,
+        benefit_group_assignment: benefit_group_assignment,
+        qle: (change_plan == 'change_by_qle' or enrollment_kind == 'sep'))
+    when 'individual'
+      coverage_household.household.new_hbx_enrollment_from(
+        consumer_role: person.consumer_role,
+        resident_role: person.resident_role,
+        coverage_household: coverage_household,
+        qle: (change_plan == 'change_by_qle' or enrollment_kind == 'sep'))
+    when 'coverall'
+      coverage_household.household.new_hbx_enrollment_from(
+        consumer_role: person.consumer_role,
+        resident_role: person.resident_role,
+        coverage_household: coverage_household,
+        qle: (change_plan == 'change_by_qle' or enrollment_kind == 'sep'))
+    end
+  end
+
   # before_save :notify_change
   # def notify_change
   #   notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
