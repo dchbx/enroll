@@ -28,8 +28,8 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
     }
     let(:family_members) { [subscriber, dependent_1, dependent_2] }
     let(:family) { FactoryGirl.create(:family, :with_family_members, person: subscriber, people: family_members) }
-    let(:family_member_1) { FactoryGirl.create(:family_member, person: dependent_1, family: family) }
-    let(:family_member_2) { FactoryGirl.create(:family_member, person: dependent_2, family: family) }
+    let(:family_member_1) { family.family_members.where(person_id: dependent_1).first }
+    let(:family_member_2) { family.family_members.where(person_id: dependent_2).first }
     let(:hbx_enrollment_member_1) {
       FactoryGirl.create(:hbx_enrollment_member,
         is_subscriber: false,
