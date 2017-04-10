@@ -4,7 +4,7 @@ class FixIsSubscriberForResponsiblePartyEnrollments < MongoidMigrationTask
   def migrate
     invalid_is_subscriber_enrollment_ids.each.with_index(1) do |enrollment_id, idx|
       HbxEnrollment.find(enrollment_id).save
-      puts "#{idx}: Changed the is_subscriber flag for HbxEnrollment ID #{enrollment_id} to true."
+      puts "#{idx}: Changed the is_subscriber flag for HbxEnrollment ID #{enrollment_id} to true." unless Rails.env.test?
     end
   end
 
