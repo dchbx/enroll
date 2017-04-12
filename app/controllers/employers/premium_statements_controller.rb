@@ -9,7 +9,7 @@ class Employers::PremiumStatementsController < ApplicationController
     authorize @employer_profile, :list_enrollments?
     set_billing_date
     query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
-    @hbx_enrollments = query.execute.hbx_enrollments unless query.execute == nil
+    @hbx_enrollments = query.execute.hbx_enrollments.to_a.select{|e| e.terminated_on.nil? || e.terminated_on > @billing_date} unless query.execute == nil
     respond_to do |format|
       format.html
       format.js

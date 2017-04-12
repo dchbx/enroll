@@ -24,6 +24,7 @@ RSpec.describe Employers::PremiumStatementsController do
       total_employer_contribution: 200,
       total_employee_cost: 781.2,
       total_premium: 981.2,
+      terminated_on: nil
       )] }
 
   let(:census_employee) {
