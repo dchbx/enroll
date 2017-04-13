@@ -14,23 +14,6 @@ Then(/^I should see Documents link$/) do
   expect(page).to have_content "Documents"
 end
 
-When(/^I click on verification link$/) do
-  click_link "Documents"
-end
-
-Given(/^I should see page for documents verification$/) do
-  expect(page).to have_content "Documents FAQ"
-  expect(page).to have_selector('table tr')
-end
-
-Given(/^I upload the file as vlp document$/) do
-  script = "$('[name=\"file[]\"]').css({opacity: 100, display: 'block'});"
-  page.evaluate_script(script)
-  within('div.Number') do
-    attach_file('file[]', Rails.root.join('app', 'assets', 'images', 'logo', 'carrier' ,'carefirst.jpg'))
-  end
-end
-
 Given(/^I click the upload file button$/) do
   within first('div.btn-group') do
     click_button "Upload", :match => :first
