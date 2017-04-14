@@ -12,6 +12,7 @@ module PdfTemplates
     attribute :enrollment, PdfTemplates::Enrollment
     attribute :email, String
     attribute :plan_year, PdfTemplates::PlanYear
+    attribute :hired_on, Date
 
     def shop?
       return true

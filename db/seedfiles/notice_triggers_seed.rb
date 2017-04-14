@@ -254,6 +254,48 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP24A',
+    title: 'You Have Been Invited to Sign Up for Employer-Sponsored Coverage through DC Health Link',
+    description: 'This notice will be sent when an employee is newly added to the roster with a date of hire in the future.',
+    resource_name: 'employee_role',
+    event_name: 'new_hire_with_doh_in_future',
+    notice_triggers: [
+      {
+        name: 'New hires with future date of hire',
+        notice_template: 'notices/shop_employee_notices/notice_for_future_date_new_hired_employee',
+        notice_builder: 'ShopEmployeeNotices::NewHireNotice',
+        mpi_indicator: 'MPI_SHOP24A',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP24B',
+    title: 'Your Health Plan Open Enrollment Period has Begun',
+    description: 'This notice goes to all new hires when their open enrollment period starts',
+    resource_name: 'employee_role',
+    event_name: 'new_hire_open_enrollment_notice',
+    notice_triggers: [
+      {
+        name: 'Open Enrollment Notice for New hires',
+        notice_template: 'notices/shop_employee_notices/open_enrollment_notice_for_new_hired_employee',
+        notice_builder: 'ShopEmployeeNotices::NewHireNotice',
+        mpi_indicator: 'MPI_SHOP24B',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
