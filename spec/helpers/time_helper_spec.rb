@@ -29,4 +29,12 @@ RSpec.describe TimeHelper, :type => :helper do
       expect(helper.set_date_max_to_plan_end_of_year(enrollment)).to eq(latest_date)
     end
   end
+
+  describe "termination date" do
+    it "returns the last day of the enrollment plan year" do
+      effective_effective_date = TimeKeeper.date_of_record
+      enrollment_end_date = TimeKeeper.date_of_record + 1.year - 1.day
+      expect(helper.term_date(effective_effective_date)).to eq(enrollment_end_date)
+    end
+  end
 end

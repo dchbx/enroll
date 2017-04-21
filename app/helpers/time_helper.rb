@@ -13,4 +13,8 @@ module TimeHelper
     year = enrollment.effective_on.year
     final_day = Date.new(year, 12, 31)
   end
+
+  def term_date(effective_on)
+    effective_on + 1.year - 1.day
+  end
 end
