@@ -164,6 +164,10 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
   describe "GET edit" do
 
+    before do
+      quote.update_attributes(broker_role_id: person.broker_role.id)
+    end
+
     it "returns http success" do
       get :edit, broker_role_id: person.broker_role.id, id: quote
       expect(response).to have_http_status(:success)
