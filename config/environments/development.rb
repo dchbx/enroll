@@ -38,6 +38,8 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  config.serve_static_files = true
+
   config.acapi.publish_amqp_events = :log
   config.acapi.app_id = "enroll"
   # Raises error for missing translations

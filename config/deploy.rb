@@ -2,7 +2,7 @@
 lock '3.3.5'
 
 set :application, 'enroll'
-set :repo_url, 'https://github.com/dchbx/enroll.git'
+set :repo_url, 'https://github.com/dchealthlink/enroll-mobile-api.git'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
