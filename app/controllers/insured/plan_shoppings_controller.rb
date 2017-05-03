@@ -200,6 +200,16 @@ class Insured::PlanShoppingsController < ApplicationController
       sort_by_standard_plans(@plans)
       @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
     end
+
+    if @person.primary_family.active_household.latest_active_tax_household.present?
+      member_ids = @hbx_enrollment.hbx_enrollment_members.collect(&:applicant_id)
+      true_count = @person.primary_family.active_household.latest_active_tax_household.tax_household_members.any_in(:applicant_id => member_ids, :is_medicaid_chip_eligible => false).count
+      if true_count < 1
+        csr_variant_ids = [ "01", "02"]
+        @plans = @plans.select { |p| p.csr_variant_id.blank? || csr_variant_ids.include?(p.csr_variant_id)}
+      end
+    end
+
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
