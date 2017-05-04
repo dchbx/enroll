@@ -55,8 +55,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       render "insured/families/shop_for_plans_widget"
     end
 
-    it "should have link without change_plan" do
-      expect(rendered).to have_selector("a[href='/insured/consumer_role/build']")
+    it "should not have link without change_plan" do
+      expect(rendered).not_to have_selector("a[href='/insured/consumer_role/build']")
     end
   end
 
@@ -108,8 +108,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       render "insured/families/shop_for_plans_widget"
     end
 
-    it "should have text about enrolling in Individual Market" do
-      expect(rendered).to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
+    it "should not show the text about enrolling in Individual Market" do
+      expect(rendered).not_to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
     end
   end
 

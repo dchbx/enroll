@@ -10,8 +10,6 @@ site:
   social_media:
     facebook_url: ""
 
-  aca_market_kinds: ["shop"] ### Deprecated
-
 contact_center:
   name: "Health Connector's Customer Care Center"
   alt_name: "Health Connector Customer Service"
@@ -23,7 +21,7 @@ contact_center:
 aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
-  market_kinds: ["shop"]
+  market_kinds: ["shop","individual"]
 
 #
   qle:

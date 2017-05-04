@@ -1,3 +1,4 @@
+
 <div class="container home module welcome">
   <br/>
   <br/>
@@ -20,8 +21,10 @@
     <br/>
   <% end %>
   <%= link_to "Employee Portal", privacy_insured_employee_index_path, class: "btn btn-default" %>
-  <%= link_to "Consumer/Family Portal", privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default" %>
-  <%= link_to "Assisted Consumer/Family Portal", privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default" %>
+  <% if individual_market_is_enabled? %>
+    <%= link_to "Consumer/Family Portal", privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default" %>
+    <%= link_to "Assisted Consumer/Family Portal", privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default" %>
+  <% end %>
   <%= link_to "Returning User", family_account_path, class: "btn btn-default" %>
   <%= link_to "Employer Portal", new_employers_employer_profile_path, class: "btn btn-default" %>
   <%= link_to "Broker Agency Portal", broker_agencies_root_path, class: "btn btn-default" %>

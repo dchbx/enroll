@@ -3,17 +3,17 @@ class BrokerAgencyProfile
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include IndividualMarketBehaviors
 
   embedded_in :organization
 
-  MARKET_KINDS = %W[individual shop both]
-
-  MARKET_KINDS_OPTIONS = {
+  MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
+  ALL_MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
-    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+    "Both - Individual & Family AND Small Business Marketplaces" => "both"
   }
-
+  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
 
   field :entity_kind, type: String
   field :market_kind, type: String
@@ -52,7 +52,7 @@ class BrokerAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid practice area" },
+    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid practice area" },
     allow_blank: false
 
   validates :entity_kind,
@@ -63,7 +63,6 @@ class BrokerAgencyProfile
 
   scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
   scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
-
 
   # has_many employers
   def employer_clients

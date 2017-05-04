@@ -47,6 +47,13 @@ class ApplicationController < ActionController::Base
     render file: 'public/403.html', status: 403
   end
 
+  def individual_market_is_active
+    if !(Settings.aca.individual_market.is_active)
+      flash[:error] = "unauthorized"
+      redirect_to root_path
+    end
+  end
+
   def user_not_authorized(exception)
     policy_name = exception.policy.class.to_s.underscore
 

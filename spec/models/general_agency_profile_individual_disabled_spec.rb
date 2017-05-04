@@ -1,7 +1,5 @@
 require 'rails_helper'
-Settings.reload_from_files(
-  Rails.root.join("config", "settings", "config_with_individual_enabled.yml").to_s,
-)
+
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
   it { should delegate_method(:hbx_id).to :organization }
@@ -11,13 +9,13 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should delegate_method(:is_active).to :organization }
 
   let(:organization) {FactoryGirl.create(:organization)}
-  let(:market_kind) {"both"}
-  let(:bad_market_kind) {"commodities"}
+  let(:market_kind) {"shop"}
+  let(:bad_market_kind) {"individual"}
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
 
   it "assigns MARKET_KINDS and MARKET_KINDS_OPTIONS correctly" do
-    expect(subject.class::MARKET_KINDS).to match_array(%W(shop individual both))
-    expect(subject.class::MARKET_KINDS_OPTIONS.count).to eq(3)
+    expect(subject.class::MARKET_KINDS).to match_array(%W(shop))
+    expect(subject.class::MARKET_KINDS_OPTIONS.count).to eq(1)
   end
 
   describe ".new" do
@@ -130,7 +128,7 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   end
 
   describe "instance method", dbclean: :after_each do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, market_kind: "shop") }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:person) { FactoryGirl.create(:person, :with_family) }
     let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role, person:person, general_agency_profile_id: general_agency_profile.id) }
@@ -176,12 +174,12 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   end
 
   describe "class method" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, market_kind: "shop") }
     let(:broker_role) { FactoryGirl.create(:broker_role) }
 
     context "all_by_broker_role" do
       before :each do
-        10.times { FactoryGirl.create(:general_agency_profile) }
+        10.times { FactoryGirl.create(:general_agency_profile, market_kind: "shop") }
         broker_role.favorite_general_agencies.create(general_agency_profile_id: general_agency_profile.id)
       end
 
@@ -192,9 +190,9 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
     end
 
     context "filter_by" do
-      let(:ga1) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_applicant') }
-      let(:ga2) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_approved') }
-      let(:ga3) { FactoryGirl.create(:general_agency_profile, aasm_state: 'is_suspended') }
+      let(:ga1) { FactoryGirl.create(:general_agency_profile, market_kind: "shop", aasm_state: 'is_applicant') }
+      let(:ga2) { FactoryGirl.create(:general_agency_profile, market_kind: "shop", aasm_state: 'is_approved') }
+      let(:ga3) { FactoryGirl.create(:general_agency_profile, market_kind: "shop", aasm_state: 'is_suspended') }
       before :each do
         ga1
         ga2

@@ -29,8 +29,8 @@ And(/^.+ enters broker agency information$/) do
   # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
   # find(:xpath, "//li[contains(., 'C Corporation')]").click
 
-  find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
-  find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'Small Business Marketplace ONLY')]")
+  #find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
 
   find('button.multiselect').click
   find(:xpath, '//label[input[@value="bn"]]').click

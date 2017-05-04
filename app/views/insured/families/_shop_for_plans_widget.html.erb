@@ -70,15 +70,17 @@
               <% else %>
                 <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
                   <%= format_date ivl_enrollment_effective_date %>.
-                </p>  
+                </p>
               <% end %>
               <br/>
               <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
             <% else %>
-              You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
+              You have no Employer Sponsored Insurance. <%= if individual_market_is_enabled? %> If you wish to purchase insurance, please enroll in the Individual Market. <% end %>
               <div id="shop-for-plans-widget">
-                <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
-              </div>
+                <% if individual_market_is_enabled? %>
+                  <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+                <% end %>
+                </div>
             <% end %>
           </div>
         </div>

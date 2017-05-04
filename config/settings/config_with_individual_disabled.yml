@@ -10,8 +10,6 @@ site:
   social_media:
     facebook_url: ""
 
-  aca_market_kinds: ["shop"] ### Deprecated
-
 contact_center:
   name: "Health Connector's Customer Care Center"
   alt_name: "Health Connector Customer Service"

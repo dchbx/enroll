@@ -97,7 +97,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         legal_name: 'useragency',
         fein: "223232323",
         entity_kind: "c_corporation",
-        market_kind: "individual",
+        market_kind: "shop",
         working_hours: "0",
         accept_new_clients: "0",
         office_locations_attributes: office_locations
