@@ -1,0 +1,117 @@
+site:
+  short_name: "Health Connector"
+  byline: "The Right Place for the Right Plan"
+  long_name: ""
+  copyright_period_start: "2017"
+  header_message: "The Right Place for the Right Plan"
+  logo_file_name: "logo.png"
+  home_url: "https://qa.enroll.mhc.hbxshop.org/"
+
+  social_media:
+    facebook_url: ""
+
+  aca_market_kinds: ["individual", "shop"]
+  general_agency_enabled: true
+  
+contact_center:
+  name: "Health Connector's Customer Care Center"
+  alt_name: "Health Connector Customer Service"
+  phone_number: "1-855-532-5465"
+  tty_number: "1-855-532-5465"
+  alt_phone_number: "1-855-532-LINK"
+  email_address: "info@mhc.hbxshop.org"
+
+aca:
+  state_name: "Massachusetts"
+  state_abbreviation: "MA"
+
+#
+  qle:
+    with_in_sixty_days: 60
+#
+
+  individual_market:
+    monthly_enrollment_due_on: 15
+    verification_outstanding_window:
+      days: 0
+
+    open_enrollment:
+      benefit_year_2016:
+        start_on: <%= Date.new(2016,11,1) %>
+        end_on: <%= Date.new(2017,1,31) %>
+
+      benefit_year_2017:
+        start_on: <%= Date.new(2016,11,1) %>
+        end_on: <%= Date.new(2017,1,31) %>
+
+  shop_market:
+    small_market_employee_count_maximum: 50
+    employer_contribution_percent_minimum: 50
+    employee_participation_ratio_minimum: <%= 2 / 3.0 %>
+    non_owner_participation_count_minimum: 1
+    binder_payment_due_on: 12
+
+    earliest_enroll_prior_to_effective_on:
+      days: -30
+    latest_enroll_after_effective_on:
+      days: 30
+    latest_enroll_after_employee_roster_correction_on:
+      days: 30
+
+    retroactive_coverage_termination_maximum:
+      days: -60
+
+    initial_application:
+      publish_due_day_of_month: 5
+      earliest_start_prior_to_effective_on:
+        months: -3
+      appeal_period_after_application_denial:
+        days: 30
+      # After submitting an ineligible plan year application, time period an Employer must wait
+      ineligible_period_after_application_denial:
+        days: 90
+
+    renewal_application:
+      earliest_start_prior_to_effective_on:
+        months: -3
+      monthly_open_enrollment_end_on: 13
+      publish_due_day_of_month: 10
+      force_publish_day_of_month: 11
+      open_enrollment:
+        minimum_length:
+          days: 3
+
+    benefit_period:
+      length_minimum:
+        year: 1
+      length_maximum:
+        year: 1
+
+    open_enrollment:
+      monthly_start_on: 1
+      monthly_end_on: 10
+
+      minimum_length:
+        days: 5
+      maximum_length:
+        months: 2
+
+    cobra_enrollment_period:
+      months: 6
+
+    group_file:
+      new_enrollment_transmit_on: 16
+      update_transmit_day_of_week: "friday"
+
+
+paper_notice: 'paper-notices'
+
+aptc_errors:
+  effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
+  enrollment_max_smaller_than_applied: "Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC."
+  max_aptc_non_numeric: "Max APTC needs to be a numeric value."
+  max_aptc_too_small: "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
+  max_aptc_too_big: "Max APTC should be less than 9999.99"
+
+#   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
+#   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth

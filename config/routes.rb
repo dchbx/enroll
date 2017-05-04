@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
+  require 'resque/server'
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
@@ -206,7 +206,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -388,31 +388,32 @@ Rails.application.routes.draw do
     end
   end
 
-  match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
-  namespace :general_agencies do
-    root 'profiles#new'
-    resources :profiles do
-      collection do
-        get :new_agency_staff
-        get :search_general_agency
-        get :new_agency
-        get :messages
-        get :agency_messages
-        get :inbox
-        get :edit_staff
-        post :update_staff
+  if Settings.site.general_agency_enabled
+    match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
+    namespace :general_agencies do
+      root 'profiles#new'
+      resources :profiles do
+        collection do
+          get :new_agency_staff
+          get :search_general_agency
+          get :new_agency
+          get :messages
+          get :agency_messages
+          get :inbox
+          get :edit_staff
+          post :update_staff
+        end
+        member do
+          get :employers
+          get :families
+          get :staffs
+        end
       end
-      member do
-        get :employers
-        get :families
-        get :staffs
+      resources :inboxes, only: [:new, :create, :show, :destroy] do
+        get :msg_to_portal
       end
-    end
-    resources :inboxes, only: [:new, :create, :show, :destroy] do
-      get :msg_to_portal
     end
   end
-
   resources :translations
 
   namespace :api, :defaults => {:format => 'xml'} do

@@ -11,7 +11,7 @@ site:
     facebook_url: ""
 
   aca_market_kinds: ["individual", "shop"]
-
+  general_agency_enabled: false
 contact_center:
   name: "DC Health Link's Customer Care Center"
   alt_name: "DC Health Link Customer Service"
