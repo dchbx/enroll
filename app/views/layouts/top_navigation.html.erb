@@ -1,0 +1,17 @@
+<% content_for :content_wrapper do %>
+  <div class="row">
+    <!-- Navigation Column -->
+    <%= yield :horizontal_menu %>
+    <%#= render template: "new_primary_nav" %>
+
+    <!-- Content Column -->
+    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
+      <div class="flash_message"><%= flash_messages %></div>
+      <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
+      <div class="horizontal_status"><%= yield(:horizontal_status) if content_for?(:horizontal_status) %></div>
+
+      <%= yield(:content) if content_for?(:content) %>
+    </div>
+  </div>
+<% end %>
+<%= render template: "layouts/application" %>

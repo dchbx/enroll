@@ -1,0 +1,49 @@
+<div class='hide' id='dchbx_enroll_date_of_record'><%= TimeKeeper.date_of_record.iso8601 %></div>
+  <nav class="navbar navbar-default navbar-static-top">
+    <div class="container" role="banner" aria-label="header">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          <%= image_tag 'logo.png' %>
+        </a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><h4 class="no-buffer"><%= get_header_text(controller_name) %></h4></a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
+              <span class="header-text">Call Customer Service</span><br/>
+              <span><i class="fa fa-phone fa-lg"></i><%= Settings.contact_center.phone_number %></span>
+            </a>
+          </li>
+          <% if signed_in? %>
+            <li>
+              <span class="my-portal-links">
+                <%= render partial: "shared/my_portal_links"%>
+                <span><a href="https://dchealthlink.com/help" target="_blank" class="header-text">Help</a></span>
+                <span> | </span>
+                <span><%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %></span><br/>
+                <span class="users-name"><%= user_first_name_last_name_and_suffix %></span>
+                <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                  &nbsp;
+                  <span>My ID: <%= truncate(current_user.person.hbx_id.upcase, length: 8, omission: '') %></span>
+                <% end %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container -->
+  </nav>
+</div>

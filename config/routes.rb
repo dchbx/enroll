@@ -1,4 +1,16 @@
 Rails.application.routes.draw do
+
+  namespace :uis do
+    resources :bootstrap3_examples do
+      collection do
+        get :index
+        get :components
+        get :getting_started
+      end
+    end
+  end
+
+
   require 'resque/server' 
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }

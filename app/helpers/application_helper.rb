@@ -1,5 +1,28 @@
 module ApplicationHelper
 
+  def bootstrap_class_for(flash_type)
+    { success: "alert-success", error: "alert-danger", alert: "alert-warning", notice: "alert-info", info: "alert-info" }[flash_type.to_sym] || flash_type.to_s
+  end
+
+  def bootstrap_icon_for(flash_type)
+    { success: "ok-circle", error: "exclamation-sign", alert: "warning-sign", notice: "exclamation-sign", info: "info-sign" }[flash_type.to_sym] || "question-sign"
+  end
+
+  def flash_messages(opts = {})
+    flash.each do |msg_type, message|
+      msg_type_sym = msg_type.to_sym
+      concat(content_tag(:div, message, class: "alert #{bootstrap_class_for(msg_type_sym)} alert-dismissible", role: 'alert') do
+        concat(content_tag(:button, class: 'close', data: { dismiss: 'alert' }) do
+          concat content_tag(:span, 'Close', class: 'sr-only')
+          concat content_tag(:icon, "".html_safe, class: "glyphicon glyphicon-remove-circle")
+        end)
+        # concat content_tag(:icon, "".html_safe, class: "glyphicon glyphicon-#{bootstrap_icon_for(msg_type_sym)}")
+        concat message
+      end)
+    end
+    nil
+  end
+
   def get_portals_text(insured, employer, broker)
     my_portals = []
     if insured == true
@@ -240,20 +263,6 @@ module ApplicationHelper
     end
     link_to(content_tag(:span, raw("&nbsp;"), class: 'fui-plus-circle') + name,
             '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
-  end
-
-  def render_flash
-    rendered = []
-    flash.each do |type, messages|
-      if messages.respond_to?(:each)
-        messages.each do |m|
-          rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => m}) unless m.blank?
-        end
-      else
-        rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => messages}) unless messages.blank?
-      end
-    end
-    rendered.join('').html_safe
   end
 
   def dd_value(val)

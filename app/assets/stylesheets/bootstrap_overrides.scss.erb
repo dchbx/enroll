@@ -1,5 +1,54 @@
 @import "variables";
 
+/*.two_column_layout {
+  @include make-row();
+}
+.content-main {
+  @include make-lg-column(8);
+}
+.content-secondary {
+  @include make-lg-column(3);
+  @include make-lg-column-offset(1);
+}*/
+
+/* panel-variant mixin takes 4 args: $border, $heading-text-color, $heading-bg-color, and $heading-border */
+.panelrow {
+  /*@include panel-variant(#d01919, #1cf21c, #000000, #bad017);*/
+}
+
+/* button-variant mixin takes three arguments – $color, $background, and $border */
+.custom-btn {
+  /*@include button-variant(#cece19, #000000, #2dbe27);*/
+}
+
+/* gradient-horizontal mixin takes four arguments – $start-color, $end-color, $start-percent, $end-percent */ 
+.example {
+  /*@include gradient-horizontal(#1834cc, #1dc937, 0%, 100%);*/
+}
+
+
+.nav-sidebar {
+  padding: 8px 15px;
+  margin-bottom: 20px;
+
+  background-color: #111; /* Black*/
+}
+
+/* The navigation menu links */
+.nav-sidebar a {
+/*    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+*/}
+
+/* When you mouse over the navigation links, change their color */
+.nav-sidebar a:hover, .offcanvas a:focus{
+    /*color: #f1f1f1;*/
+}
+
 body {
   opacity: 0;
   display: none;

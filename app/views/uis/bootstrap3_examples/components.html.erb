@@ -1,0 +1,3424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Components &middot; Flat UI Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Loading Bootstrap -->
+    <link href="../dist/css/vendor/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="../dist/css/flat-ui-pro.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+
+    <link rel="shortcut icon" href="../dist/img/favicon.ico">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="../dist/js/vendor/html5shiv.js"></script>
+      <script src="../dist/js/vendor/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <ul class="demo-sidebar hidden-md">
+      <li><a href="#fa fa-alert">Alerts</a></li>
+      <li><a href="#fa fa-bottom-menu">Bottom Menu</a></li>
+      <li><a href="#fa fa-breadcrumb">Breadcrumbs</a></li>
+      <li><a href="#fa fa-button">Buttons</a></li>
+      <li><a href="#fa fa-carousel">Carousel</a></li>
+      <li><a href="#fa fa-checkbox">Checkboxes</a></li>
+      <li><a href="#fa fa-datepicker">Datepicker</a></li>
+      <li><a href="#fa fa-dialog">Dialogs</a></li>
+      <li><a href="#fa fa-dropdown">Dropdown</a></li>
+      <li><a href="#fa fa-fileinput">File Input</a></li>
+      <li><a href="#fa fa-iconbar">Iconbar</a></li>
+      <li><a href="#fa fa-input">Input</a></li>
+      <li><a href="#fa fa-label">Labels</a></li>
+      <li><a href="#fa fa-modal">Modal</a></li>
+      <li><a href="#fa fa-nav">Nav</a></li>
+      <li><a href="#fa fa-navbar">Navbar</a></li>
+      <li><a href="#fa fa-pager">Pager</a></li>
+      <li><a href="#fa fa-pagination">Pagination</a></li>
+      <li><a href="#fa fa-popover">Popover</a></li>
+      <li><a href="#fa fa-progress">Progress</a></li>
+      <li><a href="#fa fa-radio">Radio buttons</a></li>
+      <li><a href="#fa fa-select">Select</a></li>
+      <li><a href="#fa fa-slider">Slider</a></li>
+      <li><a href="#fa fa-spinner">Spinner</a></li>
+      <li><a href="#fa fa-switch">Switch</a></li>
+      <li><a href="#fa fa-tables">Tables</a></li>
+      <li><a href="#fa fa-tagsinput">Tags Input</a></li>
+      <li><a href="#fa fa-timepicker">Timepicker</a></li>
+      <li><a href="#fa fa-tooltip">Tooltip</a></li>
+      <li><a href="#fa fa-typeahead">Typeahead</a></li>
+      <li><a href="#fa fa-videoplayer">Video Player</a></li>
+    </ul> <!-- /nav -->
+
+    <div id="fa fa-alert"></div>
+    <h1 class="demo-headline">Components</h1>
+    <div class="container">
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Alerts</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            Restyled <a href="http://getbootstrap.com/components/#alerts">Bootstrap alerts</a> with no change to the functionality.
+          </p>
+          <div class="alert alert-info">
+            <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+            <h4>Alert title</h4>
+            <p>An error message is information displayed when an unexpected condition occurs,
+               usually on a computer or other device. On modern operating systems with graphical
+                user interfaces, error messages are often displayed using dialog boxes.</p>
+            <button type="button" class="btn btn-primary btn-wide">Save</button>
+            <button type="button" class="btn btn-default btn-wide">Cancel</button>
+          </div>
+
+<pre class="prettyprint">
+&lt;div class="alert alert-info"&gt;
+  &lt;button class="close fa fa-cross" data-dismiss="alert"&gt;&lt;/button&gt;
+  &lt;h4&gt;Alert title&lt;/h4&gt;
+  &lt;p&gt;Content inside...&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+          <div id="fa fa-bottom-menu"></div>
+        </div>
+      </div><!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Bottom menu</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            A better alternative to a Footer that can fit several stacks of links. Organize your
+            columns by using grids &mdash; they are so powerfull and responsive.
+            No JS required. Go inspect the&nbsp;markup!
+          </p>
+        </div>
+      </div><!-- /.demo-row -->
+    </div><!-- /.container -->
+
+      <div class="bottom-menu bottom-menu-inverse">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-2 col-sm-2">
+              <a href="#fakelink" class="bottom-menu-brand">Flat UI</a>
+            </div>
+            <div class="col-md-8 col-sm-8">
+              <ul class="bottom-menu-list">
+                <li><a href="#fakelink">About Us</a></li>
+                <li><a href="#fakelink">Store</a></li>
+                <li class="active"><a href="#fakelink">Jobs</a></li>
+                <li><a href="#fakelink">Privacy</a></li>
+                <li><a href="#fakelink">Terms</a></li>
+                <li><a href="#fakelink">Follow Us</a></li>
+                <li><a href="#fakelink">Support</a></li>
+                <li><a href="#fakelink">Links</a></li>
+              </ul>
+            </div>
+            <div class="col-md-2 col-sm-2">
+              <ul class="bottom-menu-iconic-list">
+                <li><a href="#fakelink" class="fa fa-pinterest"></a></li>
+                <li><a href="#fakelink" class="fa fa-facebook"></a></li>
+                <li><a href="#fakelink" class="fa fa-twitter"></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div> <!-- /bottom-menu-inverse -->
+
+    <div class="container">
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>&nbsp;</h3>
+        </div>
+        <div class="demo-content">
+          <br/>
+          <p class="ptl mtl">Yes, it looks awesome without width limitations. Don't forget
+          to place a <code>.container</code> element inside.
+          </p>
+<pre class="prettyprint">
+&lt;div class=&quot;bottom-menu&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    ...
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+          <p class="ptl">
+            You can add <code>.bottom-menu-list</code> class to the menu list, and get it styled.<br>
+            When the list comes right after the <span class="text-info">title</span>, it turns into a column.
+          </p>
+<pre class="prettyprint">
+&lt;h5 class=&quot;title&quot;&gt;Title&lt;/h5&gt;
+&lt;ul class=&quot;bottom-menu-list&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+          <p class="ptl">
+            We have reserved a special class <code>.bottom-menu-icons</code> for listing social icons.
+            Just put a list with icons inside a <code>.bottom-menu</code> element and you're good to go:
+          </p>
+<pre class="prettyprint">
+&lt;div class="bottom-menu"&gt;
+  ...
+  &lt;ul class="bottom-menu-icons"&gt;
+    &lt;li&gt;
+      &lt;a href="#" class="fa fa-pinterest"&gt;&lt;/a&gt;
+    &lt;/li&gt;
+    ...
+  &lt;/ul&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">
+            We have added two color schemes: light and inverse. To use the dark look add
+            <code>.bottom-menu-inverse</code> as an additional class for your container.
+          </p>
+<pre class="prettyprint">
+&lt;div class="bottom-menu bottom-menu-inverse"&gt;
+  ...
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">
+            We have added one more modifier: <code>bottom-menu-large</code>.
+            You can use it to add some space around links if you have a bunch of them in a menu.
+          </p>
+<pre class="prettyprint">
+&lt;div class="bottom-menu bottom-menu-large"&gt;
+  ...
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">Now let's try it out:</p>
+
+        </div>
+      </div><!-- /.demo-row -->
+    </div><!-- /.container -->
+
+    <div class="bottom-menu mbl">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-2 col-sm-2">
+            <a href="#fakelink" class="bottom-menu-brand">Flat UI</a>
+          </div>
+          <div class="col-md-8 col-sm-8">
+            <ul class="bottom-menu-list">
+              <li><a href="#fakelink">About Us</a></li>
+              <li><a href="#fakelink">Store</a></li>
+              <li class="active"><a href="#fakelink">Jobs</a></li>
+              <li><a href="#fakelink">Privacy</a></li>
+              <li><a href="#fakelink">Terms</a></li>
+              <li><a href="#fakelink">Follow Us</a></li>
+              <li><a href="#fakelink">Support</a></li>
+              <li><a href="#fakelink">Links</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2 col-sm-2">
+            <ul class="bottom-menu-iconic-list">
+              <li><a href="#fakelink" class="fa fa-pinterest"></a></li>
+              <li><a href="#fakelink" class="fa fa-facebook"></a></li>
+              <li><a href="#fakelink" class="fa fa-twitter"></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /bottom-menu -->
+
+    <div class="bottom-menu bottom-menu-large bottom-menu-inverse">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-2 col-sm-2">
+            <a href="#fakelink" class="bottom-menu-brand">Flat UI</a>
+          </div>
+          <div class="col-md-2 col-sm-2">
+            <h5 class="title">ABOUT US</h5>
+            <ul class="bottom-menu-list">
+              <li><a href="#fakelink">Dashboard</a></li>
+              <li><a href="#fakelink">Feed</a></li>
+              <li><a href="#fakelink">Forums</a></li>
+              <li><a href="#fakelink">Radio</a></li>
+              <li><a href="#fakelink">Journal</a></li>
+              <li><a href="#fakelink">Reader</a></li>
+              <li><a href="#fakelink">Store</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2 col-sm-2">
+            <h5 class="title">CATEGORIES</h5>
+            <ul class="bottom-menu-list">
+              <li><a href="#fakelink">Design</a></li>
+              <li><a href="#fakelink">Freebies</a></li>
+              <li><a href="#fakelink">Tutorials</a></li>
+              <li><a href="#fakelink">Coding</a></li>
+              <li><a href="#fakelink">Inspiration</a></li>
+              <li><a href="#fakelink">WordPress</a></li>
+              <li><a href="#fakelink">Resources</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2 col-sm-2">
+            <h5 class="title">NETWORKS</h5>
+            <ul class="bottom-menu-list">
+              <li><a href="#fakelink">Insight</a></li>
+              <li><a href="#fakelink">Promotion</a></li>
+              <li><a href="#fakelink">Production</a></li>
+              <li><a href="#fakelink">Planning</a></li>
+              <li><a href="#fakelink">Journal</a></li>
+              <li><a href="#fakelink">Reader</a></li>
+              <li><a href="#fakelink">Store</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2 col-sm-2">
+            <h5 class="title">MAINFRAME</h5>
+            <ul class="bottom-menu-list">
+              <li><a href="#fakelink">Register / Login</a></li>
+              <li class="active"><a href="#fakelink">Jobs</a></li>
+              <li><a href="#fakelink">Contacts</a></li>
+              <li><a href="#fakelink">Privacy</a></li>
+              <li><a href="#fakelink">Terms of Use</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2 col-sm-2">
+            <h5 class="title">FOLLOW US</h5>
+            <ul class="bottom-menu-list">
+              <li><a href="#fakelink">Facebook</a></li>
+              <li><a href="#fakelink">Twitter</a></li>
+              <li><a href="#fakelink">Youtube</a></li>
+              <li><a href="#fakelink">Vimeo</a></li>
+              <li><a href="#fakelink">Instagram</a></li>
+              <li><a href="#fakelink">Vine&nbsp;&nbsp;<span class="label label-small label-primary">New</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /bottom-menu -->
+
+    <div class="container ptl mtl">
+      <div class="demo-row ptl mtl">
+        <div class="demo-title">
+          <h3>Breadcrumbs</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            We have restyled the default <a href="http://getbootstrap.com/components/#breadcrumbs">Bootstrap breadcrumbs</a> component and have added one more style &mdash; crisp looking text without any graphics.
+          </p>
+          <ul class="breadcrumb">
+            <li><a href="#fakelink">Home</a></li>
+            <li><a href="#fakelink">Directory</a></li>
+            <li class="active"><a href="#">Current Article</a></li>
+          </ul>
+<pre class="prettyprint">
+&lt;ul class="breadcrumb"&gt;
+  &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#"&gt;Directory&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="active"&gt;&lt;a href="#"&gt;Current Article&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+          <div class="breadcrumb-text ptl">
+            <h4 class="caption">Shop</h4>
+            <ul>
+              <li><a href="#fakelink">Home</a></li>
+              <li><a href="#fakelink">Directory</a></li>
+              <li><a href="#fakelink">Current Article</a></li>
+              <li>A&mdash;Z</li>
+            </ul>
+          </div>
+<pre class="prettyprint">
+&lt;div class="breadcrumb-text ptl"&gt;
+  &lt;h4 class="caption"&gt;Shop&lt;/h4&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href="#fakelink"&gt;Home&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink"&gt;Directory&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink"&gt;Current Article&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;A&mdash;Z&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">
+            Arrows are added through LESS as a Flat UI Icons font glyph. You are free to change the delimiter in <code>breadcrumbs.less</code>:
+          </p>
+<pre class="prettyprint">
+&gt; li {
+  position: relative;
+  text-shadow: none;
+
+  &amp;:after {
+    color: @breadcrubms-text-color;
+    content: "\e605";
+    display: inline-block;
+    font-family: 'Flat-UI-Pro-Icons';
+    font-size: (@component-font-size-base * 0.65);
+    margin: -4px 9px 0 13px;
+    vertical-align: middle;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+</pre>
+          <div id="fa fa-button"></div>
+        </div>
+      </div><!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Buttons</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            After restyling the <a href="http://getbootstrap.com/css/#buttons">Bootstrap buttons</a>, we have decided to add a new size: <code>.btn-hg</code> which will be used for the main call to action buttons on the page:
+          </p>
+          <p class="mbl">
+            <button class="btn btn-hg btn-primary">Huge Button</button>
+          </p>
+<pre class="prettyprint">
+&lt;button class="btn btn-hg btn-primary"&gt;
+  Boss Button
+&lt;/button&gt;
+</pre>
+
+          <p class="ptl">
+            In addition, we have added <code>btn-embossed</code> to make buttons look more realistic, but we still prefer them flat.
+          </p>
+          <p class="mbl">
+            <button class="btn btn-embossed btn-primary">Embossed Button</button>
+          </p>
+<pre class="prettyprint">
+&lt;button class="btn btn-embossed btn-primary"&gt;
+  Embossed Button
+&lt;/button&gt;
+</pre>
+
+          <p class="ptl">
+            In some cases buttons need to become wider. Yes, we have taken care of that as well:
+          </p>
+          <p class="mbl">
+            <button class="btn btn-primary btn-wide mrm">Save</button>
+            <button class="btn btn-default btn-wide">Cancel</button>
+          </p>
+<pre class="prettyprint">
+&lt;button class="btn btn-default btn-wide"&gt;
+  Cancel
+&lt;/button&gt;
+</pre>
+
+          <p class="ptl">
+            Another new thing is <code>btn-tip</code>. Use it when you need to highlight a part of the button text:
+          </p>
+          <p class="mbl">
+            <button class="btn btn-primary">
+              Save
+              <span class="btn-tip">$300</span>
+            </button>
+          </p>
+<pre class="prettyprint">
+&lt;button class="btn btn-primary"&gt;
+  Save &lt;span class="btn-tip"&gt;$300&lt;/span&gt;
+&lt;/button&gt;
+</pre>
+
+          <p class="ptl">
+            Finally, a nice way to use social buttons out of the box:
+          </p>
+          <div class="mbl">
+            <button class="btn btn-default btn-social-pinterest mrs"><span class="fa fa-pinterest"></span> 500</button>
+            <button class="btn btn-social-linkedin mrs"><span class="fa fa-linkedin"></span> 500</button>
+            <button class="btn btn-social-stumbleupon mrs"><span class="fa fa-stumbleupon"></span> 500</button>
+            <button class="btn btn-social-googleplus mrs"><span class="fa fa-googleplus"></span> 500</button>
+            <button class="btn btn-social-facebook mrs"><span class="fa fa-facebook"></span> 500</button>
+            <button class="btn btn-social-twitter"><span class="fa fa-twitter"></span> 500</button>
+          </div>
+<pre class="prettyprint">
+&lt;button class="btn btn-default btn-social-pinterest"&gt;
+  &lt;span class="fa fa-pinterest"&gt;&lt;/span&gt; 500
+&lt;/button&gt;
+&lt;button class="btn btn-social-linkedin"&gt;
+  &lt;span class="fa fa-linkedin"&gt;&lt;/span&gt; 500
+&lt;/button&gt;
+&lt;button class="btn btn-social-stumbleupon"&gt;
+  &lt;span class="fa fa-stumbleupon"&gt;&lt;/span&gt; 500
+&lt;/button&gt;
+&lt;button class="btn btn-social-googleplus"&gt;
+  &lt;span class="fa fa-googleplus"&gt;&lt;/span&gt; 500
+&lt;/button&gt;
+&lt;button class="btn btn-social-facebook"&gt;
+  &lt;span class="fa fa-facebook"&gt;&lt;/span&gt; 500
+&lt;/button&gt;
+&lt;button class="btn btn-social-twitter"&gt;
+  &lt;span class="fa fa-twitter"&gt;&lt;/span&gt; 500
+&lt;/button&gt;
+</pre>
+
+          <p class="ptl">
+            As usual you can assign different colors to your buttons:
+          </p>
+          <div class="mbm">
+            <button class="btn mrs">Button</button>
+            <button class="btn btn-default mrs">Default</button>
+            <button class="btn btn-primary mrs">Primary</button>
+            <button class="btn btn-info mrs">Info</button>
+            <button class="btn btn-danger mrs">Danger</button>
+          </div>
+          <div class="mbl">
+            <button class="btn btn-success mrs">Success</button>
+            <button class="btn btn-warning mrs">Warning</button>
+            <button class="btn btn-inverse mrs">Inverse</button>
+            <button class="btn btn-link mrs">Link</button>
+          </div>
+<pre class="prettyprint">
+&lt;button class="btn"&gt;Button&lt;/button&gt;
+&lt;button class="btn btn-default"&gt;Default&lt;/button&gt;
+&lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="btn btn-info"&gt;Info&lt;/button&gt;
+&lt;button class="btn btn-danger"&gt;Danger&lt;/button&gt;
+&lt;button class="btn btn-success"&gt;Success&lt;/button&gt;
+&lt;button class="btn btn-warning"&gt;Warning&lt;/button&gt;
+&lt;button class="btn btn-inverse"&gt;Inverse&lt;/button&gt;
+&lt;button class="btn btn-link"&gt;Link&lt;/button&gt;
+</pre>
+
+          <p>
+            Button groups, toolbars, and disabled state also work as expected.
+          </p>
+          <div id="fa fa-carousel"></div>
+        </div>
+      </div><!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Carousel</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            Here is the restyled <a href="http://getbootstrap.com/javascript/#carousel">Bootstrap carousel</a> with no change to the functionality.
+          </p>
+          <div id="myCarousel" class="carousel slide">
+            <ol class="carousel-indicators">
+              <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+              <li data-target="#myCarousel" data-slide-to="1"></li>
+              <li data-target="#myCarousel" data-slide-to="2"></li>
+            </ol>
+            <!-- Carousel items -->
+            <div class="carousel-inner">
+              <div class="active item">
+                <img src="assets/img/carousel/image-01.jpg" alt="" />
+                <div class="carousel-caption">
+                  <h3>Thumbnail label</h3>
+                  <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio.</p>
+                </div>
+              </div>
+              <div class="item">
+                <img src="assets/img/carousel/image-02.jpg" alt="" />
+                <div class="carousel-caption">
+                  <h3>Thumbnail label</h3>
+                  <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio.</p>
+                </div>
+              </div>
+              <div class="item">
+                <img src="assets/img/carousel/image-03.jpg" alt="" />
+                <div class="carousel-caption">
+                  <h3>Thumbnail label</h3>
+                  <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Carousel nav -->
+            <a class="carousel-control fa fa-arrow-left left" href="#myCarousel" data-slide="prev"></a>
+            <a class="carousel-control fa fa-arrow-right right" href="#myCarousel" data-slide="next"></a>
+          </div>
+          <hr/>
+<pre class="prettyprint">
+&lt;div id="myCarousel" class="carousel slide"&gt;
+  &lt;ol class="carousel-indicators"&gt;
+    &lt;li data-target="#myCarousel" data-slide-to="0" class="active"&gt;&lt;/li&gt;
+    &lt;li data-target="#myCarousel" data-slide-to="1"&gt;&lt;/li&gt;
+    &lt;li data-target="#myCarousel" data-slide-to="2"&gt;&lt;/li&gt;
+  &lt;/ol&gt;
+  &lt;!-- Carousel items --&gt;
+  &lt;div class="carousel-inner"&gt;
+    &lt;div class="active item"&gt;
+      &lt;img src="..." alt="" /&gt;
+      &lt;div class="carousel-caption"&gt;
+        &lt;h3&gt;Thumbnail label&lt;/h3&gt;
+        &lt;p&gt;Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="item"&gt;
+      &lt;img src="..." alt="" /&gt;
+      &lt;div class="carousel-caption"&gt;
+        &lt;h3&gt;Thumbnail label&lt;/h3&gt;
+        &lt;p&gt;Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="item"&gt;
+      &lt;img src="..." alt="" /&gt;
+      &lt;div class="carousel-caption"&gt;
+        &lt;h3&gt;Thumbnail label&lt;/h3&gt;
+        &lt;p&gt;Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;!-- Carousel nav --&gt;
+  &lt;a class="carousel-control fa fa-arrow-left left" href="#myCarousel" data-slide="prev"&gt;&lt;/a&gt;
+  &lt;a class="carousel-control fa fa-arrow-right right" href="#myCarousel" data-slide="next"&gt;&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+          <div id="fa fa-checkbox"></div>
+        </div>
+      </div><!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Checkboxes and radios</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            Using flat style checkboxes and radios requires a JS plugin which creates all the custom markup for us. Let's take a look:
+          </p>
+          <form action="#">
+            <div class="row">
+              <div class="col-md-6">
+                <label class="checkbox" for="checkbox1">
+                  <input type="checkbox" value="" id="checkbox1" data-toggle="checkbox">
+                  Checkbox
+                </label>
+                <label class="checkbox" for="checkbox2">
+                  <input type="checkbox" value="" id="checkbox2" checked="checked" data-toggle="checkbox">
+                  Checkbox
+                </label>
+                <label class="checkbox" for="checkbox3">
+                  <input type="checkbox" value="" id="checkbox3" data-toggle="checkbox" disabled="">
+                  Checkbox
+                </label>
+                <label class="checkbox" for="checkbox4">
+                  <input type="checkbox" value="" id="checkbox4" checked="checked" data-toggle="checkbox" disabled="">
+                  Checkbox
+                </label>
+              </div>
+              <div class="col-md-6">
+                <label class="radio" for="radio1">
+                  <input type="radio" name="optionsRadios1" value="" id="radio1" data-toggle="radio">
+                  radio
+                </label>
+                <label class="radio" for="radio2">
+                  <input type="radio" name="optionsRadios1" value="" id="radio2" data-toggle="radio" checked="checked" >
+                  radio
+                </label>
+                <label class="radio" for="radio3">
+                  <input type="radio" name="optionsRadios1" value="" id="radio3" data-toggle="radio" disabled="">
+                  radio
+                </label>
+                <label class="radio" for="radio4">
+                  <input type="radio" name="optionsRadios1" value="" id="radio4" data-toggle="radio" disabled="">
+                  radio
+                </label>
+              </div>
+            </div>
+          </form>
+
+          <h6 class="ptl">The JS:</h6>
+<pre class="prettyprint">
+$(':checkbox').radiocheck();
+</pre>
+
+          <div class="pvm">
+            <h6>Methods:</h6>
+          </div>
+          <p class="mbl">
+            <strong>.radiocheck('toggle')</strong>
+            <br/>
+            toggles the checkbox state from <span class="text-info">checked</span>
+            to <span class="text-info">unchecked</span> and back
+          </p>
+          <p class="mbl">
+            <strong>.radiocheck('check')</strong>
+            <br/>
+            sets the checkbox state to <span class="text-info">checked</span>
+          </p>
+          <p class="mbl">
+            <strong>.radiocheck('uncheck')</strong>
+            <br/>
+            sets the checkbox state to <span class="text-info">unchecked</span>
+          </p>
+          <p class="mbl">
+            <strong>.radiocheck('disable')</strong>
+            <br/>
+            sets the checkbox state to <span class="text-info">disabled</span>
+          </p>
+          <p class="mbl">
+            <strong>.radiocheck('enable')</strong>
+            <br/>
+            unsets the <span class="text-info">disabled</span> checkbox state
+          </p>
+          <p class="mbl">
+            <strong>.radiocheck('indeterminate')</strong>
+            <br/>
+            sets the checkbox state to <span class="text-info">indeterminate</span>
+          </p>
+          <p class="mbl">
+            <strong>.radiocheck('determinate')</strong>
+            <br/>
+            unsets the <span class="text-info">indeterminate</span> checkbox state
+          </p>
+          <p class="mbl">
+            <strong>.radiocheck('destroy')</strong>
+            <br/>
+            destroying the checkbox cover
+          </p>
+<pre class="prettyprint">
+$(':checkbox').radiocheck('check');
+</pre>
+
+          <div class="pbm ptl">
+            <h6>Events:</h6>
+          </div>
+          <p class="mbl">
+            <strong>.on('change.radiocheck')</strong>
+            <br/>
+            Fired when the checkbox state changes between
+            <span class="text-info">checked</span> and
+            <span class="text-info">unchecked</span>.
+          </p>
+          <p class="mbl">
+            <strong>.on('destroyed.radiocheck')</strong>
+            <br/>
+            Fired when radiocheck destroys itself.
+          </p>
+<pre class="prettyprint">
+$(':checkbox').on('change.radiocheck', function() {
+  // Do something
+});
+</pre>
+          <div id="fa fa-datepicker"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Datepicker</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://jqueryui.com/datepicker">jQuery UI Datepicker</a>.
+          </p>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-btn">
+                    <button class="btn" type="button"><span class="fa fa-calendar"></span></button>
+                  </span>
+                  <input type="text" class="form-control" value="14 March, 2013" id="datepicker-01">
+                </div>
+              </div>
+            </div>
+          </div>
+<pre class="prettyprint mtm">
+&lt;div class="form-group"&gt;
+  &lt;div class="input-group"&gt;
+    &lt;span class="input-group-btn"&gt;
+      &lt;button class="btn" type="button"&gt;&lt;span class="fa fa-calendar"&gt;&lt;/span&gt;&lt;/button&gt;
+    &lt;/span&gt;
+    &lt;input type="text" class="form-control" value="14 March, 2013" id="datepicker-01" /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="prettyprint mtl">
+var datepickerSelector = $('#datepicker-01');
+datepickerSelector.datepicker({
+  showOtherMonths: true,
+  selectOtherMonths: true,
+  dateFormat: 'd MM, yy',
+  yearRange: '-1:+1'
+}).prev('.input-group-btn').on('click', function (e) {
+  e &amp;&amp; e.preventDefault();
+  datepickerSelector.focus();
+});
+$.extend($.datepicker, { _checkOffset: function (inst,offset,isFixed) { return offset; } });
+
+// Now let's align datepicker with the prepend button
+datepickerSelector.datepicker('widget').css({ 'margin-left': -datepickerSelector.prev('.input-group-btn').find('.btn').outerWidth() + 3 });
+</pre>
+
+          <div id="fa fa-dialog"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Dialogs</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            A dialog box is an alternative for an <code>alert</code>. It makes more sense to use dialogs when you want to have inline text, buttons and form elements in one single row.
+          </p>
+
+          <p class="mbl">
+            If you need to extend its functionality, please write your custom code to <code>less/modules/dialog.less</code> and the changes will apear on each code recompile (through CodeKit or whatever tool you're using).
+          </p>
+
+          <p>
+            It is highly recommended to let the dialog fill the whole page width so it catches more attention.
+          </p>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+    </div><!-- /.container -->
+
+    <div class="dialog dialog-default">
+      <div class="container">
+        Activation link was sent to <span class="text-primary">m***@gmail.com</span>
+        <button class="btn btn-primary btn-wide mll" data-dismiss="alert">
+          <i class="fa fa-mail"></i>
+          Resend it to me!
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog dialog-default">
+      <div class="container">
+        <form class="form-inline">
+          <div class="form-group">
+            <label class="sr-only" for="dialogExampleInputEmail1">Login/E-mail</label>
+            <input type="email" class="form-control flat" id="dialogExampleInputEmail1" placeholder="Login/E-mail">
+          </div>
+          <div class="form-group">
+            <label class="sr-only" for="dialogExampleInputPass1">Login/E-mail</label>
+            <input type="password" class="form-control flat" id="dialogExampleInputPass1" placeholder="Password">
+          </div>
+          <button class="btn btn-primary btn-wide">Login</button>
+          <button class="btn btn-danger btn-wide">Register</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="container ptl">
+      <div class="demo-row ptl">
+        <div class="demo-title">
+          <h3>&nbsp;</h3>
+        </div>
+
+        <div class="demo-content">
+<pre class="prettyprint">
+&lt;div class="dialog dialog-default"&gt;
+  &lt;div class="container"&gt;
+    Dialog content
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>&nbsp;</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            Now let's give it some colors:
+          </p>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+    </div><!-- /.container -->
+
+    <div class="dialog dialog-success">
+      <div class="container">
+        Dialog content
+      </div>
+    </div>
+
+    <div class="dialog dialog-danger">
+      <div class="container">
+        Dialog content
+      </div>
+    </div>
+
+    <div class="dialog dialog-warning">
+      <div class="container">
+        Dialog content
+      </div>
+    </div>
+
+    <div class="dialog dialog-info">
+      <div class="container">
+        Dialog content
+      </div>
+    </div>
+
+    <div class="dialog dialog-inverse">
+      <div class="container">
+        Dialog content
+      </div>
+    </div>
+
+    <div class="container ptl">
+      <div class="demo-row ptl">
+        <div class="demo-title">
+          <h3>&nbsp;</h3>
+        </div>
+
+        <div class="demo-content">
+<pre class="prettyprint">
+&lt;div class="dialog dialog-success"&gt;
+  &lt;div class="container"&gt;Dialog content&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="dialog dialog-danger"&gt;
+  &lt;div class="container"&gt;Dialog content&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="dialog dialog-warning"&gt;
+  &lt;div class="container"&gt;Dialog content&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="dialog dialog-info"&gt;
+  &lt;div class="container"&gt;Dialog content&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="dialog dialog-inverse"&gt;
+  &lt;div class="container"&gt;Dialog content&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">
+            <strong>Note:</strong> to use <span class="text-danger">data-dismiss="alert"</span> inside the dialog you need to remove <code>.container</code> block so <code>.dialog</code> will be the direct parent of the inside content where you set this attribute.
+          </p>
+<pre class="prettyprint">
+&lt;div class="dialog dialog-default"&gt;
+  &lt;button class="btn" data-dismiss="alert"&gt;
+    Close
+  &lt;/button&gt;
+&lt;/div&gt;
+</pre>
+          <div id="fa fa-dropdown"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Dropdown</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            The same <a href="http://getbootstrap.com/components/#dropdowns">Bootstrap dropdown</a> is used as part of the <code>select</code>, <code>btn-group</code>, <code>nav-tabs</code> and eventually other components to present information as a menu.
+          </p>
+
+          <div class="btn-group mrm">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+              Dropdown <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+            </ul>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-inverse dropdown-toggle" type="button" data-toggle="dropdown">
+              Dropdown <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-inverse" role="menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+            </ul>
+          </div>
+
+          <div class="pvl">
+<pre class="prettyprint">
+&lt;!-- Default skin  --&gt;
+&lt;div class="btn-group"&gt;
+  &lt;button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"&gt;
+    Large button &lt;span class="caret"&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class="dropdown-menu" role="menu"&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Something else here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="divider"&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;!-- Inverted skin  --&gt;
+&lt;div class="btn-group"&gt;
+  &lt;button class="btn btn-inverse dropdown-toggle" type="button" data-toggle="dropdown"&gt;
+    Large button &lt;span class="caret"&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class="dropdown-menu dropdown-menu-inverse" role="menu"&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Something else here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="divider"&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</pre>
+          </div>
+
+          <div id="fa fa-fileinput"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>File Input</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            Based on <a href="http://jasny.github.io/bootstrap/javascript/#fileinput">Jasny's file input</a>.
+          </p>
+          <p>Inline file input:</p>
+          <div class="form-group">
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <div class="input-group">
+                <div class="form-control uneditable-input" data-trigger="fileinput">
+                  <span class="fa fa-clip fileinput-exists"></span>
+                  <span class="fileinput-filename"></span>
+                </div>
+                <span class="input-group-btn btn-file">
+                  <span class="btn btn-default fileinput-new" data-role="select-file">Select file</span>
+                  <span class="btn btn-default fileinput-exists" data-role="change"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                  <input type="file" name="...">
+                  <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><span class="fa fa-trash"></span>&nbsp;&nbsp;Remove</a>
+                </span>
+              </div>
+            </div>
+          </div>
+
+<pre class="prettyprint mtl">
+&lt;div class="form-group"&gt;
+  &lt;div class="fileinput fileinput-new" data-provides="fileinput"&gt;
+    &lt;div class="input-group"&gt;
+      &lt;div class="form-control uneditable-input" data-trigger="fileinput"&gt;
+        &lt;span class="fa fa-clip fileinput-exists"&gt;&lt;/span&gt;
+        &lt;span class="fileinput-filename"&gt;&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;span class="input-group-btn btn-file"&gt;
+        &lt;span class="btn btn-default fileinput-new" data-role="select-file"&gt;Select file&lt;/span&gt;
+        &lt;span class="btn btn-default fileinput-exists" data-role="change"&gt;&lt;span class="fa fa-gear"&gt;&lt;/span&gt;&nbsp;&nbsp;Change&lt;/span&gt;
+        &lt;input type="file" name="..."&gt;
+        &lt;a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"&gt;&lt;span class="fa fa-trash"&gt;&lt;/span&gt;&nbsp;&nbsp;Remove&lt;/a&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">Button file input:</p>
+          <div class="form-group">
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <span class="btn btn-primary btn-embossed btn-file">
+                <span class="fileinput-new"><span class="fa fa-upload"></span>&nbsp;&nbsp;Attach File</span>
+                <span class="fileinput-exists"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                <input type="file" name="...">
+              </span>
+              <span class="fileinput-filename"></span>
+              <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
+            </div>
+          </div>
+
+<pre class="prettyprint mtl">
+&lt;div class="form-group"&gt;
+  &lt;div class="fileinput fileinput-new" data-provides="fileinput"&gt;
+    &lt;span class="btn btn-primary btn-embossed btn-file"&gt;
+      &lt;span class="fileinput-new"&gt;&lt;span class="fa fa-upload"&gt;&lt;/span&gt;&nbsp;&nbsp;Attach File&lt;/span&gt;
+      &lt;span class="fileinput-exists"&gt;&lt;span class="fa fa-gear"&gt;&lt;/span&gt;&nbsp;&nbsp;Change&lt;/span&gt;
+      &lt;input type="file" name="..."&gt;
+    &lt;/span&gt;
+    &lt;span class="fileinput-filename"&gt;&lt;/span&gt;
+    &lt;a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none"&gt;&times;&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">Image upload:</p>
+            <div class="form-group">
+              <div class="fileinput fileinput-new" data-provides="fileinput">
+                <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+                <div>
+                  <span class="btn btn-primary btn-embossed btn-file">
+                    <span class="fileinput-new"><span class="fa fa-image"></span>&nbsp;&nbsp;Select image</span>
+                    <span class="fileinput-exists"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                    <input type="file" name="...">
+                  </span>
+                  <a href="#" class="btn btn-primary btn-embossed fileinput-exists" data-dismiss="fileinput"><span class="fa fa-trash"></span>&nbsp;&nbsp;Remove</a>
+                </div>
+              </div>
+            </div>
+
+<pre class="prettyprint mtl">
+&lt;div class="form-group"&gt;
+  &lt;div class="fileinput fileinput-new" data-provides="fileinput"&gt;
+    &lt;div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"&gt;&lt;/div&gt;
+    &lt;div&gt;
+      &lt;span class="btn btn-primary btn-embossed btn-file"&gt;
+         &lt;span class="fileinput-new"&gt;&lt;span class="fa fa-image"&gt;&lt;/span&gt;&nbsp;&nbsp;Select image&lt;/span&gt;
+         &lt;span class="fileinput-exists"&gt;&lt;span class="fa fa-gear"&gt;&lt;/span&gt;&nbsp;&nbsp;Change&lt;/span&gt;
+         &lt;input type="file" name="..."&gt;
+      &lt;/span&gt;
+      &lt;a href="#" class="btn btn-primary btn-embossed fileinput-exists" data-dismiss="fileinput"&gt;&lt;span class="fa fa-trash"&gt;&lt;/span&gt;&nbsp;&nbsp;Remove&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+            <div class="form-group ptl">
+              <div class="fileinput fileinput-new" data-provides="fileinput">
+                <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                  <img data-src="holder.js/100%x100%" alt="...">
+                </div>
+                <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                <div>
+                  <span class="btn btn-primary btn-embossed btn-file">
+                    <span class="fileinput-new"><span class="fa fa-image"></span>&nbsp;&nbsp;Select image</span>
+                    <span class="fileinput-exists"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                    <input type="file" name="...">
+                  </span>
+                  <a href="#" class="btn btn-primary btn-embossed fileinput-exists" data-dismiss="fileinput"><span class="fa fa-trash"></span>&nbsp;&nbsp;Remove</a>
+                </div>
+              </div>
+            </div>
+
+<pre class="prettyprint mtl">
+&lt;div class="form-group"&gt;
+  &lt;div class="fileinput fileinput-new" data-provides="fileinput"&gt;
+    &lt;div class="fileinput-new thumbnail" style="width: 200px; height: 150px;"&gt;
+      &lt;img data-src="holder.js/100%x100%" alt="..."&gt;
+    &lt;/div&gt;
+    &lt;div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"&gt;&lt;/div&gt;
+    &lt;div&gt;
+      &lt;span class="btn btn-primary btn-embossed btn-file"&gt;
+        &lt;span class="fileinput-new"&gt;&lt;span class="fa fa-image"&gt;&lt;/span&gt;&nbsp;&nbsp;Select image&lt;/span&gt;
+        &lt;span class="fileinput-exists"&gt;&lt;span class="fa fa-gear"&gt;&lt;/span&gt;&nbsp;&nbsp;Change&lt;/span&gt;
+        &lt;input type="file" name="..."&gt;
+      &lt;/span&gt;
+      &lt;a href="#" class="btn btn-primary btn-embossed fileinput-exists" data-dismiss="fileinput"&gt;&lt;span class="fa fa-trash"&gt;&lt;/span&gt;&nbsp;&nbsp;Remove&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+          <div id="fa fa-iconbar"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Iconbar</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            A new component created to have one more navigation style with icons. It has 2 orientation modes: <span class="text-info">horizontal</span> and <span class="text-info">vertical</span>:
+          </p>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="iconbar">
+                <ul>
+                  <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+                  <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+                  <li><a href="#fakelink" class="fa fa-chat"></a></li>
+                  <li><a href="#fakelink" class="fa fa-mail"></a></li>
+                  <li>
+                    <a href="#fakelink" class="fa fa-gear">
+                      <span class="iconbar-unread">1</span>
+                    </a>
+                  </li>
+                </ul>
+              </div> <!-- /iconbar -->
+            </div>
+          </div>
+
+          <div class="row mbl">
+            <div class="col-md-12">
+              <div class="iconbar iconbar-horizontal">
+                <ul>
+                  <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+                  <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+                  <li><a href="#fakelink" class="fa fa-chat"></a></li>
+                  <li><a href="#fakelink" class="fa fa-mail"></a></li>
+                  <li>
+                    <a href="#fakelink" class="fa fa-gear">
+                      <span class="iconbar-unread">1</span>
+                    </a>
+                  </li>
+                </ul>
+              </div> <!-- /iconbar -->
+            </div>
+          </div>
+
+<pre class="prettyprint">
+&lt;!-- Vertical orientation --&gt;
+&lt;div class="iconbar"&gt;
+  &lt;ul&gt;
+    &lt;li class="active"&gt;&lt;a href="#fakelink" class="fa fa-user"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink" class="fa fa-calendar"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink" class="fa fa-chat"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink" class="fa fa-mail"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;
+      &lt;a href="#fakelink" class="fa fa-gear"&gt;
+        &lt;span class="iconbar-unread"&gt;1&lt;/span&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;!-- Horizontal orientation --&gt;
+&lt;div class="iconbar iconbar-horizontal"&gt;
+  &lt;ul&gt;
+    &lt;li class="active"&gt;&lt;a href="#fakelink" class="fa fa-user"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink" class="fa fa-calendar"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink" class="fa fa-chat"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#fakelink" class="fa fa-mail"&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;
+      &lt;a href="#fakelink" class="fa fa-gear"&gt;
+        &lt;span class="iconbar-unread"&gt;1&lt;/span&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="mbl pvl">
+            Of course you can choose one of these available additional colors:
+          </p>
+
+          <div class="row mbl">
+            <div class="col-md-12">
+              <div class="iconbar iconbar-horizontal iconbar-success">
+                <ul>
+                  <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+                  <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+                  <li><a href="#fakelink" class="fa fa-chat"></a></li>
+                  <li><a href="#fakelink" class="fa fa-mail"></a></li>
+                  <li>
+                    <a href="#fakelink" class="fa fa-gear">
+                      <span class="iconbar-unread">1</span>
+                    </a>
+                  </li>
+                </ul>
+              </div> <!-- /iconbar -->
+
+              <div class="iconbar iconbar-horizontal iconbar-danger">
+                <ul>
+                  <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+                  <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+                  <li><a href="#fakelink" class="fa fa-chat"></a></li>
+                  <li><a href="#fakelink" class="fa fa-mail"></a></li>
+                  <li>
+                    <a href="#fakelink" class="fa fa-gear">
+                      <span class="iconbar-unread">1</span>
+                    </a>
+                  </li>
+                </ul>
+              </div> <!-- /iconbar -->
+
+              <div class="iconbar iconbar-horizontal iconbar-warning">
+                <ul>
+                  <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+                  <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+                  <li><a href="#fakelink" class="fa fa-chat"></a></li>
+                  <li><a href="#fakelink" class="fa fa-mail"></a></li>
+                  <li>
+                    <a href="#fakelink" class="fa fa-gear">
+                      <span class="iconbar-unread">1</span>
+                    </a>
+                  </li>
+                </ul>
+              </div> <!-- /iconbar -->
+
+              <div class="iconbar iconbar-horizontal iconbar-info">
+                <ul>
+                  <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+                  <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+                  <li><a href="#fakelink" class="fa fa-chat"></a></li>
+                  <li><a href="#fakelink" class="fa fa-mail"></a></li>
+                  <li>
+                    <a href="#fakelink" class="fa fa-gear">
+                      <span class="iconbar-unread">1</span>
+                    </a>
+                  </li>
+                </ul>
+              </div> <!-- /iconbar -->
+            </div>
+          </div>
+
+<pre class="prettyprint">
+&lt;div class="iconbar iconbar-success"&gt;
+  ...
+&lt;/div&gt;
+&lt;div class="iconbar iconbar-danger"&gt;
+  ...
+&lt;/div&gt;
+&lt;div class="iconbar iconbar-warning"&gt;
+  ...
+&lt;/div&gt;
+&lt;div class="iconbar iconbar-info"&gt;
+  ...
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">
+            To mark an icon as active just add <code>.active</code> as a class for the <code>li</code> tag:
+          </p>
+<pre class="prettyprint">
+&lt;li class="active"&gt;&lt;a href="#" class="fa fa-gear"&gt;&lt;/a&gt;&lt;/li&gt;
+</pre>
+
+          <p class="ptl">
+            To mark an icon with an unread indicator append <code>.iconbar-unread</code> this way:
+          </p>
+<pre class="prettyprint">
+&lt;li&gt;
+  &lt;a href="#" class="fa fa-gear"&gt;
+    &lt;span class="iconbar-unread"&gt;1&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/li&gt;
+</pre>
+          <div id="fa fa-input"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Input</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://getbootstrap.com/css/#forms">Bootstrap input</a>.
+          </p>
+
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" value="" placeholder="Enter something" class="form-control" />
+            </div>
+          </div>
+
+<pre class="prettyprint mtl">
+&lt;input type="text" placeholder="..." class="form-control" /&gt;
+</pre>
+
+          <p class="mbl">Add <code>.flat</code> as an additional class to completely remove the borders:</p>
+
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" value="" placeholder="Enter something" class="form-control flat" />
+            </div>
+          </div>
+
+<pre class="prettyprint mtl">
+&lt;input type="text" placeholder="..." class="form-control flat" /&gt;
+</pre>
+
+          <p class="ptl">You can have a few different sizes:</p>
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" value="" placeholder="Huge" class="form-control input-hg" />
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" value="" placeholder="Large" class="form-control input-lg" />
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" value="" placeholder="Default" class="form-control" />
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" value="" placeholder="Small" class="form-control input-sm" />
+            </div>
+          </div>
+<pre class="prettyprint mtl">
+&lt;input type="text" class="form-control input-hg" placeholder="Huge" /&gt;
+&lt;input type="text" class="form-control input-lg" placeholder="Large" /&gt;
+&lt;input type="text" class="form-control" placeholder="Default" /&gt;
+&lt;input type="text" class="form-control input-sm" placeholder="Small" /&gt;
+</pre>
+
+          <p class="ptl">You can have an icon inside:</p>
+          <div class="row">
+            <div class="col-lg-5">
+              <div class="form-group has-feedback">
+                <input type="text" value="" placeholder="With icon" class="form-control" />
+                <span class="form-control-feedback fa fa-check"></span>
+              </div>
+            </div>
+          </div>
+<pre class="prettyprint mtm">
+&lt;div class="form-group has-feedback"&gt;
+  &lt;input type="text" value="" placeholder="With icon" class="form-control" /&gt;
+  &lt;span class="form-control-feedback fa fa-check"&gt;&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">You can have the input with append/prepend options:</p>
+          <div class="row mbl">
+            <div class="col-lg-6">
+              <div class="input-group">
+                <span class="input-group-addon">@</span>
+                <input class="form-control" type="text" placeholder="Prepend" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row mbl">
+            <div class="col-lg-6">
+              <div class="input-group">
+                <input class="form-control" type="text" placeholder="Append" />
+                <span class="input-group-addon">@</span>
+              </div>
+            </div>
+          </div>
+<pre class="prettyprint mtm">
+&lt;!-- Prepend --&gt;
+&lt;div class="input-group"&gt;
+  &lt;span class="input-group-addon"&gt;@&lt;/span&gt;
+  &lt;input type="text" class="form-control" placeholder="Prepend" /&gt;
+&lt;/div&gt;
+
+&lt;!-- Append --&gt;
+&lt;div class="input-group"&gt;
+  &lt;input type="text" class="form-control" placeholder="Append" /&gt;
+  &lt;span class="input-group-addon"&gt;@&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+          <div class="ptl">
+            <p>
+              The different color styles and the disabled state work as expected:
+            </p>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group has-error">
+                  <input class="form-control" type="text" placeholder="Error" />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group has-warning">
+                  <input class="form-control" type="text" placeholder="Warning" />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group has-success">
+                  <input class="form-control" type="text" placeholder="Success" />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <input class="form-control" type="text" placeholder="Disabled" disabled />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="ptl mtl">
+            The search form doesn't have any background color set to append/prepend:
+          </p>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="form-group">
+                <div class="input-group input-group-hg input-group-rounded">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                  </span>
+                  <input type="text" class="form-control" placeholder="Search" id="search-query-2">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="form-group">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Search" id="search-query-3">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="fa fa-label"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Labels</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://getbootstrap.com/components/#labels">Bootstrap labels</a>.
+          </p>
+
+          <span class="label label-default">Default</span>
+          <span class="label label-primary">Primary</span>
+          <span class="label label-success">Success</span>
+          <span class="label label-info">Info</span>
+          <span class="label label-warning">Warning</span>
+          <span class="label label-danger">Danger</span>
+
+
+<pre class="prettyprint mtl">
+&lt;span class="label label-default"&gt;Default&lt;/span&gt;
+&lt;span class="label label-primary"&gt;Primary&lt;/span&gt;
+&lt;span class="label label-success"&gt;Success&lt;/span&gt;
+&lt;span class="label label-info"&gt;Info&lt;/span&gt;
+&lt;span class="label label-warning"&gt;Warning&lt;/span&gt;
+&lt;span class="label label-danger"&gt;Danger&lt;/span&gt;
+</pre>
+
+          <div id="fa fa-modal"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Modal</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://getbootstrap.com/javascript/#modals">Bootstrap modal</a>.
+          </p>
+
+          <div class="components-static-modal">
+            <div class="modal">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close fa fa-cross" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Modal header</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p>An error message is the information displayed when an <a href="#">unexpected condition occurs</a>, usually on a computer or other device. </p>
+                  </div>
+                  <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-wide">It’s ok</a>
+                    <a href="#" class="btn btn-primary btn-wide">Turn it off now.</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+<pre class="prettyprint mtl">
+&lt;div class="modal"&gt;
+  &lt;div class="modal-dialog"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+        &lt;button type="button" class="close fa fa-cross" data-dismiss="modal" aria-hidden="true"&gt;&lt;/button&gt;
+        &lt;h4 class="modal-title"&gt;Modal header&lt;/h3&gt;
+      &lt;/div&gt;
+
+      &lt;div class="modal-body"&gt;
+        &lt;p&gt;Modal content&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div class="modal-footer"&gt;
+        &lt;a href="#" class="btn btn-default btn-wide"&gt;It’s ok&lt;/a&gt;
+        &lt;a href="#" class="btn btn-primary btn-wide"&gt;Turn it off now.&lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+          <div id="fa fa-nav"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Nav</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://getbootstrap.com/components/#nav">Bootstrap navs</a>.
+          </p>
+          <h5 class="mbl">Pills</h5>
+          <ul class="nav nav-pills">
+            <li class="active"><a href="#fakelink">Popular</a></li>
+            <li><a href="#fakelink">Newest</a></li>
+            <li><a href="#fakelink">Bestselling</a></li>
+          </ul>
+<pre class="prettyprint mvl">
+&lt;ul class="nav nav-pills"&gt;
+  &lt;li class="active"&gt;&lt;a href="#fakelink"&gt;Popular&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#fakelink"&gt;Newest&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#fakelink"&gt;Bestselling&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+          <h5 class="mbl ptl">Tabs</h5>
+
+          <div class="tabbable">
+            <ul class="nav nav-tabs nav-append-content">
+              <li><a href="#tab4">Popular</a></li>
+              <li class="active"><a href="#tab5">Newest</a></li>
+              <li><a href="#tab6">Bestselling</a></li>
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                  Dropdown
+                  <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="#tab5">Newest</a></li>
+                  <li><a href="#tab6">Bestselling</a></li>
+                </ul>
+              </li>
+            </ul> <!-- /tabs -->
+            <div class="tab-content">
+              <div class="tab-pane" id="tab4">
+                <p>I'm in Section 1.</p>
+              </div>
+              <div class="tab-pane active" id="tab5">
+                <p>Howdy, I'm in Section 2.</p>
+              </div>
+              <div class="tab-pane" id="tab6">
+                <p>Howdy, I'm in Section 3.</p>
+              </div>
+            </div> <!-- /tab-content -->
+          </div>
+<pre class="prettyprint mvl">
+&lt;!-- Tabs --&gt;
+&lt;ul class="nav nav-tabs nav-append-content"&gt;
+  &lt;li&gt;&lt;a href="#tab4"&gt;Popular&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="active"&gt;&lt;a href="#tab5"&gt;Newest&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#tab6"&gt;Bestselling&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="dropdown"&gt;
+    &lt;a class="dropdown-toggle" data-toggle="dropdown" href="#"&gt;
+      Dropdown
+      &lt;b class="caret"&gt;&lt;/b&gt;
+    &lt;/a&gt;
+    &lt;ul class="dropdown-menu"&gt;
+      &lt;li&gt;&lt;a href="#tab5"&gt;Newest&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="#tab6"&gt;Bestselling&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Tab content --&gt;
+&lt;div class="tab-content"&gt;
+  &lt;div class="tab-pane" id="tab4"&gt;
+    &lt;p&gt;I'm in Section 1.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="tab-pane active" id="tab5"&gt;
+    &lt;p&gt;Howdy, I'm in Section 2.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="tab-pane" id="tab6"&gt;
+    &lt;p&gt;Howdy, I'm in Section 3.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+          <h5 class="mbl ptl">Nav list</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="nav nav-list">
+                <li class="nav-header">Subjects</li>
+                <li>
+                  <a href="#fakelink">
+                    UX Design
+                    <span class="badge pull-right">19</span>
+                  </a>
+                </li>
+                <li class="active">
+                  <a href="#fakelink">
+                    Photography
+                    <span class="badge pull-right">130</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                    Art
+                    <span class="badge pull-right">9</span>
+                  </a>
+                </li>
+                <li class="divider"></li>
+                <li class="nav-header">Condition</li>
+                <li>
+                  <a href="#fakelink">
+                    Brand new
+                    <span class="badge pull-right">69</span>
+                  </a>
+                </li>
+                <li class="disabled">
+                  <a href="#fakelink">
+                    Read-used
+                    <span class="badge pull-right">21</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                    Work-used
+                    <span class="badge pull-right">40</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+<pre class="prettyprint mvl">
+&lt;ul class=&quot;nav nav-list&quot;&gt;
+  &lt;li class=&quot;nav-header&quot;&gt;Heading&lt;/li&gt;
+  &lt;li&gt;
+    &lt;a href=&quot;#&quot;&gt;
+      Title
+      &lt;span class=&quot;badge pull-right&quot;&gt;18&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;active&quot;&gt;
+    &lt;a href=&quot;#&quot;&gt;
+      Title
+      &lt;span class=&quot;badge pull-right&quot;&gt;42&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+  &lt;li class=&quot;nav-header&quot;&gt;Heading&lt;/li&gt;
+  &lt;li class=&quot;disabled&quot;&gt;
+    &lt;a href=&quot;#&quot;&gt;
+      Title
+      &lt;span class=&quot;badge pull-right&quot;&gt;21&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="nav nav-list nav-list-vivid">
+                <li class="nav-header">Europe</li>
+                <li>
+                  <a href="#fakelink">
+                    London, United Kingdom
+                    <span class="badge pull-right">19</span>
+                  </a>
+                </li>
+                <li class="active">
+                  <a href="#fakelink">
+                    Berlin, Germany
+                    <span class="badge pull-right">130</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                    Madrid, Spain
+                    <span class="badge pull-right">9</span>
+                  </a>
+                </li>
+                <li class="divider"></li>
+                <li class="nav-header">Asia</li>
+                <li>
+                  <a href="#fakelink">
+                    Shanghai, China
+                    <span class="badge pull-right">69</span>
+                  </a>
+                </li>
+                <li class="disabled">
+                  <a href="#fakelink">
+                    Bombay, India
+                    <span class="badge pull-right">21</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                    Karachi, Pakistan
+                    <span class="badge pull-right">40</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+<pre class="prettyprint mvl">
+&lt;ul class=&quot;nav nav-list nav-list-vivid&quot;&gt;
+  &lt;li class=&quot;nav-header&quot;&gt;Heading&lt;/li&gt;
+  &lt;li&gt;
+    &lt;a href=&quot;#&quot;&gt;
+      Title
+      &lt;span class=&quot;badge pull-right&quot;&gt;19&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;active&quot;&gt;
+    &lt;a href=&quot;#&quot;&gt;
+      Title
+      &lt;span class=&quot;badge pull-right&quot;&gt;130&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+  &lt;li class=&quot;nav-header&quot;&gt;Heading&lt;/li&gt;
+  &lt;li class=&quot;disabled&quot;&gt;
+    &lt;a href=&quot;#&quot;&gt;
+      Title
+      &lt;span class=&quot;badge pull-right&quot;&gt;21&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="nav nav-list nav-list-bricks">
+                <li class="active">
+                  <a href="#fakelink">
+                    London, United Kingdom
+                    <span class="fa fa-arrow-right pull-right"></span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                    Berlin, Germany
+                    <span class="fa fa-arrow-right pull-right"></span>
+                  </a>
+                </li>
+                <li class="disabled">
+                  <a href="#fakelink">
+                    Madrid, Spain
+                    <span class="fa fa-arrow-right pull-right"></span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                    Shanghai, China
+                    <span class="fa fa-arrow-right pull-right"></span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                     Bombay, India
+                    <span class="fa fa-arrow-right pull-right"></span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#fakelink">
+                     Karachi, Pakistan
+                    <span class="fa fa-arrow-right pull-right"></span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+<pre class="prettyprint mvl">
+&lt;ul class=&quot;nav nav-list nav-list-bricks&quot;&gt;
+  &lt;li class=&quot;active&quot;&gt;
+    &lt;a href=&quot;#fakelink&quot;&gt;
+      Title
+      &lt;span class=&quot;fa fa-arrow-right pull-right&quot;&gt;&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;a href=&quot;#fakelink&quot;&gt;
+      Title
+      &lt;span class=&quot;fa fa-arrow-right pull-right&quot;&gt;&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;disabled&quot;&gt;
+    &lt;a href=&quot;#fakelink&quot;&gt;
+      Title
+      &lt;span class=&quot;fa fa-arrow-right pull-right&quot;&gt;&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+          <div id="fa fa-navbar"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Navbar</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://getbootstrap.com/components/#navbar">Bootstrap navbar</a>.
+          </p>
+
+          <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+                <span class="sr-only">Toggle navigation</span>
+              </button>
+              <a class="navbar-brand" href="#">Flat UI</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-collapse-01">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="#fakelink">Products</a></li>
+                <li><a href="#fakelink">Features</a></li>
+               </ul>
+              <form class="navbar-form navbar-right" action="#" role="search">
+                <div class="form-group">
+                  <div class="input-group">
+                    <input class="form-control" id="navbarInput-01" type="search" placeholder="Search">
+                    <span class="input-group-btn">
+                      <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                    </span>
+                  </div>
+                </div>
+              </form>
+            </div><!-- /.navbar-collapse -->
+          </nav><!-- /navbar -->
+
+<pre class="prettyprint mvl">
+&lt;nav class="navbar navbar-default" role="navigation"&gt;
+  &lt;div class="navbar-header"&gt;
+    &lt;button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01"&gt;
+      &lt;span class="sr-only"&gt;Toggle navigation&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;a class="navbar-brand" href="#"&gt;Flat UI&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class="collapse navbar-collapse" id="navbar-collapse-01"&gt;
+    &lt;ul class="nav navbar-nav"&gt;
+      &lt;li class="active"&gt;&lt;a href="#fakelink"&gt;Products&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="#fakelink"&gt;Features&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;form class="navbar-form navbar-right" action="#" role="search"&gt;
+      &lt;div class="form-group"&gt;
+        &lt;div class="input-group"&gt;
+          &lt;input class="form-control" id="navbarInput-01" type="search" placeholder="Search"&gt;
+          &lt;span class="input-group-btn"&gt;
+            &lt;button type="submit" class="btn"&gt;&lt;span class="fa fa-search"&gt;&lt;/span&gt;&lt;/button&gt;
+          &lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  &lt;/div>&lt;!-- /.navbar-collapse --&gt;
+&lt;/nav>&lt;!-- /navbar --&gt;
+</pre>
+
+        <p class="ptl">Inverted navbar:</p>
+        <nav class="navbar navbar-inverse" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-02">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Flat UI</a>
+          </div>
+          <div class="collapse navbar-collapse" id="navbar-collapse-02">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#fakelink">Products</a></li>
+              <li><a href="#fakelink">Features</a></li>
+             </ul>
+            <form class="navbar-form navbar-right" action="#" role="search">
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control" id="navbarInput-02" type="search" placeholder="Search">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                  </span>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+
+<pre class="prettyprint mvl">
+&lt;nav class="navbar navbar-inverse" role="navigation"&gt;
+&lt;!-- Navbar content --&gt;
+&lt;/nav&gt;
+</pre>
+
+
+        <p class="ptl">Embossed navbar:</p>
+        <nav class="navbar navbar-inverse navbar-embossed" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-03">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Flat UI</a>
+          </div>
+          <div class="collapse navbar-collapse" id="navbar-collapse-03">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#fakelink">Products</a></li>
+              <li><a href="#fakelink">Features</a></li>
+             </ul>
+            <form class="navbar-form navbar-right" action="#" role="search">
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control" id="navbarInput-03" type="search" placeholder="Search">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                  </span>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+
+<pre class="prettyprint mvl">
+&lt;nav class="navbar navbar-inverse navbar-embossed" role="navigation"&gt;
+&lt;!-- Navbar content --&gt;
+&lt;/nav&gt;
+</pre>
+
+        <p class="ptl">Large navbar:</p>
+        <nav class="navbar navbar-default navbar-lg" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-04">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Flat UI</a>
+          </div>
+          <div class="collapse navbar-collapse" id="navbar-collapse-04">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#fakelink">Products</a></li>
+              <li><a href="#fakelink">Features</a></li>
+             </ul>
+            <form class="navbar-form navbar-right" action="#" role="search">
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control" id="navbarInput-04" type="search" placeholder="Search">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                  </span>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+
+<pre class="prettyprint mvl">
+&lt;nav class="navbar navbar-default navbar-lg" role="navigation"&gt;
+&lt;!-- Navbar content --&gt;
+&lt;/nav&gt;
+</pre>
+
+        <p class="ptl">Inline forms:</p>
+        <nav role="navigation" class="navbar navbar-inverse navbar-embossed">
+          <div class="navbar-header">
+            <button data-target="#navbar-collapse-05" data-toggle="collapse" class="navbar-toggle" type="button">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a href="#" class="navbar-brand">Flat UI</a>
+          </div>
+          <div id="navbar-collapse-05" class="collapse navbar-collapse">
+            <form role="search" class="navbar-form navbar-left">
+              <div class="form-group">
+                <input type="text" placeholder="Search" class="form-control">
+              </div>
+              <button class="btn btn-default" type="submit">Submit</button>
+            </form>
+          </div>
+        </nav>
+
+<pre class="prettyprint mvl">
+&lt;form role="search" class="navbar-form navbar-left"&gt;
+  &lt;div class="form-group"&gt;
+    &lt;input type="text" placeholder="Search" class="form-control"&gt;
+  &lt;/div&gt;
+  &lt;button class="btn btn-default" type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+        <p class="ptl">Buttons:</p>
+        <nav role="navigation" class="navbar navbar-inverse navbar-embossed">
+          <div class="navbar-header">
+            <button data-target="#navbar-collapse-06" data-toggle="collapse" class="navbar-toggle" type="button">
+            </button>
+            <a href="#" class="navbar-brand">Flat UI</a>
+          </div>
+          <div id="navbar-collapse-06" class="collapse navbar-collapse">
+            <button class="btn btn-default navbar-btn" type="button">Sign in</button>
+            <button class="btn btn-default navbar-btn btn-sm" type="button">Sign in</button>
+            <button class="btn btn-default navbar-btn btn-xs" type="button">Sign in</button>
+          </div>
+        </nav>
+
+<pre class="prettyprint mvl">
+&lt;!-- Default Navbar Button --&gt;
+&lt;button class="btn btn-default navbar-btn" type="button"&gt;Sign in&lt;/button&gt;
+&lt;!-- Small Navbar Button --&gt;
+&lt;button class="btn btn-default navbar-btn btn-sm" type="button"&gt;Sign in&lt;/button&gt;
+&lt;!-- Extra Small Navbar Button --&gt;
+&lt;button class="btn btn-default navbar-btn btn-xs" type="button"&gt;Sign in&lt;/button&gt;
+</pre>
+
+        <p class="ptl">Text:</p>
+        <nav role="navigation" class="navbar navbar-inverse navbar-embossed">
+          <div class="navbar-header">
+            <button data-target="#navbar-collapse-07" data-toggle="collapse" class="navbar-toggle" type="button">
+            </button>
+            <a href="#" class="navbar-brand">Flat UI</a>
+          </div>
+          <div id="navbar-collapse-07" class="collapse navbar-collapse">
+            <p class="navbar-text">Signed in as Mark Otto</p>
+          </div>
+        </nav>
+
+<pre class="prettyprint mvl">
+&lt;p class="navbar-text"&gt;Signed in as Mark Otto&lt;/p&gt;
+</pre>
+
+        <p class="ptl">Non-nav links:</p>
+        <nav role="navigation" class="navbar navbar-inverse navbar-embossed">
+          <div class="navbar-header">
+            <button data-target="#navbar-collapse-08" data-toggle="collapse" class="navbar-toggle" type="button">
+            </button>
+            <a href="#" class="navbar-brand">Flat UI</a>
+          </div>
+          <div id="navbar-collapse-08" class="collapse navbar-collapse">
+            <p class="navbar-text navbar-right">Signed in as <a class="navbar-link" href="#">Mark Otto</a></p>
+          </div>
+        </nav>
+
+<pre class="prettyprint mvl">
+&lt;p class="navbar-text navbar-right"&gt;Signed in as &lt;a class="navbar-link" href="#"&gt;Mark Otto&lt;/a&gt;&lt;/p&gt;
+</pre>
+
+          <p class="ptl">New and Unread indicators:</p>
+          <nav class="navbar navbar-inverse navbar-embossed" role="navigation">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-09">
+                <span class="sr-only">Toggle navigation</span>
+              </button>
+              <a class="navbar-brand" href="#">Flat UI</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="#navbar-collapse-09">
+              <ul class="nav navbar-nav">
+                <li><a href="#">Messages<span class="navbar-unread">1</span></a></li>
+                <li><a href="#">About Us<span class="navbar-new">1</span></a></li>
+               </ul>
+            </div><!-- /.navbar-collapse -->
+          </nav><!-- /navbar -->
+
+<pre class="prettyprint mvl">
+&lt;!-- ... --&gt;
+  &lt;ul class="nav navbar-nav"&gt;
+    &lt;li&gt;
+      &lt;a href="#"&gt;
+        Menu item
+        &lt;!-- Indicator with number --&gt;
+        &lt;span class="navbar-new"&gt;2&lt;/span&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;!-- ... --&gt;
+</pre>
+
+<pre class="prettyprint mvl">
+&lt;!-- ... --&gt;
+  &lt;ul class="nav navbar-nav"&gt;
+    &lt;li&gt;
+      &lt;a href="#"&gt;
+        Menu item
+        &lt;!-- Indicator without number --&gt;
+        &lt;span class="navbar-unread"&gt;&lt;/span&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;!-- ... --&gt;
+</pre>
+
+          <p class="ptl">Fixed to top:</p>
+<pre class="prettyprint mvl">
+&lt;nav class="navbar navbar-default navbar-fixed-top" role="navigation"&gt;
+&lt;!-- Navbar content --&gt;
+&lt;/nav&gt;
+</pre>
+
+          <p class="ptl">Fixed to bottom:</p>
+<pre class="prettyprint mvl">
+&lt;nav class="navbar navbar-default navbar-fixed-bottom" role="navigation"&gt;
+&lt;!-- Navbar content --&gt;
+&lt;/nav&gt;
+</pre>
+
+          <p class="ptl">Static top:</p>
+<pre class="prettyprint mvl">
+&lt;nav class="navbar navbar-default navbar-static-top" role="navigation"&gt;
+&lt;!-- Navbar content --&gt;
+&lt;/nav&gt;
+</pre>
+
+          <div id="fa fa-pager"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Pager</h3>
+        </div>
+        <div class="demo-content">
+          <p>
+            Short pagination where links have a button look. Used for navigating to the next/prev item.
+          </p>
+          <ul class="pager">
+            <li class="previous">
+              <a href="#fakelink">
+                <i class="fa fa-arrow-left"></i>
+                <span>All messages</span>
+              </a>
+            </li>
+            <li class="next">
+              <a href="#fakelink">
+                <i class="fa fa-arrow-right"></i>
+              </a>
+            </li>
+          </ul>
+
+<pre class="prettyprint mvl">
+&lt;ul class="pager"&gt;
+  &lt;li class="previous"&gt;
+    &lt;a href="#"&gt;
+      &lt;span&gt;
+        &lt;i class="fa fa-arrow-left"&gt;&lt;/i&gt;
+        All messages
+      &lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+
+  &lt;li class="next"&gt;
+    &lt;a href="#"&gt;
+      &lt;i class="fa fa-arrow-right"&gt;&lt;/i&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+          <div id="fa fa-pagination"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Pagination</h3>
+        </div>
+        <div class="demo-content">
+          <p>
+            The restyled <a href="http://getbootstrap.com/components/#pagination">Bootstrap pagination</a>. We have added a dropdown navigation, a minimalistic look and a text-only look. We have also added a few color schemes with an alternative layout.
+          </p>
+          <div class="pagination">
+            <ul>
+              <li class="previous"><a href="#fakelink" class="fa fa-arrow-left"></a></li>
+              <li class="active"><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+              <li><a href="#fakelink">6</a></li>
+              <li><a href="#fakelink">7</a></li>
+              <li><a href="#fakelink">8</a></li>
+              <li><a href="#fakelink">9</a></li>
+              <li><a href="#fakelink">10</a></li>
+              <li class="pagination-dropdown dropup">
+                <a href="#fakelink" class="dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-triangle-up"></i>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="#fakelink">10–20</a></li>
+                  <li><a href="#fakelink">20–30</a></li>
+                  <li><a href="#fakelink">40–50</a></li>
+                </ul>
+              </li>
+              <li class="next"><a href="#fakelink" class="fa fa-arrow-right"></a></li>
+            </ul>
+          </div>
+
+<pre class="prettyprint mvl">
+&lt;div class="pagination"&gt;
+  &lt;ul&gt;
+    &lt;li class="previous"&gt;
+      &lt;a href="#" class="fa fa-arrow-left"&gt;&lt;/a&gt;
+    &lt;/li&gt;
+
+    &lt;!-- Make dropdown appear above pagination --&gt;
+    &lt;li class="pagination-dropdown dropup"&gt;
+      &lt;a href="#" class="dropdown-toggle" data-toggle="dropdown"&gt;
+        &lt;i class="fa fa-triangle-up"&gt;&lt;/i&gt;
+      &lt;/a&gt;
+      &lt;!-- Dropdown menu --&gt;
+      &lt;ul class="dropdown-menu"&gt;
+        &lt;li&gt;
+          &lt;a href="#"&gt;10-20&lt;/a&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+
+    &lt;li class="next"&gt;
+      &lt;a href="#" class="fa fa-arrow-right"&gt;&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="mtl ptl">The minimal look:</p>
+          <div class="pagination pagination-minimal">
+            <ul>
+              <li class="previous"><a href="#fakelink" class="fa fa-arrow-left"></a></li>
+              <li class="active"><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+              <li><a href="#fakelink">6</a></li>
+              <li><a href="#fakelink">7</a></li>
+              <li><a href="#fakelink">8</a></li>
+              <li><a href="#fakelink">9</a></li>
+              <li><a href="#fakelink">10</a></li>
+              <li class="pagination-dropdown dropup">
+                <a href="#fakelink" class="dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-triangle-up"></i>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="#fakelink">10–20</a></li>
+                  <li><a href="#fakelink">20–30</a></li>
+                  <li><a href="#fakelink">40–50</a></li>
+                </ul>
+              </li>
+              <li class="next"><a href="#fakelink" class="fa fa-arrow-right"></a></li>
+            </ul>
+          </div>
+
+<pre class="prettyprint mvl">
+&lt;div class="pagination pagination-minimal"&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="mvl ptl">The text look:</p>
+          <ul class="pagination-plain">
+            <li class="previous"><a href="#fakelink">← Previous</a></li>
+            <li><a href="#fakelink">1</a></li>
+            <li><a href="#fakelink">2</a></li>
+            <li><a href="#fakelink">3</a></li>
+            <li><a href="#fakelink">4</a></li>
+            <li class="active"><a href="#fakelink">5</a></li>
+            <li><a href="#fakelink">6</a></li>
+            <li><a href="#fakelink">7</a></li>
+            <li><a href="#fakelink">8</a></li>
+            <li><a href="#fakelink">9</a></li>
+            <li><a href="#fakelink">10</a></li>
+            <li class="next"><a href="#fakelink">Newer →</a></li>
+          </ul>
+
+<pre class="prettyprint mvl">
+&lt;ul class="pagination-plain"&gt;
+  &lt;li class="previous"&gt;
+    &lt;a href="#"&gt;Previous&lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;a href="#"&gt;1&lt;/a&gt;
+  &lt;/li&gt;
+  &lt;li class="next"&gt;
+    &lt;a href="#"&gt;Newer&lt;/a&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+          <p class="mvl ptl">The various color schemes:</p>
+          <div class="pagination pagination-danger">
+            <a href="#fakelink" class="btn btn-danger previous">
+              <i class="fa fa-arrow-left"></i>
+              OLDER
+            </a>
+            <ul>
+              <li><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+            </ul>
+            <a href="#fakelink" class="btn btn-danger next">
+              NEWER
+              <i class="fa fa-arrow-right"></i>
+            </a>
+          </div> <!-- /pagination -->
+
+          <div class="pagination pagination-success">
+            <a href="#fakelink" class="btn btn-success previous">
+              <i class="fa fa-arrow-left"></i>
+              OLDER
+            </a>
+            <ul>
+              <li><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+            </ul>
+            <a href="#fakelink" class="btn btn-success next">
+              NEWER
+              <i class="fa fa-arrow-right"></i>
+            </a>
+          </div> <!-- /pagination -->
+
+          <div class="pagination pagination-warning">
+            <a href="#fakelink" class="btn btn-warning previous">
+              <i class="fa fa-arrow-left"></i>
+              OLDER
+            </a>
+            <ul>
+              <li><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+            </ul>
+            <a href="#fakelink" class="btn btn-warning next">
+              NEWER
+              <i class="fa fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="pagination pagination-info">
+            <a href="#fakelink" class="btn btn-info previous">
+              <i class="fa fa-arrow-left"></i>
+              OLDER
+            </a>
+            <ul>
+              <li><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+            </ul>
+            <a href="#fakelink" class="btn btn-info next">
+              NEWER
+              <i class="fa fa-arrow-right"></i>
+            </a>
+          </div> <!-- /pagination -->
+
+          <div class="pagination pagination-inverse">
+            <a href="#fakelink" class="btn btn-inverse previous">
+              <i class="fa fa-arrow-left"></i>
+              OLDER
+            </a>
+            <ul>
+              <li><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+            </ul>
+            <a href="#fakelink" class="btn btn-inverse next">
+              NEWER
+              <i class="fa fa-arrow-right"></i>
+            </a>
+          </div> <!-- /pagination -->
+
+<pre class="prettyprint mvl">
+&lt;div class="pagination pagination-success"&gt;
+  &lt;a href="#" class="btn btn-success previous"&gt;Previous&lt;/a&gt;
+
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href="#"&gt;1&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;2&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;3&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+  &lt;a href="#" class="btn btn-success next"&gt;Next&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+          <div id="fa fa-popover"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Popover</h3>
+        </div>
+        <div class="demo-content">
+          <p>
+            The restyled <a href="http://getbootstrap.com/javascript/#popovers">Bootstrap popover</a>.
+          </p>
+          <div class="demo-popovers">
+            <div class="popover right">
+              <div class="arrow"></div>
+              <h3 class="popover-title">Smooth Title</h3>
+              <div class="popover-content">
+                <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+              </div>
+            </div>
+
+            <hr/>
+
+            <div class="popover left">
+              <div class="arrow"></div>
+              <h3 class="popover-title">Smooth Title</h3>
+              <div class="popover-content">
+                <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+              </div>
+            </div>
+
+            <hr/>
+
+            <div class="popover top">
+              <div class="arrow"></div>
+              <h3 class="popover-title">Smooth Title</h3>
+              <div class="popover-content">
+                <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+              </div>
+            </div>
+
+            <hr/>
+
+            <div class="popover bottom">
+              <div class="arrow"></div>
+              <h3 class="popover-title">Smooth Title</h3>
+              <div class="popover-content">
+                <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+              </div>
+            </div>
+          </div>
+
+<pre class="prettyprint mvl">
+&lt;!-- From the right of the target --&gt;
+&lt;div class="popover right"&gt;
+  &lt;div class="arrow"&gt;&lt;/div&gt;
+  &lt;h3 class="popover-title"&gt;Smooth Title&lt;/h3&gt;
+  &lt;div class="popover-content"&gt;
+    Content goes here
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- From the left of the target --&gt;
+&lt;div class="popover left"&gt;
+&lt;/div&gt;
+
+&lt;!-- From the top of the target --&gt;
+&lt;div class="popover top"&gt;
+&lt;/div&gt;
+
+&lt;!-- From the bottom of the target --&gt;
+&lt;div class="popover bottom"&gt;
+&lt;/div&gt;
+</pre>
+          <div id="fa fa-progress"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Progress</h3>
+        </div>
+        <div class="demo-content">
+          <p>
+            The restyled <a href="http://getbootstrap.com/components/#progress">Bootstrap progress</a>.
+          </p>
+          <div class="progress">
+            <div class="progress-bar" style="width: 45%;"></div>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" style="width: 40%;"></div>
+            <div class="progress-bar progress-bar-warning" style="width: 10%;"></div>
+            <div class="progress-bar progress-bar-danger" style="width: 10%;"></div>
+            <div class="progress-bar progress-bar-success" style="width: 10%;"></div>
+            <div class="progress-bar progress-bar-info" style="width: 10%;"></div>
+          </div>
+
+<pre class="prettyprint mvl">
+&lt;div class="progress"&gt;
+  &lt;div class="progress-bar" style="width: 40%;"&gt;&lt;/div&gt;
+  &lt;div class="progress-bar progress-bar-warning" style="width: 10%;"&gt;&lt;/div&gt;
+  &lt;div class="progress-bar progress-bar-danger" style="width: 10%;"&gt;&lt;/div&gt;
+  &lt;div class="progress-bar progress-bar-success" style="width: 10%;"&gt;&lt;/div&gt;
+  &lt;div class="progress-bar progress-bar-info" style="width: 10%;"&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+          <div id="fa fa-radio"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Radio buttons</h3>
+        </div>
+
+        <div class="demo-content">
+          <p>
+            Styling radio buttons also requires using a JS plugin. We have tried making things easy so you won't have to spend a huge amount of time playing around with custom&nbsp;components.
+          </p>
+          <label class="radio">
+            <input type="radio" name="group1" value="1" data-toggle="radio">
+            Radio is off
+          </label>
+          <label class="radio">
+            <input type="radio" name="group1" value="2" data-toggle="radio" checked>
+            Radio is on
+          </label>
+          <label class="radio">
+            <input type="radio" name="group2" value="1" data-toggle="radio" disabled>
+            Radio is off
+          </label>
+          <label class="radio">
+            <input type="radio" name="group2" value="2" data-toggle="radio" disabled checked>
+            Radio is on
+          </label>
+
+          <h6 class="ptl">The Data Attributes:</h6>
+<pre class="prettyprint">
+&lt;label class="radio"&gt;
+  &lt;input type="radio" name="group1" value="1" data-toggle="radio"&gt;
+  Radio is off
+&lt;/label&gt;
+
+&lt;label class="radio"&gt;
+  &lt;input type="radio" name="group1" value="2" data-toggle="radio" checked&gt;
+  Radio is on
+&lt;/label&gt;
+</pre>
+
+          <h6 class="ptl">The JS:</h6>
+<pre class="prettyprint">
+$(':radio').radio();
+</pre>
+
+          <div class="pvm">
+            <h6>Methods:</h6>
+          </div>
+          <p class="mbl">
+            <strong>.radio('check')</strong>
+            <br/>
+            sets the radio button state to <span class="text-info">checked</span>.
+          </p>
+          <p class="mbl">
+            <strong>.radio('uncheck')</strong>
+            <br/>
+            sets the radio state to <span class="text-info">unchecked</span>.
+          </p>
+<pre class="prettyprint">
+$(':radio').radio('check');
+</pre>
+
+          <div class="pbm ptl">
+            <h6>Events:</h6>
+          </div>
+          <p class="mbl">
+            <strong>.on('toggle')</strong>
+            <br/>
+            Fired when the radio button state changes between
+            <span class="text-info">checked</span> and
+            <span class="text-info">unchecked</span>.
+          </p>
+          <p class="mbl">
+            <strong>.on('change')</strong>
+            <br/>
+            Same as <span class="text-info">toggle</span> with just one difference &mdash; the event is fired for each radio button that gets a state change.
+          </p>
+<pre class="prettyprint">
+$(':radio').on('toggle', function() {
+  // Do something
+});
+</pre>
+          <div id="fa fa-select"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Select</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            We have made a custom select due to the inability of styling the system one. It is based on the <a href="http://ivaynberg.github.io/select2/">Select2</a> plug-in with the source slightly modified to meet Bootstrap naming convention.
+          </p>
+          <p class="mbl">
+            The component inherits its entire style from the button so you can use all its colors and sizes without any problems. We have also supported the <span class="text-info">multiple</span> select state as well as the <span class="text-info">block</span> mode where it takes all the available space.
+          </p>
+          <p class="mbl pbl">
+            Grids are supported here as&nbsp;well. For more technical details read the <a href="http://ivaynberg.github.io/select2/#documentation">original&nbsp;documentation</a>.
+          </p>
+
+          <select class="form-control select select-primary mbl" data-toggle="select">
+            <optgroup label="Profile">
+              <option value="0">My Profile</option>
+              <option value="1">My Friends</option>
+            </optgroup>
+            <optgroup label="System">
+              <option value="2">Messages</option>
+              <option value="3">My Settings</option>
+              <option value="4">Logout</option>
+            </optgroup>
+          </select>
+
+          <br>
+
+          <select multiple="multiple" class="form-control multiselect multiselect-info mbl" data-toggle="select">
+            <option value="0">1</option>
+            <option value="1" selected>2</option>
+            <option value="2" selected>3</option>
+            <option value="3" selected>4</option>
+            <option value="4">5</option>
+          </select>
+
+          <p class="mvl">
+            You can write the markup as you would normally do, without any difference:
+          </p>
+
+<pre class="prettyprint mvl">
+&lt;select class="form-control select select-primary select-block mbl"&gt;
+  &lt;optgroup label="Profile"&gt;
+    &lt;option value="0"&gt;My Profile&lt;/option&gt;
+    &lt;option value="1"&gt;My Friends&lt;/option&gt;
+  &lt;/optgroup&gt;
+  &lt;optgroup label="System"&gt;
+    &lt;option value="2"&gt;Messages&lt;/option&gt;
+    &lt;option value="3"&gt;My Settings&lt;/option&gt;
+    &lt;option value="4"&gt;Logout&lt;/option&gt;
+  &lt;/optgroup&gt;
+&lt;/select&gt;
+
+&lt;select multiple="multiple" class="form-control multiselect multiselect-info"&gt;
+  &lt;option value="0"&gt;1&lt;/option&gt;
+  &lt;option value="1" selected&gt;2&lt;/option&gt;
+  &lt;option value="2" selected&gt;3&lt;/option&gt;
+  &lt;option value="3" selected&gt;4&lt;/option&gt;
+  &lt;option value="4"&gt;5&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+
+          <p class="mvl ptl">
+            Then transform all the system selects into custom ones with JS:
+          </p>
+
+<pre class="prettyprint mvl">
+$("select").select2({dropdownCssClass: 'dropdown-inverse'});
+
+// dropdownCssClass: dropdown class name
+
+// You can always select by any other attribute, not just tag name.
+// Also you can leave selectpicker arguments blank to apply defaults.
+</pre>
+          <div id="fa fa-slider"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Slider</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://jqueryui.com/slider">jQuery UI slider</a> with added slider segments.
+          </p>
+
+          <div id="slider"></div>
+
+          <p class="ptl">The markup:</p>
+
+<pre class="prettyprint mvl">
+&lt;div id="slider"&gt;&lt;/div&gt;
+</pre>
+
+          <p class="ptl">The JS:</p>
+
+<pre class="prettyprint mvl">
+var $slider = $("#slider");
+if ($slider.length > 0) {
+  $slider.slider({
+    min: 1,
+    max: 5,
+    value: 3,
+    orientation: "horizontal",
+    range: "min"
+  }).addSliderSegments($slider.slider("option").max);
+}
+</pre>
+
+          <p class="pvl">How does <span class="text-info">addSliderSegments()</span> work?</p>
+          <p>This is an extended jQuery method placed in the <code>application.js</code> file. It calculates how many segments to append to the slider by looking at a <span class="text-info">slider("option").max</span> which shows a maximum slider value.</p>
+
+<pre class="prettyprint mvl">
+// Add segments to a slider
+$.fn.addSliderSegments = function (amount, orientation) {
+  return this.each(function () {
+    if (orientation == "vertical") {
+      var output = ''
+        , i;
+      for (i = 1; i &lt;= amount - 2; i++) {
+        output += '&lt;div class="ui-slider-segment" style="top:' + 100 / (amount - 1) * i + '%;"&gt;&lt;/div&gt;';
+      };
+      $(this).prepend(output);
+    } else {
+      var segmentGap = 100 / (amount - 1) + "%"
+        , segment = '&lt;div class="ui-slider-segment" style="margin-left: ' + segmentGap + ';"&gt;&lt;/div&gt;';
+      $(this).prepend(segment.repeat(amount - 2));
+    }
+  });
+};
+</pre>
+
+          <p class="pvl">Vertical slider:</p>
+
+          <div class="pbl">
+            <div id="vertical-slider" style="height: 200px;"></div>
+          </div>
+
+          <p class="ptl">The markup:</p>
+
+<pre class="prettyprint mvl">
+&lt;div id="vertical-slider" style="height: 200px;"&gt;&lt;/div&gt;
+</pre>
+
+          <p class="ptl">The JS:</p>
+
+<pre class="prettyprint mvl">
+var $verticalSlider = $("#vertical-slider");
+if ($verticalSlider.length) {
+  $verticalSlider.slider({
+    min: 1,
+    max: 5,
+    value: 3,
+    orientation: "vertical",
+    range: "min"
+  }).addSliderSegments($verticalSlider.slider("option").max, "vertical");
+}
+</pre>
+<p class="pvl">Custom slider values:</p>
+
+          <div class="pbl">
+            <div id="slider3">
+              <span class="ui-slider-value first"></span>
+              <span class="ui-slider-value last"></span>
+            </div>
+          </div>
+
+          <p class="ptl">The markup:</p>
+
+<pre class="prettyprint mvl">
+&lt;div id="slider3"&gt;
+  &lt;span class="ui-slider-value first"&gt;&lt;/span&gt;
+  &lt;span class="ui-slider-value last"&gt;&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">The JS:</p>
+
+<pre class="prettyprint mvl">
+var $slider3 = $("#slider3")
+  , slider3ValueMultiplier = 100
+  , slider3Options;
+
+if ($slider3.length > 0) {
+  $slider3.slider({
+    min: 1,
+    max: 5,
+    values: [3, 4],
+    orientation: "horizontal",
+    range: true,
+    slide: function(event, ui) {
+      $slider3.find(".ui-slider-value:first")
+        .text("$" + ui.values[0] * slider3ValueMultiplier)
+        .end()
+        .find(".ui-slider-value:last")
+        .text("$" + ui.values[1] * slider3ValueMultiplier);
+    }
+  });
+
+  slider3Options = $slider3.slider("option");
+  $slider3.addSliderSegments(slider3Options.max)
+    .find(".ui-slider-value:first")
+    .text("$" + slider3Options.values[0] * slider3ValueMultiplier)
+    .end()
+    .find(".ui-slider-value:last")
+    .text("$" + slider3Options.values[1] * slider3ValueMultiplier);
+}
+</pre>
+          <div id="fa fa-spinner"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Spinner</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://jqueryui.com/spinner">jQuery UI spinner</a>.
+          </p>
+
+          <div class="form-group">
+            <input type="text" id="spinner-01" value="0" class="form-control spinner" />
+          </div>
+
+<pre class="prettyprint mvl">
+&lt;div class="form-group"&gt;
+  &lt;input type="text" id="spinner-01" value="0" class="spinner" /&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="mbl">
+            A few different sizes for spinner:
+          </p>
+
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" id="spinner-02" value="0" class="form-control input-hg spinner" />
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" id="spinner-03" value="0" class="form-control input-lg spinner" />
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" id="spinner-04" value="0" class="form-control spinner" />
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-lg-5">
+              <input type="text" id="spinner-05" value="0" class="form-control input-sm spinner" />
+            </div>
+          </div>
+
+<pre class="prettyprint mvl">
+&lt;input type="text" id="spinner-02" value="0" class="form-control input-hg spinner" /&gt;
+&lt;input type="text" id="spinner-03" value="0" class="form-control input-lg spinner" /&gt;
+&lt;input type="text" id="spinner-04" value="0" class="form-control spinner" /&gt;
+&lt;input type="text" id="spinner-05" value="0" class="form-control input-sm spinner" /&gt;
+</pre>
+          <div id="fa fa-switch"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Switch</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            You can use a custom switch instead of a checkbox. It can have 2 styles: <span class="text-info">circle</span> (default) and <span class="text-info">square</span>. Drag functionality is also supported.
+          </p>
+          <span class="mrl">
+            <input type="checkbox" checked data-toggle="switch" id="custom-switch-01" />
+          </span>
+          <input type="checkbox" data-toggle="switch" name="switch-02"  id="custom-switch-02" />
+
+          <hr/>
+
+          <span class="bootstrap-switch-square mrl">
+            <input type="checkbox" data-toggle="switch" data-on-label="<i class='fa fa-check'></i>" data-off-label="<i class='fa fa-cross'></i>" name="switch-03" id="custom-switch-03" />
+          </span>
+
+          <span class="bootstrap-switch-square">
+            <input type="checkbox" checked data-toggle="switch" data-on-label="<i class='fa fa-check'></i>" data-off-label="<i class='fa fa-cross'></i>" name="switch-04" id="custom-switch-04" />
+          </span>
+
+<pre class="prettyprint mvl">
+&lt;!-- Default switch --&gt;
+&lt;input type="checkbox" checked data-toggle="switch" name="default-switch" id="switch-01" /&gt;
+
+&lt;!-- Square switch --&gt;
+&lt;div class="bootstrap-switch-square"&gt;
+  &lt;input type="checkbox" checked data-toggle="switch" name="square-switch" id="switch-02" /&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="mbl">The switch can have various color schemes:</p>
+
+          <span class="mrl">
+            <input type="checkbox" checked data-toggle="switch" name="switch-05" data-on-color="primary" id="custom-switch-05" />
+          </span>
+
+          <span class="mrl">
+            <input type="checkbox" checked data-toggle="switch" name="switch-06" data-on-color="info" id="custom-switch-06" />
+          </span>
+
+          <span class="mrl">
+            <input type="checkbox" checked data-toggle="switch" name="switch-07" data-on-color="success" id="custom-switch-07" />
+          </span>
+
+          <span class="mrl">
+            <input type="checkbox" checked data-toggle="switch" name="switch-08" data-on-color="warning" id="custom-switch-08" />
+          </span>
+
+          <input type="checkbox" checked data-toggle="switch" name="switch-09" data-on-color="danger" id="custom-switch-09" />
+
+<pre class="prettyprint mvl">
+&lt;!-- Primary / Default --&gt;
+&lt;input type="checkbox" checked data-toggle="switch" name="default-switch-colors" data-on-color="primary" data-off-color="default" id="switch-03" /&gt;
+
+&lt;!-- Info / Default --&gt;
+&lt;input type="checkbox" checked data-toggle="switch" name="info-square-switch" data-on-color="info" id="switch-04" /&gt;
+
+&lt;!-- Success / Default --&gt;
+&lt;input type="checkbox" checked data-toggle="switch" name="info-square-switch" data-on-color="success" id="switch-05" /&gt;
+
+&lt;!-- Warning / Default --&gt;
+&lt;input type="checkbox" checked data-toggle="switch" name="info-square-switch" data-on-color="warning" id="switch-06" /&gt;
+
+&lt;!-- Danger / Default --&gt;
+&lt;input type="checkbox" checked data-toggle="switch" name="info-square-switch" data-on-color="danger" id="switch-07" /&gt;
+</pre>
+
+          <p class="mbl">You can change the colors programmatically:</p>
+
+<pre class="prettyprint mvl">
+$('#change-color-switch').bootstrapSwitch('onColor', 'success');
+$('#change-color-switch').bootstrapSwitch('offColor', 'danger');
+</pre>
+
+          <p class="mbl">Disabled state:</p>
+
+          <span class="mrl">
+            <input type="checkbox" checked data-toggle="switch" name="switch-10" disabled id="custom-switch-10" />
+          </span>
+
+<pre class="prettyprint mvl">
+&lt;input type="checkbox" checked disabled data-toggle="switch" name="custom-switch-disabled" id="switch-08" /&gt;
+&lt;input type="checkbox" checked readonly data-toggle="switch" name="custom-switch-readonly" id="switch-09" /&gt;
+</pre>
+
+          <p class="mbl">API for managing the state:</p>
+
+<pre class="prettyprint mvl">
+$('#disable-switch').bootstrapSwitch('disabled'); // getter
+$('#disable-switch').bootstrapSwitch('toggleDisabled'); // toggle readonly state
+$('#disable-switch').bootstrapSwitch('disabled', true);  // setter, true || false
+
+$('#readonly-switch').bootstrapSwitch('readonly'); // getter
+$('#readonly-switch').bootstrapSwitch('toggleReadonly'); // toggle readonly state
+$('#readonly-switch').bootstrapSwitch('readonly', true);  // setter, true || false
+</pre>
+
+          <p class="mbl">You can change the handler text:</p>
+
+          <input type="checkbox" checked data-toggle="switch" name="switch-12" data-on-text="Ag" data-off-text="Au" id="custom-switch-12" />
+
+<pre class="prettyprint mvl">
+&lt;input type="checkbox" checked data-toggle="switch" name="custom-switch-text" data-on-text="Ag" data-off-text="Au" id="switch-10" /&gt;
+</pre>
+
+          <p class="mbl">You can do this programmaticaly as well:</p>
+
+<pre class="prettyprint mvl">
+$('#label-switch').bootstrapSwitch('onText', 'Au');
+$('#label-switch').bootstrapSwitch('offText', 'Ag');
+</pre>
+
+          <p class="mbl">Use icons insted of text on handlers:</p>
+
+          <div class="bootstrap-switch-square">
+            <input type="checkbox" checked data-toggle="switch" name="switch-13" data-on-text="<i class='fa fa-check'></i>" data-off-text="<i class='fa fa-cross'></i>" id="custom-switch-13" />
+          </div>
+
+<pre class="prettyprint mvl">
+&lt;!-- Square switch with customized icons --&gt;
+&lt;div class="bootstrap-switch-square"&gt;
+  &lt;input type="checkbox" data-on-text="&lt;i class=&#039;fa fa-check&#039;&gt;&lt;/i&gt;" data-off-text="&lt;i class=&#039;fa fa-cross&#039;&gt;&lt;/i&gt;" name="custom-square-switch-icons" id="switch-11" /&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="mbl">For more technical details read the <a href="http://bootstrap-switch.org">original documentation</a>.</p>
+
+          <p class="mbl pbl"><strong>Note:</strong> <span class="text-info">Label text</span> and <span class="text-info">switch sizing</span> are not supported.</p>
+
+          <div id="fa fa-tables"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Tables</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl pbl">
+            The restyled <a href="http://getbootstrap.com/css/#tables">Bootstrap tables</a> with mobile support added.
+          </p>
+
+          <h5 class="mbl">Striped</h5>
+          <table class="table table-striped">
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Year</th>
+              <th>Rating</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>The Shawshank Redemption</td>
+              <td>1994</td>
+              <td>9.2</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>The Godfather</td>
+              <td>1972</td>
+              <td>9.2</td>
+            </tr>
+          </table>
+
+<pre class="prettyprint mvl">
+&lt;table class="table table-striped"&gt;
+&lt;/table&gt;
+</pre>
+
+          <h5 class="mvl ptl">Striped with hovers</h5>
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Year</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>The Shawshank Redemption</td>
+                <td>1994</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>The Godfather</td>
+                <td>1972</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>The Godfather: Part II</td>
+                <td>1974</td>
+              </tr>
+            </tbody>
+          </table>
+
+<pre class="prettyprint mvl">
+&lt;table class="table table-striped table-hover"&gt;
+&lt;/table&gt;
+</pre>
+
+          <h5 class="mvl ptl">Bordered</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Year</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>The Shawshank Redemption</td>
+                <td>1994</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>The Godfather</td>
+                <td>1972</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>The Godfather: Part II</td>
+                <td>1974</td>
+              </tr>
+            </tbody>
+          </table>
+
+<pre class="prettyprint mvl">
+&lt;table class="table table-bordered"&gt;
+&lt;/table&gt;
+</pre>
+
+          <h5 class="mvl ptl">Colored</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Year</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="success">
+                <td>1</td>
+                <td>The Shawshank Redemption</td>
+                <td>1994</td>
+              </tr>
+              <tr class="danger">
+                <td>2</td>
+                <td>The Godfather</td>
+                <td>1972</td>
+              </tr>
+              <tr class="warning">
+                <td>3</td>
+                <td>The Godfather: Part II</td>
+                <td>1974</td>
+              </tr>
+              <tr class="info">
+                <td>4</td>
+                <td>Batman</td>
+                <td>2011</td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="fa fa-tagsinput"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Tags input</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            Used for managing multiple tags with the ability to add a new one and to remove or validate an existing one. It is available in 2 color schemes: grey (default) and primary.
+          </p>
+          <p class="mbl pbl">
+            This component is based on <a href="http://timschlechter.github.io/bootstrap-tagsinput/examples/bootstrap3/">Bootstrap Tags Input</a>.
+          </p>
+
+          <input name="tagsinput-01" class="tagsinput" data-role="tagsinput" value="Clean, Fresh, Modern, Unique" />
+          <div class="tagsinput-primary">
+            <input name="tagsinput-02" class="tagsinput" data-role="tagsinput" value="School, Teacher, Colleague" />
+          </div>
+
+          <p class="ptl">The markup:</p>
+
+<pre class="prettyprint mvl">
+&lt;!-- Default tags input --&gt;
+&lt;input name="tagsinput" class="tagsinput" data-role="tagsinput" value="Clean, Fresh, Modern, Unique" /&gt;
+
+&lt;!-- Primary tags input --&gt;
+&lt;div class="tagsinput-primary"&gt;
+&lt;input name="tagsinput" class="tagsinput" value="School, Teacher, Colleague" /&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="mbl">
+            Use data attribute <code>data-role="tagsinput"</code> on input to initialize the plugin.
+          </p>
+
+<pre class="prettyprint mvl">
+&lt;input name="tagsinput" class="tagsinput" data-role="tagsinput" value="Clean, Fresh, Modern, Unique" /&gt;
+</pre>
+
+          <p class="mbl">You can also do this using JavaScript:</p>
+
+<pre class="prettyprint mvl">
+$(".tagsinput").tagsinput();
+</pre>
+
+          <p class="mbl pbl">For more technical details read the <a href="http://timschlechter.github.io/bootstrap-tagsinput/examples/bootstrap3/">official plugin&nbsp;documentation</a>.</p>
+
+          <div id="fa fa-timepicker"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Timepicker</h3>
+        </div>
+
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://jonthornton.github.io/jquery-timepicker/">jQuery Timepicker</a>.
+          </p>
+          <div class="row">
+            <div class="col-md-4 mtl">
+              <div class="form-group">
+                <div class="input-group">
+                  <input type="text" id="timepicker-01" class="form-control" value="7:00am">
+                  <span class="input-group-btn">
+                    <button class="btn" type="button"><span class="fa fa-time"></span></button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+<pre class="prettyprint mtm">
+&lt;div class=&quot;form-group&quot;&gt;
+  &lt;div class=&quot;input-group&quot;&gt;
+    &lt;input type=&quot;text&quot; id=&quot;timepicker-01&quot; class=&quot;form-control&quot; value=&quot;7:00am&quot;&gt;
+    &lt;span class=&quot;input-group-btn&quot;&gt;
+      &lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;&lt;span class=&quot;fa fa-time&quot;&gt;&lt;/span&gt;&lt;/button&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+          <div id="fa fa-tooltip"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Tooltip</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://getbootstrap.com/javascript/#tooltips">Bootstrap tooltip</a>.
+          </p>
+
+          <div style="height: 70px;">
+            <div class="demo-tooltips">
+              <p data-toggle="tooltip" title="Here is a sample of a long dark tooltip. Hell yeah."></p>
+            </div>
+          </div> <!-- /tooltips -->
+
+<pre class="prettyprint mvl">
+&lt;p data-toggle="tooltip" title="Tooltip copy"&gt;&lt;/p&gt;
+</pre>
+
+          <div id="fa fa-typeahead"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Typeahead</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://twitter.github.io/typeahead.js">Twitter Typeahead</a>.
+          </p>
+
+          <p class="ptl">Example:</p>
+
+          <div class="form-group">
+            <input class="form-control" type="text" id="typeahead-demo-01" />
+          </div>
+
+          <p class="ptl">To launch Typeahead you need to include the following scripts:</p><br>
+          <ul>
+            <li><code>typeahead.jquery.js</code> &mdash; UI view</li>
+            <li><code>bloodhound.js</code> &mdash; suggestion engine</li>
+          </ul>
+          <p>You may include these files separeately, or you can include the only <code>typeahead.bundle.js</code>(which contains both <code>bloodhound.js</code> and <code>typeahead.jquery.js</code>)</p>
+
+          <p class="ptl">The markup:</p>
+
+<pre class="prettyprint mvl">
+&lt;div class="form-group"&gt;
+  &lt;input class="form-control" type="text" id="typeahead-demo-01" /&gt;
+&lt;/div&gt;
+</pre>
+
+          <p class="ptl">The JS:</p>
+<pre class="prettyprint mvl">
+var states = new Bloodhound({
+  datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.word); },
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  limit: 4,
+  local: [
+    { word: "Alabama" },
+    { word: "Alaska" },
+    { word: "Arizona" },
+    { word: "Arkansas" },
+    { word: "California" },
+    { word: "Colorado" }
+  ]
+});
+
+states.initialize();
+
+$('#typeahead-demo-01').typeahead(null, {
+  name: 'states',
+  displayKey: 'word',
+  source: states.ttAdapter()
+});
+</pre>
+
+          <p class="ptl">Useful Resources: <a href="http://twitter.github.io/typeahead.js/examples/">Examples</a>, <a href="https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md">Typeahead docs</a>, <a href="https://github.com/twitter/typeahead.js/blob/master/doc/bloodhound.md">Bloodhound docs</a>.</p>
+
+
+          <div id="fa fa-videoplayer"></div>
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+      <div class="demo-row">
+        <div class="demo-title">
+          <h3>Video player</h3>
+        </div>
+        <div class="demo-content">
+          <p class="mbl">
+            The restyled <a href="http://www.videojs.com/">Video.js HTML5 video player</a>.
+          </p>
+
+          <p class="ptl">Example:</p>
+
+          <video class="video-js" preload="auto" poster="assets/img/video/poster.jpg" data-setup="{}">
+            <source src="http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.mp4" type="video/mp4">
+            <source src="http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.webm" type="video/webm">
+          </video>
+
+          <p class="ptl">The markup:</p>
+
+<pre class="prettyprint mvl">
+&lt;video class="video-js" preload="auto" poster="assets/img/video/poster.jpg" data-setup="{}"&gt;
+  &lt;source src="http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.mp4" type="video/mp4"&gt;
+  &lt;source src="http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.webm" type="video/webm"&gt;
+&lt;/video&gt;
+</pre>
+
+          <p class="ptl">To have a working video player you need to include the JS file <code>video-js.js</code> and SWF file <code>video-js.swf</code>. You can do it in 2 ways:</p>
+
+          <p class="ptl">Include a CDN version in your page(swf file will be downloaded automaticaly from CDN):</p>
+
+<pre class="prettyprint mvl">
+&lt;script src="//vjs.zencdn.net/4.7/video.js"&gt;&lt;/script&gt;
+</pre>
+
+          <p class="ptl">Include a self hosted version of <code>flat-ui-pro.js</code> and seth path to SWF file:</p>
+
+<pre class="prettyprint mvl">
+&lt;script src="//example.com/path/to/flat-ui-pro.js">&lt;/script&gt;
+&lt;script&gt;
+  videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
+&lt;/script&gt;
+</pre>
+
+          <p class="ptl">The file <code>video-js.swf</code> can be found in <code>dist/js/vendor/</code> folder</p>
+
+
+        <p class="ptl">Useful Resources: <a href="https://github.com/videojs/video.js/blob/stable/docs/index.md">Video.js docs</a></p>
+
+        </div> <!-- /.demo-content -->
+      </div> <!-- /.demo-row -->
+
+    </div><!-- /.container -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="../dist/js/vendor/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../dist/js/vendor/video.js"></script>
+    <script src="../dist/js/flat-ui-pro.js"></script>
+
+    <script src="assets/js/prettify.js"></script>
+    <script src="assets/js/application-docs.js"></script>
+
+    <script>
+      videojs.options.flash.swf = "../dist/js/vendors/video-js.swf"
+
+      $(document).ready(function(){
+        $('select[name="huge"]').select2({dropdownCssClass: 'select-inverse'});
+      });
+    </script>
+
+  </body>
+</html>
