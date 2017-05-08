@@ -2151,12 +2151,12 @@ describe PlanYear, "which has the concept of export eligibility" do
           expect(plan_year.enrollment_errors[:enrollment_ratio].present?).to be_truthy
         end
 
-        it "should transition application to ineligible state" do
-          expect(plan_year.application_ineligible?).to be_truthy 
+        it "should remain in enrolling state" do
+          expect(plan_year.enrolling?).to be_truthy 
         end
 
-        it "should transition employer to applicant state" do
-          expect(employer_profile.applicant?).to be_truthy
+        it "should remain in registered state" do
+          expect(employer_profile.registered?).to be_truthy
         end
       end
     end
