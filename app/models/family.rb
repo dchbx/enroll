@@ -925,6 +925,11 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
+  def primary_applicant_person
+    return nil unless primary_applicant.present?
+    primary_applicant.person
+  end
+
 private
   def build_household
     if households.size == 0
@@ -939,11 +944,6 @@ private
     all_family_member_relations_defined
     single_active_household
     no_duplicate_family_members
-  end
-
-  def primary_applicant_person
-    return nil unless primary_applicant.present?
-    primary_applicant.person
   end
 
   def only_one_active_primary_family

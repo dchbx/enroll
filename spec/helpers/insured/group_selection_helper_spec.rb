@@ -28,7 +28,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     context "with active employee role" do
       let(:person) { FactoryGirl.create(:person, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
       end
 
       it "should have active employee role but no benefit group" do
@@ -36,11 +36,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
 
     end
-    
+
     context "with active employee role and benefit group" do
       let(:person) { FactoryGirl.create(:person, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
       end
 
@@ -56,17 +56,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).not_to be_truthy
       end
     end
-    
+
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
       end
       it "should have both active consumer and employee role" do
@@ -200,6 +200,321 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
           sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
           expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq nil
+        end
+      end
+    end
+  end
+
+  describe "#coverage_tr_class" do
+    context "with is_covarage and is_ineligible_for_individual as nil" do
+      let(:coverage_tr_class) {subject.coverage_tr_class(nil, nil)}
+      it 'returns a blank class' do
+        expect(coverage_tr_class).to be_blank
+      end
+    end
+
+    context "with is_covarage as nil and is_ineligible_for_individual as false" do
+      let(:coverage_tr_class) {subject.coverage_tr_class(nil, false)}
+      it 'returns a blank class' do
+        expect(coverage_tr_class).to be_blank
+      end
+    end
+
+    context "with is_covarage as false and is_ineligible_for_individual as false" do
+      let(:coverage_tr_class) {subject.coverage_tr_class(nil, false)}
+      it 'returns a blank class' do
+        expect(coverage_tr_class).to be_blank
+      end
+    end
+
+    context "with is_covarage as true and is_ineligible_for_individual as false" do
+      let(:coverage_tr_class) {subject.coverage_tr_class(true, false)}
+      it 'returns the expected class' do
+        expect(coverage_tr_class).to be_blank
+      end
+    end
+
+    context "with is_covarage as true and is_ineligible_for_individual as true" do
+      let(:coverage_tr_class) {subject.coverage_tr_class(true, true)}
+      let(:expected_tr_class) {' ineligible_row_for_ivl'}
+      it 'returns the expected class' do
+        expect(coverage_tr_class).to eq expected_tr_class
+      end
+    end
+
+    context "with is_covarage as false and is_ineligible_for_individual as true" do
+      let(:coverage_tr_class) {subject.coverage_tr_class(false, true)}
+      let(:expected_tr_class) {' ineligible_row ineligible_row_for_ivl'}
+      it 'returns the expected class' do
+        expect(coverage_tr_class).to eq expected_tr_class
+      end
+    end
+  end
+
+  describe "#coverage_td_class" do
+    context "is_ineligible_for_individual as nil" do
+      let(:coverage_td_class) {subject.coverage_td_class(nil)}
+      it 'returns a blank class' do
+        expect(coverage_td_class).to be_blank
+      end
+    end
+
+    context "is_ineligible_for_individual as false" do
+      let(:coverage_td_class) {subject.coverage_td_class(false)}
+      it 'returns a blank class' do
+        expect(coverage_td_class).to be_blank
+      end
+    end
+
+    context "with is_ineligible_for_individual as true" do
+      let(:coverage_td_class) {subject.coverage_td_class(true)}
+      let(:expected_tr_class) {' ineligible_detail_for_ivl'}
+      it 'returns the expected class' do
+        expect(coverage_td_class).to eq expected_tr_class
+      end
+    end
+  end
+
+  describe "#ineligible_due_to_non_dc_address" do
+    context "with family_member as nil" do
+      let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(nil)}
+      it 'returns nil' do
+        expect(ineligible_due_to_non_dc_address).to be_nil
+      end
+    end
+
+    context "with primary applicant as family member" do
+      let(:family_member) {double('family_member')}
+      let(:person) {double('person')}
+      before {allow(family_member).to receive(:is_primary_applicant).and_return(true)}
+      context 'who has active employee and consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(nil)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_truthy
+          end
+        end
+      end
+
+      context 'who doesnt have active employee but has active consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+      end
+
+      context 'who has have active employee but doesnt have active consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(false)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+      end
+
+      context 'who doesnt have active employee nor active consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(false)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+      end
+    end
+
+    context "with non primary applicant as family member" do
+      let(:family_member) {double('family_member')}
+      let(:person) {double('person')}
+      before {allow(family_member).to receive(:is_primary_applicant).and_return(false)}
+      context 'who has active employee and consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(nil)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_truthy
+          end
+        end
+      end
+
+      context 'who doesnt have active employee but has active consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+      end
+
+      context 'who has have active employee but doesnt have active consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(false)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+      end
+
+      context 'who doesnt have active employee nor active consumer role' do
+        before do
+          allow(person).to receive(:has_active_consumer_role?).and_return(false)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+        end
+
+        context 'who is a dc resident' do
+          before do
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns false' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
+        end
+
+        context 'who is not a dc resident' do
+          before do
+            allow(person).to receive(:no_dc_address).and_return(true)
+            allow(family_member).to receive(:primary_applicant).and_return(person)
+          end
+          let(:ineligible_due_to_non_dc_address) {subject.ineligible_due_to_non_dc_address(family_member)}
+          it 'returns true' do
+            expect(ineligible_due_to_non_dc_address).to be_falsey
+          end
         end
       end
     end

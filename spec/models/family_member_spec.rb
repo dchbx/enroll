@@ -56,7 +56,7 @@ describe FamilyMember, dbclean: :after_each do
 
   let(:p0) {Person.create!(first_name: "Dan", last_name: "Aurbach")}
   let(:p1) {Person.create!(first_name: "Patrick", last_name: "Carney")}
-  let(:ag) { 
+  let(:ag) {
     fam = Family.new
     fam.family_members.build(
       :person => p0,
@@ -186,5 +186,56 @@ describe FamilyMember, "given a relationship to update" do
     expect(subject.primary_relationship).not_to eq relationship
     subject.update_relationship(relationship)
     expect(subject.primary_relationship).to eq relationship
+  end
+end
+
+RSpec.describe FamilyMember, type: :model do
+  describe "#primary_applicant" do
+    context 'for primary applicant' do
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+      let(:person) {FactoryGirl.create(:person)}
+      let(:family_member) {FactoryGirl.create(:family_member, is_primary_applicant: true, person: person, family: family)}
+      context "without associated person" do
+        before {family_member.person = nil}
+        it 'returns nil' do
+          expect(family_member.primary_applicant).to be_nil
+        end
+      end
+
+      context "with associated person" do
+        before {family_member.person = person}
+
+        it 'returns the associated person' do
+          expect(family_member.primary_applicant).to eq person
+        end
+      end
+    end
+
+    context 'for non primary applicant' do
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+      let(:person) {FactoryGirl.create(:person)}
+      let(:family_member) {FactoryGirl.create(:family_member, is_primary_applicant: false, person: person, family: family)}
+      context "without associated family" do
+        before {family_member.family = nil}
+        it 'returns nil' do
+          expect(family_member.primary_applicant).to be_nil
+        end
+      end
+
+      context "with associated family" do
+        context 'without associated primary applicant person' do
+          before {allow(family).to receive(:primary_applicant_person).and_return(nil)}
+          it 'returns nil' do
+            expect(family_member.primary_applicant).to be_nil
+          end
+        end
+
+        context 'with associated primary applicant person' do
+          it 'returns the associated person' do
+            expect(family_member.primary_applicant).to eq family.primary_applicant_person
+          end
+        end
+      end
+    end
   end
 end

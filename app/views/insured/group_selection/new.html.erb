@@ -67,9 +67,9 @@
               </div>
             </div>
           <% elsif can_shop_shop?(@person) %>
-	           <%= hidden_field_tag 'market_kind', 'shop' %>
-	        <% elsif can_shop_individual?(@person) %>
-	           <%= hidden_field_tag 'market_kind', 'individual' %>
+             <%= hidden_field_tag 'market_kind', 'shop' %>
+          <% elsif can_shop_individual?(@person) %>
+             <%= hidden_field_tag 'market_kind', 'individual' %>
           <% elsif can_shop_resident?(@person) %>
              <%= hidden_field_tag 'market_kind', 'coverall' %>
           <% else %>
@@ -230,6 +230,14 @@ function setGroupSelectionHandlers(){
     $('#shop-coverage-household').hide();
     $('#shop-coverage-household input').removeProp('checked');
     $('#ivl-coverage-household tr').not(".ineligible_row").find('input').prop('checked', 'checked');
+    $checkbox = $('#ivl-coverage-household').find(".ineligible_row_for_ivl").find('input');
+    $checkbox.removeAttr('checked'); 
+    $checkbox.attr('disabled', 'disabled'); 
+    $td = $('#ivl-coverage-household').find(".ineligible_detail_for_ivl");
+    if(!$td.is(':visible')) {
+      $td.toggle();
+    }
+    
   });
 <% end %>
 

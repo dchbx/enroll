@@ -132,6 +132,14 @@ class FamilyMember
     family.save!
   end
 
+  def primary_applicant
+    if is_primary_applicant?
+      self.person
+    else
+      family.try(:primary_applicant_person)
+    end
+  end
+
   def self.find(family_member_id)
     return [] if family_member_id.nil?
     family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
