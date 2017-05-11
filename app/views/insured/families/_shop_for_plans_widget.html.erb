@@ -9,9 +9,13 @@
         <strong>Shop for health and dental plans</strong>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-        <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
-          Shop for Plans
-        </button>
+        <% if @family.active_seps.last %>
+              <%= build_link_for_sep_type(@family.active_seps.last, 'Shop for Plans', "btn btn-default pull-right") %>
+        <% else %>
+            <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
+              Shop for Plans
+            </button>
+        <% end %>
       </div>
     </div>
   </div>
