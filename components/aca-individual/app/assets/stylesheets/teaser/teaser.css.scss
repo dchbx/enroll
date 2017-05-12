@@ -1,0 +1,92 @@
+/*
+ * Colors from http://design-seeds.com/index.php/home/entry/a-door-green1
+ *
+ * Thanks to design seeds!
+ */
+
+$lightgreen: #e4e8ae;
+$browngreen: #786f27;
+$gray: #b5acad;
+$darkgray: #424343;
+$midgreen: #cfcb65;
+$darkgreen: #758559;
+
+/*
+ * You are allowed to do whatever you want with this layout. Though I would be pleased if you placed a link on your site to csseasy.com or to profit42.com (best "blog about hacking" ever). Donations are also welcome: paypal@profit42.com (or follow the donation button on csseasy.com)
+ *
+ * Thanks to css easy!
+ */
+
+* {
+  font-family: 'Lucida Sans Unicode';
+}
+
+body {
+  background-color: $midgreen;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+#header {
+  background-color: $browngreen;
+  height: 90px;
+  padding: 50px;
+  font-size: 80px;
+  text-align: center;
+  color: #fff;
+  text-shadow: black 0.05em 0.05em 0.05em;
+}
+
+#top {
+  width: 100%;
+  background-color: $midgreen;
+  height: 50px;
+}
+
+#center {
+  background-color: $lightgreen;
+  min-height: 600px; /* for modern browsers */
+  height: auto !important; /* for modern browsers */
+  height: 600px; /* for IE5.x and IE6 */
+  text-align: center;
+  color: #fff;
+}
+
+#footer {
+  clear: both;
+  background-color: $browngreen;
+  height: 200px;
+}
+
+#content {
+  font-size: 28px;
+  padding: 80px 0px;
+  text-align: center;
+  color: $darkgray;
+  p {
+    line-height: 28px;
+  }
+  input {
+    background-color: white;
+    border: 1px solid $gray;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+    display: inline-block;
+    height: 20px;
+    width: 200px;
+    padding: 4px 6px;
+    margin-top: 20px;
+    margin-bottom: 9px;
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+  }
+}

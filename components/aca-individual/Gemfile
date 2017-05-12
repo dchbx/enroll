@@ -1,0 +1,12 @@
+source "https://rubygems.org"
+gemspec
+
+gem 'jasmine-core', github: 'pivotal/jasmine'
+gem 'jasmine', github: 'pivotal/jasmine-gem'
+
+
+path '../' do
+  gem "annoyance"
+  gem "email_signup"
+  gem "event_counter"
+end

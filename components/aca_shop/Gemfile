@@ -1,0 +1,33 @@
+source "https://rubygems.org"
+
+# gem "rails", "4.2.3"
+
+# gem "sass-rails", "5.0.4"
+# gem "jquery-rails", "4.0.5"  
+# gem "mongoid", "5.0.1"
+# gem "symmetric-encryption", "~> 3.6.0"
+# gem "aasm", "~> 4.8.0"
+# gem "pundit", "~> 1.0.1"
+# gem "rails-i18n", "4.0.8"
+
+# group :development, :test do
+#   gem "spring", "1.6.3"
+#   gem "byebug"
+#   gem "rspec-rails", "3.4.2"
+#   gem "factory_girl_rails", "4.6.0"  
+#   gem "capybara", "2.6.2"
+#   gem "shoulda-matchers", "3.1.1"
+#   gem "poltergeist", "1.11.0"
+# end
+
+gemspec
+
+# gem "rails", "4.2.3"
+
+# gem "jasmine-core", github: "pivotal/jasmine"
+# gem "jasmine", github: "pivotal/jasmine-gem"
+
+
+# path "../" do
+#   gem "aca-individual"
+# end
