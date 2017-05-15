@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
 
-  context "Shop Monthly Queries" do 
+  context "Shop Monthly Queries" do
 
     let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
 
@@ -11,7 +11,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     }
 
     let(:initial_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer, 
+      FactoryGirl.create_list(:census_employee_with_active_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
         benefit_group: initial_employer.published_plan_year.benefit_groups.first,
         created_at: TimeKeeper.date_of_record.prev_year)
     }
@@ -21,8 +21,8 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     }
 
     let(:renewing_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
-        benefit_group: renewing_employer.active_plan_year.benefit_groups.first, 
+      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+        benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
         renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first,
         created_at: TimeKeeper.date_of_record.prev_year)
     }
@@ -45,7 +45,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     let(:renewing_employee_passives) {
       renewing_employee_enrollments.select{|e| e.auto_renewing?}
     }
-    
+
     let(:feins) {
       [initial_employer.fein, renewing_employer.fein]
     }
