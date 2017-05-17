@@ -50,7 +50,7 @@ namespace :migrations do
 
     count = 0
     orgs.each do |org|
-      next if ["536002522", "536002523", "536002558"].include?(org.fein)
+      next if [].include?(org.fein)
       
       count += 1
       employer_profile = org.employer_profile

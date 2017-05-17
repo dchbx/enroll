@@ -52,7 +52,7 @@ namespace :migrations do
       }
     ]
 
-    employer_feins = ["536002522"]#, "536002523", "536002558"]
+    employer_feins = []
     employer_feins.each do |fein|
       employer_profile = EmployerProfile.find_by_fein(fein)
 

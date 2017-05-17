@@ -3,7 +3,7 @@
 <%= hidden_field_tag 'plan_ids' %>
 <div class="container-fluid">
   <h3>Plan Comparison Chart</h3>
-  <ul>
+  <ul style="padding-left: 18px;">
     <li> Plans can be rearranged by dragging the beginning of the company name </li>
     <li> Use <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> to sort by copay </li>
   </ul>
@@ -86,6 +86,6 @@
     </table>
   </div>
   <br>
-    <%= link_to "Export to PDF", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans]), class: "btn btn-info", target: "_blank" %>
+    <%= link_to "Export to PDF", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id), class: "btn btn-info", target: "_blank" %>
   <br><br>
 </div>

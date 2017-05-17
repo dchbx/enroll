@@ -83,6 +83,7 @@ module Queries
       self
     end
 
+
     # TODO: Fix me to use the master list of statuses
     def filter_to_active
       add({

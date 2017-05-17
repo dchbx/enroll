@@ -25,5 +25,10 @@ module MailSpecHelper
   to its employees through #{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable.",
        "You Are Able to Change Your Plan Selection during Open Enrollment"]
     end
+
+    def user_mailer_initial_employee_invitation_body(census_employee)
+      ["Dear #{census_employee.full_name}","Good News! #{census_employee.employer_profile.legal_name.titleize}, has chosen to offer health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable.",
+       "To See Plan Options and Enroll:"]
+    end
   end
 end

@@ -1,0 +1,25 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Subject: Important Tax Information about your Catastrophic Health Coverage</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "You are getting this letter because you were enrolled in a catastrophic health insurance plan through #{Settings.site.short_name} in 2016. A catastrophic health plan meets the requirements for maintaining a minimum level of health coverage for all the months you had your plan. We report your enrollment to the IRS, but do not send you a marketplace tax form (Form 1095-A) because the type of plan you were enrolled in does not qualify for a premium tax credit."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Your health insurance company may send you a Form 1095-B reporting your coverage for 2016. If you have questions about this form, please contact your health insurance company."} %>

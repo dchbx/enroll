@@ -1,2 +1,5 @@
+$('.premium-reports-table').next('.container').html('');
 $('.premium-reports-table').html("<%= escape_javascript(render "employers/premium_statements/show") %>");
 semantic_class()
+initializeDataTables();
+$("div.custom_level_1").children('div').hide();

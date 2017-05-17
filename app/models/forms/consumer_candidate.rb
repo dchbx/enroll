@@ -1,5 +1,6 @@
 module Forms
   class ConsumerCandidate
+    include Acapi::Notifiers
     include ActiveModel::Model
     include ActiveModel::Validations
 
@@ -24,7 +25,7 @@ module Forms
               numericality: true
     validate :dob_not_in_future
     validate :ssn_or_checkbox
-    validate :uniq_ssn
+    validate :uniq_ssn, :uniq_ssn_dob
     validate :age_less_than_18
     attr_reader :dob
 
@@ -70,6 +71,17 @@ module Forms
         errors.add(:ssn_taken,
                   #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
                   "The social security number you entered is affiliated with another account.")
+      end
+    end
+
+    def uniq_ssn_dob
+      return true if ssn.blank?
+      person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
+      person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
+      if person_with_ssn != person_with_ssn_dob
+        errors.add(:base,
+          "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
+        log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
     end
 

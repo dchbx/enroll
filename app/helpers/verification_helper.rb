@@ -85,6 +85,10 @@ module VerificationHelper
     true if member.person.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
   end
 
+  def member_has_uploaded_paper_applications(member)
+    true if member.person.resident_role.try(:paper_applications).any? { |doc| doc.identifier }
+  end
+
   def docs_uploaded_for_all_types(member)
     member.person.verification_types.all? do |type|
       member.person.consumer_role.vlp_documents.any?{ |doc| doc.identifier && doc.verification_type == type }
@@ -158,5 +162,9 @@ module VerificationHelper
       else
         person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
     end
+  end
+
+  def text_center(v_type, person)
+    (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
   end
 end

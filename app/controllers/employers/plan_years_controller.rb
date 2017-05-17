@@ -76,22 +76,13 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def delete_benefit_group
-    plan_year = params[:plan_year_id]
-    plan_year = PlanYear.find(plan_year)
-    benefit_group_id = params[:benefit_group_id]
-    benefit_groups = plan_year.benefit_groups
-    if benefit_groups.count > 1
-      bg = benefit_groups.find(benefit_group_id)
-      bg_title = bg.title
-      invalid_benefit_group_assignments = @employer_profile.benefit_group_assignments.select { |bga| bga.benefit_group_id.to_s == benefit_group_id }
-      invalid_benefit_group_assignments.each do |invalid_benefit_group_assignment|
-        census_employee = invalid_benefit_group_assignment.census_employee
-        invalid_benefit_group_assignment.delete
-        census_employee.save
-      end
-      bg.delete
+    plan_year = PlanYear.find(params[:plan_year_id])
+    if plan_year.benefit_groups.count > 1
+      benefit_group = plan_year.benefit_groups.find(params[:benefit_group_id])
+      benefit_group.destroy!
+
       if plan_year.save
-        flash[:notice] = "Benefit Group: #{bg.title} successfully deleted."
+        flash[:notice] = "Benefit Group: #{benefit_group.title} successfully deleted."
       end
     else
       flash[:error] = "Benefit package can not be deleted because it is the only benefit package remaining in the plan year."
@@ -226,13 +217,9 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
-    @just_a_warning = false
-    if plan_year.publish_pending?
-      plan_year.withdraw_pending!
-      if !plan_year.is_application_valid?
-        @just_a_warning = true
-        plan_year.application_eligibility_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
-      end
+    if params[:publish]
+      @just_a_warning = !plan_year.is_application_eligible? ? true : false
+      plan_year.application_warnings
     end
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
@@ -302,7 +289,7 @@ class Employers::PlanYearsController < ApplicationController
       else
         application_errors = @plan_year.application_errors
         errors = @plan_year.errors.full_messages
-        error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1]}</li>"} +
+        error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1].flatten.join(',')}</li>"} +
                          errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
 
         flash[:error] = "Renewing Plan Year could not be reverted to draft. #{error_messages}".html_safe
@@ -314,7 +301,7 @@ class Employers::PlanYearsController < ApplicationController
       else
         application_errors = @plan_year.application_errors
         errors = @plan_year.errors.full_messages
-        error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1]}</li>"} +
+        error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1].flatten.join(',')}</li>"} +
                          errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
 
         flash[:error] = "Published Plan Year could not be reverted to draft. #{error_messages}".html_safe
@@ -326,20 +313,22 @@ class Employers::PlanYearsController < ApplicationController
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     @plan_year.publish! if @plan_year.may_publish?
-    if @plan_year.publish_pending?
+    if @plan_year.publish_pending? || @plan_year.renewing_publish_pending?
+      @plan_year.withdraw_pending!
       respond_to do |format|
         format.js
       end
     else
       if (@plan_year.published? || @plan_year.enrolling? || @plan_year.renewing_published? || @plan_year.renewing_enrolling?)
+
         if @plan_year.assigned_census_employees_without_owner.present?
           flash[:notice] = "Plan Year successfully published."
         else
           flash[:error] = "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
         end
       else
-        errors = @plan_year.application_errors.try(:values) + @plan_year.enrollment_period_errors
-        flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+        errors = @plan_year.application_errors.values + @plan_year.open_enrollment_date_errors.values
+        flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
     end

@@ -21,19 +21,8 @@ before_filter :configure_sign_up_params, only: [:create]
       render :new and return
     end
 
-    headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
-
-    if headless.present? && !headless.person.present?
-      headless.destroy
-    end
-    
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
-
-    headless = User.where(oim_id: /^#{Regexp.quote(resource.oim_id)}$/i).first
-
-    if headless.present? && !headless.person.present?
-      headless.destroy
-    end
+    resource.handle_headless_records
 
     resource_saved = resource.save
     yield resource if block_given?

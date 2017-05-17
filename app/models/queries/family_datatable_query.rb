@@ -36,6 +36,10 @@ module Queries
       if @custom_attributes['families'] == 'non_enrolled'
         family = family.non_enrolled
       end
+      if @custom_attributes['families'] == 'by_enrollment_coverall'
+        resident_ids = Person.all_resident_roles.pluck(:_id)
+        family = family.where('family_members.person_id' => {"$in" => resident_ids})
+      end
       if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
         family = family.by_enrollment_renewing
       end
@@ -58,7 +62,7 @@ module Queries
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)
       #Caution Mongo optimization on chained "$in" statements with same field
-      #is to do a union, not an interaction
+      #is to do a union, not an interactionl
       family_scope = family.and('family_members.person_id' => {"$in" => person_id})
       return family_scope if @order_by.blank?
       family_scope.order_by(@order_by)

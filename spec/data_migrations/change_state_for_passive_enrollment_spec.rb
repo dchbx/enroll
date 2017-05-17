@@ -11,14 +11,14 @@ describe ChangeStateForPassiveEnrollment do
   end
 
   describe "changing passive enrollment aasm state" do
-    let(:organization) { 
-      org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+    let(:organization) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryGirl.create :employer_profile, organization: org
-      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5 
+      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 4, 1), :end_on => Date.new(calender_year+1, 3, 31),
+      :open_enrollment_start_on => Date.new(calender_year, 3, 1), :open_enrollment_end_on => Date.new(calender_year, 3, 10), fte_count: 5
       renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
       census_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years
-      employer_profile.census_employees.each do |census_employee| 
+      employer_profile.census_employees.each do |census_employee|
         census_employee.add_renew_benefit_group_assignment(renewing_benefit_group)
         person = FactoryGirl.create(:person, last_name: census_employee.last_name, first_name: census_employee.first_name)
         employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)

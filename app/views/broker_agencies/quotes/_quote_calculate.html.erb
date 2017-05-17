@@ -1,0 +1,16 @@
+<div class="" class="col-md-12">
+  <input name='employee' value='0' type='hidden'>
+  <input name='spouse' value='0' type='hidden'>
+  <input name='domestic_partner' value='0' type='hidden'>
+  <input name='child_under_26' value='0' type='hidden'>
+  <%= form_tag(broker_agencies_broker_role_quote_path, method: :get) do  %>
+
+  <input type="hidden" id="quote_id" value="<%= params[:id] %>">
+  <input type="hidden" id="broker_role_id" value="<%= @broker.id %>">
+
+  <%= render partial: 'broker_agencies/quotes/panels/my_features', locals:{benefit_id: benefit_group.id} if @q.can_edit? %>
+  <% end %>
+  <%= render partial: 'broker_agencies/quotes/panels/dental'  if @q.can_edit? %>
+  <%= render partial: 'broker_agencies/quotes/panels/quote', locals: {benefit_group:benefit_group}  %>
+  <%= link_to "Save and Go Back to Quotes", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
+</div>

@@ -20,7 +20,7 @@ module Enroll
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
-    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/notices)
+    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/notices #{config}/app/jobs)
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'
@@ -30,6 +30,7 @@ module Enroll
     config.i18n.available_locales = [:en, :es]
     config.i18n.default_locale = :en
 
+    config.active_job.queue_adapter = :resque
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.active_record.raise_in_transactional_callbacks = true
     config.assets.enabled = true
@@ -56,8 +57,11 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::LawfulPresence")
       config.acapi.add_async_subscription("Subscribers::LocalResidency")
       config.acapi.add_async_subscription("Subscribers::FamilyApplicationCompleted")
+      config.acapi.add_async_subscription("Subscribers::IamAccountCreation")
       config.acapi.add_async_subscription("Subscribers::NotificationSubscriber")
       config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
+      config.acapi.add_async_subscription("Subscribers::ShopBinderEnrollmentsTransmissionAuthorized")
+      config.acapi.add_async_subscription("Subscribers::ShopRenewalTransmissionAuthorized")
     end
   end
 end

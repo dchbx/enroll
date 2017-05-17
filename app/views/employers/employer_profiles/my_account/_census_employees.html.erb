@@ -13,7 +13,7 @@
           <%= hidden_field_tag(:status, 'active') %>
           <%= hidden_field_tag(:search, true) %>
           <div class="input-group">
-            <%= text_field_tag(:employee_name, params[:employee_name], placeholder: 'Employee Name', class: 'form-control') %>
+            <%= text_field_tag(:employee_search, params[:employee_search], placeholder: 'Employee Name, SSN', class: 'form-control') %>
             <div class="input-group-btn">
               <div class="btn btn-default" id='census_employee_search_clear'>
                 <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
@@ -51,7 +51,7 @@
         <div class="col-xs-2" id="employees-filter">
 
           <div class="filter" onclick="$(this).closest('.col-xs-2').find('.filter-options').toggle();">
-            Filter By <i class="fa fa-chevron-down"></i>
+            <span id='filter-span'>Active </span><i class="fa fa-chevron-down"></i>
           </div>
           <div class="filter-options">
             <h4>Filter By <i class="fa fa-chevron-up"></i></h4>
@@ -69,6 +69,10 @@
                   <label class="btn btn-default">
                     <input autocomplete="off" id="family_all" name="options" type="radio" value="all">
                     All
+                  </label>
+                  <label class="btn btn-default">
+                    <input autocomplete="off" id="cobra" name="options" type="radio" value="cobra">
+                    COBRA Continuation
                   </label>
                 </div>
               </div>

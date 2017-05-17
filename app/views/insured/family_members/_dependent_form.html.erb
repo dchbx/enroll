@@ -58,28 +58,29 @@
              </div>
            </div>
 
-          <div class="col-md-3 col-sm-3 no-pd">
-            <div class="form-group form-group-lg">
-              <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "SOCIAL SECURITY" %>
-            </div>
-          </div>
 
-          <div class="col-md-3 col-sm-3 no-pd">
-            <div class="col-xs-12">
-              <div class="">
-                <div class="form-group form-group-lg top-buffer">
-                  <%= f.check_box :no_ssn %>
-                  <%= f.label :no_ssn, :value => true do %>
-                    <span class='no_ssn twelve'>&nbsp;I don't have an SSN</span>
-                  <% end %>
-                  <!-- <span><i class='fa fa-question-circle'></i></span> -->
-                </div>
-              </div>
-            </div>
+           <div class="col-md-3 col-sm-3 no-pd">
+             <div class="form-group form-group-lg">
+               <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "SOCIAL SECURITY" %>
+             </div>
+           </div>
 
-            <div class="col-xs-2">
-            </div>
-          </div>
+           <div class="col-md-3 col-sm-3 no-pd">
+             <div class="col-xs-12">
+               <div class="">
+                 <div class="form-group form-group-lg top-buffer">
+                   <%= f.check_box :no_ssn %>
+                   <%= f.label :no_ssn, :value => true do %>
+                   <span class='no_ssn twelve'>&nbsp;I don't have an SSN</span>
+                   <% end %>
+                   <!-- <span><i class='fa fa-question-circle'></i></span> -->
+                 </div>
+               </div>
+             </div>
+
+             <div class="col-xs-2">
+             </div>
+           </div>
 
           <div class="col-md-3 col-sm-3 no-pd">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">

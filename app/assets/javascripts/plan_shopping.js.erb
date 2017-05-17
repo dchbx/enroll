@@ -158,6 +158,11 @@ function updatePlanCost(elected_aptc) {
   };
 };
 
+function setMinMax(input, max_aptc) {
+  if (input.value < 0) input.value = 0;
+  if (input.value >= max_aptc) input.value = max_aptc.toFixed(2);
+}
+
 $(function() {
   $(document).on('click', "#select-plan-container a[role='tab'][data-toggle='tab']", function(){
 		hidePlanTabs();

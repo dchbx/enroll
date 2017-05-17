@@ -60,6 +60,23 @@ Feature: Employer Profile
     Then Point of Contact count is 2
     Then Admin approves EmployerStaffRole for NewGuy
 
+Scenario: A new person asks for a staff role at an existing company with employer profile & broker agency profile
+    Given Sarh is a person
+    Given Sarh is the staff person for an organization with employer profile and broker agency profile
+    Given JohnSmith is a user with no person who goes to the Employer Portal   
+    Given JohnSmith enters first, last, dob and contact info   
+    Given JohnSmith enters data for Turner Agency, Inc 
+    Then JohnSmith is notified about Employer Staff Role application is pending 
+    Then JohnSmith logs out         
+    # Could be HBXAdmin or Broker
+    Given Admin is a person 
+    Given Admin has HBXAdmin privileges       
+    And Admin accesses the Employers tab of HBX portal 
+    Given Admin selects Hannahs company            
+    Given Admin decides to Update Business information       
+    Then Point of Contact count is 2    
+    Then Admin approves EmployerStaffRole for JohnSmith 
+
 Scenario: A new person creates a new company
     Given NewGuy is a user with no person who goes to the Employer Portal
     Given NewGuy enters first, last, dob and contact info

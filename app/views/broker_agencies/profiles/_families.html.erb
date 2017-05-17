@@ -3,18 +3,80 @@
 
 <div class="container">
   <h3 class="title-inline">Families</h3>
-  <div class="form-inline button-group-wrapper families_search_div">
-    <div class="input-group search-wp">
-      <%= render 'shared/search', url: family_index_broker_agencies_profiles_path, q: @q, placeholder: "Name", remote: true, opts: { id: @broker_agency_profile.id }  %>
-    </div>
-  </div>
 </div>
 
 <div class="container">
   <div id="families">
-    <%= render "families_table_for_broker", families: @families%>
-  </div>
-  <%= render 'shared/alph_paginate_remote', url: family_index_broker_agencies_profiles_path, alphs: @page_alphabets,
-             all: family_index_broker_agencies_profiles_path, url_params: { id: @broker_agency_profile.id } %>
 
+    <div class="module">
+      <table class="table table-striped" id="Broker-Family-dataTable">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>SSN</th>
+          <th>DOB</th>
+          <th>HBX ID</th>
+          <th>Family</th>
+          <th>Registered?</th>
+          <th>Consumer?</th>
+          <th>Employee?</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      // datatables setup
+      $(document).ready(function() {
+        $('#Broker-Family-dataTable').DataTable( {
+          "processing": true,
+          "serverSide": true,
+          "ordering" : false,
+          "paging": true,
+	  "lengthMenu": [ 10, 25, 50, 100],
+	  "searchDelay" : 500,
+          "ajax": {
+            url: "<%= family_datatable_broker_agencies_profile_path(id: @broker_agency_profile.id, :format => :json) %>",
+            type: "POST",
+            data: function ( d ) {
+              console.log("Broker-Family-dataTable datatable")
+            }
+          },
+          "columns": [
+            { data: 'name'},
+            { data: 'ssn' },
+            { data: 'dob' },
+            { data: 'hbx_id'},
+            { data: 'family_count'},
+            { data: 'registered'},
+            { data: 'consumer'},
+            { data: 'employee'}
+      ],
+'dom': "<'row'" +
+          "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
+        ">" +
+        "<'row'" +
+          "<'col-sm-12 col-md-12'>" +
+        ">" +
+        "<'row'" +
+          "<'col-sm-12 col-md-12'tr>"+
+        ">" +
+        "<'row'" +
+          "<'col-sm-11 col-md-11'i><'col-sm-1 col-md-1'l>" +
+        ">" +
+        "<'row'" +
+          "<'col-sm-12 col-md-12'p>" +
+        ">"
+        } );
+      });
+
+
+    </script>
+
+  </div>
 </div>

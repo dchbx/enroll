@@ -48,7 +48,7 @@ aca:
     employer_contribution_percent_minimum: 50
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
-    binder_payment_due_on: 15
+    binder_payment_due_on: 12
 
     earliest_enroll_prior_to_effective_on:
       days: -30
@@ -94,6 +94,15 @@ aca:
         days: 5
       maximum_length:
         months: 2
+
+    cobra_enrollment_period:
+      months: 6
+
+    group_file:
+      new_enrollment_transmit_on: 16
+      update_transmit_day_of_week: "friday"
+
+
 paper_notice: 'paper-notices'
 
 aptc_errors:

@@ -1,6 +1,10 @@
+# This rake task used to terminate employer active plan year && active enrollments.
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017']
+
 namespace :migrations do
-  desc "create missing consumer roles for dependents"
-  task :terminate_employer_account, [:fein, :termination_date] => :environment do |task, args|
+  desc "Terminating active plan year and enrollments"
+  task :terminate_employer_account, [:fein, :end_on, :termination_date] => :environment do |task, args|
 
     fein = args[:fein]
     organizations = Organization.where(fein: fein)
@@ -10,8 +14,9 @@ namespace :migrations do
       raise 'more than 1 employer found with given fein'
     end
 
-    puts "Processing #{organizations.first.legal_name}"
+    puts "Processing #{organizations.first.legal_name}" unless Rails.env.test?
     termination_date = Date.strptime(args[:termination_date], "%m/%d/%Y")
+    end_on = Date.strptime(args[:end_on], "%m/%d/%Y")
 
     organizations.each do |organization|
 
@@ -45,8 +50,10 @@ namespace :migrations do
           end
         end
 
-        plan_year.update_attributes(:terminated_on => termination_date)
-        plan_year.terminate! if plan_year.may_terminate?    
+        if plan_year.may_terminate?
+          plan_year.update_attributes(end_on: end_on, :terminated_on => termination_date)
+          plan_year.terminate!
+        end
       end
 
       # organization.employer_profile.census_employees.non_terminated.each do |census_employee|
@@ -63,6 +70,7 @@ namespace :migrations do
     end
   end
 
+# This rake task used to cancel renewing plan year && renewing enrollments after termianting employer active plan year.
 
   task :clean_terminated_employers, [:fein, :termination_date] => :environment do |fein, termination_date|
     # employers = {

@@ -215,5 +215,37 @@ describe CensusEmployeePolicy do
         end
       end
     end
+    context "when is general agency user", dbclean: :after_each do
+      let(:user) { FactoryGirl.create(:user, :general_agency_staff, person: person) }
+      context "current user is broker of employer_profile" do
+        let(:person) { FactoryGirl.create(:person, :with_general_agency_staff_role) }
+        before do
+          allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employee.employer_profile]
+        end
+
+        it "grants access when change dob" do
+          employee.dob = TimeKeeper.date_of_record
+          expect(subject).to permit(user, employee)
+        end
+
+        it "grants access when change ssn" do
+          employee.ssn = "879876"
+          expect(subject).to permit(user, employee)
+        end
+      end
+
+      context "current user is not broker of general agency role" do
+        let(:user) { FactoryGirl.create(:user, person: person) }
+        it "denies access when change dob" do
+          employee.dob = TimeKeeper.date_of_record
+          expect(subject).not_to permit(user, employee)
+        end
+
+        it "denies access when change ssn" do
+          employee.ssn = "123321456"
+          expect(subject).not_to permit(user, employee)
+        end
+      end
+    end
   end
 end

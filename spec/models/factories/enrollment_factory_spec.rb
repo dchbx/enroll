@@ -295,6 +295,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           last_name: census_employee.last_name,
         }
         @ssn = census_employee.ssn
+        @dob = census_employee.dob
         valid_employee_params = {
           ssn: @ssn,
           gender: census_employee.gender,
@@ -329,7 +330,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       it "should still have a findable person" do
-        people = Person.match_by_id_info(ssn: @ssn)
+        people = Person.match_by_id_info(ssn: @ssn, dob: @dob)
         expect(people.count).to eq 1
         expect(people.first).to be_a Person
       end

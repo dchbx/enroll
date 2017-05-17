@@ -4,27 +4,30 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Inactive & non APTC Enrollments for <%=TimeKeeper.date_of_record.year%></h4>
+        <h4 class="modal-title" id="myModalLabel">Inactive Enrollments for <%=@current_year%></h4>
       </div>
       <div class="modal-body">
         <table class="table">
           <thead>
             <tr>
-              <th>Plan Name</th>
-              <th>Plan Premium</th>
-              <th>Applied APTC</th>
-              <th>Effective On</th>
-              <th>Terminated On</th>
+              <th>Name</th>
+              <th>Premium</th>
+              <th>APTC</th>
+              <th>Effective</th>
+              <th>Term. On</th>
+              <th>State</th>
             </tr>
           </thead>
           <tbody>
-            <% inactive_and_without_aptc_enrollments(@family, @current_year).each do |hbx|%>
+            <% inactive_enrollments(@family, @current_year).each do |hbx|%>
               <tr>
                 <td><%=hbx.try(:plan).try(:name)%></td>
                 <td><%=number_to_currency(hbx.total_premium)%></td>
                 <td><%=number_to_currency(hbx.applied_aptc_amount.to_f)%></td>
                 <td><%=hbx.effective_on%></td>
-                <td><%=hbx.terminated_on || "Active"%></td>
+                <td><%=hbx.terminated_on || "--"%></td>
+                <td><%=hbx.aasm_state.titleize%></td>
+
               </tr>
             <%end%>
           </tbody>

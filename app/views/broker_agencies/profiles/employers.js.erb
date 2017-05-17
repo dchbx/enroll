@@ -1,16 +1,2 @@
 setTabContent("<%= escape_javascript render "employers" %>");
 set_active_ontab("#employers-tab");
-
-$(document).ready(function() {
-    $('#employers_dataTable').DataTable( {
-      "order": [[ 2, "asc" ]],
-      columnDefs: [
-      				{ targets: [0,1,3,4,7], sorting: false}
-      		      ]
-    } );
-    $('select').on('selectric-init', function(element){
-	  $('.selectric').closest('.small-6').find('span').remove();
-      $('.selectric').closest('label').after('<span></span>');
-      $('.selectric').closest('.small-6').find('span:first').text(' Entries Shown')
-});
-} );

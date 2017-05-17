@@ -25,8 +25,12 @@ class Admin::Aptc < ApplicationController
         total_aptc_applied_vals_for_household  = total_aptc_applied_vals_for_household.merge(aptc_applied_vals_for_enrollment) { |k, a_value, b_value| a_value.to_f + b_value.to_f } # Adding values of two similar hashes. 
       end
       #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
-      max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f > b_value.to_f ? (a_value.to_f - b_value.to_f) : 0) }
+      max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f >= b_value.to_f ? (a_value.to_f - b_value.to_f) : a_value.to_f - b_value.to_f) }
     end
+
+    # def negative_aptc(k, a_value, b_value, total_aptc_applied_vals_for_household, hbxs)
+    #   a_value - b_value
+    # end
 
     def build_household_members(year, family, max_aptc=nil)
       individuals_covered_array = Array.new
@@ -137,13 +141,18 @@ class Admin::Aptc < ApplicationController
       first_of_month_num_current_year = last_of_month_converter(month, year)
       max_aptc_value = ""
       if max_aptc.present?
-        max_aptc_value = first_of_month_num_current_year >= TimeKeeper.datetime_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
-        max_aptc_value = first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
+        effective_starting_on = ed.tax_household.effective_starting_on
+        if effective_starting_on > TimeKeeper.date_of_record
+          max_aptc_value = first_of_month_num_current_year >= TimeKeeper.datetime_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
+          max_aptc_value = first_of_month_num_current_year >= effective_starting_on ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
+        else
+          max_aptc_value = first_of_month_num_current_year >= TimeKeeper.datetime_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
+          max_aptc_value = first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
+        end
       else
         max_aptc_value = ed.max_aptc.to_f
       end
       # Check if  'month' >= EligibilityDetermination.determined_at date?
-
       if first_of_month_num_current_year >= ed.determined_at.to_date
         # assign that month with aptc_max value from this ed (EligibilityDetermination)
         max_aptc_hash.store(month, '%.2f' % max_aptc_value)
@@ -258,42 +267,44 @@ class Admin::Aptc < ApplicationController
     end
 
     # Redetermine Eligibility on Max APTC / CSR Update.
-    def redetermine_eligibility_with_updated_values(family, params, hbxs)
+    def redetermine_eligibility_with_updated_values(family, params, hbxs, year)
       eligibility_redetermination_result = false
-      max_aptc = family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc
-      csr_percent_as_integer = family.active_household.latest_active_tax_household.latest_eligibility_determination.csr_percent_as_integer 
-      existing_latest_eligibility_determination = family.active_household.latest_active_tax_household.latest_eligibility_determination
-      latest_active_tax_household = family.active_household.latest_active_tax_household
-
-      
-      
+      latest_eligibility_determination = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination
+      max_aptc = latest_eligibility_determination.max_aptc
+      csr_percent_as_integer = latest_eligibility_determination.csr_percent_as_integer
       csr_percentage_param = params[:csr_percentage] == "limited" ? -1 : params[:csr_percentage].to_i # storing "limited" CSR as -1
 
       if !(params[:max_aptc].to_f == max_aptc && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
-        eligibility_redetermination_result = true
-        eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
+        effective_starting_on = family.active_household.latest_active_tax_household_with_year(year).effective_starting_on
+        if effective_starting_on > TimeKeeper.date_of_record
+          eligibility_date = effective_starting_on
+        else
+          eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
+        end
         # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_at" timestamp and the corresponsing csr/aptc update.
-        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date,
-                                                                      "determined_on"                 => eligibility_date, 
-                                                                      "csr_eligibility_kind"          => existing_latest_eligibility_determination.csr_eligibility_kind, 
-                                                                      "premium_credit_strategy_kind"  => existing_latest_eligibility_determination.premium_credit_strategy_kind, 
-                                                                      "csr_percent_as_integer"        => csr_percentage_param, 
-                                                                      "max_aptc"                      => params[:max_aptc].to_f, 
-                                                                      "benchmark_plan_id"             => existing_latest_eligibility_determination.benchmark_plan_id,
-                                                                      "e_pdc_id"                      => existing_latest_eligibility_determination.e_pdc_id,
-                                                                      "source"                        => "Admin"  
-                                                                      }).save!
+        tax_household = family.active_household.latest_active_tax_household_with_year(year)
+        tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date,
+                                                        "determined_on"                 => eligibility_date,
+                                                        "csr_eligibility_kind"          => latest_eligibility_determination.csr_eligibility_kind,
+                                                        "premium_credit_strategy_kind"  => latest_eligibility_determination.premium_credit_strategy_kind,
+                                                        "csr_percent_as_integer"        => csr_percentage_param,
+                                                        "max_aptc"                      => params[:max_aptc].to_f,
+                                                        "benchmark_plan_id"             => latest_eligibility_determination.benchmark_plan_id,
+                                                        "e_pdc_id"                      => latest_eligibility_determination.e_pdc_id,
+                                                        "source"                        => "Admin"
+                                                        }).save!
+        eligibility_redetermination_result = true
       end
       eligibility_redetermination_result
     end
 
     # Create new Enrollments when Applied APTC for an Enrollment is Updated.
-    def update_aptc_applied_for_enrollments(params)
+    def update_aptc_applied_for_enrollments(family, params, year)
       current_datetime = TimeKeeper.datetime_of_record
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
-      family = Family.find(params[:person][:family_id])
-      max_aptc = family.active_household.latest_active_tax_household.latest_eligibility_determination.max_aptc.to_f
+      #family = Family.find(params[:person][:family_id])
+      max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
       active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
       
       params.each do |key, aptc_value|
@@ -302,7 +313,7 @@ class Admin::Aptc < ApplicationController
           updated_aptc_value = aptc_value.to_f
           actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
           # Only create enrollments if the APTC values were updated.
-          if actual_aptc_value != updated_aptc_value # TODO  && check if the effective_on doesnt go to next year?????
+          if actual_aptc_value != updated_aptc_value # TODO: check if the effective_on doesnt go to next year?????
               percent_sum_for_all_enrolles = 0.0
               enrollment_update_result = true
               original_hbx = HbxEnrollment.find(hbx_id)
@@ -310,9 +321,12 @@ class Admin::Aptc < ApplicationController
               
               # Duplicate Enrollment
               duplicate_hbx = original_hbx.dup
+
+              # Update the following fields
               duplicate_hbx.created_at = current_datetime
               duplicate_hbx.updated_at = current_datetime
-              duplicate_hbx.effective_on = find_enrollment_effective_on_date(current_datetime) # Populate the effective_on date based on the 15th day rule.
+              duplicate_hbx.effective_on = find_enrollment_effective_on_date(current_datetime).to_date # Populate the effective_on date based on the 15th day rule.
+              duplicate_hbx.hbx_id = HbxIdGenerator.generate_policy_id
 
               # Duplicate all Enrollment Members
               duplicate_hbx.hbx_enrollment_members = original_hbx.hbx_enrollment_members.collect {|hem| hem.dup}

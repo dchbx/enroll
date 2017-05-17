@@ -1,0 +1,39 @@
+<html>
+<body>
+  Dear <%= census_employee.full_name.humanize.titleize %>,
+<br/>
+<br/>
+<div>
+  Good News! <%= census_employee.employer_profile.legal_name.titleize %>, has chosen to offer health insurance coverage to its employees through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
+</div>
+<br/>
+<div>
+  In order to enroll into employer-sponsored coverage through <%= Settings.site.short_name %>, you must complete an application for enrollment by <%= census_employee.published_benefit_group_assignment.plan_year.open_enrollment_end_on.to_formatted_s %>, for coverage to be effective on <%= census_employee.published_benefit_group_assignment.plan_year.start_on.to_date.to_formatted_s %>. If you have other coverage, you will still want to “waive” coverage to preserve your special enrollment period rights for the plan year. 
+</div>
+<br/>
+<div>
+  <b>
+    What is Open Enrollment?
+  </b>
+  <br/>
+    Open enrollment is your annual opportunity to enroll in health plans offered by your employer.  Outside of this annual open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain life events such as marriage, birth, or adoption.
+  <br/>
+  <br/>
+  <b>
+    To See Plan Options and Enroll:
+  </b>
+  <br/>
+    If you have an existing DC Health Link account, please log in at <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a> to view the plan options chosen by your employer and complete the enrollment process. If you do not have an existing DC Health Link account, please visit <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a> to create an account and proceed with plan shopping and enrollment.
+  <br/>
+  <h2 style="color: #007bc4;">
+    For Questions or Assistance:
+  </h2>
+  You can contact DC Health Link with any questions:
+  <br/>
+  <ul style="list-style-type:circle">
+    <li>By calling 855-532-5465;</li>
+    <li>Online at <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a></li>
+  </ul>
+</div>
+</body>
+</html>

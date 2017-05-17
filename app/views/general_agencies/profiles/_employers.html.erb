@@ -2,34 +2,9 @@
   <div class="tab-row">
     <div class="tab-content" id="myTabContent">
       <div class="container">
-        <h3>Employers</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>HBX Acct</th>
-              <th>Legal Name</th>
-              <th>FEIN</th>
-              <th>EE Ct</th>
-              <th>Enroll Status</th>
-              <th>Effective Date</th>
-              <th>Broker Agency Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @employers.each do |er| %>
-            <tr>
-              <td><%= er.hbx_id %></td>
-              <td><%= link_to er.legal_name, employers_employer_profile_path(er) + "?tab=home" %></td>
-              <td><%= number_to_obscured_fein(er.fein) %></td>
-              <td><%= er.roster_size %></td>
-              <td><%= er.aasm_state.humanize %></td>
-              <td><%= er.published_plan_year.try(:effective_date) %>
-                <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
-              <td><%= er.broker_agency_profile.organization.legal_name if er.broker_agency_profile.present? %></td>
-            </tr>
-            <% end %>
-          </tbody>
-        </table>
+    <%= raw render_datatable(@datatable,"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], buttons: [
+            'copy','csv','excel','print'
+        ]) %>
       </div>
     </div>
   </div>

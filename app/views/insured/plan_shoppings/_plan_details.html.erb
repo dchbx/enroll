@@ -37,25 +37,34 @@
     <br>
 
     <div class="row">
-      <div class="col-md-9">
+      <div class="col-md-12">
         <table class="table gn-10">
           <thead>
           <tr>
             <th>TYPE</th>
             <th>LEVEL</th>
             <th>NETWORK</th>
-            <th>DEDUCTIBLE</th>
+            <th>
+              <% if @hbx_enrollment.hbx_enrollment_members.size > 1 %>
+                FAMILY DEDUCTIBLE
+              <% else %>
+                DEDUCTIBLE
+              <% end %>
+            </th>
           </tr>
           </thead>
           <tbody>
-          <tr>
-            <td><%= plan.plan_type ? plan.plan_type.upcase : "" %></td>
-
-            <% plan_level = plan.metal_level.humanize %>
-            <td><span class="<%= plan_level.downcase %>-icon"><%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize %></span></td>
-            <td><%= plan.nationwide ? "Nationwide" : "DC-Metro" %></td>
-            <td><%= plan.deductible %></td>
-          </tr>
+            <tr>
+              <td><%= plan.plan_type ? plan.plan_type.upcase : "" %></td>
+              <td>
+                <% plan_level = plan.metal_level.humanize %>
+                <span class="<%= plan_level.downcase %>-icon">
+                  <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize %>
+                </span>
+              </td>
+              <td><%= plan.nationwide ? "Nationwide" : "DC-Metro" %></td>
+              <td> <%= deductible_display(@hbx_enrollment, plan) %> </td>
+            </tr>
           </tbody>
         </table>
       </div>

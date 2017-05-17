@@ -34,7 +34,7 @@ module ShopPolicyCalculations
     if age_of(member) > 20
       1.00
     else
-      if child_index(member) > 2
+      if child_index(member) > 2 && @plan.health?
         0.00
       else
         1.00

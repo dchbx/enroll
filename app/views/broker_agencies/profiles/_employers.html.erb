@@ -4,83 +4,92 @@
     <div class="top-pd" id="inbox_provider_form">
       <span class="flash_message"></span>
       <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
-        <table id="employers_dataTable" class="table table-striped table-bordered dataTable">
-          <thead>
-            <tr>
-              <th><%= check_box_tag '', true, false, id: 'select_all_tag' %></th>
-              <th>HBX Acct</th>
-              <th>Legal Name</th>
-              <th>FEIN</th>
-              <th>EE Ct</th>
-              <th>Enroll Status</th>
-              <th>Effective Date</th>
-              <%if controller_name == 'profiles' %>
-                <th>Assigned Broker</th>
-              <% else %>
-                <th>Broker Agency</th>
-              <% end %>
-              <th>General Agency</th>
-            </tr>
-          </thead>
 
+
+      <div class="module">
+        <table class="table table-striped" id="Broker-Employer-dataTable">
+          <thead>
+          <tr>
+            <th><%= check_box_tag 'BrokerAgencyProfile-check-all' %></th>
+            <th>FEIN</th>
+            <th>Legal Name</th>
+            <th>EE Count</th>
+            <th>ER State</th>
+            <th>Effective Date</th>
+            <th>Broker</th>
+            <th>General Agency</th>
+          </tr>
+          </thead>
           <tbody>
-            <% if @employer_profiles.present?%>
-              <% @employer_profiles.each do |er| %>
-                <tr id="employer_<%= er.id %>">
-                  <% if controller_name == 'profiles' %>
-                    <td><%= check_box_tag "employer_ids[]", er.id, false, class: 'employer_id_checkbox' %></td>
-                  <% end %>
-                  <td><%= er.hbx_id %></td>
-                  <td><%= link_to er.legal_name, employers_employer_profile_path(er) + "?tab=home" %></td>
-                  <td><%= number_to_obscured_fein(er.fein) %></td>
-                  <td><%= er.roster_size %></td>
-                  <td><%= er.aasm_state.humanize %></td>
-                  <td>
-                    <%= pundit_span EmployerProfile, :list_enrollments? %>
-                      <%= er.published_plan_year.try(:effective_date) %>
-                      <%= link_to ' (Review)',employers_premium_statement_path(er) %>
-                  </span>
-                  </td>
-                  <% if controller_name == 'profiles' %>
-                    <% if er.active_broker_agency_account.present? %>
-                      <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
-                      <% edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.memoize_active_broker(@memo)) %>
-                        <td><%= link_to er.memoize_active_broker(@memo).full_name, edit_path, class: "interaction-click-control-broker-show", method: :get %></td>
-                    <% else %>
-                        <td></td>
-                    <% end %>
-                  <% else %>
-                    <% if er.active_broker_agency_account.present? %>
-                      <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
-                        <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
-                    <% else %>
-                        <td>None selected</td>
-                    <% end %>
-                  <% end %>
-                  <td class='general_agency'>
-                    <%= er.hashed_active_general_agency_legal_name(@general_agency_profiles) %>
-                      &nbsp;
-                    <%= pundit_span EmployerProfile, :updateable? %>
-                      <%= link_to 'clear assign', clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: er.id), method: :post, remote: true if er.active_general_agency_account.present? && controller_name == 'profiles' %>
-                    </span>
-                  </td>
-                  <% if @profile %>
-                    <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>
-                  <% end %>
-                </tr>
-              <% end %>
-            <% end %>
           </tbody>
         </table>
+      </div>
+
+
+
+
+      <script type="text/javascript" charset="utf-8">
+        // datatables setup
+        $(document).ready(function() {
+          $('#Broker-Employer-dataTable').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "ordering" : false,
+            "paging": true,
+            "lengthMenu": [ 10, 25, 50, 100],
+            "ajax": {
+              url: "<%= employer_datatable_broker_agencies_profile_path(id: @broker_agency_profile.id, :format => :json) %>",
+              type: "POST",
+              data: function ( d ) {
+                console.log("Broker-Employer-dataTable datatable")
+              }
+            },
+            "columns": [
+              { data: 'nothing'},
+              { data: 'fein' },
+              { data: 'legal_name' },
+              { data: 'ee_count'},
+              { data: 'er_state'},
+              { data: 'effective_date'},
+              { data: 'broker'},
+              { data: 'general_agency'},
+	      ],
+  'dom': "<'row'" +
+            "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
+          ">" +
+          "<'row'" +
+            "<'col-sm-12 col-md-12'>" +
+          ">" +
+          "<'row'" +
+            "<'col-sm-12 col-md-12'tr>"+
+          ">" +
+          "<'row'" +
+            "<'col-sm-11 col-md-11'i><'col-sm-1 col-md-1'l>" +
+          ">" +
+          "<'row'" +
+            "<'col-sm-12 col-md-12'p>" +
+          ">"
+          } );
+        });
+
+        $('#BrokerAgencyProfile-check-all').click(function() {
+            var action = $(this).is(':checked') ? true : false;
+            var group = $('input[name="employer_ids[]"]');
+            group.each(function () {
+              $(this).prop("checked", action);
+            });
+        });
+
+
+      </script>
+
 
         <div class="col-md-4">
           <h3>General Agencies</h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
           <%= hidden_field_tag :from_assign, false %>
-          <%= pundit_span EmployerProfile, :updateable?  %>
-            <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
-            <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
-          </span>
+          <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+          <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
         </div>
       <% end %>
     </div>

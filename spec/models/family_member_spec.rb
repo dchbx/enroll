@@ -29,6 +29,18 @@ describe FamilyMember, "given a person" do
   end
 end
 
+
+describe FamilyMember, "given a person" do
+  let(:person) { create :person ,:with_family }
+
+  it "should error when trying to save duplicate family member" do
+    family_member = FamilyMember.new(:person => person) 
+    person.families.first.family_members << family_member
+    person.families.first.family_members << family_member
+    expect(family_member.errors.full_messages.join(",")).to match(/Family members Duplicate family_members for person/)
+  end
+end
+
 describe FamilyMember, dbclean: :after_each do
   context "a family with members exists" do
     include_context "BradyBunchAfterAll"

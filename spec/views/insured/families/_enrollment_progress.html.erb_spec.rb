@@ -7,6 +7,7 @@ RSpec.describe "insured/families/_enrollment_progress.html.erb" do
   before :each do
     #assign(:hbx_enrollment, hbx_enrollment)
     allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+    allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
     render partial: "insured/families/enrollment_progress", locals: {step: 2}, collection: [hbx_enrollment], as: :hbx_enrollment
   end
 

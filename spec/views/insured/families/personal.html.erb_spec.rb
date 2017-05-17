@@ -31,7 +31,7 @@ RSpec.describe "insured/families/personal.html.erb" do
    it_should_behave_like "display_heading"
 
    it "should display contact method dropdown " do
-    expect(rendered).to have_select("person[employee_roles_attributes][0][contact_method]", :selected => "Only Paper communication")
+    expect(rendered).to have_select("person[employee_roles_attributes][0][contact_method]", :selected => "Only Electronic communications")
    end
 
    it "should display language preference dropdown " do

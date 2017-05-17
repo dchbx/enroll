@@ -9,7 +9,9 @@ module PdfTemplates
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
+    attribute :enrollment, PdfTemplates::Enrollment
     attribute :email, String
+    attribute :plan_year, PdfTemplates::PlanYear
 
     def shop?
       return true

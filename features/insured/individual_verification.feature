@@ -32,12 +32,21 @@ Feature: Consumer verification process
   Scenario: Consumer with outstanding verification and uploaded documents
     Given a consumer exists
     And the consumer is logged in
+    And consumer has outstanding verification and unverified enrollments
     When the consumer visits verification page
+    Then consumer should see Verification Due date label
+    And consumer should see Documents FAQ link
     And the consumer should see documents verification page
     Then the consumer can expand the table by clicking on caret sign
 
 
-
+  Scenario: Consumer is fully_verified should see verification types
+    Given a consumer exists
+    And the consumer is logged in
+    When the consumer is completely verified
+    Then the consumer visits verification page
+    And the consumer should see documents verification page
+    Then verification types have to be visible
 
 
 

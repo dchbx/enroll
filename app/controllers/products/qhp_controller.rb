@@ -48,19 +48,9 @@ class Products::QhpController < ApplicationController
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-    if @market_kind == 'employer_sponsored' && (@coverage_kind == 'health' || @coverage_kind == "dental")
-      @benefit_group = @hbx_enrollment.benefit_group
-      @reference_plan = @coverage_kind == "health" ? @benefit_group.reference_plan : @benefit_group.dental_reference_plan
-      if @benefit_group.is_congress
-        @plan = PlanCostDecoratorCongress.new(@qhp.plan, @hbx_enrollment, @benefit_group)
-      else
-        @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
-      end
+    @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.plan)
+    @plan = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.plan)
 
-      #@plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
-    else
-      @plan = UnassistedPlanCostDecorator.new(@qhp.plan, @hbx_enrollment)
-    end
     respond_to do |format|
       format.html
       format.js
@@ -85,7 +75,7 @@ class Products::QhpController < ApplicationController
       return
     end
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
-    @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.kind == "employer_sponsored") ? "employer_sponsored" : "individual"
+    @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.is_shop?) ? "employer_sponsored" : "individual"
     @coverage_kind = if @hbx_enrollment.plan.present?
       @hbx_enrollment.plan.coverage_kind
     else

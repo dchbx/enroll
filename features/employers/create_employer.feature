@@ -16,7 +16,7 @@ Feature: Create Employer
       Then John Doe creates an HBX account
       Then I should see a successful sign up message
       Then I should click on employer portal
-      Then John Doe creates a new employer profile
+      Then John Doe creates a new employer profile with non_dc_office_location
       When I go to the Profile tab
       When Employer goes to the benefits tab I should see plan year information
       And Employer should see a button to create new plan year
@@ -29,7 +29,14 @@ Feature: Create Employer
       When Employer goes to the benefits tab
       Then Employer should see the plan year
       When Employer clicks on publish plan year
-      Then Employer should see Publish Plan Year Modal with warnings
+      Then Employer should see Publish Plan Year Modal with address warnings
+      When Employer clicks on the Cancel button
+      Then Employer should be on the business info page with warnings
+      When Employer updates the address location with correct address
+      When Employer goes to the benefits tab
+      Then Employer should see the plan year
+      When Employer clicks on publish plan year
+      Then Employer should see Publish Plan Year Modal with FTE warnings
       When Employer clicks on the Cancel button
       Then Employer should be on the Plan Year Edit page with warnings
       When Employer updates the FTE field with valid input and save plan year

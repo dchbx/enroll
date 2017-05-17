@@ -206,8 +206,8 @@ class ApplicationController < ActionController::Base
     append_after_action :clear_current_user
 
     def set_current_person(required: true)
-      if current_user.try(:person).try(:agent?)
-        @person = session[:person_id].present? ? Person.find(session[:person_id]) : nil
+      if current_user.try(:person).try(:agent?) && session[:person_id].present?
+        @person = Person.find(session[:person_id])
       else
         @person = current_user.person
       end
@@ -277,6 +277,14 @@ class ApplicationController < ActionController::Base
       bookmark_url = url || request.original_url
       save_bookmark role, bookmark_url
       session[:last_market_visited] = 'individual'
+    end
+
+    def set_resident_bookmark_url(url=nil)
+      set_current_person
+      role = @person.try(:resident_role)
+      bookmark_url = url || request.original_url
+      save_bookmark role, bookmark_url
+      session[:last_market_visited] = 'resident'
     end
 
     def stashed_user_password

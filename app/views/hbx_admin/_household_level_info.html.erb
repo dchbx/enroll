@@ -24,8 +24,14 @@
           <tr>
             <td width="140px;" ><%=if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end%></td>
             <% @household_info[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
-              <td class="<%=aptc_csr_data_type(@current_year, month)%>"> 
-                <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
+              <td class="<%=aptc_csr_data_type(@current_year, month)%>">
+                <%if attribute == "available_aptc" && val.to_i < 0 %> <!--If this is an available APTC with a negative value ?-->
+                  <i data-toggle="tooltip" title="Available APTC is less than 0.">
+                    <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels-negative', readonly: true, disabled: true, style: "text-align:right;"%>
+                  </i>
+                <%else%>
+                  <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
+                <%end%>
               </td>
             <%end%>
           </tr>

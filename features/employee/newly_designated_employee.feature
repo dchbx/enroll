@@ -13,7 +13,8 @@ Feature: Newly designated employees can purchase coverage only through renewing 
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
       Then Employee should see the matched employee record form
-      Then Employee Soren White should see renewing plan year start date as earliest effective date
+      Then Employee Soren White should have the renewing plan year start date as earliest effective date
+      And Employee Soren White should not see earliest effective date on the page
 
   Scenario: Newly designated can't buy coverage before open enrollment of renewing plan year through Shop for Plans
     Given Congressional Employer for Soren White exists with active and renewing plan year
@@ -34,7 +35,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
       When Employee clicks continue on the group selection page
       Then Soren White should see "open enrollment not yet started" error message
 
-  Scenario: Newly designated can't buy coverage under previous year plan year using QLE
+  Scenario: Newly designated can't buy coverage under previous year plan year using QLE if he is not eligible
     Given Congressional Employer for Soren White exists with active and renewing plan year
       And Soren White is newly designated
       And Employee has current hired on date
@@ -46,7 +47,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
       Then Employee should see "employer-sponsored benefits not found" error message
-          
+
   Scenario: Newly designated can buy coverage during open enrollment of renewing plan year
     Given Congressional Employer for Soren White exists with active and renewing plan year
       And Soren White is newly designated

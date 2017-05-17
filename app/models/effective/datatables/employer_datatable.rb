@@ -33,7 +33,7 @@ module Effective
           @latest_plan_year.try(:start_on)
           }, :filter => false
         table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
-        table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent_based_on_summary)}, :filter => false
+        table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
         table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
 
           enrolled = @latest_plan_year.try(:enrolled_summary)

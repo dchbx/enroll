@@ -2,7 +2,10 @@ class EmployerStaffRole
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
+  extend Acapi::Notifiers
 
+  after_update :notify_contact_changed
   embedded_in :person
   field :is_owner, type: Boolean, default: true
   field :employer_profile_id, type: BSON::ObjectId
@@ -26,6 +29,10 @@ class EmployerStaffRole
 
   def current_state
     aasm_state.humanize.titleize
+  end
+
+  def notify_contact_changed
+    notify("acapi.info.events.employer.contact_changed", {employer_id: EmployerProfile.find(self.employer_profile_id).hbx_id, event_name: "contact_changed"})
   end
 
 end

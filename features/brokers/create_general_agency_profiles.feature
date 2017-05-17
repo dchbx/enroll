@@ -59,7 +59,7 @@ Feature: Create General Agency and General Agency Staff Role
       Then John Wood creates an HBX account
       Then John Wood should see a successful sign up message
       Then I should click on employer portal
-      And John Wood creates a new employer profile
+      And John Wood creates a new employer profile with default_office_location
       When Employer clicks on the Brokers tab
       Then Employer should see no active broker
       When Employer click on Browse Brokers button

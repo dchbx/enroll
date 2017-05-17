@@ -303,11 +303,49 @@ var EmployerProfile = ( function( window, undefined ) {
       Freebies.tooltip();
   }
 
+  function validateCobraBeginDate() {
+    var hired_on_str = $('#census_employee_hired_on_jq_datepicker_plain_field').val();
+    var cobra_begin_date_str = $('#census_employee_cobra_begin_date_jq_datepicker_plain_field').val();
+    if($('#census_employee_existing_cobra').prop("checked") == true){
+      if (hired_on_str != '' && cobra_begin_date_str != ''){
+        var hired_on = new Date(hired_on_str);
+        var cobra_begin_date = new Date(cobra_begin_date_str);
+        if (hired_on > cobra_begin_date) {
+          alert('Hire Date must be before Cobra Begin Date.');
+        }
+      }
+    }
+  }
+
+  function submitCobraDate(type, ce_id) {
+    var target = $("tr."+type+'_'+ce_id);
+    var cobra_date = target.find('input.date-picker').val();
+    var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+    $.ajax({
+      type: 'get',
+      datatype : 'js',
+      url: cobra_link,
+      data: {cobra_date: cobra_date},
+    });
+  }
+
+  function viewCobraDateField() {
+    var target = $('#census_employee_existing_cobra');
+    if(target.prop("checked") == true){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').removeClass('hidden');
+    }else if(target.prop("checked") == false){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').addClass('hidden');
+    }
+  }
+
   return {
       changeCensusEmployeeStatus: changeCensusEmployeeStatus,
       validateEditPlanYear : validateEditPlanYear,
       validatePlanYear : validatePlanYear,
-      viewDetails : viewDetails
+      validateCobraBeginDate : validateCobraBeginDate,
+      viewDetails : viewDetails,
+      viewCobraDateField : viewCobraDateField,
+      submitCobraDate : submitCobraDate,
     };
 
 } )( window );
@@ -387,28 +425,25 @@ $(function() {
   $('div[name=employee_family_tabs] > ').children().each( function() {
     $(this).change(function(){
       filter = $(this).val();
-      search = $("#census_employee_search input#employee_name").val();
+      search = $("#census_employee_search input#employee_search").val();
       $('#employees_' + filter).siblings().hide();
       $('#employees_' + filter).show();
       $.ajax({
         url: $('span[name=employee_families_url]').text() + '.js',
         type: "GET",
-        data : { 'status': filter, 'employee_name': search },
+        data : { 'status': filter, 'employee_search': search },
         crossDomain: true,
         xhrFields: {
           withCredentials: true
+        },
+        success: function (data) {
+          $("#status").val(filter);
+          $("#filter-span").text(filter);
         }
       });
     })
   })
 })
-
-$(document).on('click', ".show_confirm", function(){
-  var el_id = $(this).attr('id');
-  $( "td." + el_id ).toggle();
-  $( "#confirm-terminate-2" ).hide();
-  return false
-});
 
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
@@ -447,6 +482,7 @@ $(document).on('click', ".rehire_confirm", function(){
     }
   });
 });
+
 
 $(document).on('change', '.dependent_info input.dob-picker', function(){
   var element = $(this).val().split("/");
@@ -509,7 +545,7 @@ function setProgressBar(){
 }
 
 $(document).on('click', '#census_employee_search_clear', function() {
-  $('form#census_employee_search input#employee_name').val('');
+  $('form#census_employee_search input#employee_search').val('');
   $("form#census_employee_search").submit();
 })
 

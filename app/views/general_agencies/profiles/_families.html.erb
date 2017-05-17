@@ -3,52 +3,11 @@
     <div class="tab-content" id="myTabContent">
       <div class="container">
         <div id="families">
-          <div class="form-inline button-group-wrapper families_search_div">
-            <div class="input-group search-wp">
-              <%= render 'shared/search', url: families_general_agencies_profile_path, q: @q, placeholder: "Name", remote: true %>
-            </div>
+          <%= raw render_datatable(@datatable,"lengthMenu": [[10, 25, 50], [10, 25, 50]], buttons: [
+            'copy','csv','excel','print'
+        ]) %>
           </div>
-          <h3>Family</h3>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>SSN</th>
-                <th>DOB</th>
-                <th>HBX ID</th>
-                <th>Family Ct</th>
-                <th>Registered?</th>
-                <th>Consumer?</th>
-                <th>Employee?</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <%= table_empty_to_human if @families.count == 0 %>
-              <% @families.each do |family| %>
-                <% pp = family.primary_applicant.person %>
-
-                <tr id="family_<%= family.id %>">
-                  <td >
-                    <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), class: 'btn btn-normal'%> <br/>
-                  </td>
-                  <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
-                    <td><%= format_date(pp.dob) %></td>
-                    <td><%= pp.hbx_id %></td>
-                    <td><%= family.active_family_members.size %></td>
-                    <td><%= pp.user.present? ? "Yes" : "No" %></td>
-                    <td class='consumer_role_present'><%= pp.consumer_role.present?  ? "Yes" : "No" %></td>
-                    <td class='employee_role_present'><%= pp.employee_roles.present?  ? "Yes" : "No" %></td>
-                    <td class='unblock'>
-                      <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-          <%= render 'shared/alph_paginate_remote', url: families_general_agencies_profile_path(@general_agency_profile), alphs: @page_alphabets, all: families_general_agencies_profile_path(@general_agency_profile) %>
+        </div>
       </div>
     </div>
   </div>

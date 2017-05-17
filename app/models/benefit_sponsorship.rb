@@ -8,7 +8,7 @@ class BenefitSponsorship
   # person/roles can determine which sponsor in a class has a relationship (offer products)
   # which benefit packages should be offered to person/roles
 
-  SERVICE_MARKET_KINDS = %w(shop individual)
+  SERVICE_MARKET_KINDS = %w(shop individual coverall)
 
   field :service_markets, type: Array, default: []
 

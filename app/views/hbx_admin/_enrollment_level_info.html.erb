@@ -5,7 +5,8 @@
 <div class="panel panel-info">  
   <div class="panel-heading">
     <h2 class="panel-title">
-      <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse">    <i class="fa fa-users" aria-hidden="true"></i>   </a>&nbsp;<b>Active Enrollment <%=enrollment_count%></b>
+      <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse">    <i class="fa fa-users" aria-hidden="true"></i>   </a>
+      &nbsp;<b>Active Enrollment <%=enrollment_count%></b>&nbsp;&nbsp;&nbsp; <small>Effective On: <%=find_enrollment(hbx_id).effective_on%></small>
       <div style="float:right">
         <div id="loading-<%=hbx_id%>-aptc"></div>
       </div>

@@ -1,0 +1,26 @@
+<% person = member.person %>
+<tr class="collapse dn" id="<%= member.id %>">
+  <td colspan="5" class="td-container">
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <% person.resident_role.paper_applications.each_with_index do |paper_app, i | %>
+          <tr class="<% if i == 0 %>bt-n<% elsif i+1 == person.resident_role.paper_applications.count %>bb<% end %>" id="doc_table_row_<%=paper_app.id%>">
+            <% if paper_app.identifier.present? %>
+              <td>
+                <% key = paper_app.identifier.split('#').last %>
+                <%= link_to "#{paper_app.subject} <i class='fa fa-cloud-download' aria-hidden='true'></i>".html_safe, "/insured/paper_applications/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>&nbsp;
+                  <% if show_doc_status(paper_app.status) %>
+                    <span class="label label-<%=doc_status_label(paper_app)%>"><%= paper_app.status.titleize %></span>
+                  <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </td>
+</tr>
+
+<script type="text/javascript" charset="utf-8">
+  Freebies.popover();
+</script>

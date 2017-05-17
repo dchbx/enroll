@@ -2,6 +2,7 @@ class SpecialEnrollmentPeriod
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include TimeHelper
 
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
@@ -61,6 +62,7 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
+  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range
 
   validates :csl_num,
     length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
@@ -134,12 +136,28 @@ class SpecialEnrollmentPeriod
     end_on - start_on
   end
 
-  def self.find(search_id)
-    family = Family.by_special_enrollment_period_id(search_id).first
-    family.special_enrollment_periods.detect() { |sep| sep._id == search_id } unless family.blank?
+  def self.find(id)
+    family = Family.where("special_enrollment_periods._id" => BSON::ObjectId.from_string(id)).first
+    family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
   end
 
-  private
+private
+  def next_poss_effective_date_within_range
+    return if next_poss_effective_date.blank?
+    min_date = sep_optional_date family, 'min', self.market_kind
+    max_date = sep_optional_date family, 'max', self.market_kind
+    errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
+  end
+
+  def optional_effective_on_dates_within_range
+    optional_effective_on.each_with_index do |date_option, index|
+      date_option = Date.strptime(date_option, "%m/%d/%Y")
+      min_date = sep_optional_date family, 'min', self.market_kind
+      max_date = sep_optional_date family, 'max', self.market_kind
+      errors.add(:optional_effective_on, "Date #{index+1} option out of range.") if not date_option.between?(min_date, max_date)
+    end
+  end
+
   def set_sep_dates
     return unless @qualifying_life_event_kind.present? && qle_on.present? && effective_on_kind.present?
     set_submitted_at
@@ -183,7 +201,7 @@ class SpecialEnrollmentPeriod
     person = self.family.primary_applicant.person if self.family
     employee_role = person.active_employee_roles.first if person.present?
     employer_profile = employee_role.employer_profile if employee_role.present?
-    if employee_role && employer_profile.plan_years.published_plan_years_by_date(effective_on).blank? && employer_profile.show_plan_year.present?
+    if employee_role && employer_profile.plan_years.published_plan_years_by_date(effective_on).blank? && employer_profile.show_plan_year.present? && employee_role.employer_profile.find_plan_year_by_effective_date(self.effective_on).blank?
       plan_year_start_on = employer_profile.show_plan_year.start_on
       self.effective_on = plan_year_start_on if effective_on < plan_year_start_on
     end

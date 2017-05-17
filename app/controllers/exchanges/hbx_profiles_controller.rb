@@ -260,7 +260,7 @@ def employer_poc
           hbx.cancel_coverage! if hbx.may_cancel_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
@@ -275,7 +275,7 @@ def employer_poc
   end
 
   def terminate_enrollment
-    @hbxs = Family.find(params[:family]).all_enrollments.cancel_eligible
+    @hbxs = Family.find(params[:family]).all_enrollments.can_terminate
     @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
@@ -295,7 +295,7 @@ def employer_poc
           hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
@@ -306,10 +306,14 @@ def employer_poc
   end
 
   def broker_agency_index
-    @broker_agency_profiles = BrokerAgencyProfile.all
+
+    @datatable = Effective::Datatables::BrokerAgencyDatatable.new
+
+    #@q = params.permit(:q)[:q]
+    #@broker_agency_profiles = HbxProfile.search_random(@q)
+
 
     respond_to do |format|
-      format.html { render "broker" }
       format.js {}
     end
   end
@@ -435,7 +439,7 @@ def employer_poc
     authorize  Family, :can_update_ssn?
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
-    @ssn_match = Person.find_by_ssn(params[:person][:ssn])
+    @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
 
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
@@ -600,19 +604,16 @@ private
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
       root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
       body =
-        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " +
-        "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
-        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
+        "Please contact #{insured.first_name} #{insured.last_name}. <br> " +
+        "Plan shopping help has been requested by #{insured_email}<br>" +
         "<a href='" + root+"phone'>Assist Customer</a>  <br>"
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
       name = first_name.to_s + ' ' + last_name.to_s
       insured_email = params[:email]
-      body =  "Please contact #{first_name} #{last_name}. <br/>" +
+      body =  "Please contact #{first_name} #{last_name}. <br>" +
         "Plan shopping help has been requested by #{insured_email}<br>"
-      body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
-      body += "DOB #{params[:dob]} <br>" if params[:dob].present?
     end
     hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
     message_params = {

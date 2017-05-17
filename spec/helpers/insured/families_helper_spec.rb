@@ -1,4 +1,4 @@
-  require "rails_helper"
+require "rails_helper"
 
 RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
@@ -9,8 +9,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_two]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     let(:hbx_enrollment_member_two) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
-
-
+    
     it "it should return subscribers full name in span with dependent-text class" do
       allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(true)
       allow(hbx_enrollment_member).to receive_message_chain("person.full_name").and_return("Bobby Boucher")
@@ -199,4 +198,78 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   end
 
+  describe "#tax_info_url" do
+    context "production environment" do
+      it "should redirect from production environment" do
+        allow(ENV).to receive(:[]).with("AWS_ENV").and_return("prod")
+        expect(helper.tax_info_url).to eq "https://dchealthlink.com/individuals/tax-documents"
+      end
+    end 
+
+    context "non-production environment" do
+      it "should redirect from test environment" do
+        allow(ENV).to receive(:[]).with("AWS_ENV").and_return("preprod")
+        expect(helper.tax_info_url).to eq "https://staging.dchealthlink.com/individuals/tax-documents"
+      end
+    end
+  end
+
+  describe "show_download_tax_documents_button?" do
+    let(:person) { FactoryGirl.create(:person)}
+    
+    before do
+      helper.instance_variable_set(:@person, person)
+    end
+    
+    context "as consumer" do
+      let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+      context "had a SSN" do
+        before do
+          person.consumer_role = consumer_role
+            person.ssn = '123456789'
+        end   
+        it "should display the download tax documents button" do
+         expect(helper.show_download_tax_documents_button?).to eq true
+        end
+
+        context "current user is hbx staff" do
+          let(:current_user) { FactoryGirl.build(:hbx_staff)}
+          it "should display the download tax documents button" do
+            expect(helper.show_download_tax_documents_button?).to eq true
+          end
+        end
+      end
+
+      context "had no SSN" do
+        before do
+          person.ssn = ''
+        end   
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button?).to eq false
+        end
+      end
+
+    end
+
+    context "as employee and has no consumer role" do
+      let(:person) { FactoryGirl.create(:person)}
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
+
+      before do
+        person.employee_roles = [employee_role]
+      end
+
+      context "had a SSN" do
+        before do
+          person.ssn = '123456789'
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button?).to eq false
+        end
+      end
+    end
+
+  end
 end

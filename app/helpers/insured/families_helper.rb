@@ -14,8 +14,10 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.kind == 'employer_sponsored'
+    if hbx_enrollment.is_shop?
       hbx_enrollment.total_employee_cost
+    elsif hbx_enrollment.kind == 'coverall'
+      hbx_enrollment.total_premium
     else
       hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
     end
@@ -127,6 +129,7 @@ module Insured::FamiliesHelper
   def disable_make_changes_button?(hbx_enrollment)
     # return false if IVL
     return false if hbx_enrollment.census_employee.blank?
+    return false if !hbx_enrollment.is_shop?
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
@@ -163,7 +166,27 @@ module Insured::FamiliesHelper
     if enrollment.is_shop?
       true
     else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing'].include?(enrollment.aasm_state.to_s)
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
+    end
+  end
+
+  def formatted_enrollment_states
+    {
+      'coverage_terminated' => 'Terminated',
+      'coverage_expired' => 'Coverage Period Ended'
+    }
+  end
+
+  def enrollment_coverage_end(hbx_enrollment)
+    if hbx_enrollment.coverage_terminated?
+      hbx_enrollment.terminated_on
+    elsif hbx_enrollment.coverage_expired?
+      if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group_assignment.present?
+        hbx_enrollment.benefit_group_assignment.benefit_group.end_on
+      else
+        benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.by_date(hbx_enrollment.effective_on).first
+        benefit_coverage_period.end_on
+      end
     end
   end
 
@@ -185,5 +208,23 @@ module Insured::FamiliesHelper
 
   def dual_role_without_shop_sep?
     @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
+  end
+
+  def tax_info_url
+    if ENV['AWS_ENV'] == 'prod'
+      "https://dchealthlink.com/individuals/tax-documents"
+    else
+      "https://staging.dchealthlink.com/individuals/tax-documents"
+    end
+  end
+
+  def show_download_tax_documents_button?
+    if @person.ssn.blank?
+      false
+    elsif @person.consumer_role.blank?
+      false
+    elsif @person.consumer_role.present? 
+      true
+    end
   end
 end

@@ -1,23 +1,23 @@
 require File.join(Rails.root, "lib/migration_task")
 
-class DefinePermissions < MigrationTask 
+class DefinePermissions < MigrationTask
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'
 
   def initial_hbx
-    Permission.where(name: /^hbx/).delete_all   
+    Permission.where(name: /^hbx/).delete_all
   	Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
   	  send_broker_agency_message: true, approve_broker: true, approve_ga: true,
   	  modify_admin_tabs: true, view_admin_tabs: true)
     Permission.create(name: 'hbx_read_only', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
   	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-  	  modify_admin_tabs: false, view_admin_tabs: true)  
+  	  modify_admin_tabs: false, view_admin_tabs: true)
   	Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
   	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
   	  modify_admin_tabs: false, view_admin_tabs: false)
   	Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
   	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-  	  modify_admin_tabs: false, view_admin_tabs: false)  
+  	  modify_admin_tabs: false, view_admin_tabs: false)
     Permission.create(name: 'hbx_csr_tier1', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: false,
   	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
   	  modify_admin_tabs: false, view_admin_tabs: false)
@@ -53,5 +53,8 @@ class DefinePermissions < MigrationTask
   end
   def hbx_admin_can_update_ssn
     Permission.hbx_staff.update_attributes(can_update_ssn: true)
+  end
+  def hbx_admin_can_complete_resident_application
+    Permission.hbx_staff.update_attributes(can_complete_resident_application: true)
   end
 end

@@ -19,11 +19,23 @@
         <%if @enrollment_update_result %> <li><h4>Enrollment(s) updated with new Applied APTC value(s).</h4></li> <%end%>
       </ul>
     </div>
+    <br />
+    <div class = "row">
+      <%if @hbxs.present?%>
+        <%@household_info["available_aptc"].each do |key, val|%>
+          <%if val.to_i < 0%>
+            <div class="alert alert-warning row">
+              <span class="glyphicon glyphicon-warning-sign gi" aria-hidden="true"></span>
+                For the month of <b><%=key%></b>, the Max APTC on the Eligibility Determination is <b><%=params[:max_aptc]%></b> out of which <b><%=params[:max_aptc].to_i - val.to_i%></b> has been applied towards Enrollment(s). (Available APTC is <b><%=val%></b>)
+             </div>
+          <%end%>
+        <%end%>
+      <%end%>
+    </div
   <%end%>
-  <br />
+  <br/><br/>
   <div class="row">
     <i class="fa fa-list" aria-hidden="true"></i> &nbsp;
-    <%#= link_to ' Go back to APTC / CSR Families List', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
     <%= link_to '<i class="fa fa-chevron-left"></i> Go back to Families Index'.html_safe, family_index_dt_exchanges_hbx_profiles_path, remote: true %>
   </div>
 </div>

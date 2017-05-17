@@ -447,7 +447,7 @@ Given(/^Company Tronics is created with benefits$/) do
   step "Tronics creates an HBX account"
   step "Tronics should see a successful sign up message"
   step "I should click on employer portal"
-  step "Tronics creates a new employer profile"
+  step "Tronics creates a new employer profile with default_office_location"
   step "Tronics creates and publishes a plan year"
   step "Tronics should see a published success message without employee"
 end
@@ -564,5 +564,4 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")
-
 end

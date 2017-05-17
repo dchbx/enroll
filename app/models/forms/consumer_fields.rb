@@ -32,21 +32,19 @@ module Forms
 
         def naturalized_citizen
           return @naturalized_citizen if !@naturalized_citizen.nil?
-          return nil if @citizen_status.blank?
+          return nil if (@us_citizen.nil? || @us_citizen)
           @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == @citizen_status)
         end
 
         def indian_tribe_member
           return @indian_tribe_member if !@indian_tribe_member.nil?
-          return nil if @citizen_status.blank?
+          return nil if @indian_tribe_member.nil?
           @indian_tribe_member ||= (::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS == @citizen_status)
         end
 
         def eligible_immigration_status
           return @eligible_immigration_status if !@eligible_immigration_status.nil?
-          return nil if @us_citizen.nil?
-          return nil if @us_citizen
-          return nil if @citizen_status.blank?
+          return nil if (@us_citizen.nil? || !@us_citizen)
           @eligible_immigration_status ||= (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == @citizen_status)
         end
 

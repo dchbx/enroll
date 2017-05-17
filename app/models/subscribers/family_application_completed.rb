@@ -50,8 +50,8 @@ module Subscribers
       end
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
-      throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
-      family.e_case_id = verified_family.integrated_case_id if family.e_case_id.blank? || (family.e_case_id.include? "curam_landing")
+      #throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
+      family.e_case_id = verified_family.integrated_case_id
       begin
         active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
       rescue
@@ -130,6 +130,8 @@ module Subscribers
               pr.subject_individual_id == verified_primary_family_member.id
           end.first.relationship_uri.split('#').last
 
+          relationship = PersonRelationship::InverseMap[relationship]
+
           if existing_person.present?
             find_or_build_consumer_role(existing_person)
             update_vlp_for_consumer_role(existing_person.consumer_role, verified_family_member)
@@ -184,7 +186,8 @@ module Subscribers
 
       if !ssn.blank?
         Person.where({
-          :encrypted_ssn => Person.encrypt_ssn(ssn)
+          :encrypted_ssn => Person.encrypt_ssn(ssn),
+          :dob => dob
         }).first
       else
         Person.where({

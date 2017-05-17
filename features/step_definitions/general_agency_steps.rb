@@ -167,7 +167,7 @@ Then(/^.+ should see list of employers and assign portal$/) do
 end
 
 When(/^.+ assign employer to general agency$/) do
-  find("input#employer_ids_").click
+  find("input[id^='broker_dt_employer_ids_']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Housecare Inc')]").click
   find("#assign_general_agency").click

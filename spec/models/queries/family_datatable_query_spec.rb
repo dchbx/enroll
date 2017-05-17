@@ -3,12 +3,12 @@ require 'rails_helper'
 describe Queries::FamilyDatatableQuery, "Filter Scopes for families Index", dbclean: :after_each do
   it "filters: by_enrollment_individual_market" do
     fdq = Queries::FamilyDatatableQuery.new({"families" => "by_enrollment_individual_market"})
-    expect(fdq.build_scope.selector).to eq ({"households.hbx_enrollments.aasm_state"=>{"$in"=>HbxEnrollment::ENROLLED_STATUSES}, "households.hbx_enrollments.kind" => {"$ne"=>"employer_sponsored"}})
+    expect(fdq.build_scope.selector).to eq ({"households.hbx_enrollments.aasm_state"=>{"$in"=>["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "enrolled_contingent", "unverified"]}, "households.hbx_enrollments.kind"=>{"$in"=>["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]}})
   end
 
   it "filters: by_enrollment_shop_market" do
     fdq = Queries::FamilyDatatableQuery.new({"families" => "by_enrollment_shop_market"})
-    expect(fdq.build_scope.selector).to eq ({"households.hbx_enrollments.aasm_state"=>{"$in"=>HbxEnrollment::ENROLLED_STATUSES}, "households.hbx_enrollments.kind"=>"employer_sponsored"})
+    expect(fdq.build_scope.selector).to eq ({"households.hbx_enrollments.aasm_state"=>{"$in"=>HbxEnrollment::ENROLLED_STATUSES}, "households.hbx_enrollments.kind"=>{"$in"=>["employer_sponsored", "employer_sponsored_cobra"]}})
   end
 
   it "filters: non_enrolled" do

@@ -19,6 +19,10 @@ FactoryGirl.define do
       #create_list(:employee_role, 1, person: p)
     end
 
+    trait :with_ssn do
+      sequence(:ssn) { |n| 222222220 + n }
+    end
+
     trait :with_work_email do
       emails { [FactoryGirl.build(:email, kind: "work") ] }
     end
@@ -77,13 +81,19 @@ FactoryGirl.define do
 
     trait :with_consumer_role do
       after(:create) do |p, evaluator|
-        create_list(:consumer_role, 1, person: p)
+        create_list(:consumer_role, 1, person: p, dob: p.dob)
       end
     end
 
     trait :with_employee_role do
       after(:create) do |p, evaluator|
         create_list(:employee_role, 1, person: p)
+      end
+    end
+
+    trait :with_resident_role do
+      after(:create) do |p, evaluator|
+        create_list(:resident_role, 1, person: p)
       end
     end
 
@@ -117,7 +127,7 @@ FactoryGirl.define do
     factory :person_with_employee_role do
 
       after(:create) do |person, evaluator|
-        create_list(:employee_role, 1, person: person, census_employee_id: evaluator.census_employee_id, employer_profile_id: evaluator.employer_profile_id, hired_on: evaluator.hired_on)
+        create_list(:employee_role, 1, person: person, census_employee_id: evaluator.census_employee_id, employer_profile_id: evaluator.employer_profile_id, hired_on: evaluator.hired_on, ssn: evaluator.ssn, dob: evaluator.dob)
       end
     end
   end

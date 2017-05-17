@@ -10,7 +10,7 @@ class MigratePlanYear < MongoidMigrationTask
     organizations.each do |organization|
       plan_years = organization.employer_profile.plan_years
       plan_years.each do |plan_year|
-      plan_year.migration_expire! if plan_year.may_migration_expire?
+      plan_year.conversion_expire! if plan_year.may_conversion_expire?
       end
     end
   end

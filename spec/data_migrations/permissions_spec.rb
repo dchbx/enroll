@@ -38,4 +38,19 @@ describe DefinePermissions do
       expect(Person.all.map{|p|p.hbx_staff_role.subrole}).to match_array roles
     end
   end
-end  
+  describe 'update permissions for hbx staff role' do
+    let(:given_task_name) {':hbx_admin_can_complete_resident_application'}
+    before do
+      User.all.delete
+      Person.all.delete
+      person = FactoryGirl.create(:person)
+      permission = FactoryGirl.create(:permission, :hbx_staff)
+      role = FactoryGirl.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: permission.id)
+      subject.hbx_admin_can_complete_resident_application
+    end
+    it "updates can_complete_resident_application to true" do
+    expect(Person.all.count).to eq(1)
+    expect(Person.first.hbx_staff_role.permission.can_complete_resident_application).to be true
+    end
+  end
+end

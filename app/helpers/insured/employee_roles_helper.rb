@@ -7,14 +7,22 @@ module Insured::EmployeeRolesHelper
     end
   end
 
-  def coverage_relationship_check(offered_relationship_benefits=[], family_member)
+  def coverage_relationship_check(offered_relationship_benefits=[], family_member, new_effective_on )
     relationship = PlanCostDecorator.benefit_relationship(family_member.primary_relationship)
-
-    if relationship == "child_under_26" && calculate_age_by_dob(family_member.dob) > 26
+    if relationship == "child_under_26" && (calculate_age_by_dob(family_member.dob) > 26 || (new_effective_on.kind_of?(Date) && new_effective_on >= family_member.dob+26.years))
       relationship = "child_over_26"
     end
 
     offered_relationship_benefits.include? relationship
   end
 
+  def show_market_name_by_enrollment(enrollment)
+    return '' if enrollment.blank?
+
+    if enrollment.is_shop?
+      enrollment.is_cobra_status? ? 'Employer Sponsored COBRA/Continuation' : 'Employer Sponsored'
+    else
+      'Individual'
+    end
+  end
 end

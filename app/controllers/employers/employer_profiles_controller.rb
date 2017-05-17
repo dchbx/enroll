@@ -164,6 +164,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @employer_profile = @organization.employer_profile
     @staff = Person.staff_for_employer_including_pending(@employer_profile)
     @add_staff = params[:add_staff]
+    @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
   end
 
   def create
@@ -213,6 +214,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @organization.save(validate: false)
 
       if @organization.update_attributes(employer_profile_params)
+        @organization.notify_legal_name_or_fein_change
+        @organization.notify_address_change(@organization_dup,employer_profile_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -252,7 +255,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def bulk_employee_upload_form
-
   end
 
   def download_invoice
@@ -272,8 +274,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
     rescue Exception => e
-      @census_employee_import.errors.add(:base, e.message)
-      render "employers/employer_profiles/employee_csv_upload_errors"
+      if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
+        render "employers/employer_profiles/_download_new_template"
+      else
+        @census_employee_import.errors.add(:base, e.message)
+        render "employers/employer_profiles/employee_csv_upload_errors"
+      end
     end
 
 
@@ -321,10 +327,15 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                          @employer_profile.census_employees.terminated.sorted
                        when 'all'
                          @employer_profile.census_employees.sorted
+                       when 'cobra'
+                         @employer_profile.census_employees.by_cobra.sorted
                        else
                          @employer_profile.census_employees.active.sorted
                        end
-    census_employees = census_employees.search_by(params.slice(:employee_name))
+    if params["employee_search"].present?
+      query_string = CensusEmployee.search_hash(params["employee_search"])
+      census_employees = census_employees.any_of(query_string)
+    end
     @page_alphabets = page_alphabets(census_employees, "last_name")
 
     if params[:page].present?

@@ -1,15 +1,17 @@
 <br/><br/>
+<% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
+<%= form_tag url, method: http_method, remote: true, class: 'input' do %>
 <div class='radio_option'>
 	<div class="col-md-2 col-md-offset-1 col-sm-4 content-bottom">
 		<div class="col-md-8 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
 			<div class="radio skinned-form-controls skinned-form-controls-mac">
-				<%= radio_button_tag :market, "shop", value: false, class: "required floatlabel"  %>
-				<label><span>MARKET</span></label>
+				<%= radio_button_tag "market_kind", "shop", value: true, class: "required floatlabel"  %>
+				<label><span>SHOP</span></label>
 			</div>
 		</div>
 		<div class="col-md-4 col-sm-4 col-xs-4 form-group form-group-lg no-pd">
 			<div class="radio skinned-form-controls skinned-form-controls-mac">
-				<%= radio_button_tag :market, "ivl", value: false, class: "required floatlabel"  %>
+				<%= radio_button_tag "market_kind", "ivl", value: true, class: "required floatlabel"  %>
 				<label><span>IVL</span></label>
 			</div>
 		</div>
@@ -21,16 +23,12 @@
 	 		<div id="personal_info">
 	 			<h3 class='title'>Add SEP</h3>
 	  			<div class="col-md-12 no-pd col-sm-12 col-xs-12">
-	 				<% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
-	 				<%= form_tag url, method: http_method, remote: true, class: 'input' do %>
+
 					<div class="row row-form-wrapper no-buffer">
 						<%= hidden_field_tag "person", f.id %>
 						<%= hidden_field_tag "firstName", f.primary_applicant.person.first_name %>
 						<%= hidden_field_tag "lastName", f.primary_applicant.person.last_name %>
 						<%= hidden_field_tag "family_actions_id", "family_actions_#{f.id.to_s}" %>
-						<div class = "qle_market">
-							<%= hidden_field_tag :market_kind, "ivl" %>
-						</div>
 						<div class = "kind">
 							<%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
 						</div>
@@ -76,13 +74,13 @@
 					</div>
 					<div class='row row-form-wrapper no-buffer optional_date'>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    <%= text_field_tag :option1_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker form-control", placeholder: "DATE 1 OPTION" %>
+						    <%= text_field_tag :option1_date, "", :'data-date-max'=> sep_optional_date(@family, 'max'), :'data-date-min'=> sep_optional_date(@family, 'min'),class: "floatlabel required date-picker form-control", placeholder: "DATE 1 OPTION" %>
 						</div>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    <%= text_field_tag :option2_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker form-control", placeholder: "DATE 2 OPTION" %>
+						    <%= text_field_tag :option2_date, "", :'data-date-max'=> sep_optional_date(@family, 'max'), :'data-date-min'=> sep_optional_date(@family, 'min'),class: "floatlabel required date-picker form-control", placeholder: "DATE 2 OPTION" %>
 						</div>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    <%= text_field_tag :option3_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker form-control", placeholder: "DATE 3 OPTION" %>
+						    <%= text_field_tag :option3_date, "", :'data-date-max'=> sep_optional_date(@family, 'max'), :'data-date-min'=> sep_optional_date(@family, 'min'),class: "floatlabel required date-picker form-control", placeholder: "DATE 3 OPTION" %>
 						</div>
 					</div>
 					<div class='row row-form-wrapper no-buffer'>
@@ -93,9 +91,10 @@
 					<div class="no-pd" style="margin-top:10px;">
 			 			<%= submit_tag "Submit",  class: "btn btn-primary" %>
 			 		</div>
-					<% end %>
+
 				</div>
-			 </div>
+			</div>
 		</div>    
 	</div>
 </div>
+<% end %>

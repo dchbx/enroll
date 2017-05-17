@@ -1,5 +1,6 @@
 qs = Queries::PolicyAggregationPipeline.new
 
+
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,9,1), "$lt" => Date.new(2017,1,1)}).eliminate_family_duplicates
 
 enroll_pol_ids = []

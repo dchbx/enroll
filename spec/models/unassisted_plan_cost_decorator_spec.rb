@@ -13,7 +13,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let!(:two)             {double("two"   , dob: 18.years.ago, age_on_effective_date: 18, employee_relationship: "child")}
     let!(:three)           {double("three" , dob: 13.years.ago, age_on_effective_date: 13, employee_relationship: "child")}
     let!(:four)            {double("four"  , dob: 11.years.ago, age_on_effective_date: 11, employee_relationship: "child")}
-    let!(:five)            {double("five"  , dob: 4.years.ago , age_on_effective_date: 4 , employee_relationship: "child")}
+    let!(:five)            {double("five"  , dob: 4.years.ago , age_on_effective_date: 4, employee_relationship: "child")}
     let!(:relationship_benefit_for) do
       {
         "self"   => double("self", :offered? => true),

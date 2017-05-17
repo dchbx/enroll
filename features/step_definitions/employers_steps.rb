@@ -181,15 +181,12 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   fill_in 'census_employee[first_name]', :with => 'Patrick'
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => '01/01/1980'
   fill_in 'census_employee[ssn]', :with => '786120965'
-  find('.darkblue').click
+  find('.census-employee-add').click
   find(:xpath, '//p[@class="label"][contains(., "GA")]').click
   find(:xpath, "//li[contains(., 'VA')]").click
 
-  fill_in 'census_employee[census_dependents_attributes][0][first_name]', :with => "Mariah"
+  fill_in 'census_employee[first_name]', :with => "Mariah"
   find('label[for=census_employee_is_business_owner]').click
-
-  find('.selectric-interaction-choice-control-census-employee-census-dependents-attributes-0-employee-relationship').click
-  find('.label', text: 'Child').click
 
   screenshot("update_census_employee_with_data")
   click_button 'Update Employee'
@@ -323,7 +320,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find('.carriers-tab a').click
   wait_for_ajax(10,2)
   find('.reference-plans label').click
-  wait_for_ajax
+  wait_for_ajax(10,2)
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
@@ -377,17 +374,31 @@ When(/^.+ clicks? on publish plan year$/) do
   find('.interaction-click-control-publish-plan-year').click
 end
 
-Then(/^.+ should see Publish Plan Year Modal with warnings$/) do
-  expect(find('.modal-body')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
+Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
+  expect(find('.modal-body')).to have_content('Has its principal business address in the District of Columbia')
+end
+
+Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
+  expect(find('.modal-body')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 
+Then(/^.+ should be on the business info page with warnings$/) do
+  expect(page).to have_content 'Primary Office Location'
+  expect(find('.alert-error')).to have_content('Has its principal business address in the District of Columbia')
+end
+
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   expect(page).to have_css('#plan_year')
-  expect(find('.alert-plan-year')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
+  expect(find('.alert-plan-year')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
+end
+
+Then(/^.+ updates the address location with correct address$/) do
+  step "I updates office location from #{non_dc_office_location} to #{default_office_location}"
+  find('.interaction-click-control-save').click
 end
 
 Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
@@ -443,6 +454,7 @@ end
 
 Given /^the employer has employees$/ do
   employees employer_profile: employer.employer_profile
+  employees.last.update_attributes(aasm_state: "employment_terminated", employment_terminated_on: TimeKeeper.date_of_record - 5.days)
 end
 
 Given /^the employer is logged in$/ do
@@ -474,6 +486,86 @@ end
 
 And /^employer clicks on terminated employee$/ do
   expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "employee_role_linked")
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^ER should land on (.*) EE tab$/ do |val|
+  expect(page).to have_content val.upcase
+end
+
+And /^ER enters (.*) EE name on search bar$/ do |val|
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}.last_name
+  search_item = val == "active" ? employees.first.last_name : ter
+  page.fill_in('employee_search', :with => search_item)
+end
+
+And /^ER clicks on search button$/ do
+  find(".interaction-click-control-search").trigger('click')
+end
+
+Then /^ER should see the (.*) searched EE on the roster page$/ do |val|
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}
+  search_item = val == "active" ? employees.first.full_name : ter.full_name
+  page.should have_selector(:link_or_button, search_item)
+end
+
+And /^ER should see no results$/ do
+  expect(page).to have_content /No results found/
+end
+
+Then /^ER clears the search value in the search box$/ do
+  page.fill_in('employee_search', :with => nil)
+end
+
+Then /^ER should see all the terminated employees$/ do
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}.last_name
+  expect(page).to have_content ter
+  expect(page).not_to have_content employees.first.last_name
+end
+
+
+Then /^employer should not see the address on the roster$/ do
+  expect(page).not_to have_content /Address/
+end
+
+And /^employer clicks on linked employee without address$/ do
+  employees.first.address.delete
+  expect(page).to have_content "Eddie Vedder"
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+Then /^employer should see the address on the roster$/ do
+  expect(page).to have_content /Address/
+end
+
+And /^employer populates the address field$/ do
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
+  fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[contains(., 'GA')]").click
+
+  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+end
+
+And /^employer clicks on update employee$/ do
+  find('.interaction-click-control-update-employee').click
+end
+
+And /^employer clicks on non-linked employee with address$/ do
+  employees.first.update_attributes(aasm_state: "eligible")
+  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+end
+
+And /^employer clicks on non-linked employee without address$/ do
+  employees.first.address.delete
+  employees.first.update_attributes(aasm_state: "eligible")
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
 

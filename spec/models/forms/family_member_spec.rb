@@ -295,6 +295,88 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
   end
 end
 
+describe "checking validations on family member object" do
+  let(:family_id) { double }
+  let(:family) { double("family", :family_members => []) }
+  let(:member_attributes) {
+    { "first_name"=>"test",
+      "middle_name"=>"",
+      "last_name"=>"fm",
+      "dob"=>"1982-11-11",
+      "ssn"=>"",
+      "no_ssn"=>"1",
+      "gender"=>"male",
+      "relationship"=>"child",
+      "tribal_id"=>"",
+      "ethnicity"=>["", "", "", "", "", "", ""],
+      "is_consumer_role"=>"true",
+      "same_with_primary"=>"true",
+      "no_dc_address"=>"false",
+      "addresses"=>
+      { "0"=>{"kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""},
+        "1"=>{"kind"=>"mailing", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""}
+      }
+    }
+  }
+
+  subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
+
+  before do
+    allow(subject).to receive(:family).and_return family
+  end
+
+
+  it "should return invalid if no answers found for required questions" do
+    expect(subject.valid?).to eq false
+  end
+
+  it "should return errors with citizen status, native american / alaskan native and incarceration status" do
+    subject.save
+    expect(subject.errors.full_messages).to eq ["Citizenship status is required", "native american / alaskan native status is required", "Incarceration status is required"]
+  end
+
+  context "user answered for citizen status question" do
+    context "when user answered us citizen as true" do
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true"})) }
+      it "should return errors with naturalization, native american / alaskan native and incarceration status" do
+        subject.save
+        expect(subject.errors.full_messages).to eq ["Naturalized citizen is required", "native american / alaskan native status is required", "Incarceration status is required"]
+      end
+    end
+
+    context "when user answered us citizen as false" do
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
+      it "should return errors with Eligible immigration, native american / alaskan native and incarceration status" do
+        subject.save
+        expect(subject.errors.full_messages).to eq ["Eligible immigration status is required", "native american / alaskan native status is required", "Incarceration status is required"]
+      end
+    end
+  end
+
+  context "when user answered for citizen & naturalization" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false"})) }
+    it "should return errors with native american / alaskan native and incarceration status" do
+      subject.save
+      expect(subject.errors.full_messages).to eq ["native american / alaskan native status is required", "Incarceration status is required"]
+    end
+  end
+
+  context "when user not answered for incarceration status" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false"})) }
+    it "should return errors with incarceration status" do
+      subject.save
+      expect(subject.errors.full_messages).to eq ["Incarceration status is required"]
+    end
+  end
+
+  context "when satisfied with all the validations" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false", "is_incarcerated"=>"false"})) }
+    it "should return true" do
+      expect(subject.valid?).to eq true
+    end
+  end
+end
+
 describe Forms::FamilyMember, "which describes an existing family member" do
   let(:family_member_id) { double }
   let(:family_id) { double }
@@ -331,6 +413,9 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
     allow(family_member).to receive(:citizen_status)
+    allow(family_member).to receive(:naturalized_citizen)
+    allow(family_member).to receive(:eligible_immigration_status)
+    allow(family_member).to receive(:indian_tribe_member)
     allow(person).to receive(:has_mailing_address?).and_return(false)
     allow(subject).to receive(:valid?).and_return(true)
   end

@@ -1,0 +1,72 @@
+= pundit_span Family, :updateable?
+- step = (defined? step) ? step.to_i : 1
+- ridp = (defined? ridp) ? ridp : false
+- search_page = (defined? search_page ) ? search_page : false
+
+- percent_complete = 0
+- percent_complete = step == 1 ? 20 : ((step == 2) ? 30 : ((step == 3) ? 40 : ((step == 4) ? 60 : (step == 5 ? 100 : 0))))
+
+%h3= "#{percent_complete}% Complete"
+%ul.list-unstyled.progress-wrapper.hidden-xs
+  %li{class: add_progress_class(1, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Personal Info
+  %li{class: add_progress_class(3, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Household Info
+  %li{class: add_progress_class(4, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Choose Plan
+  %li{class: add_progress_class(5, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Confirm
+  %li{class: add_progress_class(6, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Complete
+
+- if step == 1 && search_page == true
+  = link_to "Continue", exchanges_residents_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
+- elsif step == 1
+  %span{class: 'btn btn-lg btn-primary btn-br btn-block', onclick: 'PersonValidations.manageRequiredValidations($(this));'} CONTINUE
+  %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue.hidden{type: 'submit'}
+    CONTINUE
+- elsif defined? url
+  = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
+- elsif step == 4
+  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{disabled: true}
+    CONTINUE
+  %br
+- elsif step == 5
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary  btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
+- elsif step == 6
+  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-primary ', id: 'btn-continue', style: 'width: 100%;'
+- else
+  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
+    CONTINUE
+
+%ul.list-unstyled.list-right-section
+  - unless @no_previous_button
+    %li
+      %a.back{href: '#'}
+        = image_tag 'icons/list.png'
+        PREVIOUS
+  - unless @no_save_button
+    %li
+      %a{href: '#'}
+        = image_tag 'icons/list.png'
+        SAVE &amp; EXIT
+      %br
+      %br
+    %li
+      %p
+        If you select Save & Exit, you can save your work and continue where you left off the next time you login.
+    %br.clear
+- if step != 1
+  = render partial: 'shared/help_me_sign_up'
+  = render partial: 'insured/plan_shoppings/help_with_plan'
+</span>

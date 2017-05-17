@@ -58,6 +58,61 @@ namespace :migrations do
       puts "renewing plan year not found!!"
     end
   end
+
+  desc "Cancel conversion employer renewals"
+  task :conversion_employer_renewal_cancellations => :environment do 
+    count = 0
+    prev_canceled = 0
+
+    employer_feins = [
+        "043774897","541206273","522053522","200247609","521321945","522402507",
+        "522111704","204314853","521766976","260771506","264288621","521613732",
+        "800501539","521844112","521932886","530229573","521072698","204229835",
+        "521847137","383796793","521990963","770601491","200316239","541668887",
+        "431973129","522008056","264391330","030458695","452698846","521490485",
+        "264667460","550894892","521095089","208814321","593400922","521899983"
+    ]
+    
+    employer_feins.each do |fein|
+      employer_profile = EmployerProfile.find_by_fein(fein)
+
+      if employer_profile.blank?
+        puts "employer profile not found!"
+        return
+      end
+
+      plan_year = employer_profile.renewing_plan_year
+      if plan_year.blank?
+        plan_year = employer_profile.plan_years.published.detect{|py| py.start_on.year == 2016}
+      end
+
+      if plan_year.blank?
+        puts "#{employer_profile.legal_name} --no renewal plan year found!!"
+        prev_canceled += 1
+        next
+      end
+
+      plan_year.hbx_enrollments.each do |enrollment|
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      end
+
+      employer_profile.census_employees.each do |census_employee|
+        assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
+        assignments.each do |assignment|
+          assignment.delink_coverage! if assignment.may_delink_coverage?
+        end
+      end
+
+      plan_year.cancel! if plan_year.may_cancel?
+      plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
+      employer_profile.revert_application! if employer_profile.may_revert_application?
+
+      count += 1
+    end
+
+    puts "Canceled #{count} employers"
+    puts "#{prev_canceled} Previously Canceled employers"
+  end
 end
 
 def enrollments_for_plan_year(plan_year)

@@ -4,10 +4,13 @@ class CensusEmployeePolicy < ApplicationPolicy
     if @user.has_role? :hbx_staff
       true
     else
-      can_change = if @user.has_role? :employer_staff
+      can_change = if (@user.has_role?(:employer_staff) && !@user.has_role?(:broker))
         @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.try(:to_s) rescue false
       elsif @user.has_role? :broker
         @record.employer_profile.try(:active_broker) == @user.person
+      elsif @user.has_role?(:general_agency_staff)
+        emp_ids = EmployerProfile.find_by_general_agency_profile(@user.person.general_agency_staff_roles.first.general_agency_profile).map(&:id)
+        emp_ids.include? ( @record.employer_profile.id)
       else
         false
       end

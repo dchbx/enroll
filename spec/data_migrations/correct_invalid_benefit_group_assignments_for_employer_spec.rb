@@ -20,17 +20,18 @@ describe CorrectInvalidBenefitGroupAssignmentsForEmployer do
     let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.parent.fein)
+      allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)
     end
 
     context "checking benefit group assignments", dbclean: :after_each do
 
       it "should remove the invalid benefit group assignments" do
-        expect(census_employee.benefit_group_assignments.size).to eq 1
+        size = census_employee.benefit_group_assignments.size
         census_employee.benefit_group_assignments.first.benefit_group.delete
         subject.migrate
         census_employee.reload
         expect(census_employee.benefit_group_assignments.size).to eq 0
+        expect(census_employee.benefit_group_assignments.size).not_to eq size
       end
 
       it "should not remove the valid benefit group assignment" do

@@ -7,7 +7,7 @@
       = render :partial => "events/addresses/address", :collection => person.contact_addresses
   - if person.emails.any?
     %emails
-      = render :partial => "events/emails/email", :collection => person.emails
+      = render :partial => "events/individuals/email", :collection => person.emails
   - if person.contact_phones.any?
     %phones
       = render :partial => "events/phones/phone", :collection => person.contact_phones

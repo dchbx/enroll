@@ -16,6 +16,12 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_update_ssn => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can complete resident application'
+  DefinePermissions.define_task :hbx_admin_can_complete_resident_application => :environment
+end
+
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn
+#rake permissions:hbx_admin_can_complete_resident_application

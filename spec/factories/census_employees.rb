@@ -12,8 +12,19 @@ FactoryGirl.define do
     association :email, strategy: :build
     association :employer_profile, strategy: :build
 
+    transient do
+      benefit_group { build(:benefit_group) }
+      renewal_benefit_group { build(:benefit_group) }
+    end
+
     trait :owner do
       is_business_owner  true
+    end
+
+    trait :termination_details do
+      # aasm_state "employment_terminated"
+      employment_terminated_on {TimeKeeper.date_of_record.last_month}
+      coverage_terminated_on {TimeKeeper.date_of_record.last_month.end_of_month}
     end
 
     trait :with_enrolled_census_employee do
@@ -32,6 +43,19 @@ FactoryGirl.define do
 
       after :create do |organization, evaluator|
         FactoryGirl.create :general_agency_profile, *Array.wrap(evaluator.general_agency_traits) + [:with_staff], evaluator.general_agency_attributes.merge(organization: organization)
+      end
+    end
+
+    factory :census_employee_with_active_assignment do
+      after(:create) do |census_employee, evaluator|
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee) 
+      end
+    end
+
+    factory :census_employee_with_active_and_renewal_assignment do
+      after(:create) do |census_employee, evaluator|
+        create(:census_employee_with_active_assignment)
+        create(:benefit_group_assignment, benefit_group: evaluator.renewal_benefit_group, census_employee: census_employee, is_active: false)
       end
     end
   end

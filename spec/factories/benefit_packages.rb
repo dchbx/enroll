@@ -21,5 +21,9 @@ FactoryGirl.define do
     trait :next_coverage_year_title do
       title {"individual_health_benefits_#{TimeKeeper.date_of_record.year + 1}"}
     end
+
+    trait :last_coverage_year_title do
+      title {"individual_health_benefits_#{TimeKeeper.date_of_record.year - 1}"}
+    end
   end
 end

@@ -1,0 +1,9 @@
+$("#new_employee_dependent_form").each(function(idx, ele) {
+  $(ele).remove();
+});
+$("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent_resident_form', dependent: @dependent,person: @person) %>");
+$("#add_member_list_<%= @dependent.id %>").attr('data-confirm', '');
+$("#dependent_buttons").addClass('hidden');
+semantic_class();
+applyJQDatePickers();
+applyListeners();

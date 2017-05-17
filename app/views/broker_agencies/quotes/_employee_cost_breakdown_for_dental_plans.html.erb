@@ -1,0 +1,49 @@
+  <h3>Detailed Employee cost breakdown for selected dental plans:</h3>
+  <div class="mygrid-wrapper-div">
+    <table class="quote-detail-cost">
+      <tr>
+        <td colspan="3" class="quote_detail_plan_header">
+        </td>
+        <% quote_results.each do |qr| %>
+          <td colspan="1" class="quote_detail_plan_header">
+            <div style='width: 300px'>
+              <b><%= qr[0] %></b><br>
+              <sm>Employee: 
+              $<%= qr[1][:total_employee_cost].ceil %>,
+              Employer: 
+
+              <span >$<%= qr[1][:total_employer_cost].ceil %></span>
+              <br>
+              </sm>
+            </div>
+          </td>
+        <% end %>
+      </tr>
+      <tr style="font-weight: bolder; ">
+        <td class="quote_detail_results_header">Name</td>
+        <td class="quote_detail_results_header">Relationship (%)</td>
+        <td class="quote_detail_results_header">Age</td>
+        <% quote_results.keys.each do |de| %>
+          <td class="quote_detail_results_header" style='padding-left: 100px'>Employee Cost</td>
+        <% end %>
+      </tr>
+      <% quote_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
+        <tr>
+          <td class="quote_detail_results">
+            <%= qr[:first_name] %>
+          </td>
+          <td class="quote_detail_results">
+            <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i%>)</small>
+          </td>
+          <td class="quote_detail_results">
+            <%= qr[:age] %>
+          </td>
+          <% quote_results.keys.each do |de| %>
+            <td class="quote_detail_results"  style='padding-left: 100px'>
+            <b><%= quote_results[de][:detail].flatten[index][:employee_cost].round(2) %></b></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+    <div>&nbsp;</div>
+  </div>

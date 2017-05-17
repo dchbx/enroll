@@ -49,6 +49,9 @@
               <% if broker_or_staff_role.may_decertify? %>
                 <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary  interaction-click-control-broker-decertify" %>
               <% end %>
+              <% if broker_or_staff_role.may_recertify? %>
+                <%= submit_tag 'Re-Certify', name: 'recertify', class: "btn btn-primary  interaction-click-control-broker-recertify" %>
+              <% end %>
             <% end %>
           </span>
         </div>

@@ -12,7 +12,7 @@ class GroupConversionEmployersMigration < MongoidMigrationTask
       end
       organization.first.employer_profile.plan_years.each do |plan_year|
         if plan_year.start_on.year == 2015
-          plan_year.migration_expire! if plan_year.may_migration_expire?
+          plan_year.conversion_expire! if plan_year.may_conversion_expire?
         end
       end
       plan_years = organization.first.employer_profile.plan_years.published + organization.first.employer_profile.plan_years.renewing_published_state + organization.first.employer_profile.plan_years.where(aasm_state: "draft") + organization.first.employer_profile.plan_years.where(aasm_state: "renewing_publish_pending")

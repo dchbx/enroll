@@ -118,7 +118,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     end
 
     it 'should raise an error' do
-      expect(subject.errors.to_hash[:base]).to include("fein is already in use.")
+      expect(subject.errors.to_hash[:base]).to include("organization has already been created.")    
     end
   end
 

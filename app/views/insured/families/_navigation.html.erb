@@ -19,6 +19,14 @@
         <% end %>
       </li>
     <% end %>
+
+    <% if current_user.has_hbx_staff_role? && @person.has_resident_role? %>
+      <li <%= menu_tab_class(@tab, 'verification') %>>
+        <%= link_to upload_application_insured_families_path(tab: 'verification') do %>
+            Upload Paper Application
+        <% end %>
+      </li>
+    <% end %>
     <li <%= menu_tab_class(@tab, 'messages') %>>
       <%= link_to(inbox_insured_families_path(tab: 'messages')) do  %>
         Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.size %></span>

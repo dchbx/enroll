@@ -10,7 +10,7 @@ RSpec.describe Plan, dbclean: :after_each do
   end
 
   def active_year;
-    2016;
+    TimeKeeper.date_of_record.year;
   end
 
   def hios_id;

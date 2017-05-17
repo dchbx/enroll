@@ -433,4 +433,69 @@ RSpec.describe Organization, dbclean: :after_each do
       end
     end
   end
+
+  describe "notify_legal_name_or_fein_change" do
+
+    context "notify update" do
+      let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+      let(:organization) {FactoryGirl.create(:organization, employer_profile:employer_profile)}
+      let(:changed_fields) { ["legal_name", "version", "updated_at"] }
+      let(:changed_fields1) { ["fein", "version", "updated_at"] }
+
+      it "notify legal name updated" do
+        organization.instance_variable_set(:@changed_fields, changed_fields)
+        expect(organization).to receive(:notify).exactly(1).times
+        organization.notify_legal_name_or_fein_change
+      end
+
+      it "notify fein updated" do
+        organization.instance_variable_set(:@changed_fields, changed_fields1)
+        expect(organization).to receive(:notify).exactly(1).times
+        organization.notify_legal_name_or_fein_change
+      end
+    end
+  end
+
+  describe "legal_name_or_fein_change_attributes" do
+
+    context "changed_attributes" do
+      let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+      let(:organization) {FactoryGirl.create(:organization, employer_profile:employer_profile)}
+
+      it "legal_name changed_attributes " do
+        organization.legal_name = "test1"
+        organization.save!
+        expect(organization.instance_variable_get(:@changed_fields)).to eq ["legal_name", "version", "updated_at"]
+      end
+
+      it "fein changed_attributes" do
+        organization.fein ="000000001"
+        organization.save
+        expect(organization.instance_variable_get(:@changed_fields)).to eq ["fein", "version", "updated_at"]
+      end
+    end
+  end
+
+  describe "check_legal_name_or_fein_changed?" do
+
+    context "legal and fein change" do
+      let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+      let(:organization) {FactoryGirl.create(:organization, employer_profile:employer_profile)}
+
+      it "return true for legal name update" do
+        expect(organization.legal_name_changed?).to eq false #before update
+        organization.legal_name = "test1"
+        expect(organization.legal_name_changed?).to eq true #after update
+        organization.save!
+      end
+
+      it "return true for fein update" do
+        expect(organization.fein_changed?).to eq false
+        organization.fein ="000000001"
+        expect(organization.fein_changed?).to eq true
+        organization.save
+      end
+    end
+  end
+
 end

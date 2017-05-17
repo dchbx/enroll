@@ -168,6 +168,13 @@ var PersonValidations = (function(window, undefined) {
     }
   }
 
+  function validationForEligibleImmigrationStatuses(e) {
+    if ($('#immigration_status_container').is(':visible') && $('input[name="person[eligible_immigration_status]"]').not(":checked").length == 2) {
+      alert('Please provide an answer for question: Do you have eligible immigration status?');
+      PersonValidations.restoreRequiredAttributes(e);
+    }
+  }
+
   function validationForVlpDocuments(e) {
     if ($('#vlp_documents_container').is(':visible')) {
       $('.vlp_doc_area input.doc_fields').each(function() {
@@ -215,13 +222,13 @@ var PersonValidations = (function(window, undefined) {
 
           } else {}
         }
-        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
-          if ($(this).val().length != 10) {
-            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
-            PersonValidations.restoreRequiredAttributes(e);
-
-          } else {}
-        }
+//        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
+//          if ($(this).val().length != 10) {
+//            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
+//            PersonValidations.restoreRequiredAttributes(e);
+//
+//          } else {}
+//        }
         if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
 
         } else {
@@ -256,6 +263,7 @@ var PersonValidations = (function(window, undefined) {
     manageRequiredValidations: manageRequiredValidations,
     validationForUsCitizenOrUsNational: validationForUsCitizenOrUsNational,
     validationForNaturalizedCitizen: validationForNaturalizedCitizen,
+    validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     restoreRequiredAttributes: restoreRequiredAttributes
@@ -271,6 +279,7 @@ $(document).ready(function() {
   $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
     PersonValidations.validationForUsCitizenOrUsNational(e);
     PersonValidations.validationForNaturalizedCitizen(e);
+    PersonValidations.validationForEligibleImmigrationStatuses(e);
     PersonValidations.validationForIncarcerated(e);
     PersonValidations.validationForVlpDocuments(e);
   });

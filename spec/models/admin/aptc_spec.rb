@@ -6,7 +6,7 @@ RSpec.describe Admin::Aptc, :type => :model do
   # Household
   let(:family)       { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:household) {FactoryGirl.create(:household, family: family)}
-  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
+  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
   let(:sample_max_aptc_1) {511.78}
   let(:sample_max_aptc_2) {612.33}
   let(:sample_csr_percent_1) {87}
@@ -27,6 +27,8 @@ RSpec.describe Admin::Aptc, :type => :model do
     before(:each) do
       allow(family).to receive(:active_household).and_return household
       allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      allow(eligibility_determination_1).to receive(:tax_household).and_return tax_household
+      allow(eligibility_determination_2).to receive(:tax_household).and_return tax_household
       allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1, eligibility_determination_2]
       TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
     end
@@ -85,15 +87,39 @@ RSpec.describe Admin::Aptc, :type => :model do
          allow(eligibility_determination).to receive(:e_pdc_id).and_return "3614116"
          allow(eligibility_determination).to receive(:csr_percent_as_integer).and_return sample_csr_percent_1
          allow(save_mock).to receive(:save!).and_return true
-
       end
+
       it "should save a new determination when the Max APTC / CSR is updated" do
-        expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [])).to eq true
+        expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [], year)).to eq true
       end
 
     end
 
   end
+
+  # UPDATE APPLIED APTC  TO AN ENROLLMENT!
+    context "update_aptc_applied_for_enrollments" do
+      let(:params) {  {
+                        "person" => { "person_id"=>family.primary_applicant.person.id, "family_id" => family.id, "current_year" => TimeKeeper.date_of_record.year},
+                        "max_aptc" => "100.00",
+                        "csr_percentage" => "0",
+                        "applied_pct_#{hbx_with_aptc_2.id}" => "0.85",
+                        "aptc_applied_#{hbx_with_aptc_2.id}" => "85.00"
+                      }
+                    }
+
+      it "should create a new enrollment with a new hbx_id" do
+        allow(family).to receive(:active_household).and_return household
+        allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+        allow(tax_household).to receive(:latest_eligibility_determination).and_return eligibility_determination_1
+        enrollment_count = family.active_household.hbx_enrollments.count
+        last_enrollment = family.active_household.hbx_enrollments.last
+        expect(Admin::Aptc.update_aptc_applied_for_enrollments(family, params, year)).to eq true
+        expect(family.active_household.hbx_enrollments.count).to eq enrollment_count + 1
+        expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
+      end
+
+    end
   
 
 end

@@ -70,14 +70,21 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       assign :employee_role, employee_role
       assign :hbx_enrollments, []
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-      sign_in(current_user)
-    end
-
-    it "should action to new insured group selection path" do
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
+      sign_in(current_user)
+    end
+
+    it "should have the updated description with link to 'enroll today' text" do
+      render "insured/families/shop_for_plans_widget"
+      expect(rendered).to have_content 'coverage will begin'
+      expect(rendered).to have_link('enroll today')
+      expect(rendered).not_to have_content 'for Open Enrollment Period.'
+    end
+
+    it "should action to new insured group selection path" do
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_selector("form[action='/insured/group_selections/new']")
     end
@@ -92,4 +99,19 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       expect(rendered).to have_selector("form[action='/insured/families/find_sep']")
     end
   end
+
+  context "without employee or consumer role" do
+    before :each do
+      assign :person, person
+      sign_in(current_user)
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      render "insured/families/shop_for_plans_widget"
+    end
+
+    it "should have text about enrolling in Individual Market" do
+      expect(rendered).to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
+    end
+  end
+
+
 end

@@ -44,27 +44,54 @@ describe EmployeeRole, "given a person" do
 
 end
 
-describe "coverage_effective_on" do
-  let(:employee_role) { FactoryGirl.create(:employee_role) }
-  let(:effective_on) { Date.new(2009, 2, 5) }
 
-  context "when benefit group present" do
-    it "should return coverage_effective_on" do
-      allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(employee_role.hired_on)
-      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_eligible?).and_return(false)
-      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_linked?).and_return(false)
-      allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(effective_on)
-      expect(employee_role.coverage_effective_on).to eq effective_on
+describe ".coverage_effective_on" do
+
+  context 'when both active and renewal benefit groups present' do 
+
+    let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+    let!(:employer_profile) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
+      employer = FactoryGirl.create :employer_profile, organization: org
+      plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :active
+      FactoryGirl.create :benefit_group, plan_year: plan_year
+      renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
+      FactoryGirl.create :benefit_group, plan_year: renewal_plan_year
+      employer
+    }
+
+    let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
+    let(:end_on) { start_on + 1.year - 1.day }
+    let(:open_enrollment_start_on) { start_on - 2.months }
+    let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 9.days }
+
+    let!(:census_employees){
+      FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+      FactoryGirl.create :census_employee, employer_profile: employer_profile, hired_on: hired_on
+    }
+
+    let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+    let(:employee_role) {
+      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    }
+
+
+    context 'when called with benefit group' do
+      let(:renewal_benefit_group) {employer_profile.renewing_plan_year.benefit_groups.first}
+
+      it 'should calculate effective date from renewal benefit group' do
+        expect(employee_role.coverage_effective_on(current_benefit_group: renewal_benefit_group)).to eq renewal_benefit_group.start_on
+      end
     end
-  end
 
-  context "when benefit group doesn't exists" do
-    it "coverage_effective_on should be nil" do
-      allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(effective_on)
-      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_eligible?).and_return(false)
-      allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_linked?).and_return(false)
-      allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(nil)
-      expect(employee_role.coverage_effective_on).to eq nil
+    context 'when called without benefit group' do
+
+      it 'should calculate effective date based on active benefit group' do
+        expect(employee_role.coverage_effective_on).to eq hired_on
+      end 
     end
   end
 end
@@ -569,6 +596,93 @@ describe EmployeeRole, dbclean: :after_each do
     it "should return false when hired_on is more than two monthes ago" do
       employee_role.hired_on = TimeKeeper.date_of_record - 75.days
       expect(employee_role.can_select_coverage?).to eq false
+    end
+  end
+
+  context "is_cobra_status?" do
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+
+    it "should return false when without census_employee" do
+      allow(employee_role).to receive(:census_employee).and_return nil
+      expect(employee_role.is_cobra_status?).to be_falsey
+    end
+
+    context "with census_employee" do
+      before :each do
+        allow(employee_role).to receive(:census_employee).and_return census_employee
+      end
+
+      it "should return cobra state of census_employee" do
+        expect(employee_role.is_cobra_status?).to eq census_employee.is_cobra_status?
+      end
+    end
+  end
+end
+
+describe "#benefit_group", dbclean: :after_each do
+  subject { EmployeeRole.new(:person => person, :employer_profile => organization.employer_profile, :census_employee => census_employee) }
+  let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+  let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+  let(:sep){
+    sep = family.special_enrollment_periods.new
+    sep.effective_on_kind = 'date_of_event'
+    sep.qualifying_life_event_kind= qle_kind
+    sep.qle_on= TimeKeeper.date_of_record - 7.days
+    sep.save
+    sep
+  }
+
+  let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: person.first_name, last_name: person.last_name,
+                            dob: person.dob, ssn: person.ssn, employer_profile: organization.employer_profile)}
+  before do
+    allow(family).to receive(:current_sep).and_return sep
+  end
+
+  context "plan shop through qle and having active & renewal plan years" do
+    before do
+      active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+      renewal_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+    end
+
+    it "should return the active benefit group if sep effective date covers active plan year" do
+      active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+      expect(subject.benefit_group(qle: true)).to eq active_benefit_group
+    end
+
+    it "should return the renewal benefit group if sep effective date covers renewal plan year" do
+      renewal_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+      sep.update_attribute(:effective_on, renewal_benefit_group.plan_year.start_on + 2.days)
+      expect(subject.benefit_group(qle: true)).to eq renewal_benefit_group
+    end
+  end
+
+  context "plan shop through qle and having active & expired plan years" do
+
+    let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
+
+    before do
+      census_employee.benefit_group_assignments.each do |bga|
+        bga.delete 
+      end
+      active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+      expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+      census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: active_benefit_group, start_on: active_benefit_group.plan_year.start_on)
+      census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: expired_benefit_group, start_on: expired_benefit_group.plan_year.start_on)
+      sep.update_attribute(:effective_on, expired_benefit_group.plan_year.end_on - 7.days)
+    end
+    it "should return the expired benefit group if sep effective date covers expired plan year & has expired benefit group assignment" do
+      expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+      expect(subject.benefit_group(qle: true)).to eq expired_benefit_group
+    end
+
+    it "should return the active benefit group if sep effective date covers expired plan year if EE was not assigned to expired benefit group" do
+      expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+      census_employee.benefit_group_assignments.where(benefit_group_id: expired_benefit_group.id).first.delete
+      active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+      expect(subject.benefit_group(qle: true)).to eq active_benefit_group
     end
   end
 end

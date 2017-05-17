@@ -12,7 +12,8 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
       Then Employee should see the matched employee record form
-      Then Employee Soren White should see renewing plan year start date as earliest effective date
+      Then Employee Soren White should have the renewing plan year start date as earliest effective date
+      And Employee Soren White should not see earliest effective date on the page
 
   Scenario: New Hire can't buy coverage before open enrollment of renewing plan year through Shop for Plans
     Given Conversion Employer for Soren White exists with active and renewing plan year
@@ -66,7 +67,8 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
       Then Employee should see the matched employee record form
-      Then Employee Soren White should see renewing plan year start date as earliest effective date
+      Then Employee Soren White should have the renewing plan year start date as earliest effective date
+      Then Employee Soren White should not see earliest effective date on the page
 
   Scenario: Existing Employee can't buy coverage before open enrollment of renewing plan year
      Given Conversion Employer for Soren White exists with active and renewing plan year
@@ -98,12 +100,12 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see family members page and clicks continue
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
-      Then Employee should see the list of plans
-      And I should not see any plan which premium is 0
-      When Employee selects a plan on the plan shopping page
-      Then Soren White should see coverage summary page with renewing plan year start date as effective date
-      Then Soren White should see the receipt page with renewing plan year start date as effective date
-      Then Employee should see "my account" page with enrollment
+      # Then Employee should see the list of plans
+      # And I should not see any plan which premium is 0
+      # When Employee selects a plan on the plan shopping page
+      # Then Soren White should see coverage summary page with renewing plan year start date as effective date
+      # Then Soren White should see the receipt page with renewing plan year start date as effective date
+      # Then Employee should see "my account" page with enrollment
 
   Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
@@ -142,7 +144,6 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Soren White should see the 1st ER name
       And Soren White should see New Hire Badges for 2st ER
 
-      When 2st ER for Soren White published renewing plan year
       When Soren White click the button of new hire badge for 2st ER
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page

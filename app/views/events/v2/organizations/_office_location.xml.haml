@@ -1,8 +1,7 @@
-%office_location
-  %id
-    %id= office_location.id
-  %primary= office_location.is_primary?
-  - if office_location.address.present? && (['mailing', 'work', 'primary'].include? office_location.address.kind)
+- if is_office_location_address_valid?(office_location)
+  %office_location
+    %id
+      %id= office_location.id
+    %primary= office_location.is_primary?
     = render :partial => "events/v2/addresses/address", :object => office_location.address
-  - if office_location.phone.present? && (['work', 'home', 'main'].include? office_location.phone.kind)
-    = render partial: "events/v2/phones/phone", object: office_location.phone
+    = render partial: "events/v2/phones/phone", object: office_location.phone if is_office_location_phone_valid?(office_location)

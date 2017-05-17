@@ -49,6 +49,35 @@ describe Events::IndividualsController do
         controller.resource(connection, di, props, "")
       end
     end
+
+    describe "for when an exception is thrown" do 
+      let(:found_individuals) { [individual] }
+      let(:exception) { Exception.new("error thrown")}
+      let(:exception_backtrace) { ["error backtrace"] }
+
+      before :each do
+        allow(Person).to receive(:by_hbx_id).with(individual_id).and_return(found_individuals)
+        allow(controller).to receive(:render_to_string).and_raise(exception)
+
+        allow(exception).to receive(:backtrace).and_return(exception_backtrace)
+      end
+
+      it "should return a 500 response and the error message" do
+        expect(exchange).to receive(:publish).with(JSON.dump({
+          exception: exception.inspect,
+          backtrace: exception_backtrace.inspect
+          }),
+        {
+          :routing_key => reply_to_key,
+          :headers => {
+            :return_status => "500",
+            :individual_id => individual_id
+          }
+        })
+
+        controller.resource(connection, di, props, "")
+      end
+    end
   end
 
 end

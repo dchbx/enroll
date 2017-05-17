@@ -2,13 +2,13 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'broker', 'parsers', 'brok
 require Rails.root.join('lib', 'object_builders', 'broker_role_builder')
 
 
-log_path = "#{Rails.root}/log/rake_xml_import_broker_#{Time.now.to_s.gsub(' ', '')}.log"
-rake_logger = Logger.new(log_path)
 
 namespace :xml do
   desc "Import brokers from xml files"
   task :broker, [:file] => :environment do |task, args|
 
+    log_path = "#{Rails.root}/log/rake_xml_import_broker_#{Time.now.to_s.gsub(' ', '')}.log"
+    rake_logger = Logger.new(log_path)
 
     brokers = []
     #Person.where("broker_roles.0" => { "$exists" => true }).delete_all

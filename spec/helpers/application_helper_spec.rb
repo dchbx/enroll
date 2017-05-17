@@ -2,6 +2,24 @@ require "rails_helper"
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
+  describe "#deductible_display" do
+    let(:hbx_enrollment) {double(hbx_enrollment_members: [double, double])}
+    let(:plan) { double("Plan", deductible: "$500", family_deductible: "$500 per person | $1000 per group",) }
+
+    before :each do
+      assign(:hbx_enrollment, hbx_enrollment)
+    end
+
+    it "should return family deductible if hbx_enrollment_members count > 1" do
+      expect(helper.deductible_display(hbx_enrollment, plan)).to eq plan.family_deductible.split("|").last.squish
+    end
+
+    it "should return individual deductible if hbx_enrollment_members count <= 1" do
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([double])
+      expect(helper.deductible_display(hbx_enrollment, plan)).to eq plan.deductible
+    end
+  end
+
   describe "#dob_in_words" do
     it "returns date of birth in words for < 1 year" do
       expect(helper.dob_in_words(0, "20/06/2015".to_date)).to eq time_ago_in_words("20/06/2015".to_date)
@@ -133,13 +151,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
     context "consumer_portal" do
       it "should return correct options for consumer portal" do
         expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/Domestic Partner/mi)
-        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/other tax dependent/mi)
+        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/Spouse/mi)
+        expect(helper.relationship_options(dependent, "consumer_role_id")).not_to match(/other tax dependent/mi)
       end
     end
 
     context "employee portal" do
       it "should not match options that are in consumer portal" do
-        expect(helper.relationship_options(dependent, "")).not_to match(/Domestic Partner/mi)
+        expect(helper.relationship_options(dependent, "")).to match(/Domestic Partner/mi)
         expect(helper.relationship_options(dependent, "")).not_to match(/other tax dependent/mi)
       end
     end
@@ -331,7 +350,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should return nil given an invalid enrollment ID" do
       expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
     end
-
   end
 
+  describe "#is_new_paper_application?" do
+    let(:person_id) { double }
+    let(:admin_user) { FactoryGirl.create(:user, :hbx_staff)}
+    let(:user) { FactoryGirl.create(:user)}
+    let(:person) { FactoryGirl.create(:person, user: user)}
+    before do
+      allow(admin_user).to receive(:person_id).and_return person_id
+    end
+
+    it "should return true when current user is admin & doing new paper application" do
+      expect(helper.is_new_paper_application?(admin_user, "paper")).to eq true
+    end
+
+    it "should return false when the current user is not an admin & working on new paper application" do
+      expect(helper.is_new_paper_application?(user, "paper")).to eq nil
+    end
+
+    it "should return false when the current user is an admin & not working on new paper application" do
+      expect(helper.is_new_paper_application?(admin_user, "")).to eq false
+    end
+  end
 end

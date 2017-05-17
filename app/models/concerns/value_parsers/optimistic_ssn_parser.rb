@@ -29,6 +29,7 @@ module ValueParsers
             return nil if as_string.blank?
             justified_string = as_string.gsub(/\D/, "").rjust(9, "0")
             return nil if justified_string == "000000000"
+            return nil if justified_string == "999999999"
             justified_string
           end
         end

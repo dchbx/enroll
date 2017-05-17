@@ -15,7 +15,7 @@ module PdfTemplates
     attribute :coverage_start_on, Date
     attribute :to, String
     attribute :plan, PdfTemplates::Plan
-    attribute :trigger_type, String
+    attribute :plan_year, PdfTemplates::PlanYear
 
     def shop?
       return true

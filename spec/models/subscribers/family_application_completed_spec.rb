@@ -101,20 +101,6 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(subject).not_to receive(:log)
           subject.call(nil, nil, nil, nil, message)
         end
-
-        context "imports a payload with a different e_case_id/integrated_case_id" do
-
-          it "should log an error saying integrated_case_id does not match family " do
-            subject.call(nil, nil, nil, nil, message)
-            expect(subject).to receive(:log) do |arg1, arg2|
-              expect(arg1).to eq(message["body"])
-              expect(arg2[:error_message]).to match(/Integrated case id does not match existing family/)
-              expect(arg2[:severity]).to eq('critical')
-            end
-            family.update_attribute(:e_case_id, "some_other_id")
-            subject.call(nil, nil, nil, nil, message)
-          end
-        end
       end
 
       context "with another valid single person family" do
@@ -491,10 +477,18 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.tax_household_members.select{|thm| thm.is_primary_applicant?}.first.family_member).to eq person.primary_family.primary_family_member
       end
 
-      it "has 2 coverage households with 2 members each" do
+      it "has 2 coverage households with 4 members in immediate family" do
         expect(tax_household_db.household.coverage_households.length).to eq 2
-        expect(tax_household_db.household.coverage_households.first.coverage_household_members.length).to eq 2
+        expect(tax_household_db.household.coverage_households.where(is_immediate_family: true).first.coverage_household_members.length).to eq 4
         expect(tax_household_db.household.coverage_households.first.coverage_household_members.select{|thm| thm.is_subscriber?}.first.family_member).to eq person.primary_family.primary_family_member
+      end
+
+      it "has 2 coverage households with 0 members in non-immediate family" do
+        expect(tax_household_db.household.coverage_households.where(is_immediate_family: false).first.coverage_household_members.length).to eq 0
+      end
+
+      it "should has the following relations under primary family person" do
+        expect(family_db.family_members.map(&:primary_relationship)).to eq ["self", "spouse", "child", "child"]
       end
 
       it "updates all consumer role verifications" do

@@ -24,9 +24,37 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def send_employee_open_enrollment_invitation(email, census_employee, invitation)
+    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
+    if email.present?
+      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
+        if census_employee.hired_on > TimeKeeper.date_of_record
+          format.html { render "invitation_email", :locals => { :person_name => census_employee.full_name, :invitation => invitation }}
+        elsif census_employee.hired_on <= TimeKeeper.date_of_record && plan_years.any?{|py| py.employees_are_matchable?}
+          format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+        end
+      end
+    end
+  end
+
+  def send_future_employee_open_enrollment_invitation(email, census_employee, invitation)
+    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
+    if email.present? && plan_years.any?{|py| py.employees_are_matchable?}
+      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
+        format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      end
+    end
+  end
+
   def renewal_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
       format.html { render "renewal_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+    end
+  end
+
+  def initial_employee_invitation_email(email, census_employee, invitation)
+    mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
+      format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
     end
   end
 
