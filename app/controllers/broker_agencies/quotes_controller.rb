@@ -274,9 +274,6 @@ class BrokerAgencies::QuotesController < ApplicationController
     if @quote.destroy
       flash[:notice] = "Successfully deleted #{@quote.quote_name}."
       respond_to do |format|
-        format.js{
-          render js: 'location.reload()'
-        }
         format.html {
           redirect_to my_quotes_broker_agencies_broker_role_quotes_path(@broker)
         }
