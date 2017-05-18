@@ -2115,8 +2115,6 @@ describe PlanYear, "which has the concept of export eligibility" do
           expect(subject.eligible_for_export?).not_to eq true
         end
       end
-
-
     end
   end
 
