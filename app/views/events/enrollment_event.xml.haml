@@ -23,4 +23,9 @@
               %market= "urn:openhbx:terms:v1:aca_marketplace#shop"
             -elsif hbx_enrollment.kind == 'coverall'
               %market= "urn:openhbx:terms:v1:aca_marketplace#coverall"
+            -unless hbx_enrollment.household.latest_active_tax_household.blank?
+              - th = hbx_enrollment.household.latest_active_tax_household
+              %premium_effective_date= simple_date_for(th.effective_starting_on)
+              %assistance_election_date= simple_date_for(th.latest_eligibility_determination.determined_on)
+            %premium_effective_date
             = render "events/hbx_enrollment/policy", :formats => ["xml"], :hbx_enrollment => hbx_enrollment
