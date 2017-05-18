@@ -179,7 +179,16 @@ class PlanYear
 
   def eligible_for_export?
     return false if self.aasm_state.blank?
-    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+
+    unless INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+      true
+    else
+      if aasm_state == "terminated" && (terminated_on >= TimeKeeper.date_of_record)
+        true
+      else
+        false
+      end
+    end
   end
 
   def overlapping_published_plan_years
