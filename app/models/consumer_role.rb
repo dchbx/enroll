@@ -60,6 +60,7 @@ class ConsumerRole
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
+  field :is_applying_coverage, type: Boolean, default: true
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil

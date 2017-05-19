@@ -1,0 +1,1 @@
+<%= select_tag("attributes[#{cell.model}][#{cell.attribute}]", options_for_select(cell.values), prompt: ' NONE', disabled: cell.disabled, required: cell.required, class: "form-control") %>

@@ -1,0 +1,73 @@
+<%= render 'workflow/step_partials/progress'%>
+
+<div class="row">
+  <div class="col-md-12" style="display:none">step <%= @current_step.to_i %><%= @steps.last_step?(@current_step) %></div>
+  <%= render 'workflow/step_partials/left_nav'%>
+  <div class="col-md-7">
+    <div class="">
+      <% if !@current_step.heading.nil? %>
+      <h1 class="darkblue"><%= @current_step.heading %></h1>
+      <% if !@current_step.heading_text.nil? %>
+      <p ><%= @current_step.heading_text %></p>
+      <% end %>
+      <% end %>
+
+      <div class="focus_effect module">
+        <%= workflow_form_for @model do %>
+          <% @current_step.sections.each do |section| %>
+            <div class="margin-bottom-30">
+              <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
+            </div>
+          <% end %>
+          <% if  @steps.last_step?(@current_step) %>
+            <%= submit_tag 'Finish' %>
+          <% else %>
+            <% if !@steps.first_step?(@current_step) %>
+              <%= link_to 'Previous Step', previous_step_for %>
+            <% end %>
+            <%#= submit_tag 'Next step' %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <%= render 'workflow/step_partials/right_nav'%>
+</div>
+
+
+<script>
+  var headingMapper = {
+    "Personal info": "accountRegistration",
+    "More about You": "personalInformation",
+    "Address": "personalInformation",
+    "Communication Preferences": "personalInformation",
+    "Race / Ethnicity": "personalInformation",
+    "Who Do You Want To Enroll In a Plan?": "householdInfo",
+    "Who Can Enroll": "householdInfo",
+    "Confirm Plan and Sign Up": "householdInfo",
+    "Confirm Plan and Sign Up": "householdInfo",
+    "Help for Paying Coverage": "householdInfo",
+    "Tax Info 1": "householdInfo",
+    "Tax Info 2": "householdInfo",
+    "Job Income 1": "householdInfo",
+    "Job Income 2": "householdInfo",
+    "Other Income 1": "householdInfo",
+    "Other Income 2": "householdInfo",
+    "Adjustments 1": "householdInfo",
+    "Adjustments 2": "householdInfo",
+    "Other Health Coverage 1": "householdInfo",
+    "Other Health Coverage 2": "householdInfo",
+    "Other Questions": "householdInfo"
+  };
+
+  $(function() {
+    var currentHeading = "<%=@current_step.heading%>";
+    listID = headingMapper[currentHeading];
+    $('li#' + headingMapper[currentHeading] ).prevAll().addClass('completed');
+    $('li#' + headingMapper[currentHeading] ).addClass('active');
+  });
+
+  $('input[type="submit"]').on('click',function() {
+    $('form').submit();
+  })
+</script>

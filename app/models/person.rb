@@ -36,6 +36,10 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
+  field :is_incarcerated_pending_charge_disposition, type: Boolean
+  field :is_incarcerated_in_dc, type: Boolean
+  field :incarceration_date, type: Date
+  field :expected_release_date, type: Date
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array

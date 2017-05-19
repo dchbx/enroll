@@ -27,6 +27,7 @@ class Family
   increments :hbx_assigned_id, seed: 9999
 
   field :e_case_id, type: String # Eligibility system foreign key
+  #field :fin_app_id, type: String # Financial Application ID, Use Family ID instead
   field :e_status_code, type: String
   field :application_type, type: String
   field :renewal_consent_through_year, type: Integer # Authorize auto-renewal elibility check through this year (CCYY format)
@@ -48,12 +49,13 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
+  has_many :applications, class_name: "FinancialAssistance::Application"
 
   after_initialize :build_household
   before_save :clear_blank_fields
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
-                                :households, :broker_agency_accounts, :general_agency_accounts
+                                :households, :broker_agency_accounts, :general_agency_accounts, :applications
 
   # index({hbx_assigned_id: 1}, {unique: true})
   index({e_case_id: 1}, { sparse: true })

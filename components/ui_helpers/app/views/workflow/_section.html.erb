@@ -1,0 +1,45 @@
+
+<% if !heading.nil? %>
+  <div class="row">
+    <h2 class="darkblue"><%= heading %></h2>
+  </div>
+<% end %>
+
+<% if !heading_text.nil? %>
+  <div class="row">
+    <p><%= heading_text %></p>
+    <p class="memo">* = required field</p>
+  </div>
+<% end %>
+
+<% lines.each do |line| %>
+  <div class="row row-form-wrapper no-buffer row-height">
+  <% line.cells.each do |cell| %>
+
+  <div class='col-md-<%= cell.gutter %>'>
+    <% case cell.type %>
+    <% when 'radio' %>
+      <%= render 'workflow/radio', cell: cell %>
+    <% when 'checkbox' %>
+      <%= render 'workflow/checkbox', cell: cell %>
+    <% when 'dropdown' %>
+      <%= render 'workflow/dropdown', cell: cell %>
+    <% when 'text' %>
+      <%= render 'workflow/text', cell: cell %>
+    <% when 'input' %>
+      <%= render 'workflow/input', cell: cell %>
+    <% when 'label' %>
+      <%= render 'workflow/label', cell: cell %>
+    <% when 'raw_html' %>
+      <%= render 'workflow/raw_html', cell: cell %>
+    <% when 'anchor' %>
+      <%= render 'workflow/anchor', cell: cell %>
+    <% when 'label_radio' %>
+      <%= render 'workflow/label_radio', cell: cell %>
+    <% end %>
+  </div>
+  <% end %>
+
+  </div>
+<% end %>
+<br><br>

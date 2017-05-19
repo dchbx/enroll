@@ -1,0 +1,135 @@
+textarea:focus, input:focus {
+    color: #044972;
+}
+
+input::-webkit-input-placeholder {
+    font-size: 12px;
+    line-height: 3;
+    color: #C3C3C3;
+}
+
+/*input {
+  width: 100%;
+}*/
+
+.span-text {
+    padding-left: 10px !important;
+    color: #414141 !important;
+    font-size: 13px !important;
+    opacity: 0.5;
+}
+
+.checkbox-label {
+  padding-left: 0px;
+  color: #414141 !important;
+    font-size: 13px !important;
+    opacity: 0.5;
+}
+
+.top-small-buffer {
+  margin-top: 5px;
+}
+
+.memo {
+  margin: 0px;
+  color: #414141 !important;
+    font-size: 13px !important;
+    opacity: 0.5;
+    text-align: end;
+}
+
+.left-buffer {
+  margin-left: 10px !important;
+}
+
+.dottedline {
+  border-bottom: 1.5px dashed #044972 ; 
+ text-decoration: none;
+
+}
+
+
+
+
+.form-action {
+      margin: 8px 0 20px;
+      display: inline-block;
+      color: #007bc4;
+      font-size: 14px;
+      font-weight: none;
+      border-radius: 4px;
+      border: solid 1px #b2b2b2;
+      background-color: transparent;
+}
+
+
+.btn {
+  margin: 3px 0;
+  border-color: #007bc4;
+}
+        .btn-default {
+  color: $secondary-button-text;
+  background-color: $secondary-button-background;
+  border-color: $secondary-button-border;
+  text-transform: $secondary-button-text-casing;
+  font-weight: $primary-bold;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.blue_border_top{
+  background-color: #007BC4; 
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+}
+
+.input-border-none {
+  border: none;
+}
+
+textarea:focus, input:focus, input{
+    outline: none;
+    border: none;
+}
+
+::-webkit-input-placeholder { 
+  font-size: 20px;
+}
+
+.small-padding-top-bottom {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.row-height {
+  line-height: 2.4
+}
+
+.no-top-margin {
+  margin-top: 0px !important;
+}
+
+.medium-negative-margin {
+  margin-left: -40px;
+}
+
+.no-margin-padding {
+  margin: 0px;
+  padding: 0px
+}
+
+.line-height-small {
+  line-height: 1;
+}
+
+.line-height-medium {
+  line-height: 2;
+}
+
+.font-size-small {
+  font-size: 12px;
+}
+
+
+

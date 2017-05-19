@@ -1,17 +1,17 @@
-require 'autoinc'
+# A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
+# when determining eligibility for Insurance Assistance and Medicaid
 
 class TaxHousehold
+  require 'autoinc'
+
   include Mongoid::Document
-  include SetCurrentUser
   include Mongoid::Timestamps
+  include Mongoid::Autoinc
   include HasFamilyMembers
   include Acapi::Notifiers
-  include Mongoid::Autoinc
+  include SetCurrentUser
 
-  # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
-  # when determining eligibility for Insurance Assistance and Medicaid
-
-  embedded_in :household
+  embedded_in :application, class_name: "FinancialAssistance::Application"
 
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
@@ -24,9 +24,11 @@ class TaxHousehold
   field :submitted_at, type: DateTime
 
   embeds_many :tax_household_members
-  accepts_nested_attributes_for :tax_household_members
-
   embeds_many :eligibility_determinations
+  has_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
+  
+
+  accepts_nested_attributes_for :tax_household_members
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }

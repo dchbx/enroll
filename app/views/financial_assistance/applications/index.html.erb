@@ -1,0 +1,7 @@
+<% if @existing_applications.empty? %>
+ <%= link_to "new application", new_financial_assistance_application_path, class: "btn btn-default"  %>
+<% else %>
+  <% @existing_applications.each do |application| %>
+ <%= link_to "existing application", step_financial_assistance_application_path(application), class: "btn btn-default"  %>
+  <% end %>
+<% end %>
