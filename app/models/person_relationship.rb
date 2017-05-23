@@ -7,12 +7,12 @@ class PersonRelationship
   MaleRelationships   = %W(father grandfather grandson uncle nephew adopted\ child stepparent
                               foster\ child son-in-law brother-in-law father-in-law brother ward
                               stepson child sponsored\ dependent dependent\ of\ a\ minor\ dependent
-                              guardian court\ appointed\ guardian collateral\ dependent life\ partner)
+                              guardian court\ appointed\ guardian collateral\ dependent life\ partner domestic\ partner)
 
   FemaleRelationships = %W(mother grandmother granddaughter aunt niece adopted\ child stepparent
                               foster\ child daughter-in-law sister-in-law mother-in-law sister ward
                               stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
-                              guardian court\ appointed\ guardian collateral\ dependent life\ partner)
+                              guardian court\ appointed\ guardian collateral\ dependent life\ partner domestic\ partner)
 
   Relationships = [
     "spouse",
@@ -83,6 +83,7 @@ class PersonRelationship
     "other_relationship" => "other_relationship",
     "cousin" => "cousin",
     "unrelated" => "unrelated",
+    "domestic_partner" => "domestic_partner",
 
     #one directional
     "foster_child" => "guardian",
@@ -97,7 +98,7 @@ class PersonRelationship
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String
 
-	validates_presence_of :relative_id, message: "Choose a relative"
+       validates_presence_of :relative_id, message: "Choose a relative"
   validates :kind,
             presence: true,
             allow_blank: false,

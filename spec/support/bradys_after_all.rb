@@ -67,8 +67,10 @@ module BradysAfterAll
     def create_mikes_family
       mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
       mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
+      carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
       brady_children.each do |child|
         mike.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+        child.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "parent")
       end
       mike.save
 
@@ -84,8 +86,10 @@ module BradysAfterAll
     def create_carols_family
       carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
       carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
+      mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
       brady_children.each do |child|
         carol.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+        child.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "parent")
       end
       carol.save
 

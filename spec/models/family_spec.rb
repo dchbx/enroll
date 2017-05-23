@@ -63,7 +63,9 @@ describe Family, type: :model, dbclean: :after_each do
   end
 
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
-  let(:family_member_spouse) { FamilyMember.new(person: spouse) }
+  let(:family_member_spouse) { p = spouse
+    p.person_relationships.build(relative: person, kind: "spouse").save
+    FamilyMember.new(person: spouse) }
 
   context "when built" do
     context "with valid parameters" do
@@ -406,6 +408,37 @@ describe Family do
     end
   end
 
+  describe '#all_family_member_relations_defined' do
+    let!(:husband) { FactoryGirl.build_stubbed :person, :male, first_name: 'Bill' }
+    let!(:wife) { FactoryGirl.build_stubbed :person, :female, first_name: 'Kelly' }
+    before :each do
+      husband.person_relationships << PersonRelationship.new({
+        :kind => 'spouse',
+        :relative_id => wife.id
+      })
+      family.family_members = [
+        FactoryGirl.build_stubbed(:family_member, is_active: true, is_primary_applicant: true, person: husband),
+        FactoryGirl.build_stubbed(:family_member, person: wife)
+      ]
+    end
+    context "with dependents not having relationships with primary_family_member" do
+      it 'is not valid' do
+        expect(family).to_not be_valid
+      end
+    end
+    context "with dependent having relationships with primary_family_member" do
+      before :each do
+        wife.person_relationships << PersonRelationship.new({
+          :kind => 'spouse',
+          :relative_id => husband.id
+        })
+      end
+      it "is valid" do
+        expect(family).to be_valid
+      end
+    end
+  end
+
   context "latest_shop_sep" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     before do
@@ -476,11 +509,9 @@ end
 describe "special enrollment periods" do
 =begin
   include_context "BradyBunchAfterAll"
-
   before :each do
     create_brady_families
   end
-
   let(:family) { mikes_family }
   let(:current_sep) { FactoryGirl.build(:special_enrollment_period) }
   let(:another_current_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date) }
@@ -501,17 +532,25 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:spouse)        { FactoryGirl.create(:person, last_name: "richards", first_name: "denise") }
   let(:child)         { FactoryGirl.create(:person, last_name: "sheen", first_name: "sam") }
   let(:grandpa)       { FactoryGirl.create(:person, last_name: "sheen", first_name: "martin") }
+  let(:person)        { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck") }
 
-  let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
-                                 PersonRelationship.new(relative: child, kind: "child")] }
-  let(:family_relationships)  {  married_relationships <<
-                                 PersonRelationship.new(relative: grandpa, kind: "grandparent") }
+  let(:married_relationships) { 
+    spouse.person_relationships.build(relative: person, kind: "spouse").save
+    child.person_relationships.build(relative: person, kind: "parent").save
+    [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
+  let(:family_relationships)  {  grandpa.person_relationships.build(relative: person, kind: "child")
+    married_relationships << PersonRelationship.new(relative: grandpa, kind: "grandparent") }
 
   let(:single_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "tigerblood") }
-  let(:married_dude)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck",
-                                           person_relationships: married_relationships ) }
-  let(:family_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "charles",
-                                           person_relationships: family_relationships ) }
+  let(:married_dude)  { p = person
+     person.person_relationships = married_relationships
+     p.save
+     p
+  }
+  let(:family_dude)   {p = person
+    p.person_relationships= family_relationships
+    p.save
+    p }
 
   let(:single_employee_role)    { FactoryGirl.create(:employee_role, person: single_dude) }
   let(:married_employee_role)   { FactoryGirl.create(:employee_role, person: married_dude) }
@@ -1120,8 +1159,8 @@ describe Family, "with 2 households a person and 2 extended family members", :db
   before(:each) do
     f_id = family.id
     family.add_family_member(primary, is_primary_applicant: true)
-    family.relate_new_member(family_member_person_1, "unknown")
-    family.relate_new_member(family_member_person_2, "unknown")
+    family.relate_new_member(family_member_person_1, "unrelated")
+    family.relate_new_member(family_member_person_2, "unrelated")
     family.save!
   end
 
