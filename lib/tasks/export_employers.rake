@@ -1,4 +1,5 @@
 require 'csv'
+require 'json'
 
 namespace :employers do
   desc "Export employers to csv."
@@ -7,6 +8,7 @@ namespace :employers do
     orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
     FILE_PATH = Rails.root.join "employer_export.csv"
+    JSON_FILE_PATH = Rails.root.join "employer_export.json"
 
     def get_primary_office_location(organization)
       organization.office_locations.detect do |office_location|
@@ -135,7 +137,17 @@ namespace :employers do
 
     end
 
-    puts "Output written to #{FILE_PATH}"
+    lines = CSV.open(FILE_PATH).readlines
+    keys = lines.delete lines.first
 
+    File.open(JSON_FILE_PATH, 'w') do |f|
+      data = lines.map do |values|
+        Hash[keys.zip(values)]
+      end
+      f.puts JSON.pretty_generate(data)
+    end
+
+    puts "Output written to #{FILE_PATH}"
+    puts "JSON Output written to #{JSON_FILE_PATH}"
   end
 end
