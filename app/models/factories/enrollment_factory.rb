@@ -171,7 +171,7 @@ module Factories
         person_details.name_sfx, census_employee.ssn,
         census_employee.dob, person_details.gender, "employee"
         )
-      return nil, nil if person.blank? && person_new.blank?
+      return nil, nil if person.nil? && person_new.nil?
       self.build_employee_role(
         person, person_new, census_employee.employer_profile,
         census_employee, census_employee.hired_on
