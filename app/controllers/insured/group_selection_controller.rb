@@ -56,11 +56,23 @@ class Insured::GroupSelectionController < ApplicationController
   def create
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
+
+
+
+
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
     raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
+    end
+
+    if @hbx_enrollment.present?
+      if @market_kind == "shop" && @hbx_enrollment.plan.market == "individual"
+        raise "You cannot elect employer sponsored coverage with an individual market plan. Please shop for a new plan."
+      elsif @market_kind == "individual" && @hbx_enrollment.plan.market == "shop"
+        raise "You cannot elect individual market coverage with a shop market plan. Please shop for a new plan."
+      end
     end
 
     hbx_enrollment = build_hbx_enrollment
