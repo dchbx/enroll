@@ -19,7 +19,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#verification_type_status" do
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     context "Social Security Number" do
       it "returns outstanding status for consumer without state residency" do
         expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"

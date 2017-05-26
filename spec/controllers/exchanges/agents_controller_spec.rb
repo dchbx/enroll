@@ -57,23 +57,21 @@ RSpec.describe Exchanges::AgentsController do
       end
     end
 
-
-    context "When passed RIDP and having enrollment" do
-      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person_user) }
-      let(:household) { FactoryGirl.create(:household, family: person_user.primary_family) }
-      let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person_user.primary_family.latest_household, kind: "individual", is_active: true)}
+    context "when admin submitted paper application" do
 
       before do
-        allow(household).to receive(:hbx_enrollments).with(:first).and_return enrollment
-        current_user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
         consumer_role.update_attributes(bookmark_url: '/')
-      end
-      it 'should redirect to consumer role bookmark url' do
         sign_in current_user
-        get :resume_enrollment, person_id: person_user.id
-        person_user.reload
-        expect(person_user.consumer_role.bookmark_url).to eq '/families/home'
-        expect(response).to redirect_to '/families/home'
+      end
+
+      it "should not redirect to family account path if not paper application" do
+        get :resume_enrollment, person_id: person_user.id, original_application_type: "not_paper"
+        expect(response).not_to redirect_to family_account_path
+      end
+
+      it "should redirect to family account path if admin submitted paper application" do
+        get :resume_enrollment, person_id: person_user.id, original_application_type: "paper"
+        expect(response).to redirect_to family_account_path
       end
     end
   end

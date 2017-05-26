@@ -22,6 +22,27 @@ RSpec.describe Employers::PremiumStatementHelper, :type => :helper do
       it "should have  next month in the drop down" do
         expect(helper.billing_period_options.first[1]).to eq TimeKeeper.date_of_record.next_month.beginning_of_month
       end
+
+      it "should have the month which is 4 months older, as the last option in dropdown" do
+        expect(helper.billing_period_options.last[1]).to eq TimeKeeper.date_of_record.beginning_of_month - 4.months
+      end
+
+      context "when ER has plan which has start_on date older than 6 months from now" do
+        let!(:old_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+        before do
+          start_on = (TimeKeeper.date_of_record).beginning_of_month - 7.months
+          old_plan_year.update_attributes(
+          start_on: start_on,
+          end_on: start_on + 1.year - 1.day,
+          open_enrollment_start_on: (start_on - 30).beginning_of_month,
+          open_enrollment_end_on: (start_on - 30).beginning_of_month + 1.weeks,
+          aasm_state: "active"
+          )
+        end
+        it "should have the month which is 5 months older than upcoming billing date as the last option in dropdown" do
+          expect(helper.billing_period_options.last[1]).to eq helper.billing_period_options.first[1] - 5.months
+        end
+      end
     end
 
     context "when ER has plan year which stars 2 months ahead in future" do

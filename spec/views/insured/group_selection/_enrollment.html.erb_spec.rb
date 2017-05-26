@@ -1,6 +1,7 @@
 require 'rails_helper'
+include Insured::FamiliesHelper
 
-RSpec.describe "insured/group_selection/_enrollment.html.erb"  do
+RSpec.describe "insured/group_selection/_enrollment.html.erb" do
   let(:employee_role) { FactoryGirl.build(:employee_role) }
   let(:person) { FactoryGirl.build(:person) }
   let(:plan) { FactoryGirl.build(:plan) }
@@ -34,5 +35,16 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb"  do
 
   it "should not have button of change plan" do
     expect(rendered).not_to have_selector('a', text: 'Change Plan')
+  end
+
+  it "should show the DCHL ID as hbx_enrollment.hbx_id" do
+    expect(rendered).to match /DCHL ID/
+    expect(rendered).to match /#{hbx_enrollment.hbx_id}/
+  end
+
+  it "should show the correct Premium" do
+    dollar_amount = number_to_currency(current_premium(hbx_enrollment), precision: 2)
+    expect(rendered).to match /Premium/
+    expect(rendered).to include dollar_amount
   end
 end

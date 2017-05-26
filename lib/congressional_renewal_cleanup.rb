@@ -1,9 +1,6 @@
 class CongressionalRenewalCleanup
 
   EMPLOYERS = [
-    "536002522",
-    "536002523",
-    "536002558"
   ]
 
   def families(benefit_groups = [])

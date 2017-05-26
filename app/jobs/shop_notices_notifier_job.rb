@@ -1,12 +1,12 @@
 class ShopNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 
-  def perform(employer_profile_id, event)
+  def perform(id, event)
     Resque.logger.level = Logger::DEBUG
-    employer_profile = EmployerProfile.find(employer_profile_id)
+    profile = EmployerProfile.find(id) || CensusEmployee.where(id: id).first
     event_kind = ApplicationEventKind.where(:event_name => event).first
     notice_trigger = event_kind.notice_triggers.first
-    builder = notice_trigger.notice_builder.camelize.constantize.new(employer_profile, {
+    builder = notice_trigger.notice_builder.camelize.constantize.new(profile, {
               template: notice_trigger.notice_template,
               subject: event_kind.title,
               mpi_indicator: notice_trigger.mpi_indicator,

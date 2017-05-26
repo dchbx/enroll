@@ -1,20 +1,24 @@
 <% custom_css = (defined? custom_css) ? custom_css : false %>
 <% if plan.sbc_document.present? %>
   <% link_text = "Summary of Benefits and Coverage" %>
+  <% link_text_class = "Summary-of-Benefits-and-Coverage" %>
   <% link_text = "Plan Summary" unless plan.coverage_kind == "health" %>
+  <% link_text_class = "plan-summary" unless plan.coverage_kind == "health" %>
+  <% icon_class = "pull-left" unless plan.coverage_kind == "health" %>
   <% text_class = "health" %>
   <% text_class = "dental" unless plan.coverage_kind == "health" %>
 
   <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
   <%= link_to(document_download_path(bucket, key) + "?content_type=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link #{text_class} vertically-aligned-row", :target => "_blank") do %>
     <% if custom_css.present? %>
-      <i class="fa fa-file-pdf-o fa-1x" ></i>
+      <i class="fa fa-file-pdf-o fa-2x pull-left" ></i>
       <div class="fa-icon-label <%= text_class %>" style="display: inline; font-size: 10px;"><%= link_text %></div>
     <% else %>
-      <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i>
-      <span><%= link_text %></span>
+      <!--<i class="fa fa-file-pdf-o fa-1x" style="padding-top: 0.15em"></i>-->
+      <i class="fa fa-file-pdf-o fa-2x <%= icon_class %>" ></i>
+      <span class = "<%= link_text_class %>"><%= link_text %></span>
     <% end %>
   <% end %>
 <% else %>
-  <i class="fa fa-file-pdf-o fa-1x <%= text_class %>"></i><span><%= link_text %></span>
+  <i class="fa fa-file-pdf-o fa-2x <%= text_class %>"></i><span class="<%= link_text_class %>"><%= link_text %></span>
 <% end %>

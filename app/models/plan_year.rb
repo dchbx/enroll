@@ -28,6 +28,9 @@ class PlanYear
 
   field :imported_plan_year, type: Boolean, default: false
 
+  # Plan year created to support Employer converted into system. May not be complaint with Hbx Business Rules
+  field :is_conversion, type: Boolean, default: false
+
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
 
@@ -92,7 +95,22 @@ class PlanYear
       ]
     )
   }
-  
+
+  after_update :update_employee_benefit_packages
+
+  def update_employee_benefit_packages
+    if self.start_on_changed?
+      bg_ids = self.benefit_groups.pluck(:_id)
+      employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+      employees.each do |census_employee|
+        census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+          assignment.update(start_on: self.start_on)
+          assignment.update(end_on: self.end_on) if assignment.end_on.present?
+        end
+      end
+    end
+  end
+
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
@@ -112,7 +130,11 @@ class PlanYear
           "$in" => id_list
         },
         "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},
-        "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month, "$gte" => self.start_on}
+        "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month, "$gte" => self.start_on},
+        "$or" => [
+         {"households.hbx_enrollments.terminated_on" => {"$eq" => nil} },
+         {"households.hbx_enrollments.terminated_on" => {"$gte" => date.end_of_month}}
+        ]
       }},
       {"$sort" => {
         "households.hbx_enrollments.submitted_at" => 1
@@ -228,6 +250,10 @@ class PlanYear
   def employee_participation_percent_based_on_summary
     return "-" if eligible_to_enroll_count == 0
     "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
+  end
+
+  def external_plan_year?
+    employer_profile.is_conversion? && coverage_period_contains?(employer_profile.registered_on)
   end
 
   def editable?
@@ -373,7 +399,7 @@ class PlanYear
     warnings = {}
 
     unless employer_profile.is_primary_office_local?
-      warnings.merge!({primary_office_location: "Primary office must be located in #{Settings.aca.state_name}"})
+      warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
     end
 
     # Application is in ineligible state from prior enrollment activity
@@ -383,7 +409,7 @@ class PlanYear
 
     # Maximum company size at time of initial registration on the HBX
     if fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
-      warnings.merge!({ fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})" })
+      warnings.merge!({ fte_count: "Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees" })
     end
 
     # Exclude Jan 1 effective date from certain checks
@@ -452,23 +478,19 @@ class PlanYear
   end
 
   def enrolled_by_bga
-    benefit_group_ids = self.benefit_groups.map(&:id)
-    candidate_benefit_group_assignments = eligible_to_enroll.map do |ce|
-        enrolled_bga_for_ce ce, benefit_group_ids
-    end.compact
-    enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
-    bgas = candidate_benefit_group_assignments.select do |bga|
-      enrolled_benefit_group_assignment_ids.include?(bga.id)
-    end
+     candidate_benefit_group_assignments = eligible_to_enroll.map{|ce| enrolled_bga_for_ce(ce)}.compact
+     enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
+     bgas = candidate_benefit_group_assignments.select do |bga|
+       enrolled_benefit_group_assignment_ids.include?(bga.id)
+     end
   end
 
-  # TODO Get definition of enrolled count from @dan/@ram/@hannah
-  def enrolled_bga_for_ce ce, benefit_group_ids
-    bg_assignment = ce.benefit_group_assignments.detect{|assignment|
-      renewing = is_renewing? && !(assignment.initialized?) && !(assignment.coverage_terminated?)
-      enrolled = renewing || assignment.is_active?
-      enrolled && benefit_group_ids.include?(assignment.benefit_group_id)
-    }
+  def enrolled_bga_for_ce ce
+     if is_renewing?
+       ce.renewal_benefit_group_assignment
+     else
+       ce.active_benefit_group_assignment
+     end
   end
 
   def calc_active_health_assignments_for(employee_pool)
@@ -689,7 +711,32 @@ class PlanYear
         "2016-10-01" => '2016,9,13',
         "2016-11-01" => '2016,10,12',
         "2016-12-01" => '2016,11,14',
-        "2017-01-01" => '2016,12,13'}.each_pair do |k, v|
+        "2017-01-01" => '2016,12,13',
+        "2017-02-01" => '2017,1,12',
+        "2017-03-01" => '2017,2,14',
+        "2017-04-01" => '2017,3,14',
+        "2017-05-01" => '2017,4,12',
+        "2017-06-01" => '2017,5,12',
+        "2017-07-01" => '2017,6,13',
+        "2017-08-01" => '2017,7,12',
+        "2017-09-01" => '2017,8,14',
+        "2017-10-01" => '2017,9,12',
+        "2017-11-01" => '2017,10,12',
+        "2017-12-01" => '2017,11,14',
+        "2018-01-01" => '2017,12,12',
+        "2018-02-01" => '2018,1,12',
+        "2018-03-01" => '2018,2,13',
+        "2018-04-01" => '2018,3,13',
+        "2018-05-01" => '2018,4,12',
+        "2018-06-01" => '2018,5,14',
+        "2018-07-01" => '2018,6,12',
+        "2018-08-01" => '2018,7,12',
+        "2018-09-01" => '2018,8,14',
+        "2018-10-01" => '2018,9,12',
+        "2018-11-01" => '2018,10,12',
+        "2018-12-01" => '2018,11,13',
+        "2019-01-01" => '2018,12,12',
+        }.each_pair do |k, v|
           dates_map[k] = Date.strptime(v, '%Y,%m,%d')
         end
 
@@ -721,15 +768,15 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
-    state :enrolled,  :after_enter => :ratify_enrollment              # Published plan open enrollment has ended and is eligible for coverage,
+    state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
+    state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
-    state :renewing_draft
+    state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -739,7 +786,7 @@ class PlanYear
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated           # Coverage under this application is terminated
-    state :conversion_expired # Conversion employers who did not establish eligibility in a timely manner
+    state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
 
     event :activate, :after => :record_transition do
       transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
@@ -773,8 +820,8 @@ class PlanYear
     # Submit plan year application
     event :publish, :after => :record_transition do
       transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :draft, to: :published, :guard => :is_application_eligible?
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :initial_employer_approval_notice]
+      transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => :initial_employer_approval_notice
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
@@ -796,7 +843,7 @@ class PlanYear
       transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
       transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_eligible?
-      transitions from: :draft, to: :publish_pending
+      transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice]
@@ -821,7 +868,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:published, :enrolling, :enrolled, :active], to: :canceled
+      transitions from: [:draft, :published, :enrolling, :enrolled, :active], to: :canceled
     end
 
     # Coverage disabled due to non-payment
@@ -863,7 +910,7 @@ class PlanYear
     end
 
     event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled], to: :renewing_canceled
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled
     end
 
     event :conversion_expire, :after => :record_transition do
@@ -927,7 +974,14 @@ class PlanYear
     TimeKeeper.date_of_record.end_of_day < start_on
   end
 
-private
+  # Checks for external plan year
+  def can_be_migrated?
+    self.employer_profile.is_conversion? && self.is_conversion
+  end
+
+  alias_method :external_plan_year?, :can_be_migrated?
+
+  private
 
   def log_message(errors)
     msg = yield.first
@@ -948,11 +1002,6 @@ private
     else
       false
     end
-  end
-
-  # Checks for external plan year
-  def can_be_migrated?
-    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
   end
 
   def is_event_date_valid?
@@ -985,6 +1034,39 @@ private
     elsif event_name == "force_publish"
       self.employer_profile.trigger_notices("planyear_renewal_3b")
     end
+  end
+
+  def initial_employer_approval_notice
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
+    self.employer_profile.trigger_notices("initial_employer_approval")
+  end
+
+  def initial_employer_open_enrollment_begins
+    return true if (benefit_groups.any?{|bg| bg.is_congress?})
+    self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
+  end
+
+  def renewal_group_notice
+    event_name = aasm.current_event.to_s.gsub(/!/, '')
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
+    if self.employer_profile.is_converting?
+      self.employer_profile.trigger_notices("conversion_group_renewal")
+    else
+      self.employer_profile.trigger_notices("group_renewal_5")
+    end
+  end
+
+  def initial_employer_denial_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
+      self.employer_profile.trigger_notices("initial_employer_denial")
+    end
+  end
+
+  def initial_employer_open_enrollment_completed
+    #also check if minimum participation and non owner conditions are met by ER.
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
   end
 
   def record_transition

@@ -81,6 +81,16 @@ RSpec.describe PeopleController do
         expect(assigns(:person)).not_to be_nil
         expect(flash[:notice]).to eq 'Person was successfully updated.'
       end
+
+      it "should update is_applying_coverage" do
+        allow(request).to receive(:referer).and_return("insured/families/personal")
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:update_attributes).and_return(true)
+        person_attributes.merge!({"is_applying_coverage" => "false"})
+
+        post :update, id: person.id, person: person_attributes
+        expect(assigns(:person).consumer_role.is_applying_coverage).to eq false
+      end
     end
 
     context "when employee" do

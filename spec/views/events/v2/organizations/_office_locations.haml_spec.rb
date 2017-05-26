@@ -8,6 +8,7 @@ RSpec.describe "app/views/events/v2/organizations/_office_location.xml.haml" do
     context "phone" do
       context "kind = work" do
         before :each do
+          office_location.address.kind="primary"
           office_location.phone.kind="work"
           render :template => "events/v2/organizations/_office_location.xml.haml", :locals => {:office_location => office_location}
           @doc = Nokogiri::XML(rendered)
@@ -21,6 +22,7 @@ RSpec.describe "app/views/events/v2/organizations/_office_location.xml.haml" do
       # temporary spec for phone kind
       context "kind = phone main" do
         before :each do
+          office_location.address.kind="primary"
           office_location.phone.kind="phone main"
           render :template => "events/v2/organizations/_office_location.xml.haml", :locals => {:office_location => office_location}
           @doc = Nokogiri::XML(rendered)

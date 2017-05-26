@@ -1,0 +1,82 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% end %>
+<div class="container">
+  <div id="dependents_info_wrapper">
+    <div class="row">
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-pd">
+
+        <% if @change_plan.present? %>
+           <h3 class="blue-text"><%= params[:change_plan] %>, on: <%= @change_plan_date %></h3>
+        <% end %>
+
+        <h1 class="darkblue">Household Info: Family Members</h1>
+        <h4>If you need to get insurance coverage for other members of your household, select 'Add Member'. When you’re finished, select CONTINUE.</h4>
+        <p class='memo'>* = required field</p>
+
+        <div class="row no-buffer">
+          <div class="col-md-12 col-sm-12 col-xs-12 no-pd first">
+            <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
+              <label class="static_label label-floatlabel" for="name">NAME</label>
+              <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
+            </div>
+            <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
+              <label class="static_label label-floatlabel" for="relation">RELATION</label>
+              <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
+          <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
+            <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+              <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
+              <br>
+              <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
+                <%= link_to "Add Member", new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
+                  &nbsp; &nbsp;
+                <a class="text-center btn btn-success">Continue</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br>
+        <div class="row no-buffer">
+          <ul class="" id="dependent_ul">
+            <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
+              <%= render "resident_dependent", dependent: dependent, person: @person %>
+            <% end %>
+          </ul>
+        </div>
+
+        <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
+          <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
+            <%= link_to 'Add Member'.html_safe, new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
+            <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, resident_role_id: @resident_role.try(:id), change_plan: @change_plan, market_kind: @market_kind) %>
+            <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
+
+            <% if @change_plan.present? %>
+              <%=
+                link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_url,
+                 class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue'
+              %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
+        <% find_sep_url = find_sep_insured_families_path(resident_role_id: @resident_role.try(:id), change_plan: @change_plan)%>
+        <% if @change_plan.present? %>
+          <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
+        <% else %>
+          <%= render  partial: 'shared/resident_progress', locals: {
+            step: '3',
+            url: (@resident_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
+          } %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

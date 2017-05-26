@@ -66,8 +66,3 @@ RSpec.configure do |config|
   config.include Capybara::DSL
 
 end
-
-# These are included here because map/reduce flips out if the collections don't exist
-# This interacts strangely with db cleaner in some circumstances (i.e. multiple dbs)
-Person.create_indexes
-Family.create_indexes

@@ -1,0 +1,87 @@
+<%= form_for @person do |f|%>
+  <div class="row no-buffer">
+    <div id="personal_info" class="module">
+      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%=f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME" %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%=f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME" %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME" %>
+          </div>
+          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <div class="selectric-labeled">
+              <span><strong>Suffix</strong></span>
+              <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control" %>
+            </div>
+          </div>
+        </div>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH",
+                                             :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy', disabled: 'disabled'} %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+            <div class="radio skinned-form-controls skinned-form-controls-mac">
+              <%= f.radio_button :gender, "male", class: "required floatlabel", id: "gender_male"  %>
+              <label for="gender_male"><span>MALE</span></label>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+            <div class="radio skinned-form-controls skinned-form-controls-mac">
+              <%= f.radio_button :gender, "female", class: "required floatlabel", id: "gender_female"  %>
+              <label for="gender_female"><span>FEMALE</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><br>
+
+  <% if @person.has_active_resident_role? %>
+    <%= render 'shared/resident_fields', f: f %><br>
+    <%= render 'shared/consumer_home_address_fields', f: f %><br>
+  <% else %>
+    <%= render 'shared/home_address_fields', f: f %><br>
+  <% end %>
+
+  <%=
+    unless f.object.phones.nil?
+      ["home","mobile","work","fax"].each do |kind|
+         f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
+      end
+    end
+
+    render 'shared/phone_fields', f: f
+  %><br>
+
+    <% unless f.object.emails.nil?
+         ["home","work"].each do |kind|
+           f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
+         end
+       end
+    %>
+
+    <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+      <div id="email_info" class="row row-form-wrapper no-buffer">
+      <%= render 'shared/email_fields', f: email %>
+        </div><br>
+
+    <% end %>
+
+     <div>
+      <% if @person.has_active_consumer_role? %>
+      <%= render 'shared/contact_preferences', {f: f, role: :consumer_role} %></br>
+      <% else %>
+      <%= render 'shared/contact_preferences', {f: f, role: :employee_roles} %></br>
+      <% end %>
+      </div>
+
+  <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
+    <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
+    <span class='btn btn-lg btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));'><i class="fa fa-user-plus"></i> Save</span>
+  </div>
+<% end %><br>

@@ -1,0 +1,12 @@
+if ($("#add_member_list_<%= @dependent.id %>").length) {
+  $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'resident_dependent', dependent: @dependent,person: @person) %>");
+
+} else {
+  $("#new_employee_dependent_form").replaceWith("<%= escape_javascript(render 'resident_dependent', dependent: @dependent,person: @person) %>");
+}
+
+<% if @created %>
+  $('#qle_flow_info').removeClass('hidden');
+<% end %>
+
+$("#dependent_buttons").removeClass('hidden');

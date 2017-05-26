@@ -1,5 +1,6 @@
 class Exchanges::AgentsController < ApplicationController
   before_action :check_agent_role
+  before_action :check_for_paper_app, only: [:resume_enrollment]
   def home
      @title = current_user.agent_title
      person_id = session[:person_id]
@@ -36,17 +37,12 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def resume_enrollment
-    session[:person_id] = params[:person_id]
-    session[:original_application_type] = params['original_application_type']
-    person = Person.find(params[:person_id])
-    consumer_role = person.consumer_role
-    employee_role = person.employee_roles.last
-    person.set_consumer_role_url
-    person.check_for_ridp(session[:original_application_type]) if session[:original_application_type]
-    if consumer_role && consumer_role.bookmark_url
-      redirect_to bookmark_url_path(consumer_role.bookmark_url)
-    elsif employee_role && employee_role.bookmark_url
-      redirect_to bookmark_url_path(employee_role.bookmark_url)
+    if @person.resident_role && @person.resident_role.bookmark_url
+      redirect_to bookmark_url_path(@person.resident_role.bookmark_url)
+    elsif @person.consumer_role && @person.consumer_role.bookmark_url
+      redirect_to bookmark_url_path(@person.consumer_role.bookmark_url)
+    elsif @person.employee_roles.last && @person.employee_roles.last.bookmark_url
+      redirect_to bookmark_url_path(@person.employee_roles.last.bookmark_url)
     else
       redirect_to family_account_path
     end
@@ -68,6 +64,16 @@ class Exchanges::AgentsController < ApplicationController
     end
     current_user.last_portal_visited = home_exchanges_agents_path
     current_user.save!
+  end
+
+  def check_for_paper_app
+    session[:person_id] = params[:person_id]
+    session[:original_application_type] = params['original_application_type']
+    @person = Person.find(params[:person_id])
+    if session[:original_application_type] == "paper"
+      @person.set_ridp_for_paper_application(session[:original_application_type])
+      redirect_to family_account_path
+    end
   end
 
 

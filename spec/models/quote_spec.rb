@@ -24,6 +24,7 @@ RSpec.describe Quote, type: :model, dbclean: :after_each do
 
   context "when valid quote is published" do
     before do
+      subject.quote_benefit_groups.first.relationship_benefit_for("employee").update_attributes!(:premium_pct => "60")
       subject.publish!
     end
 

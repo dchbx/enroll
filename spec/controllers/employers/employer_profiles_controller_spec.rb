@@ -85,7 +85,9 @@ RSpec.describe Employers::EmployerProfilesController do
     ) }
     let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
     let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
+    
+    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+    let(:plan_year)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
     let(:employer_profile) { plan_year.employer_profile}
 
     let(:policy) {double("policy")}
@@ -596,6 +598,8 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:save).and_return(true)
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       allow(organization).to receive(:errors).and_return nil
+      allow(organization).to receive(:notify_address_change).and_return(true)
+      allow(organization).to receive(:notify_legal_name_or_fein_change).and_return(true)
       sign_in(user)
       expect(Organization).to receive(:find)
 
@@ -619,6 +623,8 @@ RSpec.describe Employers::EmployerProfilesController do
     context "given current user is invalid" do
       it "should render edit template" do
         allow(user).to receive(:save).and_return(false)
+        allow(organization).to receive(:notify_address_change).and_return(true)
+        allow(organization).to receive(:notify_legal_name_or_fein_change).and_return(true)
         sign_in(user)
         put :update, id: organization.id
         expect(response).to be_redirect
@@ -628,10 +634,64 @@ RSpec.describe Employers::EmployerProfilesController do
      context "given the company have managing staff" do
       it "should render edit template" do
         allow(user).to receive(:save).and_return(true)
+        allow(organization).to receive(:notify_address_change).and_return(true)
+        allow(organization).to receive(:notify_legal_name_or_fein_change).and_return(true)
         sign_in(user)
         put :update, id: organization.id
         expect(response).to be_redirect
       end
+
+    context "notify address change" do
+      let(:employer_profile1) { FactoryGirl.build(:employer_profile) }
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:office_location) { OfficeLocation.new(
+          is_primary: true,
+          address: address
+      )
+      }
+      let(:organization1) { Organization.create(
+          legal_name: "Sail Adventures, Inc",
+          dba: "Sail Away",
+          fein: "001223333",
+          employer_profile:employer_profile1,
+          office_locations: [office_location]
+      )
+      }
+      let(:address_attributes) { {
+          :kind => "address kind",
+          :address_1 => "address 1",
+          :address_2 => "address 2",
+          :city => "city",
+          :state => "MD",
+          :zip => "22222"
+      } }
+      let(:organization_params) {
+        {
+            "office_locations_attributes" => {
+                "0" => {
+                    "address_attributes" => address_attributes
+                }
+            }
+        }
+      }
+      before do
+        allow(user).to receive(:save).and_return(true)
+        allow(user).to receive(:person).and_return(person)
+        allow(Organization).to receive(:find).and_return(organization1)
+        allow(employer_profile1).to receive(:staff_roles).and_return(staff_roles)
+        allow(employer_profile1).to receive(:match_employer).and_return person
+        allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
+        allow(organization1).to receive(:update_attributes).and_return(true)
+      end
+
+      it "notify if address updated/added to employer account" do
+        expect(organization1).to receive(:notify).exactly(1).times
+        sign_in(user)
+        allow(controller).to receive(:employer_profile_params).and_return(organization_params)
+        put :update, id: organization1.id
+        expect(response).to be_redirect
+      end
+    end
     end
     # Refs #3898 Person information cannot be updated!
     #it "should update person info" do

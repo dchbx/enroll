@@ -22,17 +22,35 @@ describe PersonRelationship, dbclean: :after_each do
     end
 
     let(:consumer_relationship_kinds) { [
+        "self",
+        "spouse",
+        "domestic_partner",
+        "child",
+        "parent",
+        "sibling",
+        "ward",
+        "guardian",
+        "unrelated",
+        "other_tax_dependent",
+        "aunt_or_uncle",
+        "nephew_or_niece",
+        "grandchild",
+        "grandparent"
+      ] }
+
+    let(:relationships_UI)  { [
       "self",
       "spouse",
       "domestic_partner",
       "child",
       "parent",
       "sibling",
-      "ward",
-      "guardian",
       "unrelated",
-      "other_tax_dependent"
-      ] }
+      "aunt_or_uncle",
+      "nephew_or_niece",
+      "grandchild",
+      "grandparent"
+    ] }
 
     let(:kinds) {  [
       "spouse",
@@ -72,10 +90,13 @@ describe PersonRelationship, dbclean: :after_each do
         expect(BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS).to eq consumer_relationship_kinds
       end
 
-      it "should be valid if kind is present" do
-        expect(PersonRelationship.new(**params).valid?).to be_truthy
+      it "consumer relationships displayed on UI should match" do
+        expect(BenefitEligibilityElementGroup::Relationships_UI).to eq relationships_UI
       end
 
+      it "should be valid if kind is present in person_relationship" do
+        expect(PersonRelationship.new(**params).valid?).to be_truthy
+      end
     end
 
     it "relationships should be sorted" do

@@ -8,7 +8,7 @@ describe Queries::FamilyDatatableQuery, "Filter Scopes for families Index", dbcl
 
   it "filters: by_enrollment_shop_market" do
     fdq = Queries::FamilyDatatableQuery.new({"families" => "by_enrollment_shop_market"})
-    expect(fdq.build_scope.selector).to eq ({"households.hbx_enrollments.aasm_state"=>{"$in"=>HbxEnrollment::ENROLLED_STATUSES}, "households.hbx_enrollments.kind"=>"employer_sponsored"})
+    expect(fdq.build_scope.selector).to eq ({"households.hbx_enrollments.aasm_state"=>{"$in"=>HbxEnrollment::ENROLLED_STATUSES}, "households.hbx_enrollments.kind"=>{"$in"=>["employer_sponsored", "employer_sponsored_cobra"]}})
   end
 
   it "filters: non_enrolled" do

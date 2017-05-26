@@ -18,7 +18,10 @@
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
-            Metal level : <%= display_dental_metal_level @plan %>
+            Benefit: <%= @enrollment.coverage_kind %><br>
+            Metal level : <%= display_dental_metal_level @plan %><br>
+            Market: <%= show_market_name_by_enrollment @enrollment %>
+
           </p>
 
           <br>
@@ -29,11 +32,14 @@
             <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate: true} %>
             <%= render "insured/plan_shoppings/individual_agreement" %>
           <% end %>
+
+          <% if @enrollment.is_cobra_status? %>
+            <p>* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.</p>
+          <% end %>
         </div>
 
         <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => { :enrollment => @enrollment } if @enrollment.employee_role.present? %>
       </div>
-
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
         <% if @change_plan.blank? && @market_kind == "individual" %>
           <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
@@ -41,6 +47,12 @@
           <% else %>
             <%= render  partial: 'shared/sep_progress', locals: {step: '6'} %>
           <% end %>
+        <% elsif @change_plan.blank? && @market_kind == "coverall" %>
+            <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+              <%= render  partial: 'shared/individual_progress', locals: {step: '5'} %>
+            <% else %>
+              <%= render  partial: 'shared/sep_progress', locals: {step: '6'} %>
+            <% end %>
         <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
         <% elsif @change_plan == "change_by_qle" %>

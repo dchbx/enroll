@@ -1,0 +1,61 @@
+<!-- This notice goes to all the employees that are currently active in coverage and have an auto-renewal plan option available. -->
+
+<%= render partial: 'notices/shared/logo' %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Enroll Now: Your Health Plan Open Enrollment Period has Begun</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to your monthly premium to make the cost of coverage more affordable. <br>For a walkthrough of your options, you can follow this <a href='https://dchealthlink.com/sites/default/files/v2/forms/employee_renewal_open_enrollment_guide.pdf'>Open Enrollment Guide</a>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>Your Current Plan Election Will Automatically Renew</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Since you already enrolled in employer-sponsored coverage through #{Settings.site.short_name}, your current plan selection will automatically be renewed as #{notice.plan.plan_name}. Your cost will be #{notice.enrollment.employee_cost} per month to cover #{notice.enrollment.enrollees.join(", ")}. This plan will begin on #{notice.plan_year.start_on} unless you change your plan prior to #{notice.plan_year.open_enrollment_end_on}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>You Are Able to Change Your Plan Selection during Open Enrollment</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "In order to make a change to your employer-sponsored coverage through #{Settings.site.short_name}, you must complete your plan selection for enrollment by #{notice.plan_year.open_enrollment_end_on}, for coverage effective #{notice.plan_year.start_on}. If you no longer wish to receive coverage through #{notice.employer_name} you will want to go into your #{Settings.site.short_name} account and “waive” coverage for the upcoming plan year. Please log-in to your existing #{Settings.site.short_name} account at <a href='www.DCHealthLink.com'>DCHealthLink.com</a> to view your plan options and complete the enrollment process."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you would like to change the dependents you cover on your plan, if available from your employer, you can simply check or uncheck what dependents you cover on the “Choose Coverage for your Household” page. If you need to add dependents to your accounts you can do so under the “Manage Family” tab."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>What is Open Enrollment?</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Open enrollment is your annual opportunity to enroll in health plans offered by your employer or make changes to your current plan selection. Outside of this annual open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain life events such as marriage, birth, or adoption."} %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling #{notice.hbe.phone}."] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)"} %>

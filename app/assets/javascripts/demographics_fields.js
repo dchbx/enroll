@@ -1,3 +1,55 @@
+function isApplyingCoverage(target){
+
+fields = "input[name='" + target + "[is_applying_coverage]']"
+    $("#employer-coverage-msg").hide();
+    $("#ssn-coverage-msg").hide();
+  if($(fields).length > 0){
+    addEventOnNoSsn(target);
+    addEventOnSsn(target);
+    if($(fields).not(":checked").val() == "true"){
+      $("#consumer_fields_sets").hide();
+      $("#employer-coverage-msg").show();
+      if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
+        $("#ssn-coverage-msg").show();
+      }
+
+    }
+    $(fields).change(function () {
+      if($(fields).not(":checked").val() == "true"){
+        $("#consumer_fields_sets").hide();
+        $("#employer-coverage-msg").show();
+        if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
+          $("#ssn-coverage-msg").show();
+        }
+      }else{
+        $("#consumer_fields_sets").show();
+        $("#employer-coverage-msg").hide();
+        $("#ssn-coverage-msg").hide();
+      }
+    });
+  }
+}
+
+function addEventOnNoSsn(target){
+  $("input[name='" + target + "[no_ssn]']").change(function() {
+    if($(this).is(":checked")) {
+       $("#ssn-coverage-msg").hide();
+    }else if($("input[name='" + target + "[ssn]']").val() == '' && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
+        $("#ssn-coverage-msg").show();
+    }
+  });
+}
+
+function addEventOnSsn(target){
+  $("input[name='" + target + "[ssn]']").keyup(function() {
+    if($(this).val() != '') {
+       $("#ssn-coverage-msg").hide();
+    }else if( !$("input[name='" + target + "[no_ssn]']").is(":checked") && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
+        $("#ssn-coverage-msg").show();
+    }
+  });
+}
+
 function applyListenersFor(target) {
   // target is person or dependent
   $("input[name='" + target + "[us_citizen]']").change(function() {
@@ -52,6 +104,7 @@ function applyListenersFor(target) {
       $('#tribal_id').val("");
     }
   });
+
 }
 
 function showOnly(selected) {
@@ -116,6 +169,9 @@ function validationForIndianTribeMember() {
     $('#tribal_id_alert').hide()
   });
   $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
       alert("Please select the option for 'Are you a member of an American Indian or Alaskan Native tribe?'");
       e.preventDefault && e.preventDefault();
@@ -148,6 +204,9 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForUsCitizenOrUsNational(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if ($('input[name="person[us_citizen]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you a US Citizen or US National?');
       PersonValidations.restoreRequiredAttributes(e);
@@ -155,6 +214,9 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForIncarcerated(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if ($('input[name="person[is_incarcerated]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you currently incarcerated?');
       PersonValidations.restoreRequiredAttributes(e);
@@ -162,8 +224,18 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForNaturalizedCitizen(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
     if ($('#naturalized_citizen_container').is(':visible') && $('input[name="person[naturalized_citizen]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you a naturalized citizen?');
+      PersonValidations.restoreRequiredAttributes(e);
+    }
+  }
+
+  function validationForEligibleImmigrationStatuses(e) {
+    if ($('#immigration_status_container').is(':visible') && $('input[name="person[eligible_immigration_status]"]').not(":checked").length == 2) {
+      alert('Please provide an answer for question: Do you have eligible immigration status?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
@@ -215,13 +287,13 @@ var PersonValidations = (function(window, undefined) {
 
           } else {}
         }
-        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
-          if ($(this).val().length != 10) {
-            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
-            PersonValidations.restoreRequiredAttributes(e);
-
-          } else {}
-        }
+//        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
+//          if ($(this).val().length != 10) {
+//            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
+//            PersonValidations.restoreRequiredAttributes(e);
+//
+//          } else {}
+//        }
         if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
 
         } else {
@@ -256,6 +328,7 @@ var PersonValidations = (function(window, undefined) {
     manageRequiredValidations: manageRequiredValidations,
     validationForUsCitizenOrUsNational: validationForUsCitizenOrUsNational,
     validationForNaturalizedCitizen: validationForNaturalizedCitizen,
+    validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     restoreRequiredAttributes: restoreRequiredAttributes
@@ -271,8 +344,10 @@ $(document).ready(function() {
   $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
     PersonValidations.validationForUsCitizenOrUsNational(e);
     PersonValidations.validationForNaturalizedCitizen(e);
+    PersonValidations.validationForEligibleImmigrationStatuses(e);
     PersonValidations.validationForIncarcerated(e);
     PersonValidations.validationForVlpDocuments(e);
   });
 
+  isApplyingCoverage("person");
 });

@@ -353,6 +353,52 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
   end
 
+  describe '#ridp_by_paper_application', dbclean: :after_each do
+    subject { User.new }
+
+    before do
+      subject.ridp_by_paper_application
+    end
+
+    it "should set the identity_final_decision_code as success code" do
+      expect(subject.identity_final_decision_code).to eq User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    end
+
+    it "should set the identity_response_code as success code" do
+      expect(subject.identity_response_code).to eq User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    end
+
+    it "should set the identity_response_description_text as admin bypassed ridp" do
+      expect(subject.identity_response_description_text).to eq "admin bypass ridp"
+    end
+
+    it "should set the identity_verified_date as the it was done" do
+      expect(subject.identity_verified_date).to eq TimeKeeper.date_of_record
+    end
+  end
+
+  describe "#handle_headless_records", dbclean: :after_each do
+    let(:user) { User.new(**valid_params) }
+    let!(:headless_user_with_oim_id) { FactoryGirl.create(:user, oim_id: user.oim_id)}
+    let!(:headless_user_with_email) { FactoryGirl.create(:user, email: user.email)}
+
+    it "should destroy the headless user record which matches with the email" do
+      user.handle_headless_records
+      expect(User.where(email: user.email).first).to eq nil
+    end
+
+    it "should destroy the headless user record which matches with the oim_id" do
+      user.handle_headless_records
+      expect(User.where(email: user.email).first).to eq nil
+    end
+
+    it "should return nil if no headless records found" do
+      headless_user_with_oim_id.update_attribute(:oim_id, "some_other_stuff")
+      headless_user_with_email.update_attribute(:email, "some_other_stuff")
+      expect(user.handle_headless_records).to eq []
+    end
+  end
+
   describe "can_change_broker?", dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person) }
     let(:user) { FactoryGirl.create(:user, person: person) }

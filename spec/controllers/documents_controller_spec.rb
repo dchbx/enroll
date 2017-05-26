@@ -129,7 +129,6 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should redirect to back" do
         post :update_verification_type, person_id: person.id
         expect(response).to redirect_to :back
-        expect(flash[:notice]).to eq("Verification successfully approved.")
       end
     end
   end

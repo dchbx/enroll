@@ -35,7 +35,7 @@ module Subscribers
           end
         end
       end
-    rescue => e
+    rescue Exception => e
       log("GA_ERROR: Unable to set default ga for #{e.try(:message)}", {:severity => "error"})
     end
 

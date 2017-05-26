@@ -38,6 +38,7 @@ FactoryGirl.define do
       reference_plan_id { FactoryGirl.build(:plan).id }
       elected_plan_ids { FactoryGirl.build(:plan).to_a.map(&:id) }
       with_dental false
+      is_conversion false
     end
 
     factory :employer_with_planyear do
@@ -48,7 +49,7 @@ FactoryGirl.define do
 
     factory :employer_with_renewing_planyear do 
       after(:create) do |employer, evaluator|
-        create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on - 1.year, aasm_state: 'active')
+        create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on - 1.year, aasm_state: 'active', is_conversion: evaluator.is_conversion)
         create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on, aasm_state: evaluator.renewal_plan_year_state, renewing: true, with_dental: evaluator.with_dental)
       end
     end

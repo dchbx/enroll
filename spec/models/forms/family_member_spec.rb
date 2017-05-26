@@ -14,11 +14,19 @@ describe Forms::FamilyMember do
   end
 
   it "should require tribal_id when citizen_status=indian_tribe_member" do
-    subject.is_consumer_role = "true"
+    subject.is_consumer_role = true
+    subject.is_applying_coverage = true
     subject.citizen_status = "indian_tribe_member"
     subject.valid?
     expect(subject).to have_errors_on(:tribal_id)
     expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaskan native is selected"]
+  end
+
+  it "should not require validations on indian_tribe_member" do
+    subject.is_consumer_role = true
+    subject.is_applying_coverage = false
+    subject.valid?
+    expect(subject).not_to have_errors_on(:tribal_id)
   end
 
   it "should require a gender" do
@@ -114,13 +122,13 @@ describe Forms::FamilyMember do
     let(:primary) {FactoryGirl.create(:person)}
     let(:family) {double(primary_family_member: double(person: primary))}
     let(:family_member) {double(person: person, family: family)}
-    let(:employee_dependent) { Forms::FamilyMember.new } 
+    let(:employee_dependent) { Forms::FamilyMember.new }
 
-    context "if same with primary" do 
+    context "if same with primary" do
       before :each do
         allow(employee_dependent).to receive(:same_with_primary).and_return 'true'
-        allow(employee_dependent).to receive(:family).and_return family 
-      end 
+        allow(employee_dependent).to receive(:family).and_return family
+      end
 
       it "update person's attributes" do
         allow(primary).to receive(:no_dc_address).and_return true
@@ -133,45 +141,45 @@ describe Forms::FamilyMember do
       it "add new address if address present" do
         allow(primary).to receive(:home_address).and_return addr3
         employee_dependent.assign_person_address(person)
-        expect(person.addresses.include?(addr3)).to eq true 
+        expect(person.addresses.include?(addr3)).to eq true
       end
 
       it "not add new address if address blank" do
         allow(primary).to receive(:home_address).and_return nil
         employee_dependent.assign_person_address(person)
-        expect(person.addresses.include?(addr3)).to eq false 
-      end 
+        expect(person.addresses.include?(addr3)).to eq false
+      end
     end
 
     context "if not same with primary" do
-      before :each do 
+      before :each do
         allow(employee_dependent).to receive(:same_with_primary).and_return 'false'
       end
 
-      context "if address_1 is blank and city is blank" do 
+      context "if address_1 is blank and city is blank" do
         let(:addresses) { {"0" => {"kind"=> 'home', "address_1" => "", "city" => ""}} }
 
-        before :each do 
+        before :each do
           allow(person).to receive(:home_address).and_return addr3
           allow(employee_dependent).to receive(:addresses).and_return(addresses)
         end
 
-        it "destroy current address if current_address is absent" do 
+        it "destroy current address if current_address is absent" do
           expect(addr3).to receive(:destroy).and_return true
-          employee_dependent.assign_person_address(person) 
+          employee_dependent.assign_person_address(person)
         end
 
         it "return true" do
-          allow(addr3).to receive(:destroy).and_return nil 
+          allow(addr3).to receive(:destroy).and_return nil
           expect(employee_dependent.assign_person_address(person)).to eq true
         end
       end
 
-      context "if address_1 is blank or city is not blank" do 
+      context "if address_1 is blank or city is not blank" do
         let(:addresses) { {"0"=>{"kind"=>"home", "address_1" => "", "city" => "not blank"}} }
         let(:address) {{"kind"=>"home", "address_1" => "", "city" => "not blank"}}
 
-        before :each do 
+        before :each do
           allow(person).to receive(:home_address).and_return addr3
           allow(person).to receive(:has_mailing_address?).and_return false
           allow(employee_dependent).to receive(:addresses).and_return(addresses)
@@ -184,19 +192,19 @@ describe Forms::FamilyMember do
         it "call update when current address present " do
 
           expect(addr3).to receive(:update).and_return true
-          employee_dependent.assign_person_address(person) 
+          employee_dependent.assign_person_address(person)
         end
 
-        it "call new when current address blank" do 
-          allow(person).to receive(:home_address).and_return nil 
+        it "call new when current address blank" do
+          allow(person).to receive(:home_address).and_return nil
 
           _addresses = double(new: {})
           allow(person).to receive(:addresses).and_return _addresses
 
           expect(_addresses).to receive(:create).and_return true
-          employee_dependent.assign_person_address(person) 
+          employee_dependent.assign_person_address(person)
         end
-      end 
+      end
     end
   end
 end
@@ -227,8 +235,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :language_code => "english",
       :is_incarcerated => "no",
       :tribal_id => "test",
-      :no_dc_address=>nil,
-      :no_dc_address_reason=>nil
+      :no_dc_address => nil,
+      :no_dc_address_reason => nil
     }
   }
 
@@ -295,6 +303,88 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
   end
 end
 
+describe "checking validations on family member object" do
+  let(:family_id) { double }
+  let(:family) { double("family", :family_members => []) }
+  let(:member_attributes) {
+    { "first_name"=>"test",
+      "middle_name"=>"",
+      "last_name"=>"fm",
+      "dob"=>"1982-11-11",
+      "ssn"=>"",
+      "no_ssn"=>"1",
+      "gender"=>"male",
+      "relationship"=>"child",
+      "tribal_id"=>"",
+      "ethnicity"=>["", "", "", "", "", "", ""],
+      "is_consumer_role"=>"true",
+      "same_with_primary"=>"true",
+      "no_dc_address"=>"false",
+      "addresses"=>
+      { "0"=>{"kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""},
+        "1"=>{"kind"=>"mailing", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""}
+      }
+    }
+  }
+
+  subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
+
+  before do
+    allow(subject).to receive(:family).and_return family
+  end
+
+
+  it "should return invalid if no answers found for required questions" do
+    expect(subject.valid?).to eq false
+  end
+
+  it "should return errors with citizen status, native american / alaskan native and incarceration status" do
+    subject.save
+    expect(subject.errors.full_messages).to eq ["Citizenship status is required", "native american / alaskan native status is required", "Incarceration status is required"]
+  end
+
+  context "user answered for citizen status question" do
+    context "when user answered us citizen as true" do
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true"})) }
+      it "should return errors with naturalization, native american / alaskan native and incarceration status" do
+        subject.save
+        expect(subject.errors.full_messages).to eq ["Naturalized citizen is required", "native american / alaskan native status is required", "Incarceration status is required"]
+      end
+    end
+
+    context "when user answered us citizen as false" do
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
+      it "should return errors with Eligible immigration, native american / alaskan native and incarceration status" do
+        subject.save
+        expect(subject.errors.full_messages).to eq ["Eligible immigration status is required", "native american / alaskan native status is required", "Incarceration status is required"]
+      end
+    end
+  end
+
+  context "when user answered for citizen & naturalization" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false"})) }
+    it "should return errors with native american / alaskan native and incarceration status" do
+      subject.save
+      expect(subject.errors.full_messages).to eq ["native american / alaskan native status is required", "Incarceration status is required"]
+    end
+  end
+
+  context "when user not answered for incarceration status" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false"})) }
+    it "should return errors with incarceration status" do
+      subject.save
+      expect(subject.errors.full_messages).to eq ["Incarceration status is required"]
+    end
+  end
+
+  context "when satisfied with all the validations" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false", "is_incarcerated"=>"false"})) }
+    it "should return true" do
+      expect(subject.valid?).to eq true
+    end
+  end
+end
+
 describe Forms::FamilyMember, "which describes an existing family member" do
   let(:family_member_id) { double }
   let(:family_id) { double }
@@ -331,6 +421,9 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
     allow(family_member).to receive(:citizen_status)
+    allow(family_member).to receive(:naturalized_citizen)
+    allow(family_member).to receive(:eligible_immigration_status)
+    allow(family_member).to receive(:indian_tribe_member)
     allow(person).to receive(:has_mailing_address?).and_return(false)
     allow(subject).to receive(:valid?).and_return(true)
   end
@@ -359,6 +452,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the relationship of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
+      allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
@@ -366,6 +460,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the attributes of the person" do
       expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
+      allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
       subject.update_attributes(update_attributes)
     end
   end
@@ -404,13 +499,13 @@ describe Forms::FamilyMember, "relationship validation" do
     it "should fail with multiple spouse" do
       allow(family_member).to receive(:relationship).and_return("spouse")
       expect(subject.valid?).to be false
-      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
+      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner")
     end
 
     it "should fail with spouse and life_partner" do
       allow(family_member).to receive(:relationship).and_return("life_partner")
       expect(subject.valid?).to be false
-      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
+      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner")
     end
   end
 
@@ -421,7 +516,7 @@ describe Forms::FamilyMember, "relationship validation" do
     it "should fail with multiple life_partner" do
       allow(family_member).to receive(:relationship).and_return("life_partner")
       expect(subject.valid?).to be false
-      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
+      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner")
     end
   end
 

@@ -1,7 +1,8 @@
 def import_employee(in_file)
+    config = YAML.load_file("#{Rails.root}/conversions.yml")
 #  begin
     result_file = File.open(File.join(Rails.root, "conversion_employee_results", "RESULT_" + File.basename(in_file) + ".csv"), 'wb')
-    importer = Importers::ConversionEmployeeSet.new(in_file, result_file, Date.new(2017,2,1))
+    importer = Importers::ConversionEmployeeSet.new(in_file, result_file, config["conversions"]["employee_date"])
     importer.import!
     result_file.close
 #  rescue

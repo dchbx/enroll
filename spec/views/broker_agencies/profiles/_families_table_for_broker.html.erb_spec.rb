@@ -36,11 +36,5 @@ context "shows families" do
       render partial: 'broker_agencies/profiles/families_table_for_broker', :collection => [families] , as: :families
       expect(rendered).not_to have_selector("a", text: /phone/)
     end
-    
-    it 'should have an unblock button' do
-      allow(family1).to receive(:aptc_blocked?).and_return(true)
-      render partial: 'broker_agencies/profiles/families_table_for_broker', :collection => [families] , as: :families
-      expect(rendered).not_to have_selector("a", text: /phone/)
-    end
   end	
 end

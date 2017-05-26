@@ -45,7 +45,10 @@
 //= require freebies
 //= require responsive
 //= require effective_datatables
+//= require jquery.steps
 //= require_tree .
+
+var disableSelectric = false;
 
 $(document).on('ready page:load', function () {
   Freebies.fadeElement($("body"));
@@ -137,17 +140,6 @@ $(document).ready(function () {
     $('.plan-year').find('.fa-star.enrolling, .fa-star.published').closest('.plan-year').find('a.benefit-details').trigger('click');
 
   }
-  // check dates are not before 1900
-    $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"], [id*="date"]', function() {
-        var entered_date = $(this).val();
-        var entered_year =  entered_date.substring(entered_date.length -4);
-
-        if ((entered_year.length == 4) && (entered_year < (new Date().getFullYear() - 110))) {
-            alert("Please enter a date not more than 110 years ago.");
-            $(this).val("");
-            $(this).focus();
-        }
-    });
 
   // mimic jquery toggle function
   $.fn.toggleClick=function(){
@@ -157,6 +149,7 @@ $(document).ready(function () {
       iteration= (iteration+1) %functions.length
     })
   }
+
   //employees table table functions
   $(document).on('click', '.table-functions i.fa-trash-o', function()  {
     $(this).closest("tr").next().show();
@@ -754,8 +747,8 @@ $(document).on('click', '#address_info + span.form-action', function(){
   //toggling of divs that show APTC Enrollments
   $('.nav-toggle').click(function(){
     //get collapse content selector
-    var collapse_content_selector = $(this).attr('href');         
-        
+    var collapse_content_selector = $(this).attr('href');
+
     //make the collapse content to be shown or hide
     var toggle_switch = $(this);
     $(collapse_content_selector).slideToggle('fast', function(){
@@ -766,5 +759,12 @@ $(document).on('click', '#address_info + span.form-action', function(){
         toggle_switch.html('Hide Enrollment(s) <i class="fa fa-chevron-up fa-lg">');
         //$(collapse_content_selector).animate({top: "0px"}, 500);
       }
+    });
+  });
+
+  $(document).ready(function(){
+    $("#person_first_name").change(function() {
+      var text = $("#person_first_name").val() == '' ? "this person" : $("#person_first_name").val()
+      $("#is_applying_coverage_value").text("Is "+ text +" applying for coverage?");
     });
   });

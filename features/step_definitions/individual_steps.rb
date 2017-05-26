@@ -564,5 +564,4 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")
-
 end

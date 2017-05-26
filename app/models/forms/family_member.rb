@@ -3,9 +3,9 @@ module Forms
     include ActiveModel::Model
     include ActiveModel::Validations
 
-    attr_accessor :id, :family_id, :is_consumer_role, :vlp_document_id
+    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary
+    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -17,6 +17,7 @@ module Forms
     def initialize(*attributes)
       @addresses = [Address.new(kind: 'home'), Address.new(kind: 'mailing')]
       @same_with_primary = "true"
+      @is_applying_coverage = true
       super
     end
 
@@ -38,7 +39,7 @@ module Forms
     end
 
     def consumer_fields_validation
-      if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+      if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
         elsif @us_citizen == false && @eligible_immigration_status.nil?
@@ -48,6 +49,14 @@ module Forms
         end
         if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
           self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+        end
+
+        if @indian_tribe_member.nil?
+          self.errors.add(:base, "native american / alaskan native status is required")
+        end
+
+        if @is_incarcerated.nil?
+          self.errors.add(:base, "Incarceration status is required")
         end
       end
     end
@@ -75,6 +84,8 @@ module Forms
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
           family_member.family.build_consumer_role(family_member)
+        elsif self.is_resident_role == "true"
+          family_member.build_resident_role(family_member)
         end
         assign_person_address(existing_person)
         family_member.save!
@@ -86,6 +97,8 @@ module Forms
       family_member = family.relate_new_member(person, self.relationship)
       if self.is_consumer_role == "true"
         family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
+      elsif self.is_resident_role == "true"
+        family_member.family.build_resident_role(family_member)
       end
       assign_person_address(person)
       family.save_relevant_coverage_households
@@ -142,7 +155,8 @@ module Forms
     def extract_consumer_role_params
       {
         :citizen_status => @citizen_status,
-        :vlp_document_id => vlp_document_id
+        :vlp_document_id => vlp_document_id,
+        :is_applying_coverage => is_applying_coverage
       }
     end
 
@@ -190,7 +204,6 @@ module Forms
                   found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
                 end
       mailing_address = found_family_member.person.has_mailing_address? ? found_family_member.person.mailing_address : Address.new(kind: 'mailing')
-
       record = self.new({
         :relationship => found_family_member.primary_relationship,
         :id => family_member_id,
@@ -209,6 +222,9 @@ module Forms
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
         :citizen_status => found_family_member.citizen_status,
+        :naturalized_citizen => found_family_member.naturalized_citizen,
+        :eligible_immigration_status => found_family_member.eligible_immigration_status,
+        :indian_tribe_member => found_family_member.indian_tribe_member,
         :tribal_id => found_family_member.tribal_id,
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
@@ -248,6 +264,7 @@ module Forms
     end
 
     def try_update_person(person)
+      person.consumer_role.update_attributes(:is_applying_coverage => is_applying_coverage) if person.consumer_role
       person.update_attributes(extract_person_params).tap do
         bubble_person_errors(person)
       end
@@ -261,6 +278,8 @@ module Forms
       if attr["is_consumer_role"] == "true"
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
         return false unless assign_person_address(family_member.person)
+      elsif attr["is_resident_role"] == "true"
+        family_member.family.build_resident_role(family_member)
       end
       assign_person_address(family_member.person)
       family_member.update_relationship(relationship)

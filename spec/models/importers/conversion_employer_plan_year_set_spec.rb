@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe ::Importers::ConversionEmployerPlanYearSet do
+describe ::Importers::ConversionEmployerPlanYearSet, dbclean: :after_each do
   let(:out_stream) { StringIO.new }
   let(:employer_record) { instance_double("::Importers::ConversionEmployerPlanYear", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }
@@ -31,7 +31,7 @@ describe ::Importers::ConversionEmployerPlanYearSet do
       let(:record_save_result) { true }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n") 
+        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n")
       end
     end
 
@@ -69,7 +69,7 @@ describe ::Importers::ConversionEmployerPlanYearSet do
       let(:record_save_result) { true }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n") 
+        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n")
       end
     end
 

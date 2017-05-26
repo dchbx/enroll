@@ -79,11 +79,7 @@
                 </span>
                 <br/>
                 <span class="ttu dg fourteen">
-                  <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
-                  <%= @plan.family_deductible %>
-                  <% else %>
-                  <%= @plan.deductible %>
-                  <% end %>
+                  <%= deductible_display(@hbx_enrollment, @plan) %>
                 </span>
               </td>
             </tr>

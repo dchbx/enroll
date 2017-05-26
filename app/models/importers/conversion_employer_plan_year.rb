@@ -59,6 +59,7 @@ module Importers
       plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
       # plan_year_attrs[:imported_plan_year] = true
       plan_year_attrs[:aasm_state] = "active"
+      plan_year_attrs[:is_conversion] = true
       PlanYear.new(plan_year_attrs)
     end
 
@@ -143,6 +144,7 @@ module Importers
     def map_employees_to_benefit_groups(employer, plan_year)
       bg = plan_year.benefit_groups.first
       employer.census_employees.non_terminated.each do |ce|
+        next unless ce.valid?
         begin
         ce.add_benefit_group_assignment(bg)
         ce.save!

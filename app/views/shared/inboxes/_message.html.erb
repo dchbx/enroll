@@ -3,7 +3,7 @@
   <ul class="list-group">
     <li class="list-group-item">
       Sent By:
-      <%= "System Admin" %>
+      <%= "System Admin on #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y")} at #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p")}"%>
       <br></li>
     <li class="list-group-item">
       Subject:

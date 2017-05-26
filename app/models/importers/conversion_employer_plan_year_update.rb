@@ -117,6 +117,8 @@ module Importers
 
       return false if errors.present?
 
+      plan_year.update(is_conversion: true) unless plan_year.is_conversion
+
       if plan_year.benefit_groups[0].reference_plan.hios_id != reference_plan.hios_id
         update_reference_plan(plan_year, reference_plan)
         if renewing_plan_year

@@ -6,7 +6,7 @@ class HbxAdminController < ApplicationController
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
     @current_year = (params[:year] || Admin::Aptc.years_with_tax_household(@family).sort.last).to_i # Use the selected year or the most recent year for which there is a TH.
-    @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(@current_year)
+    @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(@current_year).by_coverage_kind("health")
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
     @household_members = Admin::Aptc.build_household_members(@current_year, @family)
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@current_year, @family, @hbxs)
@@ -27,7 +27,7 @@ class HbxAdminController < ApplicationController
     year = params[:person][:current_year].to_i
     @person = Person.find(params[:person][:person_id]) if params[:person].present? && params[:person][:person_id].present?
     @family = Family.find(params[:person][:family_id]) if params[:person].present? && params[:person][:family_id].present?
-    @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(year)
+    @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(year).by_coverage_kind("health")
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(year, @family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage])
     if @family.present? #&& TimeKeeper.date_of_record.year == year
       @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, year)
@@ -44,7 +44,7 @@ class HbxAdminController < ApplicationController
     @current_year = (params[:year] || Admin::Aptc.years_with_tax_household(@family).sort.last).to_i
     @person = Person.find(params[:person_id])
     @family = Family.find(params[:family_id])
-    @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(@current_year)
+    @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(@current_year).by_coverage_kind("health")
     @aptc_errors = Admin::Aptc.build_error_messages(params[:max_aptc], params[:csr_percentage], params[:applied_aptcs_array], @current_year, @hbxs)
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@current_year, @family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage], params[:applied_aptcs_array])
     @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])

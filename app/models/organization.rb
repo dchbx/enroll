@@ -3,6 +3,8 @@ class Organization
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Acapi::Notifiers
+  extend Acapi::Notifiers
 
   extend Mongorder
 
@@ -17,6 +19,8 @@ class Organization
     "governmental_employer",
     "foreign_embassy_or_consulate"
   ]
+
+  FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
   field :hbx_id, type: String
 
@@ -107,6 +111,7 @@ class Organization
          { name: "broker_agency_employer_search_index" })
 
   before_save :generate_hbx_id
+  after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
 
   default_scope                               ->{ order("legal_name ASC") }
   scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -165,10 +170,8 @@ class Organization
         }
       })
   }
-  scope :datatable_search, ->(query) { where(legal_name: Regexp.new(Regexp.escape(query), true)) }
-  scope :datatable_search_fein, ->(query) { where(fein: Regexp.new(Regexp.escape(query), true)) }
-  scope :datatable_search_employer_profile_source, ->(query) { where("employer_profile.profile_source" => query) }
-
+  scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
+  
   def self.generate_fein
     loop do
       random_fein = (["00"] + 7.times.map{rand(10)} ).join
@@ -279,12 +282,13 @@ class Organization
 
   def self.upload_invoice_to_print_vendor(file_path,file_name)
     org = by_invoice_filename(file_path) rescue nil
-    return if !org.employer_profile.is_conversion?
-    bucket_name= Settings.paper_notice
-    begin
-      doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
-    rescue Exception => e
-      puts "Unable to upload invoices to paper notices bucket"
+    if org.employer_profile.is_converting?
+      bucket_name= Settings.paper_notice
+      begin
+        doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
+      rescue Exception => e
+        puts "Unable to upload invoices to paper notices bucket"
+      end
     end
   end
 
@@ -326,6 +330,41 @@ class Organization
     end
   end
 
+  def check_legal_name_or_fein_changed?
+    fein_changed? || legal_name_changed?
+  end
+
+  def legal_name_or_fein_change_attributes
+    @changed_fields = changed_attributes.keys
+    notify_legal_name_or_fein_change if changed_attributes.keys.include?("fein")
+  end
+
+  def notify_legal_name_or_fein_change
+    return unless self.employer_profile.present?
+    FIELD_AND_EVENT_NAMES_MAP.each do |feild, event_name|
+      if @changed_fields.present? && @changed_fields.include?(feild)
+        notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
+      end
+    end
+  end
+
+  def notify_address_change(old_address_attribute,new_address_attribute)
+    changed_address = []
+    old_address_dup = old_address_attribute.clone
+    new_address_attribute["office_locations_attributes"].each_value do |address|
+      old_address = old_address_dup.select{|s| s["address"]["kind"] == address["address_attributes"]["kind"]}
+      old_address_dup.delete_if{|s| s["address"]["kind"] == address["address_attributes"]["kind"]}
+      keys = address["address_attributes"].keys
+      new_address_values = address["address_attributes"].values
+      old_addres_values = old_address.present? ? keys.map{|k| old_address[0]["address"]["#{k}"]} : []
+      changed_address << (new_address_values == old_addres_values)
+    end
+    changed_address << false if old_address_dup.present?
+    unless changed_address.all?
+      notify("acapi.info.events.employer.address_changed", {employer_id: self.hbx_id, event_name: "address_changed"})
+    end
+
+  end
 
   class << self
     def employer_profile_renewing_starting_on(date_filter)
@@ -391,9 +430,6 @@ class Organization
       agency_ids = agencies.map{|org| org.broker_agency_profile.id}
       brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
     end
-
-    def broker_agency_profile_by_fein(fein)
-      where(fein: fein).map(&:broker_agency_profile).compact
-    end
+    
   end
 end

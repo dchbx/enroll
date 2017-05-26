@@ -337,8 +337,7 @@ describe Family do
 
   describe "family has a past QLE, but Special Enrollment Period has expired" do
     before :each do
-      expired_sep = FactoryGirl.build(:special_enrollment_period, :expired)
-      family.special_enrollment_periods << expired_sep
+      expired_sep = FactoryGirl.build(:special_enrollment_period, :expired, family: family)
     end
 
     it "should have the SEP instance" do
@@ -360,8 +359,7 @@ describe Family do
 
   context "family has a QLE and is under a SEP" do
     before do
-      @current_sep = FactoryGirl.build(:special_enrollment_period)
-      family.special_enrollment_periods << @current_sep
+      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family)
     end
 
     it "should indicate SEP is active" do
@@ -376,10 +374,8 @@ describe Family do
 
   context "and the family is under more than one SEP" do
     before do
-      current_sep = FactoryGirl.build(:special_enrollment_period)
-      family.special_enrollment_periods << current_sep
-      another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date)
-      family.special_enrollment_periods << another_current_sep
+      current_sep = FactoryGirl.build(:special_enrollment_period, family: family)
+      another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date, family: family)
     end
     it "should return multiple current_special_enrollment" do
       expect(family.current_special_enrollment_periods.size).to eq 2
@@ -389,11 +385,9 @@ describe Family do
   context "earliest_effective_sep" do
     before do
       date1 = TimeKeeper.date_of_record - 20.days
-      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1)
-      family.special_enrollment_periods << @current_sep
+      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1, family: family)
       date2 = TimeKeeper.date_of_record - 10.days
-      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2)
-      family.special_enrollment_periods << @another_current_sep
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2, family: family)
     end
 
     it "should return earliest sep when all active" do
@@ -404,8 +398,7 @@ describe Family do
 
     it "should return earliest active sep" do
       date3 = TimeKeeper.date_of_record - 200.days
-      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3)
-      family.special_enrollment_periods << sep
+      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3, family: family)
       expect(@current_sep.is_active?).to eq true
       expect(@another_current_sep.is_active?).to eq true
       expect(sep.is_active?).to eq false
@@ -418,18 +411,14 @@ describe Family do
     before do
       @qlek = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true)
       date1 = TimeKeeper.date_of_record - 20.days
-      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
-      family.special_enrollment_periods << @current_sep
+      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
       date2 = TimeKeeper.date_of_record - 10.days
-      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
-      family.special_enrollment_periods << @another_current_sep
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
     end
 
     it "should return latest active sep" do
       date3 = TimeKeeper.date_of_record - 200.days
-      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
-      family.special_enrollment_periods << sep
-      family.save
+      sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date3, effective_on: date3, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
       expect(@current_sep.is_active?).to eq true
       expect(@another_current_sep.is_active?).to eq true
       expect(sep.is_active?).to eq false
@@ -443,11 +432,19 @@ describe Family do
     end
 
     context "with latest_shop_sep" do
+
+      let(:person) { Person.new }
+      let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
+
       let(:qlek) { FactoryGirl.build(:qualifying_life_event_kind, reason: 'death') }
       let(:date) { TimeKeeper.date_of_record - 10.days }
-      let(:normal_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date) }
-      let(:death_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date, qualifying_life_event_kind: qlek) }
+      let(:normal_sep) { FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date) }
+      let(:death_sep) { FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date, qualifying_life_event_kind: qlek) }
       let(:hbx) { HbxEnrollment.new }
+
+      before do
+        allow(family).to receive(:primary_applicant).and_return family_member_person
+      end
 
       it "normal sep" do
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
@@ -455,7 +452,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep
+        allow(family).to receive(:latest_shop_sep).and_return death_sep 
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 
@@ -665,21 +662,21 @@ describe Family, "large family with multiple employees - The Brady Bunch", :dbcl
   let(:family_member_id) {mikes_family.primary_applicant.id}
 
   it "should be possible to find the family_member from a family_member_id" do
-    expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
+    expect(FamilyMember.find(family_member_id).id.to_s).to eq family_member_id.to_s
   end
 
   context "Family.find_by_primary_applicant" do
     context "on Mike" do
       let(:find) {Family.find_by_primary_applicant(mike)}
       it "should find Mike's family" do
-        expect(find.id.to_s).to eq mikes_family.id.to_s
+        expect(find).to include mikes_family
       end
     end
 
     context "on Carol" do
       let(:find) {Family.find_by_primary_applicant(carol)}
       it "should find Carol's family" do
-        expect(find.id.to_s).to eq carols_family.id.to_s
+        expect(find).to include carols_family
       end
     end
   end
@@ -1082,87 +1079,6 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 end
 
-describe Family, "is_blocked_by_qle_and_assistance" do
-  let(:qle) {FactoryGirl.build(:qualifying_life_event_kind)}
-  let(:family) {Family.new}
-  let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
-  let(:eligibility_determination) {double(max_aptc: 0)}
-
-  it "return false without parameters" do
-    expect(family.is_blocked_by_qle_and_assistance?()).to eq false
-    expect(family.is_blocked_by_qle_and_assistance?(qle)).to eq false
-  end
-
-  it "return true when status is aptc_block" do
-    family.status = "aptc_block"
-    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq true
-  end
-
-  it "return false when status is aptc_block" do
-    family.status = "aptc_unblock"
-    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq false
-  end
-
-  #context "when max_aptc greater than 0" do
-  #  before :each do
-  #    allow(family).to receive(:latest_household).and_return household
-  #    allow(eligibility_determination).to receive(:max_aptc).and_return 100
-  #  end
-
-  #  it "return false when qle is not individual" do
-  #    allow(qle).to receive(:individual?).and_return false
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #  end
-
-  #  it "return false when qle is not family_structure_changed" do
-  #    allow(qle).to receive(:individual?).and_return true
-  #    allow(qle).to receive(:family_structure_changed?).and_return false
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #  end
-
-  #  it "return true" do
-  #    allow(qle).to receive(:individual?).and_return true
-  #    allow(qle).to receive(:family_structure_changed?).and_return true
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
-  #  end
-  #end
-
-  #it "return false when max_aptc is 0" do
-  #  allow(family).to receive(:latest_household).and_return household
-  #  allow(eligibility_determination).to receive(:max_aptc).and_return 0
-  #  expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #end
-end
-
-describe Family, "aptc_blocked?" do
-  let(:family) {Family.new}
-
-  it "return false" do
-    expect(family.aptc_blocked?).to eq false
-  end
-
-  it "return true" do
-    family.status = "aptc_block"
-    expect(family.aptc_blocked?).to eq true
-  end
-end
-
-describe Family, "update_aptc_block_status" do
-  let(:family) {Family.new}
-  let(:eligibility_determination) {double(max_aptc: 0)}
-  #let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
-  let(:household) { double(latest_active_tax_household: double(eligibility_determinations: [eligibility_determination])) }
-
-  it "set aptc_block" do
-    allow(family).to receive(:latest_household).and_return household
-    #allow(eligibility_determination).to receive(:max_aptc).and_return 100
-    #allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-    allow(family).to receive(:has_aptc_hbx_enrollment?).and_return true
-    family.update_aptc_block_status
-    expect(family.status).to eq "aptc_block"
-  end
-end
-
 describe Family, 'coverage_waived?' do
   let(:family) {Family.new}
   let(:household) {double}
@@ -1346,7 +1262,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
   let!(:dental_plan) { FactoryGirl.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year)}
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-  
+
   let!(:enrollments) {
     FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
@@ -1358,7 +1274,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
                        plan_id: plan.id,
                        aasm_state: 'auto_renewing'
     )
-  
+
     FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "dental",
@@ -1369,7 +1285,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
                        plan_id: dental_plan.id,
                        aasm_state: 'auto_renewing'
     )
-   
+
   }
   context 'when family exists with passive renewals ' do
     before do
@@ -1388,3 +1304,17 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     end
   end
 end
+
+describe Family, "#check_dep_consumer_role", dbclean: :after_each do
+  let(:person_consumer) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person_consumer) }
+  let(:dependent) { FactoryGirl.create(:person) }
+  let(:family_member_dependent) { FactoryGirl.build(:family_member, person: dependent, family: family)}
+
+  it "test" do
+    allow(family).to receive(:dependents).and_return([family_member_dependent])
+    family.send(:create_dep_consumer_role)
+    expect(family.dependents.first.person.consumer_role?).to be_truthy
+  end
+end
+

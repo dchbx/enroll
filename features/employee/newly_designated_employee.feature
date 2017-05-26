@@ -35,7 +35,7 @@ Feature: Newly designated employees can purchase coverage only through renewing 
       When Employee clicks continue on the group selection page
       Then Soren White should see "open enrollment not yet started" error message
 
-  Scenario: Newly designated can't buy coverage under previous year plan year using QLE
+  Scenario: Newly designated can't buy coverage under previous year plan year using QLE if he is not eligible
     Given Congressional Employer for Soren White exists with active and renewing plan year
       And Soren White is newly designated
       And Employee has current hired on date

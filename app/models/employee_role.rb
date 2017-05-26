@@ -69,8 +69,33 @@ class EmployeeRole
     @employer_profile = EmployerProfile.find(self.employer_profile_id)
   end
 
-  def benefit_group
-    census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
+  def benefit_group(qle: false)
+    if qle && active_coverage_benefit_group
+      active_coverage_benefit_group
+    elsif qle && renewal_coverage
+      census_employee.renewal_published_benefit_group
+    else
+      census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
+    end
+  end
+
+  def active_coverage_benefit_group
+    expired_plan_year = self.employer_profile.plan_years.where(aasm_state: "expired").order_by(:'start_on'.desc).first
+    if expired_plan_year.present?
+      bg_list = expired_plan_year.benefit_groups.map(&:id)
+      bg = self.census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_list).order_by(:'created_at'.desc).first.try(:benefit_group)
+      effective_on = person.primary_family.current_sep.effective_on
+      return bg if bg.present? && bg.start_on <= effective_on &&  bg.end_on >= effective_on
+    end
+    bg = census_employee.active_benefit_group
+    effective_on = person.primary_family.current_sep.effective_on
+    return bg if bg.start_on <= effective_on &&  bg.end_on >= effective_on
+  end
+
+  def renewal_coverage
+    bg = census_employee.renewal_published_benefit_group
+    effective_on = person.primary_family.current_sep.effective_on
+    bg.start_on <= effective_on &&  bg.end_on >= effective_on if bg.present?
   end
 
   def is_under_open_enrollment?
@@ -95,19 +120,23 @@ class EmployeeRole
   alias_method :census_employee=, :new_census_employee=
   alias_method :census_employee, :new_census_employee
 
-  def coverage_effective_on
-    if benefit_group.present?
-      effective_on_date = benefit_group.effective_on_for(census_employee.hired_on)
-
-      if census_employee.newly_designated_eligible? || census_employee.newly_designated_linked?
-        effective_on_date = [effective_on_date, census_employee.newly_eligible_earlist_eligible_date].max
-      end
+  def is_cobra_status?
+    if census_employee.present?
+      census_employee.is_cobra_status?
+    else
+      false
     end
-    
-    effective_on_date
   end
 
-  def can_enroll_as_new_hire?    
+  def coverage_effective_on(current_benefit_group: nil, qle: false)
+    if qle && benefit_group(qle: qle).present?
+      current_benefit_group = benefit_group(qle: qle)
+    end
+
+    census_employee.coverage_effective_on(current_benefit_group)
+  end
+
+  def can_enroll_as_new_hire?
     census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
   end
 
@@ -120,7 +149,7 @@ class EmployeeRole
   end
 
   def is_dental_offered?
-    plan_year = employer_profile.find_plan_year_by_effective_date(coverage_effective_on)
+    plan_year = employer_profile.find_plan_year_by_effective_date(coverage_effective_on(current_benefit_group: benefit_group))
 
     benefit_group_assignments = [census_employee.renewal_benefit_group_assignment, census_employee.active_benefit_group_assignment].compact
     benefit_group_assignment  = benefit_group_assignments.detect{|bpkg| bpkg.plan_year == plan_year}

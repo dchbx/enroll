@@ -41,11 +41,12 @@ RSpec.describe Insured::FamiliesController do
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
-  let(:family) { double("Family", active_household: household) }
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
+  let(:resident_role) { FactoryGirl.create(:resident_role) }
   let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
@@ -61,14 +62,18 @@ RSpec.describe Insured::FamiliesController do
     allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+    allow(person).to receive(:has_active_resident_role?).and_return(true)
+    allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
   end
 
   describe "GET home" do
-    before :each do
-      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
+    let(:family_access_policy) { instance_double(FamilyPolicy, :show? => true) }
 
+    before :each do
+      allow(FamilyPolicy).to receive(:new).with(user, family).and_return(family_access_policy)
+      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
@@ -487,6 +492,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
+      allow(person).to receive(:resident_role?).and_return(false)
     end
 
     it "renders the 'check_move_reason' template" do
@@ -517,6 +523,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
+      allow(person).to receive(:resident_role?).and_return(false)
     end
 
     it "renders the 'check_insurance_reason' template" do
@@ -544,6 +551,7 @@ RSpec.describe Insured::FamiliesController do
 
     before(:each) do
       sign_in(user)
+      allow(person).to receive(:resident_role?).and_return(false)
     end
 
     it "renders the 'check_qle_date' template" do
@@ -672,22 +680,7 @@ RSpec.describe Insured::FamiliesController do
         expect(family.current_broker_agency).to be nil
       end
     end
-
-    context "post unblock" do
-      let(:family) { FactoryGirl.build(:family) }
-      before :each do
-        allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
-        allow(Family).to receive(:find).and_return family
-      end
-
-      it "should be a success" do
-        xhr :post, :unblock, id: family.id, format: :js
-        expect(response).to have_http_status(:success)
-        expect(assigns(:family).status).to eq "aptc_unblock"
-      end
-    end
   end
-
 
   describe "GET upload_notice_form" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff"]) }
@@ -830,6 +823,7 @@ RSpec.describe Insured::FamiliesController do
     before :each do
       allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
       allow(person).to receive(:primary_family).and_return(family)
+      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       sign_in(user)
       get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
     end

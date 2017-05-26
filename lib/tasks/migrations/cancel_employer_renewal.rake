@@ -1,61 +1,97 @@
+# This rake task used to cancel renewing plan year and renewing enrollments.
+# ex: RAILS_ENV=production bundle exec rake migrations:cancel_employer_renewal['521111111 522221111 5211333111']
+
 namespace :migrations do
 
   desc "Cancel renewal for employer"
   task :cancel_employer_renewal, [:fein] => [:environment] do |task, args|
 
-    employer_profile = EmployerProfile.find_by_fein(args[:fein])
+    feins = args[:fein].split(' ').uniq
 
-    if employer_profile.blank?
-      raise 'unable to find employer'
-    end
+    feins.each do |fein|
 
-    puts "Processing #{employer_profile.legal_name}"
-    organizations = Organization.where(fein: args[:fein])
-    organizations.each do |organization|
-      renewing_plan_year = organization.employer_profile.plan_years.renewing.first
+      employer_profile = EmployerProfile.find_by_fein(fein)
+      next puts "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
+
+      # checking renewing_application_ineligible assm state plan year here, as aasm state not listed in renewing.
+      renewing_plan_year = employer_profile.plan_years.renewing.first || employer_profile.plan_years.where(aasm_state:'renewing_application_ineligible').first
+
       if renewing_plan_year.present?
-        enrollments = enrollments_for_plan_year(renewing_plan_year)
-        enrollments.each do |enrollment|
-          enrollment.cancel_coverage!
+        puts "found renewing plan year for #{employer_profile.legal_name}---#{renewing_plan_year.start_on}" unless Rails.env.test?
+
+        enrollments_for_plan_year(renewing_plan_year).each do |enrollment|
+          if enrollment.may_cancel_coverage?
+            enrollment.cancel_coverage!
+            puts "canceling employees coverage for employer enrollment hbx_id:#{enrollment.hbx_id}" unless Rails.env.test?
+          end
         end
 
-        puts "found renewing plan year for #{organization.legal_name}---#{renewing_plan_year.start_on}"
-        renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+        employer_profile.census_employees.each do |census_employee|
+          assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => renewing_plan_year.benefit_groups.map(&:id))
+          assignments.each do |assignment|
+            if assignment.may_delink_coverage?
+              assignment.delink_coverage!
+              assignment.update_attribute(:is_active, false)
+            end
+          end
+        end
+
+        if renewing_plan_year.may_cancel_renewal?
+          puts "canceling plan year for employer #{employer_profile.legal_name}" unless Rails.env.test?
+          renewing_plan_year.cancel_renewal!
+        end
+
+        employer_profile.revert_application! if employer_profile.may_revert_application?
+      else
+        puts "renewing plan year not found for employer #{employer_profile.legal_name}" unless Rails.env.test?
       end
-      organization.employer_profile.revert_application! if organization.employer_profile.may_revert_application?
     end
   end
 
+# This rake task used to cancel published plan year & active enrollments.
+# ex: RAILS_ENV=production bundle exec rake migrations:cancel_employer_incorrect_renewal['473089323 472289323 4730893333' ]
+
   desc "Cancel incorrect renewal for employer"
-  task :cancel_employer_incorrect_renewal, [:fein, :plan_year_start_on] => [:environment] do |task, args|
+  task :cancel_employer_incorrect_renewal, [:fein] => [:environment] do |task, args|
 
-    employer_profile = EmployerProfile.find_by_fein(args[:fein])
+    feins = args[:fein].split(' ').uniq
 
-    if employer_profile.blank?
-      puts "employer profile not found!"
-      exit
-    end
+    feins.each do |fein|
 
-    plan_year_start_on = Date.strptime(args[:plan_year_start_on], "%m/%d/%Y")
+      employer_profile = EmployerProfile.find_by_fein(fein)
+      next puts "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
 
-    if plan_year = employer_profile.plan_years.where(:start_on => plan_year_start_on).published.first
-      enrollments = enrollments_for_plan_year(plan_year)
-      if enrollments.any?
-        puts "Canceling employees coverage for employer #{employer_profile.legal_name}"
-      end
+      plan_year = employer_profile.plan_years.published.first
 
-      enrollments.each do |hbx_enrollment|
-        if hbx_enrollment.may_cancel_coverage?
-          hbx_enrollment.cancel_coverage!
-          # Just make sure cancel propograted
+      if plan_year.present?
+        puts "found  plan year for #{employer_profile.legal_name}---#{plan_year.start_on}" unless Rails.env.test?
+
+        enrollments_for_plan_year(plan_year).each do |hbx_enrollment|
+          if hbx_enrollment.may_cancel_coverage?
+            hbx_enrollment.cancel_coverage!
+            puts "canceling employees coverage for employer enrollment hbx_id:#{hbx_enrollment.hbx_id}" unless Rails.env.test?
+          end
         end
-      end
 
-      puts "canceling plan year for employer #{employer_profile.legal_name}"
-      plan_year.cancel!
-      puts "cancellation successful!"
-    else
-      puts "renewing plan year not found!!"
+        employer_profile.census_employees.each do |census_employee|
+          assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
+          assignments.each do |assignment|
+            if assignment.may_delink_coverage?
+              assignment.delink_coverage!
+              assignment.update_attribute(:is_active, false)
+            end
+          end
+        end
+
+        if plan_year.may_cancel?
+          plan_year.cancel!
+          puts "canceling plan year for employer #{employer_profile.legal_name}" unless Rails.env.test?
+        end
+
+        employer_profile.revert_application! if employer_profile.may_revert_application?
+      else
+        puts "renewing plan year not found #{employer_profile.legal_name}" unless Rails.env.test?
+      end
     end
   end
 
@@ -64,23 +100,13 @@ namespace :migrations do
     count = 0
     prev_canceled = 0
 
-    employer_feins = [ 
-      "200714211","510400233","521961415","530196563","270360045","522094677","231520302",
-      "272141277","931169142","522062304","550864322","621469595","521021282","521795954",
-      "522324745","273300538","264064164","000000028","363697513","200850720","451221231",
-      "202853236","201743104","131954338","521996156","520746264","260839561","464303739",
-      "204098898","521818188","042751357","521811081","521322260","521782065","521782065",
-      "237400898","830353971","742994661","522312249","521498887","454741440","261332221",
-      "521016137","452400752","521103582","360753125","710863908","521309304","522022029",
-      "522197080","521826332","202305292","520858689","271145882","462416858","522086855",
-      "521370897","453987501","530164970","464250263","530026395","237256856","611595539",
-      "591640708","521442741","550825492","521766561","522167254","521826441","530176859",
-      "521991811","520743373","522153746","452708794","521967581","147381250","520968193",
-      "521143054","521943790","520954741","462199955","205862174","521343924","521465311",
-      "521816954","020614142","521132764","521246872","307607552","272805278","522357359",
-      "520978073","356007147","272035063","465185752","522315929","521989454","273585906",
-      "942437024","274892667","133535334","462612890","541873351","521145355","264148393",
-      "953858298","530071995","521449994"
+    employer_feins = [
+        "043774897","541206273","522053522","200247609","521321945","522402507",
+        "522111704","204314853","521766976","260771506","264288621","521613732",
+        "800501539","521844112","521932886","530229573","521072698","204229835",
+        "521847137","383796793","521990963","770601491","200316239","541668887",
+        "431973129","522008056","264391330","030458695","452698846","521490485",
+        "264667460","550894892","521095089","208814321","593400922","521899983"
     ]
     
     employer_feins.each do |fein|

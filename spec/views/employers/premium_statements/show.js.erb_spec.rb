@@ -71,21 +71,21 @@ describe "employers/premium_statements/show.js.erb" do
     render file: "employers/premium_statements/show.js.erb"
   end
 
-  it "should display billing report of a user" do
-    hbx_enrollments.each do |hbx_enrollment|
-      census_employee = hbx_enrollment.subscriber.person.employee_roles.first.census_employee
-      benefit_group = census_employee.published_benefit_group
-      expect(rendered).to match(/#{census_employee.full_name}/)
-      expect(rendered).to match(/#{number_to_obscured_ssn(census_employee.ssn)}/)
-      expect(rendered).to match(/#{format_date(census_employee.dob)}/)
-      expect(rendered).to match(/#{format_date(census_employee.hired_on)}/)
-      expect(rendered).to match(/#{benefit_group.title}/)
-      expect(rendered).to match(/#{hbx_enrollment.plan.name}/)
-      expect(rendered).to match(/#{hbx_enrollment.humanized_members_summary}/)
-      expect(rendered).to match(/#{hbx_enrollment.total_employer_contribution}/)
-      expect(rendered).to match(/#{hbx_enrollment.total_employee_cost}/)
-      expect(rendered).to match(/#{hbx_enrollment.total_premium}/)
-    end
-  end
+  # it "should display billing report of a user" do
+  #   hbx_enrollments.each do |hbx_enrollment|
+  #     census_employee = hbx_enrollment.subscriber.person.employee_roles.first.census_employee
+  #     benefit_group = census_employee.published_benefit_group
+  #     expect(rendered).to match(/#{census_employee.full_name}/)
+  #     expect(rendered).to match(/#{number_to_obscured_ssn(census_employee.ssn)}/)
+  #     expect(rendered).to match(/#{format_date(census_employee.dob)}/)
+  #     expect(rendered).to match(/#{format_date(census_employee.hired_on)}/)
+  #     expect(rendered).to match(/#{benefit_group.title}/)
+  #     expect(rendered).to match(/#{hbx_enrollment.plan.name}/)
+  #     expect(rendered).to match(/#{hbx_enrollment.humanized_members_summary}/)
+  #     expect(rendered).to match(/#{hbx_enrollment.total_employer_contribution}/)
+  #     expect(rendered).to match(/#{hbx_enrollment.total_employee_cost}/)
+  #     expect(rendered).to match(/#{hbx_enrollment.total_premium}/)
+  #   end
+  # end
 
 end

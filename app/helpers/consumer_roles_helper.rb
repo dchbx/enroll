@@ -61,4 +61,17 @@ module ConsumerRolesHelper
 
     shop_for_plans.blank? && (hbx_enrollment.effective_on.year == (new_effective_on.present? ? new_effective_on.year : nil))
   end
+
+  def is_applying_coverage_value_consumer(use_person, person, consumer_role)
+    first_checked = true
+    second_checked = false
+    if use_person.present?
+      first_checked = person.is_applying_coverage == 'true'
+      second_checked = person.is_applying_coverage == 'false'
+    elsif consumer_role.present?
+      first_checked = consumer_role.is_applying_coverage
+      second_checked = !consumer_role.is_applying_coverage
+    end
+    return first_checked, second_checked
+  end
 end

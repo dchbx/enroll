@@ -1,35 +1,64 @@
-<div class="module container broker_quote_tool">
-  <div class="row" class="col-md-12">
-   <input name='employee' value='50' type='hidden'>
-   <input name='spouse' value='0' type='hidden'>
-   <input name='domestic_partner' value='0' type='hidden'>
-   <input name='child_under_26' value='0' type='hidden'>
-    <%= form_tag(broker_agencies_broker_role_quote_path, method: :get) do  %>
-
-    <h2>Quote Calculator</h2>
-
-             <input type="hidden" id="quote_id" value="<%= params[:id] %>">
-      <input type="hidden" id="broker_role_id" value="<%= @broker.id %>">
-
-
-      <%= render partial: 'broker_agencies/quotes/panels/my_features' if @q.can_edit? %>
-
-      <%= render partial: 'broker_agencies/quotes/panels/my_plans' if false %>
-
-      <% end %>
-      <%= render partial: 'broker_agencies/quotes/panels/dental'  if @q.can_edit? %>
-      <%= render partial: 'broker_agencies/quotes/panels/quote' %>
-      <%= link_to "Back to Quotes", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
-    </div>
+<div class="module container broker_quote_tool" style="border: 1; solid">
+  <br> <br>
+  <h2>Quote Calculator</h2>
+  <div  role="tab" id="feature-mgmt-header" style="margin-left: 10px;">
+    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group-mgmt">
+    <b>Quote Benefit Group Selection</b>
+    </a>
+  </div>
+  <div id="quote-roster" data-url="<%= broker_agencies_broker_role_quote_path(broker_role_id: @broker.id,id: @q.id, section: true)%>">
+    <% @benefit_groups.each_with_index do |benefit_group, index| %>
+    <% if index == 0 %>
+    <h3><%= benefit_group.title%></h3>
+    <section>
+      <div class="step_section_<%= index%>">
+        <%= render partial: 'quote_calculate', locals: {benefit_group: benefit_group }%>
+      </div>
+    </section>
+    <% else %>
+    <h3><%= benefit_group.title %></h3>
+    <section>
+      <div id='second_div' class="step_section_<%= index%>">
+      </div>
+    </section>
+    <% end %>
+    <% end %>
   </div>
 </div>
 
-
 <script type="text/javascript">
 
-$(document).on('ready page:load', function () {
+  $(document).on('ready page:load', function () {
     QuotePageLoad.set_select_health_plans(<%=raw @health_plan_quote_criteria %>)
     Quote.show_benefit_group("<%= @q.id%>", "<%= @quote_benefit_group.id%>")
+  });
 
-});
+  $("#quote-roster").steps({
+    headerTag: "h3",
+    bodyTag: "section",
+    transitionEffect: "slideLeft",
+    enableAllSteps: true,
+    autoFocus: true,
+    onStepChanged: function (event, currentIndex, newIndex)
+    {
+
+      $.ajax({
+        type: "GET",
+        url: $("#quote-roster").data('url'),
+        data: {
+          broker_role_id: "<%= @broker.id %>",
+          id: "<%= @q.id %>",
+          section: true,
+          row: currentIndex
+        }
+      });
+    }
+  });
+
+  $("li[role='tab']").each(function( index ) {
+    if (!$(this).hasClass('first')){
+      $( this ).addClass('done');
+    }
+  });
+
 </script>

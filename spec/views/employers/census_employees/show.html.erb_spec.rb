@@ -55,7 +55,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_premium).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employer_contribution).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
-    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+    allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment])
     allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
   end
 
@@ -79,9 +79,9 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to match /SELECT STATE/
     expect(rendered).to match /ZIP/
   end
-  
+
   it "should not show the plan" do
-    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([])
+    allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([])
     assign(:hbx_enrollments, [])
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to_not match /Plan/
@@ -120,7 +120,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
   it "should not show the dental enrollment if it is external" do
     hbx_enrollment_two.update_attributes(:external_enrollment => true)
-    allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment_two])
+    allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment_two])
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to_not match /Plan/
     expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
@@ -229,7 +229,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       coverage_kind: 'dental'
     )}
     let(:carrier_profile) { FactoryGirl.build_stubbed(:carrier_profile) }
-    let(:past_enrollments) { FactoryGirl.create(:hbx_enrollment, 
+    let(:past_enrollments) { FactoryGirl.create(:hbx_enrollment,
       household: household,
       plan: dental_plan,
       benefit_group: benefit_group,
@@ -237,7 +237,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       aasm_state: 'coverage_terminated' ) }
 
     before :each do
-      allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
+      allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
       assign(:past_enrollments, [past_enrollments])
     end
 
@@ -250,7 +250,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
     context "with not health, but dental and past enrollments" do
       before :each do
-        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([dental_hbx_enrollment])
+        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([dental_hbx_enrollment])
       end
       it "should display past enrollments" do
         render template: "employers/census_employees/show.html.erb"
@@ -272,6 +272,27 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       end
     end
 
+    context "Employee status" do
+        let(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible", hired_on: Time.now-15.days, employer_profile: employer_profile) }
+      before :each do
+        census_employee.terminate_employment(TimeKeeper.date_of_record - 10.days) && census_employee.save
+        census_employee.coverage_terminated_on = nil
+        census_employee.rehire_employee_role
+        census_employee.aasm_state = :rehired
+        census_employee.save
+      end
+
+      it "should display the rehired date and not the hired date" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).to match /Rehired/i
+      end
+
+      it "if rehired then it shouldnot display the termination date" do
+        render template: "employers/census_employees/show.html.erb"
+        expect(rendered).not_to match /Terminated:/i
+      end
+    end
+
     context "Hiding Address in CensusEmployee page if linked and populated" do
       let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: Time.now-15.days, employer_profile: employer_profile, employer_profile_id: employer_profile.id) }
       before :each do
@@ -279,7 +300,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
         census_employee.save!
         census_employee.reload
       end
-      it "should not show address fields" do 
+      it "should not show address fields" do
         allow(census_employee).to receive(:address).and_return(address)
         render template: "employers/census_employees/show.html.erb"
         expect(rendered).not_to match /#{address.address_1}/
@@ -288,6 +309,38 @@ RSpec.describe "employers/census_employees/show.html.erb" do
         expect(rendered).not_to match /#{address.state}/i
         expect(rendered).not_to match /#{address.zip}/
       end
+
     end
   end
+
+  # context "for cobra" do
+  #   context "when terminated" do
+  #     before :each do
+  #       allow(census_employee).to receive(:aasm_state).and_return 'employment_terminated'
+  #       allow(census_employee).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record
+  #       render template: "employers/census_employees/show.html.erb"
+  #     end
+  #
+  #     it "should have cobra button" do
+  #       expect(rendered).to have_selector('span', text: 'COBRA')
+  #     end
+  #
+  #     it "should have cobra confirm area" do
+  #       expect(rendered).to have_selector('div.cobra_confirm')
+  #       expect(rendered).to match /Employment Termination Date/
+  #       expect(rendered).to have_selector('a.cobra_confirm_submit')
+  #       expect(rendered).to have_selector('span.confirm-cobra-wrapper')
+  #     end
+  #
+  #     it "should have rehire button" do
+  #       expect(rendered).to have_selector('span', text: 'Rehire')
+  #     end
+  #
+  #     it "should have rehire area" do
+  #       expect(rendered).to have_selector('div.confirm-terminate-wrapper')
+  #       expect(rendered).to have_selector('a.rehire_confirm')
+  #     end
+  #   end
+  # end
+
 end

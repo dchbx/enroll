@@ -47,6 +47,7 @@ RSpec.describe Employers::PremiumStatementsController do
       allow(census_employee).to receive(:is_active?).and_return(true)
       hbx_enrollments.each do |hbx_enrollment|
         allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+        allow(hbx_enrollment).to receive(:_id).and_return(nil)
       end
     end
 
@@ -74,6 +75,7 @@ RSpec.describe Employers::PremiumStatementsController do
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(census_employee).to receive(:is_active?).and_return(true)
       allow(@hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(@hbx_enrollment).to receive(:_id).and_return(nil)
     end
 
     it "returns a text/csv content type" do

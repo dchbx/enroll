@@ -108,6 +108,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:consumer_role, consumer_role)
       assign(:coverage_household, coverage_household_jail)
       assign(:market_kind, 'individual')
+      assign(:coverage_kind, 'health')
       assign(:benefit, benefit_package)
       assign(:hbx_enrollment, hbx_enrollment)
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)

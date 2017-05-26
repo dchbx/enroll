@@ -79,6 +79,13 @@ Then(/(\w+) is the staff person for an employer$/) do |name|
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
 end
 
+Given(/^Sarh is the staff person for an organization with employer profile and broker agency profile$/) do
+  person = Person.where(first_name: "Sarh").first
+  organization = FactoryGirl.create(:organization)
+  employer_profile = FactoryGirl.create(:employer_profile, organization: organization)
+  employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
+  broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
+end
 
 Then(/(\w+) is the staff person for an existing employer$/) do |name|
   person = Person.where(first_name: name).first
@@ -212,4 +219,9 @@ end
 
 Then /there is an unlinked POC/ do
   find('td', text: /Unlinked/)
+end
+
+AfterStep do |scenario|
+  sleep 1 if ENV['SCREENSHOTS'] == "true"
+  screenshot("")
 end

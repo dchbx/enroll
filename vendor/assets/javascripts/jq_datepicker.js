@@ -84,7 +84,7 @@ function applyJQDatePickerSetup(ele) {
 
     }
   });
-  if(!isElementDOBType) {
+  if(!isElementDOBType && !el.is(".allow-future-date")) {
     el.datepicker('option', 'minDate', dateMin);
     el.datepicker('option', 'maxDate', dateMax);
   }

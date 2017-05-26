@@ -30,7 +30,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package) {double}
 
     it "should return true when 0..0" do
-      allow(benefit_package).to receive(:age_range).and_return (0..0) 
+      allow(benefit_package).to receive(:age_range).and_return (0..0)
       expect(rule.is_age_range_satisfied?).to eq true
     end
 
@@ -214,6 +214,48 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
   end
 
+  context "is_family_relationships_satisfied?" do
+    let(:consumer_role) {double}
+    let(:benefit_package) {double}
+    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)}
+
+    it "should return true for relationship other than child" do
+      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'self'
+      expect(rule.is_family_relationships_satisfied?).to eq true
+    end
+
+    it "should return true" do
+      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+      allow(rule).to receive(:is_child_age_satisfied?).and_return true
+      expect(rule.is_family_relationships_satisfied?).to eq true
+    end
+
+    it "should return false" do
+      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+      allow(rule).to receive(:is_child_age_satisfied?).and_return false
+      expect(rule.is_family_relationships_satisfied?).to eq false
+    end
+  end
+
+  context "is_child_age_satisfied?" do
+    let(:consumer_role) {double}
+    let(:benefit_package) {double}
+    let(:new_effective_on) {TimeKeeper.date_of_record}
+    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,new_effective_on:new_effective_on)}
+
+    it "should return true when new_effective_on is before child crossed 26 years" do
+      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+      allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 20.years
+      expect(rule.is_child_age_satisfied?).to eq true
+    end
+
+    it "should return false when new_effective_on is after child entered 26 years" do
+      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+      allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 30.years
+      expect(rule.is_child_age_satisfied?).to eq false
+    end
+  end
+
   context "is_lawful_presence_status_satisfied?" do
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
@@ -319,7 +361,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         expect(rule.send(:primary_applicant)).to eq pa
       end
     end
- 
+
     context "#is_family_relationships_satisfied?" do
       let(:consumer_role) {FactoryGirl.create(:consumer_role, person: family.family_members.where(is_primary_applicant: false).first.person)}
       let(:consumer_role_two) {FactoryGirl.create(:consumer_role, person: person)}
@@ -389,5 +431,32 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         end
       end
     end
+  end
+
+  context "rule satisfied?" do
+    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:benefit_package) {double}
+
+    before :each do
+      allow(consumer_role).to receive(:dob).and_return(TimeKeeper.date_of_record - 23.years)
+      allow(benefit_package).to receive(:age_range).and_return((0..30))
+      allow(benefit_package).to receive_message_chain('benefit_coverage_period.end_on').and_return(TimeKeeper.date_of_record + 100.days)
+      allow(benefit_package).to receive_message_chain('benefit_eligibility_element_group.class.fields.keys').and_return([])
+    end
+
+    it "should return a false status if is_applying_coverage is false for the cosumer_role" do
+      allow(consumer_role).to receive(:is_applying_coverage?).and_return(false)
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'health', family: family)
+      status = rule.satisfied?.first
+      expect(status).to eq false
+    end
+
+    it "should return a true status if is_applying_coverage is true for the cosumer_role" do
+      allow(consumer_role).to receive(:is_applying_coverage?).and_return(true)
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'health', family: family)
+      status = rule.satisfied?.first
+      expect(status).to eq true
+    end
+
   end
 end

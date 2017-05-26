@@ -32,25 +32,14 @@ class DocumentsController < ApplicationController
 
   def update_verification_type
     v_type = params[:verification_type]
-    if v_type == "Social Security Number"
-      @person.consumer_role.update_attributes(:ssn_validation => "valid",
-                                              :ssn_update_reason => params[:verification_reason])
-    elsif v_type == "American Indian Status"
-      @person.consumer_role.update_attributes(:native_validation => "valid",
-                                              :native_update_reason => params[:verification_reason])
-    else
-      @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
-      @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
-                                             {:v_type => v_type,
-                                              :update_reason => params[:verification_reason]
-                                             } )
-    end
-    @person.consumer_role.verify_ivl_by_admin if @person.all_types_verified?
+    update_reason = params[:verification_reason]
+    verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
     respond_to do |format|
-      format.html {
-        flash[:notice] = "Verification successfully approved."
-        redirect_to :back
-      }
+      if verification_result.is_a? String
+        format.html { redirect_to :back, :flash => { :success => verification_result} }
+      else
+        format.html { redirect_to :back, :flash => { :success => "Person verification successfully approved."} }
+      end
     end
   end
 

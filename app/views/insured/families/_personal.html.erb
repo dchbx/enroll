@@ -1,4 +1,8 @@
-<%= render 'people/landing_pages/personal' %>
+<% if @resident %>
+	<%= render 'people/landing_pages/personal_coverall' %>
+<% else %>
+	<%= render 'people/landing_pages/personal' %>
+<% end %>
 <script>
 	Freebies.floatlabels();
 </script>

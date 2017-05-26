@@ -151,24 +151,89 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       enrollment_renewal.renew
     end
 
-    def process_from_sheet
+    def active_enrollment_from_family(enrollment)
+      enrollment.family.active_household.hbx_enrollments.where({
+        :kind => 'individual',
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing'] - ["coverage_renewed", "coverage_termination_pending"]),
+        :coverage_kind => enrollment.coverage_kind
+      })
+    end
+
+    def process_missing_enrollments
       count = 0
 
       CSV.open("#{Rails.root}/IVL_Enrollment_Renewals.csv", "w") do |csv|
 
         csv << ["Enrollment HBX ID", "Subscriber HBX ID", "SSN", "Last Name", "First Name", "HIOS_ID:PlanName", "Other Effective On",  
-          "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute"]
+          "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute", "Result"]
 
+        current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
 
-        CSV.foreach("#{Rails.root}/PositiveMatchesToBeRenewed-1101.csv", headers: true, :encoding => 'utf-8') do |row|
+        CSV.foreach("#{Rails.root}/individual_enrollment_change_sets_12_05_2016_10_35.csv", headers: true, :encoding => 'utf-8') do |row|
           count += 1
 
           if count % 100 == 0
             puts "Found #{count} enrollments"
           end
 
-          hbx_enrollment = HbxEnrollment.by_hbx_id(row.to_hash["Enrollment HBX ID"]).first
+          enrollment = HbxEnrollment.by_hbx_id(row.to_hash["Enrollment HBX ID"]).first
+
+          hbx_enrollments = active_enrollment_from_family(enrollment).reject{|en| en.subscriber.present? && enrollment.subscriber.present? && en.subscriber.hbx_id != enrollment.subscriber.hbx_id }
+
+          current_coverages = hbx_enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on) }
+          renewal_coverages = hbx_enrollments.select{|en| renewal_benefit_coverage_period.contains?(en.effective_on) }
+
+          status = if current_coverages.blank?
+            ["Renewal Failed: Unable to find matching enrollment."] 
+          elsif current_coverages.size > 1
+            ["Renewal Failed: found multiple active enrollments."] 
+          elsif renewal_coverages.present?
+            en = renewal_coverages.first
+            ["Renewal Failed: Already got #{en.effective_on.year} coverage with #{en.aasm_state.camelcase} status."]
+          elsif is_individual_assisted?(current_coverages.first)
+            ["Renewal Failed: Assisted Enrollment."]
+          else
+            begin
+              process_enrollment_renewal(current_coverages.first, renewal_benefit_coverage_period)
+              ["Renewal Successful."]
+            rescue Exception => e
+              ["Renewal Failed: #{e.tos}."]
+            end
+          end
+
+          csv << (row.to_h.values + status)
+        end
+
+        puts count
+      end
+    end
+
+    def has_catastrophic_plan?(enrollment)
+      enrollment.plan.metal_level == 'catastrophic'       
+    end
+
+    def process_from_sheet
+      count = 0
+
+      CSV.open("#{Rails.root}/IVL_Enrollment_Renewals.csv", "w") do |csv|
+
+        # csv << ["Enrollment HBX ID", "Subscriber HBX ID", "SSN", "Last Name", "First Name", "HIOS_ID:PlanName", "Other Effective On",  
+        #   "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute"]
+
+
+        csv << ["Enrollment HBX ID", "Subscriber HBXID",  "Subscriber Firstname",  "Subscriber Lastname", "Market", "Coverage Kind", "Coverage Start Date", "Created At", "Updated At", "Plan Name", "Plan HIOS ID",  "Enrollment Status"]
+
+        renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
+        CSV.foreach("#{Rails.root}/individuals_missing_passive_renewals.csv", headers: true, :encoding => 'utf-8') do |row|
+          count += 1
+
+          if count % 100 == 0
+            puts "Found #{count} enrollments"
+          end
+
+          hbx_enrollment = HbxEnrollment.by_hbx_id(row.to_hash["Enrollment HBXID"]).first
 
           status = if hbx_enrollment.blank?
             count += 1

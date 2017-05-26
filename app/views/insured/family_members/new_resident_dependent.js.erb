@@ -1,0 +1,19 @@
+$('#dependents_info_wrapper h4:first').text("Please enter the information requested below. When you\'re finished, select \'Confirm Member\' at the bottom of the page.");
+$('#btn-continue').addClass('disabled');
+$("#new_employee_dependent_form").each(function(idx, ele) {
+  $(ele).remove();
+});
+$("#dependent_ul").append("<%= escape_javascript(render 'dependent_resident_form', dependent: @dependent,person: @person) %>");
+$("#add_member_list_<%= @dependent.id %>").attr('data-confirm', '');
+$("#add_member_list_<%= @dependent.id %> .close-2").attr('data-confirm', '');
+$("#dependent_buttons").addClass('hidden');
+$('.remove-new-employee-dependent').each(function(idx, ele) {
+  $(ele).click(function() {
+    var targetElementId = $(ele).attr("data-target");
+    $(targetElementId).remove();
+    $("#dependent_buttons").removeClass('hidden');
+    return false;
+  });
+});
+applyJQDatePickers();
+applyListeners();

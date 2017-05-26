@@ -45,6 +45,19 @@ class PersonRelationship
     "ward"
   ]
 
+  Relationships_UI = [
+    "spouse",
+    "domestic_partner",
+    "child",
+    "parent",
+    "sibling",
+    "unrelated",
+    "aunt_or_uncle",
+    "nephew_or_niece",
+    "grandchild",
+    "grandparent"
+  ]
+
   InverseMap = {
     "child" => "parent",
     "parent" => "child",

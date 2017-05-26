@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
@@ -116,17 +116,14 @@ class Employers::CensusEmployeesController < ApplicationController
     authorize EmployerProfile, :updateable?
     status = params[:status]
     termination_date = params["termination_date"]
+
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
-    else
-      termination_date = ""
+      if termination_date >= (TimeKeeper.date_of_record - 60.days)
+        @fa = @census_employee.terminate_employment(termination_date) && @census_employee.save
+      end
     end
-    last_day_of_work = termination_date
-    if termination_date.present? && termination_date >= (TimeKeeper.date_of_record - 60.days)
-      @fa = @census_employee.terminate_employment(last_day_of_work) && @census_employee.save
 
-    else
-    end
     respond_to do |format|
       format.js {
         if termination_date.present? && @fa
@@ -185,7 +182,35 @@ class Employers::CensusEmployeesController < ApplicationController
     render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: params[:status])}'"
   end
 
+  def cobra
+    cobra_date = params["cobra_date"]
+    if cobra_date.present?
+      @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
+    else
+      @cobra_date = ""
+    end
+
+    if @cobra_date.present? && @census_employee.can_elect_cobra?
+      if @census_employee.update_for_cobra(@cobra_date, current_user)
+        flash[:notice] = "Successfully update Census Employee."
+      else
+        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+      end
+    else
+      flash[:error] = "Please enter cobra date."
+    end
+  end
+
+  def cobra_reinstate
+    if @census_employee.reinstate_eligibility!
+      flash[:notice] = "Successfully update Census Employee."
+    else
+      flash[:error] = "Unable to update Census Employee."
+    end
+  end
+
   def show
+    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
         |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
@@ -259,7 +284,7 @@ class Employers::CensusEmployeesController < ApplicationController
 =end
 
     params.require(:census_employee).permit(:id, :employer_profile_id,
-        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner,
+        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
         :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [

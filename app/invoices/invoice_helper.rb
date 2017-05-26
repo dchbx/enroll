@@ -79,7 +79,7 @@ module InvoiceHelper
 
     @pdf.start_new_page
 
-    if @employer_profile.is_conversion?
+    if @employer_profile.is_converting?
       payment_page_for_conversion_employer
     elsif @employer_profile.published_plan_year && @employer_profile.published_plan_year.is_renewing?
       payment_page_for_renewing_employer
@@ -109,7 +109,7 @@ module InvoiceHelper
 
     enrollment_summary.each do |name, summary| 
       carrier_plan_services_data = [ 
-        ["Last 4 SSN", "Last Name","First Name", "No. of Enrolled (1=EE only)", "Coverage Month", "Employer Cost", "Employee Cost", "Premium"]
+        ["Last Name","First Name", "No. of Enrolled (1=EE only)", "Coverage Month", "Employer Cost", "Employee Cost", "Premium"]
       ]
       @pdf.start_new_page
 
@@ -136,9 +136,9 @@ module InvoiceHelper
 
       summary["enrollments"].each do |enrollment|
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
-        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
+        carrier_plan_services_data << ["#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
       end
-      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{currency_format(summary['total_premium'])}"]
+      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "$#{currency_format(summary['total_premium'])}"]
       dchbx_table_by_plan(carrier_plan_services_data)
     end
 
@@ -223,10 +223,10 @@ module InvoiceHelper
       style(column(1..-1), :align => :center)
       style(columns(-1), :align => :right)
       style(columns(0).row(-1), :width => 80)
+      style(columns(2), :width => 60)
       style(columns(3), :width => 60)
       style(columns(4), :width => 60)
-      style(columns(5), :width => 60)
-      style(columns(6), :width => 70)
+      style(columns(5), :width => 70)
     end
   end
 
@@ -437,8 +437,8 @@ module InvoiceHelper
         ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
         ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
-        ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
-        # ["DATE DUE:", "#{PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")}"]
+        # ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
+        ["DATE DUE:", "#{PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 

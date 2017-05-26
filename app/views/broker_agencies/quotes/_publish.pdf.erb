@@ -19,6 +19,7 @@
 
           <p>Costs are based on the roster associated with this quote of  <b><%= @q.quote_households.count %></b> families:</p>
           <% @q.quote_benefit_groups.each do |benefit_group| %>
+          <%  unless benefit_group.plan.nil? %>
             <div class="panel-body">
               <h3 class="title no-buffer">
                 <%= "Benefit Group: #{benefit_group.title}" %>
@@ -29,7 +30,6 @@
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Relationship</th>
-                    <th>DOB</th>
                   </tr>
                 </thead>
                 <% @q.quote_households.each do |quote_household| %>
@@ -39,12 +39,8 @@
                         <td><%= member.first_name%></td>
                         <td><%= member.last_name%></td>
                         <td><%= member.employee_relationship.humanize%></td>
-                        <td><%= member.dob%></td>
                       </tr>
                     <% end %>
-                    <tr>
-                      <td colspan="4">&nbsp;</td>
-                    </tr>
                   <% end %>
                 <% end %>
               </table>
@@ -66,7 +62,7 @@
                       <% if benefit_group.plan %>
                       <tr>
                         <td><%= benefit_group.plan.name %></td>
-                        <td><%= benefit_group.plan.carrier_profile.abbrev.upcase %></td>
+                        <td><%= benefit_group.plan.carrier_profile.legal_name %></td>
                         <td><%= benefit_group.plan.plan_type.upcase%></td>
                         <td><%= benefit_group.plan.metal_level.capitalize%></td>
                         <td><%= benefit_group.plan_option_kind.titleize%></td>
@@ -75,7 +71,7 @@
                       <% if benefit_group.dental_plan %>
                       <tr>
                         <td><%= benefit_group.dental_plan.name %></td>
-                        <td><%= benefit_group.dental_plan.carrier_profile.abbrev.upcase %></td>
+                        <td><%= benefit_group.dental_plan.carrier_profile.legal_name %></td>
                         <td><%= benefit_group.dental_plan.plan_type.upcase%></td>
                         <td><%= benefit_group.dental_plan.metal_level.capitalize%></td>
                         <td><%= benefit_group.dental_plan_option_kind.titleize%></td>
@@ -85,7 +81,7 @@
                 </div>
                 <div class="col-xs-12 quote-details">
                   <div class="col-xs-12 quote-health-details">
-                    <p>Below is your Employer's Health Plan offering Spectrum. Your offerings are based on <%=benefit_group.plan_option_kind.titleize%>.</p>
+                    <p>Below is your Employer's Health Plan offering. Your offerings are based on <%=benefit_group.plan_option_kind.titleize%>.</p>
                     <% if benefit_group.plan %>
                       <table class = "employer-health-contribution">
                         <tr>
@@ -93,6 +89,7 @@
                           <th>Employer Contribution</th>
                         </tr>
                         <% benefit_group.quote_relationship_benefits.each do|rb| %>
+                          <% next if rb.relationship == "child_26_and_over" %>
                           <tr>
                             <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
                             <td>
@@ -135,16 +132,17 @@
                       </div>
                     <%end%>
                   </div>
+                  <% if benefit_group.dental_plan %>
                   <div class="col-xs-12 quote-dental-details">
-                    <p>Below is your Employer's Dental Plan offering Spectrum. Your offerings are based on
+                    <p>Below is your Employer's Dental Plan offering. Your offerings are based on
                      <%=display_dental_plan_option_kind benefit_group%>.</p>
-                    <% if benefit_group.dental_plan %>
                       <table class = "employer-dental-contribution">
                         <tr>
                           <th>Offered</th>
                           <th>Employer Contribution</th>
                         </tr>
                         <% benefit_group.quote_dental_relationship_benefits.each do|rb| %>
+                          <% next if rb.relationship == "child_26_and_over" %>
                           <tr>
                             <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
                             <td>
@@ -193,12 +191,113 @@
                           </div>
                         </div>
                       </div>
-                    <%end%>
                   </div>
+                <%end%>
                 </div>
               </div>
             </div>
             <br>
+            <% if benefit_group.elected_health_plan_ids.present? %>
+              <% quote_health_results = get_health_cost_comparison(benefit_group: benefit_group) %>
+              <h3>Detailed Employee cost breakdown for selected health plans:</h3>
+              <table class="table table-striped table-hover table-sm panel panel-default">
+                <tr>
+                  <td colspan="3" class="thead-default">
+                  </td>
+                  <% quote_health_results.each do |qr| %>
+                    <td colspan="1" class="thead-default">
+                      <div style='width: 300px'>
+                        <b><%= qr[0] %></b><br>
+                        <sm>Employee:
+                        $<%= qr[1][:total_employee_cost].ceil %>,
+                        Employer:
+                        <span >$<%= qr[1][:total_employer_cost].ceil %></span>
+                        <br>
+                        <%#= qr[1][:buy_up]  %>
+                        </sm>
+                      </div>
+                    </td>
+                  <% end %>
+                </tr>
+
+                <tr style="font-weight: bolder; ">
+                  <td class="thead-default">Name</td>
+                  <td class="thead-default">Relationship Contribution</td>
+                  <td class="thead-default">Age</td>
+                  <% quote_health_results.keys.each do |de| %>
+                    <td class="thead-default" style='padding-left: 100px'>Employee Cost</td>
+                  <% end %>
+                </tr>
+                <% quote_health_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
+                  <tr>
+                    <td class="quote_detail_results">
+                      <%= qr[:first_name] %>
+                    </td>
+                    <td class="quote_detail_results">
+                      <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i%>%)</small>
+                    </td>
+                    <td class="quote_detail_results">
+                      <%= qr[:age] %>
+                    </td>
+                    <% quote_health_results.keys.each do |de| %>
+                      <td class="quote_detail_results"  style='padding-left: 100px'>
+                      <b><%= quote_health_results[de][:detail].flatten[index][:employee_cost].round(2) %></b>
+                      </td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </table>
+            <% end %>
+            <% if benefit_group.elected_dental_plan_ids.present? %>
+              <% quote_dental_results = get_dental_cost_comparison(benefit_group: benefit_group) %>
+              <h3>Detailed Employee cost breakdown for selected dental plans:</h3>
+              <table class="table table-striped table-hover table-sm panel panel-default">
+                <tr>
+                  <td colspan="3" class="thead-default">
+                  </td>
+                  <% quote_dental_results.each do |qr| %>
+                    <td colspan="1" class="thead-default">
+                      <div style='width: 300px'>
+                        <b><%= qr[0] %></b><br>
+                        <sm>Employee:
+                        $<%= qr[1][:total_employee_cost].ceil %>,
+                        Employer:
+
+                        <span >$<%= qr[1][:total_employer_cost].ceil %></span>
+                        <br>
+                        </sm>
+                      </div>
+                    </td>
+                  <% end %>
+                </tr>
+                <tr style="font-weight: bolder; ">
+                  <td class="thead-default">Name</td>
+                  <td class="thead-default">Relationship (%)</td>
+                  <td class="thead-default">Age</td>
+                  <% quote_dental_results.keys.each do |de| %>
+                    <td class="thead-default" style='padding-left: 100px'>Employee Cost</td>
+                  <% end %>
+                </tr>
+                <% quote_dental_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
+                  <tr>
+                    <td class="quote_detail_results">
+                      <%= qr[:first_name] %>
+                    </td>
+                    <td class="quote_detail_results">
+                      <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i%>)</small>
+                    </td>
+                    <td class="quote_detail_results">
+                      <%= qr[:age] %>
+                    </td>
+                    <% quote_dental_results.keys.each do |de| %>
+                      <td class="quote_detail_results"  style='padding-left: 100px'>
+                      <b><%= quote_dental_results[de][:detail].flatten[index][:employee_cost].round(2) %></b></td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </table>
+            <% end %>
+          <% end %>
           <% end%>
           <p>**Actual costs may vary.</p>
         </div>

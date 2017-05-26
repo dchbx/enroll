@@ -10,6 +10,7 @@ module Forms
     attr_accessor :user_id
     attr_accessor :no_ssn
     attr_accessor :dob_check #hidden input filed for one time DOB warning
+    attr_accessor :is_applying_coverage
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -30,9 +31,15 @@ module Forms
     attr_reader :dob
 
     def ssn_or_checkbox
+      return unless is_applying_coverage? # Override SSN/Checkbox validations if is_applying_coverage is "false"
+
       if ssn.blank? && no_ssn == "0"
         errors.add(:base, 'Check No SSN box or enter a valid SSN')
       end
+    end
+
+    def is_applying_coverage?
+      is_applying_coverage == "true"
     end
 
     def dob=(val)
@@ -75,6 +82,7 @@ module Forms
     end
 
     def uniq_ssn_dob
+      return true if ssn.blank?
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob

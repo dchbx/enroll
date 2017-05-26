@@ -15,7 +15,10 @@ class Insured::ConsumerRolesController < ApplicationController
     @val = params[:aqhp] || params[:uqhp]
     @key = params.key(@val)
     @search_path = {@key => @val}
-    if @person.try(:consumer_role?)
+    if @person.try(:resident_role?)
+      bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
+      redirect_to bookmark_url || family_account_path
+    elsif @person.try(:consumer_role?)
       bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
       redirect_to bookmark_url || family_account_path
     end
@@ -51,9 +54,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
-
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
+    @use_person = true #only used to manupulate form data
     respond_to do |format|
       if @consumer_candidate.valid?
         idp_search_result = nil
@@ -80,6 +83,35 @@ class Insured::ConsumerRolesController < ApplicationController
                 format.html { render 'insured/employee_roles/match' }
               end
             end
+          end
+          @resident_candidate = Forms::ResidentCandidate.new(@person_params)
+          if @resident_candidate.valid?
+            found_person = @resident_candidate.match_person
+            if found_person.present? && found_person.resident_role.present?
+              begin
+                @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+                if @resident_role.present?
+                  @person = @resident_role.person
+                  session[:person_id] = @person.id
+                else
+                # not logging error because error was logged in construct_consumer_role
+                  render file: 'public/500.html', status: 500
+                  return
+                end
+              rescue Exception => e
+                flash[:error] = set_error_message(e.message)
+                redirect_to search_exchanges_residents_path
+                return
+              end
+              create_sso_account(current_user, @person, 15, "resident") do
+                respond_to do |format|
+                  format.html {
+                    redirect_to family_account_path
+                  }
+                end
+              end
+            end
+            return
           end
 
           found_person = @consumer_candidate.match_person
@@ -124,6 +156,7 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to search_insured_consumer_role_index_path
       return
     end
+    @person.primary_family.create_dep_consumer_role if @person
     is_assisted = session["individual_assistance_path"]
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"
     create_sso_account(current_user, @person, 15, role_for_user) do
@@ -158,7 +191,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
-    #authorize @consumer_role, :edit?
+    authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
@@ -169,12 +202,17 @@ class Insured::ConsumerRolesController < ApplicationController
     save_and_exit =  params['exit_after_method'] == 'true'
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        redirect_to ridp_agreement_insured_consumer_role_index_path
+        if is_new_paper_application?(current_user, session[:original_application_type])
+          redirect_to insured_family_members_path(consumer_role_id: @consumer_role.id)
+        else
+          redirect_to ridp_agreement_insured_consumer_role_index_path
+        end
       end
     else
       if save_and_exit
@@ -202,6 +240,23 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+    if current_user.has_consumer_role?
+      respond_to do |format|
+        format.html { redirect_to edit_insured_consumer_role_path(current_user.person.consumer_role.id) }
+      end
+    else
+      flash[:error] = "We're sorry. Due to circumstances out of your control an error has occured."
+      respond_to do |format|
+        format.json { redirect_to destroy_user_session_path }
+        format.html { redirect_to destroy_user_session_path }
+        format.js   { redirect_to destroy_user_session_path }
+      end
+    end
+  end
+
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
@@ -222,6 +277,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
+      :is_resident_role,
       {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,
@@ -240,7 +296,10 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def check_consumer_role
     set_current_person(required: false)
-    if @person.try(:has_active_consumer_role?)
+    # need this check for cover all
+    if @person.try(:has_active_resident_role?)
+      redirect_to @person.resident_role.bookmark_url || family_account_path
+    elsif @person.try(:has_active_consumer_role?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path

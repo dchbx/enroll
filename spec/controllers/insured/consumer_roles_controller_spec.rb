@@ -67,6 +67,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname", :match_census_employees => []) }
+    let(:mock_resident_candidate) { instance_double("Forms::ResidentCandidate", :valid? => validation_result, ssn: "", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:found_person){ [] }
     let(:person){ instance_double("Person") }
 
@@ -76,7 +77,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(mock_consumer_candidate).to receive(:match_person).and_return(found_person)
       allow(Forms::ConsumerCandidate).to receive(:new).with(person_parameters.merge({user_id: user.id})).and_return(mock_consumer_candidate)
       allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
+      allow(Forms::ResidentCandidate).to receive(:new).and_return(mock_resident_candidate)
       allow(mock_employee_candidate).to receive(:valid?).and_return(false)
+      allow(mock_resident_candidate).to receive(:valid?).and_return(false)
     end
 
     context "given invalid parameters" do
@@ -127,6 +130,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:valid?).and_return(true)
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
+          #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
           post :match, :person => person_parameters
         end
@@ -158,6 +162,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
       allow(consumer_role).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:create_dep_consumer_role)
     end
     it "should create new person/consumer role object" do
       sign_in user
@@ -215,9 +221,18 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     it "should update existing person" do
       allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
+    end
+
+    it "should redirect to family members path when current user is admin & doing new paper app" do
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return true
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
 
     it "should not update the person" do
@@ -333,5 +348,84 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         expect(response).to render_template("ridp_agreement")
       end
     end
+  end
+
+  describe "Post match resident role" do
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:resident_parameters) { { :first_name => "John", :last_name => "Smith1", :dob => "4/4/1972" }}
+    let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => "true", ssn: "333224444", dob: Date.new(1968, 2, 3), :first_name => "fname", :last_name => "lname") }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => "true", ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname", :match_census_employees => []) }
+    let(:mock_resident_candidate) { instance_double("Forms::ResidentCandidate", :valid? => "true", ssn: "", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
+    let(:found_person){ [] }
+    let(:resident_role){ FactoryGirl.build(:resident_role) }
+
+    before(:each) do
+      allow(user).to receive(:idp_verified?).and_return false
+      sign_in(user)
+      allow(mock_consumer_candidate).to receive(:match_person).and_return(person)
+      allow(mock_resident_candidate).to receive(:match_person).and_return(person)
+      allow(Forms::ConsumerCandidate).to receive(:new).with(resident_parameters.merge({user_id: user.id})).and_return(mock_consumer_candidate)
+      allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
+      allow(Forms::ResidentCandidate).to receive(:new).with(resident_parameters.merge({user_id: user.id})).and_return(mock_resident_candidate)
+      allow(mock_employee_candidate).to receive(:valid?).and_return(false)
+      allow(mock_resident_candidate).to receive(:valid?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+    end
+
+    context "with pre-existing consumer_role" do
+      it "should not have a resident role created for it" do
+        post :match, :person => resident_parameters
+        expect(user.person.resident_role).to be_nil
+        #expect(response).to redirect_to(family_account_path)
+        expect(response).to render_template("match")
+      end
+    end
+
+    context "with pre-existing resident_role" do
+      it "should navigate to family account page" do
+        allow(person).to receive(:resident_role).and_return(resident_role)
+        post :match, :person => resident_parameters
+        expect(user.person.resident_role).not_to be_nil
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
+
+    context "with both resident and consumer roles" do
+      it "should navigate to family account page" do
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person).to receive(:resident_role).and_return(resident_role)
+        post :match, :person => resident_parameters
+        expect(user.person.consumer_role).not_to be_nil
+        expect(user.person.resident_role).not_to be_nil
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
+  end
+
+  describe "Get edit consumer role" do
+    let(:consumer_role2){ FactoryGirl.build(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
+    before(:each) do
+      current_user = user
+      allow(ConsumerRole).to receive(:find).and_return(consumer_role)
+      allow(consumer_role).to receive(:person).and_return(person)
+      allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role).and_return(consumer_role2)
+      allow(consumer_role).to receive(:save!).and_return(true)
+      allow(consumer_role).to receive(:bookmark_url=).and_return(true)
+      allow(user).to receive(:has_consumer_role?).and_return(true)
+
+    end
+
+    context "with bookmark_url pointing to another person's consumer role" do
+
+      it "should redirect to the edit page of the consumer role of the current user" do
+        sign_in user
+        get :edit, id: "test"
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(edit_insured_consumer_role_path(user.person.consumer_role.id))
+      end
+    end
+
   end
 end

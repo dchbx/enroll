@@ -4,18 +4,26 @@ module Factories
 
     # Renews a family's active enrollments from current plan year
 
-    attr_accessor :family, :census_employee, :employer, :renewing_plan_year
+    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :disable_notifications
+
+    def initialize
+      @disable_notifications = false
+    end
 
     def renew
+
+      if enrollment.present?
+        set_instance_variables
+      end
 
       raise ArgumentError unless defined?(family)
 
       # excluded_states = %w(coverage_canceled, coverage_terminated unverified renewing_passive
       #                       renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
       #                     )
-      # shop_enrollments = family.enrollments.shop_market.reduce([]) { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e } 
-      ## Works only for data migrated into Enroll 
-      ## FIXME add logic to support Enroll native renewals 
+      # shop_enrollments = family.enrollments.shop_market.reduce([]) { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e }
+      ## Works only for data migrated into Enroll
+      ## FIXME add logic to support Enroll native renewals
 
       # return true if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
 
@@ -31,33 +39,41 @@ module Factories
       prev_plan_year_end   = @plan_year_start_on - 1.day
 
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
-      shop_enrollments.reject!{|enrollment| !(enrollment.currently_active?) }
+      shop_enrollments.reject!{|enrollment| enrollment.coverage_termination_pending? }
+      begin
+        if shop_enrollments.present?
+          passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
 
-      if shop_enrollments.present?
-        passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
-
-        passive_renewals.reject! do |renewal|
-          renewal.benefit_group.elected_plan_ids.include?(renewal.plan_id) ? false : (renewal.cancel_coverage!; true)
-        end
-        
-        if passive_renewals.blank?
-          active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
-          if active_enrollment.present? && active_enrollment.inactive?
-            renew_waived_enrollment(active_enrollment)
-          elsif renewal_plan_offered_by_er?(active_enrollment)
-            renewal_enrollment = renewal_builder(active_enrollment)
-            renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
-            renewal_enrollment.decorated_hbx_enrollment
-            save_renewal_enrollment(renewal_enrollment, active_enrollment)
+          passive_renewals.reject! do |renewal|
+            renewal.benefit_group.elected_plan_ids.include?(renewal.plan_id) ? false : (renewal.cancel_coverage!; true)
           end
+
+          if passive_renewals.blank?
+            active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
+            if active_enrollment.present? && active_enrollment.inactive?
+              renew_waived_enrollment(active_enrollment)
+              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
+            elsif renewal_plan_offered_by_er?(active_enrollment)
+              renewal_enrollment = renewal_builder(active_enrollment)
+              renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
+              renewal_enrollment.decorated_hbx_enrollment
+              save_renewal_enrollment(renewal_enrollment, active_enrollment)
+              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal") unless renewal_enrollment.coverage_kind == "dental" || disable_notifications
+            else
+              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal") unless disable_notifications
+            end
+          end
+        elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
+          renew_waived_enrollment
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
         end
-      elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
-        renew_waived_enrollment
+      rescue Exception => e
+        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
-     
+
       return family
     end
- 
+
     def renewal_plan_offered_by_er?(enrollment)
       if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
 
@@ -66,7 +82,7 @@ module Factories
           @census_employee.add_renew_benefit_group_assignment(benefit_group)
           @census_employee.save!
         end
-        
+
         @census_employee.renewal_benefit_group_assignment.benefit_group.elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
       else
         false
@@ -99,9 +115,10 @@ module Factories
       renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
       renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
-  
+
       renewal_enrollment.waiver_reason = waived_enrollment.try(:waiver_reason) || "I do not have other coverage"
       renewal_enrollment.renew_waived
+      renewal_enrollment.submitted_at = TimeKeeper.datetime_of_record
 
       if renewal_enrollment.save
         return
@@ -146,7 +163,7 @@ module Factories
     end
 
     def assign_common_attributes(active_enrollment, renewal_enrollment)
-      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id 
+      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id
           writing_agent_id original_application_type kind special_enrollment_period_id
         )
       common_attributes.each do |attr|
@@ -170,7 +187,7 @@ module Factories
 
     def clone_shop_enrollment(active_enrollment, renewal_enrollment)
       # Find and associate with new ER benefit group
-     
+
       if @census_employee.renewal_benefit_group_assignment.blank?
         @census_employee.add_renew_benefit_group_assignment(@renewing_plan_year.benefit_groups.first)
       end
@@ -192,12 +209,13 @@ module Factories
 
       renewal_enrollment.employee_role_id = active_enrollment.employee_role_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
+      renewal_enrollment.kind = active_enrollment.kind if active_enrollment.is_cobra_status?
       # Set the HbxEnrollment to proper state
 
       # Renew waiver status
-      if active_enrollment.is_coverage_waived? 
+      if active_enrollment.is_coverage_waived?
         renewal_enrollment.waiver_reason = active_enrollment.waiver_reason
-        renewal_enrollment.waive_coverage 
+        renewal_enrollment.waive_coverage
       end
 
       renewal_enrollment.hbx_enrollment_members = clone_enrollment_members(active_enrollment, renewal_enrollment)
@@ -248,8 +266,14 @@ module Factories
       renewal_enrollment.hbx_enrollment_members
     end
 
+    def set_instance_variables
+      @family = enrollment.family
+      @census_employee = enrollment.employee_role.census_employee
+      @employer = enrollment.employee_role.employer_profile
+      @renewing_plan_year = @employer.renewing_published_plan_year
+    end
   end
-  
+
   class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
 

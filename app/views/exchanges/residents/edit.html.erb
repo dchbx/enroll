@@ -1,0 +1,6 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% end %>
+<%= form_for(@resident_role.person, url: exchanges_resident_path(id: @resident_role.id), :enctype =>"multipart/form-data", html: { multipart: true }, method: :put) do |f| %>
+  <%= render partial: "form", locals: {f: f} %>
+<% end %>

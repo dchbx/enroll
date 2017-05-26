@@ -68,12 +68,13 @@ module Importers
           errors.add(:fein, "employer don't exists with given fein")
         end
         has_data_not_changed_since_import
+
         if errors.empty?
           puts "Processing Update #{fein}---Data Sheet# #{legal_name}---Enroll App# #{organization.legal_name}" unless Rails.env.test?
           organization.legal_name = legal_name
           organization.dba = dba
           organization.office_locations = map_office_locations
-
+          
           if broker_npn.present?
             broker_exists_if_specified
             br = BrokerRole.by_npn(broker_npn).first
@@ -121,6 +122,7 @@ module Importers
       rescue Exception => e
         puts "FAILED.....#{e.to_s}"
       end
+
       begin
         if update_result
           update_poc(organization.employer_profile)
@@ -132,6 +134,7 @@ module Importers
       if organization
         propagate_errors(organization)
       end
+
       return update_result
     end
   end

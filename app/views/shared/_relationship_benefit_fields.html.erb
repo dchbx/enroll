@@ -1,4 +1,5 @@
 <div class="row row-form-wrapper no-buffer">
+  <% f.object.offered = false if f.object.relationship == 'child_26_and_over' %>
   <fieldset style="<%= 'display: none;' if f.object.relationship == 'child_26_and_over' %>">
     <div class="col-xs-6 form-group form-group-lg">
       <div class="checkbox">

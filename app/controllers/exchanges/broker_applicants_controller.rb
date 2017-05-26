@@ -54,11 +54,15 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else
+      all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
+      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
+      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
       broker_role.approve!
       broker_role.reload
 
       if broker_role.is_primary_broker?
-        broker_role.broker_agency_profile.approve!
+        broker_role.broker_agency_profile.approve! if broker_role.broker_agency_profile.aasm_state !=  "is_approved"
         staff_role = broker_role.person.broker_agency_staff_roles[0]
         staff_role.broker_agency_accept! if staff_role
       end

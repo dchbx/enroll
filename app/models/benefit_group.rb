@@ -1,6 +1,7 @@
 class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
+  include ::Eligibility::BenefitGroup
 
   embedded_in :plan_year
 
@@ -190,7 +191,6 @@ class BenefitGroup
     set_lowest_and_highest(plans)
   end
 
-
   def set_lowest_and_highest(plans)
     if plans.size > 0
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
@@ -269,15 +269,6 @@ class BenefitGroup
     return !(census_employee.employment_terminated_on < start_on || census_employee.hired_on > end_on)
   end
 
-  def effective_on_for(date_of_hire)
-    case effective_on_kind
-    when "date_of_hire"
-      date_of_hire_effective_on_for(date_of_hire)
-    when "first_of_month"
-      first_of_month_effective_on_for(date_of_hire)
-    end
-  end
-
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end
@@ -305,8 +296,6 @@ class BenefitGroup
        self.dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
-
-
 
   def simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
     [
@@ -429,56 +418,23 @@ class BenefitGroup
     end
   end
 
-  def eligible_on(date_of_hire)
-    if effective_on_kind == "date_of_hire"
-      date_of_hire
-    else
-      if effective_on_offset == 1
-        date_of_hire.end_of_month + 1.day
-      else
-        if (date_of_hire + effective_on_offset.days).day == 1
-          (date_of_hire + effective_on_offset.days)
-        else
-          (date_of_hire + effective_on_offset.days).end_of_month + 1.day
-        end
-      end
-    end
-  end
-
-  ## Conversion employees are not allowed to buy coverage through off-exchange plan year
-  def valid_plan_year    
-    if employer_profile.is_coversion_employer?
-      plan_year.coverage_period_contains?(employer_profile.registered_on) ? plan_year.employer_profile.renewing_plan_year : plan_year
-    else
-      plan_year
-    end
-  end
-
-  def date_of_hire_effective_on_for(date_of_hire)
-    [valid_plan_year.start_on, date_of_hire].max
-  end
-
-  def first_of_month_effective_on_for(date_of_hire)
-    [valid_plan_year.start_on, eligible_on(date_of_hire)].max
-  end
-
   def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
     self.employer_profile.census_employees.each do |ce|
       benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
-      benefit_group_assignments.each do |bga|
-        bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
-        bga.destroy
-      end
-      benefit_groups = self.plan_year.benefit_groups.reject { |bg| bg.id == self.id}
-      bga = ce.find_or_build_benefit_group_assignment(benefit_groups.first)
-      if bga.blank?
-        existing_bga = ce.benefit_group_assignments.where(:benefit_group_id => benefit_groups.first.id).first
-        existing_bga.update_attributes(is_active: true) if self.plan_year.aasm_state == 'draft' && existing_bga.is_active == false
+
+      if benefit_group_assignments.present?
+        benefit_group_assignments.each do |bga|
+          bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+          bga.destroy
+        end
+
+        benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
+        ce.find_or_create_benefit_group_assignment(benefit_groups.first)
       end
     end
   end
 
-private
+  private
 
   def set_congress_defaults
     return true unless is_congress

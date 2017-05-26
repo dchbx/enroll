@@ -11,14 +11,22 @@
   </div>
   <div class="panel-body">
     <div class="vertically-aligned-row">
-      <div>
+    <div>
         <strong>
           Broker Name:
         </strong>
         <span>
           <%= @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
         </span>
-      </div>
+    </div>
+    <div>
+        <strong>
+          Assignment Date:
+        </strong>
+        <span>
+          <%= format_date(@person.primary_family.current_broker_agency.start_on) %>
+        </span>
+    </div>
     </div>
     <div class="vertically-aligned-row">
       <% if @person.primary_family.current_broker_agency.writing_agent.phone.present? %>

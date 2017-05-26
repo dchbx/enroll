@@ -19,7 +19,13 @@ class Quote
 
 
   field :claim_code, type: String
+  field :employer_name, type: String
+  field :employer_type, type: String
+  field :employer_profile_id, type: BSON::ObjectId
+
   associated_with_one :broker_role, :broker_role_id, "BrokerRole"
+  associated_with_one :employer_profile, :employer_profile_id, "EmployerProfile"
+
 
 
   # Quote should now support multiple benefit groups
@@ -46,6 +52,8 @@ class Quote
   index({"quote_benefit_groups._id" => 1}, { unique: true })
 
   scope :datatable_search, ->(query) { where(quote_name: Regexp.new(Regexp.escape(query), true)) }
+  scope :by_client_employer_type, -> { where(employer_type: 'client') }
+  scope :by_prospect_employer_type, -> { where(employer_type: 'prospect') }
 
   after_create :update_default_benefit_group
 
@@ -63,7 +71,7 @@ class Quote
   end
 
   def can_quote_be_published?
-    all_households_have_benefit_groups? && all_benefit_groups_have_plans?
+    all_households_have_benefit_groups? && all_benefit_groups_have_plans? && is_quote_eligible?
   end
 
   def all_households_have_benefit_groups?
@@ -71,7 +79,34 @@ class Quote
   end
 
   def all_benefit_groups_have_plans?
-    quote_benefit_groups.map(&:plan).include?(nil) ? false : true
+    quote_benefit_groups.reject{ |q| !q.is_assigned? }.map(&:plan).include?(nil) ? false : true
+  end
+
+  def min_employer_contribution
+    unless quote_benefit_groups.size == 0
+      quote_benefit_groups.reject{ |q| !q.is_assigned? }.map do |qbg|
+        qbg.relationship_benefit_for("employee")
+      end.map(&:premium_pct).min
+    end
+  end
+
+  def is_quote_eligible?
+    quote_eligibility_warnings.blank?
+  end
+
+  def quote_warnings
+    if !is_quote_eligible?
+      quote_eligibility_warnings.each_pair(){ |k, v| self.errors.add(:base, v)}
+    end
+  end
+
+  def quote_eligibility_warnings
+    warnings = {}
+    unless start_on.yday == 1
+      if quote_benefit_groups.size > 0 && (min_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+        warnings.merge!({min_employer_contribution: "Employer contribution percent toward employee premium (#{min_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)"})
+      end
+    end
   end
 
   def member_count

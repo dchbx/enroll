@@ -1,3 +1,11 @@
+NOTICE_GENERATOR = ARGV[0]
+REMINDER_NOTICE_TRIGGERS = ["verifications_backlog", "first_verifications_reminder", "second_verifications_reminder", "third_verifications_reminder", "fourth_verifications_reminder"]
+
+unless ARGV[0].present? && REMINDER_NOTICE_TRIGGERS.include?(NOTICE_GENERATOR)
+  puts "Please enter a valid event name - Event Names: #{REMINDER_NOTICE_TRIGGERS.join(", ")}."
+  exit
+end
+
 def create_directory(path)
   if Dir.exists?(path)
     FileUtils.rm_rf(path)
@@ -9,8 +17,7 @@ families = Family.where({
   "households.hbx_enrollments" => {
     "$elemMatch" => {
       "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1)},
-      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+      "effective_on" => { "$gte" => Date.new(2017,1,1)},
   } }
 }).to_a
 
@@ -34,18 +41,25 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   counter = 0
 
   families.each do |family|
-
-    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lt => Date.new(2016,10,26)).present?
+    # Excluding the families that doesn't have an acitve 2017 policy in Glue
+    next if ["5619ca3e54726532e5f7f800", "58a47aae082e7654050000fe", "5845a2fff1244e5da300003d", "58365eab082e76791a000023", "5619c9e954726532e51f6500", "58815e10faca1438a00000ac", "57b5d7c6082e760ae800001e", "584ed433082e76642c000009", "5850661950526c57f2000181", "5850b2bcfaca143098000064", "58514ee4082e7608f800000a", "5852d73ff1244e6ab600014b", "58533536082e764eef00004d", "58534160faca146eb400007f", "5854639250526c4ead0000a9", "58582ce9f1244e65da000013", "58588541f1244e5007000090", "58595c1cf1244e3b3e00000a", "586265edf1244e477600003d", "586be0c0f1244e688500000e", "586becae082e76726900003e", "586d0bb5faca141565000028", "587398d3f1244e71d000000b", "587d666a50526c43a1000010", "5888e2abfaca1439520000d3", "588a3418082e763e6e0000d0", "588f73b550526c34be0001b2", "5890ba8d50526c34b400041a", "5890c1d450526c34d60004db", "5890f01350526c3cb6000085", "58910e43f1244e5565000862", "58911265f1244e5565000875", "58911964082e76600600070b", "58911ad0faca147f14000163", "58912d21faca147ed8000167", "58912db8082e765fbe000844", "58916797f1244e53ae00002a", "589a303650526c1d10000052", "589ccc2cfaca1410090000e9", "58b60709f1244e53c7000073"].include?(family.id.to_s)
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lte => Date.new(2017,3,20)).present?
     counter += 1
     begin
       person = family.primary_applicant.person
+
+      next if person.inbox.blank?
+      next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
+      # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+      #   next if secure_message.created_at > 35.days.ago
+      # end
 
       if person.consumer_role.blank?
         count += 1
         next
       end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      event_kind = ApplicationEventKind.where(:event_name => NOTICE_GENERATOR).first
 
       notice_trigger = event_kind.notice_triggers.first 
 

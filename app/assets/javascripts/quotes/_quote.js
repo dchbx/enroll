@@ -49,9 +49,9 @@ var Quote = ( function() {
     $.ajax({
       type: "GET",
       url: "/broker_agencies/broker_roles/"+$('#broker_role_id').val()+"/quotes/plan_comparison",
-      data: {plans: plans, sort_by: sort_by.substring(0, sort_by.length-2)},
+      data: {plans: plans, sort_by: sort_by.substring(0, sort_by.length-2), quote_id: $('#quote_id').val()},
       success: function(response) {
-        $('#plan_comparison_frame').html(response);
+        $('#benefit_plan_comparison_frame').html(response);
         $('#compare_plans_table').dragtable({dragaccept: '.movable'});
         $('.cost_sort').on('click', sort_plans);
         _export_compare_plans_listener();
@@ -105,8 +105,8 @@ var Quote = ( function() {
     })    
   }
   var load_publish_listeners= function() {
-    $('.publish td').on('click', function(){
-        td = $(this)
+    $('.publish td .btn').on('click', function(){
+        td = $(this).parent('td')
         quote_id=$('#quote_id').val()
         plan_id=td.parent().attr('id')
         benefit_group_id = $('#benefit_group_select').val()
@@ -115,8 +115,22 @@ var Quote = ( function() {
         elected_plans_list = selected_plans(coverage_kind)
         inject_plan_into_quote(quote_id, benefit_group_id, plan_id, elected, coverage_kind, elected_plans_list)
         _open_quote()
+
+        if(coverage_kind == 'health'){
+          $('.container-fluid .quote-detail-cost > tbody > tr > td > .darker_btn').removeClass('darker_btn')
+          alert('You can now select dental offerings. This is optional; employers are not required to offer dental coverage');
+          $('#publish-quote').removeClass('in')
+          $('#dental-feature-mgmt-header a').trigger('click')
+        }else{
+          $('.dental-panel .quote-detail-cost > tbody > tr > td > .darker_btn').removeClass('darker_btn')
+        }
+        $('#publish-quote').removeClass('in')
+        td.children('div').addClass('btn darker_btn')
+        $('#publish-quote').addClass('in')
+
     })
   }
+
   var show_benefit_group=function(quote_id, benefit_group_id){
     QuoteSliders.slider_listeners()
     QuotePageLoad.configure_benefit_group(quote_id, $('#broker_role_id').val(),benefit_group_id)

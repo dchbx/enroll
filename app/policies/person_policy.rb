@@ -4,4 +4,3 @@ class PersonPolicy < ApplicationPolicy
     role.permission.modify_family
   end
 end
-

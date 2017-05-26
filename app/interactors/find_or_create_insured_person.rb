@@ -51,8 +51,7 @@ class FindOrCreateInsuredPerson
           ssn: context.ssn,
           no_ssn: context.no_ssn,
           dob: context.dob,
-          gender: context.gender,
-        ), true
+          gender: context.gender), true
       end
     else
       # what am I doing here?  More than one person had the same SSN?

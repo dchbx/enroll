@@ -1,7 +1,8 @@
 def import_employee(in_file)
+    config = YAML.load_file("#{Rails.root}/conversions.yml")
 #  begin
     result_file = File.open(File.join(Rails.root, "conversion_employee_policy_results", "RESULT_" + File.basename(in_file) + ".csv"), 'wb')
-    importer = Importers::ConversionEmployeePolicySet.new(in_file, result_file, Date.new(2017,2,1), 2016)
+    importer = Importers::ConversionEmployeePolicySet.new(in_file, result_file, config["conversions"]["employee_policies_date"], 2016)
     importer.import!
     result_file.close
 #  rescue
@@ -10,6 +11,7 @@ def import_employee(in_file)
 end
 
 dir_glob = File.join(Rails.root, "conversion_employees", "*.{xlsx,csv}")
-Dir.glob(dir_glob).each do |file|
+Dir.glob(dir_glob).sort.each do |file|
+  puts "PROCESSING...#{file}"
   import_employee(file)
 end

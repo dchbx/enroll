@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User", person: person) }
   let(:person) { double("Person", primary_family: family, has_active_consumer_role?: true)}
-  let(:hbx_enrollment){double("HbxEnrollment", kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
+  let(:hbx_enrollment){double("HbxEnrollment", is_shop?: true, kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
   let(:plan) { double("Plan") }
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
@@ -28,7 +28,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET summary" do
-    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health') }
+    let(:hbx_enrollment){ double("HbxEnrollment", is_shop?: false, id: double("id"), enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health') }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:dental_reference_plan){ double("Plan") }
@@ -38,37 +38,28 @@ RSpec.describe Products::QhpController, :type => :controller do
     before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
-      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
-      allow(benefit_group).to receive(:is_congress).and_return(false)
+      allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
+      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
-      allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
 
     it "should return summary of a plan for shop and coverage_kind as health" do
-      allow(hbx_enrollment).to receive(:kind).and_return("shop")
       allow(hbx_enrollment).to receive(:plan).and_return(false)
-      allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "health"
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "employer_sponsored"
       expect(assigns(:coverage_kind)).to eq "health"
-      expect(assigns(:benefit_group)).to be_truthy
-      expect(assigns(:reference_plan)).to be_truthy
     end
 
     it "should return summary of a plan for shop and coverage_kind as dental" do
-      allow(hbx_enrollment).to receive(:kind).and_return("shop")
       allow(plan).to receive(:coverage_kind).and_return("dental")
-      allow(benefit_group).to receive(:dental_reference_plan).and_return(dental_reference_plan)
       allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "dental"
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "employer_sponsored"
       expect(assigns(:coverage_kind)).to eq "dental"
-      expect(assigns(:benefit_group)).to be_truthy
-      expect(assigns(:reference_plan)).to be_truthy
     end
 
     it "should return dental plan if hbx_enrollment does not have plan object" do

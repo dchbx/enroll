@@ -23,8 +23,6 @@ module Forms
 
     validate :office_location_validations
     validate :office_location_kinds
-    validate :has_broker_agency, :if => Proc.new { |m| Organization
-                                                         .broker_agency_profile_by_fein(m.fein).present? }
 
     class PersonAlreadyMatched < StandardError; end
     class TooManyMatchingPeople < StandardError; end
@@ -118,10 +116,6 @@ module Forms
       elsif location_kinds.count('mailing') > 1
         self.errors.add(:base, "can't have more than one mailing address")
       end
-    end
-
-    def has_broker_agency
-      self.errors.add(:base, "fein is already in use.")
     end
 
     def office_locations_attributes

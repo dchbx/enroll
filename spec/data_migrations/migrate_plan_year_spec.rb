@@ -15,7 +15,7 @@ describe MigratePlanYear do
   describe "changing plan year's state" do
 
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
-    let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], aasm_state: "active") }
+    let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], aasm_state: "active", is_conversion: true) }
     let(:employer_profile)  { FactoryGirl.create(:employer_profile, plan_years: [plan_year], profile_source: "conversion") }
 
     before(:each) do

@@ -2,13 +2,14 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :unblock, :upload_notice]
+  before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
 
   def home
+    authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
@@ -27,18 +28,19 @@ class Insured::FamiliesController < FamiliesController
 
     @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
+    @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
-  
+
     respond_to do |format|
       format.html
     end
   end
 
   def manage_family
-
     set_bookmark_url
     @family_members = @family.active_family_members
+    @resident = @person.has_active_resident_role?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -60,10 +62,20 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
+
+    if (params[:resident_role_id].present? && params[:resident_role_id])
+      @resident_role_id = params[:resident_role_id]
+    else
+      @resident_role_id = @person.try(:resident_role).try(:id)
+    end
+
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
-    @existing_sep = @family.special_enrollment_periods.where(:end_on.gte => Date.today).first unless params.key?(:shop_for_plan)
+    if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
+      @market_kind = "coverall"
+    end
+
     render :layout => 'application'
   end
 
@@ -91,6 +103,8 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
     @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
+    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
+    @resident = @person.resident_role.present?
     respond_to do |format|
       format.html
     end
@@ -118,7 +132,6 @@ class Insured::FamiliesController < FamiliesController
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      @qle_aptc_block = @family.is_blocked_by_qle_and_assistance?(@qle, session["individual_assistance_path"])
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
@@ -129,6 +142,11 @@ class Insured::FamiliesController < FamiliesController
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
     @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
+
+    if @person.resident_role?
+      @resident_role_id = @person.resident_role.id
+    end
+
   end
 
   def check_move_reason
@@ -143,23 +161,12 @@ class Insured::FamiliesController < FamiliesController
     if params[:hbx_enrollment_id].present?
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     else
-    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+      @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
     end
 
     if @enrollment.present?
-      plan = @enrollment.try(:plan)
-      if @enrollment.is_shop?
-        @benefit_group = @enrollment.benefit_group
-        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
-
-        if @benefit_group.is_congress
-          @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
-        else
-          @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
-        end
-      else
-        @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
-      end
+      @enrollment.reset_dates_on_previously_covered_members
+      @plan = @enrollment.build_plan_premium
 
       begin
         @plan.name
@@ -177,11 +184,6 @@ class Insured::FamiliesController < FamiliesController
     else
       redirect_to :back
     end
-  end
-
-  def unblock
-    @family = Family.find(params[:id])
-    @family.set(status: "aptc_unblock")
   end
 
   # admin manually uploads a notice for person
@@ -355,6 +357,11 @@ class Insured::FamiliesController < FamiliesController
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
+
+    if @person.resident_role?
+      @resident_role_id = @person.resident_role.id
+    end
+
   end
 
 end

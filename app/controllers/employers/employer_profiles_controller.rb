@@ -214,6 +214,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @organization.save(validate: false)
 
       if @organization.update_attributes(employer_profile_params)
+        @organization.notify_legal_name_or_fein_change
+        @organization.notify_address_change(@organization_dup,employer_profile_params)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to edit_employers_employer_profile_path(@organization)
       else
@@ -253,7 +255,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def bulk_employee_upload_form
-
   end
 
   def download_invoice
@@ -326,6 +327,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
                          @employer_profile.census_employees.terminated.sorted
                        when 'all'
                          @employer_profile.census_employees.sorted
+                       when 'cobra'
+                         @employer_profile.census_employees.by_cobra.sorted
                        else
                          @employer_profile.census_employees.active.sorted
                        end

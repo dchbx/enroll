@@ -43,9 +43,19 @@
         </div>
         <% else %>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Effective Date:
+          <strong>Plan Start:
           </strong>
           <%= hbx_enrollment.effective_on %>
+          <% if read_only == true %>
+          <br>
+          <strong class="text-danger">Plan End:
+          </strong>
+          <% if @census_employee.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
+          <span class="text-danger">
+            <%= @census_employee.coverage_terminated_on.end_of_month %>
+          </span>
+          <% end %>
+          <% end %>
         </div>
         <% end %>
       </div>
@@ -79,17 +89,6 @@
       </div>
       <% end %>
     </div>
-    <div class="col-xs-12 vertically-aligned-row">
-      <div class="plan-end info vertical-align-top">
-        <strong class="text-danger">Plan End:
-        </strong>
-        <% if @census_employee.coverage_terminated_on.present? %>
-        <span class="text-danger">
-          <%= @census_employee.coverage_terminated_on.end_of_month %>
-        </span>
-        <% end %>
-      </div>
-    </div>
     <% if hbx_enrollment.is_coverage_waived? %>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="benefit-group info vertical-align-top">
@@ -107,6 +106,25 @@
     </div>
     <% end %>
     <% end %>
+    <% if hbx_enrollment.future_enrollment_termination_date.present? %>
+      <div class="col-xs-12 vertically-aligned-row">
+        <div class="enrollment-effective info">
+          <p>
+            <strong>Future enrollment termination date: </strong>
+            <%= hbx_enrollment.future_enrollment_termination_date %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="col-xs-12 vertically-aligned-row">
+      <div class="enrollment-type info">
+        <p>
+          <strong>Market Type: </strong>
+          <%= show_market_name_by_enrollment hbx_enrollment %>
+        </p>
+      </div>
+    </div>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">
         <p>
@@ -158,7 +176,7 @@
     </div>
     <div>
       <a class="vertically-aligned-row" data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
-        <i class="fa fa-phone fa-2x pull-left"></i>
+        <i class="fa fa-phone fa-2x pull-right"></i>
         <span>Plan Contact Info</span>
       </a>
       <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
@@ -183,3 +201,4 @@
 </div>
 </div>
 <% end %>
+

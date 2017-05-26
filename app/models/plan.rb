@@ -166,6 +166,11 @@ class Plan
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
+  scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
+  scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
+  scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
+  scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
+
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -270,6 +275,7 @@ class Plan
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
   scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
+  scope :by_carrier_profile_for_bqt,            ->(carrier_profile_id) { where(:carrier_profile_id.in => carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
@@ -357,9 +363,16 @@ class Plan
     end
   end
 
+  def dental?
+    coverage_kind && coverage_kind.downcase == "dental"
+  end
+
+  def health?
+    coverage_kind && coverage_kind.downcase == "health"
+  end
+
   def is_dental_only?
-    return false if self.coverage_kind.blank?
-    self.coverage_kind.downcase == "dental"
+    dental?
   end
 
   def can_use_aptc?
@@ -485,18 +498,18 @@ class Plan
       plans = shop_plans coverage_kind, year
       selectors = {}
       if coverage_kind == 'dental'
-        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.append('any')
+        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.unshift('any')
       else
-        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.append('any')
+        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.unshift('any')
       end
       selectors[:carriers] = plans.map{|p|
         id = p.carrier_profile_id
         carrier_profile = CarrierProfile.find(id)
         [ carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id ]
-        }.uniq.append(['any','any'])
-      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.append('any')
-      selectors[:dc_network] =  ['true', 'false', 'any']
-      selectors[:nationwide] =  ['true', 'false', 'any']
+        }.uniq.unshift(['any','any'])
+      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.unshift('any')
+      selectors[:dc_network] =  ['any', 'true', 'false']
+      selectors[:nationwide] =  ['any', 'true', 'false']
       selectors
     end
 

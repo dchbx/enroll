@@ -12,7 +12,6 @@ module VlpDoc
   end
 
   def update_vlp_documents(consumer_role, source='person', dependent=nil)
-
     return true if consumer_role.blank?
 
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)

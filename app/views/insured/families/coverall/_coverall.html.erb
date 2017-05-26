@@ -1,0 +1,50 @@
+<div class="module ivl-documents-table panel">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover table-sm">
+      <thead class="thead-default">
+      <tr>
+        <th>Family Member</th>
+
+        <% if current_user && current_user.has_hbx_staff_role? %>
+            <!--<th>Complete</th>-->
+        <% end %>
+        <th>Paper Application</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @family_members.each do |member|%>
+          <tr class="<%= cycle("odd top", "even top") %>">
+            <td><%= member.person.first_name.capitalize %>
+              <%= member.person.last_name.capitalize %></td>
+              <td colspan="3">
+                    <%= render partial: 'insured/families/coverall/missing_paper_application', locals: {member: member} %>
+              </td>
+            <td class="table-functions">
+              <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
+                <% if member_has_uploaded_paper_applications(member) %>
+                  <span data-toggle="tooltip" title="View Documents" class="function-text">
+                  <i class="fa fa-caret-down fa-2x"></i>
+                  </span>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+          <div id="verification_docs_table">
+            <%= render partial: "insured/families/coverall/coverall_application", locals: {member: member} %>
+          </div>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="collapse" id="docs-verification-faq">
+  <%= render partial: "insured/families/verification/documents_verification_list" %>
+</div>
+
+<script>
+  $(document).ready(function() {
+    Freebies.tooltip();
+    Insured.custom_upload_init();
+  });
+</script>

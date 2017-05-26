@@ -5,8 +5,8 @@
     = render :partial => "events/shared/broker", :object => hbx_enrollment, as: :hbx_enrollment
   %enrollees
     = render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }
-  - if hbx_enrollment.subscriber.family_member != hbx_enrollment.household.family.primary_applicant
-    = render "events/individuals/responsible_party", :object => hbx_enrollment.household.family.primary_applicant.person, as: :person, :locals => {:hbx_enrollment => hbx_enrollment}
+  - if hbx_enrollment.subscriber.family_member != hbx_enrollment.family.primary_applicant
+    = render :partial => "events/individuals/responsible_party", :object => hbx_enrollment.family.primary_applicant.person, as: :person, :locals => {:hbx_enrollment => hbx_enrollment}
   %enrollment
     = render :partial => "events/hbx_enrollment/plan", :locals=> {:hbx_enrollment => hbx_enrollment}
     - if hbx_enrollment.is_shop?

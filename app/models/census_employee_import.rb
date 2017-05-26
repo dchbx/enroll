@@ -14,6 +14,8 @@ class CensusEmployeeImport
 
   MEMBER_RELATIONSHIP_KINDS = %w(employee spouse domestic_partner child)
 
+  EmployeeTerminationMap = Struct.new(:employee, :termination_date)
+
   CENSUS_MEMBER_RECORD = %w(
       employer_assigned_family_id
       employee_relationship
@@ -64,6 +66,7 @@ class CensusEmployeeImport
   ]
 
   def initialize(attributes = {})
+    @terminate_queue = {}
     attributes.each { |name, value| send("#{name}=", value) }
 
     raise ArgumentError, "Must provide an import file" unless defined?(@file)
@@ -77,7 +80,7 @@ class CensusEmployeeImport
       row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
       if record[:employee_relationship].nil?
-         self.errors.add :base, "Row #{index + 4}: Relationship is required"
+        self.errors.add :base, "Row #{index + 4}: Relationship is required"
       end
     end
   end
@@ -88,7 +91,6 @@ class CensusEmployeeImport
 
   def imported_census_employees
     @imported_census_employees ||= load_imported_census_employees
-    @imported_census_employees.compact!
     @imported_census_employees.each do |census_employee|
       if census_employee.is_a? CensusEmployee
         census_employee.errors.add :base, "Email is required" if census_employee.email.blank?
@@ -117,9 +119,19 @@ class CensusEmployeeImport
     (4..@sheet.last_row).each_with_index.map do |i, index|
       row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
-      if record[:termination_date].present?
-        census_employee = terminate_employee(record)
-      else
+
+      if record[:termination_date].present? #termination logic
+        census_employee = find_employee(record)
+        if census_employee.present?
+          if is_employee_terminable?(census_employee)
+            @terminate_queue[index + 4] = EmployeeTerminationMap.new(census_employee, record[:termination_date])
+          else
+            self.errors.add :base, "Row #{index + 4}: Could not terminate employee"
+          end
+          @last_ee_member = census_employee
+          @last_ee_member_record = record
+        end
+      else #add or edit census_member logic
         if record[:employee_relationship].nil?
           self.errors.add :base, "Row #{index + 4}: Relationship is required"
           break
@@ -146,27 +158,17 @@ class CensusEmployeeImport
     census_employees
   end
 
-  def terminate_employee(record)
-    employee = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).active.first
-    if employee.present?
-      employee.terminate_employment(record[:termination_date])
-      employee.save
-      #employee = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).terminated.order(:employment_terminated_on.desc).first
-    end
-    employee
-  end
-
   # change attributes, add or remove dependents
   def add_or_update_census_member(record)
     # Process Employee
     if record[:employee_relationship].downcase == "self"
       member = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).active.first || CensusEmployee.new
       member = assign_census_employee_attributes(member, record)
-      member.terminate_employment(member.employment_terminated_on) if member.employment_terminated_on.present?
       @last_ee_member = member
       @last_ee_member_record = record
     else
       # Process dependent
+      return nil if (@last_ee_member_record.nil? || @last_ee_member.nil?)
       if record[:employer_assigned_family_id] == @last_ee_member_record[:employer_assigned_family_id]
         census_dependent = @last_ee_member.census_dependents.detect do |dependent|
           (dependent.ssn == record[:ssn]) && (dependent.dob == record[:dob])
@@ -204,8 +206,8 @@ class CensusEmployeeImport
     member.employee_relationship = record[:employee_relationship].to_s if record[:employee_relationship]
     member.employer_profile = @employer_profile
     assign_benefit_group(member, record[:benefit_group], record[:plan_year])
-    address = Address.new({kind:'home', address_1: record[:address_1], address_2: record[:address_2], city: record[:city],
-                           state: record[:state], zip: record[:zip] })
+    address = Address.new({kind: 'home', address_1: record[:address_1], address_2: record[:address_2], city: record[:city],
+                           state: record[:state], zip: record[:zip]})
     member.address = address if address.valid?
     member
   end
@@ -220,7 +222,7 @@ class CensusEmployeeImport
       bg.title.casecmp(benefit_group) == 0
     end
     return if benefit_group_found.nil?
-    member.benefit_group_assignments << BenefitGroupAssignment.new({benefit_group_id: benefit_group_found.id , start_on: plan_year_found.start_on})
+    member.benefit_group_assignments << BenefitGroupAssignment.new({benefit_group_id: benefit_group_found.id, start_on: plan_year_found.start_on})
     member.benefit_group_assignments.last.make_active
   end
 
@@ -277,7 +279,7 @@ class CensusEmployeeImport
     if sheet_header_row[TEMPLATE_DATE_CELL].is_a? Date
       template_date = sheet_header_row[TEMPLATE_DATE_CELL]
     else
-      template_date = Date.strptime(sheet_header_row[TEMPLATE_DATE_CELL], "%m/%d/%Y" )
+      template_date = Date.strptime(sheet_header_row[TEMPLATE_DATE_CELL], "%m/%d/%Y")
     end
     template_date == TEMPLATE_DATE &&
     sheet_header_row[TEMPLATE_VERSION_CELL] == TEMPLATE_VERSION
@@ -343,17 +345,22 @@ class CensusEmployeeImport
   end
 
   def save
-    if imported_census_employees.map(&:valid?).all?
-      if !self.valid? || self.errors.present?
+    if imported_census_employees.compact.map(&:valid?).all? && (imported_census_employees.exclude? nil)
+      if self.errors.present? || !self.valid?
         return false
       end
 
-      imported_census_employees.each(&:save!)
+      imported_census_employees.compact.each(&:save!)
+      terminate_employees if @terminate_queue.present?
       true
     else
       imported_census_employees.each_with_index do |census_employee, index|
-        census_employee.errors.full_messages.each do |message|
-          errors.add :base, "Row #{index + 4}: #{message}"
+        if census_employee.nil?
+          errors.add :base, "Row #{index + 4}: Employee/Dependent not found or not active"
+        else
+          census_employee.errors.full_messages.each do |message|
+            errors.add :base, "Row #{index + 4}: #{message}"
+          end
         end
       end
       false
@@ -377,6 +384,22 @@ class CensusEmployeeImport
     @imported_census_employees.length
   end
 
+  def find_employee(record)
+    CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).active.first
+  end
+
+  def terminate_employees
+    @terminate_queue.each do |row, employee_termination_map|
+       employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
+    end
+  end
+
+
+  def is_employee_terminable?(employee)
+    #this logic may become more sophisticated in future
+    employee.may_terminate_employee_role?
+  end
+
   alias_method :count, :length
 
   private
@@ -384,10 +407,10 @@ class CensusEmployeeImport
     value = value.to_s.split('.')[0] if value.is_a? Float
     value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
   end
-
 end
 
 class ImportErrorValue < Exception;
 end
+
 class ImportErrorDate < Exception;
 end

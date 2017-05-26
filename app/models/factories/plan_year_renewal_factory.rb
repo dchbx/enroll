@@ -40,9 +40,7 @@ module Factories
           open_enrollment_end_on: open_enrollment_end_on,
           fte_count: @active_plan_year.fte_count,
           pte_count: @active_plan_year.pte_count,
-          msp_count: @active_plan_year.msp_count,
-        ## Remove this setting when plan year business rules should be engaged
-        imported_plan_year: @active_plan_year.imported_plan_year
+          msp_count: @active_plan_year.msp_count
         })
 
         if @renewal_plan_year.may_renew_plan_year?

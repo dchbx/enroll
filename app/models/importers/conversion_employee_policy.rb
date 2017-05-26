@@ -100,7 +100,11 @@ module Importers
         return false
       end
       if existing_people.empty?
-        merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
+        begin
+          merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
+        rescue Exception  => e 
+          errors.add(:base, e.to_s)
+        end
         return true
       end
       existing_person = existing_people.first
@@ -143,7 +147,7 @@ module Importers
       if bga.blank?
         plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
 
-        if plan_years.any?{|py| py.migration_expired? }
+        if plan_years.any?{|py| py.conversion_expired? }
           errors.add(:base, "ER migration expired!")
           return false
         end
@@ -190,7 +194,8 @@ module Importers
           benefit_group: bga.benefit_group,
           benefit_group_assignment: bga,
           coverage_start: start_date,
-          enrollment_kind: "open_enrollment"
+          enrollment_kind: "open_enrollment",
+          external_enrollment: true
           })
 
         en.external_enrollment = true

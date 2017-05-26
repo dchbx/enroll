@@ -45,7 +45,12 @@ module Importers
       # person = employee_role.person
       # hbx_enrollments = person.primary_family.enrollments
 
-      hbx_enrollments = HbxEnrollment.find_by_benefit_group_assignments(found_employee.benefit_group_assignments)
+      hbx_enrollments = []
+      found_employee.benefit_group_assignments.each do |assignment|
+        hbx_enrollments += HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
+      end
+      hbx_enrollments.uniq!
+
       employment_terminated_on = TimeKeeper.date_of_record.end_of_month
 
       if active_plan_year.present?

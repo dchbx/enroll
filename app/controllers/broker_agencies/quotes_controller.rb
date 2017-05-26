@@ -1,11 +1,12 @@
 class BrokerAgencies::QuotesController < ApplicationController
 
+  include BrokerAgencies::QuoteHelper
+
   before_action :validate_roles, :set_broker_role
   before_action :find_quote , :only => [:destroy ,:show, :delete_member, :delete_household, :publish_quote, :view_published_quote]
   before_action :format_date_params  , :only => [:update,:create]
   before_action :employee_relationship_map
   before_action :set_qhp_variables, :only => [:plan_comparison, :download_pdf]
-
 
   def view_published_quote
 
@@ -16,8 +17,9 @@ class BrokerAgencies::QuotesController < ApplicationController
       @quote.publish!
       flash[:notice] = "Quote Published"
     else
-      flash[:error] = "Unable to publish quote"
-      redirect_to my_quotes_broker_agencies_broker_role_quotes_path(@broker)
+      errors = @quote.quote_warnings.values
+      flash[:error] = "Quote failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+      redirect_to broker_agencies_broker_role_quote_path(params[:broker_role_id],params[:id])
     end
   end
 
@@ -39,11 +41,12 @@ class BrokerAgencies::QuotesController < ApplicationController
 
     #active_year = Date.today.year
     @coverage_kind = "health"
+    @section = !params[:section].present?
+    @index = params[:row].to_i
 
     @health_plans = Plan.shop_health_plans @q.plan_year
     @health_selectors = Plan.build_plan_selectors('shop', 'health', @q.plan_year)
     @health_plan_quote_criteria  = Plan.build_plan_features('shop', 'health', @q.plan_year).to_json
-
     @dental_plans = Plan.shop_dental_plans @q.plan_year
     @dental_selectors = Plan.build_plan_selectors('shop', 'dental', @q.plan_year)
     dental_plan_quote_criteria  = Plan.build_plan_features('shop', 'dental',@q.plan_year) .to_json
@@ -60,64 +63,20 @@ class BrokerAgencies::QuotesController < ApplicationController
     @dental_roster_premiums = dental_roster_premiums.to_json
     @quote_criteria = @quote_benefit_group.criteria_for_ui
     @benefit_pcts_json = @bp_hash.to_json
+    unless @section
+    respond_to do |format|
+        format.js
+    end
+    end
   end
 
   def health_cost_comparison
-      @q = Quote.find(params[:quote_id]).quote_benefit_groups.find(params[:benefit_id]) # NEW
-      @quote_results = Hash.new
-      @quote_results_summary = Hash.new
-      @health_plans = Plan.shop_health_plans @q.quote.plan_year
-      unless @q.nil?
-        roster_premiums = @q.roster_cost_all_plans
-        @roster_elected_plan_bounds = PlanCostDecoratorQuote.elected_plans_cost_bounds(@health_plans,
-          @q.quote_relationship_benefits, roster_premiums)
-        params['plans'].each do |plan_id|
-          p = @health_plans.detect{|plan| plan.id.to_s == plan_id}
-          detailCost = Array.new
-          @q.quote_households.each do |hh|
-            pcd = PlanCostDecoratorQuote.new(p, hh, @q, p)
-            detailCost << pcd.get_family_details_hash(@q.quote.start_on).sort_by { |m|
-             [m[:family_id], -m[:age], -m[:employer_contribution]]
-            }
-          end
-          employer_cost = @q.roster_employer_contribution(p,p)
-          @quote_results[p.name] = {:detail => detailCost,
-            :total_employee_cost => @q.roster_employee_cost(p),
-            :total_employer_cost => employer_cost,
-            plan_id: plan_id,
-            buy_up: PlanCostDecoratorQuote.buy_up(employer_cost, p.metal_level, @roster_elected_plan_bounds)
-          }
-        end
-        @quote_results = @quote_results.sort_by { |k, v| v[:total_employer_cost] }.to_h
-      end
+    get_health_cost_comparison({quote_id: params[:quote_id], benefit_id: params[:benefit_id], plan_ids: params['plans']})
     render partial: 'health_cost_comparison'
   end
 
   def dental_cost_comparison
-    @q = Quote.find(params[:quote_id]).quote_benefit_groups.find(params[:benefit_id])
-    @quote_results = Hash.new
-    @quote_results_summary = Hash.new
-    @health_plans = Plan.shop_dental_plans(@q.quote.plan_year)
-    @roster_elected_plan_bounds = PlanCostDecoratorQuote.elected_plans_cost_bounds(
-      @health_plans,
-      @q.quote_dental_relationship_benefits,
-      @q.roster_cost_all_plans('dental'))
-    params['plans'].each do |plan_id|
-      p = @health_plans.detect{|plan| plan.id.to_s == plan_id}
-      detailCost = Array.new
-      @q.quote_households.each do |hh|
-        pcd = PlanCostDecoratorQuote.new(p, hh, @q, p)
-        detailCost << pcd.get_family_details_hash(@q.quote.start_on).sort_by { |m| [m[:family_id], -m[:age], -m[:employer_contribution]] }
-      end
-
-      employer_cost = @q.roster_employer_contribution(p,p)
-      @quote_results[p.name] = {:detail => detailCost,
-        :total_employee_cost => @q.roster_employee_cost(p),
-        :total_employer_cost => employer_cost,
-        plan_id: plan_id,
-      }
-    end
-    @quote_results = @quote_results.sort_by { |k, v| v[:total_employer_cost] }.to_h
+    get_dental_cost_comparison({quote_id: params[:quote_id], benefit_id: params[:benefit_id], plan_ids: params['plans']})
     render partial: 'dental_cost_comparison', layout: false
   end
 
@@ -133,7 +92,9 @@ class BrokerAgencies::QuotesController < ApplicationController
   def edit
     #find quote to edit
     @quote = Quote.find(params[:id])
-
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles =  @orgs.blank? ? [] : @orgs.map {|o| o.employer_profile}.collect{|e| [e.legal_name, e.id]}
     max_family_id = @quote.quote_households.max(:family_id).to_i
 
     unless params[:duplicate_household].blank? && params[:num_of_dup].blank?
@@ -155,11 +116,12 @@ class BrokerAgencies::QuotesController < ApplicationController
 
     # Increment family id so the new place holder contains max + 1
     qhh.family_id = max_family_id + 1
-
     # Create place holder for new member of household
-    qm = QuoteMember.new
-    qhh.quote_members << qm
-    @quote.quote_households << qhh
+    if params[:new_family].present?
+      qm = QuoteMember.new
+      qhh.quote_members << qm
+      @quote.quote_households << qhh
+    end
     @quote_benefit_group_dropdown = @quote.quote_benefit_groups.dup
     @quote.quote_benefit_groups << qbg
 
@@ -200,16 +162,29 @@ class BrokerAgencies::QuotesController < ApplicationController
       update_params[:quote_benefit_groups_attributes] = update_params[:quote_benefit_groups_attributes].select {|k,v| update_params[:quote_benefit_groups_attributes][k][:id].present?}
       insert_params[:quote_benefit_groups_attributes] = insert_params[:quote_benefit_groups_attributes].select {|k,v| insert_params[:quote_benefit_groups_attributes][k][:id].blank?}
     end
-    if params[:commit] == "Add Family"
-      notice_message = "New family added."
+    if params[:commit] == "Add Employee"
+      new_family = true
+      notice_message = "New employee added."
       scrollTo = 1
     elsif params[:commit] == "Save Changes"
+      new_family = nil
       notice_message = "Successfully saved quote/employee roster."
       scrollTo = 0
+    elsif params[:commit] == "Save"
+      new_family = @quote.quote_households.count > 0 ? '' : true
     end
-
+    if (params[:quote][:employer_type] == 'prospect' && @quote.employer_type != 'prospect') || (params[:quote][:employer_type] == 'client' && @quote.employer_profile_id != params[:employer_profile_id])
+      @quote.quote_households if @quote.quote_households.present?
+      @quote.update_attributes(employer_profile_id: nil)
+    end
     if (@quote.update_attributes(update_params) && @quote.update_attributes(insert_params))
-      redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, scrollTo: scrollTo),  :flash => { :notice => notice_message }
+      duplicate_household = @quote.quote_households.where(family_id: params[:duplicate_household]).first.try(:id).try(:to_str)
+      num_of_dup = duplicate_household ? params[:num_of_dup] : nil
+      if params[:commit] == "Create Quote"
+        redirect_to broker_agencies_broker_role_quote_path(params[:broker_role_id],params[:id])
+      else
+        redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote, new_family: new_family, scrollTo: scrollTo,duplicate_household: duplicate_household ,num_of_dup: num_of_dup),  :flash => { :notice => notice_message }
+      end
     else
       redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote) ,  :flash => { :error => "Unable to update the employee roster." }
     end
@@ -252,6 +227,9 @@ class BrokerAgencies::QuotesController < ApplicationController
   def build_employee_roster
     @employee_roster = parse_employee_roster_file
     @quote= Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     @quote_benefit_group_dropdown = @quote.quote_benefit_groups
     if @employee_roster.is_a?(Hash)
       @employee_roster.each do |family_id , members|
@@ -265,10 +243,13 @@ class BrokerAgencies::QuotesController < ApplicationController
         @quote.save!
       end
     end
-    render "edit"
+    redirect_to edit_broker_agencies_broker_role_quote_path(@broker.id, @quote)
   end
 
   def upload_employee_roster
+    @quote = Quote.find(params[:id])
+    emp = params[:type] == 'prospect' ? { employer_name: params[:name] } : {employer_profile_id: params[:profile_id]}
+    @quote.update_attributes({employer_type: params[:type], start_on: params[:effective_date], quote_name: params[:quote_name]}.merge(emp))
   end
 
   def download_employee_roster
@@ -365,7 +346,6 @@ class BrokerAgencies::QuotesController < ApplicationController
      status: quote.aasm_state.capitalize,
      plan_name: bg.plan && bg.plan.name || 'None',
      dental_plan_name: "bg.dental_plan && bg.dental_plan.name" || 'None',
-     deductible_value: bg.deductible_for_ui,
     }
     bg.quote_relationship_benefits.each{|bp| bp_hash[bp.relationship] = bp.premium_pct}
     bg.quote_dental_relationship_benefits.each{|bp| bp_dental_hash[bp.relationship] = bp.premium_pct}
@@ -389,6 +369,7 @@ class BrokerAgencies::QuotesController < ApplicationController
         elected_plan_choice = ['na', 'Single Plan', 'Single Carrier', 'Metal Level'][params[:elected].to_i]
         bg.plan = plan
         bg.plan_option_kind = elected_plan_choice
+        bg.elected_health_plan_ids = params[:elected_plans_list]
         roster_elected_plan_bounds = PlanCostDecoratorQuote.elected_plans_cost_bounds(Plan.shop_health_plans(@q.plan_year),
            bg.quote_relationship_benefits, bg.roster_cost_all_plans('health'))
         case elected_plan_choice
@@ -410,18 +391,18 @@ class BrokerAgencies::QuotesController < ApplicationController
         elected_plan_choice = ['na', 'single_plan', 'single_carrier', 'single_plan'][params[:elected].to_i]
         bg.dental_plan_option_kind = elected_plan_choice
         bg.dental_plan = plan
-        bg.elected_dental_plan_ids = case column_for_dental_plan_option_kind.to_i
-        when 1
-         [plan.id]
-        when 2
-         [plan.id]
-        else
-          params[:elected_plans_list].map{|plan_id| Plan.find(plan_id).id}
-        end
+        bg.elected_dental_plan_ids = params[:elected_plans_list]
+        # bg.elected_dental_plan_ids = case column_for_dental_plan_option_kind.to_i
+        # when 1
+        #  [plan.id]
+        # when 2
+        #  [plan.id]
+        # else
+        #   params[:elected_plans_list].map{|plan_id| Plan.find(plan_id).id}
+        # end
       end
       bg.save
     end
-
     @benefit_groups = @q.quote_benefit_groups
     respond_to do |format|
       format.html {render partial: 'publish'}
@@ -473,6 +454,46 @@ class BrokerAgencies::QuotesController < ApplicationController
     render partial: 'my_dental_plans'
   end
 
+  def employees_list
+ 
+    employer_profile = EmployerProfile.find(params[:employer_profile_id])
+    quote = Quote.find(params[:quote_id])
+    @quote_benefit_group_dropdown = quote.quote_benefit_groups
+
+    unless employer_profile.blank?
+      @employees = employer_profile.census_employees.non_terminated
+
+      @quote = Quote.new
+      # # Create place holder for new member of household
+      households = quote.quote_households.destroy_all
+      @employees.each do |x|
+       max_family_id = @quote.quote_households.max(:family_id).to_i
+       qhh = QuoteHousehold.new(family_id: max_family_id + 1)
+       qhh.quote_members << QuoteMember.new(dob: x.dob, first_name: x.first_name, last_name:x.last_name)
+       @quote.quote_households << qhh
+      end
+       @employee_present = true
+    else
+      tmp_households
+      @employee_present = false
+    end
+    respond_to do |format|
+      # format.html 
+      format.js
+    end  
+  end
+
+  def employee_type
+    @quote= Quote.find(params[:id])
+    broker_role_id = @quote.broker_role.id
+    @orgs = Organization.by_broker_role(broker_role_id)
+    @employer_profiles =  @orgs.blank? ? [] : @orgs.map {|o| o.employer_profile}.collect{|e| [e.legal_name, e.id]}
+    @employee_type = params[:type]
+    if @quote.employer_type == 'client' && params[:type] == 'prospect'
+      @quote.quote_households.destroy_all
+    end
+  end
+
 
 private
 
@@ -497,6 +518,9 @@ private
                     :quote_name,
                     :start_on,
                     :broker_role_id,
+                    :employer_type,
+                    :employer_name,
+                    :employer_profile_id,
                     :quote_benefit_groups_attributes => [:id, :title],
                     :quote_households_attributes => [ :id, :family_id , :quote_benefit_group_id,
                                        :quote_members_attributes => [ :id, :first_name, :last_name ,:dob,
@@ -632,23 +656,43 @@ private
   end
 
   def set_qhp_variables
-    @active_year = Date.today.year
+    @quote = Quote.find(params['quote_id'])
+    @active_year = @quote.plan_year
     @coverage_kind = "health"
     @visit_types = @coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
   end
 
   def set_dental_plans
-    @dental_plans = Plan.shop_dental_by_active_year(2016)
-    @dental_plans_count = Plan.shop_dental_by_active_year(2016).count
-    @dental_plans = @dental_plans.by_carrier_profile(params[:carrier_id]) if params[:carrier_id].present? && params[:carrier_id] != 'any'
-    @dental_plans = @dental_plans.by_dental_level(params[:dental_level]) if params[:dental_level].present? && params[:dental_level] != 'any'
-    @dental_plans = @dental_plans.by_plan_type(params[:plan_type]) if params[:plan_type].present? && params[:plan_type] != 'any'
-    @dental_plans = @dental_plans.by_dc_network(params[:dc_network]) if params[:dc_network].present? && params[:dc_network] != 'any'
-    @dental_plans = @dental_plans.by_nationwide(params[:nationwide]) if params[:nationwide].present? && params[:nationwide] != 'any'
+    @dental_plans = Plan.shop_dental_by_active_year(2017)
+    @dental_plans_count = Plan.shop_dental_by_active_year(2017).count
+    carrier = params[:carrier_id].nil? ? [] : params[:carrier_id]
+    dental_level = params[:dental_level].nil? ? [] : params[:dental_level]
+    plan_type = params[:plan_type].nil? ? [] : params[:plan_type]
+    dc_network = params[:dc_network].nil?  ? [] : params[:dc_network]
+    nationwide = params[:nationwide].nil? ? [] : params[:nationwide]
+    @dental_plans = @dental_plans.by_carrier_profile_for_bqt(params[:carrier_id]) unless  carrier.empty? || carrier.include?('')
+    @dental_plans = @dental_plans.by_dental_level_for_bqt(params[:dental_level])  unless  dental_level.empty? || dental_level.include?('')
+    @dental_plans = @dental_plans.by_plan_type_for_bqt(params[:plan_type])   unless  plan_type.empty? || plan_type.include?('')
+    @dental_plans = @dental_plans.by_dc_network(params[:dc_network])  unless  dc_network.empty? || dc_network.include?('')
+    @dental_plans = @dental_plans.by_nationwide(params[:nationwide])  unless  nationwide.empty? || nationwide.include?('')
   end
 
   def validate_roles
     current_user.has_broker_role? || current_user.has_hbx_staff_role?
+  end
+
+  def tmp_households
+    @quote = Quote.new
+    qbg = QuoteBenefitGroup.new
+    # Create place holder for a new household and new member for the roster
+    qhh = QuoteHousehold.new
+    # Increment family id so the new place holder contains max + 1
+    max_family_id = @quote.quote_households.max(:family_id).to_i
+    qhh.family_id = max_family_id + 1
+    # Create place holder for new member of household
+    qm = QuoteMember.new
+    qhh.quote_members << qm
+    @quote.quote_households << qhh
   end
 
 end

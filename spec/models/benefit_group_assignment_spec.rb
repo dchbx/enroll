@@ -240,4 +240,28 @@ describe BenefitGroupAssignment, type: :model do
       end
     end
   end
+
+  describe '#active_and_waived_enrollments', dbclean: :after_each do
+
+    let(:household) { FactoryGirl.create(:household, family: family)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+
+    shared_examples_for "active and waived enrollments" do |state, status, result|
+
+      let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: household,
+                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, 
+                          aasm_state: state
+                          )}
+
+      it "should #{status}return the #{state} enrollments" do
+        result = (result == "active_enrollment") ?  [enrollment] : result
+        expect(census_employee.active_benefit_group_assignment.active_and_waived_enrollments).to eq result
+      end
+    end
+
+    it_behaves_like "active and waived enrollments", "coverage_terminated", "not ", []
+    it_behaves_like "active and waived enrollments", "coverage_expired", "not ", []
+    it_behaves_like "active and waived enrollments", "coverage_selected", "", "active_enrollment"
+    it_behaves_like "active and waived enrollments", "inactive", "", "active_enrollment"
+  end
 end

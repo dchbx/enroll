@@ -27,10 +27,11 @@
 
 - if @market_kind == 'shop' &&step == 2 && show_button=='true'
   = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if @hbx_enrollment and @hbx_enrollment.employee_role.present?
+- qle = (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
 
 
 - if step == 3 && !no_purchase
-  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => "btn btn-lg btn-primary  btn-block #{'disabled' if kind == 'individual'}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => "btn btn-lg btn-primary  btn-block #{'disabled' if kind == 'individual'}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment, qle: qle)
 
   %ul.list-unstyled.list-right-section
     %li

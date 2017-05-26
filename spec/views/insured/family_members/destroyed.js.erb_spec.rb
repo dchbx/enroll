@@ -10,7 +10,7 @@ describe "insured/family_members/destroyed.js.erb" do
     before :each do
       sign_in user
       assign(:person, person)
-      allow(Family).to receive(:find_family_member).with(family_member.id).and_return(family_member)
+      allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
       allow(family_member).to receive(:primary_relationship).and_return("self")
       allow(family_member).to receive(:person).and_return person
       allow(person).to receive(:has_mailing_address?).and_return false

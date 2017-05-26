@@ -1,5 +1,6 @@
 Given(/^Multiple Conversion Employers for (.*) exist with active and renewing plan years$/) do |named_person|
   person = people[named_person]
+
   secondary_organization = FactoryGirl.create :organization, legal_name: person[:mlegal_name],
                                                    dba: person[:mdba],
                                                    fein: person[:mfein]
@@ -11,33 +12,36 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                                             last_name: person[:last_name],
                                                             ssn: person[:ssn],
                                                             dob: person[:dob_date]
-  open_enrollment_start_on = (TimeKeeper.date_of_record-1.month).end_of_month + 1.day
-  open_enrollment_end_on = open_enrollment_start_on.next_month + 12.days
-  start_on = open_enrollment_start_on + 2.months
+
+
+
+  open_enrollment_start_on = TimeKeeper.date_of_record
+  open_enrollment_end_on = open_enrollment_start_on.end_of_month + 13.days
+  start_on = open_enrollment_end_on.next_month.beginning_of_month
   end_on = start_on + 1.year - 1.day
 
-  secondary_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
-                                                       start_on: start_on - 1.year - 3.months,
-                                                       end_on: (end_on - 1.year - 3.months).end_of_month,
-                                                       open_enrollment_start_on: open_enrollment_start_on - 1.year - 3.months,
-                                                       open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days - 3.months,
-                                                       fte_count: 2,
-                                                       aasm_state: :published
-  secondary_benefit_group = FactoryGirl.create :benefit_group, plan_year: secondary_plan_year
-  secondary_plan_year.expire!
 
+  active_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
+                                                       start_on: start_on - 1.year,
+                                                       end_on: end_on - 1.year,
+                                                       open_enrollment_start_on: open_enrollment_start_on - 1.year,
+                                                       open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
+                                                       fte_count: 2,
+                                                       aasm_state: :published,
+                                                       is_conversion: true
+
+  secondary_benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year
   secondary_employee.add_benefit_group_assignment secondary_benefit_group, secondary_benefit_group.start_on
 
-  plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
+  renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
                                              start_on: start_on,
                                              end_on: end_on,
                                              open_enrollment_start_on: open_enrollment_start_on,
                                              open_enrollment_end_on: open_enrollment_end_on,
                                              fte_count: 2,
-                                             aasm_state: :renewing_draft
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year,
-                                                     title: 'this is the BGGG'
-  plan_year.publish!
+                                             aasm_state: :renewing_enrolling
+
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, title: 'this is the BGGG'
   secondary_employee.add_renew_benefit_group_assignment benefit_group
 
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
@@ -83,9 +87,6 @@ end
 
 And(/(.*) matches all employee roles to employers and is logged in/) do |named_person|
   person = people[named_person]
-  Person.all.select { |stored_person| stored_person["ssn"] == person.ssn &&
-                                      stored_person["dob"] == person.dob
-                    }
   organizations = Organization.in(fein: [person[:fein], person[:mfein]])
   employer_profiles = organizations.map(&:employer_profile)
   counter = 0
@@ -129,6 +130,12 @@ Then(/Employee should see \"employer-sponsored benefits not found\" error messag
   visit '/families/home'
 end
 
+Then(/Employee should see \"You are attempting to purchase coverage through qle proir to your eligibility date\" error message/) do
+  screenshot("new_hire_not_yet_eligible_exception")
+  find('.alert', text: "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date")
+  visit '/families/home'
+end
+
 And(/Employer for (.*) published renewing plan year/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
@@ -139,10 +146,11 @@ And(/Employer for (.*) is under open enrollment/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
 
-  open_enrollment_start_on = TimeKeeper.date_of_record
+  open_enrollment_start_on = TimeKeeper.date_of_record.beginning_of_month
   open_enrollment_end_on = open_enrollment_start_on.end_of_month + 12.days
   start_on = open_enrollment_start_on.end_of_month + 1.day + 1.month
   end_on = start_on + 1.year - 1.day
+
   employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => open_enrollment_start_on,
     :open_enrollment_end_on => open_enrollment_end_on, :start_on => start_on, :end_on => end_on)
 end
@@ -177,12 +185,6 @@ Then(/(.*) should see New Hire Badges for 2st ER/) do |named_person|
   expect(page).to have_content(person[:mlegal_name])
 end
 
-When(/2st ER for (.*) published renewing plan year/) do |named_person|
-  person = people[named_person]
-  employer_profile = EmployerProfile.find_by_fein(person[:mfein])
-  employer_profile.renewing_plan_year.publish!
-end
-
 When(/(.*) click the button of new hire badge for 2st ER/) do |named_person|
   #py =Person.last.active_employee_roles.last.census_employee.renewal_benefit_group_assignment.benefit_group.plan_year
   #py.publish!
@@ -207,9 +209,31 @@ Then(/(.*) should get plan year start date as coverage effective date/) do |name
   find('.coverage_effective_date', text: employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y"))
 end
 
+Then(/(.*) should get qle effective date as coverage effective date/) do |named_person|
+  person = people[named_person]
+  effective_on = Person.where(:first_name=> person[:first_name]).first.primary_family.current_sep.effective_on
+  find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"))
+end
+
 When(/(.+) should see coverage summary page with renewing plan year start date as effective date/) do |named_person|
   step "#{named_person} should get plan year start date as coverage effective date"
   find('.interaction-click-control-confirm').click
+end
+
+Then(/(.+) should see coverage summary page with qle effective date/) do |named_person|
+  step "#{named_person} should get qle effective date as coverage effective date"
+  find('.interaction-click-control-confirm').click
+end
+
+Then(/(.*) should see the receipt page with qle effective date as effective date/) do |named_person|
+  expect(page).to have_content('Enrollment Submitted')
+  step "#{named_person} should get qle effective date as coverage effective date"
+
+  if page.has_link?('CONTINUE')
+    click_link "CONTINUE"
+  else
+    click_link "GO TO MY ACCOUNT"
+  end
 end
 
 Then(/(.*) should see the receipt page with renewing plan year start date as effective date/) do |named_person|
@@ -231,6 +255,14 @@ When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    click_link "CONTINUE"
+  end
+end
+
+When(/Employee select a qle date based on expired plan year/) do
+  screenshot("past_qle_date")
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 30.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end

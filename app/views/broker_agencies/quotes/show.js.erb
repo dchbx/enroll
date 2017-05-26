@@ -1,0 +1,6 @@
+ $("[class*=step_section_]").each(function( index ) {
+  $( this ).html('');
+});
+ $(".step_section_<%= @index%>").html("<%= j render partial: 'quote_calculate', locals: {benefit_group: @benefit_groups[@index.to_i] } %>");
+ QuotePageLoad.set_select_health_plans(<%=raw @health_plan_quote_criteria %>)
+ Quote.show_benefit_group("<%= @q.id%>", "<%= @benefit_groups[@index].id%>")

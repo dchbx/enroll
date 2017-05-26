@@ -34,7 +34,7 @@ class EmployerInvoice
       @errors << "Unable to upload PDF for. #{@organization.hbx_id}"
       Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
     end
-	end
+  end
 
   def send_to_print_vendor
     begin
@@ -45,7 +45,7 @@ class EmployerInvoice
     end
   end
 
-	def send_email_notice
+  def send_email_notice
     subject = "Invoice Now Available"
     body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
     message_params = {
@@ -63,24 +63,32 @@ class EmployerInvoice
     File.delete(file)
   end
 
-	def save_and_notify_with_clean_up
-		save
-		save_to_cloud
+  def send_first_invoice_available_notice
+    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
+      @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
+    end
+  end
+
+  def save_and_notify_with_clean_up
+    save
+    save_to_cloud
     send_to_print_vendor
-		send_email_notice
-		clear_tmp(invoice_absolute_file_path)
-	end
+    send_email_notice
+    send_first_invoice_available_notice
+    clear_tmp(invoice_absolute_file_path)
+  end
 
   def save_and_notify
     save
     save_to_cloud
     send_to_print_vendor
     send_email_notice
+    send_first_invoice_available_notice
   end
 
   private
 
-	def create_secure_message(message_params, inbox_provider, folder)
+  def create_secure_message(message_params, inbox_provider, folder)
     message = Message.new(message_params)
     message.folder =  Message::FOLDER_TYPES[folder]
     msg_box = inbox_provider.inbox

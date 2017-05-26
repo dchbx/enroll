@@ -7,10 +7,15 @@ FactoryGirl.define do
     send_broker_agency_message true
     approve_broker true
     approve_ga true
-  	modify_admin_tabs true
-  	view_admin_tabs  true
+    modify_admin_tabs true
+    view_admin_tabs  true
 
     trait :hbx_staff do
+      can_complete_resident_application true
+    end
+
+    trait :hbx_update_ssn do
+      can_update_ssn true
     end
 
     trait :hbx_read_only do
@@ -21,8 +26,8 @@ FactoryGirl.define do
       send_broker_agency_message false
       approve_broker false
       approve_ga false
-    	modify_admin_tabs false
-    	view_admin_tabs  true
+      modify_admin_tabs false
+      view_admin_tabs  true
     end
 
     trait :hbx_csr_supervisor do
@@ -33,7 +38,7 @@ FactoryGirl.define do
       send_broker_agency_message false
       approve_broker false
       approve_ga false
-    	modify_admin_tabs false
+      modify_admin_tabs false
       view_admin_tabs  false
     end
 
@@ -45,8 +50,8 @@ FactoryGirl.define do
       send_broker_agency_message false
       approve_broker false
       approve_ga false
-    	modify_admin_tabs false
-    	view_admin_tabs false
+      modify_admin_tabs false
+      view_admin_tabs false
     end
 
     trait :hbx_csr_tier1 do
@@ -57,8 +62,8 @@ FactoryGirl.define do
       send_broker_agency_message false
       approve_broker false
       approve_ga false
-    	modify_admin_tabs false
-    	view_admin_tabs  false
+      modify_admin_tabs false
+      view_admin_tabs  false
     end
 
 

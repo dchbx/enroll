@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-describe Importers::ConversionEmployeePolicyUpdate do
-  describe "given an existing employee and valid employer", dbclean: :after_each do
+describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
+  describe "given an existing employee and valid employer" do
     context "and the employee's plan HIOS ID is changed" do
       context "and the employee's enrollment is not auto-renewed" do
         it "should change the employee enrollment plan HIOS ID"
@@ -21,7 +21,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
     end
   end
 
-  describe "employee with coverage already exists", dbclean: :after_each do
+  describe "employee with coverage already exists" do
 
     let!(:employer_profile) { FactoryGirl.create(:employer_with_renewing_planyear, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, renewal_plan_year_state: 'renewing_enrolling') }
 
@@ -57,12 +57,12 @@ describe Importers::ConversionEmployeePolicyUpdate do
         :subscriber_city=>"Falls Church",
         :subscriber_state=>"VA",
         :subscriber_zip=>"22046",
-        :default_policy_start => employer_profile.active_plan_year.start_on, 
+        :default_policy_start => employer_profile.active_plan_year.start_on,
         :plan_year => employer_profile.active_plan_year.start_on.year
       }
     end
 
-    let(:dependent1_attrs) do 
+    let(:dependent1_attrs) do
       {
         :dep_1_ssn=>spouse.ssn,
         :dep_1_dob=>spouse.dob.strftime("%m/%d/%Y"),
@@ -103,7 +103,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
       end
 
-      context 'when renewing enrollment is manually selected' do 
+      context 'when renewing enrollment is manually selected' do
 
         it 'should drop the dependent from current enrollment' do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
@@ -111,7 +111,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
 
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs)).save
 
-          hbx_enrollment.reload 
+          hbx_enrollment.reload
           renewing_hbx_enrollment.reload
 
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
@@ -128,7 +128,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
 
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs)).save
 
-          hbx_enrollment.reload 
+          hbx_enrollment.reload
           renewing_hbx_enrollment.reload
 
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
@@ -145,7 +145,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
       end
 
-      context 'when renewing enrollment is manually selected' do 
+      context 'when renewing enrollment is manually selected' do
 
         it 'should add the dependent to current enrollment' do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
@@ -154,7 +154,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent2_attrs)).save
 
           family.reload
-          hbx_enrollment.reload 
+          hbx_enrollment.reload
           renewing_hbx_enrollment.reload
 
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
@@ -172,7 +172,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent2_attrs)).save
 
           family.reload
-          hbx_enrollment.reload 
+          hbx_enrollment.reload
           renewing_hbx_enrollment.reload
 
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
@@ -190,7 +190,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
       end
 
-      context 'when renewing enrollment is manually selected' do 
+      context 'when renewing enrollment is manually selected' do
         it 'should add and drop children on current enrollment' do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
           expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
@@ -198,7 +198,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent3_attrs)).save
 
           family.reload
-          hbx_enrollment.reload 
+          hbx_enrollment.reload
           renewing_hbx_enrollment.reload
 
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
@@ -216,7 +216,7 @@ describe Importers::ConversionEmployeePolicyUpdate do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent3_attrs)).save
 
           family.reload
-          hbx_enrollment.reload 
+          hbx_enrollment.reload
           renewing_hbx_enrollment.reload
 
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]

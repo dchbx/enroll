@@ -55,7 +55,7 @@ class BenefitGroupAssignment
 
   def belongs_to_offexchange_planyear?
     employer_profile = plan_year.employer_profile
-    employer_profile.is_coversion_employer? && plan_year.coverage_period_contains?(employer_profile.registered_on)
+    employer_profile.is_conversion? && plan_year.is_conversion
   end
 
   def benefit_group=(new_benefit_group)
@@ -76,16 +76,54 @@ class BenefitGroupAssignment
     @hbx_enrollment = new_hbx_enrollment
   end
 
+  def covered_families
+    Family.where({
+      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+    })
+  end
+
   def hbx_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.show_enrollments_sans_canceled.select do |enrollment|
+          enrollment.benefit_group_assignment_id == self.id
+        end.to_a
+      end
+      enrollments
+    end
+  end
+
+  def latest_hbx_enrollments_for_cobra
     families = Family.where({
       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
       })
 
-    families.inject([]) do |enrollments, family|
+    hbx_enrollments = families.inject([]) do |enrollments, family|
       family.households.each do |household|
-        enrollments += household.hbx_enrollments.show_enrollments_sans_canceled.select do |enrollment| 
+        enrollments += household.hbx_enrollments.enrollments_for_cobra.select do |enrollment|
           enrollment.benefit_group_assignment_id == self.id
         end.to_a
+      end
+      enrollments
+    end
+
+    if census_employee.cobra_begin_date.present?
+      coverage_terminated_on = census_employee.cobra_begin_date.prev_day
+      hbx_enrollments = hbx_enrollments.select do |e| 
+        e.effective_on < census_employee.cobra_begin_date && (e.terminated_on.blank? || e.terminated_on == coverage_terminated_on)
+      end
+    end
+
+    health_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'health' && !hbx.is_cobra_status? }
+    dental_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'dental' && !hbx.is_cobra_status? }
+
+    [health_hbx, dental_hbx].compact
+  end
+
+  def active_and_waived_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.non_expired_and_non_terminated.select { |enrollment| enrollment.benefit_group_assignment_id == self.id }
       end
       enrollments
     end
@@ -208,7 +246,7 @@ class BenefitGroupAssignment
 
     if hbx_enrollment.present?
       self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
-      # TODO: Re-enable this after enrollment propagation issues resolved. 
+      # TODO: Re-enable this after enrollment propagation issues resolved.
       #       Right now this is causing issues when linking census employee under Enrollment Factory.
       # self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
     end

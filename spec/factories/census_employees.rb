@@ -21,6 +21,12 @@ FactoryGirl.define do
       is_business_owner  true
     end
 
+    trait :termination_details do
+      # aasm_state "employment_terminated"
+      employment_terminated_on {TimeKeeper.date_of_record.last_month}
+      coverage_terminated_on {TimeKeeper.date_of_record.last_month.end_of_month}
+    end
+
     trait :with_enrolled_census_employee do
       aasm_state :eligible
     end

@@ -9,7 +9,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   let(:start_on)                  { Date.new(2015,10,1).beginning_of_year }
   let(:end_on)                    { Date.new(2015,10,1).end_of_year }
   let(:open_enrollment_start_on)  { Date.new(2015,10,1).beginning_of_year - 2.months }
-  let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
+  let(:open_enrollment_end_on)    { Date.new(2015,10,1).beginning_of_year.end_of_month }
 
   let(:valid_params){
       {
@@ -177,36 +177,41 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
               end
             end
           end
-          #  let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
-          # context "and termination is outside open enrollment" do
-          #   let(:offset_period)                 { 40 }
-          #   let(:after_open_enrollment_end_on)  { open_enrollment_end_on + offset_period.days }
-          #   let(:earliest_termination_date)     { after_open_enrollment_end_on + HbxProfile::IndividualEnrollmentTerminationMinimum }
 
+          context "and termination is outside open enrollment" do
+            let(:compare_date)                  { (benefit_coverage_period.start_on + 3.months).beginning_of_month }
+            let(:equalToTerminationMinimum)     { compare_date + HbxProfile::IndividualEnrollmentTerminationMinimum }
+            let(:lessThanTerminationMinimum)    { ((compare_date + HbxProfile::IndividualEnrollmentTerminationMinimum) - 1.day) }
+            let(:greaterThanTerminationMinimum) { ((compare_date + HbxProfile::IndividualEnrollmentTerminationMinimum) + 1.day) }
 
-          #     it "termination date should be the waiting period plus the minimum enrollment termination notice period" do
-          #       expect(benefit_coverage_period.termination_effective_on_for(after_open_enrollment_end_on)).to eq(earliest_termination_date)
-          #     end
-          # end
-
-            context "and termination is outside open enrollment" do
-                let(:todays_date) { TimeKeeper.date_of_record }
-                let(:lessThanTerminationMinimum)    { todays_date + 8.days }
-                let(:equalToTerminationMinimum)     { todays_date + HbxProfile::IndividualEnrollmentTerminationMinimum }
-                let(:greaterThanTermnationMinimum)  { todays_date + 23.days }
-
-                it "termination date should be set to (today + TerminationMinumum days) if selected date is less than (today + TerminationMinumum days)" do
-                  expect(benefit_coverage_period.termination_effective_on_for(lessThanTerminationMinimum)).to eq(equalToTerminationMinimum)
-                end
-
-                it "termination date should be set to the date selected if selected date is equal to (today + TerminationMinumum days)" do
-                  expect(benefit_coverage_period.termination_effective_on_for(equalToTerminationMinimum)).to eq(equalToTerminationMinimum)
-                end
-
-                it "termination date should be set to the date selected if selected date is greater than (today + TerminationMinumum days)" do
-                  expect(benefit_coverage_period.termination_effective_on_for(greaterThanTermnationMinimum)).to eq(greaterThanTermnationMinimum)
-                end
+            before :each do
+              TimeKeeper.set_date_of_record_unprotected!(compare_date)
             end
+
+            it "termination date should be set to (today + TerminationMinumum days) if selected date is less than (today + TerminationMinumum days)" do
+              expect(benefit_coverage_period.termination_effective_on_for(lessThanTerminationMinimum)).to eq(equalToTerminationMinimum)
+            end
+
+            it "termination date should be set to the date selected if selected date is equal to (today + TerminationMinumum days)" do
+              expect(benefit_coverage_period.termination_effective_on_for(equalToTerminationMinimum)).to eq(equalToTerminationMinimum)
+            end
+
+            it "termination date should be set to the date selected if selected date is greater than (today + TerminationMinumum days)" do
+              expect(benefit_coverage_period.termination_effective_on_for(greaterThanTerminationMinimum)).to eq(greaterThanTerminationMinimum)
+            end
+
+            context "and the effective date would " do
+              let(:termination_minimum)  { HbxProfile::IndividualEnrollmentTerminationMinimum }
+              let(:late_date)            { ((benefit_coverage_period.end_on - termination_minimum) + 1.day) }
+
+              before { TimeKeeper.set_date_of_record_unprotected!(late_date) }                
+
+              it "termination date should be set to end_on date" do
+                expect(benefit_coverage_period.termination_effective_on_for(late_date)).to eq benefit_coverage_period.end_on
+              end
+
+            end
+          end
 
         end
       end
@@ -217,9 +222,12 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
     let(:c1) {FactoryGirl.create(:consumer_role)}
     let(:c2) {FactoryGirl.create(:consumer_role)}
+    let(:r1) {FactoryGirl.create(:resident_role)}
+    let(:r2) {FactoryGirl.create(:resident_role)}
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
-    let(:member1) {double(family_member: family.family_members.where(is_primary_applicant: true).first, hbx_enrollment: double(family: family))}
-    let(:member2) {double(family_member: family.family_members.where(is_primary_applicant: false).first)}
+    let(:member1) {double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member:family.family_members.where(is_primary_applicant: true).first)}
+    let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first)}
+    let(:hbx_enrollment){ HbxEnrollment.new(kind: "individual", plan: plan1, effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true) }
     let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
     let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
     let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }

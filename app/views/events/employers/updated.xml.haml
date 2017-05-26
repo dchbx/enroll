@@ -23,7 +23,7 @@
     - if displayed_plan_years.any?
       %plan_years
         = render :partial => "events/employers/plan_year", :collection => displayed_plan_years
-    - if employer.is_coversion_employer?
+    - if employer.is_conversion?
       %shop_transfer
         %hbx_active_on= employer.created_at.strftime("%Y-%m-%d")
   = render :partial => "events/shared/versioned_resource", :object => employer

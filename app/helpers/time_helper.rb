@@ -11,6 +11,32 @@ module TimeHelper
 
   def set_date_max_to_plan_end_of_year (enrollment)
     year = enrollment.effective_on.year
-    final_day = Date.new(year, 12, 31)
+    if (enrollment.kind == "employer_sponsored")
+      final_day = enrollment.effective_on + 1.year - 1.day
+    else
+      final_day = Date.new(year, 12, 31)
+    end
   end
+
+  def sep_optional_date family, min_or_max, market_kind=nil
+    person = family.primary_applicant.person
+    has_dual_roles         = person.has_consumer_role? && person.has_active_employee_role?
+    has_no_role            = !person.has_consumer_role? && !person.has_active_employee_role?
+    has_only_consumer_role = person.has_consumer_role? && !person.has_active_employee_role?
+    has_only_employee_role = person.has_active_employee_role? && !person.has_consumer_role?
+
+    beginning_of_year = TimeKeeper.date_of_record.beginning_of_year
+    end_of_year = TimeKeeper.date_of_record.end_of_year
+
+    if has_only_consumer_role || has_no_role || (has_dual_roles && market_kind == "ivl")
+      min_or_max == 'min' ? beginning_of_year : end_of_year
+    elsif has_only_employee_role || (has_dual_roles && market_kind == "shop")
+      active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten
+      min_or_max == 'min' ? active_plan_years.map(&:start_on).min : active_plan_years.map(&:end_on).max
+    elsif has_dual_roles && market_kind == nil
+        active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten
+        min_or_max == 'min' ? [beginning_of_year, active_plan_years.map(&:start_on).min].min : [end_of_year, active_plan_years.map(&:end_on).max].max
+    end
+  end
+
 end

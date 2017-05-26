@@ -13,6 +13,8 @@ FactoryGirl.define do
     carrier_profile     { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
     maximum_age         66
+    deductible          "$500"
+    family_deductible   "$500 per person | $1000 per group"
 
     # association :premium_tables, strategy: :build
 
@@ -94,6 +96,7 @@ FactoryGirl.define do
       end
     end
 
+
     trait :with_next_year_premium_tables do
       transient do
         next_year_premium_tables_count 48
@@ -114,11 +117,11 @@ FactoryGirl.define do
 
     factory :renewal_individual_health_plan,      traits: [:individual_health, :next_year, :with_premium_tables]
     factory :renewal_shop_health_plan,            traits: [:shop_health, :next_year, :with_premium_tables]
+
     factory :renewal_individual_dental_plan,      traits: [:individual_dental, :next_year, :with_premium_tables]
     factory :renewal_individual_catastophic_plan, traits: [:catastrophic, :next_year, :with_premium_tables]
     factory :renewal_csr_87_plan,                 traits: [:csr_87, :next_year, :with_premium_tables]
     factory :renewal_csr_00_plan,                 traits: [:csr_00, :next_year, :with_premium_tables]
-
   end
 
   factory :premium_table do

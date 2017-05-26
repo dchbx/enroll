@@ -1,4 +1,4 @@
-Given(/I set the eligibility rule to (.*)/) do |rule|
+Given(/^I set the eligibility rule to (.*)/) do |rule|
   offsets = {
     'first of month following or coinciding with date of hire' => 0,
     'first of the month following date of hire' => 1,
@@ -7,10 +7,14 @@ Given(/I set the eligibility rule to (.*)/) do |rule|
   }
 
   employer_profile = EmployerProfile.find_by_fein(people['Soren White'][:fein])
-  employer_profile.plan_years.published.first.benefit_groups.first.update_attributes({
-    'effective_on_kind' => 'first_of_month',
-    'effective_on_offset' => offsets[rule]
-    })
+  employer_profile.plan_years.each do |py|
+    py.benefit_groups.each do |bg|
+      bg.update_attributes({
+        'effective_on_kind' => 'first_of_month',
+        'effective_on_offset' => offsets[rule]
+        })
+    end
+  end
 end
 
 Given(/I reset employee to future enrollment window/) do
@@ -28,7 +32,7 @@ Given(/Employee new hire enrollment window is closed/) do
 end
 
 And(/Employee has current hired on date/) do
-  CensusEmployee.where(:first_name => /Soren/i, 
+  CensusEmployee.where(:first_name => /Soren/i,
                        :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
 end
 
@@ -46,9 +50,13 @@ And(/Employee has future hired on date/) do
   CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record + 15.days)
 end
 
-def expected_effective_on
-  employee = Person.where(:first_name => /Soren/i, :last_name => /White/i).first
-  employee.active_employee_roles.first.coverage_effective_on
+def expected_effective_on(qle: false)
+  person = Person.where(:first_name => /Soren/i, :last_name => /White/i).first
+  if qle
+    person.primary_family.current_sep.effective_on
+  else
+    person.active_employee_roles.first.coverage_effective_on
+  end
 end
 
 Then(/Employee tries to complete purchase of another plan/) do
@@ -76,10 +84,21 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
   end
 end
 
+And(/Employer for (.*) has (.*) rule/) do |named_person, rule|
+  employer_profile = EmployerProfile.find_by_fein(people[named_person][:fein])
+  employer_profile.plan_years.each do |plan_year|
+    plan_year.benefit_groups.each{|bg| bg.update_attributes(effective_on_kind: rule) }
+  end
+end
+
 Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|
   employer_profile = EmployerProfile.find_by_fein(people['Soren White'][:fein])
   find('p', text: employer_profile.legal_name)
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
+end
+
+When(/(.*) clicks back to my account button/) do |named_person|
+  find('.interaction-click-control-go-to-my-account').click
 end
 
 When(/(.*) clicks on Continue button on receipt page/) do |named_person|
@@ -88,11 +107,85 @@ end
 
 Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sleep 1 #wait for e-mail nonsense
+  enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
+  sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
   enrollment = first('.hbx-enrollment-panel')
-  enrollment.find('.enrollment-effective', text: expected_effective_on.strftime("%m/%d/%Y"))
+  qle  = sep_enr ? true : false
+  enrollment.find('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
   # Timekeeper is probably UTC in this case, as we are in a test environment
   # this will cause arbitrary problems with the specs late at night.
 #  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
+end
+
+
+Then(/(.*) should see \"my account\" page with active enrollment/) do |named_person|
+  sleep 1 #wait for e-mail nonsense
+  enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
+  sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
+
+  enrollment = page.all('.hbx-enrollment-panel')[1]
+  qle  = sep_enr ? true : false
+  enrollment.find('.panel-heading', text: 'Coverage Selected')
+end
+
+Then (/(.*) should see passive renewal/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').first
+  enrollment.find('.panel-heading', text: 'Auto Renewing')
+end
+
+
+Then(/(.*) should see active enrollment with his daughter/) do |named_person|
+  sleep 1 #wait for e-mail nonsense
+  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
+  expect(enrollment.find('.family-members')).to have_content 'Soren'
+  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+end
+
+Then(/(.*) should see updated passive renewal with his daughter/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Auto Renewing' }
+  expect(enrollment.find('.family-members')).to have_content 'Soren'
+  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+end
+
+Then(/(.*) selects make changes on active enrollment/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
+  enrollment.find('.interaction-click-control-make-changes').click
+end
+
+Then(/(.*) should see page with SelectPlanToTerminate button/) do |named_person|
+  sleep(1)
+  expect(page).to have_content('Choose Coverage for your Household')
+  expect(page.find('.interaction-click-control-select-plan-to-terminate')).to be_truthy
+end
+
+When(/(.*) clicks SelectPlanToTerminate button/) do |named_person|
+  page.find('.interaction-click-control-select-plan-to-terminate').click
+end
+
+Then(/(.*) selects active enrollment for termination/) do |named_person|
+  sleep(1)
+  page.find('.interaction-click-control-terminate-plan').click
+end
+
+When(/(.*) enters termination reason/) do |named_person|
+  wait_for_ajax
+
+  waiver_modal = find('.terminate_confirm')
+  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Please select terminate reason')]]").click
+  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I do not have other coverage')]").click
+  waiver_modal.find('.terminate_reason_submit').click
+end
+
+Then(/(.*) should see termination confirmation/) do |named_person|
+  sleep(1)
+  expect(page).to have_content('Confirm Your Plan Selection')
+  page.find('.interaction-click-control-terminate-plan').click
+end
+
+Then(/(.*) should see a waiver instead of passive renewal/) do |named_person|
+  sleep(1)
+  waiver = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Waived' }
+  expect(waiver.present?).to be_truthy
 end
 
 Then(/Employee should see \"not yet eligible\" error message/) do
@@ -123,4 +216,8 @@ end
 When(/Employee clicks continue on the family members page/) do
   click_link('btn_household_continue')
   wait_for_ajax
+end
+
+And(/Employee has past created at date/) do
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update({ :created_at => TimeKeeper.date_of_record - 1.year })
 end

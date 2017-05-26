@@ -9,7 +9,7 @@ module Events
       employer_org = Organization.employer_by_hbx_id(employer_id).first
       if !employer_org.nil?
         employer = employer_org.employer_profile
-        event_payload = render_to_string "updated", :formats => ["xml"], :locals => { :employer => employer }
+        event_payload = render_to_string "events/v2/employers/updated", :formats => ["xml"], :locals => { :employer => employer }
 
         with_response_exchange(connection) do |ex|
           ex.publish(
