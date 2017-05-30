@@ -48,6 +48,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     before :each do
       assign :person, person
       assign :employee_role, employee_role
+      assign :family, family
       assign :hbx_enrollments, []
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       sign_in(current_user)
@@ -104,6 +105,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     before :each do
       assign :person, person
       sign_in(current_user)
+      assign :family, family
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/families/shop_for_plans_widget"
     end
