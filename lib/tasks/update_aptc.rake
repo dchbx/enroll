@@ -17,4 +17,23 @@ namespace :update_aptc do
     end
     puts "updated #{count} hbx_enrollments for applied_aptc_amount"
   end
+
+  desc "update tax household member for Chanda Harris"
+  task :certain_person => :environment do
+    persons = Person.where(first_name: 'Chanda', last_name: 'harris')
+    if persons.blank?
+      puts "can not find person by name Chanda harris"
+    else
+      persons.each do |person|
+        tax_household_members = person.primary_family.latest_household.latest_active_tax_household.tax_household_members rescue []
+        tax_household_members.each do |tm|
+          unless tm.is_primary_applicant?
+            tm.is_ia_eligible = false
+            tm.save
+          end
+        end
+      end
+      puts "finished updated for Chanda harris"
+    end
+  end
 end
