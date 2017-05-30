@@ -117,7 +117,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     end
 
     it "should displays search result title" do
-      assign(:census_employees, census_employees)
+      assign(:census_employees, CensusEmployee.all.page)
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       census_employees.each do |ce|
         expect(rendered).to match /.*#{ce.first_name}.*#{ce.last_name}.*/

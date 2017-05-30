@@ -79,7 +79,7 @@ gem "pundit", '~> 1.0.1'
 # will provide fast group premium plan fetch
 gem 'redis-rails'
 
-gem 'kaminari'
+gem 'kaminari' , '~> 0.17.0'
 
 gem 'sprockets' , "~> 2.12.3"
 # for I18n
