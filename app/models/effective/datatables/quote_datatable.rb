@@ -2,13 +2,15 @@ module Effective
   module Datatables
     class QuoteDatatable < Effective::MongoidDatatable
 
+      attr_accessor :broker_role_id
+
       datatable do
         table_column :employer_name, proc: Proc.new { |row|
         row.employer_profile.present? ? row.employer_profile.legal_name : row.employer_name
         }, :sortable => false, :filter => false
         table_column :employer_type, proc: Proc.new { |row| row.employer_type }, label: 'Employer Type', :sortable => false, :filter => false
       	table_column :quote, proc: Proc.new { |row|
-      	  link_to row.quote_name.titleize, broker_agencies_broker_role_quote_path(broker_role_id, row),
+      	  link_to row.quote_name.titleize, broker_agencies_broker_role_quote_path(row.broker_role_id.to_s, row),
       	  data: { no_turbolink: true }      		},
       	  :sortable => false, :filter => false
       	table_column :claim_code, proc: Proc.new { |row| row.claim_code}, :sortable => false, :filter => false
@@ -16,10 +18,10 @@ module Effective
       	table_column :state, proc: Proc.new { |row| row.aasm_state}, :sortable => false, :filter => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown= [
-            ['Edit Roster',edit_broker_agencies_broker_role_quote_path(broker_role_id: QuoteDatatable.broker_role_id, id: row.id),'static'],
-            ['View Published Quote',publish_broker_agencies_broker_role_quotes_path(broker_role_id: QuoteDatatable.broker_role_id, quote_id: row.id, :format => :pdf), draft_quote_publish_disabled?(row)],
-            ['Delete Quote',delete_quote_broker_agencies_broker_role_quote_path(broker_role_id: QuoteDatatable.broker_role_id, id: row.id), 'ajax'],
-            ['Copy Quote',copy_broker_agencies_broker_role_quotes_path(broker_role_id: QuoteDatatable.broker_role_id, quote_id: row.id), 'ajax'],
+            ['Edit Roster',edit_broker_agencies_broker_role_quote_path(broker_role_id: row.broker_role_id.to_s, id: row.id),'static'],
+            ['View Published Quote',publish_broker_agencies_broker_role_quotes_path(broker_role_id: row.broker_role_id.to_s, quote_id: row.id, :format => :pdf), draft_quote_publish_disabled?(row)],
+            ['Delete Quote',delete_quote_broker_agencies_broker_role_quote_path(broker_role_id: row.broker_role_id.to_s, id: row.id), 'ajax'],
+            ['Copy Quote',copy_broker_agencies_broker_role_quotes_path(broker_role_id: row.broker_role_id.to_s, quote_id: row.id), 'ajax'],
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "quote_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false
@@ -28,8 +30,8 @@ module Effective
       def collection
         state = attributes['states']
         type = attributes['employer_types']
-        broker_role_id = attributes["collection_scope"] || QuoteDatatable.broker_role_id.to_s
-        quotes = Quote.where('broker_role_id'.to_s => broker_role_id.strip)
+        bid = attributes["collection_scope"] || broker_role_id.to_s
+        quotes = Quote.where('broker_role_id'.to_s => bid.strip)
         quotes = quotes.where(employer_type: type) if ['client','prospect'].include?(type)
         quotes = quotes.where(aasm_state: state) if ['draft', 'published', 'claimed'].include?(state)
         quotes
@@ -64,9 +66,9 @@ module Effective
         end
       end
 
-      class << self
-      	attr_accessor :broker_role_id
-      end
+      # class << self
+
+      # end
 
     end
   end
