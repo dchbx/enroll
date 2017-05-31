@@ -3,13 +3,12 @@ module Effective
     class QuoteDatatable < Effective::MongoidDatatable
 
       datatable do
-        table_column :employer_name, proc: Proc.new { |row| 
+        table_column :employer_name, proc: Proc.new { |row|
         row.employer_profile.present? ? row.employer_profile.legal_name : row.employer_name
         }, :sortable => false, :filter => false
         table_column :employer_type, proc: Proc.new { |row| row.employer_type }, label: 'Employer Type', :sortable => false, :filter => false
-      	table_column :quote, proc: Proc.new { |row| 
-      	  link_to row.quote_name.titleize, broker_agencies_broker_role_quote_path(
-      	    Effective::Datatables::QuoteDatatable.broker_role_id, row),
+      	table_column :quote, proc: Proc.new { |row|
+      	  link_to row.quote_name.titleize, broker_agencies_broker_role_quote_path(broker_role_id, row),
       	  data: { no_turbolink: true }      		},
       	  :sortable => false, :filter => false
       	table_column :claim_code, proc: Proc.new { |row| row.claim_code}, :sortable => false, :filter => false
@@ -25,7 +24,7 @@ module Effective
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "quote_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false
       end
-      
+
       def collection
         state = attributes['states']
         type = attributes['employer_types']
@@ -35,7 +34,7 @@ module Effective
         quotes = quotes.where(aasm_state: state) if ['draft', 'published', 'claimed'].include?(state)
         quotes
       end
-   
+
       def global_search?
       	true
       end
