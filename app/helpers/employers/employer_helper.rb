@@ -205,4 +205,22 @@ module Employers::EmployerHelper
     (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
   end
 
+  def contain_nonrenewable_ee(plan_year)
+    if plan_year.renewing_draft?
+      elected_plans = []
+      plan_year.benefit_groups.each do |benefit_group|
+          elected_plans += benefit_group.elected_plans.map(&:hios_id)
+      end
+      enrollments=plan_year.employer_profile.active_plan_year.hbx_enrollments
+      enrollments.each do |enrollment|
+        plan=enrollment.plan
+        hios_id=plan.hios_id
+        unless elected_plans.include?(hios_id)
+          return true
+        end
+      end
+      return false
+    end
+    return false
+  end
 end

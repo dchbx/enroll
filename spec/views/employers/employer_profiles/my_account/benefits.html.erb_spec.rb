@@ -64,6 +64,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       sign_in(user)
       allow(benefit_group).to receive(:reference_plan).and_return(plan)
       allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])
+      allow(plan_year.employer_profile).to receive(:active_plan_year).and_return published_plan_year
       allow(benefit_group).to receive(:effective_on_offset).and_return 30
       assign(:plan_years, [plan_year,published_plan_year])
       assign(:employer_profile, employer_profile)
@@ -153,6 +154,20 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
         expect(rendered).not_to have_selector("a", text: "Add Plan Year")
         expect(rendered).to have_selector("a", text: "Publish Plan Year")
         expect(rendered).to have_selector("a", text: "Edit Plan Year")
+      end
+    end
+
+    context "contain_nonrenewable_ee" do
+      it "should render a pop-up template if ineligible EE's present" do
+        allow(view).to receive(:contain_nonrenewable_ee).and_return true
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).to have_selector("p", text: 'By clicking "Publish" you understand that one or more of your employees are currently enrolled')
+      end
+
+      it "should not render a pop-up template if there are no ineligible EE's" do
+        allow(view).to receive(:contain_nonrenewable_ee).and_return false
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).not_to have_selector("p", text: 'By clicking "Publish" you understand that one or more of your employees are currently enrolled')
       end
     end
   end
