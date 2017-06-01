@@ -1,0 +1,11 @@
+%dependent
+  = render :partial => "events/census_employee/person_name", locals: { person_name: census_dependent}
+  -if census_dependent.email.present?
+    = render :partial => "events/emails/email", locals: { email: census_dependent.email.address}
+  = (render :partial => "events/addresses/address", locals: { address: census_employee_address}) if census_employee_address.present?
+  - (census_dependent.employee_relationship == "employee") ? relationship = "self" : relationship = census_dependent.employee_relationship
+  %relationship= "urn:openhbx:terms:v1:employers#" + relationship
+  %gender= "urn:openhbx:terms:v1:gender#" + census_dependent.gender
+  %dob= simple_date_for(census_dependent.dob)
+  -if census_dependent.ssn.present?
+    %ssn= census_dependent.ssn

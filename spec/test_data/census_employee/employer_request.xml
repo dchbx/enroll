@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<employer_request xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns='http://openhbx.org/api/terms/1.0'
+                  xsi:type='EmployerRequestType'>
+  <header>
+    <hbx_id>1234</hbx_id>
+    <submitted_timestamp>2016-08-31T00:00:00</submitted_timestamp>
+    <authorization>yes</authorization>
+  </header>
+  <request>
+    <request_name>urn:openhbx:requests:v1:employer#by_census_member</request_name>
+    <parameters>
+      <person_name>
+        <person_first_name>firstname</person_first_name>
+        <person_last_name>lastname</person_last_name>
+      </person_name>
+      <ssn>111111111</ssn>
+      <dob>19900101</dob>
+    </parameters>
+  </request>
+</employer_request>
