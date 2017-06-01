@@ -129,7 +129,7 @@ function showOnly(selected) {
     "Other (With I-94 Number)": "immigration_other_with_i94_fields_container"
   };
   var vlp_doc_target = vlp_doc_map[selected];
-  $(".vlp_doc_area").html("<span>waiting...</span>");
+  $(".vlp_doc_area").html("<span></span>");
   var target_id = $('input#vlp_doc_target_id').val();
   var target_type = $('input#vlp_doc_target_type').val();
   $.ajax({

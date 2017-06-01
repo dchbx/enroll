@@ -5,11 +5,9 @@
   <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' if !document_upload && !show_immigration_doc_type(f.object) %>" id='immigration_doc_type_select'>
     <%= select_tag :immigration_doc_type, options_for_select(::VlpDocument::VLP_DOCUMENT_KINDS, selected: vlp_doc_subject), {id: 'immigration_doc_type', prompt: 'Select document type'} %>
   </div>
-
   <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' unless show_naturalization_doc_type(f.object) %>" id="naturalization_doc_type_select">
     <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types, selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: 'Select document type'} %>
   </div>
-
   <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden' />
   <input id="vlp_doc_target_type" value='<%= f.object.class %>' type='hidden' />
 
