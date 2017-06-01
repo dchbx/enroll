@@ -5,6 +5,7 @@ class DelinkBrokerGeneralAgency < MongoidMigrationTask
     ga_org = Organization.where(fein: "521698168").first
     ga_org.update_attributes!(:legal_name => "Insurance Marketing Center", :dba => "Insurance Marketing Center")
     # br_id = ga_org.broker_agency_profile.id
+
     ga_address = ga_org.office_locations.first.address
     ga_address.update_attributes!(:address_1 => "1101 Wootton Parkway Suite 820", :city => "Rockville", :state => 'MD', :zip => "20852")
 
