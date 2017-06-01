@@ -4,9 +4,9 @@ require File.join(Rails.root, "app", "data_migrations", "create_new_initial_plan
 describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
   let(:given_task_name) { "create_new_initial_plan_year_using_another" }
   subject { CreateNewInitialPlanYearUsingAnother.new(given_task_name, double(:current_scope => nil)) }
-  let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-  let(:existing_plan_year) { benefit_group.plan_year }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile, {:plan_years => [existing_plan_year]}) }
+  let(:benefit_group) { existing_plan_year.benefit_groups.first }
+  let(:existing_plan_year) { FactoryGirl.create(:custom_plan_year, employer_profile: employer_profile) }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:organization) { employer_profile.organization }
   let(:start_on) { "01012017" }
 
