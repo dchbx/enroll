@@ -77,7 +77,7 @@
               %>
 
               <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
-                You are not under open enrollment period.
+                <!-- You are not under open enrollment period. -->
               <% else %>
                 <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
                   <%= format_date ivl_enrollment_effective_date %>.
@@ -86,14 +86,14 @@
               <br/>
               
               <% if @family.active_seps.last && !dual_role_without_shop_sep?%>
-                <p>Would you like to use your existing special enrollment period? "<%= @family.active_seps.last.qualifying_life_event_kind.title %>"</p>
-                <p>
+                <p>You qualify for a Special Enrollment Period (SEP) because you "<%= @family.active_seps.last.qualifying_life_event_kind.title %>"
                   <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
-                  <%= build_link_for_sep_type(@active_sep, 'Shop with existing SEP') %>
+                  <%= build_link_for_sep_type(@active_sep, 'Shop Now')%>
                 </p>
-                <p><%= link_to 'Qualify for new SEP', find_sep_insured_families_path(options) %></p>
+                <br/>
+                <p>There are other types of Special Enrollment Periods that may allow you to start your coverage on a different date. <%= link_to 'Qualify for a new SEP', find_sep_insured_families_path(options), class: "btn btn-default pull-right" %></p>
               <% else %>
-                <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", find_sep_insured_families_path(options) %></p>
+                <p>Open enrollment is over, but you still may be able to enroll now if you qualify for a Special Enrollment Period. We need to ask you some questions to see if you qualify. <%= link_to "Continue ", find_sep_insured_families_path(options), class: "btn btn-default pull-right" %></p>
               <% end %>
             <% else %>
               You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.
