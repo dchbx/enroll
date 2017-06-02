@@ -555,6 +555,13 @@ class Person
     consumer_role.present? && active_employee_roles.present?
   end
 
+  def selected_employee_role(employee_id)
+    if employee_id.present?
+      id = employee_id.gsub("employee_role_", "")
+      employee_roles.where(_id: id).first
+    end
+  end
+
   def has_active_employee_role_for_census_employee?(census_employee)
     if census_employee
       (active_employee_roles.detect { |employee_role| employee_role.census_employee == census_employee }).present?

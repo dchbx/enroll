@@ -27,8 +27,7 @@ class Insured::FamiliesController < FamiliesController
     update_changing_hbxs(@hbx_enrollments)
 
     @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
-
-    @employee_role = @person.active_employee_roles.first
+    @employee_role = @person.selected_employee_role(params[:employee_id]) || @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
 
