@@ -26,6 +26,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(employee_role).to receive(:save!).and_return(true)
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
+      allow(role_form).to receive(:active_employee_roles).and_return [employee_role]
       sign_in user
     end
 
@@ -184,7 +185,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       } )
     }
     let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
-    let(:user) { double(:idp_verified? => true) }
+    let(:user) { double(:idp_verified? => true, person: person) }
 
     context "can construct_employee_role" do
       before :each do

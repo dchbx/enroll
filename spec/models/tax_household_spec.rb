@@ -126,16 +126,31 @@ RSpec.describe TaxHousehold, type: :model do
     #let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
     let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
     let(:benefit_coverage_period) {double(contains?:true, second_lowest_cost_silver_plan: plan)}
-    let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1')}
-    let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2')}
+    let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1', is_medicaid_chip_eligible: false)}
+    let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2', is_medicaid_chip_eligible: false)}
+    let(:tax_household) { TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record) }
 
-    it "can return ratio hash" do
+    before do
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
       allow(plan).to receive(:premium_for).and_return(110)
-      tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
       allow(tax_household).to receive(:aptc_members).and_return([tax_household_member1, tax_household_member2])
+    end
+
+    it "can return ratio hash" do
       expect(tax_household.aptc_ratio_by_member.class).to eq Hash
       result = {"tax_member1"=>0.5, "tax_member2"=>0.5}
+      expect(tax_household.aptc_ratio_by_member).to eq result
+    end
+
+    it 'should return 1 for tax_member1' do
+      allow(tax_household_member2).to receive(:is_medicaid_chip_eligible).and_return true
+      result = {"tax_member1"=>1.0}
+      expect(tax_household.aptc_ratio_by_member).to eq result
+    end
+
+    it 'should return 1 for tax_member2' do
+      allow(tax_household_member1).to receive(:is_medicaid_chip_eligible).and_return true
+      result = {"tax_member2"=>1.0}
       expect(tax_household.aptc_ratio_by_member).to eq result
     end
   end

@@ -94,6 +94,7 @@ class Household
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
+        curam_import_end_date: verified_tax_household.end_date,
         is_eligibility_determined: true,
         submitted_at: verified_tax_household.submitted_at
       )
@@ -101,7 +102,8 @@ class Household
       th.tax_household_members.build(
         family_member: primary_family_member,
         is_subscriber: true,
-        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false
+        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false,
+        is_medicaid_chip_eligible: verified_primary_tax_household_member.is_medicaid_chip_eligible ? verified_primary_tax_household_member.is_medicaid_chip_eligible : false
       )
 
       # verified_primary_family_member.financial_statements.each do |fs|
@@ -142,7 +144,8 @@ class Household
     th.tax_household_members.build(
       family_member: family_member,
       is_subscriber: false,
-      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
+      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible,
+      is_medicaid_chip_eligible: verified_tax_household_member.is_medicaid_chip_eligible
     )
     th.save!
   end
@@ -252,7 +255,7 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil,enrollment_kind:nil,external_enrollment: false)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil, enrollment_kind:nil, external_enrollment: false, opt_effective_on: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
@@ -265,7 +268,8 @@ class Household
       qle: qle,
       submitted_at: Time.now,
       external_enrollment: external_enrollment,
-      coverage_start: coverage_start
+      coverage_start: coverage_start,
+      opt_effective_on: opt_effective_on
     )
   end
 

@@ -125,7 +125,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "auto_renewing", "any_state"]
-    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing", "renewing_coverage_selected"]
 
     context "IVL market" do
       before :each do
@@ -179,14 +179,24 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       sep
     }
     context "when building ShopForPlan link" do
+      it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
+        expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
+      end
 
-        it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
-          expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
-        end
+      it "should be a link to 'insured/family_members' for a QLE type without date options available" do
+        expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
+      end
+    end
 
-        it "should be a link to 'insured/family_members' for a QLE type without date options available" do
-          expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
-        end
+    context "#build_link_for_sep_type" do
+      it "returns nil if sep nil" do
+        expect(helper.build_link_for_sep_type(nil)).to be_nil
+      end
+
+      it "can find qle" do
+        expect(QualifyingLifeEventKind).to receive(:find)
+        helper.build_link_for_sep_type(sep_with_date_options)
+      end
     end
 
     context "find QLE for SEP" do
@@ -195,7 +205,6 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         expect(find_qle_for_sep(sep_without_date_options)).to eq qle_first_of_month
       end
     end
-
   end
 
   describe "#tax_info_url" do
@@ -271,5 +280,124 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
     end
 
+  end
+
+  describe "show_download_tax_documents_button_on_documents_page?" do
+    let(:person) { FactoryGirl.create(:person)}
+    before do
+      helper.instance_variable_set(:@person, person)
+    end
+
+    context "current user is hbx staff" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['hbx_staff'], :person => person) }
+      before do
+        sign_in current_user
+      end
+
+      context "person is consumer role" do
+        let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+        before do
+            person.consumer_role = consumer_role
+        end
+
+        context "has SSN" do
+          before do
+            person.ssn = '123456789'
+          end
+          it "should not display the download tax documents button" do
+            expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+          end
+        end
+
+        context "has no SSN" do
+          before do
+            person.ssn = ''
+          end
+          it "should display the download tax documents button" do
+            expect(helper.show_download_tax_documents_button_on_documents_page?).to eq true
+          end
+        end
+      end
+
+      context "person is employee role" do
+        let(:employee_role) {FactoryGirl.build(:employee_role)}
+        before do
+          person.employee_roles = [employee_role]
+          person.ssn = ''
+        end
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+    end
+
+    context "current user is consumer" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['consumer_role'], :person => person) }
+      let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+      before do
+        sign_in current_user
+        person.consumer_role = consumer_role
+      end
+      context "has SSN" do
+        before do
+          person.ssn = '123456789'
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+
+      context "has no SSN" do
+        before do
+          person.ssn = ''
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+    end
+
+    context "current user is employee and not a consumer" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['employee_role'], :person => person) }
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
+      before do
+        sign_in current_user
+        person.employee_roles = [employee_role]
+      end
+
+      context "has SSN" do
+        before do
+          person.ssn = '123456789'
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+
+    end
+
+    context "current user is consumer and employee" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['consumer_role', 'employee_role'], :person => person) }
+      let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
+      before do
+        sign_in current_user
+        person.consumer_role = consumer_role
+        person.employee_roles = [employee_role]
+      end
+
+      context "has SSN" do
+        before do
+          person.ssn = '123456789'
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+    end
   end
 end

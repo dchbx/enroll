@@ -39,7 +39,9 @@ class PlanSelection
 
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
+    hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
     hbx_enrollment.select_coverage!(qle: qle)
+
   end
 
   def self.for_enrollment_id_and_plan_id(enrollment_id, plan_id)

@@ -77,3 +77,31 @@
     </tr>
   </table>
 </div>
+
+
+<script type="text/javascript">
+  $(".interaction-click-control-continue").attr('disabled', true)
+
+  $("#plan_year_fte_count").keyup(function() {
+    checkFTEcount();
+  });
+  $("#plan_year_pte_count").keyup(function() {
+    checkFTEcount();
+  });
+  $("#plan_year_msp_count").keyup(function() {
+    checkFTEcount();
+  });
+
+  function checkFTEcount(){
+    var fte_count_val = $(plan_year_fte_count).val();
+    var pte_count_val = $(plan_year_pte_count).val();
+    var msp_count_val = $(plan_year_msp_count).val();
+    if (fte_count_val.trim().length == 0 || pte_count_val.trim().length == 0 || msp_count_val.trim().length == 0) {
+      $(".interaction-click-control-continue").attr('disabled', true);
+    }
+    else {
+      $(".interaction-click-control-continue").attr('disabled', false)
+    }
+  }
+
+</script>

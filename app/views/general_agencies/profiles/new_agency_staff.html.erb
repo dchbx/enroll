@@ -9,10 +9,10 @@
       <h4>Personal Information</h4>
       <div class="row no-buffer row-form-wrapper">
         <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-          <%= f.text_field :first_name, class: "floatlabel form-control interaction-field-control-person-first-name", required: true, placeholder: 'FIRST NAME *' %>
+          <%= f.text_field :first_name, class: "floatlabel form-control interaction-field-control-person-first-name", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-          <%= f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *' %>
+          <%= f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *', autocomplete: :off %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
           <%= datepicker_control f, :dob, {:class => "floatlabel form-control interaction-field-control-person-dob", :placeholder => "DATE OF BIRTH *", :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'yy-mm-dd', required: true} %>

@@ -1,0 +1,30 @@
+<% content_for :navigation do %>
+    <%= render 'navigation' %>
+<% end %>
+<div class="module">
+  <div class="vertically-aligned-row">
+    <h1 class="darkblue no-buffer">My Documents</h1>
+  </div>
+   <div class="row">
+    <div class="table-responsive" id="message_list_form">
+      <table class="table table-striped table-hover table-sm">
+        <thead class="thead-default">
+          <tr>
+            <th>Document Name</th>
+            <th>Type</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+         <% @family.tax_documents.each do |tax_doc| %>
+  	   		<tr>
+  	   		  <td><%= tax_doc.title %></td>
+  			   <td><%= tax_doc.subject %></td>
+  			   <td><%= link_to "Download", download_tax_documents_insured_families_path(title: tax_doc.title, identifier: tax_doc.identifier), class: "btn btn-primary" %></td>
+  			   </tr>
+  		   <% end %>	
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

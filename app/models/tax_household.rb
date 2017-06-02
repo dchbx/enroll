@@ -1,15 +1,15 @@
-require 'autoinc'
+# A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
+# when determining eligibility for Insurance Assistance and Medicaid
 
 class TaxHousehold
+  require 'autoinc'
+
   include Mongoid::Document
-  include SetCurrentUser
   include Mongoid::Timestamps
+  include Mongoid::Autoinc
   include HasFamilyMembers
   include Acapi::Notifiers
-  include Mongoid::Autoinc
-
-  # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
-  # when determining eligibility for Insurance Assistance and Medicaid
+  include SetCurrentUser
 
   embedded_in :household
 
@@ -21,6 +21,7 @@ class TaxHousehold
 
   field :effective_starting_on, type: Date
   field :effective_ending_on, type: Date
+  field :curam_import_end_date, type: Date
   field :submitted_at, type: DateTime
 
   embeds_many :tax_household_members
@@ -75,7 +76,7 @@ class TaxHousehold
 
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
-    aptc_members.each do |member|
+    aptc_members.select { |thm| thm.is_medicaid_chip_eligible == false }.each do |member|
       #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium

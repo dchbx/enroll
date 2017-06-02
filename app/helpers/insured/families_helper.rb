@@ -31,7 +31,7 @@ module Insured::FamiliesHelper
   end
 
   def shift_purchase_time(policy)
-    policy.created_at.in_time_zone('Eastern Time (US & Canada)')
+    policy.submitted_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
   def shift_waived_time(policy)
@@ -166,7 +166,7 @@ module Insured::FamiliesHelper
     if enrollment.is_shop?
       true
     else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'coverage_expired', 'renewing_coverage_selected'].include?(enrollment.aasm_state.to_s)
     end
   end
 
@@ -193,12 +193,13 @@ module Insured::FamiliesHelper
   def build_link_for_sep_type(sep, link_title=nil)
     return if sep.blank?
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
+    return if qle.blank?
     if qle.date_options_available && sep.optional_effective_on.present?
       # Take to the QLE like flow of choosing Option dates if available
        qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
-      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
+      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: "btn btn-default pull-right"
     end
   end
 
@@ -223,10 +224,23 @@ module Insured::FamiliesHelper
       false
     elsif @person.consumer_role.blank?
       false
-    elsif @person.consumer_role.present? 
+    elsif @person.consumer_role.present?
       true
     end
   end
+
+  def show_download_tax_documents_button_on_documents_page?
+    if @person.ssn.present?
+      false
+    elsif !current_user.has_hbx_staff_role?
+      false
+    elsif @person.consumer_role.blank?
+      false
+    elsif @person.consumer_role.present?
+      true
+    end
+  end
+
   def is_applying_coverage_value_personal(person)
     first_checked = true
     second_checked = false

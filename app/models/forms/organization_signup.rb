@@ -7,6 +7,7 @@ module Forms
     attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein
     attr_reader :dob
     attr_accessor :office_locations
+    attr_accessor :contact_method
 
     include FnameLname
 

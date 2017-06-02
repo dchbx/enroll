@@ -35,6 +35,13 @@
           Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template. If you need to edit information for an employee, or if you're ready to add your employee to a benefit package you created, scroll over the employee's name and select the pencil icon to the right. When you're finished with your roster, select 'Benefits' in the blue menu bar to the left to continue.
         </h4>
         <br/>
+        <div class="col-xs-12 row">
+          <div class="pull-right">
+           <% if show_oop_pdf_link(@employer_profile.try(:show_plan_year).try(:aasm_state)) %>
+           <%= link_to "Plan Match Tool", "", data: {toggle: "modal", target: "#poc_cal"} %>
+           <% end %>
+          </div>
+        </div>
         <div class="col-xs-10">
           <div class="row">
             <!--  non javascript click when clicked on new employee -->
@@ -128,3 +135,22 @@
   </div>
 </div>
 <div></div>
+
+<div class="modal" id="poc_cal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="padding:65px;">
+        <div>
+        <p style="margin-bottom: 30px;"> <p><b>Plan Match:  Help your employees find the right health plan based on their needs and budget!</b></p><p>Plan Match, DC Health Link's health plan comparison tool powered by Consumers'
+CHECKBOOK, takes your employees through a few simple steps to find the best health plan for them.</br></p><p>With this anonymous tool, your employees can find every plan that you choose to make available to them through DC Health Link, and then compare plans based on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more.  Consumers' CHECKBOOK has over 35 years of experience helping consumers choose the best plans.</br></p><p>To use Plan Match, your employees will need to provide some basic information about your plan offerings and contributions.  Click “Create Employee Plan Match Instructions” and we will generate a custom set of instructions that you can share with your eligible employees to enable them to use Plan Match to find the right health plan for them.</br></p><p>Note:  Generating the custom Plan Match instructions for your employees may take a couple of minutes.  We will notify you in your secure Messages when it is ready.  Then simply download the instructions and share with your eligible employees to allow them to use Plan Match health comparison tool.</br></p>
+</p>
+        </div>
+      </div>
+      <div class="modal-footer" style="margin-right: 100px;">
+          <button type="button" class="btn btn-default" data-dismiss="modal">CANCEL</button>
+          <%= link_to "Create Plan Match Instructions", generate_checkbook_urls_employers_employer_profile_path, class: "btn btn-primary" , method: :post %>
+      </div>
+    </div>
+  </div>
+</div>
+

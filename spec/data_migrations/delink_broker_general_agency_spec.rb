@@ -27,6 +27,7 @@ describe DelinkBrokerGeneralAgency do
       bap = BrokerAgencyProfile.first
       gap = GeneralAgencyProfile.first
       expect(bap.fein).not_to eq gap.fein
+
       expect(gap.organization.office_locations.first.address.address_1).to eq("1101 Wootton Parkway Suite 820")
       expect(gap.organization.office_locations.first.address.city).to eq("Rockville")
       expect(gap.organization.office_locations.first.address.state).to eq("MD")

@@ -57,6 +57,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
     allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment])
     allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
+    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
   end
 
   it "should show the address of census employee" do
@@ -237,8 +238,10 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       aasm_state: 'coverage_terminated' ) }
 
     before :each do
+      allow(dental_hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(past_enrollments).to receive(:benefit_group).and_return(benefit_group)
       allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
-      assign(:past_enrollments, [past_enrollments])
+      allow(census_employee).to receive(:past_enrollments).and_return([past_enrollments])
     end
 
     it "should display past enrollments" do

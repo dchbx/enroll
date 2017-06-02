@@ -204,4 +204,310 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
     end
   end
+
+  describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
+
+    context "#is_market_kind_disabled?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq true
+          end
+
+          it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq false
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+          end
+
+          it "should disable the IVL market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq true
+          end
+
+          it "should not disable the shop market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq false
+          end
+        end
+      end
+
+      context "when user selected a QLE" do
+
+        context "when user selected shop QLE" do
+
+          before do
+            helper.instance_variable_set("@disable_market_kind", "individual")
+          end
+
+          it "should disable the IVL market if user selected shop based QLE" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq true
+          end
+
+          it "should not disable the shop market if user selected shop based QLE" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq false
+          end
+        end
+
+        context "when user selected IVL QLE" do
+
+          before do
+            helper.instance_variable_set("@disable_market_kind", "shop")
+          end
+
+          it "should disable the shop market if user selected IVL based QLE" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq true
+          end
+
+          it "should not disable the shop market if user selected shop based QLE" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq false
+          end
+        end
+      end
+    end
+
+    context "#is_market_kind_checked?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should not check the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_checked?("shop")).to eq false
+          end
+
+          it "should check the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_checked?("individual")).to eq true
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+          end
+
+          it "should not check the IVL market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_checked?("individual")).to eq false
+          end
+
+          it "should check the shop market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_checked?("shop")).to eq true
+          end
+        end
+      end
+    end
+
+    context "#is_employer_disabled?" do
+
+      let(:employee_role_one) { FactoryGirl.create(:employee_role)}
+      let(:employee_role_two) { FactoryGirl.create(:employee_role)}
+      let!(:hbx_enrollment) { double("HbxEnrollment", employee_role: employee_role_one)}
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should disable all the employers if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_employer_disabled?(employee_role_one)).to eq true
+            expect(helper.is_employer_disabled?(employee_role_two)).to eq true
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+            helper.instance_variable_set("@hbx_enrollment", hbx_enrollment)
+          end
+
+          it "should not disable the current employer if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_employer_disabled?(employee_role_one)).to eq false
+          end
+
+          it "should disable all the other employers other than the one user clicked shop enrollment ER" do
+            expect(helper.is_employer_disabled?(employee_role_two)).to eq true
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+        end
+
+        it "should not disable all the employers if user clicked on 'make changes' for IVL enrollment" do
+          expect(helper.is_employer_disabled?(employee_role_one)).to eq false
+          expect(helper.is_employer_disabled?(employee_role_two)).to eq false
+        end
+      end
+    end
+
+    context "#is_employer_checked?" do
+
+      let(:employee_role_one) { FactoryGirl.create(:employee_role)}
+      let(:employee_role_two) { FactoryGirl.create(:employee_role)}
+      let!(:hbx_enrollment) { double("HbxEnrollment", employee_role: employee_role_one)}
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should not check any of the employers when user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_employer_checked?(employee_role_one)).to eq false
+            expect(helper.is_employer_checked?(employee_role_two)).to eq false
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+            helper.instance_variable_set("@hbx_enrollment", hbx_enrollment)
+          end
+
+          it "should check the current employer if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_employer_checked?(employee_role_one)).to eq true
+          end
+
+          it "should not check all the other employers other than the one user clicked shop enrollment ER" do
+            expect(helper.is_employer_checked?(employee_role_two)).to eq false
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+          helper.instance_variable_set("@employee_role", employee_role_one)
+        end
+
+        it "should check the first employee role by default" do
+          expect(helper.is_employer_checked?(employee_role_one)).to eq true
+        end
+
+        it "should not check the other employee roles" do
+          expect(helper.is_employer_checked?(employee_role_two)).to eq false
+        end
+      end
+    end
+
+    context "#is_coverage_kind_disabled?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on health enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "health")
+          end
+
+          it "should disable the dental coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("dental")).to eq true
+          end
+
+          it "should not disable the health coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("health")).to eq false
+          end
+        end
+
+        context "when user clicked on dental enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "dental")
+          end
+
+          it "should not disable the dental coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("dental")).to eq false
+          end
+
+          it "should disable the health coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("health")).to eq true
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+        end
+
+        it "should not disable the health coverage kind" do
+          expect(helper.is_coverage_kind_disabled?("health")).to eq false
+        end
+
+        it "should not disable the dental coverage kind" do
+          expect(helper.is_coverage_kind_disabled?("dental")).to eq false
+        end
+      end
+    end
+
+    context "#is_coverage_kind_checked?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on health enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "health")
+          end
+
+          it "should not check the dental coverage kind" do
+            expect(helper.is_coverage_kind_checked?("dental")).to eq false
+          end
+
+          it "should check the health coverage kind" do
+            expect(helper.is_coverage_kind_checked?("health")).to eq true
+          end
+        end
+
+        context "when user clicked on dental enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "dental")
+          end
+
+          it "should check the dental coverage kind" do
+            expect(helper.is_coverage_kind_checked?("dental")).to eq true
+          end
+
+          it "should not check the health coverage kind" do
+            expect(helper.is_coverage_kind_checked?("health")).to eq false
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+        end
+
+        it "should check the health coverage kind by default" do
+          expect(helper.is_coverage_kind_checked?("health")).to eq true
+        end
+
+        it "should not check the dental coverage kind" do
+          expect(helper.is_coverage_kind_checked?("dental")).to eq false
+        end
+      end
+    end
+  end
 end

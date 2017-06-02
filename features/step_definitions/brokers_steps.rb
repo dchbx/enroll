@@ -181,6 +181,8 @@ Then(/^.* creates and publishes a plan year$/) do
   find(:xpath, '//div[div/p[contains(., "SELECT START ON")]]//li[@data-index="1"]').click
 
   fill_in 'plan_year[fte_count]', with: '3'
+  fill_in 'plan_year[pte_count]', with: '3'
+  fill_in 'plan_year[msp_count]', with: '3'
   find('.interaction-click-control-continue').click
 
   fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"

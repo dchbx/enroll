@@ -26,28 +26,27 @@ RSpec.describe "insured/families/home.html.erb" do
     assign(:person, person)
 
     assign(:family, family)
-    #assign(:active_admin_sep, sep)
     render file: "insured/families/home.html.erb"
   end
 
   it "should display the title" do
-    allow(family).to receive(:active_admin_seps).and_return(false)
+    allow(family).to receive(:active_seps).and_return(false)
     expect(rendered).to have_selector('h1', text: "My #{Settings.site.short_name}")
   end
 
   it "should have plan-summary area" do
-    allow(family).to receive(:active_admin_seps).and_return(false)
+    allow(family).to receive(:active_seps).and_return(false)
     expect(rendered).to have_selector('div#plan-summary')
   end
 
   it "should display 'existing SEP - Eligible to enroll' partial if there is an active admin SEP" do
-    assign(:active_admin_sep, sep)
+    assign(:active_sep, sep)
     render file: "insured/families/home.html.erb"
     expect(rendered).to have_selector('div#qle-details-for-existing-sep')
   end
 
   it "should not display 'existing SEP - Eligible to enroll' partial if there is no active admin SEP" do
-    assign(:active_admin_sep, [])
+    assign(:active_sep, [])
     render file: "insured/families/home.html.erb"
     expect(rendered).to_not have_selector('div#qle-details-for-existing-sep')
   end

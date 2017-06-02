@@ -33,7 +33,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
         CSV.open(file_name, "w", force_quotes: true) do |csv|
           csv << field_names
           families.each do |family|
-            if family.try(:primary_family_member).try(:person).try(:active_employee_roles).try(:any?) || family.try(:primary_family_member).try(:person).try(:consumer_role).try(:present?)
+            if family.try(:primary_family_member).try(:person).try(:employee_roles).try(:any?) || family.try(:primary_family_member).try(:person).try(:consumer_role).try(:present?)
               hbx_enrollments = family.active_household.hbx_enrollments.select{|enrollment| enrollment_for_report?(enrollment) }
               hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
               hbx_enrollment_members.each do |hbx_enrollment_member|
@@ -42,14 +42,14 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
                   enrollment = hbx_enrollment_member.hbx_enrollment
                   primary_person = family.primary_family_member.person
                   employer = enrollment.try(:employer_profile)
-                  census_employee = person.try(:employee_roles).try(:first).try(:census_employee)
+                  employee_role = person.employee_roles.where(employer_profile_id: employer.try(:id)).first || person.employee_roles.first
                   csv << [
                       person.hbx_id,
                       person.first_name,
                       person.last_name,
                       employer ? employer.legal_name : "IVL",
                       employer ? employer.fein : "IVL",
-                      census_employee ? census_employee.aasm_state : "IVL",
+                      employee_role ? employee_role.census_employee.try(:aasm_state) : "IVL",
                       primary_person.hbx_id,
                       primary_person.first_name,
                       primary_person.last_name,

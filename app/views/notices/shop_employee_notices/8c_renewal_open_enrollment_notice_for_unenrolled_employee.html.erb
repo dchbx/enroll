@@ -37,7 +37,7 @@
   { content: "<strong>To See Plan Options and Enroll:</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Please log-in to your existing account on <a href='www.DCHealthLink.com'>DCHealthLink.com</a> to view your plan options and complete the enrollment process."} %>
+  { content: "Please log-in to your existing account on <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a> to view your plan options and complete the enrollment process."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>

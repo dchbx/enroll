@@ -4,13 +4,13 @@ class ApplicationEventKind
   # PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
 
   RESOURCE_NAME_KINDS = %w(
-                          family 
+                          family
                           employer
-                          employee_role 
-                          consumer_role 
-                          broker_agency_profile 
-                          broker_role 
-                          issuer_profile 
+                          employee_role
+                          consumer_role
+                          broker_agency_profile
+                          broker_role
+                          issuer_profile
                           general_agent_profile
                         )
 
@@ -38,7 +38,6 @@ class ApplicationEventKind
       # LOG AN ERROR ABOUT A BOGUS EVENT WHERE YOU CAN'T FIND THINGS
       return
     end
-
     object_event_was_about = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
     notice_triggers.each do |trigger|
       trigger.publish(object_event_was_about, self.event_name)

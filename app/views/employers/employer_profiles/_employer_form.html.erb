@@ -47,8 +47,9 @@
              <th style='width: 18%'>Last Name    </th>
              <th style='width: 18%'> Email       </th>
              <th style='width: 18%'> Phone       </th>
-             <th style='width: 18%'> Status      </th>
+             <th style='width: 15%'> Status      </th>
              <th style='width: 9%'> Remove Role  </th>
+             <th style='width: 20%'> Edit Poc</th>
              </thead>
             <% @staff.each do |staff| %>
               <tr style='border: 1px solid #d5d5d5; height: 50px; '>
@@ -75,6 +76,9 @@
                   <%= link_to(employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), method: 'delete', id: 'delete_' + staff.id.to_s, data: {confirm: 'Delete this role?'}) do %>
                     <i class="fa fa-trash-o fa-2x role-trashcan"></i>
                   <%end%>
+                </td>
+                <td>
+                  <%= link_to raw('<i class="fa fa-pencil fa-lg" data-toggle="tooltip" title="Edit"></i>'), employers_employer_profile_census_employee_path(@employer_profile.id, staff.employee_roles.first.census_employee.id, tab: 'employees') if staff.employee_roles.present? %>
                 </td>
               </tr>
             <% end if @staff%>
@@ -124,6 +128,10 @@
               <% @row = true %>
             <% end %>
             <br/>
+            <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |f| %>
+              <%= render "employer_contact_preferences", f: f %><br>
+            <% end %>
+            <br>
             <div class="form-inputs">
               <%= pundit_span(EmployerProfile,:updateable?) %>
                  <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>

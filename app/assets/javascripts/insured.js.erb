@@ -4,6 +4,7 @@ function custom_upload_init () {
   var $file_input = $('.doc-upload-file');
   $file_input.on('change', function() {
     var input_value = $(this).val();
+    this.form.submit();
     $(this).closest('.btn-group').find('.upload-value').text(input_value);
     $(this).closest('.btn-group').find('.fa').css({'color': '#007bc4'});
     $(this).closest('.btn-group').find('input[type="submit"]').css({'background-color': '#007bc4', 'color': '#fff', 'border': 'solid 1px #007bc4'});

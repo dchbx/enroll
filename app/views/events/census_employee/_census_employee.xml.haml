@@ -1,0 +1,16 @@
+= render :partial => "events/census_employee/person_name", locals: { person_name: census_employee}
+-if census_employee.email.present?
+  = render :partial => "events/emails/email", locals: { email: census_employee.email.address}
+= (render :partial => "events/addresses/address", locals: { address: census_employee.address}) if census_employee.address.present?
+- (census_employee.employee_relationship == "employee") ? relationship = "self" : relationship = census_employee.employee_relationship
+%relationship= "urn:openhbx:terms:v1:employers#" + relationship
+%gender= "urn:openhbx:terms:v1:gender#" + census_employee.gender
+%dob= simple_date_for(census_employee.dob)
+%status= "urn:openhbx:terms:v1:employer_census_family_status#" + census_employee.aasm_state
+%ssn= census_employee.ssn
+%date_of_hire= simple_date_for(census_employee.hired_on)
+-if census_employee.employment_terminated_on.present?
+  %date_of_termination= simple_date_for(census_employee.employment_terminated_on)
+%is_business_owner= census_employee.is_business_owner?
+-if census_employee.coverage_terminated_on.present?
+  %coverage_terminated_on= simple_date_for(census_employee.coverage_terminated_on)

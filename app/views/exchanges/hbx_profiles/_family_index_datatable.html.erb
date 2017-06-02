@@ -5,7 +5,6 @@
   <%#= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
 </div>
 <%= raw render_datatable(@datatable) %>
-
 <div class="container">
   <div class="col-sm-12 col-md-12">
   <%=pundit_span Family, :updateable? %>

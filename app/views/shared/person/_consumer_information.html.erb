@@ -4,18 +4,18 @@
 
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME *' %>
+      <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
+      <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME', autocomplete: :off %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
+      <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME *', autocomplete: :off %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <div class="selectric-labeled">
         <span><strong>Suffix</strong></span>
-        <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control" %>
+        <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
       </div>
     </div>
   </div>

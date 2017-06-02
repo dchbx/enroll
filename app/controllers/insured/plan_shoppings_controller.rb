@@ -184,6 +184,16 @@ class Insured::PlanShoppingsController < ApplicationController
       sort_by_standard_plans(@plans)
       @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
     end
+
+    if @person.primary_family.active_household.latest_active_tax_household.present?
+      member_ids = @hbx_enrollment.hbx_enrollment_members.collect(&:applicant_id)
+      true_count = @person.primary_family.active_household.latest_active_tax_household.tax_household_members.any_in(:applicant_id => member_ids, :is_medicaid_chip_eligible => false).count
+      if true_count < 1
+        csr_variant_ids = [ "01", "02"]
+        @plans = @plans.select { |p| p.csr_variant_id.blank? || csr_variant_ids.include?(p.csr_variant_id)}
+      end
+    end
+
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -225,6 +235,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
+    effective_on_option_selected = session[:effective_on_option_selected].present? ? session[:effective_on_option_selected] : nil
+
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
@@ -236,9 +248,9 @@ class Insured::PlanShoppingsController < ApplicationController
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @hbx_enrollment.is_coverall?
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected, @market_kind)
       else
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
       end
 
       build_same_plan_premiums

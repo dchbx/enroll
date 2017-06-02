@@ -10,6 +10,7 @@ RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.er
     assign(:avaliable_employee_names, "employee_names")
     assign(:census_employees, [])
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+    allow(view).to receive(:generate_checkbook_urls_employers_employer_profile_path).and_return('/')
     render "employers/employer_profiles/my_account/census_employees"
   end
 

@@ -16,6 +16,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def plan_shopping_initiated(person)
+    if person.work_email_or_best.present?
+      mail({to: person.work_email_or_best, subject: "Time to choose your plan on #{Settings.site.short_name}", from: 'no-reply@dchealthlink.com'}) do |format|
+        format.html { render "plan_shopping_initiated", :locals => { :person => person} }
+      end
+    end
+  end
+
   def invitation_email(email, person_name, invitation)
     if email.present?
       mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
@@ -99,7 +107,10 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def generic_notice_alert(first_name, notice_subject, email)
+  def generic_notice_alert(first_name, notice_subject, email,files_to_attach={})
+    files_to_attach.each do |file_name, file_path|
+      attachments["#{file_name}"] = File.read(file_path)
+    end
     message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
     end
@@ -118,6 +129,19 @@ class UserMailer < ApplicationMailer
       end
     end
   end
+
+  def broker_terminate_from_employer(employer,broker_role)
+    mail({to: broker_role.email_address , subject: "Termination Notification"}) do |format|
+      format.html { render "broker_terminate_from_employer", :locals => { :employer => employer }}
+    end
+  end
+
+  def broker_terminate_from_individual(person,broker_role)
+    mail({to: broker_role.email_address , subject: "Termination Notification"}) do |format|
+      format.html { render "broker_terminate_from_individual", :locals => { :person => person }}
+    end
+  end
+
 
   def broker_application_confirmation(person)
     if person.emails.find_by(kind: 'work').address.present?

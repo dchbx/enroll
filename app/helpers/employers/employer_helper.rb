@@ -6,17 +6,21 @@ module Employers::EmployerHelper
   def employee_state_format(employee_state=nil, termination_date=nil)
     if employee_state == "employee_termination_pending" && termination_date.present?
       return "Termination Pending " + termination_date.to_s
+    elsif employee_state == 'employee_role_linked'
+      return 'Account Linked'
+    elsif employee_state == 'eligible'
+      return 'No Account Linked'
     else
       return employee_state.humanize
     end
   end
-
+  
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
   end
 
   def humanize_enrollment_states(benefit_group_assignment)
@@ -187,8 +191,6 @@ module Employers::EmployerHelper
     end
   end
 
-
-
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
@@ -205,4 +207,22 @@ module Employers::EmployerHelper
     (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
   end
 
+  def contain_nonrenewable_ee(plan_year)
+    if plan_year.renewing_draft?
+      elected_plans = []
+      plan_year.benefit_groups.each do |benefit_group|
+          elected_plans += benefit_group.elected_plans.map(&:hios_id)
+      end
+      enrollments=plan_year.employer_profile.active_plan_year.hbx_enrollments
+      enrollments.each do |enrollment|
+        plan=enrollment.plan
+        hios_id=plan.hios_id
+        unless elected_plans.include?(hios_id)
+          return true
+        end
+      end
+      return false
+    end
+    return false
+  end
 end

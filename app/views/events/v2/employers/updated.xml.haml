@@ -8,13 +8,17 @@
   -#%display_name= " " filed doesn't exists
   -#%abbreviation= " " filed doesn't exists
   %fein= employer.fein.strip
+  -  logger.info "employer_office_locations #{employer.organization.office_locations}"
+  -  logger.info "employer_legal_name #{employer.legal_name}"
   %office_locations
     = render :partial => "events/v2/organizations/office_location", :collection => employer.organization.office_locations
   - if !employer.organization.home_page.blank?
     %website= employer.organization.home_page
   - if employer.staff_roles.any?
+  - linked_staff = employer.staff_roles.uniq.select(&:user_id)
+  - staff_roles = linked_staff.present? ? linked_staff : employer.staff_roles.uniq
     %contacts
-      = render :partial => "events/v2/employers/owner_contact", :collection => employer.staff_roles.uniq
+      = render :partial => "events/v2/employers/owner_contact", :collection => staff_roles.sort_by(&:created_at).reverse!
   %is_active= (employer.is_active.blank? ? true : employer.is_active)
   - broker_agency_profile = employer.broker_agency_profile
   = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if broker_agency_profile && broker_agency_profile.brokers.present?
@@ -26,7 +30,10 @@
       %brokers
         = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts.unscoped,
         :locals => { :employer_profile => employer }
-    - if employer_plan_years(employer).present?
+    - if manual_gen
+      %plan_years
+        = render :partial => "events/v2/employers/plan_year", :collection => [employer.active_plan_year, employer.renewing_published_plan_year].compact
+    - elsif employer_plan_years(employer).present?
       %plan_years
         = render :partial => "events/v2/employers/plan_year", :collection => employer_plan_years(employer)
     - if employer.is_conversion?

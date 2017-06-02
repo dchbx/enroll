@@ -21,6 +21,8 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars
+    effective_on_option_selected = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil # params[:effective_on_option_selected] will exist in case of a QLE with date choice options.
+
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @effective_on_date = params[:effective_on_date]
@@ -32,25 +34,28 @@ class Insured::GroupSelectionController < ApplicationController
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
 
-      correct_effective_on = calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
+      correct_effective_on = calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil, effective_on_option_selected: effective_on_option_selected)
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
     end
 
-    if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
+    if (@change_plan == 'change_by_qle' || @change_plan == "existing_plan" || @enrollment_kind == 'sep')
       @disable_market_kind = "shop"
-      @disable_market_kind = "individual" if @market_kind == "shop"
+      @disable_market_kind = "individual" if @market_kind == "employer_sponsored"
+    end
+
+    if @hbx_enrollment.present? && @change_plan == "change_plan"
+      @mc_market_kind = @hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
+      @mc_coverage_kind = @hbx_enrollment.coverage_kind
     end
 
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
     qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+    session[:effective_on_option_selected] = effective_on_option_selected # This will be used later in the PlanShoppingController#set_plans_by method.
     benefit_group = (@employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil)
-    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: benefit_group)
-
+    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: benefit_group, effective_on_option_selected: effective_on_option_selected)
     generate_coverage_family_members_for_cobra
-    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
-    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
@@ -62,7 +67,6 @@ class Insured::GroupSelectionController < ApplicationController
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
-
     hbx_enrollment = build_hbx_enrollment
     if (keep_existing_plan && @hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
@@ -87,9 +91,6 @@ class Insured::GroupSelectionController < ApplicationController
 
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
-
-    # Set effective_on if this is a case of QLE with date options available.
-    hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
 
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
@@ -165,7 +166,8 @@ class Insured::GroupSelectionController < ApplicationController
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
         coverage_household: @coverage_household,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        opt_effective_on: @optional_effective_on)
     when 'coverall'
       @coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
@@ -199,6 +201,7 @@ class Insured::GroupSelectionController < ApplicationController
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
+    @optional_effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil
   end
 
   def insure_hbx_enrollment_for_shop_qle_flow

@@ -12,13 +12,6 @@ class ShopEmployerNotices::EnrollmentNoticeBuilder < ShopEmployerNotice
     build
   end
 
-  def deliver
-    # send_email_notice if @email_notice
-    # send_pdf_notice if @paper_notice
-    # send_email_notice
-    super
-  end
-
   def build
     @notice = PdfTemplates::EmployerNotice.new
     @notice.to = @to

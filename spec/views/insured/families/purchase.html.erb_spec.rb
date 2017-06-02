@@ -12,7 +12,7 @@ RSpec.describe "insured/families/purchase.html.erb" do
       @person = employee_role.person
       @plan = plan
       @enrollment = hbx_enrollment
-      @benefit_group = @enrollment.benefit_group
+      @benefit_group = benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       allow(person).to receive(:consumer_role).and_return(false)
@@ -38,7 +38,7 @@ RSpec.describe "insured/families/purchase.html.erb" do
       @person = employee_role.person
       @plan = plan
       @enrollment = hbx_enrollment
-      @benefit_group = @enrollment.benefit_group
+      @benefit_group = benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       assign :terminate, 'terminate'

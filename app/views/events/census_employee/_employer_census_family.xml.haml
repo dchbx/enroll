@@ -1,0 +1,9 @@
+%employer_census_family
+  %id
+    %id= census_employee.id
+  %employee
+    = render :partial => "events/census_employee/census_employee", locals: { census_employee: census_employee }
+  - if census_employee.census_dependents.present?
+    %dependents
+      = render :partial => "events/census_employee/census_dependent", :collection => census_employee.census_dependents,
+        locals: { census_employee_address: census_employee.address }

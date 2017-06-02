@@ -41,6 +41,7 @@ describe DefinePermissions, dbclean: :after_each do
 
   describe 'build test roles' do
     let(:given_task_name) {':build_test_roles'}
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     before do
       User.all.delete
       Person.all.delete

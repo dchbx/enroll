@@ -4,15 +4,18 @@
   </div>
   <div class="phone col-md-12 col-sm-12 col-xs-12 no-pd">
     <%= f.fields_for role, errors: {}, fieldset: true do |person_role| %>
-    <%= person_role.hidden_field :id if role == :employee_roles %>
-    <div class="row row-form-wrapper no-buffer">
-      <div class="col-md-6 col-sm-6 no-pd">
-        <%= person_role.select :contact_method, options_for_select(["Only Electronic communications", "Only Paper communication", "Paper and Electronic communications"], selected: person_role.object.contact_method), {prompt: 'Select communications preference'} %>
+      <%= person_role.hidden_field :id if role == :employee_roles %>
+      <div class="row row-form-wrapper no-buffer <%= 'hidden' if @identifier %>">
+        <div class="col-md-6 col-sm-6 no-pd">
+          <%= person_role.select :contact_method, options_for_select(["Only Electronic communications", "Only Paper communication", "Paper and Electronic communications"], selected: person_role.object.contact_method), {prompt: 'Select communications preference'} %>
+        </div>
+        <div class="col-md-6 col-sm-6 no-pd">
+          <%= person_role.select :language_preference, options_for_select(["English", "Spanish", "Amharic"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
+        </div>
       </div>
-      <div class="col-md-6 col-sm-6 no-pd">
-        <%= person_role.select :language_preference, options_for_select(["English", "Spanish", "Amharic"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
-      </div>
-    </div>
+      <% if role == :employee_roles && @person.active_employee_roles.size > 1 %>
+        <% @identifier = true %>
+      <% end %>
     <% end %>
   </div>
 </div>

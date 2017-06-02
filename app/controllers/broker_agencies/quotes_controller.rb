@@ -34,7 +34,7 @@ class BrokerAgencies::QuotesController < ApplicationController
     end
   end
 
-  def show 
+  def show
     @q = Quote.find(params[:id])
     @benefit_groups = @q.quote_benefit_groups
     @quote_benefit_group = (params[:benefit_group_id] && @q.quote_benefit_groups.find(params[:benefit_group_id])) || @benefit_groups.first
@@ -455,7 +455,7 @@ class BrokerAgencies::QuotesController < ApplicationController
   end
 
   def employees_list
- 
+
     employer_profile = EmployerProfile.find(params[:employer_profile_id])
     quote = Quote.find(params[:quote_id])
     @quote_benefit_group_dropdown = quote.quote_benefit_groups
@@ -478,9 +478,9 @@ class BrokerAgencies::QuotesController < ApplicationController
       @employee_present = false
     end
     respond_to do |format|
-      # format.html 
+      # format.html
       format.js
-    end  
+    end
   end
 
   def employee_type

@@ -60,7 +60,7 @@ def expected_effective_on(qle: false)
 end
 
 Then(/Employee tries to complete purchase of another plan/) do
-  step "Employee clicks \"Shop for Plans\" on my account page"
+  step "I can click Shop for Plans button"
   step "Employee clicks continue on the group selection page"
   step "Employee should see the list of plans"
   step "I should not see any plan which premium is 0"
@@ -82,6 +82,10 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
   else
     find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
   end
+end
+
+Then(/^I can click Shop for Plans button$/) do
+  click_button "Shop for Plans"
 end
 
 And(/Employer for (.*) has (.*) rule/) do |named_person, rule|

@@ -4,8 +4,12 @@ site:
   long_name: ""
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
+  login_message: "Log in to DC Health Link"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  login_url: "https://app.dchealthlink.com/"
+  trained_expert_url: "https://www.dchealthlink.com/find-expert"
+  website_name: "www.DCHealthLink.com"
 
   social_media:
     facebook_url: ""
@@ -17,6 +21,7 @@ contact_center:
   alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
+  psi_number: "1-855-532-5432" # plan-shopping-information
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
@@ -102,8 +107,11 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
-
 paper_notice: 'paper-notices'
+checkbook_services:
+    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
+    base_url:  "https://dc.checkbookhealth.org"
+    url: "https://dc.checkbookhealth.org/shop/dc/"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

@@ -107,6 +107,9 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 
+# Httparty
+gem 'httparty'
+
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'

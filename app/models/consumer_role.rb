@@ -20,6 +20,7 @@ class ConsumerRole
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
+  VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -551,6 +552,12 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  def check_for_critical_changes(person_params)
+    if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+      redetermine!(verification_attr)
+    end
+  end
+
   #class methods
   class << self
     #this method will be used to check 90 days verification period for outstanding verification
@@ -659,6 +666,11 @@ class ConsumerRole
     self.lawful_presence_determination.revert!(*args)
   end
 
+  #check if consumer purchased a coverage and no response from hub in 24 hours
+  def processing_hub_24h?
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+  end
+
   def all_types_verified?
     person.verification_types.all?{ |type| is_type_verified?(type) }
   end
@@ -690,6 +702,7 @@ class ConsumerRole
       else
         lawful_presence_verified?
     end
+
   end
 
   def ensure_validation_states
@@ -714,6 +727,16 @@ class ConsumerRole
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
     (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+  end
+
+  def sensitive_information_changed(field, person_params)
+    if field == "dob"
+      person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
+    elsif field == "ssn"
+      person.send(field).to_s != person_params[field].tr("-", "")
+    else
+      person.send(field).to_s != person_params[field]
+    end
   end
 
   def record_transition(*args)

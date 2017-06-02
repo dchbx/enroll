@@ -147,7 +147,27 @@ shop_notice_triggers = [
       }
     ]
   },
-
+  {
+    hbx_id: 'SHOP_Out_of_pocket_notice',
+    title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
+    description: 'Out of pocket calculator notifier',
+    resource_name: 'employer',
+    event_name: 'out_of_pocker_url_notifier',
+    notice_triggers: [
+      {
+        name: 'Out of pocket Notice',
+        notice_template: "notices/shop_employer_notices/out_of_pocket_notice.html.erb",
+        notice_builder: 'ShopEmployerNotices::OutOfPocketNotice',
+        mpi_indicator: 'MPI',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: [""],
+          primary_recipient_delivery_method: ["email"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
   {
     hbx_id: 'SHOP5',
     title: 'Group Renewal Available',
@@ -339,6 +359,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP19',
+    title: 'Group Ineligible to Obtain Coverage',
+    description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Renewal Group Ineligible to Obtain Coverage',
+        notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
+        mpi_indicator: 'MPI_SHOP19',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP20',
     title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
     description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
@@ -350,6 +391,69 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
         mpi_indicator: 'MPI_SHOP20',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP14',
+    title: 'Open Enrollment Completed',
+    description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
+    resource_name: 'employer',
+    event_name: 'initial_employer_open_enrollment_completed',
+    notice_triggers: [
+      {
+        name: 'Initial Employee Open Enrollment Successfully Completed',
+        notice_template: 'notices/shop_employee_notices/17_initial_ee_open_enrollment_completed',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
+        mpi_indicator: 'MPI_SHOP14',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP15',
+    title: 'Notice of Low Enrollment - Action Needed',
+    description: 'Notifies all the employers who doesnt meet minimum participation requirement',
+    resource_name: 'employer',
+    event_name: 'low_enrollment_notice_for_employer',
+    notice_triggers: [
+      {
+        name: 'Low Enrollment Notice',
+        notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
+        notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
+        mpi_indicator: 'MPI_SHOP15',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP26',
+    title: 'Reminder to publish Application',
+    description: 'All the initial employers with draft plan years will be notified to publish their plan year 2 days prior to soft deadline of 1st.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Initial Employer Application -  Reminder to publish',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
+        mpi_indicator: 'MPI_SHOP26',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -514,6 +618,28 @@ ivl_notice_triggers = [
   },
 
   {
+    hbx_id: 'IVLR1',
+    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    description: 'Notice to be sent out to individuals with UQHP(Unassisted)-Remaining Batch',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_renewal_notice_1_remaining_list',
+    notice_triggers: [
+      {
+        name: 'September Projected Renewal Notice',
+        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_builder: 'IvlNotices::IvlRenewalNoticeForRemainingBatch',
+        mpi_indicator: 'MPI_IVLR1',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
     hbx_id: 'IVLR2',
     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
     description: 'Notice to be sent out to individuals staying in APTC only',
@@ -664,7 +790,6 @@ ivl_notice_triggers = [
   },
 ]
 
-
 shop_notice_triggers.each do |trigger_params|
   ApplicationEventKind.create(trigger_params)
 end
@@ -672,6 +797,3 @@ end
 ivl_notice_triggers.each do |trigger_params|
   ApplicationEventKind.create(trigger_params)
 end
-
-
-

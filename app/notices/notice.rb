@@ -92,9 +92,14 @@ class Notice
   end
 
   def generate_pdf_notice
-    File.open(notice_path, 'wb') do |file|
-      file << self.pdf
+    begin
+      File.open(notice_path, 'wb') do |file|
+        file << self.pdf
+      end      
+    rescue Exception => e
+      puts "#{e} #{e.backtrace}"
     end
+
     # clear_tmp
   end
 
@@ -143,7 +148,8 @@ class Notice
       creator: "hbx_staff",
       subject: "notice",
       identifier: doc_uri,
-      format: "application/pdf"
+      format: "application/pdf",
+      description: mpi_indicator
     })
 
     if notice.save

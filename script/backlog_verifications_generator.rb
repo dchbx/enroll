@@ -33,7 +33,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   csv << [
     'Family Id',
     'Family ECase ID',
-    'Person name', 
+    'Person name',
     'Hbx ID'
   ]
 
@@ -61,11 +61,11 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
 
       event_kind = ApplicationEventKind.where(:event_name => NOTICE_GENERATOR).first
 
-      notice_trigger = event_kind.notice_triggers.first 
+      notice_trigger = event_kind.notice_triggers.first
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
-        template: notice_trigger.notice_template, 
-        subject: event_kind.title, 
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
         mpi_indicator: notice_trigger.mpi_indicator
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
@@ -74,14 +74,14 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
       puts 'processed--' + person.full_name
 
     rescue Exception  => e
-      case e.to_s 
+      case e.to_s
       when 'needs ssa validation!'
         pending_ssa_validation << person.full_name
       when 'mailing address not present'
         mailing_address_missing << person.full_name
       when 'active coverage not found!'
         coverage_not_found << person.full_name
-      else 
+      else
         puts "#{family.e_case_id}----#{e.to_s}"
       end
     end
@@ -95,7 +95,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     puts "#{count} families skipped due to missing consumer role"
   end
 
-  puts pending_ssa_validation.count 
+  puts pending_ssa_validation.count
   puts mailing_address_missing.count
   puts coverage_not_found.count
   puts others.count

@@ -225,7 +225,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     context "for special verification period" do
       it "returns special verification period" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
+        allow(family).to receive(:ivl_unverified_enrollments).and_return([hbx_enrollment_sp])
         expect(helper.verification_due_date(family)).to eq Date.new(2016,5,6)
       end
     end
@@ -265,21 +265,21 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:hbx_enrollment) { HbxEnrollment.new(:review_status => "ready") }
     context "if verification needed" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(true)
       end
       it "returns true if enrollment has complete review status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment_incomplete)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment_incomplete)
         expect(helper.hbx_enrollment_incomplete).to be_truthy
       end
       it "returns false for not incomplete status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment)
         expect(helper.hbx_enrollment_incomplete).to be_falsey
       end
     end
 
     context "without enrollments that needs verification" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(false)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(false)
       end
 
       it "returns false without enrollments" do
@@ -363,5 +363,34 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
       end
     end
+  end
+
+  describe "#documents_list" do
+    shared_examples_for "documents uploaded for one verification type" do |v_type, docs, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.vlp_documents=[]
+          docs.to_i.times { person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => v_type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    shared_examples_for "documents uploaded for multiple verification types" do |v_type, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.vlp_documents=[]
+          Person::VERIFICATION_TYPES.each {|type| person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    it_behaves_like "documents uploaded for one verification type", "Social Security Number", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
   end
 end

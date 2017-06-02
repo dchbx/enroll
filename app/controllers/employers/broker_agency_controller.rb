@@ -67,6 +67,10 @@ class Employers::BrokerAgencyController < ApplicationController
     authorize EmployerProfile, :updateable?
     if params["termination_date"].present?
       termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
+      result= UserMailer.broker_terminate_from_employer(@employer_profile,@employer_profile.active_broker_agency_account.writing_agent)
+      result.deliver_now
+      puts result.to_s if Rails.env.development?
+      send_broker_delete_msg(@employer_profile,@employer_profile.broker_agency_profile)
       @employer_profile.fire_broker_agency(termination_date)
       @employer_profile.fire_general_agency!(termination_date)
       @fa = @employer_profile.save!(validate: false)
@@ -129,6 +133,12 @@ class Employers::BrokerAgencyController < ApplicationController
     employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone.to_s}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
     secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
     secure_message(broker_agency_profile, employer_profile, employer_subject, employer_body)
+  end
+
+  def send_broker_delete_msg(employer_profile,broker_agency_profile)
+    broker_subject = "#{employer_profile.organization.legal_name} has deleted you as the broker on DC Health Link"
+    broker_body = "<br><p>You have been removed from  #{employer_profile.organization.legal_name} account on #{TimeKeeper.date_of_record} </p>"
+    secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
   end
 
   def find_employer

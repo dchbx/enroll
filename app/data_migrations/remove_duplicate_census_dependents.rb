@@ -30,7 +30,7 @@ class RemoveDuplicateCensusDependents < MongoidMigrationTask
     member_3.person_id = "5817c80ffaca14173500594f"
     member_3.save
 
-    census_employee = person.active_census_employees.first
+    census_employee = Person.where(first_name: person.first_name, last_name: person.last_name, ssn: person.ssn, dob: person.dob).first
 
     # create the employee role
     employee_relationship = Forms::EmployeeCandidate.new({first_name: census_employee.first_name,

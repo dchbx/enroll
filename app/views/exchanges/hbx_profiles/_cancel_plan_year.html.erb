@@ -1,0 +1,11 @@
+<div class="col-md-8">
+  <%= form_tag(cancel_initial_plan_year_exchanges_hbx_profiles_path(id: @employer_profile), method: :post, remote: true) do %>
+      <div class="input-no-pd">
+        <h4>Cancelling Plan Year for Employer: <%= @employer_profile.legal_name %></h4>
+        <h4>Plan Year: <%= @employer_profile.published_plan_year.start_on %>
+          - <%= @employer_profile.published_plan_year.end_on %></h4>
+        <br/>
+        <%= submit_tag "Cancel Plan Year", class: 'btn btn-primary btn-md' %>
+      </div>
+  <% end %>
+</div>

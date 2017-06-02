@@ -171,7 +171,8 @@ class InsuredEligibleForBenefitRule
 
   def age_on_next_effective_date(dob)
     today = TimeKeeper.date_of_record
-    today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
+    age_on = @benefit_package.benefit_coverage_period.earliest_effective_date
+    # today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
     age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
   end
 

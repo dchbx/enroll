@@ -39,7 +39,7 @@ RSpec.describe Admin::Aptc, :type => :model do
 
     # MAX APTC
     context "build max_aptc values" do
-        let(:expected_hash_without_param_case)  { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"612.33", 
+      let(:expected_hash_without_param_case)  { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"612.33",
                                                  "Jul"=>"612.33", "Aug"=>"612.33", "Sep"=>"612.33", "Oct"=>"612.33", "Nov"=>"612.33", "Dec"=>"612.33" } }
       
       let(:expected_hash_with_param_case)     { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"666.00", 
@@ -118,7 +118,6 @@ RSpec.describe Admin::Aptc, :type => :model do
         expect(family.active_household.hbx_enrollments.count).to eq enrollment_count + 1
         expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
       end
-
     end
   
 

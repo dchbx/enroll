@@ -1,6 +1,10 @@
 class Exchanges::HbxProfilesController < ApplicationController
+  include Exchanges::HbxProfilesHelper
   include DataTablesAdapter
+  include Pundit
   include SepAll
+  include EventsHelper
+  include Exchanges::HbxProfilesHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -9,6 +13,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
+
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -207,6 +212,7 @@ def employer_poc
   end
 
   def add_sep_form
+    authorize HbxProfile, :can_add_sep?
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
@@ -214,6 +220,16 @@ def employer_poc
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+  end
+
+  def enable_or_disable_link  
+     getActionParams
+     @family.update_attribute(:is_disabled, !@family.is_disabled)
+     @element_to_replace_id = params[:family_actions_id]
+     flash[:notice] = (@family.is_disabled? ? 'Disabled' : 'Enabled') + " user " + @family.primary_family_member.person.full_name
+     respond_to do |format|
+       format.js { render inline: "location.reload();"  }
+     end
   end
 
   def update_effective_date
@@ -426,6 +442,28 @@ def employer_poc
     end
   end
 
+   def view_terminated_hbx_enrollments
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    @enrollments = @person.primary_family.terminated_enrollments
+  end
+
+  def reinstate_enrollment
+    enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
+    
+    if enrollment.present?
+      reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
+      if reinstated_enrollment.present? && params['comments'].present?
+        reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
+      end
+      message = "Enrollment Reinstated successfully."
+    else
+      message = "Unable to find Enrollment."
+    end
+
+    redirect_to exchanges_hbx_profiles_root_path, flash: {notice: message}
+  end
+
   def verify_dob_change
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
@@ -581,6 +619,33 @@ def employer_poc
 
   end
 
+  def cancel_initial_plan_year_form
+    @employer_profile= Organization.where(:id => params[:id]).first.employer_profile
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def cancel_initial_plan_year
+    begin
+      employer_profile = EmployerProfile.find(params[:id])
+      hbx_enrollments = employer_profile.published_plan_year.hbx_enrollments
+
+      if is_initial_or_conversion_employer?(employer_profile) && can_cancel_employer_plan_year?(employer_profile)
+        process_cancel_initial_plan_year(hbx_enrollments, employer_profile)
+        post_cancel_conditions(employer_profile)
+        flash["notice"] = "Initial plan year cancelled for employer: #{employer_profile.legal_name}"
+      else
+        raise("Internal error.")
+      end
+    rescue Exception => e
+      return_status = 500
+      flash["error"] = "Could not cancel initial plan year for employer: #{employer_profile.legal_name}. #{e.message}"
+    end
+
+    render :js => "window.location = '#{exchanges_hbx_profiles_root_path}'", status: return_status
+  end
+
 private
 
    def modify_admin_tabs?
@@ -667,5 +732,17 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
+  end
+
+  def process_cancel_initial_plan_year(hbx_enrollments, employer_profile)
+    hbx_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    end
+    employer_profile.published_plan_year.cancel!
+  end
+
+  def post_cancel_conditions(employer_profile)
+    employer_profile.aasm_state = 'applicant' unless employer_profile.applicant?
+    employer_profile.save!
   end
 end

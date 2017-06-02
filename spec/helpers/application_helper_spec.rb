@@ -316,7 +316,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq false
     end
   end
+   describe "#show_oop_pdf_link" , dbclean: :after_each do
+       context 'valid aasm_state' do
+         it "should return true" do
+           PlanYear::PUBLISHED.each do |state|
+             expect(helper.show_oop_pdf_link(state)).to be true
+           end
 
+          PlanYear::RENEWING_PUBLISHED_STATE.each do |state|
+             expect(helper.show_oop_pdf_link(state)).to be true
+           end
+         end
+       end
+
+        context 'invalid aasm_state' do
+          it "should return false" do
+            ["draft", "renewing_draft"].each do |state|
+              expect(helper.show_oop_pdf_link(state)).to be false
+            end
+          end
+        end
+     end
 
 
   describe "find_plan_name", dbclean: :after_each do

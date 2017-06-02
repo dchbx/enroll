@@ -13,6 +13,12 @@ class EmployerProfile
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
+  NFP_ENROLLMENT_DATA_REQUEST = "acapi.info.events.employer.nfp_enrollment_data_request"
+  NFP_PAYMENT_HISTORY_REQUEST = "acapi.info.events.employer.nfp_payment_history_request"
+  NFP_PDF_REQUEST = "acapi.info.events.employer.nfp_pdf_request"
+  NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request"
+
+
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
@@ -34,6 +40,7 @@ class EmployerProfile
 
 
   field :profile_source, type: String, default: "self_serve"
+  field :contact_method, type: String, default: "Only Electronic communications"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
   field :xml_transmitted_timestamp, type: DateTime
 
@@ -257,8 +264,19 @@ class EmployerProfile
     renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
+  def active_or_published_plan_year
+     published_plan_year
+  end
+
+  def active_and_renewing_published
+    result = []
+    result <<active_plan_year  if active_plan_year.present?
+    result <<renewing_published_plan_year  if renewing_published_plan_year.present?
+    result
+  end
+
   def plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
   end
 
   def is_conversion?
@@ -356,13 +374,13 @@ class EmployerProfile
   end
 
   def renewing_plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft"; set }
   end
 
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -487,6 +505,16 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
+    def organizations_for_low_enrollment_notice(new_date)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
+          :"open_enrollment_end_on" => new_date+2.days
+          }
+      })
+
+    end
+
     def organizations_for_open_enrollment_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
           { :$elemMatch => {
@@ -522,6 +550,15 @@ class EmployerProfile
         { :$elemMatch => {
           :"end_on".lt => new_date,
           :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE
+        }
+      })
+    end
+
+    def initial_employers_reminder_to_publish(start_on)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"start_on" => start_on,
+          :"aasm_state" => "draft"
         }
       })
     end
@@ -587,6 +624,31 @@ class EmployerProfile
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
             plan_year.force_publish!
           end
+        end
+
+        #Initial employer reminder notice to publish plan year 2 days prior to PY start date.
+        start_on = (new_date+2.months).beginning_of_month
+        if new_date+2.days == start_on.last_month
+          initial_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send application reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
+          end
+        end
+      end
+
+      organizations_for_low_enrollment_notice(new_date).each do |organization|
+        begin
+          plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+          #exclude congressional employees
+          next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+          if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+            organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
+          end
+        rescue Exception => e
+          puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
         end
       end
 
@@ -832,6 +894,22 @@ class EmployerProfile
     notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
   end
 
+  def notify_enrollment_data_request
+    notify(NFP_ENROLLMENT_DATA_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_enrollment_data_request"})
+  end
+
+  def notify_payment_history_request
+    notify(NFP_PAYMENT_HISTORY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_payment_history_request"})
+  end
+
+  def notify_pdf_request
+    notify(NFP_PDF_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_pdf_request"})
+  end
+
+  def notify_statement_summary_request
+    notify(NFP_STATEMENT_SUMMARY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_statement_summary_request"})
+  end
+
   def notify_general_agent_added
     changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
     if changed_fields.present? && changed_fields.include?("start_on")
@@ -842,11 +920,21 @@ class EmployerProfile
   def conversion_employer?
     !self.converted_from_carrier_at.blank?
   end
-  
+
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
     org.first.employer_profile
+  end
+
+  def generate_and_deliver_checkbook_urls_for_employees
+    census_employees.each do |census_employee|
+      census_employee.generate_and_deliver_checkbook_url
+    end
+  end
+
+  def generate_checkbook_notices
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "out_of_pocker_url_notifier")
   end
 
   def trigger_notices(event)
@@ -907,6 +995,6 @@ private
   end
 
   def plan_year_publishable?
-    !published_plan_year.is_application_unpublishable? 
+    !published_plan_year.is_application_unpublishable?
   end
 end

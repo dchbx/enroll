@@ -54,10 +54,11 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
     end
 
     it "should publish the plan year" do
-      allow(ENV).to receive(:[]).with("REDIS_URL").and_return("redis://what") # No
-      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what") # Idea
-      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what") # WTF
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
+      allow(ENV).to receive(:[]).with("REDIS_URL").and_return("redis://what")
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what")
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what")
+
       employer = plan_year.employer_profile
       employer.census_employees << census_employee
       employer.save!

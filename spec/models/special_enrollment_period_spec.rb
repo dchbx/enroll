@@ -455,7 +455,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
   end
 
-
   context "is reporting a qle before the employer plan start_date and having an expired plan year" do
     let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
     let(:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
@@ -485,5 +484,4 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
 
   end
-
 end

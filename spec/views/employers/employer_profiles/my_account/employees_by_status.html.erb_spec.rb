@@ -46,7 +46,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     it "should displays enrollment state when coverage selected" do
       assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Coverage Selected/)
+      expect(rendered).to match(/Enrolled/)
     end
   end
 
@@ -61,7 +61,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     it "should displays enrollment state as coverage terminated" do
       assign(:census_employees, [census_employee2])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Coverage Terminated/)
+      expect(rendered).to match(/Terminated/)
     end
 
     it "should displays rehire function" do
@@ -104,7 +104,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     it "should displays enrollment status as waived" do
       assign(:census_employees, [census_employee3])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-      expect(rendered).to match(/Coverage Waived/)
+      expect(rendered).to match(/Waived/)
     end
   end
 

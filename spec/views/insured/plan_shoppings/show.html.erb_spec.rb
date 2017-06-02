@@ -24,7 +24,7 @@ RSpec.describe "insured/show" do
     allow(hbx_enrollment).to receive_message_chain("household.family").and_return(family)
     @person = person
     @hbx_enrollment = hbx_enrollment
-    @benefit_group = hbx_enrollment.benefit_group
+    @benefit_group = benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(plan, hbx_enrollment, @benefit_group, @reference_plan)
     @plans=[]

@@ -56,8 +56,8 @@ end
 
 Then(/^the broker should see the data in the table$/) do
   expect(page).to have_selector("input#quote_quote_households_attributes_0_family_id[value=\"1\"]")
-  expect(page).to have_selector("input#quote_quote_households_attributes_1_family_id[value=\"2\"]")
-  expect(page).to have_selector('div.panel.panel-default div input.uidatepicker', count: 10)
+  # expect(page).to have_selector("input#quote_quote_households_attributes_1_family_id[value=\"2\"]")
+  expect(page).to have_selector('#quote_quote_households_attributes_0_quote_members_attributes_0_dob', count: 1)
   expect(page).to have_selector("#quote_quote_households_attributes_0_quote_members_attributes_0_dob[value=\"06/01/1980\"]")
   expect(page).to have_selector("input#quote_quote_households_attributes_2_quote_members_attributes_0_first_name[value=\"John\"]")
   expect(page).to have_selector("input#quote_quote_households_attributes_1_quote_members_attributes_0_last_name[value=\"Ba\"]")
@@ -75,7 +75,7 @@ end
 
 When(/^broker enters valid information$/) do
   fill_in 'quote[quote_name]', with: 'Test Quote'
-  fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][dob]', with: "11/11/1991"
+  fill_in 'quote_quote_households_attributes_0_quote_members_attributes_0_dob', with: "11/11/1991"
   select "Employee", :from => "quote_quote_households_attributes_0_quote_members_attributes_0_employee_relationship"
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][first_name]', with: "John"
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][last_name]', with: "Bandari"
@@ -115,6 +115,11 @@ Then(/^the quote should be deleted$/) do
   sleep 1
   expect(page).not_to have_content(/Test Quote/)
   expect(page).to have_content(/No data available in table/)
+end
+
+Then(/^adds a benefit group$/) do
+  fill_in "quote[quote_benefit_groups_attributes][0][title]", with: 'My Benefit Group'
+  find('.interaction-click-control-save-changes').trigger 'click'
 end
 
 Then(/^adds a new benefit group$/) do

@@ -25,7 +25,7 @@ class GroupConversionEmployersMigration < MongoidMigrationTask
             enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector]).to_a
           end
           enrollments.each do |enrollment|
-            enrollment.update_attribute(:aasm_state, "coverage_canceled") if enrollment.effective_on.strftime("%m/%d/%Y") == "10/01/2016" 
+            enrollment.update_attribute(:aasm_state, "coverage_canceled") if enrollment.effective_on.strftime("%m/%d/%Y") == "10/01/2016"
           end
         end
       end

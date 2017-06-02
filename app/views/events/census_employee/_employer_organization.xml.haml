@@ -1,0 +1,16 @@
+%employer
+  %id
+    %id= employer.id
+  %name= employer.legal_name
+  - if employer.dba.present?
+    %dba= employer.dba
+  %fein= employer.fein
+  - if employer.organization.office_locations.any?
+    %office_locations
+      = render :partial => "events/organizations/office_location", :collection => employer.organization.office_locations
+  - pocs = (employer.owners.to_a + employer.staff_roles.to_a).uniq
+  - if pocs.any?
+    %contacts
+      = render :partial => "events/employers/owner_contact", :collection => pocs
+  %is_active= employer.is_active == false ? false : true
+  = render :partial => "events/census_employee/employer", locals: { employer: employer, census_employees: census_employees }

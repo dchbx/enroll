@@ -24,6 +24,7 @@ class FindOrCreateInsuredPerson
       user = person.user if context.role_type == User::ROLES[:consumer]
       person, is_new = person, false
     when 0
+      return if context.ssn.present? && Person.where(encrypted_ssn: Person.encrypt_ssn(context.ssn)).present?
       if user.try(:person).try(:present?)
         if user.person.first_name.downcase == context.first_name.downcase and
           user.person.last_name.downcase == context.last_name.downcase # if user enters lowercase during matching.

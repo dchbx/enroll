@@ -2,16 +2,15 @@ class TaxHouseholdMember
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  include BelongsToFamilyMember
+
   embedded_in :tax_household
-  embeds_many :financial_statements
 
   field :applicant_id, type: BSON::ObjectId
 
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_subscriber, type: Boolean, default: false
-
-  include BelongsToFamilyMember
 
   validate :strictly_boolean
 

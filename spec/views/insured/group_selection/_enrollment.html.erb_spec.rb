@@ -9,6 +9,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
   let(:hbx_enrollment) { HbxEnrollment.new(plan: plan, benefit_group: benefit_group) }
   let(:family) { Family.new }
   before :each do
+    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
     allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
     allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
     allow(hbx_enrollment).to receive(:is_shop?).and_return true
@@ -35,6 +36,13 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
 
   it "should not have button of change plan" do
     expect(rendered).not_to have_selector('a', text: 'Change Plan')
+  end
+
+  it "should show plan contact information" do
+    expect(rendered).to have_selector('div',text: 'Plan Contact Info')
+  end
+  it "should not show carrier contact information" do
+    expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
   end
 
   it "should show the DCHL ID as hbx_enrollment.hbx_id" do

@@ -40,10 +40,11 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true, inbox: inbox) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
+  let(:inbox) { double("Inbox", post_message: true, save: true)}
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:resident_role) { FactoryGirl.create(:resident_role) }
@@ -77,7 +78,7 @@ RSpec.describe Insured::FamiliesController do
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
-      allow(family).to receive(:active_admin_seps).and_return([sep])
+      allow(family).to receive(:active_seps).and_return([sep])
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
       allow(user).to receive(:has_employee_role?).and_return(true)
@@ -677,6 +678,8 @@ RSpec.describe Insured::FamiliesController do
         family.broker_agency_accounts = [
           FactoryGirl.build(:broker_agency_account, family: family)
         ]
+        allow(family).to receive(:primary_applicant).and_return(double("FamilyMember", person: person))
+        allow(person).to receive(:full_name).and_return("such test, much wow")
         allow(Family).to receive(:find).and_return family
         delete :delete_consumer_broker , :id => family.id
       end
@@ -843,3 +846,35 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 end
+
+RSpec.describe Insured::FamiliesController do
+  let(:hbx_enrollment) { HbxEnrollment.new }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:bucket_name) { 'tax-documents' }
+  let(:key) {"sample-key"}
+  let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}" }
+  let(:params) { {family: {identifier: doc_id}} }
+  
+    context "Failed Download" do
+      it "fails with an error message" do
+        allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+        allow(person).to receive(:primary_family).and_return(family)
+        sign_in(user)
+        get :download_tax_documents, identifier: ''
+        expect(flash[:error]).to eq("File does not exist or you are not authorized to access it.")
+      end
+    end
+
+    context "Successful Download" do
+      it "downloads successfully without error message" do
+        allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
+        allow(person).to receive(:primary_family).and_return(family)
+        sign_in(user)
+        get :download_tax_documents, identifier: doc_id
+        expect(flash[:error]).to be_nil
+        expect(response.status).to eq(200)
+      end
+    end
+  end

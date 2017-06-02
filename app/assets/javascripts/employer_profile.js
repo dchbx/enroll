@@ -25,7 +25,7 @@ var EmployerProfile = ( function( window, undefined ) {
       });
       $(this).closest('.injected-edit-status').find('.btn-primary:contains("Terminate")').on('click', function() {
         var url = $(this).closest('.census-employee').data('terminate-url');
-        var termination_date = $(this).val();
+        var termination_date = $('input[placeholder*="Termination Date"][title]').val();
         $.ajax({
           url: url,
           data: {
@@ -201,8 +201,12 @@ var EmployerProfile = ( function( window, undefined ) {
         $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
         $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Click here to save your plan year');
+        $('.interaction-click-control-save-plan-year').unbind('click');
       } else {
         $('.interaction-click-control-save-plan-year').addClass('disabled');
+        $('.interaction-click-control-save-plan-year').click(function(event){
+          event.preventDefault();
+        });
       }
       Freebies.tooltip();
   }

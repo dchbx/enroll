@@ -54,6 +54,10 @@ class ShopEmployerNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
   end
 
+  def shop_dchl_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_dchl_rights.pdf')]
+  end
+
   def non_discrimination_attachment
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
   end

@@ -37,7 +37,7 @@ class DefinePermissions < MigrationTask
     u4 = User.create( email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
     u5 = User.create( email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u6 = User.create( email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    hbx_profile_id = FactoryGirl.create(:hbx_profile).id
+    hbx_profile_id = HbxProfile.current_hbx.id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1)
     p2 = Person.create( first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2)
     p3 = Person.create( first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3)
@@ -52,9 +52,14 @@ class DefinePermissions < MigrationTask
     HbxStaffRole.create!( person: p6, permission_id: Permission.hbx_csr_tier2.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
   end
   def hbx_admin_can_update_ssn
-    Permission.hbx_staff.update_attributes(can_update_ssn: true)
+    Permission.hbx_staff.update_attributes!(can_update_ssn: true)
   end
   def hbx_admin_can_complete_resident_application
-    Permission.hbx_staff.update_attributes(can_complete_resident_application: true)
+    Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
+  end
+  def hbx_admin_can_add_sep
+    Permission.hbx_staff.update_attributes!(can_add_sep: true)
+    Permission.hbx_read_only.update_attributes!(can_add_sep: true)
+    Permission.hbx_csr_supervisor.update_attributes!(can_add_sep: true)
   end
 end

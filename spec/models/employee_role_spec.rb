@@ -618,6 +618,19 @@ describe EmployeeRole, dbclean: :after_each do
       end
     end
   end
+
+  context "hired_on date field" do
+    let(:different_hired_date) { employee_role.hired_on + 2.days }
+
+    it 'should use census employee record data' do
+      expect(employee_role.hired_on).to eq census_employee.hired_on
+      employee_role.hired_on = different_hired_date
+      employee_role.save
+      employee_role.reload
+      expect(employee_role.hired_on).to eq census_employee.hired_on
+      expect(Date.parse(employee_role.read_attribute(:hired_on).strftime('%Y/%m/%d'))).to eq different_hired_date
+    end
+  end
 end
 
 describe "#benefit_group", dbclean: :after_each do

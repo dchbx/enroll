@@ -556,7 +556,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:save_result) { true }
     let(:plan_year_id) { "plan_year_id"}
     let(:benefit_group_id) { "benefit_group_id"}
-    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', destroy!: true, title: 'bg_one'), double('bg_two')]) }
+    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', disable_benefits: true, title: 'bg_one'), double('bg_two')]) }
 
     before :each do
       sign_in user

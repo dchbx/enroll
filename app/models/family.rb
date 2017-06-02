@@ -35,6 +35,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :is_disabled, type: Boolean, default: false
 
   belongs_to  :person
 
@@ -176,7 +177,7 @@ class Family
 
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
-  scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
+  scope :all_enrollments_by_writing_agent_id  , ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
   scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
@@ -257,6 +258,11 @@ class Family
     end
 
     primary_family_member
+  end
+
+  def terminated_enrollments
+    return [] if  latest_household.blank?
+    enrollments.order_by(:created_at => "DESC").select{|h| h.aasm_state == "coverage_terminated"}
   end
 
   # @deprecated Use {primary_applicant}
@@ -657,7 +663,13 @@ class Family
     return unless broker_role_id
     existing_agency = current_broker_agency
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
-    terminate_broker_agency if existing_agency
+    if existing_agency
+      result=UserMailer.broker_terminate_from_individual(primary_applicant_person,current_broker_agency.writing_agent)
+      result.deliver_now
+      puts result.to_s if Rails.env.development?
+      send_broker_delete_msg(primary_applicant_person,current_broker_agency.broker_agency_profile)
+      terminate_broker_agency
+    end
     start_on = Time.now
     broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
     broker_agency_accounts.push(broker_agency_account)
@@ -705,6 +717,11 @@ class Family
 
   def any_unverified_enrollments?
     enrollments.verification_needed.any?
+  end
+
+  def ivl_unverified_enrollments
+    return [] if enrollments.empty?
+    enrollments.individual_market.verification_needed
   end
 
   class << self
@@ -925,6 +942,12 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
+  def tax_documents
+    documents.select do |doc|
+      (doc.subject == '1095A') && (doc.is_a? TaxDocument)
+    end
+  end
+
   def create_dep_consumer_role
     if dependents.any?
       dependents.each do |member|
@@ -1036,6 +1059,34 @@ private
     else
       return false
     end
+  end
+
+  def send_broker_delete_msg(person,broker_agency_profile)
+    broker_subject = "#{person.full_name} has deleted you as the broker on DC Health Link"
+    broker_body = "<br><p>You have been removed from  #{person.full_name} account on #{TimeKeeper.date_of_record} </p>"
+    secure_message_for_person(person, broker_agency_profile, broker_subject, broker_body)
+  end
+
+  def secure_message_for_person(from_provider, to_provider, subject, body)
+    message_params = {
+        sender_id: from_provider.id,
+        parent_message_id: to_provider.id,
+        from: from_provider.full_name,
+        to: to_provider.legal_name,
+        subject: subject,
+        body: body
+    }
+    create_secure_message(message_params, to_provider, :inbox)
+    create_secure_message(message_params, from_provider, :sent)
+  end
+
+
+  def create_secure_message(message_params, inbox_provider, folder)
+    message = Message.new(message_params)
+    message.folder =  Message::FOLDER_TYPES[folder]
+    msg_box = inbox_provider.inbox
+    msg_box.post_message(message)
+    msg_box.save
   end
 
   def clear_blank_fields

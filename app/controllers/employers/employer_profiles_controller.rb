@@ -1,8 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote]
-
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
@@ -11,6 +10,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  after_action :nfp_soap_request, only: [:find_employer]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -29,11 +29,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -118,6 +116,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
+      when 'accounts'
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
@@ -257,6 +256,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def bulk_employee_upload_form
   end
 
+  def generate_checkbook_urls
+    @employer_profile.generate_checkbook_notices
+    flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
+    redirect_to action: :show, :tab => :employees
+  end
+
   def download_invoice
     options={}
     options[:content_type] = @invoice.type
@@ -291,6 +296,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   private
+
+  def nfp_soap_request
+    @employer_profile.notify_enrollment_data_request
+    @employer_profile.notify_payment_history_request
+    @employer_profile.notify_pdf_request
+    @employer_profile.notify_statement_summary_request
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
@@ -419,7 +431,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},

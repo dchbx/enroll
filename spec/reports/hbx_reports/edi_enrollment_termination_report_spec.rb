@@ -10,7 +10,6 @@ describe TerminatedHbxEnrollments do
                                     first_name: "F_name1",
                                     last_name:"L_name1")}
   let(:person2) {FactoryGirl.create(:person,
-                                    :with_employee_role,
                                     first_name: "Lis2",
                                     last_name:"L_name1")}
   let(:hbx_enrollment_member1){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family1.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }

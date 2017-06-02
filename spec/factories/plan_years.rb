@@ -8,6 +8,8 @@ FactoryGirl.define do
     open_enrollment_start_on { (start_on - 30).beginning_of_month }
     open_enrollment_end_on { open_enrollment_start_on + 1.weeks }
     fte_count { 5 }
+    pte_count { 5 }
+    msp_count { 5 }
   end
 
   factory :next_month_plan_year, class: PlanYear do
@@ -18,6 +20,8 @@ FactoryGirl.define do
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
     aasm_state "published"
     fte_count { 5 }
+    pte_count { 5 }
+    msp_count { 5 }
 
     trait :with_benefit_group_congress do
       benefit_groups { [FactoryGirl.build(:benefit_group_congress)] }
@@ -37,6 +41,8 @@ FactoryGirl.define do
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
     aasm_state "enrolling"
     fte_count { 5 }
+    pte_count { 5 }
+    msp_count { 5 }
   end
 
   factory :renewing_plan_year, class: PlanYear do
@@ -47,6 +53,8 @@ FactoryGirl.define do
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
     aasm_state "renewing_enrolling"
     fte_count { 5 }
+    pte_count { 5 }
+    msp_count { 5 }
   end
 
   factory :plan_year_not_started, class: PlanYear do
@@ -56,6 +64,8 @@ FactoryGirl.define do
     open_enrollment_start_on { (start_on - 1.month).beginning_of_month }
     open_enrollment_end_on { open_enrollment_start_on + 1.weeks }
     fte_count { 5 }
+    pte_count { 5 }
+    msp_count { 5 }
   end
 
 

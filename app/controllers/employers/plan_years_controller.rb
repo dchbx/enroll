@@ -79,7 +79,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year = PlanYear.find(params[:plan_year_id])
     if plan_year.benefit_groups.count > 1
       benefit_group = plan_year.benefit_groups.find(params[:benefit_group_id])
-      benefit_group.destroy!
+      benefit_group.disable_benefits
 
       if plan_year.save
         flash[:notice] = "Benefit Group: #{benefit_group.title} successfully deleted."

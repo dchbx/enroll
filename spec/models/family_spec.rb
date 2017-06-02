@@ -4,14 +4,11 @@ describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
-  let(:enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
-                       household: household,
-                       coverage_kind: "health",
-                       enrollment_kind: "open_enrollment",
-                       aasm_state: 'shopping'
-    )
-  }
+  let(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+                           household: household,
+                           coverage_kind: "health",
+                           enrollment_kind: "open_enrollment",
+                           aasm_state: 'shopping') }
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
   let(:family_member_dependent) { FamilyMember.new(person: dependent) }
 
@@ -31,10 +28,6 @@ describe Family, "given a primary applicant and a dependent" do
     it "enrolled hbx enrollments should come from latest household" do
       expect(subject.enrolled_hbx_enrollments).to eq subject.latest_household.enrolled_hbx_enrollments
     end
-  end
-
-  context "#any_unverified_enrollments?" do
-
   end
 
   context "enrollments_for_display" do
@@ -240,10 +233,11 @@ describe Family, type: :model, dbclean: :after_each do
     end
 
     context "when a broker account is created for the Family" do
-      let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
+      #let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, family:carols_family)}
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
       let(:writing_agent)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
-      let(:broker_agency_profile2) { FactoryGirl.build(:broker_agency_profile) }
-      let(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
+      let(:broker_agency_profile2) { FactoryGirl.create(:broker_agency_profile) }
+      let!(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
       it "adds a broker agency account" do
         carols_family.hire_broker_agency(writing_agent.id)
         expect(carols_family.broker_agency_accounts.length).to eq(1)
@@ -452,7 +446,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep 
+        allow(family).to receive(:latest_shop_sep).and_return death_sep
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 
@@ -1250,6 +1244,32 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
     it "should not expire coverage for current year" do
       enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date).first
       expect(enrollment.coverage_expired?).to be_falsey
+    end
+  end
+end
+
+describe Family, ".tax_documents", dbclean: :after_each do
+  let(:family) { FactoryGirl.build(:family)}
+
+  context "had no tax documents" do
+    before do
+      family.documents = []
+    end
+
+    it "should return no documents" do
+      expect(family.tax_documents).to eq([])
+    end
+  end
+
+  context "had a tax document" do
+    let(:tax_document) { FactoryGirl.build(:tax_document)}
+
+    before do
+      family.documents = [tax_document]
+    end
+
+    it "should return 1 documents" do
+      expect(family.tax_documents).to eq([tax_document])
     end
   end
 end

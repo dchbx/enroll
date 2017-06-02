@@ -171,26 +171,29 @@ end
 
 describe BenefitGroup, type: :model do
 
-  context 'deleting the benefit group' do
+  context 'disabling the benefit group' do
     let(:plan_year) { FactoryGirl.create(:plan_year)}
     let!(:benefit_group_one) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "1st one") }
     let!(:benefit_group_two) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "2nd one")}
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: benefit_group_one.plan_year.employer_profile)}
     
     it "should have a default benefit group assignment with 1st benefit group" do
-      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 1
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_truthy
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 0
     end
 
-    it "should delete the benfit group assignments under the 1st benefit group" do
-      benefit_group_one.destroy!
+    it "should disable the benfit group assignments under the 1st benefit group" do
+      benefit_group_one.disable_benefits
       census_employee.reload
-      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 0
+
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_falsey
     end
 
     it "should create new benefit group assignment for census employee with 2nd benefit group" do
-      benefit_group_one.destroy!
+      benefit_group_one.disable_benefits
       census_employee.reload
-      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 1
+
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).first.is_active).to be_truthy
     end
 
     context 'when deleting the new benefit group & EE already has bga with old benefit group in inactive state' do
@@ -204,11 +207,10 @@ describe BenefitGroup, type: :model do
       end
 
       it "should move the existing benefit group assignment from inactive to active" do
-        benefit_group_two.destroy!
+        benefit_group_two.disable_benefits
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 0
-        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 1
         expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_truthy
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).first.is_active).to be_falsey
       end
     end
   end

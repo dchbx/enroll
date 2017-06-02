@@ -1,5 +1,7 @@
 %h3 Healthcare Marketplace
-
+- if @found_census_employees.size > 1
+  %p
+    The current selection will continue through the plan selection process for that enrollment, you will have the opportunity to plan shop for additional Employer Plan Year Benefits or Individual Benefits from your Employee account.
 %p
   .n-radio-group.select-employer
     - @employment_relationships.each_with_index do |er, index|

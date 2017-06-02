@@ -1,5 +1,18 @@
 <div class="module shop-for-plans-widget">
   <div class="panel panel-default" id='shop-for-plans-widget'>
+  <% if @person.consumer_role.blank? %>
+    <div class="panel-body">
+        <div class="row flex">
+        <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+          <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+        </div>
+        <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+          <div class='image-area'></div>
+          <strong>Enroll for health or dental coverage on the IVL market</strong>
+        </div>
+      </div>
+    </div>
+    <% end %>
     <div class="panel-body">
       <div class="row flex">
       <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">

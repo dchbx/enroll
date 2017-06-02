@@ -86,10 +86,23 @@ class ApplicationController < ActionController::Base
         subject: subject,
         body: body
       }
-
       create_secure_message(message_params, to_provider, :inbox)
       create_secure_message(message_params, from_provider, :sent)
     end
+
+    def secure_message_for_person(from_provider, to_provider, subject, body)
+      message_params = {
+          sender_id: from_provider.id,
+          parent_message_id: to_provider.id,
+          from: from_provider.full_name,
+          to: to_provider.legal_name,
+          subject: subject,
+          body: body
+      }
+      create_secure_message(message_params, to_provider, :inbox)
+      create_secure_message(message_params, from_provider, :sent)
+    end
+
 
     def create_secure_message(message_params, inbox_provider, folder)
       message = Message.new(message_params)

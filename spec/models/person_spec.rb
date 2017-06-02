@@ -321,47 +321,22 @@ describe Person do
 
       context "has_multiple_active_employers?" do
         let(:person) { FactoryGirl.build(:person) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-        let(:ce2) { FactoryGirl.build(:census_employee) }
+        let(:er1) { double("EmployeeRole1") }
+        let(:er2) { double("EmployeeRole2") }
 
         it "should return false without census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return([])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return false with only one census_employee" do
-          allow(person).to receive(:active_census_employees).and_return([ce1])
+          allow(person).to receive(:active_employee_roles).and_return([er1])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return true with two census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([ce1, ce2])
+          allow(person).to receive(:active_employee_roles).and_return([er1, er2])
           expect(person.has_multiple_active_employers?).to be_truthy
-        end
-      end
-
-      context "active_census_employees" do
-        let(:person) { FactoryGirl.build(:person) }
-        let(:employee_role) { FactoryGirl.build(:employee_role) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-
-        it "should get census_employees by active_employee_roles" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get census_employees by CensusEmployee match" do
-          allow(person).to receive(:active_employee_roles).and_return([])
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get uniq census_employees" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
         end
       end
       
@@ -486,6 +461,7 @@ describe Person do
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
+      @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
 
     after(:all) do
@@ -538,6 +514,16 @@ describe Person do
 
     it 'ssn present, dob not present then should return empty array' do
       expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
+    end
+
+    it 'returns person records only where is_active == true' do
+      expect(@p2.is_active).to eq true
+      expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, first_name: @p2.first_name)).to eq [@p2]
+    end
+
+    it 'should not match person record if is_active == false' do
+      expect(@p5.is_active).to eq false
+      expect(Person.match_by_id_info(last_name: @p5.last_name, dob: @p5.dob, first_name: @p5.first_name)).to be_empty
     end
   end
 

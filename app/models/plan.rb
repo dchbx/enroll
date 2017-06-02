@@ -171,7 +171,6 @@ class Plan
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
   scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
 
-
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
   scope :individual_market,     ->{ where(market: "individual") }
@@ -388,10 +387,6 @@ class Plan
     (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
   end
 
-  def deductible_integer
-    (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
-  end
-
   def hsa_plan?
     name = self.name
     regex = name.match("HSA")
@@ -400,6 +395,10 @@ class Plan
     else
       return false
     end
+  end
+
+  def deductible_integer
+    (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
   end
 
   def renewal_plan_type

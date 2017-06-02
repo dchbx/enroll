@@ -81,10 +81,10 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should update attributes" do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: "Social Security Number",
-                                          verification_reason: "in Curam list"}
+                                          verification_reason: "E-Verified in Curam"}
         person.reload
         expect(person.consumer_role.ssn_validation).to eq("valid")
-        expect(person.consumer_role.ssn_update_reason).to eq("in Curam list")
+        expect(person.consumer_role.ssn_update_reason).to eq("E-Verified in Curam")
       end
     end
 
@@ -95,10 +95,10 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should update attributes" do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: "American Indian Status",
-                                          verification_reason: "document_in_Enroll_app"}
+                                          verification_reason: "Document in EnrollApp"}
         person.reload
         expect(person.consumer_role.native_validation).to eq("valid")
-        expect(person.consumer_role.native_update_reason).to eq("document_in_Enroll_app")
+        expect(person.consumer_role.native_update_reason).to eq("Document in EnrollApp")
       end
     end
 
@@ -106,10 +106,10 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should update attributes" do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: "Citizenship",
-                                          verification_reason: "documents copy"}
+                                          verification_reason: "Document in EnrollApp"}
         person.reload
         expect(person.consumer_role.lawful_presence_update_reason).to be_a Hash
-        expect(person.consumer_role.lawful_presence_update_reason).to eq({"v_type"=>"Citizenship", "update_reason"=>"documents copy"})
+        expect(person.consumer_role.lawful_presence_update_reason).to eq({"v_type"=>"Citizenship", "update_reason"=>"Document in EnrollApp"})
       end
     end
 
@@ -117,11 +117,11 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should update attributes" do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: "Immigration",
-                                          verification_reason: "he is really good man, so why not )"}
+                                          verification_reason: "SAVE system"}
         person.reload
         expect(person.consumer_role.lawful_presence_update_reason).to be_a Hash
         expect(person.consumer_role.lawful_presence_update_reason[:v_type]).to eq("Immigration")
-        expect(person.consumer_role.lawful_presence_update_reason[:update_reason]).to eq("he is really good man, so why not )")
+        expect(person.consumer_role.lawful_presence_update_reason[:update_reason]).to eq("SAVE system")
       end
     end
 
@@ -131,5 +131,27 @@ RSpec.describe DocumentsController, :type => :controller do
         expect(response).to redirect_to :back
       end
     end
+
+    context "verification reason inputs" do
+      it "should not update verification attributes without verification reason" do
+        post :update_verification_type, { person_id: person.id,
+                                          verification_type: "Citizenship",
+                                          verification_reason: ""}
+        person.reload
+        expect(person.consumer_role.lawful_presence_update_reason).to eq nil
+      end
+
+      VlpDocument::VERIFICATION_REASONS.each do |reason|
+        it "should update verification attributes for #{reason} type" do
+            post :update_verification_type, { person_id: person.id,
+                                              verification_type: "Citizenship",
+                                              verification_reason: reason}
+            person.reload
+            expect(person.consumer_role.lawful_presence_update_reason).to eq ({"v_type"=>"Citizenship", "update_reason"=>reason})
+        end
+      end
+    end
+
+
   end
 end

@@ -1,0 +1,84 @@
+<div class="accounts-tab">
+  
+<h1 class="darkblue no-buffer">Account</h1>
+<br>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Account Due</th>
+      <th>Next Payment Due</th>
+      <th>Last Statement Balance</th>
+      <th>Last Statement Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>$4973.36</td>
+      <td>April 1, 2017</td>
+      <td>$3654.32</td>
+      <td>March 10, 2017</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="btn-group btn-group-justified" role="group" aria-label="...">
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default" id="currentActivity">Current Activity</button>
+  </div>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default" id="statements">Statements</button>
+  </div>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default" id="payMyBill" data-toggle="modal" data-target="#myModal">Pay My Bill</button>
+  </div>
+</div>
+
+<div class="account-content">
+  <div class="current-activity">
+    <%= render partial: "employers/employer_profiles/my_account/accounts/current_activity" %>
+  </div>
+  <div class="statements">
+    <%= render partial: "employers/employer_profiles/my_account/accounts/statements" %>
+  </div>
+  <div class="pay-my-bill">
+    <%= render partial: "employers/employer_profiles/my_account/accounts/pay_my_bill" %>
+  </div>
+</div>
+
+</div>
+
+
+<script>
+  $(document).ready(function() {
+    $('.statements').hide();
+    $('.pay-my-bill').hide();
+    $('#currentActivity').addClass('active');
+  });
+  
+  $('#currentActivity').click(function() {
+    $('.statements').hide();
+    $('.pay-my-bill').hide();
+    $('.current-activity').show();
+    $('#currentActivity').addClass('active');
+    $('#statements').removeClass('active');
+    $('#payMyBill').removeClass('active');
+  });
+  
+  $('#statements').click(function() {
+    $('.current-activity').hide();
+    $('.pay-my-bill').hide();
+    $('.statements').show();
+    $('#currentActivity').removeClass('active');
+    $('#statements').addClass('active');
+    $('#payMyBill').removeClass('active');
+  });
+  
+  $('#payMyBill').click(function() {
+    $('.current-activity').hide();
+    $('.statements').hide();
+    $('.pay-my-bill').show();
+    $('#currentActivity').removeClass('active');
+    $('#statements').removeClass('active');
+    $('#payMyBill').addClass('active');
+  });
+</script>

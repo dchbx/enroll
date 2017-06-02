@@ -6,13 +6,13 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="row row-form-wrapper no-buffer">
             <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME', required: true %>
+              <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME', required: true, autocomplete: :off %>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
+              <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME', autocomplete: :off %>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME', required: true %>
+              <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME', required: true, autocomplete: :off %>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}  %>

@@ -48,9 +48,9 @@ module Effective
             collection[0].try(:class) == 'Organization' ? enrollment_search(row,text) : ga_serch(row,text)
             # ga_serch(row,text)
         # end
+          end
         end
-      end        
-    end
+      end
       collection
     end
 
@@ -73,7 +73,7 @@ module Effective
     end
     def ga_serch(row,text)
       row.primary_applicant.person.full_name.try(:downcase).match(text) ||
-      row.primary_applicant.person.ssn.try(:downcase).match(text)   
+      row.primary_applicant.person.ssn.try(:downcase).match(text)
     end
   end
 end

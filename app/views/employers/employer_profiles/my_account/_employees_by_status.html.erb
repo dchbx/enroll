@@ -9,9 +9,9 @@
       <thead class="thead-default">
         <tr>
           <th>Employee Name<!-- <i class="fa fa-caret-down"></i>--></th>
-          <th>DOB</th>
-          <th>Hired</th>
-          <th>Status</th>
+          <th>Date of Birth</th>
+          <th>Date of Hire</th>
+          <th>Employee Account Status</th>
           <th>Benefit Package</th>
           <% if @employer_profile.renewing_plan_year.present? %>
           <th>Renewal Benefit Package</th>
@@ -19,7 +19,7 @@
           <% if ['terminated', 'all'].include?(status) %>
             <th>Termination Date</th>
           <% end %>
-          <th>Enrollment Status</th>
+          <th>Current Enrollment Status</th>
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <th>Renewal Enrollment Status</th>
           <% end %>
@@ -67,7 +67,11 @@
               </a>
             </td>
           <% elsif census_employee.may_terminate_employee_role? %>
-            <td class="table-functions">
+            <% if census_employee.aasm_state != "employee_termination_pending" %>
+              <td class="table-functions">
+            <% else %>
+              <td class="table-functions-terminate-pending">
+            <%end%>
               <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
               <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
             </td>
@@ -128,7 +132,7 @@
           </td>
         </tr>
             <tr></tr>
-          <% elsif census_employee.may_terminate_employee_role? %>
+          <% elsif census_employee.may_terminate_employee_role? && census_employee.aasm_state != "employee_termination_pending" %>
             <tr class="unbrd  remove_<%= census_employee.id %> dn">
               <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">
                 <div class="confirm-terminate <%=pundit_class EmployerProfile, :updateable?%>">

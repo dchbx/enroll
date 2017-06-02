@@ -7,6 +7,10 @@ describe CensusEmployeePolicy do
   let(:admin_person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
   let(:broker_person) { FactoryGirl.create(:person, :with_broker_role) }
 
+  before do 
+    allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
+  end
+
   permissions :delink? do
     context "already linked" do
       let(:employee) { FactoryGirl.build(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "employee_role_linked") }

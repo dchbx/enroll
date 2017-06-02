@@ -57,7 +57,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:".html_safe} %> 
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Online at www.DCHealthLink.com;".html_safe,
+  ["Online at #{Settings.site.website_name};".html_safe,
    "By email at employer.hbx@dc.gov; or".html_safe,
    "By calling 855-532-5465.".html_safe] } %>
 

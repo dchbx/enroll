@@ -14,7 +14,6 @@
         </div>
         <h3>Who Needs Coverage?</h3>
           <%= hidden_field_tag(:person_id, @person.id) %>
-          <%= hidden_field_tag(:employee_role_id, @employee_role.id) if @employee_role %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
@@ -58,7 +57,7 @@
                 <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
                   <div class="n-radio-row">
                     <label class="n-radio" for="market_kind_<%= kind %>">
-                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: (@market_kind == kind), disabled: (@disable_market_kind == kind) %>
+                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind), disabled: is_market_kind_disabled?(kind) %>
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>
@@ -84,7 +83,7 @@
           <% end %>
 
           <% if @employee_role.present? %>
-            <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+            <%= render 'select_employer' %>
           <% end %>
 
           <% if can_shop_resident?(@person) %>
@@ -105,7 +104,7 @@
               <div class="n-radio-group">
                 <div class="n-radio-row">
                   <label class="n-radio" for="coverage_kind_health">
-                    <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health', class: 'n-radio' %>
+                    <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"),id: 'coverage_kind_health', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Health
@@ -114,7 +113,7 @@
 
                 <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.is_dental_offered? %>">
                   <label class="n-radio" for="coverage_kind_dental">
-                    <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
+                    <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Dental
@@ -187,88 +186,3 @@
   </div>
   <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? && (@hbx_enrollment.employee_role.present? || @hbx_enrollment.benefit_group.present?)) %>
 </div>
-<script>
-  $(function(){
-    if ( $("#find_sep_link").length ) {
-      $("#find_sep_link").click(function() {
-      $(this).closest('form').attr('action', '<%= find_sep_insured_families_path %>');
-      $(this).closest('form').attr('method', 'get');
-      $(this).closest('form').submit();
-    });
-  }
-})
-
-
-function setGroupSelectionHandlers(){
-  $('.group-selection-table .dental input').removeProp('checked');
-
-  if ( $('#market_kind_shop').is(':checked') ) {
-    $("#coverage_kind_health").prop("checked", true);
-    $("#ivl-coverage-household input[type=checkbox]").prop("checked", false);
-  }
-
-<% if can_shop_both_markets?(@person) %>
-  <% if @market_kind == 'individual' %>
-    $('#market_kind_individual').prop("checked", true);
-    $('#dental-radio-button').show();
-  <% end %>
-
-  $('#market_kind_shop').on('change', function() {
-    <% if @employee_role.census_employee.active_benefit_group.blank? || !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
-      $('#dental-radio-button').slideUp();
-    <% end %>
-    $('#shop-coverage-household').show();
-    $('#ivl-coverage-household').hide();
-    $('#ivl-coverage-household input').removeProp('checked');
-
-    if ($('#coverage_kind_health').is(':checked')) {
-      $('#shop-coverage-household .health tr').not(".ineligible_row").find('input').prop('checked', 'checked');
-    }
-    if ($('#coverage_kind_dental').is(':checked')) {
-      $('#shop-coverage-household .dental tr').not(".ineligible_row").find('input').prop('checked', 'checked');
-    }
-  });
-
-  $('#market_kind_individual').on('change', function() {
-    $('#dental-radio-button').slideDown();
-    $('#ivl-coverage-household').show();
-    $('#shop-coverage-household').hide();
-    $('#shop-coverage-household input').removeProp('checked');
-    $('#ivl-coverage-household tr').not(".ineligible_row").find('input').prop('checked', 'checked');
-  });
-<% end %>
-
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
-
-  $('#coverage_kind_health').on('change', function() {
-    $('#shop-coverage-household .health').show();
-    $('#shop-coverage-household .health tr').not(".ineligible_row").find('input').prop('checked', 'checked');
-    $('#shop-coverage-household .dental').hide();
-    $('#shop-coverage-household .dental input').removeProp('checked');
-  });
-
-  $('#coverage_kind_dental').on('change', function() {
-    $('#shop-coverage-household .dental').show();
-    $('#shop-coverage-household .dental tr').not(".ineligible_row").find('input').prop('checked', 'checked');
-    $('#shop-coverage-household .health').hide();
-    $('#shop-coverage-household .health input').removeProp('checked');
-  });
-<% end %>
-
-$("input[type='checkbox']").change(function() {
-  if ($("#coverage_kind_health").is(":checked")){
-    if($(this).is(":checked")) {
-      $(this).attr( "checked", true );
-    }else{
-      $(this).removeProp('checked');
-      $('#shop-coverage-household .dental input').removeProp('checked');
-      }
-    }
-});
-}
-
-$(document).ready(function() {
- setGroupSelectionHandlers();
-});
-
-</script>

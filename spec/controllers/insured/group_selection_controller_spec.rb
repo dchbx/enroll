@@ -128,8 +128,36 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
 
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
+      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'employer_sponsored', consumer_role_id: consumer_role.id
       expect(assigns(:disable_market_kind)).to eq "individual"
+    end
+
+    it "should disable shop market kind if selected market kind is individual in dual role SEP" do
+      allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
+
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', consumer_role_id: consumer_role.id
+      expect(assigns(:disable_market_kind)).to eq "shop"
+    end
+
+    context "it should set the instance variables" do
+
+      before do
+        controller.instance_variable_set(:@hbx_enrollment, hbx_enrollment)
+        allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+        allow(hbx_enrollment).to receive(:kind).and_return "individual"
+        sign_in user
+        get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan'
+      end
+
+      it "should set market kind when user select to make changes in open enrollment" do
+        expect(assigns(:mc_market_kind)).to eq hbx_enrollment.kind
+      end
+
+      it "should set the coverage kind when user click on make changes in open enrollment" do
+        expect(assigns(:mc_coverage_kind)).to eq hbx_enrollment.coverage_kind
+      end
     end
 
     context "individual" do
@@ -155,6 +183,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         sign_in user
         get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
+      end
+
+      it "should set a session variable effective_on_option_selected to effective_on_option_selected if present" do
+        sign_in user
+        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", effective_on_option_selected: Date.new(TimeKeeper.date_of_record.year,12,06)
+        expect(session[:effective_on_option_selected]).to eq Date.new(TimeKeeper.date_of_record.year,12,06)
       end
     end
   end
@@ -209,7 +243,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
-    let(:census_employee) {FactoryGirl.create(:census_employee)}
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
 
     before do
       allow(coverage_household).to receive(:household).and_return(household)
@@ -301,7 +335,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
-    
+
     it "for cobra with invalid date" do
       user = FactoryGirl.create(:user, id: 196, person: FactoryGirl.create(:person))
       sign_in user

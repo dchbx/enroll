@@ -19,7 +19,6 @@ module Aws
           nil
         end
       rescue Exception => e
-        nil
       end
     end
 

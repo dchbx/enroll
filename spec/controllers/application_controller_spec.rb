@@ -149,4 +149,57 @@ RSpec.describe ApplicationController do
       expect(pagination).to eq alphabet_array
     end
   end
+  context "secure message" do
+    let(:person_from) { FactoryGirl.create(:employer_profile, legal_name: "from company") }
+    let(:employer_to) { FactoryGirl.create(:employer_profile, legal_name: "to company") }
+    let(:user) { FactoryGirl.create(:user) }
+    before do
+      sign_in(user)
+    end
+    it "send a message from employer to employer" do
+      expect(person_from.inbox.messages).to eq []
+      expect(employer_to.inbox.messages).to eq []
+      subject.send(:secure_message, person_from, employer_to, "message", "this is a test")
+      expect(person_from.inbox.messages.first.sender_id).to eq person_from.id
+      expect(person_from.inbox.messages.first.subject).to eq "message"
+      expect(person_from.inbox.messages.first.body).to eq "this is a test"
+      expect(person_from.inbox.messages.first.folder).to eq "sent"
+      expect(person_from.inbox.messages.first.from).to eq "from company"
+      expect(person_from.inbox.messages.first.to).to eq "to company"
+      expect(employer_to.inbox.messages.first.sender_id).to eq person_from.id
+      expect(employer_to.inbox.messages.first.subject).to eq "message"
+      expect(employer_to.inbox.messages.first.body).to eq "this is a test"
+      expect(employer_to.inbox.messages.first.folder).to eq "inbox"
+      expect(employer_to.inbox.messages.first.from).to eq "from company"
+      expect(employer_to.inbox.messages.first.to).to eq "to company"
+    end
+  end
+
+  context "secure message for person" do
+    let(:person_from) { FactoryGirl.create(:person, first_name: "Michel", last_name:"Jacson") }
+    let(:employer_to) { FactoryGirl.create(:employer_profile, legal_name: "Rolling Stone") }
+    let(:user) { FactoryGirl.create(:user) }
+    before do
+      sign_in(user)
+    end
+    it "send a message from employer to employer" do
+      expect(person_from.inbox.messages.size).to eq 1
+      expect(employer_to.inbox.messages).to eq []
+      subject.send(:secure_message_for_person, person_from, employer_to, "message", "hi there")
+      expect(person_from.inbox.messages.size).to eq 2
+      expect(person_from.inbox.messages.last.sender_id).to eq person_from.id
+      expect(person_from.inbox.messages.last.subject).to eq "message"
+      expect(person_from.inbox.messages.last.body).to eq "hi there"
+      expect(person_from.inbox.messages.last.folder).to eq "sent"
+      expect(person_from.inbox.messages.last.from).to eq "Michel Jacson"
+      expect(person_from.inbox.messages.last.to).to eq "Rolling Stone"
+      expect(employer_to.inbox.messages.first.sender_id).to eq person_from.id
+      expect(employer_to.inbox.messages.first.subject).to eq "message"
+      expect(employer_to.inbox.messages.first.body).to eq "hi there"
+      expect(employer_to.inbox.messages.first.folder).to eq "inbox"
+      expect(employer_to.inbox.messages.first.from).to eq "Michel Jacson"
+      expect(employer_to.inbox.messages.first.to).to eq "Rolling Stone"
+    end
+  end
+
 end

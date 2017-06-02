@@ -96,7 +96,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return health enrollment status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)"
         end
       end
 
@@ -106,7 +106,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return dental enrollment status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Dental)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Dental)"
         end
       end
 
@@ -116,7 +116,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return enrollment status for both health & dental" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)<Br/> Coverage Selected (Dental)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)<Br/> Enrolled (Dental)"
         end
       end
 
@@ -127,7 +127,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return terminated status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Terminated (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Terminated (Health)"
         end
       end
 
@@ -138,7 +138,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return terminated status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Waived (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Waived (Health)"
         end
       end
     end
@@ -283,6 +283,48 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
           expect(current_benefit_groups.include?(published_plan_year.benefit_groups.first)).to be_truthy
           expect(current_benefit_groups.include?(draft_plan_year.benefit_groups.first)).to be_truthy
           expect(renewal_benefit_groups).to be_empty
+        end
+      end
+
+      context 'for non-renewing plan years' do
+        shared_examples_for "falsey" do |plan_year, result|
+          it "should return false" do
+            plan_year = case plan_year
+                          when "expired_plan_year"
+                            expired_plan_year
+                          when "active_plan_year"
+                            active_plan_year
+                          when "draft_plan_year"
+                            draft_plan_year
+                          end
+            expect(helper.contain_nonrenewable_ee(plan_year)).to eq result
+          end
+        end
+        it_behaves_like "falsey", "expired_plan_year", false
+        it_behaves_like "falsey", "active_plan_year", false
+        it_behaves_like "falsey", "draft_plan_year", false
+      end
+
+      context 'for non-renewing plan years' do
+        before do
+          allow(renewing_plan_year.employer_profile).to receive(:active_plan_year).and_return active_plan_year
+          allow(active_plan_year).to receive(:hbx_enrollments).and_return [health_enrollment]
+        end
+
+        it "should return false when there's no ineligible EE's" do
+          expect(helper.contain_nonrenewable_ee(renewing_plan_year)).to eq false
+        end
+
+        context "when ineligible EE's exists" do
+          let(:plan2) { FactoryGirl.create(:plan, coverage_kind: "health")}
+          
+          before do
+            allow(health_enrollment).to receive(:plan).and_return plan2
+          end
+
+          it "should return true when there is ineligible EE's" do
+            expect(helper.contain_nonrenewable_ee(renewing_plan_year)).to eq true
+          end
         end
       end
     end

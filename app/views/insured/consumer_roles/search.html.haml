@@ -3,7 +3,7 @@
 .container.pd-container
   #new_person_wrapper
     .row
-      = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
+      = form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f|
         .col-lg-7.col-md-7.col-sm-8.col-xs-12
           %h1.darkblue Personal Information
           %h4 First, we need to verify whether you're new to DC Health Link or affiliated with another account. Please enter your personal information. When you're finished, select CONTINUE.

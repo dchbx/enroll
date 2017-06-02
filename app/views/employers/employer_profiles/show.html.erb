@@ -23,6 +23,9 @@
 
 <%- elsif @tab == 'billing' %>
   <%= render partial: "employers/employer_profiles/my_account/billing" %>
+  
+<%- elsif @tab == 'accounts' %>
+  <%= render partial: "employers/employer_profiles/my_account/accounts/accounts" %>
 
 <%- elsif @tab == 'families' %>
 <%= render partial:  "employers/employer_profiles/my_account/families" %>

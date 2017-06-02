@@ -7,19 +7,19 @@
           <div class="row top-row top-row-2">
               <div class="col-md-4 col-sm-4 no-pd">
                 <div class="form-group form-group-lg">
-                    <%= f.text_field :first_name, value: dependent.first_name,class: "home floatlabel form-control", placeholder: "FIRST NAME", required: true %>
+                    <%= f.text_field :first_name, value: dependent.first_name,class: "home floatlabel form-control", placeholder: "FIRST NAME", required: true, autocomplete: :off %>
                 </div>
               </div>
 
               <div class="col-md-4 col-sm-4 no-pd">
                 <div class="form-group form-group-lg">
-                    <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: "MIDDLE NAME"%>
+                    <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: "MIDDLE NAME", autocomplete: :off %>
                 </div>
               </div>
 
               <div class="col-md-4 col-sm-4 no-pd">
                 <div class="form-group form-group-lg">
-                    <%= f.text_field :last_name, value: dependent.last_name ,class: "home floatlabel form-control", required: true, placeholder: "LAST NAME" %>
+                    <%= f.text_field :last_name, value: dependent.last_name ,class: "home floatlabel form-control", required: true, placeholder: "LAST NAME", autocomplete: :off %>
                 </div>
               </div>
             </div>

@@ -60,4 +60,28 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
       expect(result.is_new).to be_falsey
     end
   end
+
+  context "given a person who does not exist but SSN is already taken" do
+    let(:found_person) { double(ssn: ssn, save: true) }
+    let(:context_arguments) {
+      { :first_name => first_name,
+        :last_name => last_name,
+        :dob => dob,
+        :ssn => ssn
+      }
+    }
+
+    before :each do
+      allow(Person).to receive(:match_by_id_info).with(ssn: ssn, dob: dob, first_name: first_name, last_name: last_name).and_return([])
+      allow(Person).to receive(:where).and_return [found_person]
+    end
+
+    it "should just return" do
+      expect(result.person).to eq nil
+    end
+
+    it "should communicate that a new person was not created" do
+      expect(result.is_new).to be_falsey
+    end
+  end
 end

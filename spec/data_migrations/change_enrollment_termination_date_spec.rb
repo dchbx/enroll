@@ -1,6 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_enrollment_termination_date")
 
+
 describe ChangeEnrollmentTerminationDate, dbclean: :after_each do
 
   let(:given_task_name) { "change_enrollment_effective_on_date" }

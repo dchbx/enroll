@@ -211,7 +211,7 @@ end
 
 describe Forms::FamilyMember, "which describes a new family member, and has been saved" do
   let(:family_id) { double }
-  let(:family) { Family.new }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:ssn) { nil }
   let(:dob) { "2007-06-09" }
   let(:existing_family_member_id) { double }
@@ -270,6 +270,10 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     let(:new_family_member_id) { double }
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
 
+    before do
+      allow(subject).to receive(:assign_person_address).and_return true
+    end
+
     it "should create a family member for that person" do
       expect(family).to receive(:relate_new_member).with(existing_person, relationship).and_return(new_family_member)
       subject.save
@@ -285,6 +289,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     before do
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       allow(family).to receive(:save!).and_return(true)
+      allow(subject).to receive(:assign_person_address).and_return true
     end
 
     it "should create a new person" do
@@ -462,6 +467,28 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
       subject.update_attributes(update_attributes)
+    end
+  end
+
+  context "it should create the coverage household member record if found a inactive family member record" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:new_family_member) { FactoryGirl.create(:family_member, family: family, :is_active => false)}
+    before do
+      allow(family).to receive(:find_matching_inactive_member).and_return new_family_member
+      new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }.each { |chm| chm.destroy! }
+      subject.instance_variable_set(:@family, family)
+      allow(family).to receive(:all_family_member_relations_defined).and_return true
+      subject.save
+      family.reload
+    end
+
+    it "should create a coverage household member record for the existing inactive family member" do
+      chm = new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }
+      expect(chm.size).to eq 1
+    end
+
+    it "should set the inactive family_member as active" do
+      expect(new_family_member.is_active).to eq true
     end
   end
 end

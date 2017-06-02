@@ -13,7 +13,7 @@ class Insured::FamiliesController < FamiliesController
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    @active_admin_sep = @family.active_admin_seps.last
+    @active_sep = @family.active_seps.last
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -78,6 +78,17 @@ class Insured::FamiliesController < FamiliesController
 
     render :layout => 'application'
   end
+
+  # def generate_out_of_pocket_url
+  #   @person = Person.find(params[:id])
+  #   if @person && @person.has_active_employee_role?
+  #     census_employee=@person.active_employee_roles.first.census_employee
+  #     cs= ::CheckbookServices::PlanComparision.new(census_employee)
+  #     url = cs.generate_url
+  #     redirect_to url
+  #   else
+  #   end
+  # end
 
   def record_sep
     if params[:qle_id].present?
@@ -224,14 +235,41 @@ class Insured::FamiliesController < FamiliesController
     @notices = @person.documents.where(subject: 'notice')
   end
 
+  def download_tax_documents_form
+    
+  end
+
+  def download_tax_documents
+   if params[:identifier].split("tax_documents#")[1].present?
+     uri = params[:identifier].split("tax_documents#")[1]
+     send_data Aws::S3Storage.find(uri), filename: params[:title]
+  
+   elsif params[:identifier].present?
+     uri = params[:identifier]
+     send_data Aws::S3Storage.find(uri)
+   else
+     flash[:error] = "File does not exist or you are not authorized to access it."
+     redirect_to download_tax_documents_form_insured_families_path
+   end
+ end
+
   def delete_consumer_broker
     @family = Family.find(params[:id])
+    broker_role=@family.current_broker_agency.writing_agent
     if @family.current_broker_agency.destroy
+      UserMailer.broker_terminate_from_individual(@family.primary_applicant.person,broker_role).deliver_now
+      send_broker_delete_msg(@family.primary_applicant.person,broker_role.broker_agency_profile)
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
     end
   end
 
   private
+
+  def send_broker_delete_msg(person,broker_agency_profile)
+    broker_subject = "#{person.full_name} has deleted you as the broker on DC Health Link"
+    broker_body = "<br><p>You have been removed from  #{person.full_name} account on #{TimeKeeper.date_of_record} </p>"
+    secure_message_for_person(person, broker_agency_profile, broker_subject, broker_body)
+  end
 
   def updateable?
     authorize Family, :updateable?
