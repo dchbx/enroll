@@ -123,7 +123,7 @@ class CensusEmployeeImport
       if record[:termination_date].present? #termination logic
         census_employee = find_employee(record)
         if census_employee.present?
-          if is_employee_terminable?(census_employee)
+          if is_employee_terminable?(census_employee, record[:termination_date])
             @terminate_queue[index + 4] = EmployeeTerminationMap.new(census_employee, record[:termination_date])
           else
             self.errors.add :base, "Row #{index + 4}: Could not terminate employee"
@@ -395,9 +395,9 @@ class CensusEmployeeImport
   end
 
 
-  def is_employee_terminable?(employee)
+  def is_employee_terminable?(employee, termination_date)
     #this logic may become more sophisticated in future
-    employee.may_terminate_employee_role?
+    employee.may_terminate_employee_role? && termination_date >= (TimeKeeper.date_of_record - 60.days)
   end
 
   alias_method :count, :length

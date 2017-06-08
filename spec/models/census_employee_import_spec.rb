@@ -105,15 +105,41 @@ RSpec.describe CensusEmployeeImport, :type => :model do
     context "employee exists" do
       before do
         allow(subject).to receive(:find_employee).and_return(census_employee)
-        allow(subject).to receive(:is_employee_terminable?).with(census_employee).and_return(true)
       end
 
       it "should save successfully" do
         expect(subject.save).to be_truthy
         expect(subject.load_imported_census_employees.count).to eq(1)
-        expect(subject.instance_variable_get("@terminate_queue").length).to eq(1)
       end
     end
 
+    context "termination date exist", dbclean: :after_each do
+      before do
+        allow(subject).to receive(:find_employee).and_return(census_employee)
+      end
+
+      it "should include census employee into terminated queqe if employee is terminable" do
+        allow(subject).to receive(:is_employee_terminable?).and_return(true)
+        expect(subject.save).to be_truthy
+        expect(subject.instance_variable_get("@terminate_queue").length).to eq(1)
+      end
+
+      it "should not include census employee into terminated queqe if EE is not terminable" do
+        allow(subject).to receive(:is_employee_terminable?).and_return(false)
+        expect(subject.save).to be_falsey
+        expect(subject.instance_variable_get("@terminate_queue").length).to eq(0)
+      end
+    end
+
+    context "#is_employee_terminable?" do
+      shared_examples_for "is_termination_valid?" do |termination_date, result|
+        it "should return #{result}" do
+          expect(subject.is_employee_terminable?(census_employee, termination_date)).to eq result
+        end
+      end
+
+      it_behaves_like "is_termination_valid?", TimeKeeper.date_of_record - 20.days, true
+      it_behaves_like "is_termination_valid?", TimeKeeper.date_of_record - 90.days, false
+    end
   end
 end
