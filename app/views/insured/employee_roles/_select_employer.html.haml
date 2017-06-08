@@ -4,12 +4,13 @@
   .n-radio-group.select-employer
     - @employment_relationships.each_with_index do |er, index|
       = render partial: "insured/employee_roles/employment_relationships", locals: {er: er, index: index}
-
-    .n-radio-row
-      %label.n-radio{ :for=>"individual-benefits" }
-        %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
-        %span.n-radio
-        Enroll in Individual Benefits
+ 
+    - if Settings.aca.individual_market.is_active 
+      .n-radio-row
+        %label.n-radio{ :for=>"individual-benefits" }
+          %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
+          %span.n-radio
+          Enroll in Individual Benefits
     %br
   .row
     .col-md-12.col-sm-12.col-xs-12

@@ -5,6 +5,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
+  before_action :individual_market_is_active
   #before_action :authorize_for, except: [:edit, :update]
 
   def ssn_taken
@@ -325,5 +326,5 @@ class Insured::ConsumerRolesController < ApplicationController
 
     @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
-  end
+  end    
 end

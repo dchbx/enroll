@@ -7,11 +7,22 @@ class GeneralAgencyProfile
 
   # for market_kind
   MARKET_KINDS = %W[individual shop both]
+  if Settings.aca.individual_market.is_active
+    {
+
+   MARKET_KINDS = %W[individual shop both]    
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
-  }
+  }}
+
+else
+  {
+      MARKET_KINDS = %W[shop]
+    MARKET_KINDS_OPTIONS = {
+      "Small Business Marketplace ONLY" => "shop",
+  }}
 
 
   field :entity_kind, type: String
