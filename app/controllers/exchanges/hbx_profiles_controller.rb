@@ -1,6 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
   include SepAll
+  include Exchanges::HbxProfilesHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -75,6 +76,35 @@ class Exchanges::HbxProfilesController < ApplicationController
      respond_to do |format|
        format.js
      end
+  end
+
+  def cancel_initial_plan_year_form
+    @employer_profile= Organization.where(:id => params[:id]).first.employer_profile
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def cancel_initial_plan_year
+    begin
+      employer_profile = EmployerProfile.find(params[:id])
+      hbx_enrollments = employer_profile.active_plan_year.hbx_enrollments
+      if can_cancel_employer_plan_year?(employer_profile)
+        cancel_initial_plan_year_process(hbx_enrollments, employer_profile)
+        post_cancel_conditions(hbx_enrollments, employer_profile)
+        flash["notice"] = "Initial plan year cancelled for employer: #{employer_profile.legal_name}"
+      else
+        terminate_initial_plan_year_process(hbx_enrollments, employer_profile)
+        post_cancel_conditions(hbx_enrollments, employer_profile)
+        flash["notice"] = "Initial plan year terminated for employer: #{employer_profile.legal_name}"
+      end
+      return_status = 200
+    rescue Exception => e
+      return_status = 501
+      flash["error"] = "Could not cancel/terminate initial plan year for employer: #{employer_profile.legal_name}. #{e.message}"
+    end
+
+    render :js => "window.location = '#{exchanges_hbx_profiles_root_path}'", status: return_status
   end
 
   def employer_invoice
@@ -667,5 +697,25 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
+  end
+
+  def cancel_initial_plan_year_process(hbx_enrollments, employer_profile)
+    hbx_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    end
+    employer_profile.active_plan_year.cancel!
+  end
+
+  def terminate_initial_plan_year_process(hbx_enrollments, employer_profile)
+    hbx_enrollments.each do |enrollment|
+      end_on_date = params[:end_on_date] if params[:end_on_date].present?
+      enrollment.terminate_coverage!(end_on_date) if enrollment.may_terminate_coverage?
+    end
+    employer_profile.active_plan_year.terminate!
+  end
+
+  def post_cancel_conditions(hbx_enrollments, employer_profile)
+    employer_profile.aasm_state = 'applicant' unless employer_profile.applicant?
+    employer_profile.save!
   end
 end

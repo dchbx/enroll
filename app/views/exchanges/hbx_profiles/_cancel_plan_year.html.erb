@@ -1,0 +1,29 @@
+<div class="col-md-8">
+  <%= form_tag(cancel_initial_plan_year_exchanges_hbx_profiles_path(id: @employer_profile), method: :post, remote: true) do %>
+      <% if can_cancel_employer_plan_year?(@employer_profile) %>
+          <div class="input-no-pd">
+          <h4>Cancelling Plan Year for Employer: <%= @employer_profile.legal_name %></h4>
+          <h4>Plan Year: <%= @employer_profile.active_plan_year.start_on %> - <%= @employer_profile.active_plan_year.end_on %></h4>
+            <br/>
+            <%= submit_tag "Cancel Plan Year", class: 'btn btn-primary btn-md' %>
+          </div>
+      <% else %>
+          <div class="input-no-pd">
+            <h4>Terminating Plan Year for Employer: <%= @employer_profile.legal_name %></h4>
+            <h4>Plan Year: <%= @employer_profile.active_plan_year.start_on %> - <%= @employer_profile.active_plan_year.end_on %></h4>
+            <br/>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-4">
+              <%= label_tag :end_on_date %>:
+              <div class="form-group">
+                <%= text_field_tag 'end_on_date', '', placeholder: "mm/dd/yyyy",
+                                   class: "required date-picker qle-date-picker form-control", required: true %>
+              </div>
+            </div>
+            <br/>
+          <div>
+            <%= submit_tag "Terminate Plan Year", class: 'btn btn-primary btn-md' %>
+          </div>
+          </div>
+      <% end %>
+  <% end %>
+</div>
