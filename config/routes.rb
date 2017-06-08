@@ -390,9 +390,9 @@ Rails.application.routes.draw do
     end
   end
 
-  match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
+  match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]  if Settings.ga_enable
   namespace :general_agencies do
-    root 'profiles#new'
+    root 'profiles#new' if Settings.ga_enable
     resources :profiles do
       collection do
         get :new_agency_staff
