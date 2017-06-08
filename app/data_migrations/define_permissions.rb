@@ -37,7 +37,7 @@ class DefinePermissions < MigrationTask
     u4 = User.create( email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
     u5 = User.create( email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u6 = User.create( email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    hbx_profile_id = FactoryGirl.create(:hbx_profile).id
+    hbx_profile_id = HbxProfile.current_hbx.id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1)
     p2 = Person.create( first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2)
     p3 = Person.create( first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3)
