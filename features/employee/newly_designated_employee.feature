@@ -62,3 +62,31 @@ Feature: Newly designated employees can purchase coverage only through renewing 
       Then Soren White should see coverage summary page with renewing plan year start date as effective date
       Then Soren White should see the receipt page with renewing plan year start date as effective date
       Then Employee should see "my account" page with enrollment
+
+  Scenario: Newly designated should see the shop market place workflow as default
+    Given Congressional Employer for Soren White exists with active and renewing plan year
+    And Soren White is newly designated
+    And Employee has current hired on date
+    And Employee has not signed up as an HBX user
+    And Soren White visits the employee portal
+    When Soren White creates an HBX account
+    When Employee goes to register as an employee
+    Then Employee should see the employee search page
+    When Employee enters the identifying info of Soren White
+    Then Employee should see the matched employee record form
+    And Employee should see the shop market place workflow as default
+
+  Scenario: Newly designated should not see the individual market place workflow
+    Given Congressional Employer for Soren White exists with active and renewing plan year
+    And Soren White is newly designated
+    And Employee has current hired on date
+    And Employee has not signed up as an HBX user
+    And Soren White visits the employee portal
+    When Soren White creates an HBX account
+    When Employee goes to register as an employee
+    Then Employee should see the employee search page
+    When Employee enters the identifying info of Soren White
+    Then Employee should see the matched employee record form
+    And Employee should not see the individual market place workflow
+
+

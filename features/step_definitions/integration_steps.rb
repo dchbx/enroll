@@ -573,6 +573,18 @@ Then(/^Employee should see the matched employee record form$/) do
   screenshot("employer_search_results")
 end
 
+Then(/^Employee should see the shop market place workflow as default$/) do
+  within('.select-employer') do
+    expect(page).to have_content('Enroll as an employee of Acme Inc.')
+  end
+end
+
+Then(/^Employee should not see the individual market place workflow$/) do
+  within('.select-employer') do
+    expect(page).not_to have_css('#individual-benefits')
+  end
+end
+
 # TODO: needs to be merged
 Then(/^.+ should see the matching employee record form$/) do
   expect(page).to have_content('Turner Agency')

@@ -5,7 +5,7 @@
     - @employment_relationships.each_with_index do |er, index|
       = render partial: "insured/employee_roles/employment_relationships", locals: {er: er, index: index}
 
-    .n-radio-row
+    .n-radio-row.hidden
       %label.n-radio{ :for=>"individual-benefits" }
         %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
         %span.n-radio
