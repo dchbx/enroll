@@ -1,0 +1,99 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Action Required to Renew Employer-sponsored Health Coverage on <%= Settings.site.short_name %> – Deadline Extended</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:</td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on <Renewal Date, MM/DD/YYYY>. The deadline to complete your renewal application has been extended to <10th of the month prior to renewal date, MM/DD/YYYY >. Please complete your application by this date."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Your employees will also have until <13th of the month prior to renewal date> to make their plan selections."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Continued Eligibility"} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "Your group must continue to meet the eligibility requirements to renew your coverage though #{Settings.site.short_name}.  To be eligible to renew your employer-sponsored health coverage with #{Settings.site.short_name}:",
+  listings: [["Your group must continue to meet residency requirements:", ["Have your primary business address in the District of Columbia and offer coverage to all full-time employees through #{Settings.site.short_name}, OR ", "Continue to offer coverage through #{Settings.site.short_name} to all full-time employees whose primary worksite is located in the District of Columbia and offer coverage to non-DC based employees through the SHOP exchange serving their primary worksite(s);"]],
+    "At least two-thirds of your eligible employees need to enroll in your group health coverage or waive due to having other coverage; and",
+    "One non-owner employee enrolls in health coverage."]} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "<strong>Employer Renewal Process:</strong>",
+  listings: [["<strong>Review “Draft Renewal Plan Year” on the Benefits tab of your My #{Settings.site.short_name} employer account.</strong>", ["Your draft renewal plan year is setup with the same selections you made for your current plan year, including plan offerings, reference plan, premium contributions, and family member eligibility.  You can make changes to these selections for the upcoming plan year if you’d like by clicking the Edit Plan Year button.","Please select your Open Enrollment dates to start right away so that your employees can maximize their time to review their plan options.  The latest date to end your open enrollment period is <13th of the month prior to renewal date, MM/DD/YYYY >.","If you’d like to keep the same selections in the upcoming plan year, review your open enrollment dates and then proceed to the next step."]],
+    ["<strong>Publish your “Renewal Plan Year” on the Benefits tab of your My #{Settings.site.short_name} employer account</strong>", ["Once you have reviewed and finalized your selections for the upcoming renewal plan year, click the Publish Plan Year button.", "Note: Only publish the plan year when you have made your final decision."]],
+    ["<strong>Employee Renewal Open Enrollment Period</strong>", ["After you finalize your renewal plan year by publishing it, your employees will be able to log in to their My #{Settings.site.short_name} employee accounts, review their plan options for the upcoming plan year, and make any necessary changes to their plan selections. To shop for <Renewal Plan Year, YYYY> plans your employees will need to click “Shop for Plans”.  Note:  If employees take no action during the employee renewal open enrollment period, they will be automatically re-enrolled in the same health plan for the upcoming plan year.","See the attached guides for your employees to walk them through the employee renewal open enrollment process."]]]} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Please note: If you are choosing to offer the same plan(s) as were offered in the <Current Plan Year, YYYY> Plan Year AND your employees want to keep their current enrollment (including plan selection and enrolled family members), your employees will not need to take any action - we will automatically re-enroll them into the <Current Plan Year, YYYY> version of their current plan enrollment unless they take action to change their enrollment."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Additional Resources for your New My #{Settings.site.short_name} Accounts:"} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+          <li style="margin-top: 5px;">
+            <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf">Employers Managing Your Employee Roster</a>
+          </li>
+          <li style="margin-top: 5px;">
+            <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf">Employers Enrolling as Employees</a>
+          </li>
+          <li style="margin-top: 5px;">
+            <a href="https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf">Employers Logging in to the Update <%= Settings.site.short_name %> for the first time</a>
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+          <li style="margin-top: 5px;">
+            By calling <%=Settings.contact_center.phone_number%>
+          </li>
+          <li style="margin-top: 5px;">
+            TTY: 711
+          </li>
+          <li style="margin-top: 5px;">
+            Online at <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 C.F.R. 155.725(d)."} %>
