@@ -1,0 +1,10 @@
+<div class="col-md-8">
+  <%= form_tag(reinstate_plan_year_exchanges_hbx_profiles_path(id: @employer_profile), method: :post, remote: true) do %>
+      <div class="input-no-pd">
+        <h4>Reinstate Plan Year for Employer: <%= @employer_profile.legal_name %></h4>
+        <% plan_year = latest_terminated_plan_year(@employer_profile) %>
+        <h4>Plan Year: <%= plan_year.start_on %> - <%= plan_year.end_on %></h4>
+        <%= submit_tag "Reinstate Plan Year", class: 'btn btn-primary btn-md' %>
+      </div>
+  <% end %>
+</div>

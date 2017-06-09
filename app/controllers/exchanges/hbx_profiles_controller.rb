@@ -1,6 +1,8 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
   include SepAll
+  include EventsHelper
+  include Exchanges::HbxProfilesHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -581,6 +583,32 @@ def employer_poc
 
   end
 
+  def reinstate_plan_year_form
+    @employer_profile= Organization.where(:id => params[:id]).first.employer_profile
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def reinstate_plan_year
+    begin
+      employer_profile = EmployerProfile.find(params[:id])
+
+      if latest_terminated_plan_year(employer_profile).present?
+        process_reinstate_initial_plan_year(employer_profile)
+        flash["notice"] = "Plan year reinstated for employer: #{employer_profile.legal_name}"
+        return_status = 200
+      else
+        raise("Terminated plan year not found.")
+      end
+    rescue Exception => e
+      return_status = 501
+      flash["error"] = "Could not reinstate initial plan year for employer: #{employer_profile.legal_name}. #{e.message}"
+    end
+
+    render :js => "window.location = '#{exchanges_hbx_profiles_root_path}'", status: return_status
+  end
+
 private
 
    def modify_admin_tabs?
@@ -668,4 +696,27 @@ private
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
   end
+
+  def process_reinstate_initial_plan_year(employer_profile)
+
+    plan_year = latest_terminated_plan_year(employer_profile)
+
+    plan_year.hbx_enrollments.each do |enrollment|
+      current_state = enrollment.aasm_state
+      enrollment.update_attributes!({ aasm_state: "coverage_enrolled", terminated_on: nil })
+      enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: current_state,
+          to_state: "coverage_enrolled"
+      )
+      enrollment.save!
+    end
+
+    plan_year.update_attributes!({aasm_state: "active"})
+    current_state = plan_year.aasm_state
+    plan_year.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: current_state,
+        to_state: "active")
+      plan_year.save!
+  end
+
 end
