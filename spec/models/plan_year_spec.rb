@@ -2134,9 +2134,35 @@ describe PlanYear, "which has the concept of export eligibility" do
 
   INVALID_EXPORT_STATES.each do |astate|
     describe "in #{astate} state" do
-      let(:export_state) { astate}
-      it "is not eligible for export" do
-        expect(subject.eligible_for_export?).not_to eq true
+      let(:export_state) { astate }
+
+      if astate == "terminated"
+        context "terminated with future termination date" do
+          before do
+            subject.terminated_on = TimeKeeper.date_of_record + 1.month
+            subject.save
+          end
+
+          it "is eligible for export" do
+            expect(subject.eligible_for_export?).to eq true
+          end
+        end
+
+        context "terminated with past termination date" do
+          before do
+            subject.terminated_on = TimeKeeper.date_of_record - 1.month
+            subject.save
+          end
+
+          it "is not eligible for export" do
+            expect(subject.eligible_for_export?).to eq false
+          end
+        end
+      else
+
+        it "is not eligible for export" do
+          expect(subject.eligible_for_export?).not_to eq true
+        end
       end
     end
   end
