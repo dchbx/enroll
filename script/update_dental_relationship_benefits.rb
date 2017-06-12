@@ -1,0 +1,2 @@
+org = Organization.where(:fein=>"#{ARGV[0]}")
+org.employer_profile.plan_years.where(aasm_state: "renewing_enrolled").first.benefit_groups.first.dental_relationship_benefits.where(relationship: "spouse").first.offered = false
