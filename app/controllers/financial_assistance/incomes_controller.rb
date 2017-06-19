@@ -29,7 +29,7 @@
     begin
       @model.save!
       if params[:commit] == "Finish"
-        flash[:notice] = 'Income Info Added.'
+        flash[:notice] = "Income Added - (#{@model.kind})"
         redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
       else
         render 'workflow/step'
