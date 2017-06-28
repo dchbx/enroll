@@ -274,59 +274,81 @@
       }
     }
   }
-	&.census-employees-table {
-		margin-top: 1.25%;
-		.table {
-			.thead-default {
-				tr {
-					background-color: #fff;
-					th {
-						text-align: center;
-						vertical-align: middle;
-					}
-				}
-			}
-			tbody {
-				tr {
-					&.top {
-						&.even {
-							background-color: #fff;
-							&:hover {
-								background-color: #f5f5f5;
-							}
-						}
-					}
-					td {
-						vertical-align: middle;
-						&.table-functions {
-							min-width: 70px;
-							.fa {
-								cursor: pointer;
-								display: inline-block;
-								color: #b7b7b7;
-								margin-left: 5px;
-							}
-						}
-					}
-					&:hover {
-						td {
-							&.table-functions {
-								.fa {
-									&:hover {
-										color: #23527c;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	&.shopping-data {
-		.dependent-text {
-			font-weight: 600;
-			text-transform: capitalize;
-		}
-	}
+  &.census-employees-table {
+    margin-top: 1.25%;
+    .table {
+      .thead-default {
+        tr {
+          background-color: #fff;
+          th {
+            text-align: center;
+            vertical-align: middle;
+          }
+        }
+      }
+      tbody {
+        tr {
+          &.top {
+            &.even {
+              background-color: #fff;
+              &:hover {
+                background-color: #f5f5f5;
+              }
+            }
+          }
+          td {
+            vertical-align: middle;
+            &.table-functions {
+              min-width: 70px;
+              .fa {
+                cursor: pointer;
+                display: inline-block;
+                color: #b7b7b7;
+                margin-left: 5px;
+              }
+            }
+          }
+          &:hover {
+            td {
+              &.table-functions {
+                .fa {
+                  &:hover {
+                    color: #23527c;
+                  }
+                }
+              }
+            }
+          }
+          td {
+            vertical-align: middle;
+            &.table-functions-terminate-pending {
+              min-width: 70px;
+              .fa {
+                display: inline-block;
+                color: #b7b7b7;
+                margin-left: 5px;
+              }
+            }
+          }
+          &:hover {
+            td {
+              &.table-functions-terminate-pending {
+                .fa {
+                  &:hover {
+                    color: #b7b7b7;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  &.shopping-data {
+    .dependent-text {
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+  }
 }
