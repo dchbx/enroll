@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-md-1">1 Column</div>
+
+    <!-- Tabs across top of frame.  These are Workflow level 1 categories -->
+    <div class="col-md-10">
+      <h1>Ux::Wizard#index</h1>
+      <div class="row">
+        <div class="col-md-offset-2 col-md-10">
+          <ul class="nav nav-tabs">
+              <li role="presentation" class="active"><a href="#">Topic 1</a></li>
+              <li role="presentation"><a href="#">Topic 2</a></li>
+              <li role="presentation"><a href="#">Topic 3</a></li>
+          </ul>
+        </div>
+
+        <div class="col-md-2">
+          <div class="row">
+            <!-- Tabs left of frame.  These are Workflow level 2 sub-categories -->
+            <%= nav class: 'nav-pills nav-stacked', role: 'tab-list' do |n| %>
+              <%= n.pill :subtopic_a, 'Subtopic A', active: true %>
+              <%= n.pill :subtopic_b, 'Subtopic B' %>
+              <%= n.pill :subtopic_c, 'Subtopic C' %>
+            <% end %>
+
+            <div class="tab-content">
+              <div role="tabpanel" class="tab-pane active" id="subtopic_a"><%= %></div>
+              <div role="tabpanel" class="tab-pane" id="subtopic_b"><h1>This is Subtopic B</h1></div>
+              <div role="tabpanel" class="tab-pane" id="subtopic_c"><h1>This is Subtopic C</h1></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-1">1 Column</div>
+  </div>
+
+</div>

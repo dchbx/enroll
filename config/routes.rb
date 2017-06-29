@@ -15,6 +15,8 @@ Rails.application.routes.draw do
     resources :orphans, only: [:index, :show, :destroy]
   end
 
+  resource :wizard, controller: :wizard
+
   resources :saml, only: [] do
     collection do
       post :login

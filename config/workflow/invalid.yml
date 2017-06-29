@@ -1,0 +1,13 @@
+steps:
+  step1:
+        title:  "name"
+    description: "full name"
+    question: "whats your name?"
+  step2:
+    title:  "age"
+    description: "full age"
+    question: "whats your age?"
+  step3:
+    title:  "birthday"
+    description: "full birthday"
+    question: "whats your birthday?"

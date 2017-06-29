@@ -1,0 +1,14 @@
+<% @consumer_role = Person.new().build_consumer_role %>
+<% first_name = "Mary" %>
+<% title = "More About this Person" %>
+<% instruction = "Please enter the following information for #{first_name}. When you're finished, select CONTINUE." %>
+<%= form_for [:insured, @consumer_role], url: {controller: "insured/consumer_roles", action: "create"} do |f| %>
+  <%#= render 'shared/error_messages', :object => @organization %>
+
+  <div>
+    <h1><%= title %></h1>
+    <p><%= instruction %></p>
+    <%= render "radio", f: f%>
+  </div>
+
+<% end %>
