@@ -17,7 +17,7 @@
 
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
-    <% @family_members.each do |f_member| %>
+    <% ivl_enrolled_family_members(@family_members, @person.primary_family).each do |f_member| %>
       <% person = f_member.person %>
       <div class="row">
         <div class="family-member col-md-12">

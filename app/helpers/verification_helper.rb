@@ -172,4 +172,14 @@ module VerificationHelper
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
   end
+
+  def ivl_enrolled_family_members(family_members, family)
+    enrolled_family_members = []
+    family_members.each do |family_member|
+      if family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).present?
+        enrolled_family_members << family_member
+      end
+    end
+    enrolled_family_members
+  end
 end
