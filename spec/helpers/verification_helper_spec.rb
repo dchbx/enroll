@@ -296,10 +296,6 @@ RSpec.describe VerificationHelper, :type => :helper do
       it "returns outstanding for unverified without documents and more than 24hs request" do
         expect(helper.show_v_type('Social Security Number', person)).to eq("Outstanding")
       end
-      it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:processing_hub_24h?).and_return true
-        expect(helper.show_v_type('Social Security Number', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
-      end
     end
     context "Citizenship" do
       it "returns in review if documents for citizenship uploaded" do
@@ -315,11 +311,6 @@ RSpec.describe VerificationHelper, :type => :helper do
         person.consumer_role.vlp_documents = []
         expect(helper.show_v_type('Citizenship', person)).to eq("Outstanding")
       end
-      it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:processing_hub_24h?).and_return true
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Citizenship', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
-      end
     end
     context "Immigration status" do
       it "returns in review if documents for citizenship uploaded" do
@@ -334,11 +325,6 @@ RSpec.describe VerificationHelper, :type => :helper do
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         person.consumer_role.vlp_documents = []
         expect(helper.show_v_type('Immigration status', person)).to eq("Outstanding")
-      end
-      it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:processing_hub_24h?).and_return true
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
       end
     end
   end

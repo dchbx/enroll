@@ -49,7 +49,7 @@ module VerificationHelper
       when "in review"
         "warning"
       when "outstanding"
-        member.consumer_role.processing_hub_24h? ? "info" : "danger"
+        "danger"
     end
   end
 
@@ -136,7 +136,7 @@ module VerificationHelper
       when "verified"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
-        person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        "Outstanding"
     end
   end
 
