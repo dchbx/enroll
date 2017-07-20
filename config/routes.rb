@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   require 'resque/server'
   mount Resque::Server, at: '/jobs'
-  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
+  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
@@ -255,7 +255,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :employer_attestations do 
+    resources :employer_attestations do
        get 'authorized_download'
        get 'verify_attestation'
        #get 'revert_attestation'
