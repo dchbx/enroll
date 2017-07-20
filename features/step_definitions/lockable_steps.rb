@@ -1,7 +1,7 @@
 Then(/^there are (\d+) preloaded (.*?) user accounts$/) do |num, status|
   (0...num.to_i).each do |int|
     user = FactoryGirl.create(:user, :with_family)
-    user.update_lockable if status.eql?('locked')
+    user.lock! if status.eql?('locked')
   end
 end
 

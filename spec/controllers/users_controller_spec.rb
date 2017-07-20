@@ -44,7 +44,7 @@ describe UsersController do
       before do
         hbx_staff_role.permission_id = permission_yes.id
         hbx_staff_role.save
-        user.update_lockable
+        user.lock!
         sign_in(admin)
         get :lockable, id: user.id
       end
