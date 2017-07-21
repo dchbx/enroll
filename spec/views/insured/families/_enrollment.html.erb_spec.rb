@@ -13,7 +13,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "should display legal_name" do
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }
     let(:plan) { FactoryGirl.build(:plan) }
-    let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
+    let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, submitted_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
     before :each do
       allow(hbx).to receive(:employer_profile).and_return(employer_profile)
       allow(hbx).to receive(:plan).and_return(plan)
@@ -83,6 +83,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
+      allow(hbx_enrollment).to receive(:submitted_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
@@ -198,6 +199,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
+      allow(hbx_enrollment).to receive(:submitted_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
@@ -244,6 +246,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
+      allow(hbx_enrollment).to receive(:submitted_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
       allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
       allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
