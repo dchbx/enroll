@@ -19,7 +19,7 @@ module Effective
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Reset Password', user_password_path(user: { email: row.email }), 'post_ajax'],
            ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'ajax'],
-           ['View Login History',show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax']
+           ['View Login History',login_history_user_path(id: row.id), 'ajax']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false

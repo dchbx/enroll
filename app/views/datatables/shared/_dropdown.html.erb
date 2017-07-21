@@ -1,6 +1,6 @@
 <div class="dropdown pull-right" id="<%= row_actions_id %>">
 	<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
-    Actions 
+    Actions
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" aria-labelledby="dropdown_for_<%= row_actions_id %>">
@@ -20,7 +20,7 @@
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", remote: true %>
       <%when "ajax with confirm"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", remote: true, data: { confirm: line[3] } %>
-      <%end%>
+			<%end%>
     </li>
   <% end %>
   </ul>

@@ -1,0 +1,20 @@
+<div class="modal fade" id="user-login-history-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><%= "Login history for #{@user.email}" %></h4>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <% login_history.each do |login| %>
+            <li><%= login.sign_in_outcome || "Successful" %> login on: <%= TimeKeeper.local_time(login.created_at).strftime('%D %r') %></li>
+          <% end %>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

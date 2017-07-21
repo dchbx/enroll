@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       post :unlock
       get :lockable
       get :confirm_lock
+      get :login_history
     end
   end
 
