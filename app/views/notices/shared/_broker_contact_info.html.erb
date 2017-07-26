@@ -9,27 +9,11 @@
 	</tr>
 	<tr>
 		<td style="width: 15%"></td>
-    <td style="width: 85%"><%= broker.address.try(:street_1) %></td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%"><%= broker.address.try(:street_2) %></td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-    <td style="width: 85%"><%= broker.address.try(:city) %>, <%= broker.address.try(:state) %> <%= broker.address.try(:zip) %></td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
     <td style="width: 85%"><%= broker.try(:phone) %></td>
 	</tr>
 	<tr>
 		<td style="width: 15%"></td>
     <td style="width: 85%"><%= broker.try(:email) %></td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-    <td style="width: 85%"><%= broker.try(:web_address) %></td>
 	</tr>
 	<tr>
 		<td style="width: 15%"></td>

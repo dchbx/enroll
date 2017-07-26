@@ -8,8 +8,8 @@ module Queries
       self
     end
 
-    def initialize(hb_ids)
-      @hbx_ids = hb_ids
+    def initialize(enroll_ids)
+      @hbx_enrollment_ids = enroll_ids
       
     end
 
@@ -36,20 +36,20 @@ module Queries
     end
 
     def build_scope
-       hbx_idss = {"households.hbx_enrollments._id" => {"$in" => @hbx_ids}}
+      enrollment_ids = {"households.hbx_enrollments._id" => {"$in" => @hbx_enrollment_ids}}
       if @search_string
-        employe_roles = Person.any_of({ :first_name => /.*#{@search_string}.*/ }, { :last_name => /.*#{@search_string}.*/ }).collect{|p| p.employee_roles.pluck(:_id)}.flatten
-        hbx_idss = {
+        employee_roles = Person.any_of({ :first_name => /.*#{@search_string}.*/ }, { :last_name => /.*#{@search_string}.*/ }).collect{|p| p.employee_roles.pluck(:_id)}.flatten
+        enrollment_ids = {
           "$and" => [
-            { 'households.hbx_enrollments.employee_role_id' => {"$in" => employe_roles} },
-            hbx_idss 
+            { 'households.hbx_enrollments.employee_role_id' => {"$in" => employee_roles} },
+            enrollment_ids 
           ]
         }
       end
       # if @order_by
       #   return Family.unscoped.where(criteria).order_by(@order_by)
       # end
-       Family.unscoped.where(hbx_idss).order_by(:'households.hbx_enrollments._id'.asc)
+      Family.unscoped.where(enrollment_ids).order_by(:'households.hbx_enrollments._id'.asc)
     end
 
   end

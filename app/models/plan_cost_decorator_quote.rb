@@ -16,7 +16,7 @@ class PlanCostDecoratorQuote < PlanCostDecorator
 
   def add_members(combined_family)
      member_provider.quote_members.each {|member|
-       combined_family[member] = member.age_on(benefit_group.quote.start_on) if large_family_factor(member) > 0.0 
+       combined_family[member] = member.age_on(benefit_group.quote.start_on)
      }
   end
 

@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "deactivate_consumer_role")
-describe DeactivateConsumerRole do
+describe DeactivateConsumerRole, dbclean: :after_each do
 
     let(:given_task_name) { "deactivate_consumer_role" }
     subject { DeactivateConsumerRole.new(given_task_name, double(:current_scope => nil)) }
@@ -18,13 +18,13 @@ describe DeactivateConsumerRole do
    before(:each) do
     allow(ENV).to receive(:[]).with("hbx_id").and_return("12345678")
    end
-    
+
     it "should change is_active field" do
      role_status = person.consumer_role
      role_status.is_active = true
      role_status.save
      subject.migrate
-     person.reload	
+     person.reload
      expect(person.consumer_role.is_active).to eq false
     end
   end

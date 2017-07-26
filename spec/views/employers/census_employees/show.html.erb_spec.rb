@@ -92,6 +92,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     hbx_enrollment.update_attributes(:aasm_state => 'inactive', )
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
     allow(hbx_enrollment).to receive(:plan).and_return(nil)
+    allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Waived Date/i
     expect(rendered).to match /#{hbx_enrollment.waiver_reason}/

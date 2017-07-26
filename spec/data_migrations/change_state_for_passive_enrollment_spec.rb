@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_state_for_passive_enrollment")
-describe ChangeStateForPassiveEnrollment do
+describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
   let(:calender_year) { TimeKeeper.date_of_record.year }
   let(:given_task_name) { "deactivate_consumer_role" }
   subject { ChangeStateForPassiveEnrollment.new(given_task_name, double(:current_scope => nil)) }

@@ -4387,6 +4387,11 @@
 			last,
 			timer;
 
+		/* 
+		 * FIXME: It appears this event is fired twice when typing happens in the
+		 *        dataTables search box.  The original implementation would also
+		 *        fire the event first off instead of firing the event with a timeout.
+		 */
 		return function () {
 			var
 				that = this,
@@ -4396,14 +4401,20 @@
 			if ( last && now < last + frequency ) {
 				clearTimeout( timer );
 
+				last = now;
 				timer = setTimeout( function () {
 					last = undefined;
+					timer = undefined;
 					fn.apply( that, args );
 				}, frequency );
 			}
 			else {
 				last = now;
-				fn.apply( that, args );
+				timer = setTimeout( function () {
+					last = undefined;
+					timer = undefined;
+					fn.apply( that, args );
+				}, frequency );
 			}
 		};
 	}

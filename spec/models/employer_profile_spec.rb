@@ -1002,6 +1002,26 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       end
     end
   end
+
+  describe "#dt_display_plan_year", dbclean: :after_each do
+    let(:organization) { FactoryGirl.create(:organization, :with_draft_and_canceled_plan_years)}
+    let(:invalid_employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:canceled_plan_year) { FactoryGirl.create(:plan_year, aasm_state: "canceled", employer_profile: invalid_employer_profile)}
+    let(:ineligible_employer_profile) { EmployerProfile.new }
+
+    it "should return draft plan year when employer profile has canceled and draft plan years with same py start on date" do
+      draft_plan_year = organization.employer_profile.plan_years.where(aasm_state: "draft").first
+      expect(organization.employer_profile.dt_display_plan_year).to eq draft_plan_year
+    end
+
+    it "should return canceled plan year when there is no other plan year associated with employer" do
+      expect(invalid_employer_profile.dt_display_plan_year).to eq canceled_plan_year
+    end
+
+    it "should return nil when there is no plan year associated with employer" do
+      expect(ineligible_employer_profile.dt_display_plan_year).to eq nil
+    end
+  end
 end
 
 describe EmployerProfile, ".is_converting?", dbclean: :after_each do

@@ -694,7 +694,8 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
           "dob" => primary.person_demographics.birth_date,
           "ssn" => primary.person_demographics.ssn,
           "no_ssn" => "",
-          "gender" => primary.person_demographics.sex.split('#').last
+          "gender" => primary.person_demographics.sex.split('#').last,
+          "is_applying_coverage" => false
         }
       }
     end
@@ -712,6 +713,11 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     it "should not crash on updating the e_case_id" do
       expect {person.primary_family.update_attributes!(:e_case_id => "some e case id whatever")}.not_to raise_error
     end
+
+    it "should is_applying_coverage should be false" do
+      expect(person.consumer_role.is_applying_coverage).to eq false
+    end
+
   end
 
   context "with errors initializing the person" do
@@ -760,11 +766,15 @@ describe Factories::EnrollmentFactory, "with an exisiting consumer role" do
 
   context ".build_family" do
     let(:subject) { Factories::EnrollmentFactory }
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
 
     it "should add a family to a person without one" do
       subject.build_family(person,[])
       expect(person.primary_family).to be_truthy
+    end
+
+    it "should is_applying_coverage should be false" do
+      expect(person.consumer_role.is_applying_coverage).to eq true
     end
 
   end

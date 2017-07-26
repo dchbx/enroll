@@ -761,3 +761,10 @@ $(document).on('click', '#address_info + span.form-action', function(){
       }
     });
   });
+
+  $(document).ready(function(){
+    $("#person_first_name").change(function() {
+      var text = $("#person_first_name").val() == '' ? "this person" : $("#person_first_name").val()
+      $("#is_applying_coverage_value").text("Is "+ text +" applying for coverage?");
+    });
+  });

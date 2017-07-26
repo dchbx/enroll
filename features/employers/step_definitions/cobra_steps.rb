@@ -275,11 +275,12 @@ And(/^.+ should only see the status of Cobra Linked$/) do
 end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
-  expect(page).to have_content('Coverage Termination Pending')
   unless TimeKeeper.date_of_record.day == 1
     expect(page).to have_content('Coverage Selected')
+    expect(page).to have_content('Coverage Termination Pending')
   else
     expect(page).to have_content('Coverage Enrolled')
+    expect(page).to have_content('Terminated')
   end
 end
 

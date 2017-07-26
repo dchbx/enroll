@@ -833,15 +833,6 @@ class Family
     end
   end
 
-  def enrolled_hbx_enrollments
-    latest_household.try(:enrolled_hbx_enrollments)
-  end
-
-  def enrolled_including_waived_hbx_enrollments
-    latest_household.try(:enrolled_including_waived_hbx_enrollments)
-  end
-
-
   def save_relevant_coverage_households
     households.each do |household|
       household.coverage_households.each{|hh| hh.save }
@@ -923,6 +914,34 @@ class Family
 
   def generate_family_search
     ::MapReduce::FamilySearchForFamily.populate_for(self)
+  end
+
+  def create_dep_consumer_role
+    if dependents.any?
+      dependents.each do |member|
+        build_consumer_role(member)
+      end
+    end
+  end
+
+  def verification_due_date
+    if active_household.hbx_enrollments.verification_needed.any?
+      if active_household.hbx_enrollments.verification_needed.first.special_verification_period
+        active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
+      else
+        active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
+      end
+    else
+      TimeKeeper.date_of_record.to_date + 95.days
+    end
+  end
+
+  def review_status
+    if active_household.hbx_enrollments.verification_needed.any?
+      active_household.hbx_enrollments.verification_needed.first.review_status.gsub(/\s+/, '')
+    else
+      "no enrollment"
+    end
   end
 
 private
@@ -1035,5 +1054,4 @@ private
       unset("e_case_id")
     end
   end
-
 end

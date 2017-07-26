@@ -7,6 +7,13 @@ FactoryGirl.define do
     sequence(:extension) { |n| "#{n}"}
 
 
+    trait :for_testing do
+      kind 'home'
+      area_code "101"
+      number "1234567"
+      extension "111"
+      country_code "1"
+    end
     trait :without_kind do
       kind ' '
     end

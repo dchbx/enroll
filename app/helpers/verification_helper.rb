@@ -65,18 +65,6 @@ module VerificationHelper
     person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
   end
 
-  def verification_due_date(family)
-    if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
-      else
-        family.active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
-      end
-    else
-      TimeKeeper.date_of_record.to_date + 95.days
-    end
-  end
-
   def documents_uploaded
     @person.primary_family.active_family_members.all? { |member| docs_uploaded_for_all_types(member) }
   end
@@ -141,14 +129,6 @@ module VerificationHelper
     @family_members.all?{|member| member.person.consumer_role.aasm_state == "fully_verified"}
   end
 
-  def review_status(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      family.active_household.hbx_enrollments.verification_needed.first.review_status
-    else
-      "no enrollment"
-    end
-  end
-
   def show_doc_status(status)
     ["verified", "rejected"].include?(status)
   end
@@ -166,5 +146,26 @@ module VerificationHelper
 
   def text_center(v_type, person)
     (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+  end
+
+  # returns vlp_documents array for verification type
+  def documents_list(person, v_type)
+    person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
+  end
+
+  def admin_actions(v_type, f_member)
+    options_for_select(build_admin_actions_list(v_type, f_member))
+  end
+
+  def build_admin_actions_list(v_type, f_member)
+    if verification_type_status(v_type, f_member) == "outstanding"
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Return for Deficiency"}
+    else
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
+  def type_unverified?(v_type, person)
+    verification_type_status(v_type, person) != "verified"
   end
 end

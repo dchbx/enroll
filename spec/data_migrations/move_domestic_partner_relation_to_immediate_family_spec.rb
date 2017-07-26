@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "move_domestic_partner_relation_to_immediate_family")
-describe MoveDomesticPartnerRelationToImmediateFamily do
+describe MoveDomesticPartnerRelationToImmediateFamily, dbclean: :after_each do
   let(:given_task_name) { "move_domestic_partner_relation_to_immediate_family" }
   subject { MoveDomesticPartnerRelationToImmediateFamily.new(given_task_name, double(:current_scope => nil)) }
   describe "given a task name" do

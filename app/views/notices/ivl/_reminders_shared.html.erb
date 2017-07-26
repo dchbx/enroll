@@ -269,7 +269,7 @@
   content: "We need your documents above by <strong>#{notice.due_date}</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our current records are correct. <u>Your health insurance coverage may be terminated</u>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you think you will not be able to submit the requested documentation by <strong>#{notice.due_date}</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
+  content: "If you think you will not be able to submit the requested documentation by <strong>#{notice.due_date}</strong> due to circumstances outside of your control, please call #{Settings.site.short_name} Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."],
@@ -305,7 +305,7 @@
                 <span style="width: 300px;">
                  <span style="float: left; width: 95px;"><strong>U.S. Postal Mail:</strong></span>
                  <span style="float: left; width: 205px;">
-                  DC Health Link Exchange Contact Center<br>
+                  <%= "#{Settings.site.short_name}" %> Exchange Contact Center<br>
                   PO Box 44018<br>
                   Washington, DC 20026<br><br>
                 </span>
@@ -339,7 +339,7 @@
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."],
+  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer Service toll-free at 1-855-532-5465."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 
@@ -364,7 +364,7 @@
 
 <%#= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already,
-    you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling
+    you can create one by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling
     #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
@@ -379,5 +379,5 @@
 
 <%#= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2015 has already been cancelled or
-  terminated, you must go to <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a> during open enrollment to re-enroll for 2016.
+  terminated, you must go to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a> during open enrollment to re-enroll for 2016.
   Your coverage will not be automatically renewed.</strong>".html_safe} %>

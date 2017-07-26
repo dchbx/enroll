@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "add_and_remove_enrollment_member")
 
-describe AddAndRemoveEnrollmentMember do
+describe AddAndRemoveEnrollmentMember, dbclean: :after_each do
 
   let(:given_task_name) { "add_and_remove_enrollment_member" }
   subject { AddAndRemoveEnrollmentMember.new(given_task_name, double(:current_scope => nil)) }

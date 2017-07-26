@@ -2,73 +2,77 @@ require 'rails_helper'
 
 RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_each do
 
-  let(:calender_year) { TimeKeeper.date_of_record.year }
-  let(:date_of_record_to_use) { Date.new(calender_year, 2, 1)}
+  context '.renew' do 
 
-  let(:organization) {
-    org = FactoryGirl.create :organization, legal_name: "Corp 1"
-    employer_profile = FactoryGirl.create :employer_profile, organization: org
-    active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
-    :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5
-    benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
-    owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
-    2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+    let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
+    let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
+    let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: 'health') }
 
-    employer_profile.census_employees.each do |ce|
-      ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
-      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
-      ce.update_attributes({employee_role: employee_role})
-      family = Family.find_or_build_from_employee_role(employee_role)
+    let(:generate_renewal) {
+      factory = Factories::PlanYearRenewalFactory.new
+      factory.employer_profile = renewing_employer
+      factory.is_congress = false
+      factory.renew
+    }
 
-      enrollment = HbxEnrollment.create_from(
-        employee_role: employee_role,
-        coverage_household: family.households.first.coverage_households.first,
-        benefit_group_assignment: ce.active_benefit_group_assignment,
-        benefit_group: benefit_group,
-        )
-      enrollment.update_attributes(:aasm_state => 'coverage_selected')
+    let!(:renewing_employees) {
+      FactoryGirl.create_list(:census_employee_with_active_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
+        benefit_group: renewing_employer.active_plan_year.benefit_groups.first) 
+    }
+
+    context 'when employer offering health benefits' do
+
+      let(:renewing_employer) {
+        FactoryGirl.create(:employer_with_planyear, start_on: effective_on.prev_year, 
+          plan_year_state: 'active',
+          reference_plan_id: plan.id)
+      }
+
+      it 'should renew employer plan year' do
+        generate_renewal
+
+        renewing_plan_year = renewing_employer.renewing_plan_year
+        expect(renewing_plan_year.present?).to be_truthy
+        expect(renewing_plan_year.aasm_state).to eq 'renewing_draft'
+
+        renewing_plan_year_start = renewing_employer.active_plan_year.start_on + 1.year
+        expect(renewing_plan_year.start_on).to eq renewing_plan_year_start
+        expect(renewing_plan_year.open_enrollment_start_on).to eq (renewing_plan_year_start - 2.months)
+        expect(renewing_plan_year.open_enrollment_end_on).to eq (renewing_plan_year_start - 1.month + (Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 1).days)
+
+        renewing_employer.census_employees.each do |ce|
+          expect(ce.renewal_benefit_group_assignment.present?).to be_truthy
+        end
+      end
     end
 
-    org
-  }
+    context 'when Employer offering both health and dental benefits' do
+      let!(:dental_renewal_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year, hios_id: "91111111122302", coverage_kind: 'dental', dental_level: 'high')}
+      let!(:dental_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year - 1, hios_id: "91111111122302", renewal_plan_id: dental_renewal_plan.id, coverage_kind: 'dental', dental_level: 'high')}
 
-  let(:renewal_plan) { FactoryGirl.create(:plan, :with_premium_tables) }
+      let(:renewing_employer) {
+        FactoryGirl.create(:employer_with_planyear, start_on: effective_on.prev_year, 
+          plan_year_state: 'active',
+          reference_plan_id: plan.id,
+          dental_reference_plan_id: dental_plan.id, 
+          with_dental: true
+          )
+      }
 
+      it 'should generate renewal plan year with both health and dental' do
+        expect(renewing_employer.renewing_plan_year.present?).to be_falsey
+        generate_renewal
+        expect(renewing_employer.renewing_plan_year.present?).to be_truthy
+        renewed_benefit_group = renewing_employer.renewing_plan_year.benefit_groups.first
+        expect(renewed_benefit_group.reference_plan).to eq renewal_plan
+        expect(renewed_benefit_group.is_offering_dental?).to be_truthy
+        expect(renewed_benefit_group.dental_reference_plan).to eq dental_renewal_plan
+      end
 
-  context '.renew' do
-
-    before do
-      TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
-    end
-
-    after :all do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
-    end
-
-    it 'should renew the employer profile' do
-      employer_profile = organization.employer_profile
-      active_plan_year = employer_profile.active_plan_year
-      renewing_plan_year = employer_profile.plan_years.renewing.first
-      expect(renewing_plan_year.present?).to be_falsey
-      active_plan_year.benefit_groups.first.reference_plan.update_attributes({:renewal_plan_id => renewal_plan._id })
-
-      plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
-      plan_year_renewal_factory.employer_profile = organization.employer_profile
-      plan_year_renewal_factory.is_congress = false
-      plan_year_renewal_factory.renew
-
-      renewing_plan_year = employer_profile.plan_years.renewing.first
-      expect(renewing_plan_year.present?).to be_truthy
-      expect(renewing_plan_year.aasm_state).to eq 'renewing_draft'
-
-      renewing_plan_year_start = active_plan_year.start_on + 1.year
-      expect(renewing_plan_year.start_on).to eq renewing_plan_year_start
-      expect(renewing_plan_year.open_enrollment_start_on).to eq (renewing_plan_year_start - 2.months)
-      expect(renewing_plan_year.open_enrollment_end_on).to eq (renewing_plan_year_start - 1.month + (Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 1).days)
-
-      employer_profile.census_employees.each do |ce|
-        expect(ce.renewal_benefit_group_assignment.present?).to be_truthy
+      it 'should assign renewal benefit group assignments' do
+        renewing_employees.each{|ce| expect(ce.renewal_benefit_group_assignment.present?).to be_falsey }
+        generate_renewal
+        renewing_employees.each{|ce| expect(ce.renewal_benefit_group_assignment.blank?).to be_truthy }
       end
     end
   end

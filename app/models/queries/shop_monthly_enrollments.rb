@@ -71,7 +71,9 @@ module Queries
         "households.hbx_enrollments.benefit_group_id" => {"$in" => collect_benefit_group_ids},
         "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
         "households.hbx_enrollments.effective_on" => @effective_on,
-        "households.hbx_enrollments.enrollment_kind" => "open_enrollment"
+        "households.hbx_enrollments.enrollment_kind" => "open_enrollment",
+        # Exclude COBRA, for now
+        "households.hbx_enrollments.kind" => "employer_sponsored"
       }
     end
 
@@ -79,7 +81,9 @@ module Queries
       {
         "households.hbx_enrollments.benefit_group_id" => {"$in" => collect_benefit_group_ids(@effective_on.prev_year)},
         "households.hbx_enrollments.aasm_state" => {"$in" => existing_enrollment_statuses},
-        "households.hbx_enrollments.effective_on" => {"$gte" => @effective_on.prev_year}
+        "households.hbx_enrollments.effective_on" => {"$gte" => @effective_on.prev_year},
+        # Exclude COBRA, for now
+        "households.hbx_enrollments.kind" => "employer_sponsored"
       }
     end
 
@@ -116,7 +120,6 @@ module Queries
       add({
        "$sort" => {"households.hbx_enrollments.submitted_at" => 1}
       })
-
       self
     end
 
@@ -127,7 +130,6 @@ module Queries
          "enrollment_hbx_id" => "$hbx_enrollment_id"
         }
       })
-
       self
     end
 

@@ -26,6 +26,7 @@ module Factories
         validate_employer_profile
 
         @active_plan_year = @employer_profile.active_plan_year
+        validate_plan_year
 
         @plan_year_start_on = @active_plan_year.end_on + 1.day
         @plan_year_end_on   = @active_plan_year.end_on + 1.year
@@ -81,6 +82,36 @@ module Factories
       end
     end
 
+    def validate_plan_year
+      if @active_plan_year.blank?
+        raise PlanYearRenewalFactoryError, "Employer #{@employer_profile.legal_name} don't have active application for renewal"
+      end
+    
+      @active_plan_year.benefit_groups.each do |benefit_group|
+        reference_plan_id = benefit_group.reference_plan.renewal_plan_id
+        if reference_plan_id.blank?
+          raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{benefit_group.reference_plan.id} Year #{benefit_group.reference_plan.active_year} Hios #{benefit_group.reference_plan.hios_id}"
+        end
+
+        elected_plan_ids = benefit_group.renewal_elected_plan_ids
+        if elected_plan_ids.blank?
+          raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_plan_ids}"
+        end
+
+        if benefit_group.is_offering_dental?
+          reference_plan_id = benefit_group.dental_reference_plan.renewal_plan_id
+          if reference_plan_id.blank?
+            raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{benefit_group.dental_reference_plan.id} Year #{benefit_group.dental_reference_plan.active_year} Hios #{benefit_group.dental_reference_plan.hios_id}"
+          end
+
+          elected_plan_ids = benefit_group.renewal_elected_dental_plan_ids
+          if elected_plan_ids.blank?
+            raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_dental_plan_ids}"
+          end
+        end
+      end
+    end
+
     def renew_benefit_groups
       @active_plan_year.benefit_groups.each do |active_group|
         new_group = clone_benefit_group(active_group)
@@ -93,44 +124,42 @@ module Factories
       end
     end
 
-    def reference_plan_ids(active_group)
-      start_on_year = (active_group.start_on + 1.year).year
-      if active_group.plan_option_kind == "single_carrier"
-        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(active_group.reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
-      elsif active_group.plan_option_kind == "metal_level"
-        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(active_group.reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
-      else
-        Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
-      end
+    def assign_health_plan_offerings(renewal_benefit_group, active_group)
+      renewal_benefit_group.assign_attributes({
+        plan_option_kind: active_group.plan_option_kind,
+        reference_plan_id: active_group.reference_plan.renewal_plan_id,
+        elected_plan_ids: active_group.renewal_elected_plan_ids,
+        relationship_benefits: active_group.relationship_benefits
+      })
+
+      renewal_benefit_group
     end
 
-    def clone_benefit_group(active_group)
-      index = @active_plan_year.benefit_groups.index(active_group) + 1
-      new_year = @active_plan_year.start_on.year + 1
+    def assign_dental_plan_offerings(renewal_benefit_group, active_group)
+      renewal_benefit_group.assign_attributes({
+        dental_plan_option_kind: active_group.dental_plan_option_kind,
+        dental_reference_plan_id: active_group.dental_reference_plan.renewal_plan_id,
+        elected_dental_plan_ids: active_group.renewal_elected_dental_plan_ids,
+        dental_relationship_benefits: active_group.dental_relationship_benefits
+      })
 
-      reference_plan_id = Plan.find(active_group.reference_plan_id).renewal_plan_id
-      if reference_plan_id.blank?
-        raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{active_group.reference_plan.id} Year #{active_group.reference_plan.active_year} Hios #{active_group.reference_plan.hios_id}"
-      end
+      renewal_benefit_group
+    end
 
-      elected_plan_ids = reference_plan_ids(active_group)
-      if elected_plan_ids.blank?
-        raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
-      end
-
-      @renewal_plan_year.benefit_groups.build({
-        title: "#{active_group.title} (#{new_year})",
+    def clone_benefit_group(active_group)      
+      renewal_benefit_group = @renewal_plan_year.benefit_groups.build({
+        title: "#{active_group.title} (#{@renewal_plan_year.start_on.year})",
         effective_on_kind: "first_of_month",
         terminate_on_kind: active_group.terminate_on_kind,
-        plan_option_kind: active_group.plan_option_kind,
         default: active_group.default,
         effective_on_offset: active_group.effective_on_offset,
         employer_max_amt_in_cents: active_group.employer_max_amt_in_cents,
-        relationship_benefits: active_group.relationship_benefits,
-        reference_plan_id: reference_plan_id,
-        elected_plan_ids: elected_plan_ids,
         is_congress: active_group.is_congress
       })
+     
+      renewal_benefit_group = assign_health_plan_offerings(renewal_benefit_group, active_group)
+      renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if active_group.is_offering_dental?
+      renewal_benefit_group
     end
 
     def renew_census_employees(active_group, new_group)

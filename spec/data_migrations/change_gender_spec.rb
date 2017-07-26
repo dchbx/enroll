@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_gender")
 
-describe ChangeGender do
+describe ChangeGender, dbclean: :after_each do
 
   let(:given_task_name) { "change_gender" }
   subject { ChangeGender.new(given_task_name, double(:current_scope => nil)) }
@@ -16,7 +16,7 @@ describe ChangeGender do
     let(:person) { FactoryGirl.create(:person, gender: "male") }
     let(:employer_profile) { FactoryGirl.create(:employer_profile)}
     let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, gender: "male") }
-    
+
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)

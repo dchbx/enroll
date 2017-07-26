@@ -39,20 +39,28 @@ namespace :migrations do
 
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
-          puts "Terminating employees coverage for employer #{organization.legal_name}"
+          puts "Terminating employees coverage for employer #{organization.legal_name}" unless Rails.env.test?
         end
 
         enrollments.each do |hbx_enrollment|
           if hbx_enrollment.may_terminate_coverage?
-            hbx_enrollment.update_attributes(:terminated_on => termination_date)
             hbx_enrollment.terminate_coverage!
+            hbx_enrollment.update_attributes!(terminated_on: end_on, termination_submitted_on: termination_date)
             # hbx_enrollment.propogate_terminate(termination_date)
           end
         end
 
         if plan_year.may_terminate?
-          plan_year.update_attributes(end_on: end_on, :terminated_on => termination_date)
           plan_year.terminate!
+          plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
+
+          bg_ids = plan_year.benefit_groups.map(&:id)
+          census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+          census_employees.each do |census_employee|
+            census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+              assignment.update(end_on: plan_year.end_on) if assignment.end_on.present? && assignment.end_on > plan_year.end_on
+            end
+          end
         end
       end
 

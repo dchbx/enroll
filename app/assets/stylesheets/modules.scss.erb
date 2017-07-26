@@ -202,7 +202,6 @@
     padding: 0 15% 5%;
     .btn-primary {
       padding: 4%;
-      font-size: auto;
       font-size: 13px;
       background-color: transparent;
       border: solid 1px #ccc;
@@ -329,4 +328,76 @@
 			text-transform: capitalize;
 		}
 	}
+  // ***** Consumer Documents Verification ******** //
+
+  &.verification-process {
+    .family-member, .person {
+      padding: 0;
+      margin-bottom: 15px;
+      background-color: $primary-white;
+      color: $primary-dark-gray;
+      .person {
+        padding: 5px 0;
+        font-weight: bold;
+        border-bottom: $new-style-gray-border;
+        padding-left: 30px;
+      }
+      .selectric {
+        border: $new-style-gray-border;
+        width: 200px;
+        height: 30px;
+        p {
+          font-size:0.9em;
+          margin-top: -7px;
+          color: #7b7b7b;
+        }
+        .button {
+          margin-top: -7px;
+        }
+      }
+    }
+    .btn-default {
+      background-color: #ffffff;
+      width: 195px;
+      padding: 4px;
+      margin-top: 0;
+      overflow: hidden;
+    }
+    .btn-default:hover {
+      text-decoration: underline;
+    }
+    .lb-md {
+      font-size: 0.9em;
+      vertical-align: middle;
+    }
+    .verification-update-reason, .return-for-def-reason, .fedhub-request {
+      margin-top: 10px;
+      padding-bottom: 10px;
+      display: none;
+    }
+    .verification-document {
+      border: $new-style-gray-border;
+    }
+    .v-doc-list {
+      border-top: $new-style-gray-border;
+      margin: 20px 0;
+      padding: 5px;
+      background-color: $primary-white;
+      .v-doc-elem {
+        margin: 5px;
+      }
+    }
+    .family-member {
+      border: $new-style-gray-border;
+    }
+    .v-type {
+      margin-bottom: 10px;
+    }
+    .verification-types {
+      border: none;
+      margin-bottom: 10px;
+    }
+  }
+
+  // --- end of consumer verification --- //
 }

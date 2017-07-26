@@ -5,7 +5,7 @@ module Eligibility
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
       if py.present?
         if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
-          find_or_create_benefit_group_assignment(py.benefit_groups.first)
+          find_or_create_benefit_group_assignment(py.benefit_groups)
         end
       end
 
@@ -16,16 +16,14 @@ module Eligibility
       end
     end
 
-    def find_or_create_benefit_group_assignment(benefit_group)
-      bg_assignments = benefit_group_assignments.where(:benefit_group_id => benefit_group.id).order_by(:'created_at'.desc)
+    def find_or_create_benefit_group_assignment(benefit_groups)
+      bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
 
-      valid_bg_assignment = bg_assignments.detect{|bg_assign| bg_assign.aasm_state != 'initialized'}
-      valid_bg_assignment = bg_assignments.first if valid_bg_assignment.blank?
-
-      if valid_bg_assignment.present?
+      if bg_assignments.present?
+        valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
         valid_bg_assignment.make_active
       else
-        add_benefit_group_assignment(benefit_group, benefit_group.plan_year.start_on)
+        add_benefit_group_assignment(benefit_groups.first, benefit_groups.first.plan_year.start_on)
       end
     end
 
@@ -50,10 +48,10 @@ module Eligibility
       benefit_group_assignments << bga
     end
 
-    def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
+    def add_benefit_group_assignment(new_benefit_group, start_on = nil)
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
       reset_active_benefit_group_assignments(new_benefit_group)
-      benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
+      benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on))
     end
 
     def active_benefit_group_assignment

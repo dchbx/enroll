@@ -196,10 +196,10 @@ class CensusEmployeeImport
     member.name_sfx = record[:name_sfx].to_s if record[:name_sfx]
     member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
-    if ["0", "false"].include? record[:is_business_owner].to_s
-      member.is_business_owner = false
-    else
+    if ["1", "true"].include? record[:is_business_owner].to_s
       member.is_business_owner = true
+    else
+      member.is_business_owner = false
     end
     member.gender = record[:gender].to_s if record[:gender]
     member.email = Email.new({address: record[:email].to_s, kind: "home"}) if record[:email]

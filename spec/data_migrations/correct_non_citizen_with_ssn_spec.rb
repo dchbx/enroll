@@ -23,7 +23,7 @@ shared_examples_for "determination in the correct states" do |cr_state, ssn_stat
   end
 end
 
-describe CorrectNonCitizenStatus do
+describe CorrectNonCitizenStatus, dbclean: :after_each do
   let(:threshold_date) { Time.mktime(2016,7,5,8,0,0) }
   let(:body_ssn_true_citizenship_true) {"<ssa_verification_result xmlns=\"http://openhbx.org/api/terms/1.0\"
                                         xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\"
@@ -185,7 +185,7 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
         subject.migrate
         person.reload
       end
-      
+
       it_behaves_like "determination in the correct states", "verification_outstanding", "outstanding", "verification_outstanding", "not_lawfully_present_in_us"
 
       it "stores transition information from existing response" do

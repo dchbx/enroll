@@ -12,10 +12,10 @@ class Phone
   field :kind, type: String
   field :country_code, type: String, default: ""
   field :area_code, type: String, default: ""
-  field :number, type: String
+  field :number, type: String, default: ""
   field :extension, type: String, default: ""
   field :primary, type: Boolean
-  field :full_phone_number, type: String
+  field :full_phone_number, type: String, default: ""
 
   before_validation :save_phone_components
 
@@ -44,12 +44,12 @@ class Phone
   def save_phone_components
     phone_number = filter_non_numeric(self.full_phone_number).to_s
     if !phone_number.blank?
-      case phone_number.length
-      when 11
-        self.country_code = phone_number[0,1]
-        self.area_code = phone_number[1,3]
-        self.number = phone_number[4,7]
-      when 10
+      length=phone_number.length
+      if length>10
+        self.area_code = phone_number[0,3]
+        self.number = phone_number[3,7]
+        self.extension = phone_number[10,length-10]
+      elsif length==10
         self.area_code = phone_number[0,3]
         self.number = phone_number[3,7]
       end

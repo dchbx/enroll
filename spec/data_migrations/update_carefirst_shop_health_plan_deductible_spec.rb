@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_carefirst_shop_health_plan_deductible")
 
-describe UpdateCarefirstShopHealthPlanDeductible do
+describe UpdateCarefirstShopHealthPlanDeductible, dbclean: :after_each do
   subject { UpdateCarefirstShopHealthPlanDeductible.new("update_carefirst_shop_health_plan_deductible", double(current_scope: nil)) }
   let(:plan){ FactoryGirl.create(:plan, name: "BluePreferred PPO HSA/HRA Silver 2000", active_year: 2017) }
 

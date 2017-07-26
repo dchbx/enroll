@@ -170,10 +170,8 @@ class Organization
         }
       })
   }
-  scope :datatable_search, ->(query) { where(legal_name: Regexp.new(Regexp.escape(query), true)) }
-  scope :datatable_search_fein, ->(query) { where(fein: Regexp.new(Regexp.escape(query), true)) }
-  scope :datatable_search_employer_profile_source, ->(query) { where("employer_profile.profile_source" => query) }
-
+  scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
+  
   def self.generate_fein
     loop do
       random_fein = (["00"] + 7.times.map{rand(10)} ).join

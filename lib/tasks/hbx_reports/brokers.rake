@@ -66,7 +66,7 @@ namespace :reports do
     end
 
     def organization_info(broker)
-      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil?
+      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil? or broker.broker_role.broker_agency_profile.organization.primary_office_location.nil?
       [
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_1,
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_2,

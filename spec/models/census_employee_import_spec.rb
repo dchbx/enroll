@@ -114,6 +114,74 @@ RSpec.describe CensusEmployeeImport, :type => :model do
         expect(subject.instance_variable_get("@terminate_queue").length).to eq(1)
       end
     end
+  end
 
+  context "#assign_census_employee_attributes" do
+    let(:member) { CensusEmployee.new}
+    let(:record) {
+      {
+        employer_assigned_family_id: nil,
+        first_name: "Mike",
+        last_name: "Scofield",
+        ssn: "789765567",
+        dob: TimeKeeper.date_of_record - 30.years,
+        hire_date: TimeKeeper.date_of_record - 1.year,
+        is_business_owner: "no",
+        gender: "male",
+        employee_relationship: "Employee",
+        email: nil
+      }
+    }
+
+    context "it should assign the census employee attributes on the object" do
+
+      before do
+        @result = subject.assign_census_employee_attributes(member, record)
+      end
+
+      it "should return census employee" do
+        expect(@result.class).to eq CensusEmployee
+      end
+
+      shared_examples_for "assign_census_employee_attributes" do |attr_key, value|
+        it "should assign #{attr_key}" do
+          expect(@result.send(attr_key)).to eq value
+        end
+      end
+
+      it_behaves_like "assign_census_employee_attributes", "employer_assigned_family_id", nil
+      it_behaves_like "assign_census_employee_attributes", "first_name", "Mike"
+      it_behaves_like "assign_census_employee_attributes", "last_name", "Scofield"
+      it_behaves_like "assign_census_employee_attributes", "ssn", "789765567"
+      it_behaves_like "assign_census_employee_attributes", "dob", TimeKeeper.date_of_record - 30.years
+      it_behaves_like "assign_census_employee_attributes", "hired_on", TimeKeeper.date_of_record - 1.year
+      it_behaves_like "assign_census_employee_attributes", "is_business_owner", false
+      it_behaves_like "assign_census_employee_attributes", "gender", "male"
+      it_behaves_like "assign_census_employee_attributes", "employee_relationship", "employee"
+      it_behaves_like "assign_census_employee_attributes", "email", nil
+
+    end
+
+    context "is_business_owner", dbclean: :after_each do
+
+      shared_examples_for "is_business_owner" do |input, value|
+        let(:record) {
+          {
+            :is_business_owner => subject.parse_boolean(input)
+          }
+        }
+
+        it "it should return #{value} when received #{input} in is_business_owner field" do
+          result = subject.assign_census_employee_attributes(member, record)
+          expect(result.is_business_owner).to eq value
+        end
+      end
+
+      it_behaves_like "is_business_owner", nil, false
+      it_behaves_like "is_business_owner", "yes", true
+      it_behaves_like "is_business_owner", "no", false
+      it_behaves_like "is_business_owner", "true", true
+      it_behaves_like "is_business_owner", "false", false
+    end
   end
 end

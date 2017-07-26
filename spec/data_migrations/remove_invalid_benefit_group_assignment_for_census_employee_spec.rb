@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_invalid_benefit_group_assignment_for_census_employee")
 
-describe RemoveInvalidBenefitGroupAssignmentForCensusEmployee do
+describe RemoveInvalidBenefitGroupAssignmentForCensusEmployee, dbclean: :after_each do
 
   let(:given_task_name) { "remove_invalid_benefit_group_assignment_for_census_employee" }
   subject { RemoveInvalidBenefitGroupAssignmentForCensusEmployee.new(given_task_name, double(:current_scope => nil)) }

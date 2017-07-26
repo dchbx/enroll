@@ -1,17 +1,17 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "expire_conversion_employers")
 
-describe ExpireConversionEmployers do
+describe ExpireConversionEmployers, dbclean: :after_each do
 
   let(:given_task_name) { "expire_conversion_employers" }
   subject { ExpireConversionEmployers.new(given_task_name, double(:current_scope => nil)) }
-  
+
   context "conversion employer" do
-    let(:organization) { 
+    let(:organization) {
       org = create(:organization, :with_expired_and_active_plan_years)
       org.employer_profile.update!(profile_source: 'conversion', registered_on: org.employer_profile.active_plan_year.start_on - 3.months)
       org.employer_profile.plan_years.expired.first.update(is_conversion: true)
-      org 
+      org
     }
 
     let(:employer_profile) {
@@ -41,7 +41,7 @@ describe ExpireConversionEmployers do
       benefit_group_assignment_id: benefit_group_assignment.id
       )
     }
-   
+
     it 'should cancel enrollments' do
       subject.update_employer_plan_years(employer_profile, benefit_group.start_on)
       health_enrollment.reload

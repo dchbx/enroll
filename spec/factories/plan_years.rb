@@ -64,6 +64,8 @@ FactoryGirl.define do
     transient do
       renewing false
       with_dental false
+      reference_plan {FactoryGirl.create(:plan, :with_premium_tables)._id}
+      dental_reference_plan nil
     end
 
     employer_profile
@@ -79,9 +81,9 @@ FactoryGirl.define do
 
     after(:create) do |custom_plan_year, evaluator|
       if evaluator.with_dental
-        create(:benefit_group, :with_valid_dental, plan_year: custom_plan_year)
+        create(:benefit_group, :with_valid_dental, plan_year: custom_plan_year, reference_plan_id: evaluator.reference_plan, dental_reference_plan_id: evaluator.dental_reference_plan)
       else
-        create(:benefit_group, plan_year: custom_plan_year)
+        create(:benefit_group, plan_year: custom_plan_year, reference_plan_id: evaluator.reference_plan)
       end
     end
   end

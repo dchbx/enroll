@@ -1304,3 +1304,36 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     end
   end
 end
+
+describe Family, "#check_dep_consumer_role", dbclean: :after_each do
+  let(:person_consumer) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person_consumer) }
+  let(:dependent) { FactoryGirl.create(:person) }
+  let(:family_member_dependent) { FactoryGirl.build(:family_member, person: dependent, family: family)}
+
+  it "test" do
+    allow(family).to receive(:dependents).and_return([family_member_dependent])
+    family.send(:create_dep_consumer_role)
+    expect(family.dependents.first.person.consumer_role?).to be_truthy
+  end
+end
+
+describe "#verification due date" do
+  let(:family) { FactoryGirl.build(:family) }
+  let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
+  let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
+
+  context "for special verification period" do
+    it "returns special verification period" do
+      allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
+      expect(family.verification_due_date).to eq Date.new(2016,5,6)
+    end
+  end
+
+  context "with no special verification period" do
+    it "calls determine due date method" do
+      allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_no_sp])
+      expect((family.verification_due_date)).to eq TimeKeeper.date_of_record + 95.days
+    end
+  end
+end

@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_email_of_user")
-describe ChangeEmailOfUser do
+describe ChangeEmailOfUser, dbclean: :after_each do
   let(:given_task_name) { "change_email_of_user" }
   subject { ChangeEmailOfUser.new(given_task_name, double(:current_scope => nil)) }
   describe "given a task name" do

@@ -46,9 +46,10 @@ module VlpDoc
   end
 
   def get_vlp_doc_subject_by_consumer_role(consumer_role)
-    return nil if consumer_role.blank?
-    if [::ConsumerRole::NATURALIZED_CITIZEN_STATUS, ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS].include? consumer_role.try(:person).try(:citizen_status)
-      consumer_role.try(:vlp_documents).try(:last).try(:subject)
-    end
+    return nil if consumer_role.blank? || consumer_role.vlp_documents.empty?
+    naturalized_citizen_docs = ["Certificate of Citizenship", "Naturalization Certificate"]
+    docs_for_status = consumer_role.citizen_status == "naturalized_citizen" ? naturalized_citizen_docs : VlpDocument::VLP_DOCUMENT_KINDS
+    docs_for_status_uploaded = consumer_role.vlp_documents.where(:subject=>{"$in" => docs_for_status})
+    docs_for_status_uploaded.any? ? docs_for_status_uploaded.order_by(:updated_at => 'desc').first.subject : nil
   end
 end

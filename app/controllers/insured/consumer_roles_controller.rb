@@ -54,9 +54,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
-
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
+    @use_person = true #only used to manupulate form data
     respond_to do |format|
       if @consumer_candidate.valid?
         idp_search_result = nil
@@ -156,6 +156,7 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to search_insured_consumer_role_index_path
       return
     end
+    @person.primary_family.create_dep_consumer_role if @person
     is_assisted = session["individual_assistance_path"]
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"
     create_sso_account(current_user, @person, 15, role_for_user) do
@@ -190,7 +191,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
-    #authorize @consumer_role, :edit?
+    authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
@@ -201,6 +202,7 @@ class Insured::ConsumerRolesController < ApplicationController
     save_and_exit =  params['exit_after_method'] == 'true'
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
@@ -238,6 +240,23 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+    if current_user.has_consumer_role?
+      respond_to do |format|
+        format.html { redirect_to edit_insured_consumer_role_path(current_user.person.consumer_role.id) }
+      end
+    else
+      flash[:error] = "We're sorry. Due to circumstances out of your control an error has occured."
+      respond_to do |format|
+        format.json { redirect_to destroy_user_session_path }
+        format.html { redirect_to destroy_user_session_path }
+        format.js   { redirect_to destroy_user_session_path }
+      end
+    end
+  end
+
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
@@ -266,12 +285,14 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :no_dc_address_reason,
+      :is_applying_coverage
     ]
   end
 
   def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
+    @person = @consumer_role.person
   end
 
 

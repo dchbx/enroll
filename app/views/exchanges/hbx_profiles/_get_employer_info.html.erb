@@ -1,0 +1,59 @@
+<div class = "table-responsive table-override"> 
+  <h4> UserName/eMail view </h4>
+  <table class = "table table-striped table-bordered" id="user-info-table" style="table-layout: fixed; width: 300px">
+      <tr>
+        <th> Org Legal Name: </th>
+        <td> <%= @organization.legal_name %> </td>
+      </tr>
+      <% address = @organization.primary_office_location.address %>
+      <tr>
+        <th> Address: </th>
+        <td> <%= address.address_1 + ',' + address.address_2 %></td>
+      </tr>
+      <tr>
+        <th> Locale: </th>
+        <td> <%= address.city + ',' + address.state + ',' + address.zip %></td>
+      </tr>
+  </table>
+  <% if @people.present? %>
+    <table class = "table table-striped table-bordered" id="user-info-table" style="table-layout: fixed;">
+      <thead>
+        <tr>
+          <th> POC No. </th>
+          <th> Username </th>
+          <th> eMail </th>
+          <th> User Roles </th>
+          <th> Last Sign In </th>
+          <th> Person Created Date </th>
+          <th> Phone Number </th>
+          <th> Person Roles </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        
+        <% @people.each do |person| %>
+          <% person_roles = get_person_roles(person) %>
+          <% user = person.user %>
+          <tr>
+            <td></td>
+            <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
+            <td> <%= user.present? ? user.email : "Nil" %> </td>
+            <td> <%= user.present? ? user.roles.collect(&:humanize).join(", ") : "Nil" %> </td>
+            <% if user.present? %>
+              <td> <%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+            <% else %>
+              <td> Nil </td>
+            <% end %>
+            <td> <%= person.created_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= person.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+            <td> <%= person.work_phone_or_best %> </td>
+            <td> <%= person_roles.join(", ") %> </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p> No person Record Found</p>
+  <% end %>
+  <h6 align="right"> Requested by @<%= @current_user.person.full_name %> </h6>
+</div>

@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_dependent_from_ee_enrollment")
 
-describe RemoveDependentFromEeEnrollment do
+describe RemoveDependentFromEeEnrollment, dbclean: :after_each do
   subject { RemoveDependentFromEeEnrollment.new("remove dependent from ee enrollment", double(:current_scope => nil)) }
   let(:family){FactoryGirl.create(:family,:with_primary_family_member)}
   let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }

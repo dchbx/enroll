@@ -156,7 +156,7 @@ module SepAll
     if special_enrollment_period.save
       @message_for_partial = "SEP Added for #{@name}"
     else
-        @message_for_partial = "SEP not saved. Error: " + special_enrollment_period.errors.full_messages.to_s
+      @message_for_partial = "SEP not saved. (Error: " + special_enrollment_period.errors.full_messages.join(", ") + ")"
     end
   end
 

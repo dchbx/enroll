@@ -7,13 +7,14 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
+  before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
   def home
     authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    @active_admin_sep = @family.active_admin_seps.last
+    @active_sep = @family.active_seps.last
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -75,7 +76,6 @@ class Insured::FamiliesController < FamiliesController
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
-
     render :layout => 'application'
   end
 
@@ -89,11 +89,10 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep'}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: qle.id}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
-
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -150,11 +149,12 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_move_reason
-    calculate_dates
   end
 
   def check_insurance_reason
-    calculate_dates
+  end
+
+  def check_marriage_reason
   end
 
   def purchase

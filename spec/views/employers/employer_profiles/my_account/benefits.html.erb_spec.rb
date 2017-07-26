@@ -155,5 +155,29 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
         expect(rendered).to have_selector("a", text: "Edit Plan Year")
       end
     end
+
+    context "when employer have active plan year"do
+      before do
+        allow(employer_profile).to receive(:is_new_employer?).and_return(true)
+        allow(employer_profile).to receive(:active_plan_year).and_return(true)
+      end
+
+      it "should display claim quote button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).not_to have_selector("a", text: "Claim Quote")
+      end
+    end
+
+    context "when employer do not have active plan year"do
+      before do
+        allow(employer_profile).to receive(:is_new_employer?).and_return(true)
+        allow(employer_profile).to receive(:active_plan_year).and_return(false)
+      end
+
+      it "should not display add plan year button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).to have_selector("a", text: "Claim Quote")
+      end
+    end
   end
 end

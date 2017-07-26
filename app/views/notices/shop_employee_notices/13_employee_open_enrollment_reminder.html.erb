@@ -1,0 +1,50 @@
+<%= render partial: 'notices/shared/logo' %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>REMINDER: Your Open Enrollment Period Ends Soon</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This is a reminder that you have until #{notice.plan_year.open_enrollment_end_on} to enroll into health coverage offered by #{notice.employer_name} through #{Settings.site.short_name}"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>To See Plan Options and Enroll:</strong>"} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "To complete the enrollment process, please complete the following steps:",
+  listings: ["Go to <a href='www.DCHealthLink.com'>DCHealthLink.com</a>",
+             "Log-in or create an account",
+             "If necessary, update your household information add any dependents",
+             "Select your health plan"] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>What is Open Enrollment?</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Open enrollment is your annual opportunity to enroll in your employer’s health plan or make changes to your current plan selection. Outside of this annual open enrollment period, you will only be allowed to make changes to your health plan enrollment if you experience certain life events such as marriage, birth, or adoption."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling #{notice.hbe.phone}."] } %>

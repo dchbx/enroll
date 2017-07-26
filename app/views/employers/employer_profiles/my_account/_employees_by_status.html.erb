@@ -1,4 +1,4 @@
-<% if @search %>
+<% if @search || params[:employee_search] %>
 <% if @census_employees.present? %>
 <% else %>
 <h4>No results found</h4>
@@ -156,7 +156,7 @@
   <div class="row">
     <div class="col-md-9">
       <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
-      <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
+      <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_search: params[:employee_search]) %>
       <% end %>
     </div>
     <div class="col-md-3 text-right content-bottom">

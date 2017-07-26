@@ -43,7 +43,8 @@ class ChangePlanYearEffectiveDate < MongoidMigrationTask
       end
 
       if !(organizations.first.employer_profile.is_conversion?) || organizations.first.employer_profile.renewing_published_plan_year.present?
-        return "Renewing plan year for the conversion employer is published (Or) Employer is not a conversion Employer. You cannot perform this action."
+        puts "Renewing plan year for the conversion employer is published (Or) Employer is not a conversion Employer. You cannot perform this action." unless Rails.env.test?
+        return
       end
       open_enrollment_start_on = start_on.last_month.beginning_of_month
       open_enrollment_end_on = PlanYear::RENEWING.include?(plan_year.aasm_state) ? open_enrollment_start_on + 12.days : open_enrollment_start_on + 9.days

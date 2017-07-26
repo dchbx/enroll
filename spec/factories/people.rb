@@ -49,12 +49,6 @@ FactoryGirl.define do
       gender "female"
     end
 
-    trait :with_employee_role do
-      after(:create) do |p, evaluator|
-        create_list(:employee_role, 1, person: p)
-      end
-    end
-
     trait :with_employer_staff_role do
       after(:create) do |p, evaluator|
         create_list(:employer_staff_role, 1, person: p)

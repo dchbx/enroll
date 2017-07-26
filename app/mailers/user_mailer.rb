@@ -24,6 +24,28 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def send_employee_open_enrollment_invitation(email, census_employee, invitation)
+    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
+    if email.present?
+      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
+        if census_employee.hired_on > TimeKeeper.date_of_record
+          format.html { render "invitation_email", :locals => { :person_name => census_employee.full_name, :invitation => invitation }}
+        elsif census_employee.hired_on <= TimeKeeper.date_of_record && plan_years.any?{|py| py.employees_are_matchable?}
+          format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+        end
+      end
+    end
+  end
+
+  def send_future_employee_open_enrollment_invitation(email, census_employee, invitation)
+    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
+    if email.present? && plan_years.any?{|py| py.employees_are_matchable?}
+      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
+        format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      end
+    end
+  end
+
   def renewal_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
       format.html { render "renewal_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -60,6 +82,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def send_employee_ineligibility_notice(email, first_name)
+    if email.present?
+      message = mail({to: email, subject: "#{Settings.site.short_name} - Assistance Enrolling in Employer-sponsored Health Insurance", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+        format.html {render "employee_ineligibility_notice", locals: {first_name: first_name}}
+      end
+    end
+  end
+
   def new_client_notification(agent_email, first_name, name, role, insured_email, is_person)
     if agent_email.present?
       subject = "New Client Notification -[#{name}] email provided - [#{insured_email}]"
@@ -80,6 +110,14 @@ class UserMailer < ApplicationMailer
   def generic_notice_alert(first_name, notice_subject, email)
     message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
+    end
+  end
+
+  def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
+    if email.present?
+      message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+        format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
+      end
     end
   end
 

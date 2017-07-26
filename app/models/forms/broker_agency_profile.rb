@@ -88,6 +88,10 @@ module Forms
       end
 
       self.person.add_work_email(email)
+      # since we can have multiple office_locations each will have separate phone numbers
+      @office_locations.each do  |office_location|
+        self.person.phones.push(office_location.phone)
+      end
     end
 
     def create_or_find_organization

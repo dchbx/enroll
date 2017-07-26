@@ -16,9 +16,6 @@ cp = org.create_carrier_profile(id: "53e67210eb899a4603000013", abbrev: "DTGA", 
 org = Organization.new(office_locations: [hbx_office], fein: "030000000", legal_name: "Dominion")
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000016", abbrev: "DMND", hbx_carrier_id: "116184", ivl_health: false, ivl_dental: true, shop_health: false, shop_dental: false)
 
-org = Organization.new(office_locations: [hbx_office], fein: "040000000", legal_name: "Guardian")
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000019", abbrev: "GARD", hbx_carrier_id: nil, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: false)
-
 org = Organization.new(office_locations: [hbx_office], fein: "050000000", legal_name: "BestLife")
 cp = org.create_carrier_profile(id: "53e67210eb899a460300001a", abbrev: "BLHI", hbx_carrier_id: nil, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: false)
 

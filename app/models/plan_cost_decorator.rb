@@ -55,6 +55,7 @@ class PlanCostDecorator < SimpleDelegator
       "guardian" => nil,
       "court_appointed_guardian" => nil,
       "collateral_dependent" => "child_under_26",
+      "domestic_partner" => "domestic_partner",
       "life_partner" => "domestic_partner",
       "child" => "child_under_26",
       "grandchild" => nil,

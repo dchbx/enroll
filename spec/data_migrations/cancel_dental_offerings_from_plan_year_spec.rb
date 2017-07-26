@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "cancel_dental_offerings_from_plan_year")
 
-describe CancelDentalOfferingsFromPlanYear do
+describe CancelDentalOfferingsFromPlanYear, dbclean: :after_each do
 
   let(:given_task_name) { "cancel_dental_offerings_from_plan_year" }
   subject { CancelDentalOfferingsFromPlanYear.new(given_task_name, double(:current_scope => nil)) }

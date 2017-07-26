@@ -1,61 +1,97 @@
+# This rake task used to cancel renewing plan year and renewing enrollments.
+# ex: RAILS_ENV=production bundle exec rake migrations:cancel_employer_renewal['521111111 522221111 5211333111']
+
 namespace :migrations do
 
   desc "Cancel renewal for employer"
   task :cancel_employer_renewal, [:fein] => [:environment] do |task, args|
 
-    employer_profile = EmployerProfile.find_by_fein(args[:fein])
+    feins = args[:fein].split(' ').uniq
 
-    if employer_profile.blank?
-      raise 'unable to find employer'
-    end
+    feins.each do |fein|
 
-    puts "Processing #{employer_profile.legal_name}"
-    organizations = Organization.where(fein: args[:fein])
-    organizations.each do |organization|
-      renewing_plan_year = organization.employer_profile.plan_years.renewing.first
+      employer_profile = EmployerProfile.find_by_fein(fein)
+      next puts "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
+
+      # checking renewing_application_ineligible assm state plan year here, as aasm state not listed in renewing.
+      renewing_plan_year = employer_profile.plan_years.renewing.first || employer_profile.plan_years.where(aasm_state:'renewing_application_ineligible').first
+
       if renewing_plan_year.present?
-        enrollments = enrollments_for_plan_year(renewing_plan_year)
-        enrollments.each do |enrollment|
-          enrollment.cancel_coverage!
+        puts "found renewing plan year for #{employer_profile.legal_name}---#{renewing_plan_year.start_on}" unless Rails.env.test?
+
+        enrollments_for_plan_year(renewing_plan_year).each do |enrollment|
+          if enrollment.may_cancel_coverage?
+            enrollment.cancel_coverage!
+            puts "canceling employees coverage for employer enrollment hbx_id:#{enrollment.hbx_id}" unless Rails.env.test?
+          end
         end
 
-        puts "found renewing plan year for #{organization.legal_name}---#{renewing_plan_year.start_on}"
-        renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+        employer_profile.census_employees.each do |census_employee|
+          assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => renewing_plan_year.benefit_groups.map(&:id))
+          assignments.each do |assignment|
+            if assignment.may_delink_coverage?
+              assignment.delink_coverage!
+              assignment.update_attribute(:is_active, false)
+            end
+          end
+        end
+
+        if renewing_plan_year.may_cancel_renewal?
+          puts "canceling plan year for employer #{employer_profile.legal_name}" unless Rails.env.test?
+          renewing_plan_year.cancel_renewal!
+        end
+
+        employer_profile.revert_application! if employer_profile.may_revert_application?
+      else
+        puts "renewing plan year not found for employer #{employer_profile.legal_name}" unless Rails.env.test?
       end
-      organization.employer_profile.revert_application! if organization.employer_profile.may_revert_application?
     end
   end
 
+# This rake task used to cancel published plan year & active enrollments.
+# ex: RAILS_ENV=production bundle exec rake migrations:cancel_employer_incorrect_renewal['473089323 472289323 4730893333' ]
+
   desc "Cancel incorrect renewal for employer"
-  task :cancel_employer_incorrect_renewal, [:fein, :plan_year_start_on] => [:environment] do |task, args|
+  task :cancel_employer_incorrect_renewal, [:fein] => [:environment] do |task, args|
 
-    employer_profile = EmployerProfile.find_by_fein(args[:fein])
+    feins = args[:fein].split(' ').uniq
 
-    if employer_profile.blank?
-      puts "employer profile not found!"
-      exit
-    end
+    feins.each do |fein|
 
-    plan_year_start_on = Date.strptime(args[:plan_year_start_on], "%m/%d/%Y")
+      employer_profile = EmployerProfile.find_by_fein(fein)
+      next puts "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
 
-    if plan_year = employer_profile.plan_years.where(:start_on => plan_year_start_on).published.first
-      enrollments = enrollments_for_plan_year(plan_year)
-      if enrollments.any?
-        puts "Canceling employees coverage for employer #{employer_profile.legal_name}"
-      end
+      plan_year = employer_profile.plan_years.published.first
 
-      enrollments.each do |hbx_enrollment|
-        if hbx_enrollment.may_cancel_coverage?
-          hbx_enrollment.cancel_coverage!
-          # Just make sure cancel propograted
+      if plan_year.present?
+        puts "found  plan year for #{employer_profile.legal_name}---#{plan_year.start_on}" unless Rails.env.test?
+
+        enrollments_for_plan_year(plan_year).each do |hbx_enrollment|
+          if hbx_enrollment.may_cancel_coverage?
+            hbx_enrollment.cancel_coverage!
+            puts "canceling employees coverage for employer enrollment hbx_id:#{hbx_enrollment.hbx_id}" unless Rails.env.test?
+          end
         end
-      end
 
-      puts "canceling plan year for employer #{employer_profile.legal_name}"
-      plan_year.cancel!
-      puts "cancellation successful!"
-    else
-      puts "renewing plan year not found!!"
+        employer_profile.census_employees.each do |census_employee|
+          assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
+          assignments.each do |assignment|
+            if assignment.may_delink_coverage?
+              assignment.delink_coverage!
+              assignment.update_attribute(:is_active, false)
+            end
+          end
+        end
+
+        if plan_year.may_cancel?
+          plan_year.cancel!
+          puts "canceling plan year for employer #{employer_profile.legal_name}" unless Rails.env.test?
+        end
+
+        employer_profile.revert_application! if employer_profile.may_revert_application?
+      else
+        puts "renewing plan year not found #{employer_profile.legal_name}" unless Rails.env.test?
+      end
     end
   end
 

@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_verification_types")
 
-describe "UpdateVerificationTypes data migration" do
+describe "UpdateVerificationTypes data migration", dbclean: :after_each do
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   subject { UpdateVerificationTypes.new("fix me task", double(:current_scope => nil)) }

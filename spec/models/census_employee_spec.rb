@@ -646,7 +646,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
   end
-  
+
   context "validation for employment_terminated_on" do
     let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year - 50.days)}
 
@@ -892,7 +892,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       termination_dates = [TimeKeeper.date_of_record - 5.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 5.days]
       termination_dates.each do |terminated_on|
-        
+
         context 'move the enrollment into proper state' do
 
           before do
@@ -931,24 +931,39 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           before do
             hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
             hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
-
             census_employee.terminate_employment!(terminated_on)
           end
 
           it "should cancel the health enrollment if effective date is in future" do
-            expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+            else
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+            end
           end
 
           it "should set the coverage termination on date on the health enrollment" do
-            expect(hbx_enrollment.terminated_on).to eq nil
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment.terminated_on).to eq nil
+            else
+              expect(hbx_enrollment.terminated_on).to eq census_employee.coverage_terminated_on
+            end
           end
 
           it "should cancel the dental enrollment if effective date is in future" do
-            expect(hbx_enrollment_two.aasm_state).to eq 'coverage_canceled'
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+            else
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+            end
           end
 
           it "should set the coverage termination on date on the dental enrollment" do
-            expect(hbx_enrollment_two.terminated_on).to eq nil
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment_two.terminated_on).to eq nil
+            else
+              expect(hbx_enrollment.terminated_on).to eq census_employee.coverage_terminated_on
+            end
           end
         end
 
@@ -1165,12 +1180,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
 
-    it 'should have renewal benefit group assignment' do 
+    it 'should have renewal benefit group assignment' do
       expect(census_employee.renewal_benefit_group_assignment.present?).to be_truthy
       expect(census_employee.renewal_benefit_group_assignment.benefit_group).to eq renewal_benefit_group
     end
 
-    it 'should have active benefit group assignment' do 
+    it 'should have active benefit group assignment' do
       expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
       expect(census_employee.active_benefit_group_assignment.benefit_group).to eq active_benefit_group
     end
@@ -1195,7 +1210,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it 'should activate existing benefit_group_assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
-        census_employee.find_or_create_benefit_group_assignment(blue_collar_benefit_group)
+        census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment
       end
@@ -1218,7 +1233,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(census_employee.benefit_group_assignments.size).to eq 4
         expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
         expect(blue_collar_benefit_group_assignment2.activated_at).to be_nil
-        census_employee.find_or_create_benefit_group_assignment(blue_collar_benefit_group)
+        census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 4
         expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment2
         expect(blue_collar_benefit_group_assignment2.activated_at).not_to be_nil
@@ -1231,7 +1246,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 1
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq blue_collar_benefit_group
-        census_employee.find_or_create_benefit_group_assignment(white_collar_benefit_group)
+        census_employee.find_or_create_benefit_group_assignment([white_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq white_collar_benefit_group
       end
@@ -1242,7 +1257,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:census_employee) { CensusEmployee.new }
 
     context "existing_cobra is true" do
-      before :each do 
+      before :each do
         census_employee.existing_cobra = 'true'
       end
 
@@ -1551,7 +1566,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it "should #{status}return #{state} health enrollment" do
         expect(census_employee.enrollments_for_display[0].try(:aasm_state) == state).to eq result
       end
-      
+
       it "should #{status}return #{state} dental enrollment" do
         expect(census_employee.enrollments_for_display[1].try(:aasm_state) == state).to eq result
       end

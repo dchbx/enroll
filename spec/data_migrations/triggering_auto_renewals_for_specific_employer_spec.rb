@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "triggering_auto_renewals_for_specific_employer")
 
-describe TriggeringAutoRenewalsForSpecificEmployer do
+describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
 
   let(:given_task_name) { "triggering_auto_renewals_for_specific_employer" }
   subject { TriggeringAutoRenewalsForSpecificEmployer.new(given_task_name, double(:current_scope => nil)) }
@@ -26,13 +26,13 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
       new_date = TimeKeeper.date_of_record.beginning_of_month + 11.days
       TimeKeeper.set_date_of_record_unprotected!(new_date)
       start_on = Date.new(2016,1,1) # we can fix it better some-time later
-      organization.employer_profile.plan_years.where(aasm_state: "active").first.update_attributes(start_on: start_on, 
-        :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, 
+      organization.employer_profile.plan_years.where(aasm_state: "active").first.update_attributes(start_on: start_on,
+        :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month,
         :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks
         )
       start_on = start_on + 1.year
-      organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.update_attributes(start_on: start_on, 
-        :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, 
+      organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.update_attributes(start_on: start_on,
+        :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month,
         :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks
         )
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
@@ -57,8 +57,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 2
-        expect(household.hbx_enrollments.where(aasm_state: "auto_renewing").size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "auto_renewing").size).to eq 1
       end
 
       it "should trigger a renewing waived enrollment if the previous existing enrollment is inactive", dbclean: :after_each do
@@ -66,17 +66,17 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 2
-        expect(household.hbx_enrollments.where(aasm_state: "renewing_waived").size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "renewing_waived").size).to eq 1
       end
 
       it "should not trigger an enrollment if we already have an enrollment with renewing plan year", dbclean: :after_each do
         hbx_enrollment.update_attributes(:benefit_group_id => organization.employer_profile.renewing_plan_year.benefit_groups.first.id, :benefit_group_assignment => census_employee.renewal_benefit_group_assignment)
-        hbx_enrollment.update_attribute(:effective_on, organization.employer_profile.renewing_plan_year.start_on + 1.month)
+        hbx_enrollment.update_attribute(:effective_on, organization.employer_profile.renewing_plan_year.start_on)
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 1
       end
     end
 
@@ -90,8 +90,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 1
-        expect(household.hbx_enrollments.first.aasm_state).to eq "renewing_waived"
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').first.aasm_state).to eq "renewing_waived"
       end
     end
   end

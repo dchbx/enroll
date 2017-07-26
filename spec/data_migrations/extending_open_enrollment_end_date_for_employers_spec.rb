@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "extending_open_enrollment_end_date_for_employers")
 
-describe ExtendingOpenEnrollmentEndDateForEmployers do
+describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
 
   let(:given_task_name) { "extending_open_enrollment_end_date_for_employers" }
   subject { ExtendingOpenEnrollmentEndDateForEmployers.new(given_task_name, double(:current_scope => nil)) }

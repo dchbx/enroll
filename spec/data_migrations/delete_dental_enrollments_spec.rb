@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "delete_dental_enrollments")
 
-describe DeleteDentalEnrollment do
+describe DeleteDentalEnrollment, dbclean: :after_each do
   describe "Delete dental enrollments" do
     subject { DeleteDentalEnrollment.new }
 

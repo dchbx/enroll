@@ -1,7 +1,7 @@
 class Envelope < PdfReport
 
   def initialize(template_name = nil)
-    template_name ||= 'envelope.pdf'
+    template_name ||= 'envelope_1.pdf'
     template = Rails.root.join('lib/pdf_templates', template_name)
 
     super({:template => template, :margin => [30, 55]})
@@ -11,13 +11,13 @@ class Envelope < PdfReport
   end
 
   def fill_envelope(notice, mpi_indicator = nil)
-    x_pos = mm2pt(21.83) - @margin[0]
+    x_pos = mm2pt(17.34) - @margin[0]
 
     # Enable this for Conversion renewal notice
     # if notice.respond_to?(:employer_name) && notice.employer_name.present?
     #   y_pos = 790.86 - mm2pt(57.15) - 55
     # else
-      y_pos = 790.86 - mm2pt(57.15) - 65
+      y_pos = 850 - mm2pt(57.15) - 50
     # end
 
     bounding_box([x_pos, y_pos], :width => 300) do

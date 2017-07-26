@@ -65,7 +65,7 @@ class V2GroupXmlGenerator
 
         cv_xml = nil
         carrier_profiles.each do |carrier|
-          cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile}
+          cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile, manual_gen: true}
 
           organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
 

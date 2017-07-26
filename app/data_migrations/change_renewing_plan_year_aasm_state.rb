@@ -13,6 +13,7 @@ class ChangeRenewingPlanYearAasmState< MongoidMigrationTask
           plan_year.withdraw_pending! if plan_year.renewing_publish_pending?
           plan_year.renew_publish! if plan_year.may_renew_publish?
           plan_year.advance_date! if plan_year.may_advance_date?
+          plan_year.advance_date! if plan_year.may_advance_date? && ENV['py_state_to'] == "renewing_enrolled"
           puts "Plan year aasm state changed to #{plan_year.aasm_state}" unless Rails.env.test?
         end
       else

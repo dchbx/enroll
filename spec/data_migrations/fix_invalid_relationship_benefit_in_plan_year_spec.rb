@@ -1,7 +1,7 @@
 require "rails_helper"
 
 require File.join(Rails.root, "app", "data_migrations", "fix_invalid_relationship_benefit_in_plan_year")
-describe FixInvalidRelationshipBenefitInPlanYear do
+describe FixInvalidRelationshipBenefitInPlanYear, dbclean: :after_each do
 
   let(:given_task_name) { "set_child_over_26_relationship_false_in_plan_year" }
   subject { FixInvalidRelationshipBenefitInPlanYear.new(given_task_name, double(:current_scope => nil)) }

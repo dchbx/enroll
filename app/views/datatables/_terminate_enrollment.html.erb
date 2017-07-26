@@ -39,7 +39,7 @@ $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
           <td><%= hbx.hbx_id %></td>
           <td><%= hbx.plan.name %></td>
           <td><%= hbx.effective_on %></td>
-          <td><%= text_field_tag "termination_date_#{hbx.id}", nil, readonly: true, value:  TimeKeeper.date_of_record, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_effective_on(hbx), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx) %></td>
+          <td><%= text_field_tag "termination_date_#{hbx.id}", nil, readonly: true, value:  set_default_termination_date_value(hbx), id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_effective_on(hbx), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx) %></td>
           <td><%= check_box_tag "terminate_hbx_#{hbx.id}", hbx.id %></td>
           <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%></td>
         </tr>

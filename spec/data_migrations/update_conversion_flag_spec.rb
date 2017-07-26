@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_conversion_flag")
 
-describe UpdateConversionFlag do
+describe UpdateConversionFlag, dbclean: :after_each do
 
   let(:given_task_name) { "update_conversion_flag" }
   subject { UpdateConversionFlag.new(given_task_name, double(:current_scope => nil)) }

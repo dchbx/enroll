@@ -32,7 +32,11 @@ FactoryGirl.define do
           FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: Person.new(first_name: "Alex", last_name: "Doe"))
         ]
       }
-    end
+      before(:create)  do |family, evaluator|
+        dep_person = family.dependents.first.person
+        family.relate_new_member(dep_person, "child")
+      end
+   end
   end
 end
 

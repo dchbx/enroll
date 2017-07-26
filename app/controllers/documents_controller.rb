@@ -33,13 +33,17 @@ class DocumentsController < ApplicationController
   def update_verification_type
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
-    verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
+    admin_action = params[:admin_action]
+    if (VlpDocument::VERIFICATION_REASONS + VlpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
+      verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
+      message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
+      flash_message = { :success => message}
+    else
+      flash_message = { :error => "Please provide a verification reason."}
+    end
+
     respond_to do |format|
-      if verification_result.is_a? String
-        format.html { redirect_to :back, :flash => { :success => verification_result} }
-      else
-        format.html { redirect_to :back, :flash => { :success => "Person verification successfully approved."} }
-      end
+      format.html { redirect_to :back, :flash => flash_message }
     end
   end
 
@@ -67,7 +71,7 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record)
+    @person.consumer_role.redetermine!(verification_attr)
     respond_to do |format|
       format.html {
         flash[:success] = "Request was sent to FedHub."

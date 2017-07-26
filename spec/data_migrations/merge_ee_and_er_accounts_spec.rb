@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "merge_ee_and_er_accounts")
 
-describe MergeEeAndErAccounts do
+describe MergeEeAndErAccounts, dbclean: :after_each do
 
   let(:given_task_name) { "merge ee and er accounts" }
   subject { MergeEeAndErAccounts.new(given_task_name, double(:current_scope => nil)) }

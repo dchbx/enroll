@@ -9,8 +9,10 @@
         <%= render "shared/error_messages", object: f.object %>
         <%= render 'shared/person/consumer_information', f: f %>
         <br>
+        <div id="consumer_fields_sets">
         <%= render 'shared/consumer_fields', f: f %>
         <br>
+        </div>
         <%= render 'shared/consumer_home_address_fields', f: f %><br>
         <%= render 'shared/phone_fields', f: f %><br>
 

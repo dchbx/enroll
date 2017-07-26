@@ -12,46 +12,84 @@ describe CorrectInvalidBenefitGroupAssignmentsForEmployer do
     end
   end
 
-  describe "changing plan year's state" do
+  describe "employer profile with employees present" do
 
-    let!(:benefit_group_one)     { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    let!(:plan_year)         { FactoryGirl.create(:plan_year, aasm_state: "draft", employer_profile: employer_profile) }
-    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)}
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active')}
+    let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+
+    let!(:census_employees){
+      FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+      employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    }
+
+    let(:census_employee) { employer_profile.census_employees.non_business_owner.first }
+    let!(:benefit_group_assignment) {
+      census_employee.active_benefit_group_assignment.update(is_active: false) 
+      ce = build(:benefit_group_assignment, census_employee: census_employee, start_on: benefit_start_on, end_on: benefit_end_on)
+      ce.save(:validate => false)
+      ce
+    }
+
+    let(:benefit_start_on) { benefit_group.start_on }
+    let(:benefit_end_on) { nil }
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)
+      allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.fein)
     end
 
     context "checking benefit group assignments", dbclean: :after_each do
 
       it "should remove the invalid benefit group assignments" do
-        size = census_employee.benefit_group_assignments.size
-        census_employee.benefit_group_assignments.first.benefit_group.delete
+        census_employee.active_benefit_group_assignment.benefit_group.delete
+        expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
         subject.migrate
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.size).to eq 0
-        expect(census_employee.benefit_group_assignments.size).not_to eq size
+        expect(census_employee.active_benefit_group_assignment).to be_nil
       end
 
       it "should not remove the valid benefit group assignment" do
         subject.migrate
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.size).to eq 1
+        expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
       end
 
-      it "should change the incorrect start on date for invalid benefit group assignment" do
-        census_employee.benefit_group_assignments.first.update_attribute(:start_on, plan_year.start_on - 2.months)
-        subject.migrate
-        census_employee.reload
-        expect(census_employee.benefit_group_assignments.first.start_on).to eq [benefit_group_one.start_on, census_employee.hired_on].compact.max
+      context "when benefit group assignment start on is outside the plan year" do
+        let(:benefit_start_on) { benefit_group.start_on.prev_day }
+
+        it "should fix start date" do
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_falsey
+          expect(census_employee.active_benefit_group_assignment.start_on).to eq benefit_start_on
+          subject.migrate
+          census_employee.reload
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_truthy
+          expect(census_employee.active_benefit_group_assignment.start_on).to eq benefit_group.start_on
+        end
       end
 
-      it "should change the incorrect end on date for invalid benefit group assignment" do
-        census_employee.benefit_group_assignments.first.update_attribute(:end_on, plan_year.end_on + 2.months)
-        subject.migrate
-        census_employee.reload
-        expect(census_employee.benefit_group_assignments.first.end_on).to eq plan_year.end_on
+      context "when benefit group assignment end date before start date" do
+        let(:benefit_end_on) { benefit_group.start_on.prev_day }
+
+        it "should fix end date" do
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_falsey
+          expect(census_employee.active_benefit_group_assignment.end_on).to eq benefit_end_on
+          subject.migrate
+          census_employee.reload
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_truthy
+          expect(census_employee.active_benefit_group_assignment.end_on).to eq benefit_group.end_on
+        end
+      end
+
+      context "when benefit group assignment end date is outside the plan year" do
+        let(:benefit_end_on) { benefit_group.end_on.next_day }
+
+        it "should fix end date" do
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_falsey
+          expect(census_employee.active_benefit_group_assignment.end_on).to eq benefit_end_on
+          subject.migrate
+          census_employee.reload
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_truthy
+          expect(census_employee.active_benefit_group_assignment.end_on).to eq benefit_group.end_on
+        end
       end
     end
   end

@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_broker_npn")
 
-describe ChangeBrokerNpn do
+describe ChangeBrokerNpn, dbclean: :after_each do
   let(:given_task_name) { "change_broker_npn" }
   subject { ChangeBrokerNpn.new(given_task_name, double(:current_scope => nil)) }
   describe "given a task name" do

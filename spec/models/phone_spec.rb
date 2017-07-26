@@ -91,9 +91,9 @@ describe Phone, type: :model do
     let(:phone) {Phone.create(**params)}
 
     it "when the length of phone number is 11" do
-      phone.full_phone_number = "+1-222-333-0123"
+      phone.full_phone_number = "222-333-0123-3"
       phone.save
-      expect(phone.country_code).to eq "1"
+      expect(phone.country_code).to eq ""
       expect(phone.area_code).to eq "222"
       expect(phone.number).to eq "3330123"
     end

@@ -9,7 +9,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_two]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     let(:hbx_enrollment_member_two) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
-    
+
     it "it should return subscribers full name in span with dependent-text class" do
       allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(true)
       allow(hbx_enrollment_member).to receive_message_chain("person.full_name").and_return("Bobby Boucher")
@@ -32,8 +32,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
 
     it "it should return options" do
-      options = helper.generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
       date = TimeKeeper.date_of_record
+      options = helper.generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
       expect(options).to eq [[date.to_s, 'date_of_event'], [(date.end_of_month+1.day).to_s, 'fixed_first_of_next_month']]
     end
   end
@@ -158,7 +158,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month ) }
     let(:qle_with_date_options_available) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month, date_options_available: true ) }
-    let(:sep_without_date_options) { 
+    let(:sep_without_date_options) {
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
@@ -168,7 +168,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       sep
     }
 
-    let(:sep_with_date_options) { 
+    let(:sep_with_date_options) {
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
@@ -179,14 +179,24 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       sep
     }
     context "when building ShopForPlan link" do
+      it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
+        expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
+      end
 
-        it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
-          expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
-        end
+      it "should be a link to 'insured/family_members' for a QLE type without date options available" do
+        expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
+      end
+    end
 
-        it "should be a link to 'insured/family_members' for a QLE type without date options available" do
-          expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
-        end
+    context "#build_link_for_sep_type" do
+      it "returns nil if sep nil" do
+        expect(helper.build_link_for_sep_type(nil)).to be_nil
+      end
+
+      it "can find qle" do
+        expect(QualifyingLifeEventKind).to receive(:find)
+        helper.build_link_for_sep_type(sep_with_date_options)
+      end
     end
 
     context "find QLE for SEP" do
@@ -195,7 +205,6 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         expect(find_qle_for_sep(sep_without_date_options)).to eq qle_first_of_month
       end
     end
-
   end
 
   describe "#tax_info_url" do
@@ -204,7 +213,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         allow(ENV).to receive(:[]).with("AWS_ENV").and_return("prod")
         expect(helper.tax_info_url).to eq "https://dchealthlink.com/individuals/tax-documents"
       end
-    end 
+    end
 
     context "non-production environment" do
       it "should redirect from test environment" do
@@ -216,18 +225,18 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   describe "show_download_tax_documents_button?" do
     let(:person) { FactoryGirl.create(:person)}
-    
+
     before do
       helper.instance_variable_set(:@person, person)
     end
-    
+
     context "as consumer" do
       let(:consumer_role) {FactoryGirl.build(:consumer_role)}
       context "had a SSN" do
         before do
           person.consumer_role = consumer_role
             person.ssn = '123456789'
-        end   
+        end
         it "should display the download tax documents button" do
          expect(helper.show_download_tax_documents_button?).to eq true
         end
@@ -243,7 +252,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       context "had no SSN" do
         before do
           person.ssn = ''
-        end   
+        end
 
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button?).to eq false

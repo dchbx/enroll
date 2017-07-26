@@ -90,4 +90,9 @@ class HbxProfilePolicy < ApplicationPolicy
   def set_date?
     index?
   end
+
+  def can_add_sep?
+    return false unless role = user.person && user.person.hbx_staff_role
+    role.permission.can_add_sep
+  end
 end

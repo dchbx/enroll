@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_user_email")
 
-describe UpdateUserEmail do
+describe UpdateUserEmail, dbclean: :after_each do
 
   before(:all) do
     @file = File.join(Rails.root, 'spec', 'test_data', 'update_user_email.xlsx')

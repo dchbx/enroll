@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_enrollment_review_status")
 
-describe UpdateReviewStatus do
+describe UpdateReviewStatus, dbclean: :after_each do
   subject { UpdateReviewStatus.new("update_enrollment_review_status", double(:current_scope => nil)) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:enrollment_with_nil_review) {

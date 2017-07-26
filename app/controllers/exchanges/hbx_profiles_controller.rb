@@ -1,5 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include DataTablesSearch
+  include Pundit
   include SepAll
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
@@ -207,6 +209,7 @@ def employer_poc
   end
 
   def add_sep_form
+    authorize HbxProfile, :can_add_sep?
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
@@ -214,6 +217,17 @@ def employer_poc
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+  end
+
+  def get_user_info
+    @element_to_replace_id = params[:family_actions_id] || params[:employers_action_id]
+    if params[:person_id].present?
+      @person = Person.find(params[:person_id])
+    else
+      @employer_actions = true
+      @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
+      @organization = Organization.find(@element_to_replace_id.split("_").last)
+    end
   end
 
   def update_effective_date
@@ -384,20 +398,18 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    families = []
     all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-    if dt_query.search_string.blank?
-      families = all_families
-    else
-      person_ids = Person.search(dt_query.search_string).pluck(:id)
-      families = all_families.where({
-        "family_members.person_id" => {"$in" => person_ids}
-      })
-    end
+
+    families = search_families(dt_query.search_string, all_families)
+
+    sorted_by, order = input_sort_request
+
+    families = sorted_families(sorted_by, order, families)
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
-    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    @families = families[dt_query.skip, dt_query.take]
     render
   end
 

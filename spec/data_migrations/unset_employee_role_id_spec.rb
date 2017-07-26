@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "unset_employee_role_id")
-describe UnsetEmplyeeRoleId do
+describe UnsetEmplyeeRoleId, dbclean: :after_each do
   let(:given_task_name) { "unset_employee_role_id" }
   subject { UnsetEmplyeeRoleId.new(given_task_name, double(:current_scope => nil)) }
   describe "given a task name" do

@@ -3,30 +3,37 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CorrectInvalidBenefitGroupAssignmentsForEmployer < MongoidMigrationTask
 
-  def invalid_benefit_group_assignments(census_employee)
-    census_employee.benefit_group_assignments.select { |bga| ( bga.benefit_group.blank? || bga.start_on < bga.benefit_group.start_on || (bga.end_on.present? && (bga.end_on <  bga.start_on || bga.end_on > bga.benefit_group.end_on)))}
+  def organizations
+    if ENV['fein'].present?
+      Organization.where(fein: ENV['fein'])
+    else
+      Organization.exists(:employer_profile => true)
+    end
   end
   
-  def migrate
-    organizations = Organization.where(fein: ENV['fein'])
-    if organizations.size !=1
-      'Issues with fein'
-      return
-    end
-    organizations.first.employer_profile.census_employees.each do |ce|
-      invalid_benefit_group_assignments(ce).each do |bga|
-        if bga.benefit_group.present?
-          if bga.start_on < bga.benefit_group.start_on
+  def migrate  
+    organizations.each do |org|
+      org.employer_profile.census_employees.each do |ce|
+        ce.benefit_group_assignments.each do |bga|
+          benefit_group = bga.benefit_group
+
+          if benefit_group.blank?
+            bga.delete
+            puts "Deleting invalid benefit group assignments for #{ce.first_name} #{ce.last_name} for ER with legal name #{organizations.first.legal_name}" unless Rails.env.test?
+            next
+          end
+
+          if !(benefit_group.start_on..benefit_group.end_on).cover?(bga.start_on)
             bga.update_attribute(:start_on, [bga.benefit_group.start_on, ce.hired_on].compact.max)
             puts "Updating the start date of benefit group assignment for #{ce.first_name} #{ce.last_name} for ER with legal name #{organizations.first.legal_name}" unless Rails.env.test?
           end
-          if bga.end_on.present? && ( bga.end_on > bga.benefit_group.end_on || bga.end_on <  bga.start_on)
+          
+          next if bga.end_on.blank?
+
+          if !(benefit_group.start_on..benefit_group.end_on).cover?(bga.end_on) || bga.end_on < bga.start_on
             bga.update_attribute(:end_on, bga.benefit_group.end_on)
             puts "Updating the end date of benefit group assignment for #{ce.first_name} #{ce.last_name} for ER with legal name #{organizations.first.legal_name}" unless Rails.env.test?
           end
-        else
-          bga.delete if bga.benefit_group.blank?
-          puts "Deleting invalid benefit group assignments for #{ce.first_name} #{ce.last_name} for ER with legal name #{organizations.first.legal_name}" unless Rails.env.test?
         end
       end
     end

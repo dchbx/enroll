@@ -29,8 +29,8 @@
                       <div><p><%= render_plan_type_details(plan) %></p></div>
                       <div>
                         <p>
-                          <label>Premium:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/month
-                          <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id) %></strong>
+                          <label>Premium:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
+                          <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.hbx_id %></strong>
                         </p>
                       </div>
                         <% names = hbx_enrollment.covered_members_first_names %>

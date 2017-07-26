@@ -26,6 +26,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(employee_role).to receive(:save!).and_return(true)
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
+      allow(role_form).to receive(:active_employee_roles).and_return [employee_role]
       sign_in user
     end
 
@@ -184,7 +185,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       } )
     }
     let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
-    let(:user) { double(:idp_verified? => true) }
+    let(:user) { double(:idp_verified? => true, person: person) }
 
     context "can construct_employee_role" do
       before :each do
@@ -242,7 +243,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
-    let(:user) { double("User",id: user_id ) }
+    let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
 
     before(:each) do
       sign_in(user)
@@ -277,6 +278,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("no_match")
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+          expect(response).to render_template("employee_ineligibility_notice")
         end
 
         context "that find a matching employee" do

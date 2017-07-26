@@ -5,7 +5,7 @@ ACCEPTABLE_STATES = %w(us_citizen naturalized_citizen alien_lawfully_present law
 NOT_ACCEPTABLE_STATES = %w(undocumented_immigrant not_lawfully_present_in_us non_native_not_lawfully_present_in_us ssn_pass_citizenship_fails_with_SSA non_native_citizen)
 STATES_TO_FIX = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us ssn_pass_citizenship_fails_with_SSA)
 
-describe UpdateCitizenStatus do
+describe UpdateCitizenStatus, dbclean: :after_each do
   subject { UpdateCitizenStatus.new("fix_citizen_for_hub_responses", double(:current_scope => nil)) }
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }

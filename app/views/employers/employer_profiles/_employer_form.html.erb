@@ -59,7 +59,7 @@
                 </td>
                 <td>
                   <% phone = staff.phones.detect{|phone| phone.kind == 'work'} %>
-                  <%= phone && (phone.area_code.to_s + phone.number + (phone.extension? ? ' x'+phone.extension : '')) %>
+                  <%= phone && phone.to_s %>
                 <td>
                   <% role = staff.employer_staff_roles.detect{|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
                   <%= role && role.current_state %>

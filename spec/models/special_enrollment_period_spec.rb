@@ -106,6 +106,51 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         end
       end
     end
+
+    context "with invalid next_poss_effective_date" do
+      let(:param_with_invalid_next_poss_effective_date){
+        {
+          family: family,
+          qualifying_life_event_kind: ivl_qle,
+          effective_on_kind: "first_of_next_month",
+          qle_on: qle_on,
+          next_poss_effective_date: TimeKeeper.date_of_record + 2.years
+        }
+      }
+      it "should be invalid" do
+        expect(SpecialEnrollmentPeriod.create(**param_with_invalid_next_poss_effective_date).errors[:next_poss_effective_date].any?).to be_truthy
+      end
+    end
+
+    context "with invalid optional_effective_on" do
+      let(:param_with_invalid_optional_effective_on){
+        {
+          family: family,
+          qualifying_life_event_kind: ivl_qle,
+          effective_on_kind: "first_of_next_month",
+          qle_on: qle_on,
+          optional_effective_on: ["05/01/#{TimeKeeper.date_of_record.year + 1}", "05/03/#{TimeKeeper.date_of_record.year}"]
+        }
+      }
+      it "should be invalid" do
+        expect(SpecialEnrollmentPeriod.create(**param_with_invalid_optional_effective_on).errors[:optional_effective_on].any?).to be_truthy
+      end
+    end
+
+    context "with valid optional_effective_on" do
+      let(:param_with_invalid_optional_effective_on){
+        {
+          family: family,
+          qualifying_life_event_kind: ivl_qle,
+          effective_on_kind: "first_of_next_month",
+          qle_on: qle_on,
+          optional_effective_on: ["07/03/#{TimeKeeper.date_of_record.year}", "09/07/#{TimeKeeper.date_of_record.year}"]
+        }
+      }
+      it "should be valid" do
+        expect(SpecialEnrollmentPeriod.create(**param_with_invalid_optional_effective_on).errors[:optional_effective_on].any?).to be_falsey
+      end
+    end
   end
 
 

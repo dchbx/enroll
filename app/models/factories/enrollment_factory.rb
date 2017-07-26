@@ -69,11 +69,19 @@ module Factories
     def self.construct_consumer_role(person_params, user)
       person_params = person_params[:person]
       person, person_new = initialize_person(
-        user, person_params["name_pfx"], person_params["first_name"],
-        person_params["middle_name"] , person_params["last_name"],
-        person_params["name_sfx"], person_params["ssn"].gsub("-",""),
-        person_params["dob"], person_params["gender"], "consumer", person_params["no_ssn"]
-        )
+        user,
+        person_params["name_pfx"],
+        person_params["first_name"],
+        person_params["middle_name"],
+        person_params["last_name"],
+        person_params["name_sfx"],
+        person_params["ssn"].gsub("-",""),
+        person_params["dob"],
+        person_params["gender"],
+        "consumer",
+        person_params["no_ssn"],
+        person_params["is_applying_coverage"]
+      )
       if person.blank? && person_new.blank?
         begin
           raise
@@ -91,6 +99,8 @@ module Factories
         return nil
       end
       role = build_consumer_role(person, person_new)
+      role.update_attribute(:is_applying_coverage, (person_params["is_applying_coverage"].nil? ?  true : person_params["is_applying_coverage"]))
+      role
     end
 
     def self.build_consumer_role(person, person_new)
@@ -303,7 +313,7 @@ module Factories
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
+                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil, is_applying_coverage=true)
         person_attrs = {
           user: user,
           name_pfx: name_pfx,
@@ -315,7 +325,8 @@ module Factories
           dob: dob,
           gender: gender,
           no_ssn: no_ssn,
-          role_type: role_type
+          role_type: role_type,
+          is_applying_coverage: is_applying_coverage
         }
         result = FindOrCreateInsuredPerson.call(person_attrs)
         return result.person, result.is_new

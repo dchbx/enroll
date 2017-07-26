@@ -18,6 +18,7 @@ class Person
 
   PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
+  VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -51,6 +52,9 @@ class Person
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
+
+  delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
+
   # Login account
   belongs_to :user
 
@@ -531,13 +535,7 @@ class Person
   end
 
   def has_multiple_active_employers?
-    active_census_employees.count > 1
-  end
-
-  def active_census_employees
-    census_employees = CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
-    ces = census_employees.select { |ce| ce.is_active? }
-    (ces + active_employee_roles.map(&:census_employee)).uniq
+    active_employee_roles.count > 1
   end
 
   def has_active_employer_staff_role?
@@ -812,7 +810,7 @@ class Person
 
   def eligible_immigration_status
     return @eligible_immigration_status if !@eligible_immigration_status.nil?
-    return nil if @us_citizen.nil?
+    return nil if us_citizen.nil?
     return nil if @us_citizen
     return nil if citizen_status.blank?
     @eligible_immigration_status ||= (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == citizen_status)
@@ -943,7 +941,7 @@ class Person
   end
 
   def consumer_fields_validations
-    if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+    if @is_consumer_role.to_s == "true" && consumer_role.is_applying_coverage.to_s == "true" #only check this for consumer flow.
       citizenship_validation
       native_american_validation
       incarceration_validation

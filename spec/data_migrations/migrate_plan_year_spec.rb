@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "migrate_plan_year")
 
-describe MigratePlanYear do
+describe MigratePlanYear, dbclean: :after_each do
 
   let(:given_task_name) { "migrate_plan_year" }
   subject { MigratePlanYear.new(given_task_name, double(:current_scope => nil)) }

@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_ee_dot")
 
-describe UpdateEeDot do
+describe UpdateEeDot, dbclean: :after_each do
 
   let(:given_task_name) { "update_ee_dot" }
   subject { UpdateEeDot.new(given_task_name, double(:current_scope => nil)) }
@@ -13,7 +13,7 @@ describe UpdateEeDot do
   end
 
   describe "updating termination date for an Employee" do
-    
+
     let(:employer_profile) { FactoryGirl.create(:employer_profile)}
     let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
 

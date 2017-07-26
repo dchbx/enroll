@@ -13,7 +13,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
   }
 
   let!(:employer_profile) {
-    create(:employer_with_renewing_planyear, start_on: renewal_start, renewal_plan_year_state: 'renewing_enrolling', reference_plan_id: plan.id, elected_plan_ids: plan.to_a.map(&:id) )
+    create(:employer_with_renewing_planyear, start_on: renewal_start, renewal_plan_year_state: 'renewing_enrolling', reference_plan_id: plan.id)
   }
   let(:active_plan_year) { employer_profile.active_plan_year }
   let(:benefit_group) { active_plan_year.benefit_groups.first }
@@ -70,7 +70,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
       expect(family.enrollments.size).to eq 1
       expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
       generate_cobra_enrollment
-      expect(family.enrollments.size).to eq 2
+      expect(family.enrollments.by_coverage_kind('health').size).to eq 3
       expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
     end
 

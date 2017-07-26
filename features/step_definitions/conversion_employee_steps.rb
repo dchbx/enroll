@@ -76,6 +76,8 @@ And(/(.*) already matched and logged into employee portal/) do |named_person|
                                                                  census_employee_id: ce.id,
                                                                  employer_profile_id: employer_profile.id,
                                                                  hired_on: ce.hired_on)
+
+  ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
   FactoryGirl.create :family, :with_primary_family_member, person: person_record
   user = FactoryGirl.create(:user, person: person_record,
                                    email: person[:email],

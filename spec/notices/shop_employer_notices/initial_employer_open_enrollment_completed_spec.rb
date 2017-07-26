@@ -10,12 +10,14 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
                             :name =>'Initial Employee Open Enrollment Successfully Completed',
                             :notice_template => 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
+                            :event_name => 'initial_employer_open_enrollment_completed',
                             :mpi_indicator => 'MPI_SHOP17',
                             :title => "Open Enrollment Completed"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 

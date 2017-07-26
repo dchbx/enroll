@@ -1,0 +1,35 @@
+<div class = "table-responsive table-override">
+  <h4> UserName/eMail view </h4>
+  <% user = @person.user %>
+  <table class = "table table-striped table-bordered" style="table-layout: fixed;">
+    <thead>
+      <tr>
+        <th> Username </th>
+        <th> eMail </th>
+        <th> User Roles </th>
+        <th> Last Sign In </th>
+        <th> Person Created Date </th>
+        <th> e-Case ID </th>
+        <th> Person Roles </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% person_roles = get_person_roles(@person) %>
+      <tr>
+        <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
+        <td> <%= user.present? ? user.email : "Nil" %> </td>
+        <td> <%= user.present? ? user.roles.collect(&:humanize).join(", ") : "Nil" %> </td>
+        <% if user.present? %>
+          <td> <%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+        <% else %>
+          <td> Nil </td>
+        <% end %>
+        <td> <%= @person.created_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= @person.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+        <td> <%= @person.primary_family.e_case_id || "Nil" %> </td>
+        <td> <%= person_roles.join(", ") %> </td>
+      </tr>
+    </tbody>
+  </table>
+  <h6 align="right"> Requested by @<%= @current_user.person.full_name %> </h6>
+</div>

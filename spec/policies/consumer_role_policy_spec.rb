@@ -40,12 +40,17 @@ describe ConsumerRolePolicy do
   end
 
   permissions :edit? do
-    let(:user) {FactoryGirl.create(:user, :consumer)}
-    let(:person) { FactoryGirl.build(:person) }
-    let(:hbx_staff_person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+    let(:hbx_staff_user) {FactoryGirl.create(:user, person: person)}
+    let(:person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:permission) { FactoryGirl.create(:permission)}
 
     it "grants access when hbx_staff" do
-      expect(subject).to permit(FactoryGirl.build(:user, :hbx_staff, person: hbx_staff_person), consumer_role)
+      allow(hbx_staff_role).to receive(:permission).and_return permission
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      allow(hbx_staff_user).to receive(:person).and_return person
+      allow(permission).to receive(:can_update_ssn).and_return true
+      expect(subject).to permit(hbx_staff_user, consumer_role)
     end
 
     it "denies access when normal user" do
@@ -53,6 +58,9 @@ describe ConsumerRolePolicy do
     end
 
     context "consumer" do
+      let(:user) {FactoryGirl.create(:user, :consumer)}
+      let(:person) { FactoryGirl.build(:person) }
+
       before :each do
         allow(user).to receive(:person).and_return person
       end

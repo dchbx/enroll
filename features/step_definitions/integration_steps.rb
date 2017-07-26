@@ -246,6 +246,18 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
 
+Given(/^a Hbx admin with super admin access exists$/) do
+  #Note: creates an enrollment for testing purposes in the UI
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
+  person = people['Hbx Admin']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
+end
+
 Given(/^a Hbx admin with read only permissions exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
@@ -322,10 +334,6 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
   renewal_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewal_plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment renewal_benefit_group
-
-  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
-  employee.update_attributes(employee_role_id: employee_role.id)
-
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
@@ -869,6 +877,18 @@ Then(/^I should see confirmation and continue$/) do
   click_button "Continue"
 end
 
+Then(/^I can click on Shop for Plan button$/) do
+  click_button "Shop for Plans"
+end
+
+Then(/^Page should contain existing qle$/) do
+  expect(page).to have_content 'You qualify for a Special Enrollment Period (SEP) because you "Married"'
+end
+
+Then(/^I can click Shop with existing SEP link$/) do
+  click_link "Shop Now"
+end
+
 Then(/^I should see the dependents and group selection page$/) do
   #@browser.element(text: /Household Info: Family Members/i).wait_until_present
   expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
@@ -921,3 +941,16 @@ Then(/Devops can verify session logs/) do
   #user was a consumer
   expect(user.person.consumer_role).not_to be nil
 end
+
+Given(/^a Hbx admin with read and write permissions and employers$/) do
+  p_staff=FactoryGirl.create :permission, :hbx_update_ssn
+  person = people['Hbx AdminEnrollments']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  org1 = FactoryGirl.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
+  employer_profile = FactoryGirl.create :employer_profile, organization: org1
+  org2 = FactoryGirl.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
+  employer_profile = FactoryGirl.create :employer_profile, organization: org2
+end
+

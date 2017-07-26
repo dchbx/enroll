@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_full_phone_number")
 
-describe UpdateFullPhoneNumber do
+describe UpdateFullPhoneNumber, dbclean: :after_each do
 
   describe "given a task name" do
     let(:given_task_name) { "migrate_update_full_phone_number" }
@@ -48,6 +48,7 @@ describe UpdateFullPhoneNumber do
         organization.office_locations.first.phone.number ="2222222"
         organization.office_locations.first.phone.area_code = "456"
         organization.office_locations.first.phone.extension = "908"
+        organization.office_locations.first.phone.unset(:full_phone_number)
         organization.office_locations.first.phone.save!
         subject.migrate
         organization.office_locations.first.phone.reload

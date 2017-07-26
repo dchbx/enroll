@@ -5,7 +5,7 @@ require File.join(Rails.root, "app", "data_migrations", "correct_enrollment_stat
 #2. move to pending if any has pending state
 #3. move to coverage selected if all hbx_enrollment_members fully_verified
 
-describe CorrectEnrollmentStatus do
+describe CorrectEnrollmentStatus, dbclean: :after_each do
   subject { CorrectEnrollmentStatus.new("correct_enrollment_state", double(:current_scope => nil)) }
   verification_states = %w(unverified ssa_pending dhs_pending verification_outstanding fully_verified verification_period_ended)
   verification_states.each do |state|

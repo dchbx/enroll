@@ -24,4 +24,14 @@ module Insured::FamilyMembersHelper
   rescue
     []
   end
+
+  def is_applying_coverage_value_dependent(dependent)
+    first_checked = true
+    second_checked = false
+    if dependent.family_member.try(:person).try(:consumer_role).present?
+      first_checked = dependent.family_member.person.consumer_role.is_applying_coverage
+      second_checked = !dependent.family_member.person.consumer_role.is_applying_coverage
+    end
+    return first_checked, second_checked
+  end
 end

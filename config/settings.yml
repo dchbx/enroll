@@ -6,6 +6,7 @@ site:
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  website_name: "www.DCHealthLink.com"
 
   social_media:
     facebook_url: ""

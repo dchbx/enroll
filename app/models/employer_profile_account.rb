@@ -63,8 +63,10 @@ class EmployerProfileAccount
 
     # A new billing period begins the first day of each month
     event :advance_billing_period, :guard => :first_day_of_month?, :after => :record_transition do
-      transitions from: :binder_pending, to: :canceled #, :after => :expire_enrollment
 
+      # Commented due initial ER plan year cancellation issues ticket 16300
+      # transitions from: :binder_pending, to: :canceled #, :after => :expire_enrollment
+      transitions from: :binder_pending, to: :binder_pending
       transitions from: :binder_paid, to: :invoiced, :after => :enroll_employer
       transitions from: :current, to: :invoiced
       transitions from: :invoiced, to: :past_due
@@ -116,6 +118,7 @@ private
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
+      event: aasm.current_event,
       transition_at: Time.now.utc
     )
   end

@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_member_from_hbx_enrollment")
 
-describe RemoveMemberFromHbxEnrollment do
+describe RemoveMemberFromHbxEnrollment, dbclean: :after_each do
 
   let(:given_task_name) { "remove_member_from_hbx_enrollment" }
   subject { RemoveMemberFromHbxEnrollment.new(given_task_name, double(:current_scope => nil)) }

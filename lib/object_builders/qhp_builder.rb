@@ -3,8 +3,8 @@ class QhpBuilder
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
 
   def initialize(qhp_hash)
-    log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
-    @logger = Logger.new(log_path)
+    @log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.strftime("%Y_%m_%d_%H%M%S")}.log"
+    @logger = Logger.new(@log_path)
     @qhp_hash = qhp_hash
     @qhp_array = []
     if qhp_hash[:packages_list].present?
@@ -119,7 +119,7 @@ class QhpBuilder
     puts "*"*80
     puts "Total Number of Plans imported from xml: #{@xml_plan_counter}."
     puts "Total Number of Plans Saved to database: #{@success_plan_counter}."
-    puts "Check the log file #{LOG_PATH}"
+    puts "Check the log file #{@log_path}"
     puts "*"*80
     @logger.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
     @logger.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"

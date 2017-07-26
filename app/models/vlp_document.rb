@@ -76,6 +76,15 @@ class VlpDocument < Document
 		"Yemen", "Zambia","Zimbabwe"
   ]
 
+  # admin action list for verification process, dropdown for each verification type
+  ADMIN_VERIFICATION_ACTIONS = ["Verify", "Return for Deficiency", "View History", "Call HUB"]
+
+  # reasons admin can provide when verifying type
+  VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
+
+  # reasons admin can provide when returning for deficiency verification type
+  RETURNING_FOR_DEF_REASONS = ["Illegible Document", "Member Data Change", "Document Expired", "Additional Document Required", "Other"]
+
   field :alien_number, type: String
   field :i94_number, type: String
   field :visa_number, type: String

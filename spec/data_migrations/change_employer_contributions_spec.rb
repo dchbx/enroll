@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_employer_contributions")
 
-describe ChangeEmployerContributions do
+describe ChangeEmployerContributions, dbclean: :after_each do
 
   let(:given_task_name) { "change_employer_contributions" }
   subject { ChangeEmployerContributions.new(given_task_name, double(:current_scope => nil)) }

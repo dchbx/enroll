@@ -2,6 +2,7 @@ module PdfTemplates
   class EmployerNotice
     include Virtus.model
 
+    attribute :notification_type, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
     attribute :notice_date, Date

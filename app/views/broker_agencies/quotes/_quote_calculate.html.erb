@@ -12,5 +12,4 @@
   <% end %>
   <%= render partial: 'broker_agencies/quotes/panels/dental'  if @q.can_edit? %>
   <%= render partial: 'broker_agencies/quotes/panels/quote', locals: {benefit_group:benefit_group}  %>
-  <%= link_to "Save and Go Back to Quotes", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
 </div>

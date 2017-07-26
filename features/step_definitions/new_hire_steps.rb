@@ -60,7 +60,7 @@ def expected_effective_on(qle: false)
 end
 
 Then(/Employee tries to complete purchase of another plan/) do
-  step "Employee clicks \"Shop for Plans\" on my account page"
+  step "I can click Shop for Plans button"
   step "Employee clicks continue on the group selection page"
   step "Employee should see the list of plans"
   step "I should not see any plan which premium is 0"
@@ -82,6 +82,10 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
   else
     find('.interaction-click-control-shop-for-new-plan', :wait => 10).click
   end
+end
+
+Then(/^I can click Shop for Plans button$/) do
+  click_button "Shop for Plans"
 end
 
 And(/Employer for (.*) has (.*) rule/) do |named_person, rule|
@@ -108,13 +112,17 @@ end
 Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sleep 1 #wait for e-mail nonsense
   enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
-  sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
-  enrollment = first('.hbx-enrollment-panel')
+  sep_enr = enrollments.order_by(:'created_at'.asc).detect{|e| e.enrollment_kind == "special_enrollment"} if enrollments.present?
+  enrollment = all('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
-  enrollment.find('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
+
+  expect(all('.hbx-enrollment-panel').select{|panel| 
+    panel.has_selector?('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
+  }.present?).to be_truthy
+
   # Timekeeper is probably UTC in this case, as we are in a test environment
   # this will cause arbitrary problems with the specs late at night.
-#  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
+  #  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
 end
 
 
@@ -131,6 +139,19 @@ end
 Then (/(.*) should see passive renewal/) do |named_person|
   enrollment = page.all('.hbx-enrollment-panel').first
   enrollment.find('.panel-heading', text: 'Auto Renewing')
+end
+
+Then(/(.*) click on make changes button on passive renewal/) do |named_person|
+  find_all('.interaction-click-control-make-changes')[0].click
+end
+
+Then(/Employee (.*) should see confirm your plan selection page/) do |named_person|
+  expect(page).to have_content "Confirm Your Plan Selection"
+end
+
+Then (/(.*) should see renewal policy in active status/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').first
+  enrollment.find('.panel-heading', text: 'Coverage Selected')
 end
 
 

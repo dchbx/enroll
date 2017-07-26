@@ -79,7 +79,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.
-    If you don’t have an account already, you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>.
+    If you don’t have an account already, you can create one by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>.
     You can get help with logging in or creating an account by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 

@@ -26,6 +26,6 @@ feins = %w(
 feins.each do |fein|
   org = Organization.where(:fein => fein.gsub("-","")).first
   e_id = org.hbx_id
-  properties_slug = PropertiesSlug.new("", {:employer_id => e_id})
+  properties_slug = PropertiesSlug.new("", {:employer_id => e_id, manual_gen: true})
   controller.resource(ConnectionSlug.new(e_id), "", properties_slug, "")
 end

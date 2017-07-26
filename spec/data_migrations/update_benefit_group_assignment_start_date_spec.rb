@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_benefit_group_assignment_start_date")
 
-describe UpdateBenefitGroupAssignmentStartDate do
+describe UpdateBenefitGroupAssignmentStartDate, dbclean: :after_each do
 
   let(:given_task_name) { "update_benefit_group_assignment_start_date" }
   subject { UpdateBenefitGroupAssignmentStartDate.new(given_task_name, double(:current_scope => nil)) }
@@ -30,7 +30,7 @@ describe UpdateBenefitGroupAssignmentStartDate do
       allow(census_employee).to receive(:benefit_group_assignments).and_return benefit_group_assignments
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group).and_return(benefit_group)
-     
+
     end
 
 

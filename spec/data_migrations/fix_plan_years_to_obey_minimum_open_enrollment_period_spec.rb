@@ -2,7 +2,7 @@ require "rails_helper"
 require "pry"
 
 require File.join(Rails.root, "app", "data_migrations", "fix_plan_years_to_obey_minimum_open_enrollment_period")
-describe FixPlanYearsToObeyMinimumOpenEnrollmentPeriod do
+describe FixPlanYearsToObeyMinimumOpenEnrollmentPeriod, dbclean: :after_each do
 
     let(:given_task_name) { "fix_plan_years_to_obey_minimum_open_enrollment_period" }
     subject { FixPlanYearsToObeyMinimumOpenEnrollmentPeriod.new(given_task_name, double(:current_scope => nil)) }

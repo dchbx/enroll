@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "terminate_census_employee")
 
-describe TerminateCensusEmployee do
+describe TerminateCensusEmployee, dbclean: :after_each do
 
   describe "given a task name" do
     let(:given_task_name) { "termiante_census_employee" }

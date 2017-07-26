@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "correct_curam_vlp_status")
 
-describe CorrectCuramVlpStatus do
+describe CorrectCuramVlpStatus, dbclean: :after_each do
   let(:threshold_date) {
     Time.mktime(2016, 7, 5, 6, 0, 0)
   }
