@@ -101,9 +101,11 @@
           </div>
         </div>
       </div>
-      <div class="row row-form-wrapper no-buffer">
-        <%= render "insured/family_members/financial_assistance_row", family_member: dependent %>
-      </div>
+      <%if @family.application_in_progress.present?%>
+        <div class="row row-form-wrapper no-buffer">
+          <%= render "insured/family_members/financial_assistance_row", family_member: dependent %>
+        </div>
+      <%end%>
     <% end %>
     
     <% if (@prev_url_include_intractive_identity || @prev_url_include_consumer_role_id) && !@employee_role %>

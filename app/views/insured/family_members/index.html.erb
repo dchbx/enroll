@@ -38,11 +38,13 @@
         <div class="append_consumer_info">
 
         </div>
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-            <%= render "financial_assistance_row", family_member: @family.primary_applicant %>
+        <%if @family.application_in_progress.present?%>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+              <%= render "financial_assistance_row", family_member: @family.primary_applicant %>
+            </div>
           </div>
-        </div>
+        <%end%>
 
         <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
           <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
