@@ -4,6 +4,7 @@ class WorkflowStateTransition
 
   embedded_in :transitional, polymorphic: true
 
+  field :event, type: String
   field :from_state, type: String
   field :to_state, type: String
   field :transition_at, type: DateTime

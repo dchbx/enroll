@@ -1,5 +1,5 @@
 <% if hbx_enrollment.is_coverage_waived? %>
-  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: disable_make_changes_button?(hbx_enrollment), hbx_enrollment: hbx_enrollment } %>
+  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || disable_make_changes_button?(hbx_enrollment), hbx_enrollment: hbx_enrollment } %>
 <% else %>
 <% plan = hbx_enrollment.plan %>
 <div class="module hbx-enrollment-panel panel panel-default">

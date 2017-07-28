@@ -30,8 +30,8 @@ module Factories
         @plan_year_start_on = @active_plan_year.end_on + 1.day
         @plan_year_end_on   = @active_plan_year.end_on + 1.year
 
-        open_enrollment_start_on = Date.new(2017,1,10) # these dates were requested by business
-        open_enrollment_end_on = Date.new(2017,1,13) # these dates were requested by business
+        open_enrollment_start_on = Date.new(2017,5,5) # these dates were requested by business
+        open_enrollment_end_on = Date.new(2017,5,13) # these dates were requested by business
 
         @renewal_plan_year = @employer_profile.plan_years.build({
           start_on: @plan_year_start_on,

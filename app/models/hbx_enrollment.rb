@@ -208,7 +208,8 @@ class HbxEnrollment
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 
@@ -1309,7 +1310,7 @@ class HbxEnrollment
 
     if is_shop?
       if employee_role.can_enroll_as_new_hire?
-        coverage_effective_date = employee_role.coverage_effective_on(qle: qle)
+        coverage_effective_date = employee_role.coverage_effective_on(current_benefit_group: self.benefit_group, qle: qle)
       elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
         coverage_effective_date = special_enrollment_period.effective_on
       elsif benefit_group.is_open_enrollment?

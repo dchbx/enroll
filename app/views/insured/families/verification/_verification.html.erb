@@ -3,10 +3,10 @@
     <h4>
       <% if enrollment_group_unverified?(@person) && verification_needed?(@person) %>
           Document Due Date:&nbsp;&nbsp;
-          <% if verification_due_date(@family) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= verification_due_date(@person.primary_family) %> (Past Due)</span>
+          <% if @family.verification_due_date <= TimeKeeper.date_of_record %>
+              <span class="label label-danger"><%= @person.primary_family.verification_due_date %> (Past Due)</span>
           <% else %>
-              <span class="label label-warning"><%= verification_due_date(@person.primary_family) %></span>
+              <span class="label label-warning"><%= @person.primary_family.verification_due_date %></span>
           <% end %>
       <% end %>
     </h4>
@@ -16,27 +16,27 @@
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
     <% @family_members.each do |f_member| %>
-        <% person = f_member.person %>
-        <div class="row">
-          <div class="family-member col-md-12">
-            <div class="person">
-              <%= f_member.person.full_name %>
-            </div>
-            <div class="verification-types col-md-12">
-              <% person.verification_types.each do |v_type| %>
-                  <div class="row">
-                    <div class="v-type col-md-12">
-                      <div class="v-type-name col-md-3">
-                        <%= v_type %>
-                      </div>
-                      <div class="v-type-status col-md-3">
+      <% person = f_member.person %>
+      <div class="row">
+        <div class="family-member col-md-12">
+          <div class="person">
+            <%= f_member.person.full_name %>
+          </div>
+          <div class="verification-types col-md-12">
+            <% person.verification_types.each do |v_type| %>
+                <div class="row">
+                  <div class="v-type col-md-12">
+                    <div class="v-type-name col-md-3">
+                      <%= v_type %>
+                    </div>
+                    <div class="v-type-status col-md-3">
                       <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
                         <%= show_v_type(v_type, person) %>
                       </span>&nbsp;
                         <%= pundit_span Family, :updateable? %>
                       </div>
                       <div class="v-type-upload col-md-3">
-                        <% if unverified?(person) %>
+                        <% if type_unverified?(v_type, person) %>
                             <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
                           <span class="btn btn-default btn-file">
                                 <i class="fa fa-upload" aria-hidden="true"></i>
@@ -50,12 +50,13 @@
                       </div>
                       <% if current_user.has_hbx_staff_role? %>
                           <div class="v-type-actions col-md-3">
-                            <%= select_tag :verification_actions, options_for_select(::VlpDocument::ADMIN_VERIFICATION_ACTIONS), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+                            <%= select_tag :verification_actions, admin_actions(v_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
                           </div>
                       <% end %>
                     </div>
                   </div>
                   <% if current_user.has_hbx_staff_role? %>
+                      <!-- ***** Verification reason ***** -->
                       <div class="row">
                         <div class="verification-update-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}"%>>
                           <div class="col-md-6">
@@ -64,6 +65,7 @@
                           <%= form_tag update_verification_type_documents_path, method: :put do %>
                               <%= hidden_field_tag 'person_id', person.id  %>
                               <%= hidden_field_tag 'verification_type', v_type%>
+                              <%= hidden_field_tag 'admin_action', 'verify' %>
                               <div class="form-group col-md-3">
                                 <%= select_tag :verification_reason, options_for_select(::VlpDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
                               </div>
@@ -73,6 +75,47 @@
                           <%end%>
                         </div>
                       </div>
+                      <!-- ==== verification reason ==== -->
+
+                      <!-- ***** Return for Deficiency reason ***** -->
+                      <div class="row">
+                        <div class="return-for-def-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-return"%>>
+                          <div class="col-md-6">
+                            Return for Deficiency reason:
+                          </div>
+                          <%= form_tag update_verification_type_documents_path, method: :put do %>
+                              <%= hidden_field_tag 'person_id', person.id  %>
+                              <%= hidden_field_tag 'verification_type', v_type%>
+                              <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
+                              <div class="form-group col-md-3">
+                                <%= select_tag :verification_reason, options_for_select(::VlpDocument::RETURNING_FOR_DEF_REASONS), {prompt: ' Select Reason', required: true}%>
+                              </div>
+                              <div class="col-md-3">
+                                <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+                              </div>
+                          <%end%>
+                        </div>
+                      </div>
+                      <!-- ==== return for deficiency reason ==== -->
+
+                      <!-- ***** FEDhub request ***** -->
+                      <div class="row">
+                        <div class="fedhub-request col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-hub"%>>
+                          <div class="col-md-9">
+                            <p>New request to the Federal Hub will be sent.</p>
+                          </div>
+                          <%= form_tag fed_hub_request_documents_path, method: :post do %>
+                              <%= hidden_field_tag 'person_id', person.id  %>
+                              <%= hidden_field_tag 'verification_type', v_type%>
+                              <%= hidden_field_tag 'admin_action', 'hub_request' %>
+                              <div class="col-md-3">
+                                <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+                              </div>
+                          <%end%>
+                        </div>
+                      </div>
+                      <!-- ==== fedhub request ==== -->
+
                   <% end %>
                   <div class="row">
                     <% if documents_list(person, v_type).any? %>
@@ -83,7 +126,7 @@
                                   <div class="v-doc col-md-11">
                                     <% if vlp_doc.identifier.present? %>
                                         <% key = vlp_doc.identifier.split('#').last %>
-                                        <%= link_to "Document copy for #{vlp_doc.verification_type.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>
+                                        <%= link_to "#{vlp_doc.title.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>
                                     <% end %>
                                   </div>
                                   <div class="v-doc col-md-1">

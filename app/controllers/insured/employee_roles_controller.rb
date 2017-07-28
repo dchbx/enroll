@@ -28,11 +28,14 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if @found_census_employees.empty?
+        first_name = @person_params[:first_name]
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
         respond_to do |format|
           format.html { render 'no_match' }
         end
+        # Sends an external email to EE when the EE match fails
+        UserMailer.send_employee_ineligibility_notice(current_user.email, first_name).deliver_now unless current_user.email.blank?
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
         respond_to do |format|

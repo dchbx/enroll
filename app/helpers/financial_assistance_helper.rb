@@ -87,11 +87,19 @@ module FinancialAssistanceHelper
     next_path ? send("financial_assistance_application_applicant_#{next_path}_path", application, applicant) : other_questions_financial_assistance_application_applicant_path(application, applicant)
   end
   
-  def show_component(url)
-    if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members"
-      false
+  def show_component(controller_name)
+    if controller_name == "consumer_roles"
+      return Settings.view_horizontal_status.consumer_roles
+    elsif controller_name == "interactive_identity_verifications"
+      return Settings.view_horizontal_status.interactive_identity_verifications
+    elsif controller_name == "applications"
+      return Settings.view_horizontal_status.applications
+    elsif controller_name == "family_members"
+      return Settings.view_horizontal_status.family_members
+    elsif controller_name == "applicants"
+      return Settings.view_horizontal_status.applicants
     else
-      true
+      return true
     end
   end
 end

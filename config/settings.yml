@@ -115,3 +115,11 @@ aptc_errors:
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
+
+view_horizontal_status:
+  consumer_roles: false
+  interactive_identity_verifications: false
+  applications: false
+  family_members: false
+  applicants: false
+

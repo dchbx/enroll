@@ -3,10 +3,11 @@ require 'rails_helper'
 RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   let(:family) { double }
   let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
-  context "#is_benefit_categories_satisfied?" do
-    let(:consumer_role) {double}
-    let(:benefit_package) {double}
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:consumer_role) { person.consumer_role }
+  let(:benefit_package) {double}
 
+  context "#is_benefit_categories_satisfied?" do
     it "should return true if benefit_package has both kinds of benefit categories" do
       allow(benefit_package).to receive(:benefit_categories).and_return(['health', 'dental'])
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, coverage_kind: 'dental', family: family)
@@ -47,7 +48,9 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
   context "is_age_range_satisfied_for_catastrophic?" do
     let(:consumer_role) {double(dob: (TimeKeeper.date_of_record - 20.years))}
-    let(:benefit_package) {double}
+    before do
+      allow(consumer_role).to receive(:person).and_return(person)
+    end
 
     it "should return true when not catastrophic" do
       allow(benefit_package).to receive(:age_range).and_return (0..0)
@@ -75,8 +78,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "age_on_benefit_end_on" do
-    let(:consumer_role) {double(dob: (TimeKeeper.date_of_record - 20.years))}
-    let(:benefit_package) {double}
+    let(:consumer_role) { (FactoryGirl.create(:person, :with_consumer_role, dob: (TimeKeeper.date_of_record - 20.years))).consumer_role}
     let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package) }
     let(:end_on) { Date.new(2016, 12, 31) }
 
@@ -215,8 +217,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "is_family_relationships_satisfied?" do
-    let(:consumer_role) {double}
-    let(:benefit_package) {double}
     let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package)}
 
     it "should return true for relationship other than child" do
@@ -238,8 +238,6 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "is_child_age_satisfied?" do
-    let(:consumer_role) {double}
-    let(:benefit_package) {double}
     let(:new_effective_on) {TimeKeeper.date_of_record}
     let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,new_effective_on:new_effective_on)}
 
@@ -260,26 +258,24 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_eligibility_element_group) {FactoryGirl.build(:benefit_eligibility_element_group)}
-    let(:role) {FactoryGirl.create(:consumer_role_object)}
-    let(:rule) {InsuredEligibleForBenefitRule.new(role, benefit_package, family: family)}
-    let(:person) {double}
+    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
 
     context "consumer_role aasm_state is fully_verified" do
       before :each do
-        role.aasm_state = "fully_verified"
+        consumer_role.aasm_state = "fully_verified"
       end
       it "returns true for verification_successful state" do
-        role.lawful_presence_determination.aasm_state = "verification_successful"
+        consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
       it "returns true for verification_pending state" do
-        role.lawful_presence_determination.aasm_state = "verification_pending"
+        consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
       it "returns true for verification outstanding" do
-        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
@@ -293,22 +289,23 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       it "returns true if insured_eligible_for_benefit_rule satisfies all criteria" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
-        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
+        consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.satisfied?).to eq [true, []]
       end
     end
 
     context "consumer_role aasm_state is NOT fully_verified" do
       before :each do
-        role.aasm_state = "ssa_pending"
+        consumer_role.aasm_state = "ssa_pending"
       end
       it "returns true for verification_successful state" do
-        role.lawful_presence_determination.aasm_state = "verification_successful"
+        consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
       it "returns true for verification_pending state" do
-        role.lawful_presence_determination.aasm_state = "verification_pending"
+        consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
@@ -316,9 +313,9 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         args = OpenStruct.new
         args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         args.vlp_authority = "dhs"
-        role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
-        role.ssn_invalid!(args)
-        role.person.save!
+        consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
+        consumer_role.ssn_invalid!(args)
+        consumer_role.person.save!
         expect(rule.is_lawful_presence_status_satisfied?).to eq (Settings.aca.individual_market.verification_outstanding_window.days == 0)
       end
 
@@ -326,32 +323,37 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         args = OpenStruct.new
         args.determined_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days - 10.days)
         args.vlp_authority = "dhs"
-        role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
-        role.ssn_invalid!(args)
-        role.person.save!
+        consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: "payload"})
+        consumer_role.ssn_invalid!(args)
+        consumer_role.person.save!
         expect(rule.is_lawful_presence_status_satisfied?).to eq true
       end
 
       it "returns false if insured_eligible_for_benefit_rule fails" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
-        role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
-        role.lawful_presence_determination.aasm_state = "verification_outstanding"
+        allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
+        consumer_role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
+        consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         error_msg = (Settings.aca.individual_market.verification_outstanding_window.days == 0) ? [] : [["eligibility failed on lawful_presence_status"]]
         expect(rule.satisfied?).to eq [(Settings.aca.individual_market.verification_outstanding_window.days == 0), error_msg]
       end
     end
 
-    context "is citizenship status satisfied" do
-      it "returns false if person is not lawfully present" do
-        role.citizen_status = "not_lawfully_present_in_us"
-        expect(rule.is_citizenship_status_satisfied?).to eq false
+    context "is citizenship status satisfied?" do
+      shared_examples_for "citizenship status satisfied" do |citizen_status, result|
+        it "returns #{result} if citizen status is #{citizen_status}" do
+          consumer_role.citizen_status = citizen_status
+          expect(rule.is_citizenship_status_satisfied?).to eq result
+        end
       end
-
-      it "returns true if person is lawfully present" do
-        role.citizen_status = "alien_lawfully_present"
-        expect(rule.is_citizenship_status_satisfied?).to eq true
-      end
+      it_behaves_like "citizenship status satisfied", "not_lawfully_present_in_us", false
+      it_behaves_like "citizenship status satisfied", "non_native_not_lawfully_present_in_us", false
+      it_behaves_like "citizenship status satisfied", nil, false
+      it_behaves_like "citizenship status satisfied", "alien_lawfully_present", true
+      it_behaves_like "citizenship status satisfied", "", false
+      it_behaves_like "citizenship status satisfied", " ", false
+      it_behaves_like "citizenship status satisfied", "    ", false
     end
 
     context "#primary applicant" do

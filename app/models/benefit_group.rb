@@ -429,7 +429,7 @@ class BenefitGroup
         end
 
         benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
-        ce.find_or_create_benefit_group_assignment(benefit_groups.first)
+        ce.find_or_create_benefit_group_assignment(benefit_groups)
       end
     end
   end

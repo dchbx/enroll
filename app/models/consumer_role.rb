@@ -17,9 +17,11 @@ class ConsumerRole
   US_CITIZEN_STATUS = "us_citizen"
   NOT_LAWFULLY_PRESENT_STATUS = "not_lawfully_present_in_us"
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
+  INELIGIBLE_CITIZEN_VERIFICATION = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us)
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
+  VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -405,6 +407,15 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
+    event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :verification_outstanding
+      transitions from: :dhs_pending, to: :verification_outstanding
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
+      transitions from: :verification_period_ended, to: :verification_outstanding
+    end
+
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
@@ -553,6 +564,12 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  def check_for_critical_changes(person_params)
+    if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+      redetermine!(verification_attr) if Person.person_has_an_active_enrollment?(person)
+    end
+  end
+
   #class methods
   class << self
     #this method will be used to check 90 days verification period for outstanding verification
@@ -671,6 +688,28 @@ class ConsumerRole
     end
   end
 
+  def admin_verification_action(admin_action, v_type, update_reason)
+    case admin_action
+      when "verify"
+        update_verification_type(v_type, update_reason)
+      when "return_for_deficiency"
+        return_doc_for_deficiency(v_type, update_reason)
+    end
+  end
+
+  def return_doc_for_deficiency(v_type, update_reason, *authority)
+    if v_type == "Social Security Number"
+      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason)
+    elsif v_type == "American Indian Status"
+      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason)
+    else
+      lawful_presence_determination.deny!(verification_attr(authority.first))
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    end
+    reject!(verification_attr(authority.first))
+    "#{v_type} was returned for deficiency."
+  end
+
   def update_verification_type(v_type, update_reason, *authority)
     if v_type == "Social Security Number"
       update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
@@ -718,6 +757,10 @@ class ConsumerRole
     (dhs_pending? || ssa_pending?) && no_changes_24_h?
   end
 
+  def no_changes_24_h?
+    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
+  end
+
   def sensitive_information_changed(field, person_params)
     if field == "dob"
       person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
@@ -728,14 +771,11 @@ class ConsumerRole
     end
   end
 
-  def no_changes_24_h?
-    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
-  end
-
   def record_transition(*args)
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 

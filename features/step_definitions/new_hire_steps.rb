@@ -141,6 +141,19 @@ Then (/(.*) should see passive renewal/) do |named_person|
   enrollment.find('.panel-heading', text: 'Auto Renewing')
 end
 
+Then(/(.*) click on make changes button on passive renewal/) do |named_person|
+  find_all('.interaction-click-control-make-changes')[0].click
+end
+
+Then(/Employee (.*) should see confirm your plan selection page/) do |named_person|
+  expect(page).to have_content "Confirm Your Plan Selection"
+end
+
+Then (/(.*) should see renewal policy in active status/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').first
+  enrollment.find('.panel-heading', text: 'Coverage Selected')
+end
+
 
 Then(/(.*) should see active enrollment with his daughter/) do |named_person|
   sleep 1 #wait for e-mail nonsense

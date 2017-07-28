@@ -1210,7 +1210,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it 'should activate existing benefit_group_assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
-        census_employee.find_or_create_benefit_group_assignment(blue_collar_benefit_group)
+        census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment
       end
@@ -1233,7 +1233,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(census_employee.benefit_group_assignments.size).to eq 4
         expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
         expect(blue_collar_benefit_group_assignment2.activated_at).to be_nil
-        census_employee.find_or_create_benefit_group_assignment(blue_collar_benefit_group)
+        census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 4
         expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment2
         expect(blue_collar_benefit_group_assignment2.activated_at).not_to be_nil
@@ -1246,7 +1246,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 1
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq blue_collar_benefit_group
-        census_employee.find_or_create_benefit_group_assignment(white_collar_benefit_group)
+        census_employee.find_or_create_benefit_group_assignment([white_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 2
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq white_collar_benefit_group
       end

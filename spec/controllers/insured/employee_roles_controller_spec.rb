@@ -243,7 +243,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
-    let(:user) { double("User",id: user_id ) }
+    let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
 
     before(:each) do
       sign_in(user)
@@ -278,6 +278,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("no_match")
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+          expect(response).to render_template("employee_ineligibility_notice")
         end
 
         context "that find a matching employee" do

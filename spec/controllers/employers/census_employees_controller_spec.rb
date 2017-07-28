@@ -154,6 +154,7 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       allow(CensusEmployee).to receive(:new).and_return(census_employee)
       allow(census_employee).to receive(:employee_role).and_return(true)
+      allow(census_employee).to receive(:find_or_create_benefit_group_assignment).and_return(true)
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_groups)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
@@ -514,6 +515,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(new_census_employee).to receive(:hired_on=).and_return("test")
           allow(new_census_employee).to receive(:employer_profile=).and_return("test")
           allow(new_census_employee).to receive(:address).and_return(true)
+          allow(new_census_employee).to receive(:construct_employee_role_for_match_person)
           allow(new_census_employee).to receive(:add_default_benefit_group_assignment).and_return(true)
         end
 
@@ -523,7 +525,6 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
-          allow(new_census_employee).to receive(:construct_employee_role_for_match_person)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
@@ -535,7 +536,6 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
-          allow(new_census_employee).to receive(:construct_employee_role_for_match_person)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."

@@ -64,7 +64,7 @@ class Employers::CensusEmployeesController < ApplicationController
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
 
       if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
-        @census_employee.find_or_create_benefit_group_assignment(benefit_group)
+        @census_employee.find_or_create_benefit_group_assignment([benefit_group])
       end
     end
 
@@ -161,8 +161,8 @@ class Employers::CensusEmployeesController < ApplicationController
 
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?
-          new_census_employee.add_default_benefit_group_assignment
           new_census_employee.construct_employee_role_for_match_person
+          new_census_employee.add_default_benefit_group_assignment
 
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."

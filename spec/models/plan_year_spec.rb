@@ -325,6 +325,21 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             expect(plan_year.open_enrollment_date_errors[:open_enrollment_period].first).to match(/Open enrollment must end on or before/i)
           end
         end
+
+        context "when terminated plan year end_on is not end of month" do
+          let(:plan_year)       { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_year, aasm_state: :terminated)}
+
+          before do
+            plan_year.end_on = TimeKeeper.date_of_record.end_of_year - 30.days
+            plan_year.save!
+          end
+
+          it "should pass validation" do
+            expect(plan_year.open_enrollment_date_errors.present?).to be_falsey
+            expect(plan_year.errors.messages).to eq({})
+            expect(plan_year.open_enrollment_date_errors).to eq({})
+          end
+        end
       end
     end
   end
@@ -542,6 +557,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         py.save
         py
       end
+      let(:plan_year1) { FactoryGirl.create(:renewing_plan_year)}
 
       context "and at least one employee is present on the roster sans assigned benefit group" do
         let!(:census_employee_no_benefit_group)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
@@ -641,6 +657,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
+          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/fewer full time equivalent employees/)
+          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
         end
 
         it "and plan year should be in publish pending state" do

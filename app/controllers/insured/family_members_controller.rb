@@ -103,9 +103,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def destroy
-    @dependent = Forms::FamilyMember.find(params.require(:id))
     @dependent.destroy!
-
     respond_to do |format|
       format.html { render 'index' }
       format.js { render 'destroyed' }
@@ -124,7 +122,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def edit
-    @dependent = Forms::FamilyMember.find(params.require(:id))
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
 
@@ -135,8 +132,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    @dependent = Forms::FamilyMember.find(params.require(:id))
-
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
@@ -147,6 +142,7 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+    consumer_role.check_for_critical_changes(params[:dependent]) if consumer_role
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
       respond_to do |format|
@@ -233,5 +229,9 @@ private
       end
       @dependent.addresses = addresses
     end
+  end
+
+  def set_dependent
+    @dependent = Forms::FamilyMember.find(params.require(:id))
   end
 end

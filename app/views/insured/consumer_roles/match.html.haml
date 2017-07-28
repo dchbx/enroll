@@ -1,5 +1,5 @@
 = content_for :horizontal_status do
-  - if show_component(request.path)
+  - if show_component(controller_name)
     = render  partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1}
 .container
   #new_person_wrapper

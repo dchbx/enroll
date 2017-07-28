@@ -216,28 +216,6 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe "#verification due date" do
-    let(:family) { FactoryGirl.build(:family) }
-    let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
-    let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
-    before :each do
-      assign(:family, family)
-    end
-    context "for special verification period" do
-      it "returns special verification period" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
-        expect(helper.verification_due_date(family)).to eq Date.new(2016,5,6)
-      end
-    end
-
-    context "with no special verification period" do
-      it "calls determine due date method" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_no_sp])
-        expect((helper.verification_due_date(family))).to eq TimeKeeper.date_of_record + 95.days
-      end
-    end
-  end
-
   describe "#documents uploaded" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     it "returns true if any family member has uploaded docs" do
@@ -392,5 +370,20 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
     it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
     it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
+  end
+
+  describe "#build_admin_actions_list" do
+    shared_examples_for "admin actions dropdown list" do |type, status, actions|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return status
+      end
+      it "returns admin actions array" do
+        expect(helper.build_admin_actions_list(person, type)).to eq actions
+      end
+    end
+
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Return for Deficiency", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Return for Deficiency", "View History", "Call HUB"]
   end
 end

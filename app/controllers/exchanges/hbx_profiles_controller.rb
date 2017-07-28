@@ -1,5 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include DataTablesSearch
   include Pundit
   include SepAll
 
@@ -397,20 +398,18 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    families = []
     all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-    if dt_query.search_string.blank?
-      families = all_families
-    else
-      person_ids = Person.search(dt_query.search_string).pluck(:id)
-      families = all_families.where({
-        "family_members.person_id" => {"$in" => person_ids}
-      })
-    end
+
+    families = search_families(dt_query.search_string, all_families)
+
+    sorted_by, order = input_sort_request
+
+    families = sorted_families(sorted_by, order, families)
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
-    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    @families = families[dt_query.skip, dt_query.take]
     render
   end
 

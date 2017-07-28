@@ -23,7 +23,7 @@
     <li <%= menu_tab_class(active_tab, "billing") %>>
       <%= link_to 'Billing', employers_employer_profile_path(@employer_profile.id,:tab=>'billing'), "aria-expanded" => "true" %>
     </li>
-    <% unless current_user.try(:has_broker_agency_staff_role?)%>
+    <%# unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>
       <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
       Messages
@@ -35,7 +35,7 @@
       <small>Messages</small>
       <% end %>
     </li>
-    <% end %>
+    <%# end %>
   </ul>
   <div class="module my-account-widget panel panel-default">
     <div class="panel-heading">

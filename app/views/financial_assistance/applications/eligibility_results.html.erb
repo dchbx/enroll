@@ -1,5 +1,7 @@
 <% content_for :horizontal_status do %>
-  <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% if show_component(controller_name) %>
+    <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% end %>
 <% end %>
   <div class="container">
     <div id="new_person_wrapper">
