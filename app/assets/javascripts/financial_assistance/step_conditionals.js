@@ -66,10 +66,15 @@ $(document).ready(function() {
   if ($("#income_amount").val() == 0){
    $("#income_amount").val("");
   }
+    $("#is_joint_tax_filing_yes").closest(".row").hide();
+    $("#is_claimed_as_tax_dependent_yes").closest(".row").next(".row").hide()
 
   $("body").on("change", "#is_required_to_file_taxes_no", function(){
     if ($('#is_required_to_file_taxes_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
+         $(this).parents(".row").next().each(function () {
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        })
     }
     else{
       $(this).parents(".row").next().next().removeClass('hide');
@@ -78,7 +83,10 @@ $(document).ready(function() {
   $("body").on("change", "#is_required_to_file_taxes_yes", function(){
 
     if ($('#is_required_to_file_taxes_yes').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
+      $(this).closest(".row").next(".row").each( function() {
+          $(this).show();
+          $(this).find("input").prop('required', 'required');
+      });
     }
     else{
       $(this).parents(".row").next().next().addClass('hide');
@@ -89,7 +97,11 @@ $(document).ready(function() {
 
   $("body").on("change", "#is_claimed_as_tax_dependent_no", function(){
     if ($('#is_claimed_as_tax_dependent_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
+      //$(this).parents(".row").next().addClass('hide');
+        $('#is_claimed_as_tax_dependent_no').closest(".row").next(".row").each( function(){
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        });
     }
     else{
       $(this).parents(".row").next().next().removeClass('hide');
@@ -99,7 +111,10 @@ $(document).ready(function() {
   $("body").on("change", "#is_claimed_as_tax_dependent_yes", function(){
 
     if ($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
+      //$(this).parents(".row").next().removeClass('hide');
+        $(this).closest(".row").next(".row").each( function() {
+            $(this).show();
+         });
     }
     else{
       $(this).parents(".row").next().next().addClass('hide');
@@ -203,7 +218,7 @@ $(document).ready(function() {
     $('#living_outside_yes').parents(".row").next().removeClass('hide');
   }
   /* Submit Application Form Related */
-  
+
 
   /* Preference Application Form Related */
 
@@ -237,43 +252,88 @@ $(document).ready(function() {
 
 /* Applicant's Tax Info Form Related */
   if($('#is_required_to_file_taxes_no').is(':checked')) {
-    $('#is_required_to_file_taxes_no').parents(".row").next().addClass('hide');
+    $('#is_required_to_file_taxes_no').closest(".row").next(".row").each( function(){
+      $(this).hide();
+      $(this).find("input").removeAttr('required');
+    });
   }
 
   if($('#is_required_to_file_taxes_yes').is(':checked')) {
-    $('#is_required_to_file_taxes_yes').parents(".row").next().removeClass('hide');
+     $('#is_required_to_file_taxes_yes').closest(".row").next(".row").show();
+     $('#is_required_to_file_taxes_yes').closest(".row").next(".row").find("input").prop('required', true);
   }
 
   if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
-    $('#is_claimed_as_tax_dependent_no').parents(".row").next().addClass('hide');
+    //$('#is_claimed_as_tax_dependent_no').closest(".row").hide();
+      $('#is_claimed_as_tax_dependent_no').closest(".row").next(".row").each( function(){
+          $(this).hide();
+       });
   }
 
   if($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
-    $('#is_claimed_as_tax_dependent_yes').parents(".row").next().removeClass('hide');
+    $('#is_claimed_as_tax_dependent_yes').closest(".row").next(".row").show();
   }
 
 /* Applicant's Tax Info Form Related */
-
+    $("#is_ssn_applied_yes").closest(".row").hide();
+    $("#is_ssn_applied_yes").removeAttr('required');
+    $("#is_ssn_applied_yes").closest(".row").find("input").removeAttr('required')
+    $("#is_pregnant_yes").closest(".row").nextAll(".row").slice(0,-4).each(function() {
+        $(this).hide();
+        $(this).find("input").removeAttr('required');
+    });
+    $("#is_former_foster_care_yes").closest(".row").show();
+    $("#is_student_yes").closest(".row").show();
 
 /* Applicant's Other Questions Form Related */
-  $("body").on("change", "#is_pregnant_no", function(){
-    if ($('#is_pregnant_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
-      $(this).parents(".row").next().next().addClass('hide');
-      $(this).parents(".row").next().next().next().removeClass('hide');
-      $(this).parents(".row").next().next().next().next().removeClass('hide');
-    };
-  });
+  //$("body").on("change", "#is_pregnant_no", function(){
+  //  if ($('#is_pregnant_no').is(':checked')) {
+  //    $(this).parents(".row").next().addClass('hide');
+  //    $(this).parents(".row").next().next().addClass('hide');
+  //    $(this).parents(".row").next().next().next().removeClass('hide');
+  //    $(this).parents(".row").next().next().next().next().removeClass('hide');
+  //  };
+  //});
 
-  $("body").on("change", "#is_pregnant_yes", function(){
-    if ($('#is_pregnant_yes').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
-      $(this).parents(".row").next().next().removeClass('hide');
-      $(this).parents(".row").next().next().next().addClass('hide');
-      $(this).parents(".row").next().next().next().next().addClass('hide');
-      $(this).parents(".row").next().next().next().next().next().addClass('hide');
-    };
-  });
+    $("body").on("change", "#is_pregnant_no", function(){
+        if ($('#is_pregnant_no').is(':checked')) {
+            //$(this).parents(".row").next().addClass('hide');
+            $(this).closest(".row").next(".row").each(function(){
+                $(this).hide();
+                $(this).find("input").removeAttr('required');
+            });
+            $('.interaction-choice-control-financial-assistance-applicant-student-school-kind').closest(".row").each(function(){
+                $(this).hide();
+                $(this).find("input").removeAttr('required');
+            });
+            $("#is_post_partum_period_yes").closest(".row").show();
+        };
+    });
+
+  //$("body").on("change", "#is_pregnant_yes", function(){
+  //  if ($('#is_pregnant_yes').is(':checked')) {
+  //    $(this).parents(".row").next().removeClass('hide');
+  //    $(this).parents(".row").next().next().removeClass('hide');
+  //    $(this).parents(".row").next().next().next().addClass('hide');
+  //    $(this).parents(".row").next().next().next().next().addClass('hide');
+  //    $(this).parents(".row").next().next().next().next().next().addClass('hide');
+  //  };
+  //});
+
+    $("body").on("change", "#is_pregnant_yes", function(){
+        if ($('#is_pregnant_yes').is(':checked')) {
+            //$(this).parents(".row").next().removeClass('hide');
+            $('#is_pregnant_yes').closest(".row").next(".row").each(function(){
+                $(this).show();
+                $(this).find("input").removeAttr('required');
+            });
+            $('#is_pregnant_yes').closest(".row").next().next().each(function(){
+                $(this).show();
+                $(this).find("input").removeAttr('required');
+            });
+            $("#is_post_partum_period_yes").closest(".row").hide();
+        };
+    });
 
   if($('#is_pregnant_no').is(':checked')) {
     $('#is_pregnant_no').parents(".row").next().addClass('hide');
@@ -282,39 +342,100 @@ $(document).ready(function() {
     $('#is_pregnant_no').parents(".row").next().next().next().next().removeClass('hide');
   }
 
-  if($('#is_pregnant_yes').is(':checked')) {
-    $('#is_pregnant_yes').parents(".row").next().removeClass('hide');
-    $('#is_pregnant_yes').parents(".row").next().next().removeClass('hide');
-    $('#is_pregnant_yes').parents(".row").next().next().next().addClass('hide');
-    $('#is_pregnant_yes').parents(".row").next().next().next().next().addClass('hide');
-    $('#is_pregnant_yes').parents(".row").next().next().next().next().next().addClass('hide');
-  }
+  //if($('#is_pregnant_yes').is(':checked')) {
+  //  $('#is_pregnant_yes').parents(".row").next().removeClass('hide');
+  //  $('#is_pregnant_yes').parents(".row").next().next().removeClass('hide');
+  //  $('#is_pregnant_yes').parents(".row").next().next().next().addClass('hide');
+  //  $('#is_pregnant_yes').parents(".row").next().next().next().next().addClass('hide');
+  //  $('#is_pregnant_yes').parents(".row").next().next().next().next().next().addClass('hide');
+  //}
 
-  $("body").on("change", "#is_post_partum_period_yes", function(){
-    if ($('#is_post_partum_period_yes').is(':checked')) {
-      $(this).parents(".row").next().next().removeClass('hide');
-    };
-  });
+    if($('#is_pregnant_yes').is(':checked')) {
+        $('#is_pregnant_yes').closest(".row").next(".row").each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+        $('#is_pregnant_yes').closest(".row").next().next().each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+    }
 
-  $("body").on("change", "#is_post_partum_period_no", function(){
-    if ($('#is_post_partum_period_no').is(':checked')) {
-      $(this).parents(".row").next().next().addClass('hide');
-    };
-  });
+  //$("body").on("change", "#is_post_partum_period_yes", function(){
+  //  if ($('#is_post_partum_period_yes').is(':checked')) {
+  //    $(this).parents(".row").next().next().removeClass('hide');
+  //  };
+  //});
+    $("body").on("change", "#is_post_partum_period_yes", function(){
+        if ($('#is_post_partum_period_yes').is(':checked')) {
+            //$(this).parents(".row").next().next().removeClass('hide');
+            $("#applicant_pregnancy_end_on").closest(".row").each(function(){
+                $(this).show();
+                $(this).find("input").removeAttr('required');
+            });
+            $("#medicaid_pregnency_yes").closest(".row").each(function(){
+                $(this).show();
+                $(this).find("input").removeAttr('required');
+            });
+        };
+    });
+
+    if($('#is_post_partum_period_yes').is(':checked')) {
+        //$('#is_post_partum_period_yes').parents(".row").next().next().removeClass('hide');
+        $("#applicant_pregnancy_end_on").closest(".row").each(function(){
+            $(this).show();
+            $(this).find("input").prop('required', true);
+        });
+        $("#medicaid_pregnency_yes").closest(".row").each(function(){
+            $(this).show();
+            $(this).find("input").prop('required', true);
+        });
+    }
+
+  //$("body").on("change", "#is_post_partum_period_no", function(){
+  //  if ($('#is_post_partum_period_no').is(':checked')) {
+  //    $(this).parents(".row").next().next().addClass('hide');
+  //  };
+  //});
+
+    $("body").on("change", "#is_post_partum_period_no", function(){
+        if ($('#is_post_partum_period_no').is(':checked')) {
+            //$(this).parents(".row").next().next().addClass('hide');
+            $("#applicant_pregnancy_end_on").closest(".row").each(function(){
+                $(this).hide();
+                $(this).find("input").removeAttr('required');;
+            });
+            $("#medicaid_pregnency_yes").closest(".row").each(function(){
+                $(this).hide();
+                $(this).find("input").removeAttr('required');
+            });
+        };
+    });
 
   if($('#is_post_partum_period_yes').is(':checked')) {
     $('#is_post_partum_period_yes').parents(".row").next().next().removeClass('hide');
   }
 
-  if($('#is_post_partum_period_no').is(':checked')) {
-    $('#is_post_partum_period_no').parents(".row").next().next().addClass('hide');
-  }
+  //if($('#is_post_partum_period_no').is(':checked')) {
+  //  $('#is_post_partum_period_no').parents(".row").next().next().addClass('hide');
+  //}
+    if($('#is_post_partum_period_no').is(':checked')) {
+        //$('#is_post_partum_period_no').parents(".row").next().next().addClass('hide');
+        $("#applicant_pregnancy_end_on").closest(".row").each(function(){
+            $(this).hide();
+            $(this).find("input").removeAttr('required');;
+        });
+        $("#medicaid_pregnency_yes").closest(".row").each(function(){
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        });
+    }
 
   $("body").on("change", "#former_foster_care_no", function(){
     if ($('#former_foster_care_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
-      $(this).parents(".row").next().next().addClass('hide');
-      $(this).parents(".row").next().next().next().addClass('hide');
+      $(this).parents(".row").next().hide();
+      $(this).parents(".row").next().next().hide();
+      $(this).parents(".row").next().next().next().hide();
     };
   });
 
@@ -424,4 +545,81 @@ $(document).ready(function() {
   }
   /* Preference Application Form Related */
 
-});
+    $("body").on("change", "#is_former_foster_care_yes", function() {
+        $("#is_former_foster_care_yes").closest(".row").next().each(function(){
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#is_former_foster_care_yes").closest(".row").next().next().each(function(){
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#is_former_foster_care_yes").closest(".row").next().next().next().each(function(){
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+    });
+    if($('#is_former_foster_care_yes').is(':checked')) {
+        $("#is_former_foster_care_yes").closest(".row").next().each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#is_former_foster_care_yes").closest(".row").next().next().each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#is_former_foster_care_yes").closest(".row").next().next().next().each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+    }
+    if($('#is_student_yes').is(':checked')) {
+        $("#financial_assistance_applicant_student_kind").closest(".row").each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#applicant_student_status_end_on").closest(".row").each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+    }
+    if($('#is_student_no').is(':checked')) {
+        $("#financial_assistance_applicant_student_kind").closest(".row").each(function () {
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#applicant_student_status_end_on").closest(".row").each(function () {
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        });
+    }
+    $("body").on("change", "#is_student_yes", function() {
+        $("#financial_assistance_applicant_student_kind").closest(".row").each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#applicant_student_status_end_on").closest(".row").each(function () {
+            $(this).show();
+            $(this).find("input").removeAttr('required');
+        })
+    });
+    $("body").on("change", "#is_student_no", function() {
+        $("#financial_assistance_applicant_student_kind").closest(".row").each(function () {
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        });
+        $("#applicant_student_status_end_on").closest(".row").each(function () {
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        });
+    });
+    //$("body").on(".interaction-choice-control-financial-assistance-applicant-student-school-kind", "change", function(){
+        $("#financial_assistance_applicant_student_kind").change(function(){
+         var _input = $(this).val();
+         if (_input == "Full Time"){
+
+        }
+    })
+
+
+    });
