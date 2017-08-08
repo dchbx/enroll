@@ -1,7 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
   def migrate
-    #trigger_single_table_inheritance_auto_load_of_child = VlpDocument
+    trigger_single_table_inheritance_auto_load_of_child = VlpDocument
     hbx_id_1=ENV['hbx_id_1']
     hbx_id_2=ENV['hbx_id_2']
     person1 = Person.where(hbx_id:hbx_id_1).first
@@ -25,8 +25,9 @@ class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
         #person1.user_id = nil
         person1.save(:validate => false)
         person2.save(:validate => false)
-         person1.unset(:user_id)
+        person1.unset(:user_id)
         person1.save
+        person1.reload
         person2.save
         puts "move the user account from  #{hbx_id_1} to #{hbx_id_2}" unless Rails.env.test?
       end
