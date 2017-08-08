@@ -20,7 +20,7 @@ class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
         end
         person2.user=person1.user
 
-        #person1.unset(:_type)
+        person1.unset(:_type)
         #person1.update(:user_id => nil)
         #person1.user_id = nil
         person1.save(:validate => false)
