@@ -3,7 +3,7 @@
 <% @style_text_indent = "style='margin-left:30px;'" %>
 <% @style_color_indent = "style='color:#ff0000; margin-left:30px;'" %>
 <%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">

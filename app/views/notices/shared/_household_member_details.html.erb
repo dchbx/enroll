@@ -1,0 +1,24 @@
+<div style="display:block; page-break-inside: avoid;">
+  <table align="center" cellpadding="10" class="total_table thick_broder" style="margin-top: 10px; margin-bottom: 10px; width: <%= table_width if defined? table_width %>;">
+    <tbody>
+      <tr style="text-align: left">
+        <th>
+          <b>Household Member(s):</b>
+        </th>
+        <th>
+          <b>Deadline to Send Documents</b>
+        </th>
+      </tr>
+      <% rows[0].each do |member| %>
+        <tr valign="top">
+          <td class="small" style="width: 60%;">
+            <%= member.full_name%> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= member.age %>
+          </td>
+          <td class="small">
+            <%= member.documents_due_date.strftime("%B %d, %Y") %>
+          </td>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
+</div>

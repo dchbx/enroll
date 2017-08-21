@@ -77,7 +77,16 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       end 
     end
 
-    context "enrollment with outstanding member" do
+    context "outstanding enrollment with outstanding member" do
+      let(:enrollment_status) { 'enrolled_contingent' }
+      it "return move_to_contingent! event" do
+        allow(subject).to receive(:roles_for_determination).and_return([verification_outstanding_person.consumer_role])
+        expect(subject.determine_next_state).to eq :do_nothing
+      end
+    end
+
+    context "selected enrollment with outstanding member" do
+      let(:enrollment_status) { 'coverage_selected' }
       it "return move_to_contingent! event" do
         allow(subject).to receive(:roles_for_determination).and_return([verification_outstanding_person.consumer_role])
         expect(subject.determine_next_state).to eq :move_to_contingent!

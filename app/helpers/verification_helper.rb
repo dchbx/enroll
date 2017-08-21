@@ -14,27 +14,28 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
+    consumer = member.consumer_role
     case type
       when 'Social Security Number'
-        if member.consumer_role.ssn_verified?
+        if consumer.ssn_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
           "in review"
         else
           "outstanding"
         end
       when 'American Indian Status'
-        if member.consumer_role.native_verified?
+        if consumer.native_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
           "in review"
         else
           "outstanding"
         end
       else
-        if member.consumer_role.lawful_presence_verified?
+        if consumer.lawful_presence_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
           "in review"
         else
           "outstanding"
@@ -58,23 +59,25 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
+    person.primary_family.contingent_enrolled_active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
   end
 
   def verification_needed?(person)
     person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
   end
 
-  def verification_due_date(family)
-    if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
-      else
-        family.active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
-      end
-    else
-      TimeKeeper.date_of_record.to_date + 95.days
-    end
+  def has_enrolled_policy?(family_member)
+    return true if family_member.blank?
+    family_member.family.enrolled_policy(family_member).present?
+  end
+
+  def is_not_verified?(family_member, v_type)
+    return true if family_member.blank?
+    !family_member.person.consumer_role.is_type_verified?(v_type)
+  end
+
+  def can_show_due_date?(person, options ={})
+    enrollment_group_unverified?(person) && verification_needed?(person) && (has_enrolled_policy?(options[:f_member]) && is_not_verified?(options[:f_member], options[:v_type]))
   end
 
   def documents_uploaded
@@ -141,14 +144,6 @@ module VerificationHelper
     @family_members.all?{|member| member.person.consumer_role.aasm_state == "fully_verified"}
   end
 
-  def review_status(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      family.active_household.hbx_enrollments.verification_needed.first.review_status
-    else
-      "no enrollment"
-    end
-  end
-
   def show_doc_status(status)
     ["verified", "rejected"].include?(status)
   end
@@ -171,5 +166,21 @@ module VerificationHelper
   # returns vlp_documents array for verification type
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
+  end
+  
+  def admin_actions(v_type, f_member)
+    options_for_select(build_admin_actions_list(v_type, f_member))
+  end
+
+  def build_admin_actions_list(v_type, f_member)
+    if verification_type_status(v_type, f_member) == "outstanding"
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
+    else
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
+  def type_unverified?(v_type, person)
+    verification_type_status(v_type, person) != "verified"
   end
 end

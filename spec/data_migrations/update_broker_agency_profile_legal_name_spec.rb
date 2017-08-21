@@ -16,7 +16,7 @@ describe UpdateBrokerAgencyProfileLegalName, dbclean: :after_each do
 
 
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
-    let(:organization) { FactoryGirl.create(:organization, broker_agency_profile: broker_agency_profile) }
+    let(:organization) { broker_agency_profile.organization }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return organization.fein

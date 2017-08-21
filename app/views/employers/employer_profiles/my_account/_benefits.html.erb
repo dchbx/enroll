@@ -4,7 +4,7 @@
       <h1>Benefits - Coverage You Offer</h1>
     </div>
     <div class="col-xs-4">
-      <% if @employer_profile.is_new_employer? && !@employer_profile.active_plan_year %>
+      <% if @employer_profile.is_new_employer? && @employer_profile.published_plan_year.blank? %>
         <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#claimQUoteModal" }, class: 'btn btn-default btn-block' %>
       <% end %>
       <%= pundit_span EmployerProfile,:updateable? %>

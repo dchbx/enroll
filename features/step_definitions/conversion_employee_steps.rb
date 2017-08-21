@@ -148,13 +148,7 @@ And(/Employer for (.*) is under open enrollment/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
 
-  open_enrollment_start_on = TimeKeeper.date_of_record.beginning_of_month
-  open_enrollment_end_on = open_enrollment_start_on.end_of_month + 12.days
-  start_on = open_enrollment_start_on.end_of_month + 1.day + 1.month
-  end_on = start_on + 1.year - 1.day
-
-  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => open_enrollment_start_on,
-    :open_enrollment_end_on => open_enrollment_end_on, :start_on => start_on, :end_on => end_on)
+  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record.beginning_of_month)
 end
 
 And(/Other Employer for (.*) is also under open enrollment/) do |named_person|

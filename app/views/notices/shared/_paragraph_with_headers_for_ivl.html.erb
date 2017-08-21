@@ -1,0 +1,21 @@
+<div style="display:block; page-break-inside: avoid;">
+  <table class="total_table" border="0" style="margin-top: <%= top_margin if defined? top_margin %>;">
+    <tbody>
+      <% if heading.present? %>
+      <tr>
+        <td style="font-size: 14px;"><%= heading.html_safe %></td>
+      </tr>
+      <% end %>
+      <% if sub_heading.present? %>
+      <tr>
+        <td style="color:black;"><%= sub_heading.html_safe %></td>
+      </tr>
+      <% end %>
+      <% contents.each do |para| %>
+      <tr>
+        <td style="padding-top: 8px; padding-bottom: 6px" ><%= para.html_safe %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

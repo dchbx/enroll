@@ -1,0 +1,94 @@
+<div class="col-md-9">
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="title-inline"><b>Edit Applicant</b></h3>
+    </div>
+  </div>
+
+  <h4>Tax Info, Incomes, Benefits and Deductions for <b><%= @applicant.person.full_name %></b></h4>
+
+  <table class="table">
+    <tr>
+      <th>Applicant Name</th>
+      <th>Claimed as Tax Dependent?</th>
+      <th>Claimed dependent by</th>
+      <th></th>
+    </tr>
+    <tr>
+      <td><%=@applicant.family_member.person.full_name.titleize%></td>
+      <td><%=human_boolean(@applicant.is_claimed_as_tax_dependent)%></td>
+      <td><%=@applicant.claimed_as_tax_dependent_by.present? ? @application.applicants.find(@applicant.claimed_as_tax_dependent_by).person.full_name : '--'%></td>
+    </tr>
+  </table>
+
+  <%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
+  <br />
+
+  <div>
+    <% if @applicant.incomes.present? %>
+      <h4>Edit Existing Income(s)</h4>
+      <table class="table">
+        <th>Income Type</th>
+        <th></th>
+        <th></th>
+        <% @applicant.incomes.each do |income| %>
+        <tr>
+          <td><%= income.kind.titleize %></td>
+          <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_income_path(@application, @applicant, income, 1), class: "btn btn-small btn-success" %></td>
+          <td><%= link_to "Delete", financial_assistance_application_applicant_income_path(@application, @applicant, income), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
+        </tr>
+        <% end %>
+      </table>
+    <%end%>
+  </ div>
+  <%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %>
+
+  <br>
+  <hr />
+
+  <div>
+    <% if @applicant.benefits.present? %>
+      <h4>Edit Existing Benefit(s)</h4>
+      <table class="table">
+        <th>Benefit Type</th>
+        <th>Benefit Insurance Type</th>
+        <th></th>
+        <th></th>
+        <% @applicant.benefits.each do |benefit| %>
+        <tr>
+          <td><%= benefit.kind.split('_').second.capitalize!%></td>
+          <td><%= benefit.insurance_kind.titleize %></td>
+          <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1), class: "btn btn-small btn-success" %></td>
+          <td><%= link_to "Delete", financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
+        </tr>
+        <% end %>
+      </table>
+    <%end%>
+  </ div>
+  <%= link_to "Add Benefit", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %><br>
+  <hr />
+
+  <div>
+    <% if @applicant.deductions.present? %>
+      <h4>Edit Existing Deductions (Income)</h4>
+      <table class="table">
+        <th>Deduction Income Type</th>
+        <th></th>
+        <th></th>
+        <% @applicant.deductions.each do |deduction| %>
+        <tr>
+          <td><%= deduction.kind.titleize %></td>
+          <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
+          <td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
+        </tr>
+        <% end %>
+      </table>
+    <%end%>
+  </div>
+  <%= link_to "Add Deductions", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+
+  <br> <br>
+  <hr />
+
+  <%= link_to "Back to All Applicants", edit_financial_assistance_application_path(@application)%> (Go back and work on another person)
+</div>

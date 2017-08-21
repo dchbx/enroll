@@ -1,0 +1,55 @@
+<html>
+<head>
+  <title><%= Settings.site.short_name %> Confirmation</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+  <meta content="telephone=no" name="format-detection" />
+
+  <style type="text/css">
+
+    @font-face {
+      font-family: 'Open Sans';
+      font-style: normal;
+      font-weight: 300;
+    }
+
+    body {
+      width:100%!important;
+      -webkit-text-size-adjust:100%;
+      -ms-text-size-adjust:100%;
+      margin:0;
+      padding:0;
+      mso-line-height-rule:exactly
+      font-size:10px;
+      color:#333333;
+      font-family: "Open Sans", sans-serif;
+      margin-top: 14px;
+    }
+
+    table td {
+      border-collapse:collapse;
+      font-size:8px;
+      font-family: "Open Sans", sans-serif;
+    }
+    table {
+      border-collapse: collapse;
+    }
+    table td {
+      border-collapse: collapse;
+    }
+  </style>
+
+</head>
+
+<body onload="subst()">
+  <table class="footer-section" style="color: #333333;" width="100%" border="0">
+    <tr>
+      <td align="center">_________________________________________________________________________________________________________________</td>
+    </tr>
+    <tr>
+      <td style="padding:3px 10px; font-size:8px;" align="center">Questions? Call DC Health Link at <%= notice.hbe.phone %>, or go to www.dchealthlink.com.</td>
+    </tr>
+  </table>
+</body>
+</html>

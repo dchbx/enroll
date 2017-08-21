@@ -8,7 +8,7 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
     self.data = args[:data]
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/header_ivl.html.erb"
     super(args)
   end
 
@@ -17,7 +17,7 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     generate_pdf_notice
     attach_blank_page
     attach_voter_application
-    prepend_envelope
+    # prepend_envelope
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -34,6 +34,8 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   end
 
   def build
+    notice.notification_type = self.event_name
+    notice.mpi_indicator = self.mpi_indicator
     family = recipient.primary_family
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""

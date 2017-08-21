@@ -1,23 +1,20 @@
 <div style="display:block; page-break-inside: avoid;">
-  <table class="total_table" border="0">
+  <table class="total_table" border="0" style="margin-top: <%= top_margin if defined? top_margin %>;">
     <tbody>
-      <tr>
-        <td></br></td>
-      </tr>
       <% if heading.present? %>
-      <tr>
-        <td><h2 style="color:rgb(54,95,145);"><%= heading.html_safe %></h2></td>
-      </tr>
-    <% end %>
+        <tr>
+          <td style="font-size: 14px; padding-bottom: 8px;"><%= heading.html_safe %></td>
+        </tr>
+      <% end %>
       <% if sub_heading.present? %>
-      <tr>
-        <td><h3 style="color:black;"><%= sub_heading.html_safe %></h3></td>
-      </tr>
+        <tr>
+          <td style="padding-bottom: 5px;"><%= sub_heading.html_safe %></td>
+        </tr>
       <% end %>
       <% contents.each do |para| %>
-      <tr>
-        <td><%= para.html_safe %></td>
-      </tr>
+        <tr>
+          <td style="padding-bottom: <%= bottom_margin if defined? bottom_margin %>;"><%= para.html_safe %></td>
+        </tr>
       <% end %>
     </tbody>
   </table>

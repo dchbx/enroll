@@ -12,6 +12,18 @@ RSpec.describe "_waived_coverage_widget.html.erb" do
     assign(:person, person)
     allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
   end
+  # Added in the case of @person not persent
+  context 'a person object not passed to widget' do
+    let(:person) { nil }
+    
+    before :each do
+      render partial: 'insured/families/waived_coverage_widget', locals: { hbx_enrollment: hbx_enrollment, read_only: true }
+    end
+    
+    it 'should not break the page' do
+      expect(rendered).to match (/waived/i)
+    end
+  end
 
   context 'insured home waived coverage widget' do
 

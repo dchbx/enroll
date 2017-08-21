@@ -1,0 +1,11 @@
+<div style="display:block;">
+  <table class="total_table reference" border="0">
+    <tbody>
+    <% contents.each do |para| %>
+      <tr>
+        <td style="padding-top: 2px;" ><%= para.html_safe %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

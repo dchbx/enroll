@@ -4,7 +4,7 @@
   (with minimum participation or 1/1 coverage effective date)</span></h3>".html_safe} %>
 
 <%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<h3><strong'>RE: Open Enrollment Completed</h3></strong>".html_safe} %>
 

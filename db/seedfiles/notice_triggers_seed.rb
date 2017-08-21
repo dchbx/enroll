@@ -547,6 +547,69 @@ shop_notice_triggers = [
         }
       }
     ]
+  },
+  {
+    hbx_id: 'SHOP33',
+    title: 'Employer Annual Renewal - Denial of Eligibility',
+    description: 'denial of eligibility for employer as failed resindency',
+    resource_name: 'employer',
+    event_name: 'employer_renewal_eligibility_denial_notice',
+    notice_triggers: [
+      {
+        name: 'Employer Annual Renewal - Denial of Eligibility',
+        notice_template: 'notices/shop_employer_notices/employer_renewal_eligibility_denial_notice',
+        notice_builder: 'ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice',
+        mpi_indicator: 'MPI_SHOP33',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP35',
+    title: 'Special Enrollment Period Denial',
+    description: 'EE SEP Requested by Employee outside of allowable time frame',
+    resource_name: 'employee_role',
+    event_name: 'sep_request_denial_notice',
+    notice_triggers: [
+      {
+        name: 'Denial of SEP Requested by EE outside of allowable time frame',
+        notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
+        notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
+        mpi_indicator: 'MPI_SHOP35',
+                notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP10047',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'Notification to employees regarding their Employer’s ineligibility.',
+    resource_name: 'employee_role',
+    event_name: 'notify_employee_of_initial_employer_ineligibility',
+    notice_triggers: [
+      {
+        name: 'Notification to employees regarding their Employer’s ineligibility.',
+        notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
+        notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
+        mpi_indicator: 'MPI_SHOP10047',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
   }
 ]
 
@@ -842,6 +905,69 @@ ivl_notice_triggers = [
         notice_template: 'notices/ivl/final_catastrophic_plan_letter',
         notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
         mpi_indicator: 'MPI_CAT16',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_ELA',
+    title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
+    description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
+    resource_name: 'consumer_role',
+    event_name: 'eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Eligibilty Notice',
+        notice_template: 'notices/ivl/eligibility_notice',
+        notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_ELA',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_NEL',
+    title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH DC HEALTH LINK',
+    description: 'Notice will be sent to the household if everyone in the household is ineligible',
+    resource_name: 'consumer_role',
+    event_name: 'ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Ineligibilty Notice',
+        notice_template: 'notices/ivl/ineligibility_notice',
+        notice_builder: 'IvlNotices::IneligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_NEL',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_ENR',
+    title: 'Enrollment notice',
+    description: 'Notice will be sent to families after their enrollment is done.',
+    resource_name: 'consumer_role',
+    event_name: 'enrollment_notice',
+    notice_triggers: [
+      {
+        name: 'Enrollment Notice',
+        notice_template: 'notices/ivl/enrollment_notice',
+        notice_builder: 'IvlNotices::EnrollmentNoticeBuilder',
+        mpi_indicator: 'IVL_ENR',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],

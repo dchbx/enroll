@@ -21,7 +21,7 @@
           <% end %>
         </li>
         <% if @staff_role %>
-          <li role="presentation" id="brokers-tab" <%= menu_tab_class(active_tab, "brokers-tab") %>>
+          <li role="presentation" id="brokers-tab" <%= menu_tab_class(active_tab, "brokers-tab").present? || "class=hide" %>>
             <%= link_to(broker_agencies_profile_applicants_path(@broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
               <span class="hidden-xs">Brokers</span>
               <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Brokers"></span>

@@ -5,18 +5,12 @@
 "<%= json_escape person.last_name %>",
 "<%= documents_count(person) %>",
 <% verification_due_info = capture do %>
-	<%= verification_due_date(outstanding_verification_family) %>
-
-
-	<%= link_to extend_due_date_documents_path(:family_id => outstanding_verification_family.id), method: :put, data: { confirm: "Verification due date will be extended." }, class: "#{pundit_class(Family, :updateable?)}" do %>
-
-		<br><i class="fa fa-clock-o"></i>&nbsp;extend
-	<% end %>
+	<%= outstanding_verification_family.min_verification_due_date_on_family %>
 <% end %>
 <%= raw verification_due_info.to_json %>,
 <% review_status_info = capture do %>
-	<%= review_status(outstanding_verification_family) %><br>
-	<% if verification_due_date(outstanding_verification_family) <= TimeKeeper.date_of_record %>
+	<%= outstanding_verification_family.review_status.gsub(/r/, " r").strip %><br>
+	<% if outstanding_verification_family.min_verification_due_date_on_family <= TimeKeeper.date_of_record %>
 		<span class="label label-danger">Past Due</span>
 	<% end %>
 <% end %>

@@ -1,0 +1,179 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+<%= render partial: 'notices/shared/ivl_cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/ivl_logo', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>ACTION REQUIRED – HEALTH COVERAGE ELIGIBILITY</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "You recently applied for help paying for health coverage through #{Settings.site.short_name} on #{TimeKeeper.date_of_record.strftime("%B %d, %Y")}. This letter will tell you:",
+  listings: ["Your eligibility results",
+             "What you need to do next",
+             "How we made our decision",
+             "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["Based on the information you told us about who needs health coverage, your results are as follows:"],
+   heading: 'Your Eligibility Results', sub_heading: ''} %>
+
+<% if notice.magi_medicaid_eligible.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Likely Qualify for Medicaid:</strong>",
+    listings: notice.magi_medicaid_eligible} %>
+
+  <%= render partial: 'notices/shared/custom_listing', locals: {
+    listing: "<strong>What you need to do next:</strong> You don’t need to do anything right now. The DC Department of Human Services (DHS) has your application. They will make a final decision on whether those listed qualify for Medicaid. They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS by #{(TimeKeeper.date_of_record+14.days).strftime("%B %d, %Y")}, you may want to ask for an update by calling us at #{notice.hbe.phone}."} %>
+<% end %>
+
+<% if notice.aqhp_individuals.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
+    listings: notice.aqhp_individuals} %>
+  <% notice.tax_households.each do |thh|%>
+    <% if thh.max_aptc > 0 %>
+      <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+       contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
+         heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
+    <% else %>
+      <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+       contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
+         heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if notice.tax_hh_with_csr.present? %>
+  <% notice.tax_hh_with_csr.each do |hh_csr|%>
+    <% case hh_csr.csr_percent_as_integer %>
+    <% when 73 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+    <% when 87 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+    <% when 94 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+    <% when 100 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+    <% else %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if notice.aqhp_individuals.present? %>
+  <% if is_under_open_enrollment? %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
+  <% else %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+  <% end %>
+<% end %>
+
+<% if notice.uqhp_individuals.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
+    listings: notice.uqhp_individuals} %>
+
+  <% if is_under_open_enrollment? %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
+  <% else %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+  <% end %>
+<% end %>
+
+<% if notice.ineligible_applicants.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Does Not Qualify for Coverage:</strong>",
+    listings: notice.ineligible_applicants} %>
+
+  <%= render partial: 'notices/shared/custom_listing', :locals => {
+  listing: "<strong>What you need to do next:</strong> Review the section, ‘How We Made Our Decision’, to find out why, and learn about options for those listed."} %>
+<% end %>
+
+<% if notice.aqhp_individuals.present? || notice.uqhp_individuals.present? %>
+  <% if is_under_open_enrollment? %>
+    <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+     contents: ["<strong>Don’t miss the deadline!</strong> Open enrollment for #{notice.coverage_year} private health plans began on #{notice.ivl_open_enrollment_start_on}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
+       heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>
+
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "",
+      listings: ["Those who qualify must enroll before the deadline. ",
+                 "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
+
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.coverage_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
+  <% else %>
+
+    <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+     contents: ["Open enrollment for #{notice.coverage_year} ended on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
+       heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>
+
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "",
+      listings: ["Those who qualify must enroll before the deadline. ",
+                 "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
+
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "To find out if those who qualify can enroll now, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
+
+  <% end %>
+
+  <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+   contents: ["#{Settings.site.short_name} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
+     heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '12px'} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["We reviewed what you told us on your application about your household, and each person who needs health coverage. We checked to see who qualifies for coverage, and if they qualify for savings. The results below tell you how we made our decision."],
+   heading: 'How We Made Our Decision', sub_heading: '', top_margin: '8px'} %>
+
+<% notice.individuals.each do |ivl|%>
+  <%= render partial: 'notices/ivl/eligibility_notice_household_information', :locals => { notice: notice, ivl: ivl } %>
+<% end %>
+
+<% if (notice.magi_medicaid_eligible.nil? || notice.non_magi_medicaid_eligible.nil?) && (notice.request_full_determination == false) %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "You did not ask to have the DC Department of Human Services (DHS) do a full review for Medicaid eligibility.  If you want to change your mind, call #{Settings.site.short_name} at #{notice.hbe.phone}.", top_margin: '12px'} %>
+<% end %>
+
+<% if (notice.magi_medicaid_eligible.nil? || notice.non_magi_medicaid_eligible.nil?) && (notice.request_full_determination == true) %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "You asked us to send your application to the DC Department of Human Services (DHS) to review Medicaid eligibility for your household.  They may ask you for more information or documents. They will make a final decision.  If you have questions, call #{Settings.site.short_name} at #{notice.hbe.phone}", top_margin: '4px'} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
+   heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '12px'} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
+  "<i>Exchange Regulations</i>","General eligibility etandards for exchange participation and affordability programs: 45 CFR § 155.305","Premium tax credit calculations:  26 CFR § 1.36B-3","Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)","Annual open enrollment period: 45 CFR § 155.155.410(e)","Special enrollment periods: 45 CFR § 155.420","Requirement to report changes: 45 CFR § 155.3330(b)","<i>Medicaid Regulations</i>","State residence: 42 CFR § 435.403","Citizenship and non-nitizenship eligibility: 42 CFR § 435.406","Medicaid use of modified adjusted gross income:  42 CFR § 435.603","Medicaid determination of eligibility: 42 CFR § 435.911","Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)","Verification of other non-financial information: 42 CFR § 435.956","Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>

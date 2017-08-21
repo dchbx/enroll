@@ -30,6 +30,12 @@ class EligibilityDetermination
   # Available to household with income between 100% and 400% of the Federal Poverty Level (FPL)
   field :max_aptc, type: Money, default: 0.00
 
+
+  field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
+  field :magi_medicaid_monthly_allowable_limit_income, type: Money, default: 0.00
+  field :csr_household_income, type: Money, default: 0.00
+  field :csr_allowable_limit_income, type: Money, default: 0.00
+
   field :aptc_csr_annual_household_income, type: Money, default: 0.00
   field :aptc_annual_income_limit, type: Money, default: 0.00
   field :csr_annual_income_limit, type: Money, default: 0.00

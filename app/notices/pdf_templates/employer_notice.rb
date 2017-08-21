@@ -21,5 +21,10 @@ module PdfTemplates
     def shop?
       return true
     end
+
+    def employee_notice?
+      false
+    end
+
   end
 end

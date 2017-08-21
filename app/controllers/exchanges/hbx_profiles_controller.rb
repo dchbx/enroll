@@ -1,5 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include DataTablesSearch
   include Pundit
   include SepAll
 
@@ -36,14 +37,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   def transmit_group_xml
     HbxProfile.transmit_group_xml(params[:id].split)
     @employer_profile = EmployerProfile.find(params[:id])
-    @fein=@employer_profile.fein
-    start_on = @employer_profile.active_plan_year.start_on.strftime("%Y%m%d")
-    end_on = @employer_profile.active_plan_year.end_on.strftime("%Y%m%d")
+    @fein = @employer_profile.fein
+    start_on = @employer_profile.show_plan_year.start_on.strftime("%Y%m%d")
+    end_on = @employer_profile.show_plan_year.end_on.strftime("%Y%m%d")
     @xml_submit_time = @employer_profile.xml_transmitted_timestamp
     v2_xml_generator =  V2GroupXmlGenerator.new([@fein], start_on, end_on)
     send_data v2_xml_generator.generate_xmls
-    #flash["notice"] = "Successfully transmitted the employer group xml."
-    #redirect_to exchanges_hbx_profiles_root_path
   end
 
   def employer_index
@@ -263,28 +262,14 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    @result = {success: [], failure: []}
-    @row = params[:family_actions_id]
-    @family_id = params[:family_id]
-    params.each do |key, value|
-      if key.to_s[/cancel_hbx_.*/]
-        hbx = HbxEnrollment.find(params[key.to_s])
-        begin
-          hbx.cancel_coverage! if hbx.may_cancel_coverage?
-          @result[:success] << hbx
-        rescue
-          @result[:failure] << hbx
-        end
-      end
-      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
-    end
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.cancel_enrollments
     respond_to do |format|
       format.js { render :file => "datatables/cancel_enrollment_result.js.erb"}
     end
-  end
-
-  def set_transmit_flag(hbx_id)
-    HbxEnrollment.find(hbx_id).update_attributes!(is_tranding_partner_transmittable: true)
   end
 
   def terminate_enrollment
@@ -297,22 +282,11 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    @result = {success: [], failure: []}
-    @row = params[:family_actions_id]
-    @family_id = params[:family_id]
-    params.each do |key, value|
-      if key.to_s[/terminate_hbx_.*/]
-        hbx = HbxEnrollment.find(params[key.to_s])
-        begin
-          termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
-          hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
-          @result[:success] << hbx
-        rescue
-          @result[:failure] << hbx
-        end
-      end
-      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
-    end
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.terminate_enrollments
     respond_to do |format|
       format.js { render :file => "datatables/terminate_enrollment_result.js.erb"}
     end
@@ -397,20 +371,18 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    families = []
     all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-    if dt_query.search_string.blank?
-      families = all_families
-    else
-      person_ids = Person.search(dt_query.search_string).pluck(:id)
-      families = all_families.where({
-        "family_members.person_id" => {"$in" => person_ids}
-      })
-    end
+
+    families = search_families(dt_query.search_string, all_families)
+
+    sorted_by, order = input_sort_request
+
+    families = sorted_families(sorted_by, order, families)
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
-    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    @families = families[dt_query.skip, dt_query.take]
     render
   end
 

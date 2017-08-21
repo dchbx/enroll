@@ -548,7 +548,7 @@ Rails.application.routes.draw do
       get :enrollment_verification
       put :enrollment_docs_state
       put :extend_due_date
-      get :fed_hub_request
+      post :fed_hub_request
     end
   end
 

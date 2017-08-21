@@ -1,0 +1,29 @@
+<table class="total_table" border="0">
+  <tbody>
+    <% if defined? previous %>
+      <tr>
+        <td style="padding-bottom: 6px">
+          <%= previous.html_safe %>
+        </td>
+      </tr>
+    <% end %>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+          <% listings.each do |listing| %>
+            <li style="padding-top: 0px;">
+              <%= listing[:full_name]%>&nbsp;&nbsp;&nbsp;&nbsp;Age: <%= listing[:age]%>
+            </li>
+          <% end %>
+        </ul>
+      </td>
+    </tr>
+    <% if defined? after %>
+    <tr>
+      <td style="padding-bottom: 0px;">
+        <%= after.html_safe %>
+      </td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

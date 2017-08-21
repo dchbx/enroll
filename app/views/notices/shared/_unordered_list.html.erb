@@ -2,7 +2,7 @@
   <tbody>
     <% if defined? previous %>
       <tr>
-        <td>
+        <td style="padding-bottom: 6px">
           <%= previous.html_safe %>
         </td>
       </tr>   
@@ -11,12 +11,12 @@
       <td>
         <ul style="list-style: circle solid;">
           <% listings.each do |listing| %>
-            <li style="margin-top: 5px; <%= 'page-break-inside: avoid' if listing.is_a?(Array) && listing[1].size <= 2 %>;">
+            <li style="padding-top: 0px; <%= 'page-break-inside: avoid' if listing.is_a?(Array) && listing[1].size <= 2 %>;">
             <% if listing.is_a?(Array) %>
               <%= listing[0].html_safe %>
               <ul style="list-style-type: circle;">
                 <% listing[1].each do |item| %>
-                  <li style="margin-top: 5px;">
+                  <li>
                      <%= item.html_safe %>
                   </li>
                 <% end %>
@@ -31,7 +31,7 @@
     </tr>
     <% if defined? after %>
     <tr>
-      <td>
+      <td style="padding-bottom: 0px;">
         <%= after.html_safe %>
       </td>
     </tr>   

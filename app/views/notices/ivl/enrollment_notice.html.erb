@@ -1,0 +1,204 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+<%= render partial: 'notices/shared/ivl_cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/ivl_logo', :locals => {notice: notice} %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>PAYMENT DEADLINE: <%= notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y") %> - <%= notice.enrollment_notice_subject.upcase %></h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<% if notice.aqhp_enrollments.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You recently signed up for insurance through #{Settings.site.short_name}. This letter tells you what you need to do next to keep your insurance and cost savings. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year."} %>
+<% else%>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You recently signed up for insurance through #{Settings.site.short_name}. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")}. All of your premium payments must be made by the first of the month."],
+   heading: 'Here’s What You Need to Do Now', sub_heading: '<strong>Make Your First Payment</strong>', top_margin: '10px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+      listings: ["Make your premium payment directly to the insurance company - not #{Settings.site.short_name}.","We’ve included information in this letter on the amount you owe, and how to make your payment.","If you don’t make your payments on time, you could lose your insurance."]} %>
+
+<% if notice.documents_needed %>
+  <% if notice.aqhp_enrollments.present? %>
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
+
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by the deadline.",
+      listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
+  <% else %>
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
+
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by the deadline.",
+      listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+  <% end %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["On #{TimeKeeper.date_of_record.strftime("%B %d, %Y")}, you enrolled the people listed in the plan(s) shown below:"],
+   heading: 'Your Plan', sub_heading: ''} %>
+
+<% notice.enrollments.each do |enrollment| %>
+  <%= render partial: 'notices/shared/enrollment_info_table', locals: {
+                               rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
+      col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
+<% end %>
+
+<% notice.current_health_enrollments.each do |enrollment|%>
+  <% if enrollment.aptc_amount > 0 %>
+    <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+      contents: ["You’re getting savings on your health insurance called an advance premium tax credit."],
+       heading: 'What You’ll Pay Each Month', sub_heading: '', top_margin: '10px'} %>
+
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "#{enrollment.plan.plan_name}", top_margin: '5px'} %>
+    <table class="plan_table" align="left">
+      <tr>
+        <td>
+          Full price monthly premium:
+        </td>
+        <td align="right">
+          $<%= enrollment.premium %>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Your tax credit savings:
+        </td>
+        <td align="right">
+          - $<%= enrollment.aptc_amount.to_f %>
+          <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Your monthly premium payment:
+        </td>
+        <td align="right">
+          $<%= enrollment.responsible_amount %>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Your premium is how much you must pay each month to your insurance company to keep your plan. Your insurance company will send plan ID cards, and details about your benefits once you make your first payment."],
+   heading: 'How to Pay Your Monthly Premium', sub_heading: '', top_margin: '8px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "",
+  listings: ["You should receive a bill from your insurance company 7-10 days from now. Your bill tells you how to make your monthly payments.",
+             "If you haven’t received a bill in 7-10 days, call your insurance company right away so you don’t miss your payment deadline.",
+             "You must pay your first monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start your plan. Your premium payments for the rest of the year are also due by the first of the month.",
+             "Do NOT send your premium payments to #{Settings.site.short_name}."]} %>
+
+<%= render partial: 'notices/shared/custom_listing', locals: {
+  listing: "Your insurance bill is not like other bills. You won’t get time to catch up if you fall behind on payments. You must make your monthly premium payments to your insurance company on time. <strong>If you don’t, you could lose your insurance, and not be able to activate it again.</strong> If you think you are going to have trouble making your payments on time, call #{Settings.site.short_name}. We can help you find out if there are other options to make your coverage more affordable."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Every health plan includes some services - like vaccines and certain tests - that are free if you use an in-network provider. These are called preventive services, and help you avoid illness or detect it early."],
+   heading: 'What You’ll Pay When You Receive Services', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "Most services covered by your plan – like doctor visits, medicines you need, or emergency care – may have cost-sharing. This means you’ll pay some of the costs for these services. These costs are in addition to your monthly premium payment.", top_margin: '5px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "<strong>Types of cost-sharing include:</strong>",
+  listings: ["<strong>The annual deductible</strong> - the amount you must pay for services before your plan begins to pay. Some plans help pay for certain services like routine doctor visits before you meet the deductible.",
+             "<strong>Copayments</strong> – fixed dollar amounts you pay when you receive some services. (For example, $25 for a doctor visit).",
+             "<strong>Coinsurance</strong> – a percentage dollar amount you pay when you receive some services. (For example, if your plan pays up to $1,000 for an emergency room visit, and coinsurance is 20 percent, you would pay $200).",
+             "<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance."]} %>
+
+<% if notice.csr_enrollments.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You chose a plan with extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses.", top_margin: '5px'} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Call your insurance company if you have questions about services the plan covers, or the doctors, hospitals, and other providers you can use.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Once your plan begins, you must tell us about life changes.  You must tell us within 30 days if:"],
+   heading: 'Reporting Life Changes or Making Changes to Your Plan', sub_heading: '', top_margin: '8px'} %>
+
+<% if notice.assisted_enrollments.present? %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "",
+    listings: ["You move","Your estimated income goes up or down by $150 or more per month ($1,800 annually)","You become eligible for Medicaid, an employer health plan, or other health insurance","The size of your household changes (for example, marriage, divorce, having a baby, adoption)","Your immigration status changes","Your tax filing plans for #{notice.coverage_year} change (for example, you’re married and file jointly but now plan to file separately)","You’re going to jail or prison"]} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Life changes can impact the cost savings you receive or your eligibility to be enrolled in insurance through #{Settings.site.short_name}. If you have any of these life changes, you may be able to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
+<% else %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "",
+    listings: ["You move","Your immigration status changes","You’re going to jail or prison"]} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Life changes can impact your eligibility to be enrolled in insurance through #{Settings.site.short_name}. If have any of these life changes, you may be eligible to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "To report life changes, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["You can end your insurance for any reason, but you must tell us at least 2 weeks before you want your plan to end. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{Settings.site.short_name} first. We can help you find out if there are other options to make your coverage more affordable."],
+   heading: 'Ending Your Insurance', sub_heading: '', top_margin: '8px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you end your health plan, and don’t replace it, you may have to pay a penalty to the IRS for the months you don’t have health insurance.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Please call #{Settings.site.short_name} at #{notice.hbe.phone} if you have any questions about this letter, or if you think we made a mistake."],
+   heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+listing: "<strong>Remember, you must pay your monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>", top_margin: '10px'} %>
+
+<% if (notice.documents_needed == true && !notice.cover_all?) %>
+  <%= render partial: 'notices/shared/custom_listing', :locals => {
+  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+
+<% if notice.documents_needed == false %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility standards: 45 CFR §155.305",
+  "Eligibility process: 45 CFR §155.310",
+  "Annual open enrollment period: 45 CFR §155.410(e)",
+  "Special enrollment periods: 45 CFR §155.420",
+  "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)]"]} %>
+<% end %>

@@ -17,15 +17,15 @@ class DelinkBroker < MongoidMigrationTask
 
       hbx_office = OfficeLocation.new(
       is_primary: true, 
-      address: {kind: "work", address_1: "10 Post Office Rd #233", address_2: "", city: "Silver Spring", state: "MD", zip: "20910" },
-      phone: {kind: "main", area_code: "301", number: "509-3088"}
+      address: {kind: "work", address_1: "308 Southwest Drive", address_2: "", city: "Silver Spring", state: "MD", zip: "20901" },
+      phone: {kind: "main", area_code: "301", number: "593-0600"}
       )
 
       org = Organization.create(office_locations: [hbx_office], fein: fein, legal_name: legal_name, is_fake_fein: true)
       broker_agency_profile = BrokerAgencyProfile.create(market_kind: "both",
                                                       entity_kind: "s_corporation",
                                                       primary_broker_role_id: person.broker_role.id,
-                                                      default_general_agency_profile_id: BSON::ObjectId('57334ab5082e761cd7000025'),
+                                                      default_general_agency_profile_id: BSON::ObjectId('57339b79082e761cd1000066'),
                                                       organization: org)
       org.save
       org.broker_agency_profile.approve!

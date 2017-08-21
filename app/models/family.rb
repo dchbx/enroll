@@ -1081,6 +1081,54 @@ class Family
     end
   end
 
+  def min_verification_due_date_on_family
+    due_dates = []
+    contingent_enrolled_active_family_members.each do |family_member|
+      family_member.person.verification_types.each do |v_type|
+        due_dates << document_due_date(family_member, v_type)
+      end
+    end
+    due_dates.compact!
+    due_dates.min.to_date if due_dates.present?
+  end
+
+  def contingent_enrolled_active_family_members
+    enrolled_family_members = []
+    family_members.active.each do |family_member|
+      if enrolled_policy(family_member).present?
+        enrolled_family_members << family_member
+      end
+    end
+    enrolled_family_members
+  end
+
+  def document_due_date(family_member, v_type)
+    return nil if family_member.person.consumer_role.is_type_verified?(v_type)
+    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
+    enrollment = enrolled_policy(family_member)
+    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)
+  end
+
+  def enrolled_policy(family_member)
+    enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+  end
+
+  def verification_due_date_from_enrollment(enrollment)
+    if enrollment.special_verification_period
+      enrollment.special_verification_period.to_date
+    else
+      TimeKeeper.date_of_record + 95.days
+    end
+  end
+
+  def review_status
+    if active_household.hbx_enrollments.verification_needed.any?
+      active_household.hbx_enrollments.verification_needed.first.review_status.gsub(/\s+/, '')
+    else
+      "no enrollment"
+    end
+  end
+
 private
   def build_household
     if households.size == 0

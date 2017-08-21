@@ -245,7 +245,7 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_waiting_period
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'
@@ -272,7 +272,7 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_mec_met
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'
@@ -281,7 +281,7 @@
                   type: text
                   text: How much would the employee only pay for the lowest cost minimum value standard plan ? *
                   classNames: 'span-text'
-                - gutter: 2
+                - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'

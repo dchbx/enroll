@@ -20,7 +20,7 @@ class Notice
 
   def html(options = {})
     ApplicationController.new.render_to_string({ 
-      :template => template,
+      :template => options[:custom_template] || template,
       :layout => layout,
       :locals => { notice: notice }
     })
@@ -35,7 +35,11 @@ class Notice
   end
 
   def layout
-    'pdf_notice'
+    if market_kind == 'individual'
+      'ivl_pdf_notice'
+    else
+      'pdf_notice'
+    end
   end
 
   def notice_filename
@@ -54,7 +58,7 @@ class Notice
     options = {
       margin:  {
         top: 15,
-        bottom: 28,
+        bottom: 20,
         left: 22,
         right: 22 
       },
@@ -67,14 +71,16 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
+          locals: { recipient: recipient, notice: notice}
           }),
         }
     }
     if market_kind == 'individual'
       options.merge!({footer: { 
         content: ApplicationController.new.render_to_string({ 
-          template: "notices/shared/footer.html.erb", 
-          layout: false 
+          template: "notices/shared/footer_ivl.html.erb",
+          layout: false,
+          locals: {notice: notice}
         })
       }})
     end

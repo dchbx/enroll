@@ -1,0 +1,76 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Denial of Application to Renew Group Health Coverage in DC Health Link</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.employer_name %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Thank you for applying to renew your group health coverage through #{Settings.site.short_name}. However, based upon the information you have provided in your account, your group does not meet #{Settings.site.short_name} eligibility criteria <strong><i>#{notice.plan_year.warnings.join(' and ')}</i></strong> as listed below. This means that the health insurance contract(s) between you, #{notice.employer_name}, and the health insurance carrier(s) will be terminated effective #{notice.plan_year.end_on} and your group will not renew coverage through DC Health Link on #{notice.plan_year.start_on}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "In order to participate in #{Settings.site.short_name}, federal regulations require:"} %>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td>
+          <ul>
+            <li style="margin-top: 0px;">
+              Employers continue to meet residency requirements:
+              <ul>
+                <li>Have your principal business address in the District of Columbia and offer coverage to all full-time employees through <%= Settings.site.short_name %>, OR</li>
+                <li>Continue to offer coverage through <%= Settings.site.short_name %> to all full-time employees whose primary worksite is located in the District of Columbia and offer coverage to non-DC based employees through the SHOP exchange serving their primary worksite(s); </li>
+              </ul>
+            </li>
+            <li style="margin-top: 5px;">
+              At least two-thirds of your eligible employees need to enroll in your group health coverage or waive due to having other coverage; and
+            </li>
+            <li style="margin-top: 5px;">
+              One non-owner employee enrolls in health coverage.
+          </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "For more information about SHOP employer eligibility requirements, please see 45 C.F.R. 155.710"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Please note that you can reapply for employer-sponsored coverage with #{Settings.site.short_name} at any time."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph', locals: {
+ content: "You can contact #{Settings.site.short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                 ["By calling #{notice.hbe.phone}.",
+                                                                  "TTY: 711",
+                                                                  "Online at <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>"]} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 C.F.R 155.715(e)."} %>

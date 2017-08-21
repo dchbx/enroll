@@ -1,0 +1,73 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+
+<%= render partial: 'notices/shared/ivl_cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/ivl_logo', :locals => {notice: notice} %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>IMPORTANT NOTICE – INELIGIBLE FOR COVERAGE THROUGH <%= Settings.site.short_name.upcase %></h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<% if ((notice.has_applied_for_assistance == true) && (notice.is_family_totally_ineligibile == true)) %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You recently applied for help paying for coverage through #{Settings.site.short_name} on #{(TimeKeeper.date_of_record).strftime("%B %d, %Y")}. Based on the information you told us about who needs coverage, your results are listed below."} %>
+  <% notice.individuals.each do |ivl|%>
+    <%= render partial: 'notices/shared/info_table', locals: {
+                                 rows: [['Household Member:', "#{ivl.full_name} Age: #{ivl.age}"],
+                                    ['Does not qualify for Medicaid or private health insurance', "#{ivl.first_name} likely doesn’t qualify for Medicaid. #{ivl.first_name} also does not qualify for private insurance (with or without savings) through #{Settings.site.short_name}. The reason is #{ivl.reason_for_ineligibility.join(' In addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{notice.hbe.phone}."]],
+        col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
+  <% end %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You recently applied for private insurance through #{Settings.site.short_name} on #{(TimeKeeper.date_of_record).strftime("%B %d, %Y")}. Based on the information you told us on your application about who needs coverage in your household, your results are listed below."} %>
+  <% notice.individuals.each do |ivl| %>
+    <%= render partial: 'notices/shared/info_table', locals: {
+                                 rows: [['Household Member:', "#{ivl.full_name} Age: #{ivl.age}"],
+                                    ['Does not qualify for private health insurance', "#{ivl.first_name} likely doesn’t qualify for Medicaid. #{ivl.first_name} also does not qualify for private insurance (with or without savings) through #{Settings.site.short_name}. The reason is #{ivl.reason_for_ineligibility.join(' In Addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{notice.hbe.phone}."]],
+        col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
+    <% end %>
+<% end %>
+
+<% if notice.request_full_determination == false %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You did not ask us to send your application to the DC Department of Human Services (DHS) for a full review for Medicaid eligibility. If you want to change your mind, call #{Settings.site.short_name} at #{notice.hbe.phone}."} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You asked us to send your application to the DC Department of Human Services (DHS) to review Medicaid eligibility for your household. They may ask you for more information or documents. They will make a final decision. If you have questions, call #{Settings.site.short_name} at #{notice.hbe.phone}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
+   heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+"<i>Exchange Regulations</i>",
+"General eligibility standards for exchange participation and affordability programs: 45 CFR § 155.305",
+"Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
+"Requirement to report changes: 45 CFR § 155.3330(b)",
+"<i>Medicaid Regulations</i>",
+"State residence: 42 CFR § 435.403",
+"Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
+"Medicaid determination of eligibility: 42 CFR § 435.911",
+"Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)"]} %>

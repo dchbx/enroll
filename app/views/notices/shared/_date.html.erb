@@ -4,7 +4,7 @@
   <td></br></br></td>
   </tr>
     <tr class="wid50">
-      <td align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></td>
+      <td align="left"><%= notice.shop? ? TimeKeeper.date_of_record.strftime('%m/%d/%Y'): TimeKeeper.date_of_record.strftime("%B %d, %Y") %></td>
     </tr>
   <tr>
   <td></td>

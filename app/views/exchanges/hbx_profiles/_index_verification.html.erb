@@ -22,11 +22,16 @@
     $('#verification-dataTable').DataTable( {
       "processing": true,
       "serverSide": true,
-      "ordering" : false,
+      "ordering" : true,
+      "order": [],
+      "lengthMenu": [ 10, 25, 50, 100],
       "ajax": {
         url: "<%= verifications_index_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
         type: "GET"
-      }
+      },
+      columnDefs: [
+        { targets: [0, 1, 2, 3, 5, 7], orderable: false}
+      ]
     });
   });
 </script>

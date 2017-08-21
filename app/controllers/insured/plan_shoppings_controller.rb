@@ -58,6 +58,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
+    IvlNoticesNotifierJob.perform_later(@person.id.to_s ,"enrollment_notice") unless @enrollment.is_shop?
+
     send_receipt_emails if @person.emails.first
   end
 

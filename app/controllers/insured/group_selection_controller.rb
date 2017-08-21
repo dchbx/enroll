@@ -167,7 +167,8 @@ class Insured::GroupSelectionController < ApplicationController
         coverage_household: @coverage_household,
         benefit_group: benefit_group,
         benefit_group_assignment: benefit_group_assignment,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        opt_effective_on: @optional_effective_on)
     when 'individual'
       @coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,

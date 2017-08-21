@@ -1,0 +1,119 @@
+<div style="display:block; page-break-inside: avoid;">
+  <table align="center" cellpadding="5" class="total_table thick_broder" style="margin-top: 10px; margin-bottom: 10px; width: 100% %>;" border="1">
+    <tbody>
+      <tr valign="top">
+        <td style="width: 25%;">
+          <b>Household Member:</b>
+        </td>
+        <td style="width: 75%;">
+          <p><%= ivl.full_name %> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= ivl.age %> </p>
+        </td>
+      </tr>
+
+      <% if notice.eligibility_notice_display_medicaid(ivl) %>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Medicaid</b>
+          </td>
+          <td style="width: 75%;">
+            <% if ivl.is_medicaid_chip_eligible %>
+              <p><%= ivl.first_name %> likely qualifies for Medicaid. Your monthly household income of $<%= ivl.tax_household.aptc_csr_annual_household_income %> is within the monthly income limit of $<%= ivl.magi_medicaid_monthly_income_limit %> for this person.  Medicaid offers free, comprehensive health coverage.</p>
+            <% end %>
+            <% if ivl.is_non_magi_medicaid_eligible %>
+              <p><%= ivl.first_name %> may qualify for a special category of Medicaid because you told us on your application that at least one or more of the following apply to <%= ivl.first_name %>: over age 64; blind or has a disability; applying for long term care, community care, nursing care or other similar services; enrolled in Medicare; formerly in foster care in the District; or receives supplemental security income. Medicaid offers free, comprehensive health coverage.</p>
+              <p>Medicaid offers some additional health services to people who qualify in this category. You may be required to submit additional documents.</p>
+              <p>The DC Department of Human Services (DHS) will make a final decision on <%= ivl.first_name %>’s Medicaid eligibility. We have forwarded your application to them.</p>
+              <p>IF DHS determines that <%= ivl.first_name %>  qualifies for Medicaid, DHS will provide information on how to enroll.</p>
+            <% end %>
+            <% if (ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && !(ivl.is_totally_ineligible) %>
+              <% if ivl.immigration_unverified == true %>
+                <p><%= ivl.first_name %> likely doesn’t qualify for Medicaid. Either the person’s immigration status doesn’t meet requirements, or the person has not held the status long enough to qualify for Medicaid.</p>
+              <% else %>
+                <p><%= ivl.first_name %> likely doesn’t qualify for Medicaid. Your monthly household income of $<%= ivl.tax_household.aptc_csr_annual_household_income %> is over the monthly income limit of $<%= ivl.magi_medicaid_monthly_income_limit %> for this person.</p>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || !(ivl.is_totally_ineligible) || !ivl.is_medicaid_chip_eligible %>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Private Health Insurance</b>
+          </td>
+          <td style="width: 75%;">
+            <% if (ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || !(ivl.is_totally_ineligible)) %>
+              <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>. People who likely qualify for Medicaid also have the option to purchase private health insurance at full price, even though Medicaid offers free, comprehensive health coverage.</p>
+            <% elsif (!ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || !(ivl.is_totally_ineligible)) %>
+              <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>.</p>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if notice.eligibility_notice_display_aptc(ivl) %>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Advance Premium Tax Credit (APTC)</b>
+          </td>
+          <td style="width: 75%;">
+            <% if ivl.tax_household.max_aptc > 0 %>
+              <p><%= ivl.first_name %> qualifies for an advance premium tax credit to help pay for the insurance. Your annual household income of $<%= ivl.tax_household.aptc_csr_annual_household_income %> is within the income limit of $<%= ivl.tax_household.aptc_annual_income_limit %> for this person. The value of the tax credit is based on your household size, income, and the cost of health plans available to those who qualify.</p>
+            <% end %>
+            <% if ivl.no_aptc_because_of_income %>
+              <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for the insurance. Your annual household income of $<%= ivl.tax_household.aptc_csr_annual_household_income %> is over the income limit of $<%= ivl.tax_household.aptc_annual_income_limit %> for this person.</p>
+            <% end %>
+            <% if ivl.is_medicaid_chip_eligible %>
+              <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for private health insurance because this person is likely eligible for Medicaid.</p>
+            <% end %>
+            <% if ivl.has_access_to_affordable_coverage %>
+              <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for the insurance because this person has access to what the federal government considers affordable coverage.</p>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if notice.eligibiltiy_notice_display_csr(ivl) %>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Cost-Sharing Reductions (CSR)</b>
+          </td>
+          <td style="width: 75%;">
+          <% if (ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100) %>
+            <p><%= ivl.first_name %> qualifies for cost-sharing reductions, but must select a silver plan to receive them. Your annual household income of $<%= ivl.tax_household.aptc_csr_annual_household_income %> is within the income limit of $<%= ivl.tax_household.csr_annual_income_limit %>. With a silver plan, <%= ivl.first_name %> will get a discount on out-of-pocket costs for medical services.</p>
+          <% end %>
+
+          <% if ivl.indian_conflict == true %>
+            <% if ivl.magi_as_percentage_of_fpl <= 300 %>
+              <p><%= ivl.first_name %> qualifies for plans with no cost sharing. Your annual household income of $<%= ivl.tax_household.aptc_csr_annual_household_income %> is within the income limit of $<%= ivl.tax_household.csr_annual_income_limit %>, and you indicated that <%= ivl.first_name %> is a member of a federally recognized tribe. This means services covered by a health plan’s network, such as doctor visits, medicines, or emergency care won’t cost anything. Services provided by an Indian Health Service facility are also free.</p>
+            <% elsif ivl.magi_as_percentage_of_fpl > 300 %>
+              <p><%= ivl.first_name %> qualifies for limited cost-sharing. You indicated that <%= ivl.first_name %> is a member of a federally recognized tribe. This means <%= ivl.first_name %> won’t have to pay for services covered by a health plan’s network, such as doctor visits, medicines, or emergency care if this person gets care through the Indian Health Service, Tribal Health Providers, or Urban Indian Health Providers (I/T/U). This person must have a referral from an I/T/U provider to receive covered services from another in-network service provider at no cost.</p>
+            <% end %>
+          <% end %>
+
+          <% if ivl.no_csr_because_of_income %>
+            <p><%= ivl.first_name %> does not qualify for cost-sharing reductions because your annual household income of $<%= ivl.tax_household.aptc_csr_annual_household_income %> is over the income limit of $<%= ivl.tax_household.csr_annual_income_limit %>.</p>
+          <% end %>
+          <% if ivl.is_medicaid_chip_eligible %>
+            <p><%= ivl.first_name %> does not qualify for cost-sharing reductions because this person is likely eligible for Medicaid.</p>
+          <% end %>
+          <% if ivl.tax_household.csr_percent_as_integer.nil? && ivl.has_access_to_affordable_coverage %>
+            <p><%= ivl.first_name %> does not qualify for cost-sharing reductions because this person has access to what the federal government considers affordable coverage.</p>
+          <% end %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if ivl.is_totally_ineligible %>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Ineligible for Medicaid and Private Health Insurance</b>
+          </td>
+          <td style="width: 75%;">
+            <p><%= ivl.first_name %> does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because <%= ivl.reason_for_ineligibility.join(' In addition, ') %> If <%= ivl.first_name %>’s status changes, we encourage you to update your application, or call <%= Settings.site.short_name %> at <%= notice.hbe.phone %>."</p>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

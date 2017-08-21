@@ -4,7 +4,7 @@ class AddCoverageHouseholdMember < MongoidMigrationTask
   def migrate
     person = Person.where(hbx_id: ENV['hbx_id'])
     if person.size != 1
-    	raise "Invalid Hbx Id"
+      raise "Invalid Hbx Id"
     end
 
     family_member = person.first.primary_family.primary_family_member

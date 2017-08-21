@@ -20,99 +20,37 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#verification_type_status" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-    context "Social Security Number" do
-      it "returns outstanding status for consumer without state residency" do
-        expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
-      end
-
-      it "returns in review for outstanding with docs" do
-        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
-        expect(helper.verification_type_status("Social Security Number", person)).to eq "in review"
-      end
-
-      it "returns verified status for consumer with state residency" do
-        person.consumer_role.ssn_validation = "valid"
-        expect(helper.verification_type_status("Social Security Number", person)).to eq "verified"
-      end
-    end
-
-    context "Native American status" do
-      context "native american with uploaded docs" do
-        it "returns in review status" do
-          person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "American Indian Status")
-          expect(helper.verification_type_status("American Indian Status", person)).to eq "in review"
-        end
-      end
-      context "native validation pending" do
-        it "returns outstanding status" do
-          person.consumer_role.native_validation = "pending"
-          person.consumer_role.vlp_documents=[]
-          expect(helper.verification_type_status("American Indian Status", person)).to eq "outstanding"
-        end
-      end
-      context "native validation outstanding" do
-        it "returns outstanding status" do
-          person.consumer_role.native_validation = "outstanding"
-          person.consumer_role.vlp_documents=[]
-          expect(helper.verification_type_status("American Indian Status", person)).to eq "outstanding"
-        end
-      end
-    end
-
-    context "Citizenship/Immigration" do
-      context "lawful presence valid" do
-        it "returns verified status" do
+    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status|
+      before do
+        uploaded_doc ? person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
+        person.consumer_role.revert!(verification_attr) unless current_state
+        if current_state == "valid"
+          person.consumer_role.ssn_validation = "valid"
+          person.consumer_role.native_validation = "valid"
           person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
-          expect(helper.verification_type_status("Immigration status", person)).to eq "verified"
+        else
+          person.consumer_role.ssn_validation = "outstanding"
+          person.consumer_role.native_validation = "outstanding"
+          person.consumer_role.lawful_presence_determination.deny!(verification_attr)
         end
       end
-      describe "Citizenship" do
-        context "lawful presence with uploaded docs" do
-          it "returns in review status" do
-            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-            person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Citizenship")
-            expect(helper.verification_type_status("Citizenship", person)).to eq "in review"
-          end
-        end
-        context "lawful presence determination pending" do
-          it "returns outstanding status" do
-            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-            person.consumer_role.vlp_documents=[]
-            expect(helper.verification_type_status("Citizenship", person)).to eq "outstanding"
-          end
-        end
-        context "lawful presence determination outstanding" do
-          it "returns outstanding status" do
-            person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
-            person.consumer_role.vlp_documents=[]
-            expect(helper.verification_type_status("Citizenship", person)).to eq "outstanding"
-          end
-        end
-      end
-      describe "Immigration status" do
-        context "lawful presence with uploaded docs" do
-          it "returns in review status" do
-            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-            person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
-            expect(helper.verification_type_status("Immigration status", person)).to eq "in review"
-          end
-        end
-        context "lawful presence determination pending" do
-          it "returns outstanding status" do
-            person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-            person.consumer_role.vlp_documents=[]
-            expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
-          end
-        end
-        context "lawful presence determination outstanding" do
-          it "returns outstanding status" do
-            person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
-            person.consumer_role.vlp_documents=[]
-            expect(helper.verification_type_status("Immigration status", person)).to eq "outstanding"
-          end
-        end
+      it "returns #{status} status for #{verification_type} #{uploaded_doc ? 'with uploaded doc' : 'without uploaded docs'}" do
+        expect(helper.verification_type_status(verification_type, person)).to eq status
       end
     end
+
+    it_behaves_like "verification type status", "outstanding", "Social Security Number", false, "outstanding"
+    it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified"
+    it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "in review"
+    it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding"
+    it_behaves_like "verification type status", "valid", "American Indian Status", false, "verified"
+    it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "in review"
+    it_behaves_like "verification type status", "outstanding", "Citizenship", false, "outstanding"
+    it_behaves_like "verification type status", "valid", "Citizenship", false, "verified"
+    it_behaves_like "verification type status", "outstanding", "Citizenship", true, "in review"
+    it_behaves_like "verification type status", "outstanding", "Immigration status", false, "outstanding"
+    it_behaves_like "verification type status", "valid", "Immigration status", false, "verified"
+    it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review"
   end
 
   describe "#verification_type_class" do
@@ -194,15 +132,19 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe "#enrollment_group_verified?" do
+  describe "#enrollment_group_unverified?" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    before do
+      allow_any_instance_of(Person).to receive_message_chain("primary_family").and_return(family)
+      allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
+    end
     it "returns true if any family members has outstanding verification state" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.person.consumer_role.aasm_state="verification_outstanding"
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
@@ -211,30 +153,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq false
-    end
-  end
-
-  describe "#verification due date" do
-    let(:family) { FactoryGirl.build(:family) }
-    let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
-    let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
-    before :each do
-      assign(:family, family)
-    end
-    context "for special verification period" do
-      it "returns special verification period" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
-        expect(helper.verification_due_date(family)).to eq Date.new(2016,5,6)
-      end
-    end
-
-    context "with no special verification period" do
-      it "calls determine due date method" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_no_sp])
-        expect((helper.verification_due_date(family))).to eq TimeKeeper.date_of_record + 95.days
-      end
     end
   end
 
@@ -392,5 +311,20 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
     it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
     it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
+  end
+
+  describe "#build_admin_actions_list" do
+    shared_examples_for "admin actions dropdown list" do |type, status, actions|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return status
+      end
+      it "returns admin actions array" do
+        expect(helper.build_admin_actions_list(person, type)).to eq actions
+      end
+    end
+
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
   end
 end

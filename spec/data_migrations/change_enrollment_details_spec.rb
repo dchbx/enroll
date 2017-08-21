@@ -65,7 +65,7 @@ describe ChangeEnrollmentDetails do
         end
       end
 
-      it_behaves_like "revert termination", "aasm_state", "coverage_selected"
+      it_behaves_like "revert termination", "aasm_state", "coverage_enrolled"
       it_behaves_like "revert termination", "terminated_on", nil
       it_behaves_like "revert termination", "termination_submitted_on", nil
     end

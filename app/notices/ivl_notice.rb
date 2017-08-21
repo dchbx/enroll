@@ -1,5 +1,7 @@
 class IvlNotice < Notice
 
+  include ActionView::Helpers::NumberHelper
+
   Required= Notice::Required + []
 
   def initialize(options ={})
@@ -7,11 +9,13 @@ class IvlNotice < Notice
   end
 
   def deliver
+    append_hbe
     build
     generate_pdf_notice
-    attach_blank_page
-    attach_dchl_rights
-    prepend_envelope
+    attach_blank_page(notice_path)
+    attach_appeals
+    attach_non_discrimination
+    attach_taglines
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -23,24 +27,69 @@ class IvlNotice < Notice
     end
   end
 
-  def prepend_envelope
-    envelope = Envelope.new
-    envelope.fill_envelope(notice, mpi_indicator)
-    envelope.render_file(envelope_path)
-    join_pdfs [envelope_path, notice_path]
+  def append_hbe
+    notice.hbe = PdfTemplates::Hbe.new({
+      url: Settings.site.home_url,
+      phone: phone_number_format(Settings.contact_center.phone_number),
+      email: Settings.contact_center.email_address,
+      short_url: "#{Settings.site.short_name.gsub(/[^0-9a-z]/i,'').downcase}.com",
+    })
+  end
+
+  def phone_number_format(number)
+    number_to_phone(number.gsub(/^./, "").gsub('-',''), area_code: true)
   end
 
   def attach_dchl_rights
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'dchl_rights.pdf')]
   end
 
-  def attach_blank_page
-    blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
+  def attach_taglines
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
+  end
 
-    page_count = Prawn::Document.new(:template => notice_path).page_count
+  def attach_appeals
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_appeal_rights.pdf')]
+  end
+
+  def attach_non_discrimination
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_non_discrimination.pdf')]
+  end
+
+  def join_pdfs_with_path(pdfs, path = nil)
+    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf << CombinePDF.load(pdfs[1])
+    path_to_save = path.nil? ? notice_path : path
+    pdf.save path_to_save
+  end
+
+  def attach_blank_page(template_path = nil)
+    path = template_path.nil? ? notice_path : template_path
+    blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
+    page_count = Prawn::Document.new(:template => path).page_count
     if (page_count % 2) == 1
-      join_pdfs [notice_path, blank_page]
+      join_pdfs_with_path([path, blank_page], path)
     end
+  end
+
+  def lawful_presence_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
+  end
+
+  def append_address(primary_address)
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
+      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
+      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
+      city: primary_address.city.titleize,
+      state: primary_address.state,
+      zip: primary_address.zip
+      })
+  end
+
+  def capitalize_quadrant(address_line)
+    address_line.split(/\s/).map do |x|
+      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
+    end.join(' ')
   end
 
   # def join_pdfs(pdfs)

@@ -346,7 +346,11 @@ class EmployerProfile
   end
 
   def is_transmit_xml_button_disabled?
-    (!self.renewing_plan_year.present? && !self.binder_paid?) || binder_criteria_satisfied?
+    if self.renewing_plan_year.present?
+      binder_criteria_satisfied?
+    else
+      !self.renewing_plan_year.present? && !self.binder_paid?
+    end
   end
 
   def binder_criteria_satisfied?
@@ -418,7 +422,7 @@ class EmployerProfile
             if qhh.employee.present?
                 quote_employee = qhh.employee
                 ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
-                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s))
+                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s).to_a)
 
                 qhh.dependents.each do |qhh_dependent|
                   ce.census_dependents << CensusDependent.new(
@@ -992,7 +996,8 @@ private
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 

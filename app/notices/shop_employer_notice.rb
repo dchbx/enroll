@@ -23,6 +23,7 @@ class ShopEmployerNotice < Notice
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
+    send_generic_notice_alert_to_broker_and_ga
   end
 
   def build
@@ -71,6 +72,19 @@ class ShopEmployerNotice < Notice
       state: primary_address.state,
       zip: primary_address.zip
       })
+  end
+
+  def send_generic_notice_alert_to_broker_and_ga
+    if employer_profile.broker_agency_profile.present?
+      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+      broker_email = employer_profile.broker_agency_profile.primary_broker_role.email_address
+      UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
+    end
+    if employer_profile.general_agency_profile.present?
+      ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name
+      ga_staff_email = employer_profile.general_agency_profile.general_agency_staff_roles.first.email_address
+      UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email, employer_profile.legal_name.titleize).deliver_now
+    end
   end
 
   def append_broker(broker)

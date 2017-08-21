@@ -11,7 +11,8 @@ class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
     
     attach_envelope
     upload_and_send_secure_message
-    # send_generic_notice_alert
+    send_generic_notice_alert
+    send_generic_notice_alert_to_broker_and_ga
   end
 
   def create_secure_inbox_message(notice)

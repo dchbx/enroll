@@ -6,7 +6,7 @@ content: "<span #{@style_color_text}>[SHOP5C]</span><br>
 <span #{@style_color_text}>(minimum participation not met, non 1/1 coverage effective date groups)</span><br> "} %>
 
 <%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
 

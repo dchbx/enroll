@@ -33,20 +33,23 @@ class DocumentsController < ApplicationController
   def update_verification_type
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
+    admin_action = params[:admin_action]
+    if (VlpDocument::VERIFICATION_REASONS + VlpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
+      verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
+      message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
+      flash_message = { :success => message}
+    else
+      flash_message = { :error => "Please provide a verification reason."}
+    end
+
     respond_to do |format|
-      if VlpDocument::VERIFICATION_REASONS.include? (update_reason)
-        verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
-        message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
-        format.html { redirect_to :back, :flash => { :success => message} }
-      else
-        format.html { redirect_to :back, :flash => { :error => "Please provide a verification reason."} }
-      end
+      format.html { redirect_to :back, :flash => flash_message }
     end
   end
 
   def enrollment_verification
      family = @person.primary_family
-     if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
+     if family.active_household.hbx_enrollments.verification_needed.any?
        family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
          enrollment.evaluate_individual_market_eligiblity
        end
@@ -68,7 +71,7 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record)
+    @person.consumer_role.redetermine!(verification_attr)
     respond_to do |format|
       format.html {
         flash[:success] = "Request was sent to FedHub."
@@ -98,19 +101,30 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    family = Family.find(params[:family_id])
-      if family.any_unverified_enrollments?
-        if family.enrollments.verification_needed.first.special_verification_period
-          new_date = family.enrollments.verification_needed.first.special_verification_period += 30.days
-          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => new_date)
-          flash[:success] = "Special verification period was extended for 30 days."
-        else
-          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => TimeKeeper.date_of_record + 30.days)
-          flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.hbx_enrollments.verification_needed.first.special_verification_period}"
-        end
+    family_member = FamilyMember.find(params[:family_member_id])
+    v_type = params[:verification_type]
+    enrollment = family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+    if enrollment.present?
+      sv = family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
+      if sv.present?
+        new_date = sv.due_date.to_date + 30.days
+        flash[:success] = "Special verification period was extended for 30 days."
+      elsif enrollment.special_verification_period
+        new_date = enrollment.special_verification_period.to_date + 30.days
+        flash[:success] = "Special verification period was extended for 30 days."
       else
-        flash[:danger] = "Family does not have any active Enrollment to extend verification due date."
+        new_date = (enrollment.submitted_at.to_date + 95.days) + 30.days
+        flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{new_date.to_date}"
       end
+
+      # special_verification_period is the day we send notices
+      # enrollment.update_attributes!(:special_verification_period => new_date)
+      sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id)
+      family_member.person.consumer_role.special_verifications << sv
+      family_member.person.consumer_role.save!
+    else
+      flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
+    end
     redirect_to :back
   end
 

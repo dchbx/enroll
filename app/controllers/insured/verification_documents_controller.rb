@@ -68,8 +68,10 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def update_vlp_documents(title, file_uri)
+    v_type = params[:verification_type]
     document = @docs_owner.consumer_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
+    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>v_type})
+    person_consumer_role.mark_doc_type_uploaded(v_type)
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end
