@@ -460,7 +460,11 @@ private
     end
 
     if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
-      errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank")
+      if person.person_relationships.blank?
+        errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank. There are no household members, please add household members or select NO to 'will this person be claimed as somebody else’s tax dependent for 2017?' ")
+      else
+        errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank")
+      end
     end
   end
 
