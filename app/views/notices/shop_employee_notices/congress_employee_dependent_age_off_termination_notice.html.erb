@@ -1,0 +1,52 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Change to your Insurance Coverage</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>: </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents.join(', ')}, recently turning 26 and their coverage as a dependent on your employer-sponsored insurance through #{notice.employer_name} will terminate automatically on #{notice.enrollment.dependent_dob}. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the calendar year during which they turn 26 and automatically terminates on the last day of that month."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "This means that, although your dependent child may be eligible to participate in #{Settings.site.short_name},they are not eligible to remain active on your policy as a dependent. This is because they are no longer eligible to enroll as a dependent child due to their age."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Dependent children with disabilities may be eligible to remain covered by their parents’ policy regardless of their age. Please contact the #{Settings.site.short_name} Contact Center at 1-855-532-5465 [TTY 711] regarding adult children with disabilities that need to remain enrolled on an employee’s plan beyond age 26 or if you believe this decision is the result of an error."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "<strong>Individual Market Enrollment</strong><br><br>"} %>
+
+<%= render partial: 'notices/shared/paragraph_without_page_break', :locals => {
+content: "If your dependent child does not qualify to enroll in employer-sponsored coverage or other coverage at this time, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period your dependent can enroll in individual market coverage through #{Settings.site.short_name} if they live in the District of Columbia. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. Your dependent child may also be eligible for premium subsidies and other forms of financial assistance if they are unable to afford the full cost of health insurance. Your dependent child can create a #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to review health plan options and learn whether they might be eligible for financial assistance. If your dependent lives outside the District of Columbia, they can apply during open enrollment through the health insurance exchange operating in their state. To find the Health Insurance Marketplace in your state, go to <a href='https://www.healthcare.gov/'>www.healthcare.gov</a>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If your dependent is a District of Columbia resident and thinks they might be eligible for an individual market Special Enrollment Period, they can contact #{Settings.site.short_name} to see if they are eligible to enroll through a Special Enrollment Period."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""],
+  heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph', locals: {
+ content: "Please contact your benefits office for further assistance. You can contact #{Settings.site.short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                 ["By calling #{notice.hbe.phone}.",
+                                                                  "TTY: 711",
+                                                                  "Online at <a href=#{Settings.site.home_url}> #{Settings.site.website_name} </a>"]} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 C.F.R. §155.735(d)."} %>

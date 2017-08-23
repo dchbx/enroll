@@ -610,7 +610,28 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
+  },
+  {
+    hbx_id: 'SHOPDPTC',
+    title: 'Change to your Insurance Coverage - Congressional',
+    description: 'Dependent EE coverage Termination due to Age-Off on policy when turn 26 for Congressional',
+    resource_name: 'employee_role',
+    event_name: 'congress_employee_dependent_age_off_termination_notice',
+    notice_triggers: [
+      {
+        name: 'Notice to EE of DPT Termination due to Age-Off (Congressional)',
+        notice_template: 'notices/shop_employee_notices/congress_employee_dependent_age_off_termination_notice',
+        notice_builder: 'ShopEmployeeNotices::CongressEmployeeDependentAgeOffTerminationNotice',
+        mpi_indicator: 'MPI_SHOPDPTC',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 

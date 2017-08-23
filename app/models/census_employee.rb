@@ -444,11 +444,48 @@ class CensusEmployee < CensusMember
     end
 
     def advance_day(new_date)
+      CensusEmployee.congress_employee_dependent_age_off_termination_notice(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
+    end
+
+    def congress_employee_dependent_age_off_termination_notice(new_date)
+      if new_date.mday == 1
+        employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
+        Person.all_employee_roles.each do |person|
+          begin
+          employee_roles = person.active_employee_roles.select{|role| employer_ids.include?(role.employer_profile_id) } 
+          next if employee_roles.empty?
+          if person.person_relationships.present?
+            relations = person.person_relationships.select{|relation| relation.kind == 'child'}
+            aged_off_dependents = []
+            relations.select do |relation|
+              id = relation.relative_id.to_s
+              dep =  Person.where(_id: id).first
+              if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && dep.age_on(TimeKeeper.date_of_record.end_of_month) < 27 
+                aged_off_dependents << dep
+                next if aged_off_dependents.empty?
+                employee_roles.each do |employee_role|
+                  enrollments = person.primary_family.active_household.hbx_enrollments.where(employee_role_id: employee_role.id).enrolled
+                  enrollments.each do |en|
+                    covered_members = (en.hbx_enrollment_members.map{|member| member.person} && aged_off_dependents)
+                    if covered_members.any?{|cm| new_date.month ==  cm.dob.month}
+                      ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "congress_employee_dependent_age_off_termination_notice")
+                      break
+                    end
+                  end
+                end
+              end
+            end
+          end
+          rescue Exception => e
+            puts "#{person.full_name}, #{person.hbx_id} #{e.message}"
+          end
+        end
+      end
     end
 
     def initial_employee_open_enrollment_notice(date)
