@@ -198,7 +198,7 @@ class Household
               aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
               csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
               source: source
-              ).save!
+              ).save
             else
               throw(:processing_issue, "Failed to create Eligibility Determinations")
             end

@@ -17,7 +17,7 @@
           <n1:person_surname>Sammm</n1:person_surname>
           <n1:person_given_name>Jamesss</n1:person_given_name>
           <n1:person_middle_name></n1:person_middle_name>
-          <n1:person_name_suffix></n1:person_name_suffix>
+          <n1:person_name_suffix_text></n1:person_name_suffix_text>
         </n1:person_name>
       </n1:person>
       <n1:person_relationships>
@@ -55,7 +55,7 @@
       <n1:magi_medicaid_monthly_household_income>6474.42</n1:magi_medicaid_monthly_household_income>
       <n1:magi_medicaid_monthly_income_limit>3760.67</n1:magi_medicaid_monthly_income_limit>
       <n1:magi_as_percentage_of_fpl>380</n1:magi_as_percentage_of_fpl>
-      <n1:magi_medicaid_category>urn:openhbx:terms:v1:magi_medicaid_category#parent_caretaker_category</n1:magi_medicaid_category>
+      <n1:magi_medicaid_category>urn:openhbx:terms:v1:magi_medicaid_category#parent_caretaker</n1:magi_medicaid_category>
       <n1:medicaid_household_size>3</n1:medicaid_household_size>
       <n1:verifications></n1:verifications>
       <n1:created_at>2017-08-22T11:28:22Z</n1:created_at>
@@ -72,7 +72,7 @@
           <n1:person_surname>Sammm</n1:person_surname>
           <n1:person_given_name>Lucyyy</n1:person_given_name>
           <n1:person_middle_name></n1:person_middle_name>
-          <n1:person_name_suffix></n1:person_name_suffix>
+          <n1:person_name_suffix_text></n1:person_name_suffix_text>
         </n1:person_name>
       </n1:person>
       <n1:person_relationships>
@@ -101,7 +101,7 @@
       <n1:magi_medicaid_monthly_household_income>6474.42</n1:magi_medicaid_monthly_household_income>
       <n1:magi_medicaid_monthly_income_limit>3760.67</n1:magi_medicaid_monthly_income_limit>
       <n1:magi_as_percentage_of_fpl>380</n1:magi_as_percentage_of_fpl>
-      <n1:magi_medicaid_category>urn:openhbx:terms:v1:magi_medicaid_category#parent_caretaker_category</n1:magi_medicaid_category>
+      <n1:magi_medicaid_category>urn:openhbx:terms:v1:magi_medicaid_category#parent_caretaker</n1:magi_medicaid_category>
       <n1:medicaid_household_size>3</n1:medicaid_household_size>
       <n1:verifications></n1:verifications>
       <n1:created_at>2017-08-22T11:28:22Z</n1:created_at>
@@ -118,7 +118,7 @@
           <n1:person_surname>Sammm</n1:person_surname>
           <n1:person_given_name>Linaaa</n1:person_given_name>
           <n1:person_middle_name></n1:person_middle_name>
-          <n1:person_name_suffix></n1:person_name_suffix>
+          <n1:person_name_suffix_text></n1:person_name_suffix_text>
         </n1:person_name>
       </n1:person>
       <n1:person_relationships/>

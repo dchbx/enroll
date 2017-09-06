@@ -11,8 +11,7 @@ module Subscribers
     def call(event_name, e_start, e_end, msg_id, payload)
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
-
-      application = FinancialAssistance::Application.find(stringed_key_payload["assistance_application_id"]) if stringed_key_payload["assistance_application_id"].present?
+      application = FinancialAssistance::Application.where(:id => stringed_key_payload["assistance_application_id"]).first if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
         application.update_attributes(determination_http_status_code: payload_http_status_code)
@@ -53,7 +52,7 @@ module Subscribers
       #        family = Family.find(stupid_family_id) # wow
       #        active_household = family.active_household
 
-      application_in_context = family.applications.find(verified_family.fin_app_id)
+      application_in_context = family.applications.where(:id => verified_family.fin_app_id).first
       throw(:processing_issue, "ERROR: Failed to find application for person in xml") unless application_in_context.present?
       active_verified_household = verified_family.households.max_by(&:start_date)
       verified_dependents.each do |verified_family_member|

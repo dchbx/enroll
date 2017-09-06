@@ -17,7 +17,7 @@
           <n1:person_surname>Louis</n1:person_surname>
           <n1:person_given_name>Henry</n1:person_given_name>
           <n1:person_middle_name></n1:person_middle_name>
-          <n1:person_name_suffix></n1:person_name_suffix>
+          <n1:person_name_suffix_text></n1:person_name_suffix_text>
         </n1:person_name>
       </n1:person>
       <n1:person_relationships/>
