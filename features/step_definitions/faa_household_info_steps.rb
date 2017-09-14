@@ -1,6 +1,6 @@
 And(/^saves a YES answer to the question: Do you want to apply for Medicaid…$/) do
 	find(:xpath, '//label[@for="radio1"]').click
-	create_plan
+	benchmark_plan
 	find('.btn', text: 'CONTINUE').click
 	expect(page).to have_content('Application Checklist')
 end

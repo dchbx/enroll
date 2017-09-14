@@ -41,7 +41,7 @@ Then(/^they should be taken back to the application's details page for applicant
 end
 
 When(/^they click edit for an applicant$/) do
-  click_link 'Add Info', href: "/financial_assistance/applications/#{consumer.primary_family.application_in_progress.id}/applicants/#{consumer.primary_family.application_in_progress.primary_applicant.id}/step/1"
+  click_link 'ADD INCOME & COVERAGE INFO', href: "/financial_assistance/applications/#{consumer.primary_family.application_in_progress.id}/applicants/#{consumer.primary_family.application_in_progress.primary_applicant.id}/step/1"
 end
 
 When(/^they complete and submit the Income and Coverage information$/) do

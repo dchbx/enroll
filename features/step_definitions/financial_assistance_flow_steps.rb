@@ -1,4 +1,3 @@
-
 Given(/^that the user is applying for a CONSUMER role$/) do
   visit "/users/sign_up"
   fill_in "user_oim_id", with: user_sign_up[:oim_id]
@@ -7,10 +6,8 @@ Given(/^that the user is applying for a CONSUMER role$/) do
   click_button "Create account"
 end
 
-And(/the primary member has supplied mandatory information required$/) do
+Given(/^the primary member has supplied mandatory information required$/) do
   visit privacy_insured_consumer_role_index_path
-  expect(page).to have_content("Your Information")
-  expect(page).to have_content("CONTINUE")
   click_link "CONTINUE"
   fill_in "person_first_name", with: personal_information[:first_name]
   fill_in "person_last_name", with: personal_information[:last_name]
@@ -19,7 +16,7 @@ And(/the primary member has supplied mandatory information required$/) do
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   find('.btn', text: 'CONTINUE').click
-  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
+  page.should have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
   find('.btn', text: 'CONTINUE').click
   find(:xpath, '//label[@for="person_us_citizen_true"]').click
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
@@ -36,17 +33,16 @@ And(/the primary member has supplied mandatory information required$/) do
 end
 
 Given(/^the primary member authorizes the system to call EXPERIAN$/) do
-  expect(page).to have_content('Authorization and Consent')
+  page.should have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   find('.btn', text: 'CONTINUE').click
 end
 
-Given(/^system receives a positive response from EXPERIAN$/) do
+And(/^system receives a positive response from EXPERIAN$/) do
   expect(page).to have_content('Verify Identity')
 end
 
-Given(/^the user answers all VERIFY IDENTITY  questions$/) do 
-  expect(page).to have_content('Verify Identity')
+Given(/^the user answers all VERIFY IDENTITY  questions$/) do
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
 end
@@ -64,15 +60,10 @@ Then(/^The user will navigate to the Help Paying for Coverage page$/) do
 end
 
 Given(/^the user is on the Help Paying For Coverage page$/) do
-  expect(page).to have_content('Verify Identity')
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
-  click_button "Submit"
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  visit help_paying_coverage_financial_assistance_applications_path
 end
 
 When(/^the user clicks CONTINUE$/) do
-  expect(page).to have_content('Help Paying for Coverage')
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -82,7 +73,7 @@ When(/^the answer to Do you want to apply for Medicaid… is NIL$/) do
 end
 
 Then(/^the user will remain on the page$/) do
-  expect(page).to have_content('Do you want to apply for Medicaid, tax credits, savings and cost-sharing reductions ? *')
+  page.should have_content('Do you want to apply for Medicaid, tax credits, savings and cost-sharing reductions ? *')
 end
 
 Then(/^an error message will display stating the requirement to populate an answer$/) do
@@ -93,10 +84,6 @@ When(/^the answer to Do you want to apply for Medicaid… is NO$/) do
   find(:xpath, '//label[@for="radio2"]').click
 end
 
-When(/^clicks CONTINUE$/) do
-  find('.btn', text: 'CONTINUE').click
-end
-
 Then(/^the user will navigate to the UQHP Household Info: Family Members page$/) do
   consumer.person.families.last.family_members.each do |family_member|
     expect(page).to have_content(family_member.first_name)
@@ -104,13 +91,8 @@ Then(/^the user will navigate to the UQHP Household Info: Family Members page$/)
 end
 
 When(/^the answer to Do you want to apply for Medicaid… is YES$/) do
-  expect(page).to have_content('Verify Identity')
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
-  click_button "Submit"
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  visit help_paying_coverage_financial_assistance_applications_path
   find(:xpath, '//label[@for="radio2"]').click
-  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^the user will navigate to the FAA Household Info: Family Members page$/) do
@@ -132,9 +114,15 @@ When(/^the user clicks the SAVE & EXIT link$/) do
   find('.interaction-click-control-save---exit').trigger 'click'
 end
 
-Then(/^next time the user logs in the user will Help Paying For Coverage page$/) do
-  visit "/users/sign_in"
+Then(/^next time the user logs in and the user will be on Help Paying For Coverage page$/) do
+  visit '/'
+  click_link 'Consumer/Family Portal'
+  click_link 'Sign In Existing Account'
   fill_in "user_login", with: user_sign_up[:oim_id]
   fill_in "user_password", with: user_sign_up[:password]
   click_button "Sign in"
+end
+
+Then(/^an flash message will display stating Signed in sucessfully\.$/) do
+  expect(page).to have_content('Signed in successfully.')
 end

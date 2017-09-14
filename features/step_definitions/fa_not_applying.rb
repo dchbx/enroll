@@ -64,7 +64,7 @@ end
 
 Given(/^the user navigates to the "Household Info" page with "no" selected$/) do
   find(:xpath, '//label[@for="radio2"]').click
-  create_plan
+  benchmark_plan
   find('.btn', text: 'CONTINUE').click
   expect(page).to have_content('Household Info: Family Members')
 end
@@ -99,7 +99,7 @@ end
 
 Given(/^the user navigates to the "Household Info" page with "yes" selected/) do
   find(:xpath, '//label[@for="radio1"]').click
-  create_plan
+  benchmark_plan
   find('.btn', text: 'CONTINUE').click
 end
 And(/^the user is navigated to Application checklist page/) do
@@ -111,5 +111,5 @@ When(/^the user clicks on CONTINUE button/) do
 end
 
 Then(/^the user will navigate to FAA Household Info: Family Members page/) do
-  page.should have_css('.interaction-click-control-add-info')
+  page.should have_content('Household Info: Family Members')
 end
