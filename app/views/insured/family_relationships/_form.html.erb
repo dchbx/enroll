@@ -40,33 +40,21 @@
     <br />
     <%= submit_tag "Add Relationship", class: "btn btn-primary" %>
   <% end %>
-<%else%>
-  <h1 class="darkblue">Household Relationships</h1>
-  <div>
-    <h4>All the relationships are added. Please continue.</h4>
-    <% if params[:consumer_role_id].present? || params[:employee_role_id].present? || params[:resident_role_id].present?%>
-      <h4> Please click continue to proceed.</h4>
-    <% end %>
-  </div>
-  <br />
-  <div>
-    <table id="relationship-matrix">
-      <thead>
-        <th></th>
-        <%@people.each do |person|%>
-          <th><%=person.full_name%></th>
-        <%end%>
-      </thead>
-      <tbody>
-        <%@matrix.each_with_index do |relationships_row, index_x|%>
-          <tr>
-            <td><b><%=@people[index_x].full_name%></b></td>
-            <%relationships_row.each_with_index do |rel, index_y|%>
-              <td><small><%= rel.titleize if rel.present?%></small></td>
-            <%end%>
-          </tr>
-        <%end%>
-      </tbody>
-    </table>
-  </div>
+  <%else%>
+   <h1 class="darkblue">Household Relationships</h1>
+   <div>
+     <h4>All the relationships are added. Please continue.</h4>
+     <% if params[:consumer_role_id].present? || params[:employee_role_id].present? || params[:resident_role_id].present?%>
+       <h4> Please click continue to proceed.</h4>
+     <% end %>
+   </div>
 <%end%>
+<script >
+  $(function() {
+    if(<%= missing_relationships.present? %>){
+      $('#btn-continue').addClass('disabled');
+    } else {
+      $('#btn-continue').removeClass('disabled');
+    }
+  });
+</script>
