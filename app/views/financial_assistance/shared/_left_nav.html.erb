@@ -9,7 +9,7 @@
           View My Applications
         </a>
       </li>
-      <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> indent-w">
+      <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w">
         <% if  @application.is_draft? %>
           <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
         <% else %>
@@ -87,7 +87,7 @@
         </li>
       </ul>
     <% else %>
-      <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> indent-w">
+      <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> global-nav indent-w">
         <% if @application.ready_for_attestation? and @application.is_draft? %>
           <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>
         <% else %>
