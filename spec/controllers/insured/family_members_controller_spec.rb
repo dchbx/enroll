@@ -13,6 +13,7 @@ RSpec.describe Insured::FamilyMembersController do
   before do
     employer_profile.plan_years << published_plan_year
     employer_profile.save
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
   end
 
 
@@ -191,12 +192,17 @@ RSpec.describe Insured::FamilyMembersController do
   end
 
   describe "DELETE destroy" do
-    let(:dependent) { double }
-    let(:dependent_id) { "234dlfjadsklfj" }
+    let!(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:family_member) { test_family.primary_applicant }
+    let!(:application) { FactoryGirl.create(:application, aasm_state: "draft", family: test_family) }
+    let!(:applicant) { FactoryGirl.create(:applicant, family_member_id: family_member.id, application: application)}
+    let!(:dependent) { double }
+    let!(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(dependent).to receive(:family_member).and_return(family_member)
     end
 
     it "should destroy the dependent" do
@@ -265,7 +271,14 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     describe "with a valid dependent" do
+      let(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:family_member) {  test_family.primary_applicant }
       let(:update_result) { true }
+
+      before :each do
+        allow(dependent).to receive(:family_member).and_return(family_member)
+      end
+
       it "should render the show template" do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         put :update, :id => dependent_id, :dependent => dependent_properties

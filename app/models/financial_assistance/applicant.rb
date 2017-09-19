@@ -45,6 +45,8 @@ class FinancialAssistance::Applicant
   field :family_member_id, type: BSON::ObjectId
   field :tax_household_id, type: BSON::ObjectId
 
+  field :is_active, type: Boolean, default: true
+
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
   field :is_temp_out_of_state, type: Boolean, default: false
@@ -130,6 +132,8 @@ class FinancialAssistance::Applicant
 
   field :workflow, type: Hash, default: { }
 
+  default_scope -> {where(:is_active => true)}
+  
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"

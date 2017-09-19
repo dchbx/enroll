@@ -106,6 +106,10 @@ class Insured::FamilyMembersController < ApplicationController
   def destroy
     @dependent = Forms::FamilyMember.find(params.require(:id))
     @dependent.destroy!
+    family_member = @dependent.family_member
+    application = family_member.family.application_in_progress
+    # Set corresponding Applicant to Inactive if you have a FAA application in progress
+    family_member.applicant_of_application(application).update_attribute("is_active", false) if application
 
     respond_to do |format|
       format.html { render 'index' }
