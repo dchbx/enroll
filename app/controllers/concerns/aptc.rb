@@ -14,7 +14,7 @@ module Aptc
       application = person.primary_family.active_approved_application
       if application.present?
         application.tax_households.each do |th|
-          tax_households << th if th.applicants.where(:family_member_id.in => family_member_ids).present?
+          tax_households << th if th.active_applicants.where(:family_member_id.in => family_member_ids).present?
         end
       end
     end

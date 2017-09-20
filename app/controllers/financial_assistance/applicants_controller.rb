@@ -9,19 +9,19 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   before_filter :load_support_texts, only: [:other_questions, :step]
 
   def edit
-    @applicant = @application.applicants.find(params[:id])
+    @applicant = @application.active_applicants.find(params[:id])
     render layout: 'financial_assistance'
   end
 
   def other_questions
     save_faa_bookmark(@person, request.original_url)
-    @applicant = @application.applicants.find(params[:id])
+    @applicant = @application.active_applicants.find(params[:id])
     render layout: 'financial_assistance'
   end
 
   def save_questions
     format_date_params params[:financial_assistance_applicant] if params[:financial_assistance_applicant].present?
-    @applicant = @application.applicants.find(params[:id])
+    @applicant = @application.active_applicants.find(params[:id])
     @applicant.assign_attributes(permit_params(params[:financial_assistance_applicant])) if params[:financial_assistance_applicant].present?
     if @applicant.save(context: :other_qns)
       redirect_to edit_financial_assistance_application_path(@application)
@@ -65,7 +65,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def age_of_applicant
-    applicant = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id])
+    applicant = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id])
     render :text => "#{applicant.age_of_the_applicant}"
   end
 
@@ -99,7 +99,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def find
-    @applicant = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:id])
+    @applicant = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:id])
   end
 
   def permit_params(attributes)

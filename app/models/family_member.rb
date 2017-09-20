@@ -144,12 +144,8 @@ class FamilyMember
     end
   end
 
-  def applicant
-    application = self.family.application_in_progress
-    if application.present?
-      applicant = application.applicants.where(family_member_id: self.id).first
-      return applicant if applicant.present?
-    end
+  def applicant_of_application(application)
+    application.active_applicants.where(family_member_id: self.id).first
   end
 
   private

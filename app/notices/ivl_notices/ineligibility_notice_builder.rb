@@ -30,7 +30,7 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     if (notice.has_applied_for_assistance && latest_application.present? && latest_application.is_family_totally_ineligibile)
       notice.request_full_determination = latest_application.request_full_determination
       notice.is_family_totally_ineligibile = latest_application.is_family_totally_ineligibile
-      latest_application.applicants.map(&:person).uniq.each do |person|
+      latest_application.active_applicants.map(&:person).uniq.each do |person|
         notice.individuals << append_family_members(person)
       end
     else

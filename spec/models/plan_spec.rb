@@ -529,7 +529,7 @@ RSpec.describe Plan, dbclean: :after_each do
       it "should return health plans" do
         plans = [plan2]
         allow(tax_household).to receive(:family).and_return family
-        allow(application).to receive(:applicants).and_return nil
+        allow(application).to receive(:active_applicants).and_return nil
         expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household], family_member_ids:nil).to_a).to eq plans
       end
 

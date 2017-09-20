@@ -47,7 +47,7 @@ class TaxHousehold
   end
 
   def aptc_members
-    applicants.find_all(&:is_ia_eligible?)
+    active_applicants.find_all(&:is_ia_eligible?)
   end
 
   def aptc_ratio_by_member
@@ -176,19 +176,19 @@ class TaxHousehold
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    applicants.each do |applicant|
+    active_applicants.each do |applicant|
       return applicant if applicant.family_member.is_primary_applicant?
     end
   end
 
   def applicants
-    return nil unless application.applicants
-    application.applicants.where(tax_household_id: self.id)
+    return nil unless application.active_applicants
+    application.active_applicants.where(tax_household_id: self.id)
   end
 
   def any_applicant_ia_eligible?
-    return nil unless applicants.present?
-    applicants.map(&:is_ia_eligible).include?(true)
+    return nil unless active_applicants.present?
+    active_applicants.map(&:is_ia_eligible).include?(true)
   end
 
   def preferred_eligibility_determination

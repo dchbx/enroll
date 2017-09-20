@@ -163,7 +163,7 @@ class FinancialAssistance::Application
   # @return [ {FamilyMember} ] primary {FamilyMember}
   def primary_applicant
     return @primary_applicant if defined?(@primary_applicant)
-    @primary_applicant = applicants.detect { |applicant| applicant.is_primary_applicant? }
+    @primary_applicant = active_applicants.detect { |applicant| applicant.is_primary_applicant? }
   end
 
 
@@ -319,13 +319,13 @@ class FinancialAssistance::Application
   end
 
   def is_family_totally_ineligibile
-    applicants.each { |applicant| return false unless applicant.is_totally_ineligible }
+    active_applicants.each { |applicant| return false unless applicant.is_totally_ineligible }
     return true
   end
 
   def all_tax_households
     tax_households = []
-    applicants.each do |applicant|
+    active_applicants.each do |applicant|
        tax_households << applicant.tax_household
     end
     tax_households.uniq
@@ -347,7 +347,7 @@ class FinancialAssistance::Application
   end
 
   def tax_household_for_family_member(family_member_id)
-    tax_households.select {|th| th if th.applicants.where(family_member_id: family_member_id).present? }.first
+    tax_households.select {|th| th if th.active_applicants.where(family_member_id: family_member_id).present? }.first
   end
 
   # TODO: Move to Aplication model and refactor accordingly.
@@ -422,7 +422,7 @@ class FinancialAssistance::Application
   def ready_for_attestation?
     application_valid = is_application_ready_for_attestation?
     # && chec.k for the validity of all applicants too.
-    self.applicants.each do |applicant|
+    self.active_applicants.each do |applicant|
       return false unless applicant.applicant_validation_complete?
     end
     application_valid && family.relationships_complete?
@@ -437,17 +437,21 @@ class FinancialAssistance::Application
   end
 
   def incomplete_applicants?
-    applicants.each do |applicant|
+    active_applicants.each do |applicant|
       return true if applicant.applicant_validation_complete? == false
     end
     return false
   end
 
   def next_incomplete_applicant
-    applicants.each do |applicant|
+    active_applicants.each do |applicant|
       return applicant if applicant.applicant_validation_complete? == false
     end
   end
+
+  def active_applicants
+    applicants.where(:is_active => true)
+  end 
 
   def build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
     verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
@@ -474,11 +478,11 @@ class FinancialAssistance::Application
 
           #Applicant/TaxHouseholdMember block start
           applicants_persons_hbx_ids = []
-          applicants.each { |appl| applicants_persons_hbx_ids << appl.person.hbx_id.to_s}
+          active_applicants.each { |appl| applicants_persons_hbx_ids << appl.person.hbx_id.to_s}
           vthh.tax_household_members.each do |thhm|
             #If applicant exisits in our db.
             if applicants_persons_hbx_ids.include?(thhm.person_id)
-              applicant = applicants.select { |applicant| applicant.person.hbx_id == thhm.person_id }.first
+              applicant = active_applicants.select { |applicant| active_applicants.person.hbx_id == thhm.person_id }.first
 
               # verified_family_member = verified_family.family_members.detect { |vfm| vfm.person.id == thhm.person_id }
               # applicant.update_attributes({is_without_assistance: verified_family_member.is_without_assistance, is_ia_eligible: verified_family_member.is_insurance_assistance_eligible, is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible, is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible, is_totally_ineligible: verified_family_member.is_totally_ineligible})
@@ -752,12 +756,12 @@ private
     tax_households.destroy_all
     eligibility_determinations.destroy_all
 
-    applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
+    active_applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
     ##
-    applicants.each do |applicant|
+    active_applicants.each do |applicant|
       if applicant.is_claimed_as_tax_dependent?
         # Assign applicant to the same THH that the person claiming this dependent belongs to.
-        thh_of_claimer = applicants.find(applicant.claimed_as_tax_dependent_by).tax_household
+        thh_of_claimer = active_applicants.find(applicant.claimed_as_tax_dependent_by).tax_household
         applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
         applicant.update_attributes!(tax_filer_kind: 'dependent')
       elsif applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.tax_household_of_spouse.present?
@@ -774,7 +778,7 @@ private
 
     # delete THH without any applicant.
     empty_th = tax_households.select do |th|
-      applicants.map(&:tax_household).exclude?(th)
+      active_applicants.map(&:tax_household).exclude?(th)
     end
     empty_th.each &:destroy
   end

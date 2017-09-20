@@ -17,6 +17,10 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       }
     }
 
+    before(:each) do
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    end
+
   context "with wrong arguments" do
     let(:params) {{application: application, tax_filer_kind: "test", has_fixed_address: nil}}
 

@@ -189,13 +189,17 @@ describe "for families with financial assistance application" do
   let(:person1) { FactoryGirl.create(:person)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
 
+  before(:each) do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
+
   context "family_member added when application is in progress" do
     it "should create an applicant with the family_member_id of the added member" do
       family.applications.create!
-      expect(family.application_in_progress.applicants.count).to eq 0
+      expect(family.application_in_progress.active_applicants.count).to eq 0
       fm = family.family_members.create!({person_id: person1.id, is_primary_applicant: false, is_coverage_applicant: true})
-      expect(family.application_in_progress.applicants.count).to eq 1
-      expect(family.application_in_progress.applicants.first.family_member_id).to eq fm.id
+      expect(family.application_in_progress.active_applicants.count).to eq 1
+      expect(family.application_in_progress.active_applicants.first.family_member_id).to eq fm.id
     end
   end
 end

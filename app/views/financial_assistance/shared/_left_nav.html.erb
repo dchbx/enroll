@@ -24,12 +24,6 @@
       </li>
     <% end %>
 
-    <% if defined?(@matrix) %>
-      <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w'>
-        <%= link_to 'Family Relationships', insured_family_relationships_path %>
-      </li>
-    <% end %>
-
     <% if defined?(@applicant) %>
       <ul class="nav nav-stacked">
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_and_coverage) %> income-style">
@@ -86,7 +80,17 @@
           <% end %>
         </li>
       </ul>
+
     <% else %>
+
+      <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w'>
+        <% if @application.incomplete_applicants?%>
+          <% if @application.active_applicants.count > 1 %> <a class="cna">Family Relationships</a> <% end %>
+        <% else %>
+          <%= link_to 'Family Relationships', insured_family_relationships_path if @application.active_applicants.count > 1 and @application.is_draft?%>
+        <% end %>
+      </li>
+
       <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> indent-w">
         <% if @application.ready_for_attestation? and @application.is_draft? %>
           <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>

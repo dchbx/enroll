@@ -22,7 +22,8 @@
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
       previous_url: @family.application_in_progress.present? ? edit_financial_assistance_application_path(@family.application_in_progress) : insured_family_members_path(consumer_role_id: @consumer_role.id),
-      next_url: @family.application_in_progress.present? ? go_to_step_financial_assistance_application_applicant_path(@family.application_in_progress, @family.application_in_progress.applicants.first, 1) : find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)
+      next_url: find_next_application_path(@application),
+      disabled: @missing_relationships.present? ? true : false
     } %>
   </div>
 </div>

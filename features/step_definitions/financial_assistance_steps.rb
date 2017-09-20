@@ -124,24 +124,24 @@ end
 
 Given(/^the consumer has completed a financial assistance application$/) do
   # Kelly to John
-  application.applicants.second.person.person_relationships.create kind: 'spouse',
+  application.active_applicants.second.person.person_relationships.create kind: 'spouse',
     family_id: consumer.primary_family.id,
-    successor_id: application.applicants.first.person.id,
-    predecessor_id: application.applicants.second.person.id
+    successor_id: application.active_applicants.first.person.id,
+    predecessor_id: application.active_applicants.second.person.id
 
   # Danny to John
-  application.applicants.third.person.person_relationships.create kind: 'parent',
+  application.active_applicants.third.person.person_relationships.create kind: 'parent',
     family_id: consumer.primary_family.id,
-    successor_id: application.applicants.first.person.id,
-    predecessor_id: application.applicants.third.person.id
+    successor_id: application.active_applicants.first.person.id,
+    predecessor_id: application.active_applicants.third.person.id
 
   # Danny to Kelly
-  application.applicants.third.person.person_relationships.create kind: 'parent',
+  application.active_applicants.third.person.person_relationships.create kind: 'parent',
     family_id: consumer.primary_family.id,
-    successor_id: application.applicants.second.person.id,
-    predecessor_id: application.applicants.third.person.id
+    successor_id: application.active_applicants.second.person.id,
+    predecessor_id: application.active_applicants.third.person.id
 
-  application.applicants.each do |applicant|
+  application.active_applicants.each do |applicant|
     applicant.update_attributes is_required_to_file_taxes: false,
       is_claimed_as_tax_dependent: false,
       is_living_in_state: false,
@@ -248,7 +248,7 @@ And (/^they complete the form for the deduction/) do
 end
 
 Given (/^the consumer has an income$/) do
-  consumer.primary_family.application_in_progress.applicants.first.incomes.create amount: '5000',
+  consumer.primary_family.application_in_progress.active_applicants.first.incomes.create amount: '5000',
     frequency_kind: 'monthly',
     employer_name: 'Ideacrew',
     start_on: '2017/01/01',
@@ -265,11 +265,11 @@ Given (/^the consumer has an income$/) do
 end
 
 Given (/^the consumer has a benefit$/) do
-  consumer.primary_family.application_in_progress.applicants.first.update_attributes has_enrolled_health_coverage: true
+  consumer.primary_family.application_in_progress.active_applicants.first.update_attributes has_enrolled_health_coverage: true
 end
 
 Given (/^the consumer has a deduction$/) do
-  consumer.primary_family.application_in_progress.applicants.first.deductions.create! kind: 'alimony_paid'
+  consumer.primary_family.application_in_progress.active_applicants.first.deductions.create! kind: 'alimony_paid'
 end
 
 And (/^they should see the newly added deduction$/) do

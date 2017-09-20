@@ -45,6 +45,8 @@ class FinancialAssistance::Applicant
   field :family_member_id, type: BSON::ObjectId
   field :tax_household_id, type: BSON::ObjectId
 
+  field :is_active, type: Boolean, default: true
+
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
   field :is_temp_out_of_state, type: Boolean, default: false
@@ -129,7 +131,7 @@ class FinancialAssistance::Applicant
   field :has_eligible_health_coverage, type: Boolean
 
   field :workflow, type: Hash, default: { }
-
+  
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -197,7 +199,7 @@ class FinancialAssistance::Applicant
     spouse_relationship  = self.person.person_relationships.where(kind: 'spouse').first
     if spouse_relationship.present?
       spouse = Person.find(spouse_relationship.successor_id)
-      spouse_applicant = application.applicants.detect {|applicant| spouse == applicant.person }
+      spouse_applicant = application.active_applicants.detect {|applicant| spouse == applicant.person }
       return spouse_applicant.tax_household
     end
     return nil

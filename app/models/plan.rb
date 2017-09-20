@@ -468,7 +468,7 @@ class Plan
 
         if tax_households.present?
           if family_member_ids.present?
-            tax_households.first.family.active_approved_application.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
+            tax_households.first.family.active_approved_application.active_applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
               if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
                 csr_kinds << "csr_100"
               end

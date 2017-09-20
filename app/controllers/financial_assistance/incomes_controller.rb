@@ -87,12 +87,12 @@
 
   def find_application_and_applicant
     @application = FinancialAssistance::Application.find(params[:application_id])
-    @applicant = @application.applicants.find(params[:applicant_id])
+    @applicant = @application.active_applicants.find(params[:applicant_id])
   end
 
   def create
     @application = FinancialAssistance::Application.find(params[:application_id])
-    @applicant = @application.applicants.find(params[:applicant_id])
+    @applicant = @application.active_applicants.find(params[:applicant_id])
     @model = @applicant.incomes.build
   end
 
@@ -102,7 +102,7 @@
 
   def find
     begin
-      FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).incomes.find(params[:id])
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
     rescue
       nil
     end

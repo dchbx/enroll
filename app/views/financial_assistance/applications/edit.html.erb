@@ -8,7 +8,7 @@
       </div>
     <% end %>
 
-    <% @application.applicants.each do |applicant| %>
+    <% @application.active_applicants.each do |applicant| %>
       <% content_for "person_#{applicant.person.id}" do %>
         <div class="row row-form-wrapper no-buffer">
           <%= render "financial_assistance_row", applicant: applicant %>
@@ -21,8 +21,9 @@
 
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: @application.ready_for_attestation? ? other_questions_financial_assistance_application_applicant_path(@application, @application.applicants.last) : application_checklist_financial_assistance_applications_path,
-      next_url: @missing_relationships.present? ? insured_family_relationships_path(@person.consumer_role.id) : find_next_application_path(@application)
+      previous_url: @application.ready_for_attestation? ? other_questions_financial_assistance_application_applicant_path(@application, @application.active_applicants.last) : application_checklist_financial_assistance_applications_path,
+      next_url: @application.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : find_next_application_path(@application),
+      disabled: @application.incomplete_applicants? ? true : false
     } %>
   </div>
 </div>

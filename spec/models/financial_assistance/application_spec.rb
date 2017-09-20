@@ -181,7 +181,7 @@ RSpec.describe FinancialAssistance::Application, type: :model do
     let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
     let!(:applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
     before do
-      application.applicants.each do |applicant|
+      application.active_applicants.each do |applicant|
         applicant.is_totally_ineligible = true
         applicant.save!
       end

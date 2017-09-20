@@ -1,7 +1,7 @@
 <% if @family.application_in_progress.present? && request.env['HTTP_REFERER'].include?('financial_assistance') %>
   <% content_for "person_#{@dependent.family_member.person.id}" do %>
     <div class="row row-form-wrapper no-buffer">
-      <%= render "financial_assistance/applications/financial_assistance_row", applicant: @family.application_in_progress.applicants.find_by(family_member_id: @dependent.family_member.id) %>
+      <%= render "financial_assistance/applications/financial_assistance_row", applicant: @family.application_in_progress.active_applicants.find_by(family_member_id: @dependent.family_member.id) %>
     </div>
   <% end %>
 <% end %>
@@ -9,7 +9,7 @@
 <% if !@family.relationships_complete? %>
   <% puts 'family_reslationships_complete is not true' %>
   <%= content_for :submit_button do %>
-    <%= link_to 'Continue', insured_family_relationships_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue' %>
+    <%= link_to 'Continue', insured_family_relationships_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: @family.application_in_progress.incomplete_applicants? %>
   <% end %>
 <% end %>
 
@@ -28,6 +28,12 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
 $("#dependent_buttons").removeClass('hidden');
 
 <% if @family.application_in_progress.present? %>
-  $(".container > .row > .col-md-3").html("<%= escape_javascript(render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: financial_assistance_applications_path,
-    next_url:  go_to_step_financial_assistance_application_applicant_path(@family.application_in_progress, @family.application_in_progress.applicants.first, 1)}) %>");
+  $(".container > .row > .col-md-10 > .col-md-3").html("<%= escape_javascript(render partial: 'financial_assistance/shared/right_nav', 
+      locals: { previous_url: financial_assistance_applications_path,
+                next_url:  @family.application_in_progress.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : find_next_application_path(@family.application_in_progress),
+                disabled: @family.application_in_progress.incomplete_applicants? ? true : false
+  }) %>");
+
+  $(".container > .row > .col-md-2").html("<%= escape_javascript(render partial: 'financial_assistance/shared/left_nav') %>");
+
 <% end %>

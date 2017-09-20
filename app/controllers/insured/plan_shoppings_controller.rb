@@ -215,7 +215,7 @@ class Insured::PlanShoppingsController < ApplicationController
     # family_members = primary_family.family_members.where(id: family_member_ids)
     csr_kinds = []
     family_member_ids.each do |key, member|
-      applicant = primary_family.active_approved_application.applicants.where(family_member_id: member).first
+      applicant = primary_family.active_approved_application.active_applicants.where(family_member_id: member).first
       if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
         return false
       end

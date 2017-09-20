@@ -79,13 +79,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def copy
     if @person.primary_family.application_in_progress.blank?
       old_application = @person.primary_family.applications.find params[:id]
-      old_application.applicants.each do |applicant|
+      old_application.active_applicants.each do |applicant|
         applicant.person.person_relationships.each do |pr|
           puts pr.inspect
         end
       end
       @application = old_application.dup
-      @application.applicants.each do |applicant|
+      @application.active_applicants.each do |applicant|
         applicant.person.person_relationships.each do |pr|
           puts pr.inspect
         end
@@ -136,7 +136,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     save_faa_bookmark(@person, request.original_url)
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
-    @applicants = @application.applicants
+    @applicants = @application.active_applicants
 
     render layout: 'financial_assistance'
   end
@@ -183,7 +183,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def dummy_data_for_demo(params)
     #Dummy_ED
     @model.update_attributes!(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year)
-    @model.applicants.each do |applicant|
+    @model.active_applicants.each do |applicant|
       applicant.update_attributes!(is_ia_eligible: true)
     end
     @model.tax_households.each do |txh|
@@ -197,7 +197,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
                                               e_pdc_id: "3110344",
                                               source: "Haven",
                                               tax_household_id: txh.id).save!
-      @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false) if txh.applicants.count > 1
+      @model.active_applicants.second.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false) if txh.active_applicants.count > 1
     end
   end
 
