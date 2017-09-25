@@ -420,6 +420,7 @@ class Person
     else
       verification_types << 'Immigration status'
     end
+    verification_types << "Income" << "Minimal Essential Coverage"  if families.any?{ |family| family.has_financial_assistance_verification? }
     verification_types
   end
 

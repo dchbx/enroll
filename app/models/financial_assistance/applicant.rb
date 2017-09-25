@@ -135,6 +135,7 @@ class FinancialAssistance::Applicant
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
+  embeds_many :assisted_verifications, class_name: "::FinancialAssistance::AssistedVerification"
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 

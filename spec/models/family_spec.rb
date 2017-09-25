@@ -1471,3 +1471,57 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
     expect(family.dependents.first.person.consumer_role?).to be_truthy
   end
 end
+
+describe Family, "#has_financial_assistance_verification", dbclean: :after_each do
+  let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
+  let(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: false)}
+  let(:current_hbx_under_open_enrollment) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
+
+  context "when there is at least one application in a 'submitted' state for the current year" do
+    let!(:submitted_application) { FactoryGirl.create(:application, family: family, aasm_state: "submitted", assistance_year: TimeKeeper.date_of_record.year) }
+    let!(:determined_application) { FactoryGirl.create(:application, family: family, aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year) }
+    let!(:draft_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft", assistance_year: TimeKeeper.date_of_record.year) }
+
+    it "should return true if not under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+      expect(family.has_financial_assistance_verification?).to be_truthy
+    end
+
+    it "should return false if under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
+  end
+
+  context "when there is at least one application in a 'submitted' state for the next year" do
+    let!(:submitted_application_for_next_year) { FactoryGirl.create(:application, family: family, aasm_state: "submitted", assistance_year: TimeKeeper.date_of_record.year + 1) }
+
+    it "should return true under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
+      expect(family.has_financial_assistance_verification?).to be_truthy
+    end
+
+    it "should return false when not under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
+  end
+
+  context "when there is no application in a 'submitted' state" do
+    let!(:draft_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft", assistance_year: TimeKeeper.date_of_record.year) }
+
+    it "should return false when not under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
+
+    it "should return false when under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
+  end
+end

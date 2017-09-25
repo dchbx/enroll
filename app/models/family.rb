@@ -724,6 +724,14 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def has_financial_assistance_verification?
+    return false if applications.blank?
+    current_year = TimeKeeper.date_of_record.year
+    applicable_year = HbxProfile.current_hbx.under_open_enrollment? ? current_year + 1 : current_year
+    current_submitted_app = applications.where(assistance_year: applicable_year, aasm_state: "submitted").order_by(:submitted_at => 'desc').first
+    current_submitted_app.present? ? true : false
+  end
+
   def application_in_progress
     # Do we disable creating new Applications if there is one already in “draft”?
     # Also implement the logic to populate assistance_year (current_year or next_year based on application done before/after OE)
