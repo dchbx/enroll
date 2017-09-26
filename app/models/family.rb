@@ -724,6 +724,10 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def fin_assisted_verification?
+    applications.order_by(:submitted_at => 'desc').first.submitted?
+  end
+
   def application_in_progress
     # Do we disable creating new Applications if there is one already in “draft”?
     # Also implement the logic to populate assistance_year (current_year or next_year based on application done before/after OE)
