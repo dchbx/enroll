@@ -31,6 +31,22 @@ module VerificationHelper
         else
           "outstanding"
         end
+      when 'Income'
+        if member.consumer_role.assisted_income_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
+      when 'Minimal Essential Coverage'
+        if member.consumer_role.assisted_mec_verified?
+          "verified"
+        elsif member.consumer_role.has_docs_for_type?(type)
+          "in review"
+        else
+          "outstanding"
+        end
       else
         if member.consumer_role.lawful_presence_verified?
           "verified"

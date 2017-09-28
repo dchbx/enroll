@@ -77,6 +77,11 @@ class ConsumerRole
   field :native_update_reason, type: String
   field :is_applying_coverage, type: Boolean, default: true
 
+  field :assisted_income_validation, type: String
+  field :assisted_mec_validation, type: String
+  field :assisted_income_reason, type: String
+  field :assisted_mec_reason, type: String
+
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
@@ -611,6 +616,14 @@ class ConsumerRole
     native_validation == "valid"
   end
 
+  def assisted_income_verified?
+    assisted_income_validation == "valid"
+  end
+
+  def assisted_mec_verified?
+    assisted_mec_validation == "valid"
+  end
+
   def native_outstanding?
     native_validation == "outstanding"
   end
@@ -679,6 +692,10 @@ class ConsumerRole
       update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
     elsif v_type == "American Indian Status"
       update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
+    elsif v_type == "Minimal Essential Coverage"
+      update_attributes(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
+    elsif v_type == "Income"
+      update_attributes(:assisted_income_validation => "valid", :assisted_income_reason => update_reason)
     else
       lawful_presence_determination.authorize!(verification_attr(authority.first))
       update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
