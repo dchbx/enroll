@@ -131,7 +131,7 @@ class ConsumerRole
 
   embeds_one :lawful_presence_determination, as: :ivl_role
 
-  embeds_many :local_residency_responses, class_name:"EventResponse"
+  embeds_many :local_residency_responses, class_name:"EventResponse"''
 
   after_initialize :setup_lawful_determination_instance
 
@@ -709,6 +709,10 @@ class ConsumerRole
         ssn_verified?
       when 'American Indian Status'
         native_verified?
+      when "Income"
+        assisted_income_verified?
+      when "Minimal Essential Coverage"
+        assisted_mec_verified?
       else
         lawful_presence_verified?
     end

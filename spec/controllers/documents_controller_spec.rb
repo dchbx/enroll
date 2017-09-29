@@ -152,6 +152,35 @@ RSpec.describe DocumentsController, :type => :controller do
       end
     end
 
+    context "MEC verification type" do
+      it "should update attributes" do
+        post :update_verification_type, { person_id: person.id,
+                                          verification_type: "Minimal Essential Coverage",
+                                          verification_reason: "Document in EnrollApp"}
+        person.reload
+        expect(person.consumer_role.assisted_mec_validation).to eq("valid")
+        expect(person.consumer_role.assisted_mec_reason).to eq("Document in EnrollApp")
+      end
+    end
 
+    context "assisted verification reason inputs" do
+      it "should not update verification attributes without verification reason" do
+        post :update_verification_type, { person_id: person.id,
+                                          verification_type: "Income",
+                                          verification_reason: ""}
+        person.reload
+        expect(person.consumer_role.assisted_income_reason).to eq nil
+      end
+
+      (VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS).uniq.each do |reason|
+        it "should update verification attributes for #{reason} type" do
+          post :update_verification_type, { person_id: person.id,
+                                            verification_type: "Minimal Essential Coverage",
+                                            verification_reason: reason}
+          person.reload
+          expect(person.consumer_role.assisted_mec_reason).to eq (reason)
+        end
+      end
+    end
   end
 end
