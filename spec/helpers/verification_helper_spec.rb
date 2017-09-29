@@ -114,7 +114,19 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    context "Minimal Essential Coverage status" do
+    describe "Minimal Essential Coverage status" do
+
+      before :each do
+        allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+      end
+
+      let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+      let!(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+      let!(:application) { FactoryGirl.create(:application, family: family) }
+      let!(:tax_household1) { FactoryGirl.create(:tax_household, application: application) }
+      let!(:applicant) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family.primary_applicant.id) }
+      let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant) }
+
       #uploadable not implemented  - -  To write specs  according to assisted_verification_documents
       # context "Minimal Essential Coverage with uploaded docs" do
       #   it "returns in review status" do
@@ -123,22 +135,27 @@ RSpec.describe VerificationHelper, :type => :helper do
       #   end
       # end
       context "Minimal Essential Coverage verified" do
-        it "returns outstanding status" do
+        it "returns verified status" do
           person.consumer_role.assisted_mec_validation = "valid"
-          person.consumer_role.assisted_verification_documents=[]
           expect(helper.verification_type_status("Minimal Essential Coverage", person)).to eq "verified"
         end
       end
       context "Minimal Essential Coverage outstanding" do
         it "returns outstanding status" do
-          person.consumer_role.assisted_mec_validation = nil
-          person.consumer_role.assisted_verification_documents=[]
-          expect(helper.verification_type_status("Minimal Essential Coverage", person)).to eq "outstanding"
+          allow(applicant).to receive(:family_member).and_return(family.primary_applicant)
+          person.consumer_role.assisted_verification_documents.create!(application_id: application.id, applicant_id: applicant.id, assisted_verification_id: assisted_verification.id)
+          person.consumer_role.assisted_income_validation = nil
+          expect(helper.verification_type_status("Income", person)).to eq "outstanding"
         end
       end
     end
 
-    context "Income status" do
+    describe "Income status" do
+
+      before :each do
+        allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+      end
+
       #uploadable not implemented  - - To write specs  according to assisted_verification_documents
       # context "Income with uploaded docs" do
       #   it "returns in review status" do
@@ -146,17 +163,26 @@ RSpec.describe VerificationHelper, :type => :helper do
       #     expect(helper.verification_type_status("Income", person)).to eq "in review"
       #   end
       # end
-      context "Income validation pending" do
-        it "returns outstanding status" do
-          person.consumer_role.assisted_income_validation = "pending"
-          person.consumer_role.assisted_verification_documents=[]
-          expect(helper.verification_type_status("Income", person)).to eq "outstanding"
+      # person.consumer_role.assisted_verification_documents.present? && ["unverified"].include?(assistance_applicant_documents.where(kind: "Income").first.status)
+
+      let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+      let!(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+      let!(:application) { FactoryGirl.create(:application, family: family) }
+      let!(:tax_household1) { FactoryGirl.create(:tax_household, application: application) }
+      let!(:applicant) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family.primary_applicant.id) }
+      let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant) }
+
+      context "Income validation verify" do
+        it "returns verified status" do
+          person.consumer_role.assisted_income_validation = "valid"
+          expect(helper.verification_type_status("Income", person)).to eq "verified"
         end
       end
       context "Income validation outstanding" do
         it "returns outstanding status" do
-          person.consumer_role.assisted_income_validation = "outstanding"
-          person.consumer_role.assisted_verification_documents=[]
+          allow(applicant).to receive(:family_member).and_return(family.primary_applicant)
+          person.consumer_role.assisted_verification_documents.create!(application_id: application.id, applicant_id: applicant.id, assisted_verification_id: assisted_verification.id)
+          person.consumer_role.assisted_income_validation = nil
           expect(helper.verification_type_status("Income", person)).to eq "outstanding"
         end
       end

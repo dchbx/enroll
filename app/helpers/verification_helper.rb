@@ -14,6 +14,7 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
+    assistance_applicant_documents = member.consumer_role.assisted_verification_documents
     case type
       when 'Social Security Number'
         if member.consumer_role.ssn_verified?
@@ -34,17 +35,17 @@ module VerificationHelper
       when 'Income'
         if member.consumer_role.assisted_income_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif member.consumer_role.has_faa_docs_for_type?(type)
           "in review"
-        else
+        elsif assistance_applicant_documents.present? && ["unverified"].include?(assistance_applicant_documents.select{|document| document.kind == "Income"}.first.status)
           "outstanding"
         end
       when 'Minimal Essential Coverage'
         if member.consumer_role.assisted_mec_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif member.consumer_role.has_faa_docs_for_type?(type)
           "in review"
-        else
+        elsif assistance_applicant_documents.present? && ["unverified"].include?(assistance_applicant_documents.select{|document| document.kind == "MEC"}.first.status)
           "outstanding"
         end
       else

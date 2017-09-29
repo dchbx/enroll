@@ -172,6 +172,11 @@ class ConsumerRole
     self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
   end
 
+  #check if consumer has uploaded documents for Income/MEC verification type
+  def has_faa_docs_for_type?(type)
+    self.assisted_verification_documents.any?{ |doc| doc.kind == type && doc.identifier }
+  end
+
   #use this method to check what verification types needs to be included to the notices
   def outstanding_verification_types
     self.person.verification_types.find_all do |type|
