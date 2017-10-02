@@ -437,6 +437,14 @@ class Family
     special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
 
+  def active_shop_seps
+    special_enrollment_periods.shop_market.find_all { |sep| sep.is_active? }
+  end
+
+  def active_ivl_seps
+    special_enrollment_periods.individual_market.find_all { |sep| sep.is_active? }
+  end
+
   # Get list of HBX Admin assigned {SpecialEnrollmentPeriod} (SEP) eligibilities currently available to this family
   #
   # @example Get the list of HBX Admin assigned {SpecialEnrollmentPeriod SpecialEnrollmentPeriods}

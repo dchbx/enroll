@@ -776,9 +776,10 @@ class HbxEnrollment
     end
   end
 
+  # Modified logic to use most recent active SEP instead of earliest effective active SEP(ticket 17402)
   def set_special_enrollment_period
     if is_special_enrollment?
-      sep_id = is_shop? ? self.family.earliest_effective_shop_sep.id : self.family.earliest_effective_ivl_sep.id
+      sep_id = is_shop? ? self.family.active_shop_seps.last.id : self.family.active_ivl_seps.last.id
       self.update_current(special_enrollment_period_id: sep_id)
     end
   end

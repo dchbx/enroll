@@ -2639,4 +2639,39 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
+
+  describe HbxEnrollment, '.set_special_enrollment_period' do
+    context 'when employee has multipe active SEPs' do
+
+      let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
+      let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true)}
+
+      let!(:special_enrollment_period1) {
+        date1 = TimeKeeper.date_of_record.beginning_of_month
+        family.special_enrollment_periods.create(qle_on: TimeKeeper.date_of_record.prev_month, effective_on: date1, qualifying_life_event_kind: qle, effective_on_kind: 'first_of_month')
+      }
+
+      let!(:special_enrollment_period2){
+        date2 = TimeKeeper.date_of_record.next_month.beginning_of_month
+        family.special_enrollment_periods.create(qle_on: TimeKeeper.date_of_record, effective_on: date2, qualifying_life_event_kind: qle, effective_on_kind: 'first_of_month')
+      }
+
+      let(:enrollment) { 
+        FactoryGirl.build(:hbx_enrollment,
+          household: family.active_household,
+          coverage_kind: "health",
+          enrollment_kind: "special_enrollment",
+          kind: 'employer_sponsored'
+          )
+      }
+
+      it 'should set most recent active SEP' do
+        expect(enrollment.special_enrollment_period).to be_nil
+        enrollment.set_special_enrollment_period
+        expect(enrollment.special_enrollment_period).to eq special_enrollment_period2
+      end
+    end
+  end
 end
