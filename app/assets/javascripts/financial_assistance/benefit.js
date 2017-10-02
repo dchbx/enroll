@@ -31,7 +31,7 @@ $(document).ready(function() {
       return 'You have an unsaved benefit, are you sure you want to proceed?';
     });
 
-    $(document).on('click', 'a[href]:not(.disabled)', function(e) {
+    $(document).on('click', 'a[href]:not(.disabled):not(.benefit-support-modal)', function(e) {
       if (currentlyEditing()) {
         e.preventDefault();
         var self = this;

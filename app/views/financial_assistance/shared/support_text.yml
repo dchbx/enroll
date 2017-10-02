@@ -22,3 +22,7 @@ need_help_paying_bills: "<b> Does this person need any help paying for medical b
 
 # help coverage
 is_applying_for_assistance: "<b> Do you want to apply for Medicaid, tax credits, savings and cost-sharing reductions? </b> <br> <br> If you answer ‘yes’, we’ll check to see if you qualify for all of these programs. If you answer ‘no’, you’ll have to pay full price for private health insurance <br> <ul> <li>Medicaid offers free, comprehensive coverage</li><li>Tax credit savings and cost-sharing reductions lower your costs for private health insurance</li></ul> You cannot apply for just one program.<br> You can get an estimate of what you might qualify for using our Plan Match Tool."
+
+# health coverage
+is_esi_waiting_period: "<b> Is this person in a waiting period and eligible to enroll in the next 3 months? </b> <br> <br> Select ‘yes’ if this person can get health coverage within the next 3 months after a waiting period. Some employers that offer health insurance have a waiting period of a few months before health insurance starts."
+is_esi_mec_met: <b> Does this employer offer a health plan that meets the minimum value standard ? *? </b> <br> <br> Select ‘yes’ if this person can get health coverage within the next 3 months after a waiting period. Some employers that offer health insurance have a waiting period of a few months before health insurance starts."

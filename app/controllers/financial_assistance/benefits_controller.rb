@@ -6,7 +6,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
   include NavigationHelper
 
   before_filter :find_application_and_applicant
-  before_filter :load_support_texts, only: [:index]
+  before_filter :load_support_texts, only: [:index, :create, :update]
 
   def index
     save_faa_bookmark(@person, request.original_url)
