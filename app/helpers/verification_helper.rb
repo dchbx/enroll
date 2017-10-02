@@ -43,7 +43,7 @@ module VerificationHelper
       when 'Minimal Essential Coverage'
         if member.consumer_role.assisted_mec_verified?
           "verified"
-        elsif member.consumer_role.has_faa_docs_for_type?(type)
+        elsif member.consumer_role.has_faa_docs_for_type?("MEC")
           "in review"
         elsif assistance_applicant_documents.present? && ["unverified"].include?(assistance_applicant_documents.select{|document| document.kind == "MEC"}.first.status)
           "outstanding"
