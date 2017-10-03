@@ -45,4 +45,3 @@ Scenario: Left Nav Links - navigation to Other Questions section
 	Given that the user is on the Tax Info page for a given applicant
 	When the user clicks Other Questions section on the left navigation
 	Then the user will navigate to the Other Questions page for the corresponding applicant
-	

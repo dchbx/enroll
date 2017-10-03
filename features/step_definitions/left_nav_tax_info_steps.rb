@@ -20,7 +20,7 @@ Given(/^that the user is on the Tax Info page for a given applicant$/) do
 end
 
 When(/^the user clicks My Household section on the left navigation$/) do
-	click_link 'My Household' 
+	click_link 'My Household'
 end
 
 Then(/^the user will navigate to the FAA Household Info page for the corresponding application\.$/) do
@@ -28,7 +28,7 @@ Then(/^the user will navigate to the FAA Household Info page for the correspondi
 end
 
 When(/^the user clicks Income & Coverage section on the left navigation$/) do
-	click_link 'Income and Coverage Info' 
+	click_link 'Income and Coverage Info'
 end
 
 Then(/^the cursor will display disabled\.$/) do
@@ -36,7 +36,7 @@ Then(/^the cursor will display disabled\.$/) do
 end
 
 When(/^the user clicks Tax Info section on the left navigation$/) do
-	click_link 'Tax Info' 
+	click_link 'Tax Info'
 end
 
 When(/^the user clicks Job Income section on the left navigation$/) do
