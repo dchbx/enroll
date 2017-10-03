@@ -113,6 +113,54 @@ RSpec.describe VerificationHelper, :type => :helper do
         end
       end
     end
+
+    context "Minimal Essential Coverage status" do
+      #uploadable not implemented  - -  To write specs  according to assisted_verification_documents
+      # context "Minimal Essential Coverage with uploaded docs" do
+      #   it "returns in review status" do
+      #     person.consumer_role.assisted_verification_documents << FactoryGirl.build(:vlp_document, :verification_type => "Minimal Essential Coverage")
+      #     expect(helper.verification_type_status("Minimal Essential Coverage", person)).to eq "in review"
+      #   end
+      # end
+      context "Minimal Essential Coverage verified" do
+        it "returns outstanding status" do
+          person.consumer_role.assisted_mec_validation = "valid"
+          person.consumer_role.assisted_verification_documents=[]
+          expect(helper.verification_type_status("Minimal Essential Coverage", person)).to eq "verified"
+        end
+      end
+      context "Minimal Essential Coverage outstanding" do
+        it "returns outstanding status" do
+          person.consumer_role.assisted_mec_validation = nil
+          person.consumer_role.assisted_verification_documents=[]
+          expect(helper.verification_type_status("Minimal Essential Coverage", person)).to eq "outstanding"
+        end
+      end
+    end
+
+    context "Income status" do
+      #uploadable not implemented  - - To write specs  according to assisted_verification_documents
+      # context "Income with uploaded docs" do
+      #   it "returns in review status" do
+      #     person.consumer_role.assisted_verification_documents << FactoryGirl.build(:vlp_document, :verification_type => "Income")
+      #     expect(helper.verification_type_status("Income", person)).to eq "in review"
+      #   end
+      # end
+      context "Income validation pending" do
+        it "returns outstanding status" do
+          person.consumer_role.assisted_income_validation = "pending"
+          person.consumer_role.assisted_verification_documents=[]
+          expect(helper.verification_type_status("Income", person)).to eq "outstanding"
+        end
+      end
+      context "Income validation outstanding" do
+        it "returns outstanding status" do
+          person.consumer_role.assisted_income_validation = "outstanding"
+          person.consumer_role.assisted_verification_documents=[]
+          expect(helper.verification_type_status("Income", person)).to eq "outstanding"
+        end
+      end
+    end
   end
 
   describe "#verification_type_class" do
