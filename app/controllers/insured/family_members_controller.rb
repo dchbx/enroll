@@ -63,7 +63,6 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
-
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.save
         @created = true
@@ -78,14 +77,17 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
+
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
-      financial_application = @dependent.family_member.family.application_in_progress
-      @application = financial_application if financial_application.present?
       @created = true
       @missing_relation_url = insured_family_relationships_path(consumer_role_id: params[:consumer_role_id], employee_role_id: params[:employee_role_id])
       @matrix = @dependent.family.build_relationship_matrix
       @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
       @relationship_kinds = PersonRelationship::Relationships_UI
+      @dependent.copy_finanacial_assistances_application
+      financial_application = @dependent.family_member.family.application_in_progress
+      @application = financial_application if financial_application.present?
+
       respond_to do |format|
         if session[:source_fa].present?
           session[:source_fa] = nil
@@ -98,6 +100,8 @@ class Insured::FamilyMembersController < ApplicationController
     else
       @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@dependent.family_member.try(:person).try(:consumer_role))
       init_address_for_dependent
+      @dependent.copy_finanacial_assistances_application
+
       respond_to do |format|
         format.html { render 'new' }
         format.js { render 'new' }
@@ -108,10 +112,9 @@ class Insured::FamilyMembersController < ApplicationController
   def destroy
     @dependent = Forms::FamilyMember.find(params.require(:id))
     @dependent.destroy!
-    family_member = @dependent.family_member
-    @application = family_member.family.application_in_progress
-    # Set corresponding Applicant to Inactive if you have a FAA application in progress
-    family_member.applicant_of_application(@application).update_attribute("is_active", false) if @application
+    @dependent.copy_finanacial_assistances_application
+    financial_application = @dependent.family_member.family.application_in_progress
+    @application = financial_application if financial_application.present?
 
     respond_to do |format|
       format.html { render 'index' }
@@ -144,7 +147,6 @@ class Insured::FamilyMembersController < ApplicationController
 
   def update
     @dependent = Forms::FamilyMember.find(params.require(:id))
-
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|

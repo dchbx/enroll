@@ -334,7 +334,7 @@ class FinancialAssistance::Application
   end
 
   def populate_applicants_for(family)
-    self.applicants = family.family_members.map do |family_member|
+    self.applicants = family.active_family_members.map do |family_member|
       FinancialAssistance::Applicant.new family_member_id: family_member.id
     end
   end
@@ -636,6 +636,44 @@ class FinancialAssistance::Application
 
   def has_atleast_one_assisted_but_no_medicaid_applicant?
     active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
+  end
+
+  def copy_application
+    if self.family.application_in_progress.blank?
+      self.applicants.each do |applicant|
+        applicant.person.person_relationships.each do |pr|
+          puts pr.inspect
+        end
+      end
+      new_application = self.dup
+      new_application.applicants.each do |applicant|
+        applicant.person.person_relationships.each do |pr|
+          puts pr.inspect
+        end
+      end
+      new_application.aasm_state = "draft"
+      new_application.submitted_at = nil
+      new_application.created_at = nil
+      new_application.save!
+      new_application.sync_family_members_with_applicants
+      new_application
+    end
+  end
+
+  def sync_family_members_with_applicants
+    active_member_ids = family.active_family_members.map(&:id)
+    applicants.each do |app| app.update_attributes(:is_active => false) if !active_member_ids.include?(app.family_member_id) end
+    active_applicant_family_member_ids = active_applicants.map(&:family_member_id)
+    family.active_family_members.each do |fm|
+      if !active_applicant_family_member_ids.include?(fm.id)
+        applicant_in_context = applicants.where(family_member_id: fm.id)
+        if applicant_in_context.present?
+          applicant_in_context.first.update_attributes(is_active: true)
+        else
+          applicants.create(family_member_id: fm.id)
+        end
+      end
+    end
   end
 
 private

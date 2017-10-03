@@ -32,14 +32,14 @@ module Forms
 
     attr_reader :dob
 
-    HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
+    HUMANIZED_ATTRIBUTES = {relationship: "Select Relationship Type "}
 
     def self.human_attribute_name(attr, options={})
       HUMANIZED_ATTRIBUTES[attr.to_sym] || super
     end
 
     def consumer_fields_validation
-      if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
+      if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true") #only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
         elsif @us_citizen == false && @eligible_immigration_status.nil?
@@ -304,10 +304,21 @@ module Forms
       return if family.blank? || family.family_members.blank?
 
       relationships = Hash.new
-      family.active_family_members.each{|fm| relationships[fm._id.to_s]=fm.relationship}
+      family.active_family_members.each {|fm| relationships[fm._id.to_s]=fm.relationship}
       relationships[self.id.to_s] = self.relationship
-      if relationships.values.count{|rs| rs=='spouse' || rs=='life_partner'} > 1
+      if relationships.values.count {|rs| rs=='spouse' || rs=='life_partner'} > 1
         self.errors.add(:base, "can not have multiple spouse or life partner")
+      end
+    end
+
+    def copy_finanacial_assistances_application
+      if family.applications.present?
+        application_in_draft = family.application_in_progress
+        if application_in_draft.present?
+          application_in_draft.sync_family_members_with_applicants
+        else family.latest_submitted_application.present?
+          family.latest_submitted_application.copy_application
+        end
       end
     end
   end

@@ -77,24 +77,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def copy
-    if @person.primary_family.application_in_progress.blank?
-      old_application = @person.primary_family.applications.find params[:id]
-      old_application.active_applicants.each do |applicant|
-        applicant.person.person_relationships.each do |pr|
-          puts pr.inspect
-        end
-      end
-      @application = old_application.dup
-      @application.active_applicants.each do |applicant|
-        applicant.person.person_relationships.each do |pr|
-          puts pr.inspect
-        end
-      end
-      @application.aasm_state = "draft"
-      @application.submitted_at = nil
-      @application.created_at = nil
-      @application.save!
-    end
+    old_application = @person.primary_family.applications.find params[:id]
+    @application = old_application.copy_application
     redirect_to edit_financial_assistance_application_path(@application)
   end
 
