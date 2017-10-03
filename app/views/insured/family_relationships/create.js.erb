@@ -1,5 +1,3 @@
-<%if @missing_relationships.present?%>
-$("#family-matrix").html("<%= escape_javascript(render '/insured/family_relationships/form', form_remote: true, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: '') %>");
-<% else %>
-$('#family-matrix').html("You have sucessfully added missing relationships");
-<%end%>
+$("<%=params[:predecessor_id]%>_<%=params[:successor_id]%>").removeClass("missing_relation");
+$("#family-matrix").html("<%= escape_javascript(render '/insured/family_relationships/form', form_remote: false, missing_relationships: @missing_relationships, all_relationships: @all_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: '') %>");
+$(".faa-status").html("<%= escape_javascript(render 'financial_assistance/shared/status', application: @application) %>");

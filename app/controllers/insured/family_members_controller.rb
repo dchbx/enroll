@@ -144,6 +144,11 @@ class Insured::FamilyMembersController < ApplicationController
 
   def update
     @dependent = Forms::FamilyMember.find(params.require(:id))
+    #Application when in draft state
+    @application = @dependent.family_member.family.application_in_progress
+    if @application.present?
+    load_support_texts
+    end
 
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.update_attributes(params.require(:dependent))

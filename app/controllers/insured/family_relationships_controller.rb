@@ -23,12 +23,16 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @people = @family.family_members.where(is_active: true).map(&:person)
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
+    # @existing_relationships = @family.find_existing_relationships(@matrix)
+    @all_relationships = @family.find_all_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships_UI
 
     render layout: 'financial_assistance'
-	end
+  end
 
   def create
+    @application = @family.application_in_progress
+
     predecessor = Person.where(id: params[:predecessor_id]).first
     successor = Person.where(id: params[:successor_id]).first
     predecessor.add_relationship(successor, params[:kind], @family.id, true)
@@ -37,6 +41,8 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships_UI
+    @people = @family.family_members.where(is_active: true).map(&:person)
+    @all_relationships = @family.find_all_relationships(@matrix)
 
     respond_to do |format|
       format.html {
@@ -46,8 +52,8 @@ class Insured::FamilyRelationshipsController < ApplicationController
     end
   end
 
-	private
-	def set_family
-		@family = @person.try(:primary_family)
-	end
+  private
+  def set_family
+    @family = @person.try(:primary_family)
+  end
 end

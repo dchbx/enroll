@@ -988,6 +988,23 @@ class Family
     return rel.kind if rel.present?
   end
 
+  def find_all_relationships(matrix)
+    id_map = {}
+    family_members_id = family_members.where(is_active: true).map(&:person_id)
+    family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
+    all_relationships = []
+    matrix.each_with_index do |x, xi|
+      x.each_with_index do |y, yi|
+        if (xi < yi)
+          relation = Person.find(id_map[xi]).person_relationships.where(family_id: self.id, predecessor_id: id_map[xi], successor_id: id_map[yi]).first
+          relation_kind = relation.present? ? relation.kind : nil
+          all_relationships << {:predecessor => id_map[xi], :relation => relation_kind,  :successor => id_map[yi]}
+        end
+      end
+    end
+    all_relationships
+  end
+
   def find_missing_relationships(matrix)
     id_map = {}
     family_members_id = family_members.where(is_active: true).map(&:person_id)

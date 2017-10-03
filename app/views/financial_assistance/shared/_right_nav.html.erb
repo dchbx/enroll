@@ -1,5 +1,7 @@
 <% if show_faa_status %>
-  <%= render partial: 'financial_assistance/shared/status', locals: { application: @application || @family.application_in_progress } %>
+    <div class = "faa-status">
+      <%= render partial: 'financial_assistance/shared/status', locals: { application: @application || @family.application_in_progress } %>
+    </div>
 <% end %>
 
 <% if content_for? :submit_button %>
