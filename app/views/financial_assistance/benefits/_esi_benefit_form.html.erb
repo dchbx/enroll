@@ -13,10 +13,10 @@
       <%= benefit_fields.hidden_field :kind, value: 'primary' %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6">
-          <%= benefit_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: benefit.employer_address.try(:address_1), required: true, class: "floatlabel" %>
+          <%= benefit_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: benefit.employer_address.try(:address_1), required: true, class: "floatlabel ph-width" %>
         </div>
         <div class="col-md-6">
-          <%= benefit_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2', value: benefit.employer_address.try(:address_2), class: "floatlabel" %>
+          <%= benefit_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2 (APT, UNIT, ETC.)', value: benefit.employer_address.try(:address_2), class: "floatlabel ph-width" %>
         </div>
       </div>
       <div class="row row-form-wrapper no-buffer row-height">
@@ -40,7 +40,7 @@
           <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel" %>
         </div>
         <div class="col-md-6">
-          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', required: true, class: "floatlabel" %>
+          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', required: true, class: "floatlabel ph-width" %>
         </div>
       </div>
     <% end %>

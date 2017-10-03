@@ -27,10 +27,10 @@
       <%= income_fields.hidden_field :kind, value: 'primary' %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6">
-          <%= income_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: income.employer_address.try(:address_1), required: true, class: "floatlabel" %>
+          <%= income_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: income.employer_address.try(:address_1), required: true, class: "floatlabel ph-width" %>
         </div>
         <div class="col-md-6">
-          <%= income_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2', value: income.employer_address.try(:address_2), class: "floatlabel" %>
+          <%= income_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2 (APT, UNIT, ETC.)', value: income.employer_address.try(:address_2), class: "floatlabel ph-width" %>
         </div>
       </div>
       <div class="row row-form-wrapper no-buffer row-height">
