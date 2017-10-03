@@ -77,6 +77,11 @@ class ConsumerRole
   field :native_update_reason, type: String
   field :is_applying_coverage, type: Boolean, default: true
 
+  field :assisted_income_validation, type: String
+  field :assisted_mec_validation, type: String
+  field :assisted_income_reason, type: String
+  field :assisted_mec_reason, type: String
+
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
@@ -165,6 +170,11 @@ class ConsumerRole
   #check if consumer has uploaded documents for verification type
   def has_docs_for_type?(type)
     self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
+  end
+
+  #check if consumer has uploaded documents for Income/MEC verification type
+  def has_faa_docs_for_type?(type)
+    self.assisted_verification_documents.any?{ |doc| doc.kind == type && doc.identifier }
   end
 
   #use this method to check what verification types needs to be included to the notices
@@ -611,6 +621,14 @@ class ConsumerRole
     native_validation == "valid"
   end
 
+  def assisted_income_verified?
+    assisted_income_validation == "valid"
+  end
+
+  def assisted_mec_verified?
+    assisted_mec_validation == "valid"
+  end
+
   def native_outstanding?
     native_validation == "outstanding"
   end
@@ -679,6 +697,10 @@ class ConsumerRole
       update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
     elsif v_type == "American Indian Status"
       update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
+    elsif v_type == "Minimal Essential Coverage"
+      update_attributes(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
+    elsif v_type == "Income"
+      update_attributes(:assisted_income_validation => "valid", :assisted_income_reason => update_reason)
     else
       lawful_presence_determination.authorize!(verification_attr(authority.first))
       update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
@@ -692,6 +714,10 @@ class ConsumerRole
         ssn_verified?
       when 'American Indian Status'
         native_verified?
+      when "Income"
+        assisted_income_verified?
+      when "Minimal Essential Coverage"
+        assisted_mec_verified?
       else
         lawful_presence_verified?
     end
