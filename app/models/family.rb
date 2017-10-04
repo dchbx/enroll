@@ -983,7 +983,7 @@ class Family
   end
   
   def self.min_verification_due_date_range(start_date,end_date)
-    where(min_verification_due_date_range: start_date..end_date)
+    where(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
   end
 
 private
