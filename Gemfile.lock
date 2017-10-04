@@ -39,7 +39,7 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
-  remote: ./project_gems/effective_datatables-2.6.14
+  remote: project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
       coffee-rails
@@ -694,4 +694,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.13.6
+   1.14.6

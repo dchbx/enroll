@@ -134,6 +134,23 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
   end
 
+  describe "#select_benefit_group" do
+    let(:benefit_group) { double("BenefitGroup")}
+    let(:employee_role) { double("EmployeeRole")}
+
+    it "should return nil if market kind is not shop" do
+      helper.instance_variable_set("@market_kind", "individual")
+      expect(helper.select_benefit_group(false)).to eq nil
+    end
+
+    it "should return benefit group on employee role if shop" do
+      helper.instance_variable_set("@market_kind", "shop")
+      helper.instance_variable_set("@employee_role", employee_role)
+      allow(employee_role).to receive(:benefit_group).with(qle: false).and_return benefit_group
+      expect(helper.select_benefit_group(false)).to eq benefit_group
+    end
+  end
+
 
   describe "#selected_enrollment" do
 

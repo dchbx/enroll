@@ -458,12 +458,12 @@ class BenefitGroup
   def renewal_elected_plan_ids
     start_on_year = (start_on.next_year).year
     if plan_option_kind == "single_carrier"
-      Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
+      Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(reference_plan.carrier_profile).and(hios_id: /-01/).pluck(:_id)
     else 
       if plan_option_kind == "metal_level"
-        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).pluck(:_id)
       else
-        Plan.where(:id.in => elected_plan_ids).map(&:renewal_plan_id).compact
+        Plan.where(:id.in => elected_plan_ids).pluck(:renewal_plan_id).compact
       end
     end
   end
@@ -472,9 +472,9 @@ class BenefitGroup
     return [] unless is_offering_dental?
     start_on_year = (start_on.next_year).year
     if plan_option_kind == "single_carrier"
-      Plan.by_active_year(start_on_year).shop_market.dental_coverage.by_carrier_profile(dental_reference_plan.carrier_profile).map(&:id)
+      Plan.by_active_year(start_on_year).shop_market.dental_coverage.by_carrier_profile(dental_reference_plan.carrier_profile).pluck(:_id)
     else
-      Plan.where(:id.in => elected_dental_plan_ids).map(&:renewal_plan_id).compact
+      Plan.where(:id.in => elected_dental_plan_ids).pluck(:renewal_plan_id).compact
     end
   end
 

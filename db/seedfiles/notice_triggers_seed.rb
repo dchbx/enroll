@@ -809,15 +809,15 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_PRE_2',
-    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
+    title: 'Update your information at DC Health Link by October 15',
+    description: 'Notice to be sent out to individuals with AQHP(Assisted)',
     resource_name: 'consumer_role',
     event_name: 'projected_eligibility_notice_2',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
         notice_template: 'notices/ivl/projected_eligibility_notice',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],

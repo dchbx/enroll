@@ -368,7 +368,7 @@ class CensusEmployee < CensusMember
     if employment_terminated_on < TimeKeeper.date_of_record
       if may_terminate_employee_role?
         terminate_employee_role!
-        perform_employer_plan_year_count
+        # perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
@@ -545,7 +545,7 @@ class CensusEmployee < CensusMember
         begin
           Invitation.invite_future_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          puts "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test? 
         end
       end
     end
@@ -556,7 +556,7 @@ class CensusEmployee < CensusMember
         begin
           census_employee.terminate_employment(census_employee.employment_terminated_on)
         rescue Exception => e
-          puts "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -567,7 +567,7 @@ class CensusEmployee < CensusMember
         begin
           employee.rebase_new_designee! if employee.may_rebase_new_designee?
         rescue Exception => e
-          puts "Error while rebasing newly designated cesus employee - #{employee.full_name} due to #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while rebasing newly designated cesus employee - #{employee.full_name} due to #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -578,7 +578,7 @@ class CensusEmployee < CensusMember
         begin
           census_employee.terminate_employee_role!
         rescue Exception => e
-          puts "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -596,7 +596,7 @@ class CensusEmployee < CensusMember
             next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
             ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
           rescue Exception => e
-            puts "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" unless Rails.env.test?
+            (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
           end
         end
       end

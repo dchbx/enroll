@@ -81,7 +81,7 @@
             <% end %>
           <% end %>
 
-          <% if @employee_role.present? %>
+          <% if can_shop_shop?(@person) %>
             <%= render 'select_employer' %>
           <% end %>
 

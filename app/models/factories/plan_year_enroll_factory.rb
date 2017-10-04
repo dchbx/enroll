@@ -45,7 +45,7 @@ module Factories
     end
 
     def create_active_benefit_group_assignments(benefit_groups)
-      benefit_group_ids = benefit_groups.map(&:id)
+      benefit_group_ids = benefit_groups.pluck(:_id)
 
       count = 0
       @employer_profile.census_employees.each do |census_employee|

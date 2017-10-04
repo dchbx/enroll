@@ -56,6 +56,23 @@ FactoryGirl.define do
           :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5
       end
     end
+
+    trait :with_conversion_expired_and_renewing_canceled_plan_years do
+      before :create do |organization, evaluator|
+        organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization, registered_on: Date.new(2015,12,1), profile_source: "conversion"
+      end
+      after :create do |organization, evaluator|
+        start_on = (TimeKeeper.date_of_record).beginning_of_month - 1.year
+        con_expired_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "conversion_expired",
+          :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month,
+           :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5, is_conversion: true
+        start_on = (TimeKeeper.date_of_record).beginning_of_month
+        renewing_canceled_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "renewing_canceled",
+          :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5
+        con_expired_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: con_expired_plan_year
+        renewing_canceled_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_canceled_plan_year
+      end
+    end
   end
 
   factory :broker_agency, class: Organization do

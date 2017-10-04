@@ -565,3 +565,55 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")
 end
+
+And(/consumer has a dependent in "child" relationship/) do
+  family = Family.all.first
+  child = FactoryGirl.create :person, :with_consumer_role, dob: TimeKeeper.date_of_record - 5.years
+  fm = FactoryGirl.create :family_member, family: family, person: child
+  user.person.person_relationships << PersonRelationship.new(kind: "child", relative_id: child.id)
+  ch = family.active_household.immediate_family_coverage_household
+  ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
+  ch.save
+  user.person.save
+end
+
+And(/consumer visits home page after successful ridp/) do
+  user.identity_final_decision_code = "acc"
+  user.save
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  visit "/families/home"
+end
+
+And(/consumer clicked on "Married" qle/) do
+  click_link "Married"
+end
+
+And(/ivl clicked continue on household info page/) do
+  find_all("#btn_household_continue")[1].trigger('click')
+end
+
+And(/consumer unchecks the primary person/) do
+  find("#family_member_ids_0").set(false)
+end
+
+Then(/consumer should see all the family members names/) do
+  people = Person.all
+  people.each do |person|
+    expect(page).to have_content "#{person.full_name}"
+  end
+end
+
+And(/consumer clicked on shop for new plan/) do
+  find(".interaction-click-control-shop-for-new-plan").click
+end
+
+Then(/consumer should see both dependent and primary/) do
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  expect(page).to have_content "COVERAGE FOR: #{primary.full_name} + 1 Dependent"
+end
+
+Then(/consumer should only see the dependent name/) do
+  dependent = Person.all.select { |person| person.primary_family.blank? }.first
+  expect(page).to have_content "COVERAGE FOR: #{dependent.full_name}"
+end

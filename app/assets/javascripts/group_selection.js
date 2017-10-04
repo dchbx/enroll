@@ -10,6 +10,7 @@ function setGroupSelectionHandlers(){
   if($('#market_kinds').length) {
 
     if ( $('#market_kind_individual').is(':checked') ) {
+      $('#shop-coverage-household input').removeProp('checked');
       $('#market_kind_individual').prop("checked", true);
       $('#dental-radio-button').show();
       disableEmployerSelection();

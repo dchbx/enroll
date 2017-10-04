@@ -7,7 +7,7 @@ module Factories
         renewal_enrollment = assign_common_attributes(enrollment, renewal_enrollment)
         renewal_enrollment.renew_enrollment
         renewal_enrollment = clone_shop_enrollment(enrollment, renewal_enrollment)
-        renewal_enrollment.decorated_hbx_enrollment
+        # renewal_enrollment.decorated_hbx_enrollment
         save_renewal_enrollment(renewal_enrollment, enrollment)
       end
     end

@@ -392,6 +392,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user)}
     let(:person) { FactoryGirl.create(:person, user: user) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+    let(:time_keeper_form) { instance_double(Forms::TimeKeeper) }
+
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -400,9 +402,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
     it "sends timekeeper a date" do
+      timekeeper_form_params = { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+      allow(Forms::TimeKeeper).to receive(:new).with(timekeeper_form_params).and_return(time_keeper_form)
+      allow(time_keeper_form).to receive(:forms_date_of_record).and_return(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
+      expect(time_keeper_form).to receive(:set_date_of_record).with(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       sign_in(user)
-      expect(TimeKeeper).to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       expect(response).to have_http_status(:redirect)
     end

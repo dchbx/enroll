@@ -1,2 +1,4 @@
-Applid,Subscriber,hbx_id,ic_ref,first_name,last_name,dob,tax_hh_count,resident,citizen_status,filer_type,mec,actual_income,Projected Amount,incarcerated,Medi Eligible,aptc_amount,csr_percentage,csr,Fplpercent,totally_ineligible,aqhp_elig,uqhp_elig, Renew Years,Renewbaseyear,Exceed Year,uqhp_reason,subscriber,magi_medicaid,non_magi_medicaid,irs_consent
-1.50291E+12,91881223,39587345,3791337,Daniel,Sabas,8/20/1975,1,Yes,LP,Filers,,2000.98,,No,Yes,443.84,,No,16,No,Yes,No,1,,,,Yes,Yes,No,No
+applid,subscriber_id,member_id,ic_number,first_name,last_name,dob,tax_hh_count,resident,citizen_status,filer_type,mec,actual_income,projected_amount,incarcerated,medi_eligible,aptc,csr_percent,csr,fpl_percent,totally_inelig,aqhp_eligible,uqhp_eligible,renew_years,renewbaseyear,exceed_year,Uqhp Reason,subscriber,magi_medicaid,non_magi_medicaid,irs_consent,dependent
+1.50E+12,383883748,18836443,2124627,Robert,Morgan,5/14/1976,3,Yes,US,Married Filing Jointly,,49341,,N,No,340.59,73,Yes,241,No,Yes,No,5,2017,2022,,Yes,No,No,Yes,No
+1.50E+12,18836443,18836444,2124627,Danielle,Sharkey,5/26/1972,3,Yes,US,Married Filing Jointly,,49341,,N,No,340.59,73,Yes,241,No,Yes,No,5,2017,2022,,Yes,No,No,Yes,Yes
+1.50E+12,18836443,18836445,2124627,Henry,Morgan,12/31/2010,3,Yes,US,Dependents,,49341,,N,Yes,,,No,241,No,No,No,5,2017,2022,,Yes,Yes,No,Yes,Yes

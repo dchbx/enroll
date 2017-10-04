@@ -54,7 +54,7 @@ module Factories
           trigger_notice { "employee_open_enrollment_unenrolled" }
         end
       rescue Exception => e
-        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
+        "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
     end
 
@@ -103,20 +103,26 @@ module Factories
 
     def trigger_notice
       if !disable_notifications && coverage_kind == 'health'
-        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
+        notice_name = yield
+        begin
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
+        end
       end
     end
 
     def renewal_plan_offered_by_er?(enrollment)
-      if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
+      plan = enrollment.plan
+      if plan.present? || plan.renewal_plan_id.present?
         benefit_group = renewal_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
         elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
-        elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
+        elected_plan_ids.include?(plan.renewal_plan_id)
       else
         false
       end
     end
   end
 
-  class FamilyEnrollmentRenewalFactoryError < StandardError; end
+class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end

@@ -6,7 +6,7 @@ RSpec.describe IvlNotices::SecondIvlRenewalNotice, :dbclean => :after_each do
   file = "#{Rails.root}/spec/test_data/notices/second_ivl_renewal_notice_test_data.csv"
   csv = CSV.open(file,"r",:headers =>true)
   data = csv.to_a
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :hbx_id => "39587345")}
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :hbx_id => "383883748")}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual")}
   let(:application_event){ double("ApplicationEventKind",{

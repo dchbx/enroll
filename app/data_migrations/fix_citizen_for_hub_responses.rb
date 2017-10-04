@@ -1,10 +1,8 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateCitizenStatus < MongoidMigrationTask
-  ACCEPTABLE_STATES = ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident", "indian_tribe_member"]
-  STATES_TO_FIX = %w(not_lawfully_present_in_us
-                     non_native_not_lawfully_present_in_us
-                     ssn_pass_citizenship_fails_with_SSA)
+  ACCEPTABLE_STATES = ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident", "indian_tribe_member", "not_lawfully_present_in_us"]
+  STATES_TO_FIX = ["not_lawfully_present_in_us", "non_native_not_lawfully_present_in_us", "ssn_pass_citizenship_fails_with_SSA", nil]
   def get_people
     Person.where("versions"=>{"$exists"=> true}).or({"consumer_role.lawful_presence_determination.ssa_responses"=>{"$exists"=> true}},
                                                     {"consumer_role.lawful_presence_determination.vlp_responses"=>{"$exists"=> true}})

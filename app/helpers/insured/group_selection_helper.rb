@@ -42,10 +42,24 @@ module Insured
 
     def select_market(person, params)
       return params[:market_kind] if params[:market_kind].present?
-      if @person.try(:has_active_employee_role?)
+      if params[:qle_id].present? && (!person.has_active_resident_role?)
+        qle = QualifyingLifeEventKind.find(params[:qle_id])
+        return qle.market_kind
+      end
+      if person.has_active_employee_role?
         'shop'
-      elsif @person.try(:has_active_consumer_role?)
+      elsif person.has_active_consumer_role? && !person.has_active_resident_role?
         'individual'
+      elsif person.has_active_resident_role?
+        'coverall'
+      else
+        nil
+      end
+    end
+
+    def select_benefit_group(qle)
+      if @market_kind == "shop"
+        @employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil
       else
         nil
       end

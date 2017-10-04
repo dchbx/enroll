@@ -8,13 +8,13 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <% if notice.notification_type == "projected_eligibility_notice_1" %>
-        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017</h3></td>
-      <% else %>
-        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017<br>
-        IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <%= notice.coverage_year %>
-        </h3>
+      <% if notice.notification_type == "projected_eligibility_notice_2" && !notice.irs_consent_needed %>
+        <td>
+          <h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017<br>
+            IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <%= notice.coverage_year %></h3>
         </td>
+      <% else %>
+        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017</h3></td>
       <% end %>
     </tr>
   </tbody>
@@ -23,7 +23,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname.titleize %>:  </td>
     </tr>
   </tbody>
 </table>
@@ -43,7 +43,7 @@
 <% end %>
 
 <% if notice.notification_type == "projected_eligibility_notice_2" %>
-  <% if !notice.irs_consent_needed %>
+  <% if notice.irs_consent_needed %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Review your household information, and make sure it’s correct",
                "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
@@ -79,23 +79,20 @@
 <% end %>
 
 <% if notice.notification_type == "projected_eligibility_notice_2"%>
-  <% if notice.aqhp_individuals.present? %>
-      <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-     contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
-
-    <% notice.aqhp_individuals.each do |member| %>
-      <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
-                                 rows: [['Household Member:', "#{member.first_name} #{member.last_name}  Age: #{member.age}"],
-                                    ['DC Resident:', "#{member.residency_verified}"],
-                                    ['Citizenship/Lawful Presence:', "#{member.citizen_status}"],
-                                    ['Incarcerated:',"#{member.incarcerated}"],
-                                    ['Other Coverage:', "#{member.mec}"],
-                                    ['Federal Tax Filing Status:', "#{member.tax_status}"],
-                                    ['Tax Household Size:', "#{member.taxhh_count}"],
-                                    ["Expected Income for #{notice.coverage_year}:","$#{member.actual_income}"]],
-        col_styles: ['width: 35%;', 'width: 65%; text-align: left;'], table_width: '100%'} %>
-    <%end%>
-  <% end %>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
+  <% notice.individuals.each do |member| %>
+    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
+                               rows: [['Household Member:', "#{member.first_name.titleize} #{member.last_name.titleize}  Age: #{member.age}"],
+                                  ['DC Resident:', "#{member.residency_verified}"],
+                                  ['Citizenship/Lawful Presence:', "#{member.citizen_status}"],
+                                  ['Incarcerated:',"#{member.incarcerated}"],
+                                  ['Other Coverage:', "#{member.mec}"],
+                                  ['Federal Tax Filing Status:', "#{member.tax_status}"],
+                                  ['Tax Household Size:', "#{member.taxhh_count}"],
+                                  ["Expected Income for #{notice.coverage_year}:",number_to_currency("#{member.actual_income}", precision: 0)]],
+      col_styles: ['width: 35%;', 'width: 65%; text-align: left;'], table_width: '100%'} %>
+  <%end%>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
@@ -109,7 +106,6 @@
       previous: "<strong>Likely Qualify for Medicaid:</strong>",
       listings: notice.magi_medicaid_eligible} %>
   <% end %>
-
   <% if notice.aqhp_or_non_magi_medicaid_eligible.present? %>
   <!-- [If AQHP=YES for AQHP OR for NON MAGI MEDICAID ONLY] -->
     <%= render partial: 'notices/shared/unordered_family_listing', locals: {
@@ -117,16 +113,6 @@
       listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
     <% notice.tax_households.each do |thh|%>
       <% if thh.max_aptc.present? %>
-        <% if thh.max_aptc > 0 %>
-          <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-           contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
-             heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
-        <% else %>
-          <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-           contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
-             heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
-        <% end %>
-      <% else %>
         <%= render partial: 'notices/shared/paragraph', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> The people listed above are projected to be eligible for a tax credit to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. We’ll let you know the amount of your tax credit before open enrollment begins.", bottom_margin: '5px'} %>
       <% end %>
@@ -160,10 +146,10 @@
   <% end %>
 <% end %>
 
-<% if notice.notification_type == "projected_eligibility_notice_1" %>
+<% if notice.uqhp_or_non_magi_medicaid_individuals.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
-    listings: notice.uqhp_individuals} %>
+    listings: notice.uqhp_or_non_magi_medicaid_individuals} %>
 <% end %>
 
 <% if notice.notification_type == "projected_eligibility_notice_2" && notice.ineligible_applicants.present? %>
