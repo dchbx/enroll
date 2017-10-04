@@ -282,6 +282,11 @@ $(document).ready(function() {
     $('#is_claimed_as_tax_dependent_yes').parents(".row").next().removeClass('hide');
   }
 
+  $("#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no, #is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no").on('change', function() {
+    if( $('.interaction-click-control-tax-info').parent('li').hasClass('active') && ($('#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no').is(':checked') && $('#is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no').is(':checked'))){
+     $('.interaction-click-control-continue').prop('disabled', false)
+   }
+ });
 /* Applicant's Tax Info Form Related */
 
 
