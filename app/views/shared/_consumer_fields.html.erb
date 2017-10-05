@@ -151,6 +151,23 @@
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_physically_disabled"} %>
     </div>
   </div>
+  <div class="row row-form-wrapper no-buffer">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <label class="required no-pd"> Does this person have a disability? *</label>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+      <div class="radio">
+        <%= f.radio_button :is_physically_disabled, true, class: "required floatlabel", id: 'radio_physically_disabled_yes', required: true %>
+        <label for="radio_physically_disabled_yes"><span>Yes</span></label>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio">
+        <%= f.radio_button :is_physically_disabled, false, class: "required floatlabel", id: 'radio_physically_disabled_no', required: true %>
+        <label for="radio_physically_disabled_no"><span>No</span></label>
+      </div>
+    </div>
+  </div>
 </div>
 
 <%= render "shared/race_and_ethnicity_options", f: f %>
