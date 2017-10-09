@@ -28,7 +28,7 @@ class Insured::FamiliesController < FamiliesController
     update_changing_hbxs(@hbx_enrollments)
 
     @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
-
+    @hbx_enrollments = @hbx_enrollments.select{ |enrollment| enrollment.aasm_state != "coverage_terminated"}
     @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
