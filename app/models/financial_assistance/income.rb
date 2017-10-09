@@ -95,7 +95,7 @@ class FinancialAssistance::Income
   validate :start_on_must_precede_end_on
 
   before_create :set_submission_timestamp
-
+  before_update :delete_esi_info_for_non_esi_types
 
   def hours_worked_per_week
     return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
@@ -148,6 +148,15 @@ private
   def start_on_must_precede_end_on
     return unless start_on.present? && end_on.present?
     errors.add(:end_on, "Date can't occur before start on date") if end_on < start_on
+  end
+
+  def delete_esi_info_for_non_esi_types
+    return unless kind.present?
+    if self.kind != JOB_INCOME_TYPE_KIND
+      self.assign_attributes(employer_name: nil, employer_id: nil)
+      self.employer_address = nil
+      self.employer_phone = nil
+    end
   end
 
 end

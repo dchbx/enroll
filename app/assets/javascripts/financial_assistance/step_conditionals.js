@@ -202,9 +202,10 @@ $(document).ready(function() {
   /* Benefit Form Related */
 
   /* Submit Application Form Related */
-
-  $('#living_outside_yes').parents(".row").next().addClass('hide');
-  $('#living_outside_yes').parents(".row").next().next().addClass('hide');
+  if($('#living_outside_yes').prop('checked') == false) {
+    $('#living_outside_yes').parents(".row").next().addClass('hide');
+    $('#living_outside_yes').parents(".row").next().next().addClass('hide');
+  }
 
   $("body").on("change", "#living_outside_no", function(){
     if ($('#living_outside_no').is(':checked')) {
