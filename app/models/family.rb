@@ -18,6 +18,7 @@ class Family
   include Sortable
   include Mongoid::Autoinc
 
+
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
   field :version, type: Integer, default: 1
@@ -986,6 +987,18 @@ class Family
   def self.min_verification_due_date_range(start_date,end_date)
     where(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
   end
+
+  def outstanding_vlp_documents
+    @documents_list = []
+    @document_status_outstanding = []
+    self.active_family_members.each do |member|
+      member.person.verification_types.all? do |type|
+        @documents_list <<  member.person.consumer_role.has_docs_for_type?(type)
+        @document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
+      end
+    end
+    return @documents_list,@document_status_outstanding
+  end 
 
 private
   def build_household
