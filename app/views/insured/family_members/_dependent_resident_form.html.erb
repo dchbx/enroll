@@ -24,19 +24,19 @@
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "FIRST NAME *" %>
+              <%= f.text_field :first_name, :autocomplete => :off, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "FIRST NAME *" %>
             </div>
           </div>
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: "MIDDLE NAME"%>
+              <%= f.text_field :middle_name, :autocomplete => :off, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: "MIDDLE NAME"%>
             </div>
           </div>
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "LAST NAME *" %>
+              <%= f.text_field :last_name, :autocomplete => :off, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "LAST NAME *" %>
               <div class="text-right">
                 <% if !dependent.persisted? %>
                   <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \'Add Member\'. When you\'re finished, select CONTINUE.')" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
