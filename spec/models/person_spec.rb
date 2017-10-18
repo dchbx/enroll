@@ -1431,42 +1431,4 @@ describe Person do
       end
     end
   end
-
-
-  describe "vlp documents status" do
-    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-    let(:family_member_person) { FamilyMember.new(:is_active => true, is_primary_applicant: true, is_consent_applicant: true, person: person) }
-    let(:family){
-        f = Family.new(:family_members => [family_member_person])
-        f.save
-        f
-    }
-    let(:family_person) {family.primary_applicant.person}
-    it "verify there vlp_documents_status is nil" do
-      expect(family.vlp_documents_status).to eq(nil)
-    end
-
-    it "returns vlp_documents_status is None when there is no document uploaded" do
-      family_person.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
-      expect(family_person.vlp_documents_status).to eq("None")
-    end
-
-    it "returns vlp_documents_status is partially uploaded when single document is uploaded" do
-      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document)
-      family_person.save!
-      expect(family_person.vlp_documents_status).to eq("Partially Uploaded")
-    end
-
-    it "returns vlp_documents_status is fully uploaded when all documents are uploaded" do
-      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "Social Security Number")
-      family_person.save!
-      expect(family_person.vlp_documents_status).to eq("Fully Uploaded")
-    end
-
-    it "returns vlp_documents_status is partially uploaded when document is rejected" do
-      family_person.consumer_role.update_attributes(:ssn_rejected => true)
-      family_person.save!
-      expect(family_person.vlp_documents_status).to eq("Partially Uploaded")
-    end    
-  end
 end

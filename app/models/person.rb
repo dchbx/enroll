@@ -215,27 +215,6 @@ class Person
   after_update :notify_updated
 
   
-  def vlp_documents_status
-    @documents_list,@document_status_outstanding = primary_family.outstanding_vlp_documents
-    case 
-    when @documents_list.include?(true) && @documents_list.include?(false)
-      return "Partially Uploaded" 
-    when @documents_list.include?(true) && !@documents_list.include?(false)      
-      if @document_status_outstanding.include?("outstanding")
-        return "Partially Uploaded" 
-      else
-        return "Fully Uploaded" 
-      end
-    when !@documents_list.include?(true) && @documents_list.include?(false)
-      return "None"
-    end
-  end
-
-  def update_family_document_status!
-    primary_family.update_attributes(vlp_documents_status: self.vlp_documents_status)
-  end
-
-  
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
   end

@@ -8,7 +8,7 @@ class ConsumerRole
   include AASM
   include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
-  include VerificationHelper
+  include DocumentsVerificationStatus
 
   embedded_in :person
 

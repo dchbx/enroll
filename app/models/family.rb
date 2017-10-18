@@ -197,7 +197,7 @@ class Family
   scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
-  scope :vlp_none_uploaded,                     ->{ where(vlp_documents_status: "None")}
+  scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
    
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
@@ -987,17 +987,35 @@ class Family
     where(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
   end
 
-  def outstanding_vlp_documents
-    @documents_list = []
-    @document_status_outstanding = []
+  def all_persons_vlp_documents_status
+    documents_list = []
+    document_status_outstanding = []
     self.active_family_members.each do |member|
       member.person.verification_types.all? do |type|
-        @documents_list <<  member.person.consumer_role.has_docs_for_type?(type)
-        @document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
+      if member.person.consumer_role
+        documents_list <<  member.person.consumer_role.has_docs_for_type?(type)
+        document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
+      end
       end
     end
-    return @documents_list,@document_status_outstanding
-  end 
+    case
+    when documents_list.include?(true) && documents_list.include?(false)
+      return "Partially Uploaded" 
+    when documents_list.include?(true) && !documents_list.include?(false)      
+      if document_status_outstanding.include?("outstanding")
+        return "Partially Uploaded" 
+      else
+        return "Fully Uploaded" 
+      end
+    when !documents_list.include?(true) && documents_list.include?(false)
+      return "None"
+    end
+  end
+
+  def update_family_document_status!
+    update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
+  end
+
 
 private
   def build_household

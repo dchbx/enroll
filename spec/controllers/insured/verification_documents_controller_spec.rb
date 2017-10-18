@@ -68,6 +68,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       let(:bucket_name) { 'id-verification' }
       let(:doc_uri) { "doc_uri" }
       let(:file_path) { 'temp_file' } # a sample file path
+      let(:family) { double("Family", :update_family_document_status! => true)}
 
       before do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:find_docs_owner).and_return(person)
@@ -80,7 +81,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).with('temp_file').and_return("sample-filename")
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
 
-        allow(person).to receive(:update_family_document_status!).and_return(true)
+        controller.instance_variable_set(:"@family", family)
         sign_in user
         post :upload, params
 
