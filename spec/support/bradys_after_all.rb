@@ -114,11 +114,11 @@ module BradysAfterAll
       end
 
       last_year = TimeKeeper.date_of_record - 1.years
-      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: last_year)
+      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: last_year, is_eligibility_determined: true)
       mikes_family.latest_household.tax_households.first.eligibility_determinations << EligibilityDetermination.new(max_aptc: 200, csr_eligibility_kind: 'csr_100', csr_percent_as_integer: 100, determined_at: last_year, determined_on: last_year)
 
       current_date = TimeKeeper.date_of_record
-      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: current_date)
+      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: current_date, is_eligibility_determined: true)
       mikes_family.latest_household.tax_households.last.eligibility_determinations << EligibilityDetermination.new(max_aptc: 100, csr_eligibility_kind: 'csr_87', csr_percent_as_integer: 87, determined_at: current_date, determined_on: current_date)
     end
 

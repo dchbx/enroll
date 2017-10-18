@@ -20,6 +20,8 @@ class ConsumerRole
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
+  INCOME_VALIDATION_STATES = %w(na valid outstanding pending)
+  MEC_VALIDATION_STATES = %w(na valid outstanding pending)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -77,8 +79,10 @@ class ConsumerRole
   field :native_update_reason, type: String
   field :is_applying_coverage, type: Boolean, default: true
 
-  field :assisted_income_validation, type: String
-  field :assisted_mec_validation, type: String
+  field :assisted_income_validation, type: String, default: "na"
+  validates_inclusion_of :ssn_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
+  field :assisted_mec_validation, type: String, default: "na"
+  validates_inclusion_of :ssn_validation, :in => MEC_VALIDATION_STATES, :allow_blank => false
   field :assisted_income_reason, type: String
   field :assisted_mec_reason, type: String
 
@@ -385,6 +389,22 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
+    event :income_valid, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_assistance_verified?
+    end
+
+    event :income_outstanding, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding], to: :verification_outstanding
+    end
+
+    event :mec_valid, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_assistance_verified?
+    end
+
+    event :mec_outstanding, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding], to: :verification_outstanding
+    end
+
     event :coverage_purchased do
       transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn, :record_transition, :notify_of_eligibility_change]
       transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
@@ -401,10 +421,10 @@ class ConsumerRole
     end
 
     event :ssn_valid_citizenship_valid, :after => [:pass_ssn, :pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
-      transitions from: :unverified, to: :fully_verified, :guard => [:call_ssa?]
-      transitions from: :ssa_pending, to: :fully_verified
-      transitions from: :verification_outstanding, to: :fully_verified
-      transitions from: :fully_verified, to: :fully_verified
+      transitions from: :unverified, to: :fully_verified, :guard => [:call_ssa?, :is_assistance_verified?]
+      transitions from: :ssa_pending, to: :fully_verified, :guard => :is_assistance_verified?
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_assistance_verified?
+      transitions from: :fully_verified, to: :fully_verified, :guard => :is_assistance_verified?
     end
 
     event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -412,10 +432,10 @@ class ConsumerRole
     end
 
     event :pass_dhs, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
-      transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?]
-      transitions from: :dhs_pending, to: :fully_verified
-      transitions from: :verification_outstanding, to: :fully_verified
-      transitions from: :fully_verified, to: :fully_verified
+      transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?, :is_assistance_verified?]
+      transitions from: :dhs_pending, to: :fully_verified, :guard => :is_assistance_verified?
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_assistance_verified?
+      transitions from: :fully_verified, to: :fully_verified, :guard => :is_assistance_verified?
     end
 
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
@@ -532,7 +552,7 @@ class ConsumerRole
   end
 
   def latest_active_tax_household_with_year(year)
-    person.primary_family.latest_household.latest_active_tax_household_with_year(year)
+    person.primary_family.latest_household.latest_active_tax_households_with_year(year)
   rescue => e
     log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
@@ -773,5 +793,48 @@ class ConsumerRole
     OpenStruct.new({:determined_at => Time.now,
                     :vlp_authority => authority
                    })
+  end
+
+  def is_assistance_verified?
+    return true if ((!eligible_for_faa?) || (eligible_for_faa? && assisted_income_validation == "valid" && assisted_mec_validation == "valid"))
+    return false
+  end
+
+  def eligible_for_faa?
+    assisted_verification_documents.present? && assisted_verification_documents.first.family.active_approved_application.present?
+  end
+
+  def valid_mec_response
+    update_attributes!(assisted_mec_validation: "valid")
+  end
+
+  def invalid_mec_response
+    update_attributes!(assisted_mec_validation: "outstanding")
+  end
+
+  def valid_income_response
+    update_attributes!(assisted_income_validation: "valid")
+  end
+
+  def invalid_income_response
+    update_attributes!(assisted_income_validation: "outstanding")
+  end
+
+  def income_pending?
+    assisted_doument_pending?("Income")
+  end
+
+  def mec_pending?
+    assisted_doument_pending?("MEC")
+  end
+
+  def assisted_doument_pending?(kind)
+    if eligible_for_faa? && assisted_verification_documents.select{|assisted_document| assisted_document.kind == kind }.first.status == "pending"
+      return true
+    elsif !eligible_for_faa?
+      return false
+    else
+      return false
+    end
   end
 end

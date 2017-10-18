@@ -24,6 +24,10 @@ describe ConsumerRole, dbclean: :after_each do
   let(:is_applicant)          { true }
   let(:citizen_error_message) { "test citizen_status is not a valid citizen status" }
 
+  before :each do
+    allow_any_instance_of(Family).to receive(:application_applicable_year).and_return(TimeKeeper.date_of_record.year)
+  end
+
   describe ".new" do
     let(:valid_params) do
       {
@@ -189,11 +193,11 @@ describe "#latest_active_tax_household_with_year" do
   before :all do
     create_tax_household_for_mikes_family
     @consumer_role = mike.consumer_role
-    @taxhouhold = mikes_family.latest_household.tax_households.last
+    @tax_households = mikes_family.latest_household.tax_households.to_a
   end
 
   it "should rerturn active taxhousehold of this year" do
-    expect(@consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq @taxhouhold
+    expect(@consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq @tax_households
   end
 
   it "should rerturn nil when can not found taxhousehold" do
@@ -449,6 +453,7 @@ context "Verification process and notices" do
         consumer.lawful_presence_determination.deny! verification_attr
         consumer.citizen_status = "alien_lawfully_present"
       end
+
       it "changes state to fully_verified from unverified for native citizen or non native with ssn" do
         expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
@@ -456,6 +461,12 @@ context "Verification process and notices" do
         #check that user's input was not overwritten
         expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
       end
+
+      it "fails to change the state to fully_verified from unverified on failed call back" do
+        allow_any_instance_of(ConsumerRole).to receive(:is_assistance_verified?).and_return(false)
+        expect{consumer.ssn_valid_citizenship_valid}.to raise_error(AASM::InvalidTransition)
+      end
+
       it "changes state to fully_verified from ssa_pending" do
         expect(consumer).to transition_from(:ssa_pending).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
@@ -463,6 +474,7 @@ context "Verification process and notices" do
         #check that user's input was not overwritten
         expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
       end
+
       it "changes state to fully_verified from verification_outstanding" do
         expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
@@ -470,6 +482,7 @@ context "Verification process and notices" do
         #check that user's input was not overwritten
         expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
       end
+
       it "changes state to fully_verified from fully_verified" do
         expect(consumer).to transition_from(:fully_verified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
@@ -491,21 +504,28 @@ context "Verification process and notices" do
       before :each do
         consumer.lawful_presence_determination.deny! verification_attr
       end
+
+      it "fails to change the state from dhs_pending to fully_verified on failed call back" do
+        allow_any_instance_of(ConsumerRole).to receive(:is_assistance_verified?).and_return(false)
+        expect{consumer.pass_dhs}.to raise_error(AASM::InvalidTransition)
+      end
+
       it "changes state from dhs_pending to fully_verified" do
         person.ssn=nil
         consumer.citizen_status = "not_us"
         expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:pass_dhs, verification_attr)
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
       end
+
       it "changes state from dhs_pending to fully_verified" do
         expect(consumer).to transition_from(:dhs_pending).to(:fully_verified).on_event(:pass_dhs, verification_attr)
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
       end
+
       it "changes state from dhs_pending to fully_verified" do
         expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:pass_dhs, verification_attr)
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
       end
-
     end
 
     context "revert" do
@@ -567,4 +587,67 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_outstanding
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :fully_verified
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
+end
+
+
+
+describe "state transitions for valid and invalid scenarios(INCOME and MEC)" do
+
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    consumer_role.assisted_verification_documents << [
+      FactoryGirl.build(:assisted_verification_document, application_id: application.id, applicant_id: applicant.id, assisted_verification_id: assisted_verification.id) ]
+  end
+
+  let(:assisted_person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:assisted_family) { FactoryGirl.create(:family, :with_primary_family_member, person: assisted_person) }
+  let(:consumer_role) { assisted_person.consumer_role }
+  let(:application) { FactoryGirl.create(:application, family: assisted_family) }
+  let(:applicant) { FactoryGirl.create(:applicant, application: application) }
+  let(:assisted_verification)  { FactoryGirl.create(:assisted_verification, applicant: applicant) }
+  let(:state) { consumer_role.aasm_state }
+
+  context "for Income verifications" do
+
+    context "for event income_valid" do
+      it "changes state from verification_outstanding to fully_verified" do
+        consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "valid")
+        expect(consumer_role).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:mec_valid)
+      end
+
+      it "fails to change state on failed call back" do
+        consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "na")
+        expect{consumer_role.mec_valid}.to raise_error(AASM::InvalidTransition)
+      end
+    end
+
+    context "for event income_outstanding" do
+      it "changes state to verification_outstanding" do
+        consumer_role.update_attributes(assisted_income_validation: "outstanding", assisted_mec_validation: "valid")
+        expect(consumer_role).to transition_from(state).to(:verification_outstanding).on_event(:income_outstanding)
+      end
+    end
+  end
+
+  context "for MEC verifications" do
+
+    context "for event mec_valid" do
+      it "changes state from verification_outstanding to fully_verified" do
+        consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "valid")
+        expect(consumer_role).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:mec_valid)
+      end
+
+      it "fails to change state on failed call back" do
+        consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "na")
+        expect{consumer_role.mec_valid}.to raise_error(AASM::InvalidTransition)
+      end
+    end
+
+    context "for event mec_outstanding" do
+      it "changes state to verification_outstanding" do
+        consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "outstanding")
+        expect(consumer_role).to transition_from(state).to(:verification_outstanding).on_event(:mec_outstanding)
+      end
+    end
+  end
 end

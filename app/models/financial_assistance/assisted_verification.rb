@@ -19,6 +19,9 @@ class FinancialAssistance::AssistedVerification
   validates :verification_type,
       inclusion: { in: VERIFICATION_TYPES, message: "%{value} is not a defined verification type" }
 
+  scope :income, ->{ where(:"verification_type" => "Income") }
+  scope :mec, ->{ where(:"verification_type" => "MEC") }
+
   def assisted_verification_doument
     applicant.person.consumer_role.assisted_verification_documents.where(assisted_verification_id: self.id).first
   end

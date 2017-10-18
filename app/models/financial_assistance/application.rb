@@ -694,6 +694,7 @@ private
         update_verifications_of_applicants("not_required")
       elsif has_atleast_one_assisted_but_no_medicaid_applicant?
         update_verifications_of_applicants("pending")
+        update_consumer_role_of_applicants
       end
     end
   end
@@ -707,6 +708,12 @@ private
   def end_date_latest_active_tax_households
     latest_tax_households = family.active_household.latest_active_tax_households
     latest_tax_households.each { |th| th.update_attributes(effective_ending_on: TimeKeeper.date_of_record) } if latest_tax_households.present?
+  end
+
+  def update_consumer_role_of_applicants
+    active_applicants.each do |applicant|
+      applicant.person.consumer_role.update_attributes(assisted_income_validation: "pending", assisted_mec_validation: "pending")
+    end
   end
 
   def set_submit

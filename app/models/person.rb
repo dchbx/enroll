@@ -930,6 +930,147 @@ class Person
     person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
   end
 
+  def is_a_valid_faa_update?(params)
+    if (
+    params["first_name"] == first_name &&
+        params["middle_name"] == middle_name &&
+        params["last_name"] == last_name &&
+        params["dob"].to_date == dob.to_date &&
+        params["ssn"].tr("-", '') == ssn &&
+        params["no_ssn"] == no_ssn &&
+        params["gender"] == gender &&
+        params["relationship"] == person_relationships.where(family_id: params['family_id']).first.kind &&
+        params["is_applying_coverage"] == is_applying_coverage.to_s &&
+        params["us_citizen"] == us_citizen.to_s &&
+        params["naturalized_citizen"] == naturalized_citizen.to_s &&
+        # params["consumer_role"].values[0].values[0].values[0] ==
+        #params["eligible_immigration_status"] == eligible_immigration_status.to_s &&
+        params["indian_tribe_member"] == indian_tribe_member.to_s &&
+        params["tribal_id"] == tribal_id &&
+        params["is_incarcerated"] == is_incarcerated.to_s &&
+        params["is_physically_disabled"] == is_physically_disabled.to_s &&
+        params["ethnicity"] == ethnicity &&
+        # params["is_consumer_role"] == is_consumer_role &&
+        # params["same_with_primary"] == same_with_primary &&
+        params["no_dc_address"] == no_dc_address.to_s &&
+        params["addresses"].values[0].values[0] == addresses[0].kind &&
+        params["addresses"].values[0].values[1] == addresses[0].address_1 &&
+        params["addresses"].values[0].values[2] == addresses[0].address_2 &&
+        params["addresses"].values[0].values[3] == addresses[0].city &&
+        params["addresses"].values[0].values[4] == addresses[0].state &&
+        params["addresses"].values[0].values[5] == addresses[0].zip &&
+        params["addresses"].values[1].values[0] == addresses[1].kind &&
+        params["addresses"].values[1].values[1] == addresses[1].address_1 &&
+        params["addresses"].values[1].values[2] == addresses[1].address_2 &&
+        params["addresses"].values[1].values[3] == addresses[1].city &&
+        params["addresses"].values[1].values[4] == addresses[1].state &&
+        params["addresses"].values[1].values[5] == addresses[1].zip
+    )
+      return true
+    else
+      return false
+    end
+  end
+
+  def is_a_valid_primary_member_update?(params)
+    if (
+    params["first_name"] == first_name &&
+        (params["middle_name"].empty? ? nil : params["middle_name"]) == middle_name &&
+        params["last_name"] == last_name &&
+        # params["dob"].to_date == dob.to_date &&
+        # params["ssn"].tr("-",'') == ssn &&
+        # params["no_ssn"] == no_ssn &&
+        params["gender"] == gender &&
+        # params["relationship"] == person_relationships.where(family_id: params['family_id']).first.kind &&
+        params["is_applying_coverage"] == is_applying_coverage.to_s &&
+        params["us_citizen"] == us_citizen.to_s &&
+        params["naturalized_citizen"] == naturalized_citizen.to_s &&
+        # params["consumer_role"].values[0].values[0].values[0] ==
+        # params["eligible_immigration_status"] == eligible_immigration_status.to_s &&
+        params["indian_tribe_member"] == indian_tribe_member.to_s &&
+        params["tribal_id"] == tribal_id &&
+        params["is_incarcerated"] == is_incarcerated.to_s &&
+        params["is_physically_disabled"] == is_physically_disabled.to_s &&
+        params["ethnicity"] == ethnicity &&
+        # params["is_consumer_role"] == is_consumer_role &&
+        # params["same_with_primary"] == same_with_primary &&
+        params["no_dc_address"] == no_dc_address.to_s &&
+        params["no_dc_address_reason"] == (no_dc_address_reason.present? ? no_dc_address_reason : "") &&
+        # is_valid_address?(params["addresses_attributes"])&&
+        (params["name_sfx"].empty? ? nil : params["name_sfx"]) == name_sfx &&
+        # params["eligible_immigration_status"] == eligible_immigration_status.to_s &&
+        # params["is_consumer_role"] == is_consumer_role &&
+        # params["same_with_primary"] == same_with_primary &&
+        params["phones_attributes"].values[0].values[1].tr("(", '').tr(")", '').tr(" ", '').tr("-", '') == (self.phones[0].present? ? self.phones[0].full_phone_number : "") &&
+        params["phones_attributes"].values[1].values[1].tr("(", '').tr(")", '').tr(" ", '').tr("-", '') == (self.phones[1].present? ? self.phones[1].full_phone_number : "") &&
+        params["addresses_attributes"].values[0].values[0] == (addresses[0].present? ? addresses[0].kind : "") &&
+        params["addresses_attributes"].values[0].values[1] == (addresses[0].present? ? addresses[0].address_1 : "") &&
+        params["addresses_attributes"].values[0].values[2] == (addresses[0].present? ? addresses[0].address_2 : "") &&
+        params["addresses_attributes"].values[0].values[3] == (addresses[0].present? ? addresses[0].city : "") &&
+        params["addresses_attributes"].values[0].values[4] == (addresses[0].present? ? addresses[0].state : "") &&
+        params["addresses_attributes"].values[0].values[5] == (addresses[0].present? ? addresses[0].zip : "") &&
+        # params["addresses_attributes"].values[1].values[0] == (addresses[1].present? ? addresses[1].kind : "") &&
+        params["addresses_attributes"].values[1].values[1] == (addresses[1].present? ? addresses[1].address_1 : "") &&
+        params["addresses_attributes"].values[1].values[2] == (addresses[1].present? ? addresses[1].address_2 : "") &&
+        params["addresses_attributes"].values[1].values[3] == (addresses[1].present? ? addresses[1].city : "") &&
+        params["addresses_attributes"].values[1].values[4] == (addresses[1].present? ? addresses[1].state : "") &&
+        params["addresses_attributes"].values[1].values[5] == (addresses[1].present? ? addresses[1].zip : "") &&
+        params["emails_attributes"].values[0].values[1] == (emails[0].present? ? emails[0].address : "")&&
+        params["emails_attributes"].values[1].values[1] == (emails[1].present? ? emails[1].address : "")
+        # is_valid_phone?(params["phones_attributes"]) &&
+        # is_valid_email?(params["emails_attributes"])
+    )
+      return true
+    else
+      return false
+    end
+  end
+
+  def is_valid_phone?(params)
+    if self.phones.present? && params.values[a.to_i].values[1]
+      a = params.all? {|a|
+          puts (params.values[a.to_i].values[1].tr("(", '').tr(")", '').tr(" ", '').tr("-", '') == (self.phones[a.to_i].present? ? self.phones[a.to_i].full_phone_number : ""))
+
+      }
+    else
+      true
+    end
+  end
+
+  def is_valid_address?(params)
+    if self.addresses.present?
+      params.select {|a|
+        if self.addresses[a.to_i].present?
+        a = (params.values[a.to_i].values[0] == addresses[a.to_i].kind &&
+        params.values[a.to_i].values[1] == addresses[a.to_i].address_1 &&
+        params.values[a.to_i].values[2] == addresses[a.to_i].address_2 &&
+        params.values[a.to_i].values[3] == addresses[a.to_i].city &&
+        params.values[a.to_i].values[4] == addresses[a.to_i].state &&
+        params.values[a.to_i].values[5] == addresses[a.to_i].zip)
+        else
+          true
+        end
+      }
+    else
+      true
+    end
+  end
+
+  def is_valid_email?(params)
+    if self.emails.present?
+      params.select { |a|
+      if self.emails[a.to_i].present?
+        params.values[a.to_i].values[0] == self.emails[a.to_i].kind &&
+            params.values[a.to_i].values[1] == self.emails[a.to_i].address
+      else
+        true
+      end
+      }
+    else
+      true
+    end
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:

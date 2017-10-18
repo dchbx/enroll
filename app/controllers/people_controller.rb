@@ -193,6 +193,7 @@ class PeopleController < ApplicationController
   end
 
   def update
+    attributes_primay_matched =  Person.find(params[:id]).is_a_valid_primary_member_update?(params[:person])
     sanitize_person_params
     @person = find_person(params[:id])
     clean_duplicate_addresses
@@ -226,6 +227,13 @@ class PeopleController < ApplicationController
         format.html { redirect_to redirect_path, alert: "Person update failed. #{person_error_megs}" }
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
+      end
+    end
+
+    if Person.find(params[:id]).primary_family.applications.present?
+      if !attributes_primay_matched && !Person.find(params[:id]).primary_family.application_in_progress
+        # family.latest_submitted_application.copy_application
+        Forms::FamilyMember.find( Person.find(params[:id]).primary_family.active_family_members.first.id.to_s).copy_finanacial_assistances_application
       end
     end
   end

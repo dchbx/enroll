@@ -109,6 +109,7 @@ module Forms
       assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
+      # family.reload!
       family.build_relationship_matrix
       self.id = family_member.id
       true
@@ -280,6 +281,7 @@ module Forms
     end
 
     def update_attributes(attr)
+      attributes_matched = family_member.person.is_a_valid_faa_update?(attr)
       assign_attributes(attr)
       assign_citizen_status
       return false unless valid?
@@ -296,6 +298,14 @@ module Forms
       family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
       family.build_relationship_matrix
       family_member.save!
+
+        if family.applications.present?
+          if !attributes_matched && !family.application_in_progress
+            # family.latest_submitted_application.copy_application
+            copy_finanacial_assistances_application
+          end
+        end
+
       true
     end
 

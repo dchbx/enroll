@@ -49,4 +49,8 @@ class AssistedVerificationDocument < Document
   def assisted_verification
     FinancialAssistance::Application.where(id: application_id).first.applicants.where(id: applicant_id).first.assisted_verifications.where(id: assisted_verification_id).first
   end
+
+  def family
+    FinancialAssistance::Application.where(id: application_id).first.family
+  end
 end
