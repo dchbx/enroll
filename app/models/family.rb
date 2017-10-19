@@ -17,6 +17,7 @@ class Family
   # include Mongoid::Versioning
   include Sortable
   include Mongoid::Autoinc
+  include Mongoid::History::Trackable
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -56,6 +57,7 @@ class Family
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
                                 :households, :broker_agency_accounts, :general_agency_accounts
 
+   track_history   :on => [:hbx_assigned_id, :is_active, :person_id], :scope => :person
   # index({hbx_assigned_id: 1}, {unique: true})
   index({e_case_id: 1}, { sparse: true })
   index({submitted_at: 1})

@@ -3,6 +3,7 @@ class Person
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Mongoid::History::Trackable
 
   include Notify
   include UnsetableSparseFields
@@ -55,6 +56,7 @@ class Person
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
+  track_history   :on => [:hbx_id, :first_name, :last_name, :encrypted_ssn, :dob, :gender, :is_active, :updated_by], :version_field => :version, :track_update   =>  true
 
   # Login account
   belongs_to :user
