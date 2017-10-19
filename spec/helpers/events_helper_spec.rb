@@ -201,3 +201,50 @@ describe EventsHelper, "transforming a qualifying event kind for external xml" d
   end
 
 end
+
+describe EventsHelper, "selecting plan years to be exported" do
+  subject { EventsHelperSlug.new }
+
+  describe "plan_years_for_manual_export" do
+    let (:employer_profile) { FactoryGirl.create(:employer_with_planyear) }
+    let (:plan_year) { employer_profile.plan_years.first }
+
+    context "draft plan year" do
+      it "should return []" do
+        expect(subject.plan_years_for_manual_export(employer_profile)).to eq []
+      end
+    end
+
+    context "enrolled plan year" do
+      before do
+        plan_year.update_attributes({:aasm_state => "enrolled"})
+      end
+
+      it "should return the plan year" do
+        expect(subject.plan_years_for_manual_export(employer_profile)).to eq [plan_year]
+      end
+    end
+
+    context "terminated plan year with future date of termination" do
+      before do
+        plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
+                                     :aasm_state => "terminated"})
+      end
+
+      it "should return the plan year" do
+        expect(subject.plan_years_for_manual_export(employer_profile)).to eq [plan_year]
+      end
+    end
+
+    context "terminated plan year with past date of termination" do
+      before do
+        plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record - 1.month,
+                                     :aasm_state => "terminated"})
+      end
+
+      it "should not return the plan year" do
+        expect(subject.plan_years_for_manual_export(employer_profile)).to eq []
+      end
+    end
+  end
+end

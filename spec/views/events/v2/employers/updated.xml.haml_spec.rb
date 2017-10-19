@@ -174,17 +174,33 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     context "when manual gen of cv = true" do
 
-      before :each do
-        employer.plan_years = [plan_year,future_plan_year]
-        employer.save
-        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: true }
-        @doc = Nokogiri::XML(rendered)
+      context "non termination case" do
+        before :each do
+          employer.plan_years = [plan_year, future_plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 2
+        end
       end
 
-      it "should return all eligible for export plan years" do
-        expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 2
+      context "terminated plan year with future termination date" do
+        before :each do
+          plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
+                                       :aasm_state => "terminated"})
+          employer.plan_years = [plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 1
+        end
       end
     end
-
   end
 end
