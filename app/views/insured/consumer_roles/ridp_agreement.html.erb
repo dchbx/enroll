@@ -36,6 +36,16 @@
           <label for="agreement_disagree"><span style="white-space: nowrap;">I Disagree</span></label>
         </div>
       </div>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 edit pd aut_cons_text">
+          <p>
+            <b>We are required by Federal law to verify your identity before you continue with your application.</b>
+            If you do not want to continue with identity verification through Experian, you can apply by completing and sending us a
+            <a href="https://dchealthlink.com/sites/default/files/v2/forms/DC_Health_Link_Application_for_Health_Coverage_201509.pdf" target="_blank">paper application </a>
+            or going to a <a href="https://dchealthlink.com/dhsservicecenters" target="_blank">Department of Human Services service center </a> to apply in person.
+          </p>
+        </div>
+      </div>
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
@@ -44,15 +54,16 @@
   </div>
 </div>
 <script type="text/javascript">
-  $(document).ready(function(){
-    $(".interaction-choice-control-value-agreement-agree").click(function(){
-      $(".interaction-click-control-continue").attr("disabled", false);
-        // $(".disagree_placeholder_text").hide();
-      });
-    $(".interaction-choice-control-value-agreement-disagree").click(function(){
-      $(".interaction-click-control-continue").attr("disabled", true);
-        // $(".disagree_placeholder_text").show();
-        alert("Please contact <%= Settings.site.short_name %> at <%= Settings.contact_center.phone_number %> for more info");
-      });
-  });
+    $(document).ready(function(){
+        $(".interaction-choice-control-value-agreement-agree").prop("checked", true);
+        $('.aut_cons_text').parents('.row-form-wrapper').addClass('hide');
+        $(".interaction-choice-control-value-agreement-agree").click(function(){
+            $(".interaction-click-control-continue").attr("href", "<%= new_insured_interactive_identity_verification_path %>");
+            $('.aut_cons_text').parents('.row-form-wrapper').addClass('hide');
+        });
+        $(".interaction-choice-control-value-agreement-disagree").click(function(){
+            $(".interaction-click-control-continue").attr("href", "<%= upload_ridp_document_insured_consumer_role_index_path %>");
+            $('.aut_cons_text').parents('.row-form-wrapper').removeClass('hide');
+        });
+    });
 </script>

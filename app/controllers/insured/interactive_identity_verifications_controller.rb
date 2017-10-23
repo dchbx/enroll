@@ -8,12 +8,12 @@ module Insured
       respond_to do |format|
         format.html do
           if service_response.blank?
-            render "service_unavailable"
+            redirect_to :action => "service_unavailable"
           else
             if service_response.failed?
               @step = 'start'
-              @verification_response = service_response
-              render "failed_validation"
+              @verification_response= service_response
+              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_response.transaction_id
             else
               @interactive_verification = service_response.to_model
               render :new
@@ -21,6 +21,18 @@ module Insured
           end
         end
       end
+    end
+
+    def service_unavailable
+      set_consumer_bookmark_url
+      render "service_unavailable"
+    end
+
+    def failed_validation
+      set_consumer_bookmark_url
+      @step = params[:step]
+      @verification_transaction_id = params[:verification_transaction_id]
+      render "failed_validation"
     end
 
     def create
@@ -31,14 +43,14 @@ module Insured
             service = ::IdentityVerification::InteractiveVerificationService.new
             service_response = service.respond_to_questions(render_question_responses(@interactive_verification))
             if service_response.blank?
-              render "service_unavailable"
+              redirect_to :action => "service_unavailable"
             else
               if service_response.successful?
                 process_successful_interactive_verification(service_response)
               else
                 @step = 'questions'
-                @verification_response = service_response
-                render "failed_validation"
+                @verification_response= service_response
+                redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_response.transaction_id
               end
             end
           else
@@ -56,13 +68,13 @@ module Insured
             service = ::IdentityVerification::InteractiveVerificationService.new
             service_response = service.check_override(render_verification_override(@transaction_id))
             if service_response.blank?
-              render "service_unavailable"
+              redirect_to :action => "service_unavailable"
             else
               if service_response.successful?
                 process_successful_interactive_verification(service_response)
               else
                 @verification_response = service_response
-                render "failed_validation"
+                redirect_to :action =>  "failed_validation", :step => @step || nil, :verification_transaction_id => @verification_response.transaction_id
               end
             end
         end

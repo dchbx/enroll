@@ -136,6 +136,35 @@ describe "#find_vlp_document_by_key" do
   end
 end
 
+describe "#find_ridp_document_by_key" do
+  let(:person) {Person.new}
+  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:key) {"sample-key"}
+  let(:ridp_document) {RidpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
+
+  context "has a ridp_document without a file uploaded" do
+    before do
+      consumer_role.ridp_documents.build({subject: "Certificate of Citizenship"})
+    end
+
+    it "return no document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to be_nil
+    end
+  end
+
+  context "has a ridp_document with a file uploaded" do
+    before do
+      consumer_role.ridp_documents << ridp_document
+    end
+
+    it "returns ridp_document document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to eql(ridp_document)
+    end
+  end
+end
+
 describe "#build_nested_models_for_person" do
   let(:person) {FactoryGirl.create(:person)}
   let(:consumer_role) {ConsumerRole.new}
@@ -205,6 +234,32 @@ context "Verification process and notices" do
       it "returns false if person has NO documents for this type" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Immigration type")
         expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_truthy
+      end
+    end
+  end
+
+  describe "#has_ridp_docs_for_type?" do
+    before do
+      person.consumer_role.ridp_documents=[]
+    end
+    context "ridp exist but document is NOT uploaded" do
+      it "returns false for ridp doc without uploaded copy" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil )
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+      it "returns false for Identity type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil, :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+    end
+    context "ridp with uploaded copy" do
+      it "returns true if person has uploaded documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
+      end
+      it "returns false if person has NO documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
       end
     end
   end
@@ -329,6 +384,20 @@ context "Verification process and notices" do
     it_behaves_like "update verification type for consumer", "Citizenship", "curam", "hbx"
   end
 
+  describe "update_ridp_verification_type private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "update ridp verification type for consumer" do |verification_type, reason|
+      before do
+        consumer.update_ridp_verification_type(verification_type, reason)
+      end
+      it "updates #{verification_type}" do
+        expect(consumer.identity_verified?).to eq true
+      end
+    end
+
+    it_behaves_like "update ridp verification type for consumer", "Identity", "documents in Enroll"
+  end
+
   describe "#update_all_verification_types private" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "curam" })}
     let(:consumer) { person.consumer_role }
@@ -351,6 +420,28 @@ context "Verification process and notices" do
     it_behaves_like "update update all verification types for consumer", "admin", "hbx"
     it_behaves_like "update update all verification types for consumer", "curam", "curam"
     it_behaves_like "update update all verification types for consumer", "any", "hbx"
+  end
+
+  describe "#admin_ridp_verification_action private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "admin ridp verification actions" do |admin_action, v_type, update_reason, upd_attr, result, rejected_field|
+      before do
+        consumer.admin_ridp_verification_action(admin_action, v_type, update_reason)
+      end
+      it "updates #{v_type} as #{result} if admin clicks #{admin_action}" do
+        expect(consumer.send(upd_attr)).to eq result
+      end
+
+      if admin_action == "return_for_deficiency"
+        it "marks #{v_type} type as rejected" do
+          expect(consumer.send(rejected_field)).to be_truthy
+        end
+      end
+    end
+
+    it_behaves_like "admin ridp verification actions", "verify", "Identity", "Document in EnrollApp", "identity_validation", "valid"
+    it_behaves_like "admin ridp verification actions", "return_for_deficiency", "Identity", "Document in EnrollApp", "identity_validation", "outstanding", "identity_rejected"
+
   end
 
   describe "#admin_verification_action private" do

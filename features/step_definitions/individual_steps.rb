@@ -110,6 +110,28 @@ Then(/^\w+ agrees? to the privacy agreeement/) do
   click_link "Continue"
 end
 
+Given(/^that the Consumer has chosen “I Disagree” on the Auth and Consent page$/) do
+  expect(page).to have_content('Authorization and Consent')
+  find(:xpath, '//label[@for="agreement_disagree"]').click
+  click_link "Continue"
+end
+
+When(/^the consumer tries to create their own account$/) do
+  expect(page).to have_content('Identity')
+  expect(page).to have_content('Application')
+  find('.interaction-click-control-continue')['disabled'].should == "disabled"
+end
+
+Then(/^the consumer can’t navigate passed the doc upload page until proof of identity is uploaded and verified by the Admin$/) do
+  page.should have_content "Outstanding"
+  find('.interaction-click-control-continue')['disabled'].should == "disabled"
+end
+
+Then(/^the consumer can navigate passed the doc upload page if proof of identity is uploaded and verified by the Admin$/) do
+  page.should have_content "Outstanding"
+  find('.interaction-click-control-continue')['disabled'].should == "disabled"
+end
+
 When /^Individual clicks on Individual and Family link should be on verification page/ do
   wait_for_ajax
   find('.interaction-click-control-individual-and-family').trigger('click')
@@ -123,7 +145,7 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "Continue Application"
 end
 
 Then(/\w+ should see the dependents form/) do

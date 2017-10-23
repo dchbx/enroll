@@ -1,0 +1,10 @@
+.content
+  .container
+    .row
+      .col-lg-7.col-md-7.col-sm-8.col-xs-12
+        %h4 Allowing Experian to verify your identity is the fastest way to continue your application. If you change your mind, go back to the previous page.
+        = render partial: 'insured/interactive_identity_verifications/options_to_verify_identity'
+        .outstanding-ridp-documents
+        = render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents'
+      .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+        = render  partial: 'shared/individual_progress', locals: {step: '2', next_link: insured_family_members_path(consumer_role_id: @person.consumer_role.id), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?}

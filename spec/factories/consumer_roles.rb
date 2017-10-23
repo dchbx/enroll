@@ -9,6 +9,7 @@ FactoryGirl.define do
     is_incarcerated 'yes'
     is_applicant 'yes'
     vlp_documents {[FactoryGirl.build(:vlp_document)]}
+    ridp_documents {[FactoryGirl.build(:ridp_document)]}
     bookmark_url nil
     is_applying_coverage true
   end

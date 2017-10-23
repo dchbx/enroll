@@ -1,7 +1,7 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
-  before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
+  before_action :set_document,  only: [:destroy, :update]
+  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :update_ridp_verification_type]
   respond_to :html, :js
 
   def download
@@ -36,6 +36,23 @@ class DocumentsController < ApplicationController
     admin_action = params[:admin_action]
     if (VlpDocument::VERIFICATION_REASONS + VlpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
       verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
+      message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
+      flash_message = { :success => message}
+    else
+      flash_message = { :error => "Please provide a verification reason."}
+    end
+
+    respond_to do |format|
+      format.html { redirect_to :back, :flash => flash_message }
+    end
+  end
+
+  def update_ridp_verification_type
+    ridp_type = params[:ridp_verification_type]
+    update_reason = params[:verification_reason]
+    admin_action = params[:admin_action]
+    if (RidpDocument::VERIFICATION_REASONS + RidpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
+      verification_result = @person.consumer_role.admin_ridp_verification_action(admin_action, ridp_type, update_reason)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
     else

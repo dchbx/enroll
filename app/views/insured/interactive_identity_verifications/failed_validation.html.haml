@@ -1,20 +1,21 @@
 .content
   .container
-    .col-xs-9
-      - if @step == 'start'
-        %h4 To keep your data secure, we are required to verify your identity electronically using the credit reporting agency Experian. Unfortunately, Experian was unable to confirm your identity based on the information you provided. You have two options for completing your application:
+    .row
+      .col-lg-7.col-md-7.col-sm-8.col-xs-12
+        - if @step == 'start'
+          %h4 Your identity could not be confirmed by Experian – the third-party service we use to verify your identity
+          = render partial: 'insured/interactive_identity_verifications/options_to_verify_identity'
+        - else
+          %br
+          = render partial: 'notices/shared/unordered_list', locals: { previous: "Your identity could not be confirmed by Experian – the third-party service we use to verify your identity. For your security, you won’t be able to continue your application until you resolve this issue. Follow these steps:", listings: ["Call Experian at (855) 578-5409", "Provide your reference number:  #{ @verification_transaction_id} ", "Experian will need to ask you a few questions to verify your identity"] }
+          %p If you are able to resolve the issue with Experian, select CONTINUE APPLICATION.
+          %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_transaction_id), :method => :put, :class => "btn btn-primary  btn-small interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))
+          = render partial: 'insured/interactive_identity_verifications/options_to_verify_identity'
+        .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
+          Help me sign up
         %br
-        1. Complete your application at the DC Health Benefit Exchange Authority. Please call (202) 715-7576 to set up an appointment.
-        %br
-        %br
-        2. Complete a paper application form, scan it, and email it to info@dchealthlink.com. Click here for the paper application form. Be sure to fill out all the required information so that we can process your application as soon as possible.
-        %br
-      - else
-        %h4= t('insured.interactive_identity_verifications.failed_validation.contact_information', :ref_number => @verification_response.transaction_id)
-
-      %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_response.transaction_id), :method => :put, :class => "btn btn-primary  btn-small interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))
-      %br
-      .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
-        Help me sign up
-    %br
-      = render partial: 'insured/plan_shoppings/help_with_plan'
+          = render partial: 'insured/plan_shoppings/help_with_plan'
+        .outstanding-ridp-documents
+          = render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents'
+      .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+        = render  partial: 'shared/individual_progress', locals: {ridp:true, step: '2', next_link: insured_family_members_path(consumer_role_id: @person.consumer_role.id), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?}

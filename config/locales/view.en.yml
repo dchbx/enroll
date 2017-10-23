@@ -22,7 +22,7 @@ en:
   insured:
     interactive_identity_verifications:
         service_unavailable:
-          try_again_later: "We’re sorry. The third-party service used to confirm your identity is currently unavailable. Please try again later. If you continue to receive this message after trying several times, please call DC Health Link customer service for assistance at 1-855-532-5465."
+          try_again_later: "We’re sorry. Experian - the third-party service we use to confirm your identity - is unavailable. Please try again later."
         failed_validation:
           contact_information: "You have not passed identity validation.  To proceed please contact Experian at 1-866-578-5409, and provide them with reference number #%{ref_number}."
-          override: "Please click here once you have contacted the exchange and have been told to proceed."
+          override: "Continue Application"

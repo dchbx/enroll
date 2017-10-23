@@ -104,6 +104,8 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:user).and_return(user)
         allow(user).to receive(:identity_verified?).and_return(false)
+        allow(consumer_role).to receive(:identity_verified?).and_return(false)
+        allow(consumer_role).to receive(:application_verified?).and_return(false)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
@@ -212,6 +214,8 @@ RSpec.describe Insured::FamiliesController do
         before do
           allow(user).to receive(:idp_verified?).and_return false
           allow(user).to receive(:identity_verified?).and_return false
+          allow(consumer_role).to receive(:identity_verified?).and_return false
+          allow(consumer_role).to receive(:application_verified?).and_return false
           allow(user).to receive(:last_portal_visited).and_return ''
           allow(person).to receive(:user).and_return(user)
           allow(person).to receive(:has_active_employee_role?).and_return(false)
@@ -688,7 +692,7 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         family.broker_agency_accounts = [
-          FactoryGirl.build(:broker_agency_account, family: family)
+            FactoryGirl.build(:broker_agency_account, family: family)
         ]
         allow(Family).to receive(:find).and_return family
         delete :delete_consumer_broker , :id => family.id

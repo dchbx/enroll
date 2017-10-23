@@ -136,4 +136,37 @@ RSpec.describe DocumentsController, :type => :controller do
       end
     end
   end
+  describe "PUT update_ridp_verification_type" do
+    before :each do
+      request.env["HTTP_REFERER"] = "http://test.com"
+    end
+
+    shared_examples_for "update ridp verification type" do |type, reason, admin_action, updated_attr, result|
+      it "updates #{updated_attr} for #{type} to #{result} with #{admin_action} admin action" do
+        post :update_ridp_verification_type, { person_id: person.id,
+                                               ridp_verification_type: type,
+                                               verification_reason: reason,
+                                               admin_action: admin_action}
+        person.reload
+        expect(person.consumer_role.send(updated_attr)).to eq(result)
+      end
+    end
+
+    context "Identity verification type" do
+      it_behaves_like "update ridp verification type", "Identity", "Document in EnrollApp", "verify", "identity_validation", "valid"
+      it_behaves_like "update ridp verification type", "Identity", "E-Verified in Curam", "verify", "identity_update_reason", "E-Verified in Curam"
+    end
+
+    context "Application verification type" do
+      it_behaves_like "update ridp verification type", "Application", "Document in EnrollApp", "verify", "application_validation", "valid"
+      it_behaves_like "update ridp verification type", "Application", "Document in EnrollApp", "verify", "application_update_reason", "Document in EnrollApp"
+    end
+
+    context "redirection" do
+      it "should redirect to back" do
+        post :update_ridp_verification_type, person_id: person.id
+        expect(response).to redirect_to :back
+      end
+    end
+  end
 end

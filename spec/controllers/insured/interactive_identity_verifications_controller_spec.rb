@@ -4,9 +4,10 @@ describe Insured::InteractiveIdentityVerificationsController do
 
   describe "GET #new" do
     let(:mock_person) { double }
+    let(:mock_transaction_id) { double }
     let(:mock_user) { double(:person => mock_person) }
     let(:mock_service) { instance_double("::IdentityVerification::InteractiveVerificationService") }
-    let(:mock_service_result) { instance_double("::IdentityVerification::InteractiveVerificationResponse", :failed? => service_failed, :to_model => mock_session) }
+    let(:mock_service_result) { instance_double("::IdentityVerification::InteractiveVerificationResponse", :failed? => service_failed, :to_model => mock_session, :transaction_id => mock_transaction_id) }
     let(:mock_session) { double }
     let(:mock_template_result) { double }
 
@@ -28,7 +29,7 @@ describe Insured::InteractiveIdentityVerificationsController do
         allow(mock_service).to receive(:initiate_session).with(mock_template_result).and_return(mock_service_result)
         get :new
         expect(assigns[:verification_response]).to eq mock_service_result
-        expect(response).to render_template("failed_validation")
+        expect(response).to redirect_to(failed_validation_insured_interactive_identity_verifications_path(:step => 'start', :verification_transaction_id => mock_transaction_id))
       end
     end
 
@@ -36,7 +37,7 @@ describe Insured::InteractiveIdentityVerificationsController do
       it "should render the 'try back later' message" do
         allow(mock_service).to receive(:initiate_session).with(mock_template_result).and_return(nil)
         get :new
-        expect(response).to render_template("service_unavailable")
+        expect(response).to redirect_to(service_unavailable_insured_interactive_identity_verifications_path)
       end
     end
 
@@ -124,7 +125,7 @@ describe Insured::InteractiveIdentityVerificationsController do
 
         it "should render the 'try back later' message" do
           post :create, { "interactive_verification" => verification_params }
-          expect(response).to render_template("service_unavailable")
+          expect(response).to redirect_to(service_unavailable_insured_interactive_identity_verifications_path)
         end
       end
 
@@ -133,7 +134,7 @@ describe Insured::InteractiveIdentityVerificationsController do
         it "should render the 'please call' message" do
           post :create, { "interactive_verification" => verification_params }
           expect(assigns[:verification_response]).to eq mock_service_result
-          expect(response).to render_template("failed_validation")
+          expect(response).to redirect_to(failed_validation_insured_interactive_identity_verifications_path(:step => 'questions', :verification_transaction_id => mock_transaction_id))
         end
       end
 
@@ -187,7 +188,7 @@ describe Insured::InteractiveIdentityVerificationsController do
 
       it "should render the 'try back later' message" do
         post :update, { "id" => transaction_id }
-        expect(response).to render_template("service_unavailable")
+        expect(response).to redirect_to(service_unavailable_insured_interactive_identity_verifications_path)
       end
     end
 
@@ -196,7 +197,7 @@ describe Insured::InteractiveIdentityVerificationsController do
       it "should render the 'please call' message" do
         post :update, { "id" => transaction_id }
         expect(assigns[:verification_response]).to eq mock_service_result
-        expect(response).to render_template("failed_validation")
+        expect(response).to redirect_to(failed_validation_insured_interactive_identity_verifications_path(:verification_transaction_id => mock_transaction_id))
       end
     end
 
@@ -215,4 +216,34 @@ describe Insured::InteractiveIdentityVerificationsController do
       end
     end
   end
+
+  describe "GET #service_unavailable" do
+    let(:mock_person) { double }
+    let(:mock_user) { double(:person => mock_person) }
+    before :each do
+      sign_in(mock_user)
+    end
+
+    it "should render new template" do
+      get :service_unavailable
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:service_unavailable)
+    end
+  end
+
+  describe "GET #failed_validation" do
+    let(:mock_person) { double }
+    let(:mock_transaction_id) { double }
+    let(:mock_user) { double(:person => mock_person) }
+    before :each do
+      sign_in(mock_user)
+    end
+
+    it "should render new template" do
+      get :failed_validation, :step => 'start', :verification_transaction_id => mock_transaction_id
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:failed_validation)
+    end
+  end
+
 end

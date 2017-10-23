@@ -1,0 +1,40 @@
+<div class="modal fade read-only-modal" id="insured_ridp_modal" role="dialog">
+  <div class="modal-dialog" style='min-height: 600px; width: 720px'>
+    <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>&nbsp;
+      </div>
+      <div class="modal-body">
+        <div>
+            <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
+              <div class="text-center">
+                <span class="btn btn-default btn-file">
+                  <i class="fa fa-upload" aria-hidden="true"></i>
+                  Select File to Upload
+                  <%= file_field_tag "file[]", type: :file, accept: 'image/png,image/gif,image/jpeg,application/pdf', class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
+                </span>
+              </div>
+              <div style='font-size: 100%;'>
+                <span>
+                  <%= radio_button_tag 'ridp_subject', "Driver's  License issued by state or territory", true %> Driver's  License issued by state or territory
+                  <br>
+                  <%= radio_button_tag 'ridp_subject', 'School identification card', false %> School identification card
+                  <br>
+                  <%= radio_button_tag 'ridp_subject', 'U.S. military card or draft record', false%> U.S. military card or draft record
+                  <br>
+                  <%= radio_button_tag 'ridp_subject', 'Identification card issued by the federal, state or local government, including a U.S. Passport', false %> Identification card issued by the federal, state or local government, including a U.S. Passport
+                  <br>
+                  <%= radio_button_tag 'ridp_subject', "Military dependent's identification card", false %> Military dependent's identification card
+                  <br>
+                  <%= radio_button_tag 'ridp_subject', 'Native American tribal document', false %> Native American tribal document
+                  <br>
+                  <%= radio_button_tag 'ridp_subject', 'U.S. Coast Guard Merchant Mariner card', false %> U.S. Coast Guard Merchant Mariner card
+                </span>
+              </div>
+                <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
+            <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -420,6 +420,14 @@ class Person
     verification_types
   end
 
+# collect all ridp_verification_types user in case of unsuccessful ridp
+  def ridp_verification_types
+    ridp_verification_types = []
+    ridp_verification_types << 'Identity' if consumer_role && consumer_role.is_applicant == true && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types << 'Application' if consumer_role && consumer_role.is_applicant == true && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types
+  end
+
   def relatives
     person_relationships.reject do |p_rel|
       p_rel.relative_id.to_s == self.id.to_s

@@ -205,6 +205,20 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
+  context "GET upload_ridp_document" do
+    before(:each) do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role?).and_return(true)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+    end
+    it "should render new template" do
+      sign_in user
+      get :upload_ridp_document
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:upload_ridp_document)
+    end
+  end
+
   context "PUT update" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryGirl.build(:person) }

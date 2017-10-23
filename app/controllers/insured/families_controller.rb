@@ -316,10 +316,15 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && !@person.user.identity_verified?
+      elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end
+  end
+
+  def ridp_redirection
+    consumer = @person.consumer_role
+    @person.user && (!@person.user.identity_verified? && !consumer.identity_verified? && !consumer.application_verified?)
   end
 
   def update_changing_hbxs(hbxs)

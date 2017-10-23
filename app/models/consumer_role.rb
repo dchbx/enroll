@@ -21,6 +21,11 @@ class ConsumerRole
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
+
+  #ridp
+  IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
+  APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
+
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
@@ -72,6 +77,19 @@ class ConsumerRole
   field :native_validation, type: String, default: nil
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => true
 
+  
+  # Identity
+  field :identity_validation, type: String, default: "outstanding"
+  validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => true
+
+  # Application
+  field :application_validation, type: String, default: "outstanding"
+  validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => true
+
+  #ridp update reason fields
+  field :identity_update_reason, type: String
+  field :application_update_reason, type: String
+
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
   field :native_update_reason, type: String
@@ -81,6 +99,10 @@ class ConsumerRole
   field :ssn_rejected, type: Boolean, default: false
   field :native_rejected, type: Boolean, default: false
   field :lawful_presence_rejected, type: Boolean, default: false
+
+  #ridp rejection flags
+  field :identity_rejected, type: Boolean, default: false
+  field :application_rejected, type: Boolean, default: false
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -97,10 +119,11 @@ class ConsumerRole
 
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
+  embeds_many :ridp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
 
-  accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
+  accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents, :ridp_documents
 
   validates_presence_of :dob, :gender, :is_applicant
   #validate :ssn_or_no_ssn
@@ -170,6 +193,10 @@ class ConsumerRole
     self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
   end
 
+  def has_ridp_docs_for_type?(type)
+    self.ridp_documents.any?{ |doc| doc.ridp_verification_type == type && doc.identifier }
+  end
+
   #use this method to check what verification types needs to be included to the notices
   def outstanding_verification_types
     self.person.verification_types.find_all do |type|
@@ -203,6 +230,14 @@ class ConsumerRole
 
   def lawful_presence_verified?
     self.lawful_presence_determination.verification_successful?
+  end
+
+  def identity_verified?
+    ['na', 'valid'].include?(self.identity_validation)
+  end
+
+  def application_verified?
+    ['na', 'valid'].include?(self.application_validation)
   end
 
   def is_hbx_enrollment_eligible?
@@ -534,6 +569,22 @@ class ConsumerRole
     end
   end
 
+  def find_ridp_document_by_key(key)
+    candidate_vlp_documents = ridp_documents
+    if person.consumer_role.present?
+        candidate_vlp_documents << person.consumer_role.ridp_documents
+        candidate_vlp_documents.uniq!
+    end
+
+    return nil if candidate_vlp_documents.nil?
+
+    candidate_vlp_documents.detect do |document|
+      next if document.identifier.blank?
+      doc_key = document.identifier.split('#').last
+      doc_key == key
+    end
+  end
+
   def latest_active_tax_household_with_year(year, family)
     family.latest_household.latest_active_tax_household_with_year(year)
   rescue => e
@@ -651,6 +702,15 @@ class ConsumerRole
     end
   end
 
+  def mark_ridp_doc_uploaded(ridp_type)
+    case ridp_type
+      when 'Identity'
+        update_attributes(:identity_rejected => false, :identity_validation => 'pending')
+      when 'Application'
+        update_attributes(:application_rejected => false, :application_validation => 'pending')
+    end
+  end
+
   def invoke_ssa
     lawful_presence_determination.start_ssa_process
   end
@@ -719,6 +779,15 @@ class ConsumerRole
     end
   end
 
+  def admin_ridp_verification_action(admin_action, ridp_type, update_reason)
+    case admin_action
+      when 'verify'
+        update_ridp_verification_type(ridp_type, update_reason)
+      when 'return_for_deficiency'
+        return_ridp_doc_for_deficiency(ridp_type, update_reason)
+    end
+  end
+
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     if v_type == "Social Security Number"
       update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
@@ -730,6 +799,24 @@ class ConsumerRole
     end
     reject!(verification_attr(authority.first))
     "#{v_type} was rejected."
+  end
+
+  def return_ridp_doc_for_deficiency(ridp_type, update_reason)
+    if ridp_type == 'Identity'
+      update_attributes(:identity_validation => 'outstanding', :identity_update_reason => update_reason, :identity_rejected => true)
+    elsif  ridp_type == 'Application'
+      update_attributes(:application_validation => 'outstanding', :application_update_reason => update_reason, :application_rejected => true)
+    end
+    "#{ridp_type} was rejected."
+  end
+
+  def update_ridp_verification_type(ridp_type, update_reason)
+    if ridp_type == 'Identity'
+      update_attributes(:identity_validation => 'valid', :identity_update_reason => update_reason)
+    elsif ridp_type == 'Application'
+      update_attributes(:application_validation => 'valid', :application_update_reason => update_reason)
+    end
+    "#{ridp_type} successfully verified."
   end
 
   def update_verification_type(v_type, update_reason, *authority)

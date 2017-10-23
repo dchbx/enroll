@@ -681,7 +681,7 @@ describe Person do
       expect(person.emails.first.address).to eq 'sam@example.com'
     end
   end
-  
+
   describe '#work_email_or_best' do
     it "expects to get a work email address or home address" do
       person = Person.new
@@ -1089,6 +1089,34 @@ describe Person do
     end
 
   end
+
+  describe 'ridp_verification_types' do
+    let(:user) {FactoryGirl.create(:user)}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role, user: user) }
+
+    shared_examples_for 'collecting ridp verification types for person' do |ridp_types, types_count, is_applicant|
+      before do
+        allow(person).to receive(:completed_identity_verification?).and_return(false)
+        person.consumer_role.update_attributes!(is_applicant: is_applicant)
+      end
+      it 'returns array of verification types' do
+        expect(person.ridp_verification_types).to be_a Array
+      end
+
+      it "returns #{types_count} verification types" do
+        expect(person.ridp_verification_types.count).to eq types_count
+      end
+
+      it "contains #{ridp_types} verification types" do
+        expect(person.ridp_verification_types).to eq ridp_types
+      end
+    end
+    context 'ridp verification types for person' do
+      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, true
+      it_behaves_like 'collecting ridp verification types for person', [], 0, false
+    end
+  end
+
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
     let(:employer_profile){FactoryGirl.create(:employer_profile)}
