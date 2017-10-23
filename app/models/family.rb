@@ -36,7 +36,8 @@ class Family
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
   field :min_verification_due_date, type: Date, default: nil
-
+  field :vlp_documents_status, type: String
+  
   belongs_to  :person
 
   # Collection of insured:  employees, consumers, residents
@@ -194,7 +195,10 @@ class Family
   scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
   scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
   scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
-
+  scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
+  scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
+  scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+   
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -977,6 +981,40 @@ class Family
       "no enrollment"
     end
   end
+  
+  def self.min_verification_due_date_range(start_date,end_date)
+    where(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
+  end
+
+  def all_persons_vlp_documents_status
+    documents_list = []
+    document_status_outstanding = []
+    self.active_family_members.each do |member|
+      member.person.verification_types.all? do |type|
+      if member.person.consumer_role
+        documents_list <<  member.person.consumer_role.has_docs_for_type?(type)
+        document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
+      end
+      end
+    end
+    case
+    when documents_list.include?(true) && documents_list.include?(false)
+      return "Partially Uploaded" 
+    when documents_list.include?(true) && !documents_list.include?(false)      
+      if document_status_outstanding.include?("outstanding")
+        return "Partially Uploaded" 
+      else
+        return "Fully Uploaded" 
+      end
+    when !documents_list.include?(true) && documents_list.include?(false)
+      return "None"
+    end
+  end
+
+  def update_family_document_status!
+    update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
+  end
+
 
 private
   def build_household

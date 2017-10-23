@@ -1,4 +1,5 @@
 module VerificationHelper
+  include DocumentsVerificationStatus
 
   def doc_status_label(doc)
     case doc.status

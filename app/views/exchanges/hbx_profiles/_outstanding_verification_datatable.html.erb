@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<div class='container'>
+  <h1> Outstanding Verifications </h1>
+  <%#= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
+</div>
+   <%= raw render_datatable(@datatable,"lengthMenu": [[10, 25, 50], [10, 25, 50]], buttons: [
+            'excel','csv','print'
+        ]) %>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+	    $('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
+ initializeDataTables();
+ <% if @selector == 'assisted' %>
+    $('#Tab\\:by_enrollment_individual_market').click();
+    $('#Tab\\:by_enrollment_individual_market-all_assistance_receiving').addClass('active');
+  <% end %>
+</script>

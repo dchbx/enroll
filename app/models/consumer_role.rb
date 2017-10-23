@@ -8,6 +8,7 @@ class ConsumerRole
   include AASM
   include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
+  include DocumentsVerificationStatus
 
   embedded_in :person
 
@@ -193,8 +194,13 @@ class ConsumerRole
     self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
   end
 
+
   def has_ridp_docs_for_type?(type)
     self.ridp_documents.any?{ |doc| doc.ridp_verification_type == type && doc.identifier }
+  end
+
+  def has_outstanding_documents?
+    self.vlp_documents.any? {|doc| verification_type_status(doc.verification_type, self.person) == "outstanding" }
   end
 
   #use this method to check what verification types needs to be included to the notices

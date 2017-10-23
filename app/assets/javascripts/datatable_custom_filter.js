@@ -43,12 +43,17 @@ DT = ( function() {
       $('.Filter-'+id).removeClass('hide')
       $('.effective-datatable').DataTable().draw()
     })
+    $('#date_range_apply').click(function() {
+      $('.effective-datatable').DataTable().draw()
+    })
     clear_button_todojf()
     extendDatatableServerParams = function(){
       var keys = {}
       DT.filter_params(keys, 1)
       keys["collection_scope"] = $('#collection_scope').html()
-      var attributes_for_filtering = {"attributes": keys}
+      keys["custom_datatable_date_from"] = $('#custom_datatable_date_from').val()
+      keys["custom_datatable_date_to"] = $('#custom_datatable_date_to').val()
+      var attributes_for_filtering = {"custom_attributes": keys}
       return attributes_for_filtering;
     }
   }

@@ -1,4 +1,5 @@
 require 'rake'
+require "#{Rails.root}/lib/documents_verification_status"
 require "#{Rails.root}/app/helpers/verification_helper"
 include VerificationHelper
 # This is a report that is generated for audit purpose, for all families with outstanding documents

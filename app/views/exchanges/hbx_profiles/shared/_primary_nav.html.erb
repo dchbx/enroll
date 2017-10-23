@@ -7,12 +7,28 @@
             <span title="HBX Profile" aria-hidden="true" class="glyphicon glyphicon-home"></span>
           <% end %>
         </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "families-tab") %>>
-         <%= link_to(family_index_dt_exchanges_hbx_profiles_path, "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Families</span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
-         <% end %>
+
+  <li class="brokers-dropdown dropdown">
+        <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                            tab_name: 'families',
+                                                                            link_path: family_index_dt_exchanges_hbx_profiles_path,
+                                                                            display_name: 'Families',
+                                                                            active_tab: active_tab
+                                                                          } %>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                              tab_name: 'outstanding-verifications',
+                                                                              link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
+                                                                              display_name: 'Outstanding Verifications',
+                                                                              active_tab: active_tab
+                                                                            } %>
+             
+            </ul>
         </li>
+
+
+        
         <!-- <li role="presentation"<%= menu_tab_class(active_tab, "employers-tab") %>>
          <%= link_to(employer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers", "role" => "tab" ) do  %>
             <span class="hidden-xs">Employers</span>
@@ -68,14 +84,6 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Configuration"></span>
          <% end %>
         </li>
-
-        <li role="presentation"<%= menu_tab_class(active_tab, "vlp-docs-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
-          <%= link_to(verification_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "vlp-docs", "role" => "tab" ) do  %>
-              <span class="hidden-xs">Documents</span>
-              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="VLP Docs"></span>
-          <% end %>
-        </li>
-
         <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
          <%= link_to(staff_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "staff", "role" => "tab" ) do  %>
             <span class="hidden-xs">Staff</span>

@@ -20,10 +20,13 @@
 - effective_model = effective_datatable_params[:id].split('-table')[0].camelcase
 - effective_model_class = "Effective::Datatables::#{effective_model}"
 - effective_filter = effective_model_class.constantize.new.try(:nested_filter_definition)
+- effective_date_filter = effective_model_class.constantize.new.try(:date_filter_name_definition)
 
 .container
   - if effective_filter
     = render partial: '/datatables/shared/filter', locals: {filters: effective_filter}
+  - if effective_date_filter
+    = render partial: '/datatables/shared/date_filter', locals: {filter_name: effective_date_filter}
   #effective_datatable_wrapper
     .row
       %table.effective-datatable{effective_datatable_params}

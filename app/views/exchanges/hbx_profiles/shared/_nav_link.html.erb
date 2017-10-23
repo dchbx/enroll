@@ -1,0 +1,6 @@
+<li role="presentation"<%= menu_tab_class(active_tab, "#{tab_name}-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
+ <%= link_to(link_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "#{tab_name}", "role" => "tab" ) do  %>
+  <span class="hidden-xs"><%= display_name %></span>
+  <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title=<%= display_name %>></span>
+ <% end %>
+</li>

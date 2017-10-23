@@ -15,5 +15,4 @@ RSpec.describe VlpDocument, :type => :model do
       expect(person2.consumer_role.vlp_documents.uploaded.count).to eq(1)
     end
   end
-
 end

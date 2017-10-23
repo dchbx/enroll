@@ -386,11 +386,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     before :each do
       sign_in(user)
     end
-
-    it "should render json template" do
-      get :verifications_index_datatable, {format: :json}
-      expect(response).to render_template("exchanges/hbx_profiles/verifications_index_datatable")
-    end
   end
 
   describe "POST" do

@@ -57,6 +57,43 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       end
     end
 
+    context "Successful Save family documnent status" do
+
+    describe "file upload" do
+      let(:file) { [:temp_file] }
+      let(:person) { instance_double(Person) }
+      let(:temp_file) { double }
+      let(:consumer_role_params) {}
+      let(:params) { {person: {consumer_role: ''}, file: file} }
+      let(:bucket_name) { 'id-verification' }
+      let(:doc_uri) { "doc_uri" }
+      let(:file_path) { 'temp_file' } # a sample file path
+      let(:family) { double("Family", :update_family_document_status! => true)}
+
+      before do
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:find_docs_owner).and_return(person)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:set_current_person).and_return(person)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
+        allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_uri)
+
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).with('temp_file').and_return(file_path)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).with('temp_file').and_return("sample-filename")
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
+
+        controller.instance_variable_set(:"@family", family)
+        sign_in user
+        post :upload, params
+
+      end
+
+      it "updates the family doc status" do
+        expect(flash[:notice]).to eq("File Saved")
+      end
+
+     end
+    end
+
     context "Failed Download" do
       it "fails with an error message" do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)

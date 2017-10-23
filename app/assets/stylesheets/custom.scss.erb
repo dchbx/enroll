@@ -2095,7 +2095,24 @@ input[type="checkbox"] + h4.agree {
 
 .mainmenu {
     background: #007bc4 none repeat scroll 0 0;
+
+    li.dropdown {
+      a.dropdown-toggle {
+        span {
+          display: inline-block;
+        }
+      }
+      ul.dropdown-menu {
+        li {
+          padding: 2%;
+          a {
+            color: #5C5C5C;
+          }
+        }
+      }
+    }
 }
+
 .submenu {
     background: #00a3d9 none repeat scroll 0 0;
 }
@@ -2111,6 +2128,7 @@ input[type="checkbox"] + h4.agree {
 .mainmenu ul li:first-child, .submenu ul li:first-child {
     padding-left: 0;
 }
+
 
 .mainmenu ul li a, .submenu ul li a {
     color: #fff;

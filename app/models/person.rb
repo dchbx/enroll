@@ -207,7 +207,6 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
-
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
@@ -215,6 +214,7 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
   end
