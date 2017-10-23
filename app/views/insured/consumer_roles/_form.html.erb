@@ -3,6 +3,20 @@
     <div class="row">
       <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
+        <% if current_user.has_hbx_staff_role? %>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-lg-4 col-md-4 form-group form-group-lg no-pd top-buffer" >
+            <div style="margin-left: 10px">
+              <span> <b> Application Type :</b></span>
+            </div>
+          </div>
+          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 form-group form-group-lg no-pd">
+            <div class="selectric-labeled">
+              <%= f.select :application_type, [ 'Phone', 'In Person', 'Paper', 'Curam', 'Mobile' ], :include_blank => 'choose', class: "floatlabel form-control", autocomplete: :off %>
+            </div>
+          </div>
+        </div>
+        <% end %>
         <h1 class="darkblue">Personal Information</h1>
         <p>Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.</p>
         <p class='memo'>* = required field</p>
