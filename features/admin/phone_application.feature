@@ -1,6 +1,6 @@
-Feature: Phone application feature
+Feature: Hbx Admin as Phone Application for ivl- User Disagrees to Experian Identity Proofing- User directed to Document Upload page
 
-Background: phone application
+Background: Hbx Admin navigates into the new consumer application with phone application option and goes forward till Experian Auth and Consent Page
 	Given Hbx Admin exists
   When Hbx Admin logs on to the Hbx Portal
 	And admin has navigated into the NEW CONSUMER APPLICATION
@@ -11,21 +11,21 @@ Background: phone application
 	When Admin clicks CONTINUE button
 	Then the Admin should navigate to the Experian Auth and Consent Page
 
-Scenario: phone applicationfgdhfd fjhgdfg
+Scenario: Hbx Admin will be navigated to the DOCUMENT UPLOAD page
 	Given the Admin should navigate to the Experian Auth and Consent Page
 	When the Admin chooses 'I Disagree'
 	And Admin clicks CONTINUE button
 	Then the Admin will be navigated to the DOCUMENT UPLOAD page
 
-Scenario: phone applicationfgdhfd fjhgdfg
+Scenario: Hbx Admin clicks continue without uploading and verifying an application
 	Given the Admin should navigate to the Experian Auth and Consent Page
 	When the Admin chooses 'I Disagree'
 	And Admin clicks CONTINUE button
 	Then the Admin will be navigated to the DOCUMENT UPLOAD page
 	When the Admin clicks CONTINUE without uploading and verifying an application
-	Then the Admin can not navigate to the next page
+	Then the Admin can navigate to the next page and finish the application
 
-Scenario: phone applicationfgdhfd fjhgdfg
+Scenario: Hbx Admin clicks continue after uploading and verifying an application
 	Given the Admin should navigate to the Experian Auth and Consent Page
 	When the Admin chooses 'I Disagree'
 	And Admin clicks CONTINUE button

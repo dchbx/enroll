@@ -8,7 +8,7 @@
         <div>
             <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
               <div class="text-center">
-                <span class="btn btn-default btn-file">
+                <span class="btn btn-default btn-file" id = "select_upload_identity">
                   <i class="fa fa-upload" aria-hidden="true"></i>
                   Select File to Upload
                   <%= file_field_tag "file[]", type: :file, accept: 'image/png,image/gif,image/jpeg,application/pdf', class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>

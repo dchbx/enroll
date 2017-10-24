@@ -24,7 +24,7 @@ And(/^the Admin clicks the Application Type drop down$/) do
 end
 
 And(/^the Admin selects the Phone application option$/) do
-	 find(:xpath, "//select[@name='person[application_type]']/option[@value='Phone']")
+  find(:xpath, "//select[@name='person[application_type]']/option[@value='Phone']")
 end
 
 Given(/^all other mandatory fields on the page have been populated$/) do
@@ -65,11 +65,31 @@ Then(/^the Admin can not navigate to the next page$/) do
 end
 
 When(/^the Admin clicks CONTINUE after uploading and verifying an application$/) do
-	pending # Write code here that turns the phrase above into concrete actions
+  find('#upload_identity').click
+  find('#select_upload_identity').click
+  within '#select_upload_identity' do
+    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
+  end
+  wait_for_ajax(10,2)
+
+  find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div/div[2]").click
+  find('.interaction-choice-control-verification-reason-1').click
+  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.v-type-confirm-button').click
+
+  find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div/div[2]").click
+  find('.interaction-choice-control-verification-reason-1').click
+  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  select('Document in EnrollApp', :from => 'verification_reason')
+  find('.v-type-confirm-button').click
+
+  expect(page).to have_content('Application successfully verified.')
+  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^the Admin can navigate to the next page and finish the application$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(page).to have_content('Household Info: Family Members')
 end
 
 
