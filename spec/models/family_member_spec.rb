@@ -203,3 +203,58 @@ describe "for families with financial assistance application" do
     end
   end
 end
+
+
+describe "person attr & params" do
+  include_examples "family_member examples"
+  include_examples "phone numbers"
+  include_examples "addresses attr examples"
+  include_examples "person params examples"
+  include_examples "email attr examples"
+
+  let!(:family_member) {FactoryGirl.build(:family_member, family: family, person: person2)}
+  let!(:dob) {"1972-04-04"}
+
+  let!(:family_member_person_attributes) { person_params2.merge({"addresses" => array_address1})}
+
+  let!(:primary_person_attributes){person_primary_params2.merge({"phones_attributes"=> array_phone1, "addresses_attributes" => array_address1, "emails_attributes" => array_email1})}
+
+  it "should be true for family member when passed with same params" do
+    allow(family_member).to receive(:relationship).and_return 'spouse'
+    allow(family_member).to receive(:is_applying_coverage).and_return 'true'
+    allow(family_member).to receive(:eligible_immigration_status).and_return 'false'
+    allow(person2).to receive(:us_citizen).and_return 'true'
+    allow(family_member).to receive(:naturalized_citizen).and_return 'true'
+    allow(family_member).to receive(:indian_tribe_member).and_return 'true'
+    expect(family_member.family_mem_attr_changed?(family_member_person_attributes)).to eq true
+  end
+
+  it "should be false for family member when passed with different params" do
+    allow(family_member).to receive(:relationship).and_return 'spouse'
+    allow(family_member).to receive(:is_applying_coverage).and_return 'false'
+    allow(family_member).to receive(:eligible_immigration_status).and_return 'false'
+    allow(person2).to receive(:us_citizen).and_return 'true'
+    allow(family_member).to receive(:naturalized_citizen).and_return 'true'
+    allow(family_member).to receive(:indian_tribe_member).and_return 'true'
+    expect(family_member.family_mem_attr_changed?(family_member_person_attributes)).to eq false
+  end
+
+  it "should be false for primary member when passed with different params" do
+    allow(family.primary_family_member).to receive(:is_applying_coverage).and_return 'false'
+    allow(family.primary_family_member).to receive(:eligible_immigration_status).and_return 'false'
+    allow(person).to receive(:us_citizen).and_return 'true'
+    allow(family.primary_family_member).to receive(:naturalized_citizen).and_return 'true'
+    allow(family.primary_family_member).to receive(:indian_tribe_member).and_return 'true'
+    expect(family.primary_family_member. primary_mem_attr_changed?(primary_person_attributes)).to eq false
+  end
+
+  it "should be false for primary member when passed with different params" do
+    allow(family.primary_family_member).to receive(:is_applying_coverage).and_return 'true'
+    allow(family.primary_family_member).to receive(:eligible_immigration_status).and_return 'false'
+    allow(person).to receive(:us_citizen).and_return 'true'
+    allow(family.primary_family_member).to receive(:naturalized_citizen).and_return 'true'
+    allow(family.primary_family_member).to receive(:indian_tribe_member).and_return 'true'
+    expect(family.primary_family_member. primary_mem_attr_changed?(primary_person_attributes)).to eq true
+  end
+
+end

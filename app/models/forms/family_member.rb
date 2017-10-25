@@ -280,6 +280,7 @@ module Forms
     end
 
     def update_attributes(attr)
+      attributes_changed= self.family_member.family_mem_attr_changed?(attr) && (attr["same_with_primary"] == same_with_primary)
       assign_attributes(attr)
       assign_citizen_status
       return false unless valid?
@@ -296,6 +297,14 @@ module Forms
       family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
       family.build_relationship_matrix
       family_member.save!
+
+      if family.applications.present?
+        if !attributes_changed && !family.application_in_progress
+          # family.latest_submitted_application.copy_application
+          copy_finanacial_assistances_application
+        end
+      end
+
       true
     end
 

@@ -756,7 +756,7 @@ class Family
 
   def latest_submitted_application
     #Returns last application submitted, aasm state is not in draft
-    applications.order_by(:submitted_at => 'desc').first
+    applications.where(:aasm_state.ne => "draft").order_by(:submitted_at => 'desc').first
   end
 
   class << self

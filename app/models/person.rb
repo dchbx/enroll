@@ -930,6 +930,16 @@ class Person
     person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
   end
 
+  def phone_matched?(person_params)
+    status = []
+    phones.as_json.each_with_index do |a, i|
+      a.slice("full_phone_number").each do |k, v|
+        status << (person_params["phones_attributes"].values[i].present? ? (person_params["phones_attributes"].values[i].slice("full_phone_number").values[0].gsub(/[^\d]/, '') == v.to_s) : false)
+      end
+    end
+    return (status.all? {|s| s == true})
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:

@@ -115,6 +115,27 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_test_data do
+      first_name 'ivl'
+      middle_name 'X'
+      last_name 'test'
+      gender "male"
+      dob "1972-04-04".to_date
+      ssn '123121234'
+      no_ssn '0'
+      # relationship 'spouse'
+      # is_applying_coverage 'true'
+      us_citizen 'true'
+      naturalized_citizen 'true'
+      indian_tribe_member 'true'
+      tribal_id '1234'
+      is_incarcerated 'true'
+      is_physically_disabled 'true'
+      eligible_immigration_status nil
+      ethnicity ["", "", "", "", "", "", ""]
+      no_dc_address nil
+    end
+
     factory :male, traits: [:male]
     factory :female, traits: [:female]
 

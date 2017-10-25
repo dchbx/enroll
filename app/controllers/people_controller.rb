@@ -193,6 +193,7 @@ class PeopleController < ApplicationController
   end
 
   def update
+    attributes_changed = primary_mem_attr_changed?
     sanitize_person_params
     @person = find_person(params[:id])
     clean_duplicate_addresses
@@ -228,7 +229,18 @@ class PeopleController < ApplicationController
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
+
+    #to check if phone is changed before and after update
+    phone_numbers_matched = @person.phone_matched?(person_params)
+
+    # Any change in demographics should copy submitted FAA
+    if phone_numbers_matched && @person.primary_family.applications.present?
+      if !attributes_changed && !@person.primary_family.application_in_progress
+        Forms::FamilyMember.find( find_primary_family_member.id.to_s).copy_finanacial_assistances_application
+      end
+    end
   end
+
 
   def create
     sanitize_person_params
@@ -299,6 +311,10 @@ private
     end
   end
 
+  def find_primary_family_member
+    Person.find(params[:id]).primary_family.active_family_members.first
+  end
+
   def find_person(id)
     safe_find(Person, id)
   end
@@ -323,6 +339,10 @@ private
     ["home","work"].each do |kind|
        @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
     end
+  end
+
+  def primary_mem_attr_changed?
+    find_primary_family_member.primary_mem_attr_changed?(params[:person])
   end
 
   def sanitize_person_params
