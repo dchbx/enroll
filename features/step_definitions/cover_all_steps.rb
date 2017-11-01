@@ -7,7 +7,7 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
 end
 
 When(/^Hbx Admin clicks on New DC Resident Application link$/) do
-  click_link "New DC Resident Application"
+  find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").trigger('click')
 end
 
 Then(/^Hbx Admin should see New DC Resident Personal Information page$/) do

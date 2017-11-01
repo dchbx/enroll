@@ -3,7 +3,7 @@ Then(/^ the Hbx Admin should see the list of primary applicants and an Action bu
 end
 
 When(/^the Hbx Admin clicks on the Action button$/) do
-  click_button('Actions')
+  find(:xpath, "//*[@id='dropdownMenu1']", :wait => 10).trigger("click")
 end
 
 Then(/^the Add SEP option should be enabled$/) do
