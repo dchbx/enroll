@@ -15,9 +15,8 @@ class FixPlanYear < MongoidMigrationTask
       plan_year.aasm_state = ENV['aasm_state']
       plan_year.terminated_on = ENV['terminated_on'].present? ? Date.strptime(ENV['terminated_on'].to_s, "%m/%d/%Y") : " "
 
-      plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: prev_state, to_state: ENV['aasm_state'])
-
       if plan_year.save!
+        plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: prev_state, to_state: ENV['aasm_state'])
         puts "plan year updated" unless Rails.env.test?
 
         if plan_year.aasm_state == "active"
@@ -57,7 +56,6 @@ class FixPlanYear < MongoidMigrationTask
 
   def find_by_benefit_groups(benefit_groups)
     id_list = benefit_groups.collect(&:_id).uniq
-
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).canceled_and_terminated.to_a
