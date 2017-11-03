@@ -193,6 +193,8 @@ class PeopleController < ApplicationController
   end
 
   def update
+    primay_person_id = Person.find(params[:id]).primary_family.active_family_members.first.id.to_s
+    attributes_primay_matched =  FamilyMember.find( primay_person_id).is_a_valid_primary_member_update?(params[:person])
     sanitize_person_params
     @person = find_person(params[:id])
     clean_duplicate_addresses
@@ -227,6 +229,15 @@ class PeopleController < ApplicationController
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
+    end
+
+    phones_matched = @person.is_phones_matched?(person_params)
+
+    # Any change in demographics should copy submitted FAA
+    if phones_matched && @person.primary_family.applications.present?
+        if !attributes_primay_matched && !@person.primary_family.application_in_progress
+          Forms::FamilyMember.find( primay_person_id).copy_finanacial_assistances_application
+ end
     end
   end
 
@@ -397,5 +408,4 @@ private
     @old_addresses = @person.addresses
     @person.addresses = [] #fix unexpected duplicates issue
   end
-
 end

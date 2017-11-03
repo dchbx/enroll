@@ -150,6 +150,146 @@ class FamilyMember
     application.active_applicants.where(family_member_id: self.id).first
   end
 
+  def is_a_valid_faa_update?(params)
+    (personal_details_changed?(params) &&
+        params["dob"].to_date == dob.to_date &&
+        params["ssn"].tr("-", '') == ssn &&
+        params["no_ssn"] == (person.no_ssn.present? ? person.no_ssn : "0") &&
+        params["relationship"] == relationship && personal_queries_changed?(params) &&
+        params["eligible_immigration_status"] == (eligible_immigration_status.present? ? eligible_immigration_status.to_s : "false") &&
+        ethnicity_changed?(params) &&
+        no_dc_address?(params) &&
+        address_changed?(params["addresses"])).present?
+  end
+
+  def is_a_valid_primary_member_update?(params)
+    (personal_details_changed?(params) &&
+        personal_queries_changed?(params) &&
+        ethnicity_changed?(params) &&
+        no_dc_address?(params) &&
+        params["no_dc_address_reason"].to_s == person.no_dc_address_reason &&
+        (params["name_sfx"].empty? ? nil : params["name_sfx"]) == name_sfx &&
+        phone_or_email_changed?(params["phones_attributes"], "full_phone_number", {:type => :phones, :trim => true}) &&
+        address_changed?(params["addresses_attributes"]) &&
+        phone_or_email_changed?(params["emails_attributes"], "address", {:type => :emails})).present?
+  end
+
+  def ethnicity_changed?(params)
+    params["ethnicity"] == ethnicity
+  end
+
+  def personal_details_changed?(params)
+    (params["first_name"] == first_name &&
+        (params["middle_name"].empty? ? nil : params["middle_name"]) == middle_name &&
+        params["last_name"] == last_name &&
+        params["gender"] == gender)
+  end
+
+  def no_dc_address?(params)
+    params["no_dc_address"] == (person.no_dc_address.present? ? person.no_dc_address.to_s : "false")
+  end
+
+  def personal_queries_changed?(params)
+    (params["is_applying_coverage"] == is_applying_coverage.to_s &&
+        params["us_citizen"] == person.us_citizen.to_s &&
+        params["naturalized_citizen"] == naturalized_citizen.to_s &&
+        params["indian_tribe_member"] == indian_tribe_member.to_s &&
+        params["tribal_id"] == tribal_id &&
+        params["is_incarcerated"] == is_incarcerated.to_s &&
+        params["is_physically_disabled"] == is_physically_disabled.to_s)
+  end
+
+  def phone_or_email_changed?(params, slice, options = {})
+    status = []
+    params.each do |key, val|
+      val.slice(slice.to_sym).each do |attr_idx, attr|
+        status << attr.present?
+      end
+    end
+    p_values_exist = status.include?(true)
+
+    if person.send(options[:type]).present? && p_values_exist
+      status = []
+      params.each do |key, val|
+        val.slice(slice.to_sym).each do |attr_idx, attr|
+          attr = attr.gsub(/[^\d]/, '') if options[:trim]
+          status << (person.send(options[:type])[key.to_i].send(attr_idx.to_sym).to_s == attr) if person.send(options[:type])[key.to_i].present?
+        end
+      end
+      r_value = status.all? {|s| s == true}
+    elsif !person.send(options[:type]).present? && p_values_exist
+      r_value = false
+    elsif person.send(options[:type]).present? && !p_values_exist
+      r_value = false
+    else
+      r_value = true
+    end
+    return r_value
+  end
+
+  def address_changed?(params)
+    if person.addresses.present?
+      is_same_db = is_same_dependent_as_primary?(params)
+      is_same_with_params = is_same_with_params?(params)
+      is_params_empty = is_params_empty?(params)
+      is_params_same_with_primary = is_params_same_with_primary?(params)
+
+      if is_same_db && is_same_with_params
+        true
+      elsif !is_same_db  && is_same_with_params
+        true
+      elsif is_same_db && !is_same_with_params && !is_params_empty
+        false
+      elsif is_same_db && is_params_empty
+        true
+      elsif !is_same_db  && !is_same_with_params && is_params_same_with_primary
+        true
+      end
+    else
+      true
+    end
+  end
+
+  def is_same_with_params?(params)
+    status = []
+    params.each do |key, val|
+      val.each do |attr_idx, attr|
+        status << (person.addresses[key.to_i].send(attr_idx.to_sym) == attr) if person.addresses[key.to_i].present?
+      end
+    end
+    return status.all? {|s| s == true}
+  end
+
+  def is_params_same_with_primary?(params)
+    status = []
+    params.each do |key, val|
+      val.each do |attr_idx, attr|
+        status << (family.primary_family_member.person.addresses[key.to_i].send(attr_idx.to_sym) == attr) if person.addresses[key.to_i].present?
+      end
+    end
+    return status.all? {|s| s == true}
+  end
+
+  def is_params_empty?(params)
+    status = []
+    params.each do |key, val|
+      val.except("kind").each do |attr_idx, attr|
+        status << (attr.empty?)
+      end
+    end
+    return status.all? {|s| s == true}
+  end
+
+  def is_same_dependent_as_primary?(params)
+    status = []
+    params.each do |key, val|
+      val.each do |attr_idx, attr|
+        status << (family.primary_family_member.person.addresses[key.to_i].send(attr_idx.to_sym) == person.addresses[key.to_i].send(attr_idx.to_sym)) if person.addresses[key.to_i].present?
+      end
+    end
+    return status.all? {|s| s == true}
+  end
+
   private
 
   def no_duplicate_family_members
