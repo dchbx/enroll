@@ -1,16 +1,20 @@
-Then(/^Hbx Admin should see an New DC Resident Application link$/) do
-  find_link('New DC Resident Application').visible?
+Then(/^Hbx Admin should see an DC Resident Application link$/) do
+  find_link('DC Resident Application').visible?
 end
 
 Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
   expect(page).not_to have_content('New DC Resident Application')
 end
 
-When(/^Hbx Admin clicks on New DC Resident Application link$/) do
-  find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").trigger('click')
+Then(/^Hbx Admin should not see an DC Resident Application link$/) do
+  expect(page).not_to have_content('DC Resident Application')
 end
 
-Then(/^Hbx Admin should see New DC Resident Personal Information page$/) do
+When(/^Hbx Admin clicks on DC Resident Application link$/) do
+  find(:xpath, "//*[@id='myTab']/li[2]/ul/li[3]/a/span[1]").trigger('click')
+end
+
+Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
   expect(page).not_to have_content('Personal Information')
 end
 
