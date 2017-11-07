@@ -12,7 +12,7 @@
         %>
         <tr class="<%='ineligible_row' unless is_coverage%>">
           <td width="20">
-            <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>
+            <%= check_box_tag("family_member_ids[#{index}]", family_member.id)%>
           </td>
           <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
           <td><%= "This dependent is ineligible for employer-sponsored #{coverage_kind} coverage."  if !is_coverage %></td>
