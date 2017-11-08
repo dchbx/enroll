@@ -9,7 +9,7 @@
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
         <div style="font-size :18px" font-weight:normal>
         <%if @effective_on_date.present? || @new_effective_on %>
-          Effective Date: <span style="color: red;"><%= @optional_effective_on || @effective_on_date || @new_effective_on %></span>
+          Effective Date: <span style="color: black;"><%= @new_effective_on %></span>
         <%end%>
         </div>
         <h3>Who Needs Coverage?</h3>
