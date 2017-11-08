@@ -25,13 +25,13 @@
               remote: false
             } %>
             <% if policy(:family).hbx_super_admin_visible? %>
-                <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                    tab_name: 'dc-resident-application',
-                    link_path: begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'),
-                    display_name: 'DC Resident Application',
-                    active_tab: active_tab,
-                    remote: false
-                } %>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                tab_name: 'dc-resident-application',
+                link_path: begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'),
+                display_name: 'DC Resident Application',
+                active_tab: active_tab,
+                remote: false
+              } %>
             <% end %>
           </ul>
         </li>
