@@ -34,6 +34,8 @@ module EventsHelper
                   "drop_family_member_due_to_new_eligibility"
                 when "employer_sponsored_coverage_termination"
                   "eligibility_change_employer_ineligible"
+                when "employer_sponsored_cobra"
+                  "employer_cobra_non_payment"
                 else
                   eligibility_kind
                 end
