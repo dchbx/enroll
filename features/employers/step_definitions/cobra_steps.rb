@@ -163,7 +163,7 @@ Then(/employer should see the message Your employee was successfully added to yo
   expect(page).to have_content('Your employee was successfully added to your roster')
   person = people_for_cobra['Jack Employee']
   expect(page).to have_content(person[:first_name])
-  expect(page).to have_content(person[:last_name])  
+  expect(page).to have_content(person[:last_name])
   expect(page).to have_content((TimeKeeper.date_of_record + 1.days).to_s)
 end
 
@@ -235,7 +235,7 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}  
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
   element.find('i.fa-trash-o').click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
@@ -294,7 +294,7 @@ end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1.months).year}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
