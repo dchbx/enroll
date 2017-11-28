@@ -123,7 +123,7 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "CONTINUE APPLICATION"
 end
 
 Then(/\w+ should see the dependents form/) do
