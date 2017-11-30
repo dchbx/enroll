@@ -13,6 +13,7 @@ describe TerminateACensusEmployee, dbclean: :after_each do
     
     before(:each) do
       allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)
+      allow(ENV).to receive(:[]).with("termination_date").and_return (TimeKeeper.date_of_record - 30.days)
       census_employee.update_attributes({:aasm_state => 'employee_role_linked'})
     end
     
