@@ -600,7 +600,7 @@ class FinancialAssistance::Applicant
   private
 
   def validate_applicant_information
-    validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
+    validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
   end
 
   def driver_question_responses
