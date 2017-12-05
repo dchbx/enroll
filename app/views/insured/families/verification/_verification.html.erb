@@ -60,7 +60,7 @@
                   </div>
                   <% if current_user.has_hbx_staff_role? %>
                     <div class="v-type-actions col-md-2">
-                      <%= select_tag :verification_actions, admin_actions(v_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+                      <%= select_tag :verification_actions, admin_actions(v_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", data: {typeof:v_type}, prompt: 'Action'} %>
                     </div>
                   <% end %>
                 </div>
@@ -118,6 +118,8 @@
 <div class="collapse" id="docs-verification-faq">
   <%= render partial: "insured/families/verification/documents_verification_list" %>
 </div>
+
+<%= render partial: "insured/families/modals/history_modal" %>
 
 <script>
   $(document).ready(function() {

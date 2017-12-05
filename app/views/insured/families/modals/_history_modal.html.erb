@@ -1,0 +1,57 @@
+<!-- Modal -->
+<div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <div class="ssn-table">
+          <div class="ssn-overview">
+            <%= render partial: 'insured/families/modals/tables/ssn' %>
+          </div>
+          <div class="ssn-request">
+            <%= render partial: 'insured/families/modals/tables/ssn_request' %>
+          </div>
+          <div class="ssn-response">
+            <%= render partial: 'insured/families/modals/tables/ssn_response' %>
+          </div>
+        </div>
+        <div class="citizenship-table">
+          <div class="citizenship-overview">
+            <%= render partial: 'insured/families/modals/tables/citizenship' %>
+          </div>
+          <div class="citizenship-request">
+            <%= render partial: 'insured/families/modals/tables/citizenship_request' %>
+          </div>
+          <div class="citizenship-response">
+            <%= render partial: 'insured/families/modals/tables/citizenship_response' %>
+          </div>
+        </div>
+        <div class="immigration-table">
+          <div class="immigration-overview">
+            <%= render partial: 'insured/families/modals/tables/immigration' %>
+          </div>
+          <div class="immigration-request">
+            <%= render partial: 'insured/families/modals/tables/immigration_request' %>
+          </div>
+          <div class="immigration-response">
+            <%= render partial: 'insured/families/modals/tables/immigration_response' %>
+          </div>
+        </div>
+        <div class="ai-table">
+          <div class="ai-overview">
+            <%= render partial: 'insured/families/modals/tables/ai' %>
+          </div>
+          <div class="ai-request">
+            <%= render partial: 'insured/families/modals/tables/ai_request' %>
+          </div>
+          <div class="ai-response">
+            <%= render partial: 'insured/families/modals/tables/ai_response' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

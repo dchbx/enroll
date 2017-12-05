@@ -36,10 +36,77 @@ var Verification = (function(){
    function confirmVerificationType(){
        $(this).closest('div').parent().hide();
    }
+   function modalProperties(name) {
+     // Formats name for css
+     if (name == "Social Security Number") {
+       var modalType = 'ssn';
+     }
+     if (name == "Immigration status") {
+       var modalType = 'immigration';
+     }
+     if (name == "Citizenship") {
+       var modalType = 'citizenship';
+     }
+     if (name == "American Indian Status") {
+       var modalType = 'ai';
+     }
+     // Displays the table view in the modal
+     $('.'+modalType+'-table').show();
+     $('.'+modalType+'-request').hide();
+     $('.'+modalType+'-response').hide();
+     // Shows request view in the modal
+     $('#'+modalType+'-request').click(function() {
+       $('.'+modalType+'-overview').hide();
+       $('.'+modalType+'-request').show();
+       $('#historyModal').find('.modal-title').text(name + ' Hub Request');
+     });
+     // Shows response view in the modal
+     $('#'+modalType+'-response').click(function() {
+       $('.'+modalType+'-overview').hide();
+       $('.'+modalType+'-response').show();
+       $('#historyModal').find('.modal-title').text(name + ' Hub Response');
+     });
+     // Allows view to return to previous in the modal
+     $('.'+modalType+'-back').click(function() {
+       $('.'+modalType+'-table').show();
+       $('.'+modalType+'-overview').show();
+       $('.'+modalType+'-request').hide();
+       $('.'+modalType+'-response').hide();
+       $('#historyModal').find('.modal-title').text(name + ' Verification History');
+     });
+     // Populates modal titles
+     $('#historyModal').find('.modal-title').text(name + ' Verification History');
+   }
+   // Hides all modals
+   function hideAllModals() {
+     $('.ssn-table').hide();
+     $('.citizenship-table').hide();
+     $('.immigration-table').hide();
+     $('.ai-table').hide();
+   }
+   // Opens modal when View History is selected
+   function modalByType(name, modalType) {
+     $('#historyModal').modal({backdrop: 'static', keyboard: false}, 'show');
+     $('#historyModal').on('shown.bs.modal', function (event) {
+       var element = $(event.relatedTarget)
+       var modal = $(this);
+       switch (name) {
+         default:
+           hideAllModals();
+           modalProperties(name);
+       }
+     });
+     $('#historyModal').on('hide.bs.modal', function (event) {
+       hideAllModals();
+       // Resets selectric options to default on modal close
+       $('select').selectric().prop('selectedIndex', 0).selectric('refresh');
+     });
+   }
    function checkAction(event){
      var $selected_id = $(event.target).attr('id');
      var $selected_el = $('#'+$selected_id);
      var $selected_el_val = $selected_el.val();
+     var $selected_typeof = $selected_el.data('typeof');
 
      switch ($selected_el_val) {
          case 'Verify':
@@ -58,8 +125,11 @@ var Verification = (function(){
             hideAllActions($selected_id);
             showExtendAction($selected_id);
             break;
+          case 'View History':
+            modalByType($selected_typeof);
+            break;
          default:
-             hideAllActions($selected_id);
+             hideAllActions($selected_el_val);
      }
    }
 
@@ -73,4 +143,8 @@ var Verification = (function(){
 $(document).ready(function(){
    $('.v-type-actions').on('change', Verification.check_selected_action);
    $('.verification-update-reason').delegate('a', "click", Verification.confirm_v_type );
+   $('.ssn-table').hide();
+   $('.citizenship-table').hide();
+   $('.immigration-table').hide();
+   $('.ai-table').hide();
 });
