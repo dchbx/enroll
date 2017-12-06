@@ -192,8 +192,17 @@ class HbxEnrollment
                 message: "%{value} is not a valid coverage type"
             }
 
-  before_save :generate_hbx_id, :set_submitted_at
+  before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber
   after_save :check_created_at
+
+  # This method checks to see if there is at least one subscriber in the hbx_enrollment_members nested document.
+  # If not, it assigns it to the oldest person.
+  def check_for_subscriber
+    if hbx_enrollment_members.map { |x| x.is_subscriber ? 1 : 0 }.max == 0
+      new_is_subscriber_true = hbx_enrollment_members.min_by { |hbx_member| hbx_member.person.dob }
+      new_is_subscriber_true.is_subscriber = true
+    end
+  end
 
   def generate_hbx_signature
     if self.subscriber
