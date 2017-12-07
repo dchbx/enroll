@@ -12,6 +12,10 @@ When(/^the applicant with no e_case_id and visit personal information edit page$
   allow_any_instance_of(ConsumerRolePolicy).to receive(:can_view_application_types?).and_return(true)
 end
 
+When(/^the applicant with no e_case_id and visit personal information edit page$/) do
+  allow_any_instance_of(ConsumerRolePolicy).to receive(:can_view_application_types?).and_return(true)
+end
+
 Then(/^EA will automatically populate the Application Type as CURAM$/) do
   expect(page).to have_content("Curam")
   find(:xpath, "//p[@class='label'][contains(., 'Curam')]").click
