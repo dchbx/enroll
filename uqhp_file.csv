@@ -1,0 +1,3 @@
+family.id,policy.id,policy.subscriber.coverage_start_on,policy.aasm_state,policy.plan.coverage_kind,policy.plan.metal_level,policy.plan.plan_name,subscriber_id,person.first_name,person.last_name,policy.subscriber.person.is_incarcerated,policy.subscriber.person.citizen_status,outstanding_verification_types,policy.subscriber.person.is_dc_resident?,dependent
+5a2839e578b53a7a96000281,5a2839fb78b53a7a9600028a,1/1/18,coverage_selected,health,Bronze,"BlueChoice HMO HSA Standard Bronze $6,200",be6395e809034c9ca27031a274d8f4a9,ivl,Notice,,,,TRUE,NO
+5619c9af54726532e5510200,3081928,1/1/18,auto_renewing,health,platinum,BluePreferred PPO Standard Platinum $0,10000730,ULRICH,GAMERDINGER,,,,TRUE,FALSE

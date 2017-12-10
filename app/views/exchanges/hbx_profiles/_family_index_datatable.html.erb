@@ -10,11 +10,10 @@
   <%=pundit_span Family, :updateable? %>
     <div class="row">
          <ul class='col-xs-12 col-md-5 col-lg-5'>
-          <li> <%=link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(
-          original_application_type: 'phone')  %> <br/></li>
-
-          <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(
-          original_application_type: 'paper')  %> <br/></li>
+          <% if policy(:family).hbx_super_admin_visible? %>
+            <li> <%=link_to 'New DC Resident Application', begin_resident_enrollment_exchanges_residents_path(
+                 original_application_type: 'paper')  %> </li>
+          <% end %>
           </ul>
     </span>
     </div>
