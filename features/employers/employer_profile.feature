@@ -146,3 +146,15 @@ Scenario: A company  at least one active linked employer staff can delete pendin
     Then Point of Contact count is 2
     When Fred removes EmployerStaffRole from Sam
     Then Point of Contact count is 1
+
+Scenario: Employer should be Update phone types in Business Info
+    Given NewGuy is a user with no person who goes to the Employer Portal
+    Given NewGuy enters first, last, dob and contact info
+    Given a FEIN for a new company
+    Given NewGuy enters Employer Information
+    Then NewGuy becomes an Employer
+    When NewGuy decides to Update Business information
+    Then NewGuy should be able update phone type
+    When NewGuy clicks save
+    Then NewGuy should see successful message
+    And NewGuy logs out

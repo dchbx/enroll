@@ -112,6 +112,19 @@ Then /(\w+) decides to Update Business information/ do |person|
   screenshot('update_business_info')
 end
 
+Then(/(\w+) should be able update phone type$/) do |name|
+  find(:xpath, "//p[@class='label'][contains(., 'Main')]").click
+  find(:xpath, "//li[contains(., 'Direct')]").click
+end
+
+When(/(\w+) clicks save$/) do |name|
+  find('.interaction-click-control-save').click
+end
+
+Then(/(\w+) should see successful message$/) do |name|
+  expect(page).to have_content("Employer successfully Updated.")
+end
+
 Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   person = Person.where(first_name: new_staff).first
   click_link 'Add Employer Staff Role'
@@ -225,3 +238,5 @@ AfterStep do |scenario|
   sleep 1 if ENV['SCREENSHOTS'] == "true"
   screenshot("")
 end
+
+
