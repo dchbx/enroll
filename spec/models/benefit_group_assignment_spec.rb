@@ -241,6 +241,26 @@ describe BenefitGroupAssignment, type: :model do
     end
   end
 
+  describe "#deactivate_benefitgroup_assignment" do
+    let(:valid_params) do
+      {
+          census_employee: census_employee,
+          benefit_group: benefit_group,
+          start_on: start_on,
+          aasm_state: "coverage_selected"
+      }
+    end
+    let(:params) {valid_params}
+    let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
+
+    it "deactivates active benefit group assignment" do
+      benefit_group_assignment.terminate_coverage!
+      expect(benefit_group_assignment.aasm_state).to eq "coverage_terminated"
+      expect(benefit_group_assignment.is_active).to eq(false)
+      expect(benefit_group_assignment.end_on).to eq benefit_group.end_on
+    end
+  end
+
   describe '#active_and_waived_enrollments', dbclean: :after_each do
 
     let(:household) { FactoryGirl.create(:household, family: family)}
