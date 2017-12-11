@@ -163,7 +163,7 @@ class BenefitGroupAssignment
     state :initialized, initial: true
     state :coverage_selected
     state :coverage_waived
-    state :coverage_terminated
+    state :coverage_terminated, :after_enter => :deactivate_coverage
     state :coverage_void
     state :coverage_renewing
     state :coverage_expired
@@ -215,6 +215,10 @@ class BenefitGroupAssignment
     end
 
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
+  end
+
+  def deactivate_coverage
+    self.update_attributes(:is_active => false, end_on: plan_year.present? ? plan_year.end_on : nil)
   end
 
   private
