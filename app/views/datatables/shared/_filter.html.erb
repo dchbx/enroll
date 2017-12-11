@@ -12,7 +12,7 @@
 <div class="btn btn-group  <%= level > 1 && 'hide sub_level'%> custom_level_<%=level%> Filter-<%=filter_group%>" data-scope="<%=data_scope%>"  role='group'>
   <% filters[data_scope].each do |filter| %>
     <div class="btn btn-default" data-key="<%=filter[:scope]%>"
-    id="Tab:<%=filter_group.present? ? [filter_group,filter[:scope]].join('-') : filter[:scope] %>">
+    id="Tab:<%=filter_group.present? ? [filter_group,filter[:scope]].join('-') : filter[:scope] %>" title= "<%= filter[:title] %>" >
       <%=filter[:label]%>
     </div>
   <% end %>

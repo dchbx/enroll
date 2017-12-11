@@ -37,10 +37,10 @@ module Effective
       def nested_filter_definition
         filters = {
         documents_uploaded: [
-          {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded'},
-          {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded'},
-          {scope: 'vlp_none_uploaded', label: 'None Uploaded'},
-          {scope: 'all', label: 'All'},
+          {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded', title: "Documents to review for all outstanding verifications"},
+          {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded', title: "Documents to review for some outstanding verifications"},
+          {scope: 'vlp_none_uploaded', label: 'None Uploaded', title: "No documents to review"},
+          {scope: 'all', label: 'All', title: "All outstanding verifications"},
         ],
         top_scope: :documents_uploaded
         }
