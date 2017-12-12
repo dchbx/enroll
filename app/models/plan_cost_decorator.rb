@@ -21,7 +21,12 @@ class PlanCostDecorator < SimpleDelegator
     end
   end
 
-  def child_index(member)
+  def members
+    member_provider.family_members 
+  end
+
+  def child_index(member) 
+    # @children = member_provider.family_members.select(){|member| age_of(member) < 21} unless defined?(@children)
     @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
     @children.index(member)
   end
