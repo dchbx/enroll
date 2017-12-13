@@ -5,7 +5,7 @@ describe PersonRelationship, dbclean: :after_each do
   it { should validate_presence_of :kind }
 
   let(:kind) {"spouse"}
-  let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  let(:person) {FactoryGirl.create(:person )}
 
   describe "class methods" do
     context "shop_display_relationship_kinds" do

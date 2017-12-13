@@ -23,6 +23,7 @@ module Forms
               length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
               numericality: true
     validate :dob_not_in_future
+    validate :invalid_ssn_formats
 
     attr_reader :dob
 

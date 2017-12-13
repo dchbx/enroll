@@ -908,19 +908,42 @@ class Person
     #   0000 in the serial number (last four digits)
 
     if ssn.present?
-      invalid_area_numbers = %w(000 666)
-      invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
-
-      return false if ssn.to_s.blank?
-      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
-      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
-      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
-      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
+      errors.add(:base, 'SSN is invalid') if is_ssn_invalid? || is_ssn_sequential? || is_ssn_has_same_number?
     end
+  end
 
-    true
+  def is_ssn_invalid?
+    invalid_area_numbers = %w(000 666)
+    # invalid_area_range = 900..999
+    invalid_group_numbers = %w(00)
+    invalid_serial_numbers = %w(0000)
+    invalid_area_numbers.include?(ssn.to_s[0,3]) || invalid_group_numbers.include?(ssn.to_s[3,2]) || invalid_serial_numbers.include?(ssn.to_s[5,4])
+  end
+
+  def is_ssn_sequential?
+    # SSN should not have 6 or more sequential numbers
+    sequences = []
+    ssn.split('').map(&:to_i).each_cons(2) do |a, b|
+      if b == a + 1
+        sequences << [a, b]
+        return true if sequences.size == 5
+      else
+        sequences = []
+      end
+    end
+  end
+
+  def is_ssn_has_same_number?
+    # SSN should not have 6 or more of the same number in a row
+    sequences = []
+    ssn.split('').map(&:to_i).each_cons(2) do |a, b|
+      if b == a
+        sequences << [a, b]
+        return true if sequences.size == 5
+      else
+        sequences = []
+      end
+    end
   end
 
   def create_inbox

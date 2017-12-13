@@ -17,7 +17,7 @@ FactoryGirl.define do
     first_name { Forgery(:name).first_name }
     last_name { Forgery(:name).first_name }
     gender { Forgery(:personal).gender }
-    sequence(:ssn, 222222222)
+    sequence(:ssn, 899877866)
     dob Date.new(1980, 1, 1)
   end
 

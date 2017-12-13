@@ -460,8 +460,8 @@ describe Person do
   describe '.match_by_id_info' do
     before(:all) do
       @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
-      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
-      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
+      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888127654")
+      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "661332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
     end
 
@@ -728,9 +728,9 @@ describe Person do
     end
   end
 
-  describe "need_to_notify?" do
+  describe "need_to_notify?", dbclean: :after_each do
     let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:person2) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person2) { FactoryGirl.create(:person, :with_employee_role, ssn: "887766551", dob: "1965-01-01") }
     let(:person3) { FactoryGirl.create(:person, :with_employer_staff_role) }
 
     it "should return true when update consumer_role" do
@@ -1393,6 +1393,31 @@ describe Person do
     end
   end
 
+  describe "#is_ssn_composition_correct?" do
+    let(:person) { FactoryGirl.create(:person)}
+
+    shared_examples_for "invalid SSN" do |input, result|
+      display_text = result ? "valid" : "invalid"
+      it "should return #{result} when received #{display_text} SSN" do
+        person.ssn = input
+        expect(person.save).to eq result
+      end
+    end
+
+    it_behaves_like "invalid SSN", "999786567", true
+    it_behaves_like "invalid SSN", "000786567", false
+    it_behaves_like "invalid SSN", "666786567", false
+    it_behaves_like "invalid SSN", "945786567", true
+    it_behaves_like "invalid SSN", "123006567", false
+    it_behaves_like "invalid SSN", "123000000", false
+    it_behaves_like "invalid SSN", "123456000", false
+    it_behaves_like "invalid SSN", "812345600", false
+    it_behaves_like "invalid SSN", "811111197", false
+    it_behaves_like "invalid SSN", "111111997", false
+    it_behaves_like "invalid SSN", "811111897", true
+    it_behaves_like "invalid SSN", "812345800", true
+
+  end
 
   describe "staff_for_employer" do
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }

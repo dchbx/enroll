@@ -78,7 +78,7 @@ describe Subscribers::FamilyApplicationCompleted do
               "name_pfx" => primary.person.name_pfx,
               "name_sfx" => primary.person.name_sfx,
               "dob" => primary.person_demographics.birth_date,
-              "ssn" => primary.person_demographics.ssn,
+              "ssn" => (primary.person_demographics.ssn == "999999999" ? "" : primary.person_demographics.ssn),
               "no_ssn" => "1",
               "gender" => primary.person_demographics.sex.split('#').last
             }

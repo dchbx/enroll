@@ -194,7 +194,13 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
       context "SSA response: SSN - ok, Citizenship - ok" do
         before :each do
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_true
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -206,7 +212,13 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
       context "SSA response: SSN - ok, Citizenship - fail" do
         before :each do
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_false
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -217,7 +229,13 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
       context "SSA response: SSN - fail" do
         before :each do
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_false
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -232,7 +250,13 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
           person.consumer_role.citizen_status = "alien_lawfully_present"
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_false
           person.consumer_role.lawful_presence_determination.vlp_responses << dhs_response_false
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -247,7 +271,13 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
           person.consumer_role.citizen_status = "alien_lawfully_present"
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_false
           person.consumer_role.lawful_presence_determination.vlp_responses << dhs_response_true
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end

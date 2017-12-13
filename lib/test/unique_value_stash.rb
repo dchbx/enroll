@@ -4,7 +4,7 @@ module UniqueValueStash
       @unique_values = {}
     end
     def number digits=9, key=nil
-      random_value = (0.1 + 0.9*rand)* (10**digits)
+      random_value = key != :ssn ? (0.1 + 0.9*rand)* (10**digits) : (0.1 + 0.1*rand(0.8))* (10**digits)
       digit_string = random_value.to_i.to_s
       @unique_values[key] = digit_string if key
       digit_string

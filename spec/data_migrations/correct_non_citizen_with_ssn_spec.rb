@@ -54,7 +54,7 @@ describe CorrectNonCitizenStatus, dbclean: :after_each do
               </ns6:phones>
               </ns6:person>
               <ns6:person_demographics>
-              <ns6:ssn>989898989</ns6:ssn>
+              <ns6:ssn>121456689</ns6:ssn>
               <ns6:sex>urn:openhbx:terms:v1:gender#female</ns6:sex>
               <ns6:birth_date>19700311</ns6:birth_date>
               <ns6:created_at>2015-10-11T02:01:03Z</ns6:created_at>
@@ -111,7 +111,7 @@ describe CorrectNonCitizenStatus, dbclean: :after_each do
               </ns6:phones>
               </ns6:person>
               <ns6:person_demographics>
-              <ns6:ssn>989898989</ns6:ssn>
+              <ns6:ssn>121456689</ns6:ssn>
               <ns6:sex>urn:openhbx:terms:v1:gender#female</ns6:sex>
               <ns6:birth_date>19700311</ns6:birth_date>
               <ns6:created_at>2015-10-11T02:01:03Z</ns6:created_at>
@@ -141,7 +141,13 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         person.consumer_role.lawful_presence_determination.ssa_responses = []
         person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_true
-        person.save!
+        if person.valid?
+          person.save!
+        elsif person.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          person.ssn = p2.ssn
+          person.save!
+        end
         subject.migrate
         person.reload
       end
@@ -154,14 +160,20 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
 
       end
 
-      describe "citizenship false" do
+      describe "citizenship false", :dbclean => :after_each do
         before :each do
           person.consumer_role.aasm_state = "any state"
           person.consumer_role.lawful_presence_determination.citizen_status = "naturalized_citizen"
           person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
           person.consumer_role.lawful_presence_determination.ssa_responses = []
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_false
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -181,7 +193,13 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         person.consumer_role.lawful_presence_determination.ssa_responses = []
         person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_false
-        person.save!
+        if person.valid?
+          person.save!
+        elsif person.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          person.ssn = p2.ssn
+          person.save!
+        end
         subject.migrate
         person.reload
       end

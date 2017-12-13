@@ -584,7 +584,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   describe ".build_same_plan_premiums" do
     let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) } 
     let(:dob) { Date.new(1985, 4, 10) }
-    let(:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, dob: dob) }
+    let(:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, :with_ssn, dob: dob) }
     let(:family) { person.primary_family }
     let(:household) { family.active_household }
     let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }

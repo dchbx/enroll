@@ -26,6 +26,7 @@
                                                  :'data-date-min' => "-110y", :'data-date-max' => "+0",
                                                  required: true, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
     </div>
+
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-7 form-group form-group-lg no-pd">
       <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", readonly: f.object.is_a?(Forms::EmployeeRole) %>
     </div>

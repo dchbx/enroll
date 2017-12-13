@@ -18,7 +18,7 @@ describe ConsumerRole, dbclean: :after_each do
   it { should validate_presence_of :dob }
 
   let(:address)       {FactoryGirl.build(:address)}
-  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
+  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "887776665")}
   let(:saved_person_no_ssn)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '1')}
   let(:saved_person_no_ssn_invalid)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '0')}
   let(:is_applicant)          { true }

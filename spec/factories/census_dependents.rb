@@ -5,7 +5,7 @@ FactoryGirl.define do
     dob "01/12/1980"
     gender "female"
     employee_relationship "spouse"
-    sequence :ssn, "333333333"
+    sequence :ssn, "333444333"
   end
 
 end

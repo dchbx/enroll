@@ -13,6 +13,12 @@ module Forms
         def no_ssn=(no_ssn)
           @no_ssn = no_ssn
         end
+
+        def invalid_ssn_formats
+          object = Person.new(ssn: ssn)
+          ssn_errors = object.send(:is_ssn_composition_correct?)
+          errors.add(:base, ssn_errors.join(',')) if ssn_errors.present?
+        end
       end
     end
   end

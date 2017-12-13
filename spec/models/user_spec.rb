@@ -10,7 +10,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       password: gen_pass,
       password_confirmation: gen_pass,
       approved: true,
-      person: {first_name: "john", last_name: "doe", ssn: "123456789"}
+      person: {first_name: "john", last_name: "doe"}
     }
   end
 

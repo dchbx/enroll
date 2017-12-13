@@ -1792,8 +1792,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context '.hbx_enrollments_by_month' do
     let!(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
-    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, hired_on: TimeKeeper.date_of_record) }
+    let!(:person) { FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn) }
 
     let!(:employee_role) {
       person.employee_roles.create(

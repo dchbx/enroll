@@ -25,14 +25,14 @@ end
 
 describe Forms::EmployeeCandidate, "asked to match a census employee" do
   let(:fake_plan_year) { instance_double("PlanYear") }
-  let(:census_employee) { instance_double("CensusEmployee", :first_name => "Tom", :last_name => "Baker", :gender => "male", :ssn => "123456789", :dob => Date.new(2012, 10, 12), :aasm_state => "eligible", :eligible? => true) }
+  let(:census_employee) { instance_double("CensusEmployee", :first_name => "Tom", :last_name => "Baker", :gender => "male", :ssn => "123356779", :dob => Date.new(2012, 10, 12), :aasm_state => "eligible", :eligible? => true) }
   let(:fake_employer) { instance_double("EmployerProfile", :census_employees => [census_employee], :plan_years => [fake_plan_year]) }
   let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
 
   subject {
     Forms::EmployeeCandidate.new({
                                      :dob => "2012-10-12",
-                                     :ssn => "123-45-6789",
+                                     :ssn => "123-35-6779",
                                      :first_name => "Tom",
                                      :last_name => "Baker",
                                      :gender => "male",
@@ -42,7 +42,7 @@ describe Forms::EmployeeCandidate, "asked to match a census employee" do
 
   let(:search_params) { {
       :dob => Date.new(2012, 10, 12),
-      :ssn => "123456789"
+      :ssn => "123356779"
   } }
 
   it "should return nothing if that employee does not exist" do
@@ -85,7 +85,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
   subject {
     Forms::EmployeeCandidate.new({
                                      :dob => "2012-10-12",
-                                     :ssn => "123-45-6789",
+                                     :ssn => "123-35-6779",
                                      :first_name => "yo",
                                      :last_name => "guy",
                                      :gender => "m",
@@ -96,7 +96,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
 
   let(:search_params) { {
       :dob => Date.new(2012, 10, 12),
-      :encrypted_ssn => Person.encrypt_ssn("123456789")
+      :encrypted_ssn => Person.encrypt_ssn("123356779")
   } }
 
   let(:user) { nil }

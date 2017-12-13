@@ -5,7 +5,7 @@ def people_for_cobra
       first_name: "Jack",
       last_name: "Cobra",
       dob: "08/10/1960",
-      ssn: "196008107",
+      ssn: "887788766",
       email: "jack@cobra.com",
       password: 'aA1!aA1!aA1!'
     },
@@ -13,7 +13,7 @@ def people_for_cobra
       first_name: "Jack",
       last_name: "Employee",
       dob: "08/10/1960",
-      ssn: "196008111",
+      ssn: "887788789",
       email: "jack@employee.com",
       password: 'aA1!aA1!aA1!'
     },

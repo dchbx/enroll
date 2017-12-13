@@ -971,8 +971,8 @@ describe HbxEnrollment, dbclean: :after_each do
   let(:calender_year) { TimeKeeper.date_of_record.year }
 
   let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
-  let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
-  let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+  let(:census_employee) { FactoryGirl.create(:census_employee, created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
+  let(:person) { FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn) }
 
   let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
@@ -1001,7 +1001,7 @@ describe HbxEnrollment, dbclean: :after_each do
 
   let(:hired_on) { middle_of_prev_year }
   let(:created_at) { middle_of_prev_year }
-  let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: created_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
+  let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, created_at: created_at, updated_at: created_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
 
   let(:employee_role) {
       FactoryGirl.create(:employee_role, employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id)
@@ -1034,8 +1034,13 @@ describe HbxEnrollment, dbclean: :after_each do
 
   context ".effective_date_for_enrollment" do
     context 'when new hire' do
+
       let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
       let(:created_at) { TimeKeeper.date_of_record }
+
+      before do
+        census_employee.update_attributes(hired_on: hired_on, created_at: created_at)
+      end
 
       it 'should return new hire effective date' do
         expect(employee_role.can_enroll_as_new_hire?).to be_truthy
@@ -1120,7 +1125,8 @@ describe HbxEnrollment, dbclean: :after_each do
     let(:calender_year) { TimeKeeper.date_of_record.year }
 
     let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let(:census_employee) { FactoryGirl.create(:census_employee, created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
+    let(:person) { FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn) }
 
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
@@ -1150,7 +1156,7 @@ describe HbxEnrollment, dbclean: :after_each do
     let(:created_at) { middle_of_prev_year }
     let(:updated_at) { middle_of_prev_year }
 
-    let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: updated_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
+    let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, created_at: created_at, updated_at: updated_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
 
     let(:employee_role) {
       FactoryGirl.create(:employee_role, employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id)
@@ -1195,11 +1201,13 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when its a new hire' do
+
       let(:hired_on) { Date.new(calender_year, 3, 1) }
       let(:created_at) { Date.new(calender_year, 2, 1) }
       let(:updated_at) { Date.new(calender_year, 2, 1) }
 
       before do
+        census_employee.update_attributes(hired_on: hired_on, created_at: created_at, updated_at: updated_at)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
       end
 
@@ -1225,11 +1233,13 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when roster create present' do
+
       let(:hired_on) { middle_of_prev_year }
       let(:created_at) { Date.new(calender_year, 5, 10) }
       let(:updated_at) { Date.new(calender_year, 5, 10) }
 
       before do
+        census_employee.update_attributes(hired_on: hired_on, created_at: created_at, updated_at: updated_at)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 15))
       end
 
@@ -1244,6 +1254,7 @@ describe HbxEnrollment, dbclean: :after_each do
       let(:updated_at) { Date.new(calender_year, 5, 10) }
 
       before do
+        census_employee.update_attributes(hired_on: hired_on, created_at: created_at, updated_at: updated_at)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 9))
       end
 
@@ -1270,7 +1281,7 @@ describe HbxEnrollment, dbclean: :after_each do
       let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee: census_employee ) }
       let(:employee_role_id) { employee_role.id }
-      let(:new_census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
+      let(:new_census_employee) { FactoryGirl.create(:census_employee, hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
 
 
       let(:special_enrollment_period) {

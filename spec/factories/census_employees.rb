@@ -6,7 +6,7 @@ FactoryGirl.define do
     gender "male"
     employee_relationship "self"
     hired_on "2015-04-01".to_date
-    sequence(:ssn) { |n| 222222220 + n }
+    sequence(:ssn) { |n| 222111220 + n }
     is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build

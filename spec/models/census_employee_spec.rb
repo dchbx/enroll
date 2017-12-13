@@ -799,8 +799,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "construct_employee_role_for_match_person" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:person) { FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn, gender: 'male') }
     let(:census_employee1) { FactoryGirl.build(:census_employee) }
 
     it "should return false when not match person" do

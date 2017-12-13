@@ -25,12 +25,18 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
     subject { CorrectCuramVlpStatus.new("fix me task", double(:current_scope => nil)) }
 
     context "people with SSN, and NO qualifying ssa response" do
-      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role)}
+      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role, :with_ssn)}
       before :each do
         curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
         curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         curam_user.consumer_role.aasm_state = "verification_outstanding"
-        curam_user.save!
+        if curam_user.valid?
+          curam_user.save!
+        elsif curam_user.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          curam_user.ssn = p2.ssn
+          curam_user.save!
+        end
         subject.migrate
         curam_user.reload
       end
@@ -49,13 +55,19 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
     end
 
     context "people with SSN, and a qualifying ssa response" do
-      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role)}
+      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role, :with_ssn)}
       before :each do
         curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
         curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         curam_user.consumer_role.aasm_state = "verification_outstanding"
         curam_user.consumer_role.lawful_presence_determination.ssa_responses << qualifying_ssa_response
-        curam_user.save!
+        if curam_user.valid?
+          curam_user.save!
+        elsif curam_user.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          curam_user.ssn = p2.ssn
+          curam_user.save!
+        end
         subject.migrate
         curam_user.reload
       end
@@ -99,7 +111,13 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
         curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
         curam_user.consumer_role.aasm_state = "verification_outstanding"
         curam_user.consumer_role.lawful_presence_determination.ssa_responses << qualifying_ssa_response
-        curam_user.save!
+        if curam_user.valid?
+          curam_user.save!
+        elsif curam_user.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          curam_user.ssn = p2.ssn
+          curam_user.save!
+        end
         subject.migrate
         curam_user.reload
       end
@@ -136,7 +154,13 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
       user.consumer_role.lawful_presence_determination.vlp_authority = "ssa"
       user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
       user.consumer_role.aasm_state = "verification_outstanding"
-      user.save!
+      if user.valid?
+        user.save!
+      elsif user.errors.messages == {:base=>["SSN is invalid"]}
+        p2 = FactoryGirl.build(:person, :with_ssn)
+        user.ssn = p2.ssn
+        user.save!
+      end
       subject.migrate
       user.reload
     end
