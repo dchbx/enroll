@@ -5,11 +5,11 @@
 
 <% case notice.notification_type %>
 <% when "initial_employer_first_reminder_to_publish_plan_year" %>
-  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
+  <% subject = "Action Required to Complete Employer Application" %>
 <% when "initial_employer_second_reminder_to_publish_plan_year" %>
-  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name} – Deadline Extended" %>
+  <% subject = "Action Required to Complete Employer Application – Deadline Extended" %>
 <% when "initial_employer_final_reminder_to_publish_plan_year" %>
-  <% subject = "Final Reminder – Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
+  <% subject = "Final Reminder – Action Required to Complete Employer Application" %>
 <% end %>
 
 <table class="total_table" border="0">
