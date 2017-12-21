@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "welcome/index.html.erb", :type => :view do
+RSpec.describe "welcome/index.html.slim", :type => :view do
   it "should has current_user oim_id" do
     user = FactoryGirl.create(:user, oim_id: "test@enroll.com")
     sign_in user

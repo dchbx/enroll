@@ -3,14 +3,15 @@
 <% end %>
 <div class="module">
   <div class="vertically-aligned-row">
-    <h1 class="darkblue no-buffer">Messages</h1>
+    <h1 class="darkblue no-buffer"><%= l10n("messages") %></h1>
     <span class='text-right'>
-      <%= link_to "Upload Notices", upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank' if current_user.has_hbx_staff_role? %>
-      <%= link_to "Download Tax Documents", tax_info_url, class: "btn btn-primary", target: '_blank' if show_download_tax_documents_button? %>
+      <%= link_to l10n("upload_notices"), upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank' if current_user.has_hbx_staff_role? %>
+      <%= link_to l10n(".download_tax_documents"), tax_info_url, class: "btn btn-primary", target: '_blank' if show_download_tax_documents_button? %>
     </span>
   </div>
   <%= render 'inbox', provider: @person %>
 </div>
+
 &nbsp;
 
 <div>

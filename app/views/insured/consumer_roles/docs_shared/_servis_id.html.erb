@@ -1,6 +1,6 @@
 <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-  <%= v.text_field :sevis_id, :placeholder => "SEVIS ID", :pattern => "\\d{10}", class: "doc_fields",
-  :title => "
+  <%= v.text_field :sevis_id, :placeholder => l10n("insured.consumer_roles.docs_shared.sevis_id"), :pattern => "\\d{10}", class: "doc_fields",
+  :title => l10n("insured.consumer_roles.docs_shared.sevis_id_title") %><br>
   • When entering a SEVIS ID, only include the numbers. Do not enter the 'N' or any other characters or letters. For example: If your SEVIS ID is 'N1234567891' then please enter '1234567891'.
   • The SEVIS ID entered must have 10 digits.
   How to find the SEVIS ID: On the DS-2019, the number is on the top right hand side of the page in the box above the barcode." %><br>

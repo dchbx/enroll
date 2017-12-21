@@ -4,7 +4,7 @@
       <div class="col-md-12">
         <%= draft_quote_header(@q.aasm_state, @q.quote_name)%><br/>
 
-        <p>Quote: "<%=@q.quote_name %>" effective <b><%=@q.start_on %></b></p>
+        <p><%= l10n("quote")%>: "<%=@q.quote_name %>" effective <b><%=@q.start_on %></b></p>
 
         <p>Costs are based on the roster associated with this quote of <b><%= @q.quote_households.count %></b> families:</p>
         <br>
@@ -29,36 +29,36 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-2">
-                  <p>Coverage Year</p>
-                </div>
-                <div class="col-md-offset-2">
-                  <p>
-                   <%= @q.start_on.strftime("%m/%d/%Y") %> - <%= (@q.start_on.next_year - 1.day).strftime("%m/%d/%Y") %>
-                  </p>
+              <div class="col-md-2">
+                <p><%= l10n("coverage_year")%></p>
+              </div>
+              <div class="col-md-offset-2">
+                <p>
+                 <%= @q.start_on.strftime("%m/%d/%Y") %> - <%= (@q.start_on.next_year - 1.day).strftime("%m/%d/%Y") %>
+                </p>
                 </div>
               </div>
             </div>
-            <div class="published-quote-table">
-                  <table>
-                    <tr>
-                      <th class="col-md-2 col-xs-2 ">
-                        <header>Reference Plan</header>
-                      </th>
-                      <th class="col-md-2 col-xs-2">
-                        <header>Carrier</header>
-                      </th>
-                      <th class="col-md-2 col-xs-2">
-                        <header>Type</header>
-                      </th>
-                      <th class="col-md-2 col-xs-2">
-                        <header>Metal Level</header>
-                      </th>
-                      <th class="col-md-2 col-xs-2">
-                        <header>Plans By</header>
-                      </th>
-                    </tr>
-                    <% if benefit_group.plan %>
+          <div class="published-quote-table">
+                <table>
+                  <tr>
+                    <th class="col-md-2 col-xs-2 ">
+                      <header><%= l10n("reference_plan")%></header>
+                    </th>
+                    <th class="col-md-2 col-xs-2">
+                      <header><%= l10n("carrier")%></header>
+                    </th>
+                    <th class="col-md-2 col-xs-2">
+                      <header><%= l10n("type")%></header>
+                    </th>
+                    <th class="col-md-2 col-xs-2">
+                      <header><%= l10n("metal_level")%></header>
+                    </th>
+                    <th class="col-md-2 col-xs-2">
+                      <header><%= l10n("plans_by")%></header>
+                    </th>
+                  </tr>
+                  <% if benefit_group.plan %>
                     <tr>
                       <td class="col-md-2 col-xs-2">
                         <p>
@@ -275,13 +275,13 @@
           <% end%>
         <% end %>
         <br>
-        <p>**Actual costs may vary.</p>
+        <p><%= l10n("broker_agencies.quotes.actual_costs_may_vary")%></p>
           <%= render :partial => "quote_publish_button" , :locals => { :quote => @q } %>
         <% if @q.published? %>
-          <h4> Employer Claim Code: &nbsp;<b><%=@q.claim_code%></b></h4>
+          <h4> <%= l10n("employer_claim_code")%>: &nbsp;<b><%=@q.claim_code%></b></h4>
         <% end %>
         <br>
-        <%= link_to 'Download PDF' , publish_broker_agencies_broker_role_quotes_path(@broker,quote_id: @q.id, :format => "pdf"), class: "btn btn-default" , :target => "_blank " %> <br><br>
+        <%= link_to "#{l10n('download_pdf')}" , publish_broker_agencies_broker_role_quotes_path(@broker,quote_id: @q.id, :format => "pdf"), class: "btn btn-default" , :target => "_blank " %> <br><br>
       </div>
       <br></br>
     </div>
@@ -289,7 +289,7 @@
 
 <%else%>
   <div class="alert alert-notice">
-    <h4>Please select plans for all the benefit groups assigned to households by using the <b>"COMPARE COSTS / SELECT PLAN" </b> button in health plan selection</h4>
+    <h4><%= l10n("broker_agencies.quotes.select_the_plans")%> <b>"<%= l10n("broker_agencies.quotes.compare_costs_select_plan")%>" </b> <%= l10n("broker_agencies.quotes.button_in_health_plan_selection")%></h4>
   </div>
 <% end %>
 

@@ -4,8 +4,8 @@
 <div class="col-md-1 col-sm-1 col-xs-12"></div>
 <div class="col-md-5 col-sm-5 col-xs-12 text-right">
   <p>
-    Not your employer?
-    <%= link_to 'Click Here', '#', data: {toggle: "modal", target: "#notEmployer"} %>
+    <%= l10n("is_not_your_employer") %>
+    <%= link_to l10n("click_here"), '#', data: {toggle: "modal", target: "#notEmployer"} %>
   </p>
 </div>
 
@@ -14,15 +14,15 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Not your employer?</h4>
+        <h4 class="modal-title"><%= l10n("is_not_your_employer") %></h4>
       </div>
       <div class="modal-body">
         <p>
-          Unable to match your identifying information with an active employer.  First, verify the information that you provided here is correct.  If so, contact your employer to confirm that your name, date of birth, social security number, gender and date-of-hire information, as entered on <%= Settings.site.short_name %>, is accurate and complete.
+          <%= l10n("insured.employee_roles.not_your_employer_modal_body", site_short_name: Settings.site.short_name) %>
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("close") %></button>
       </div>
     </div>
   </div>

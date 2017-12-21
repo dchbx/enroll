@@ -4,20 +4,18 @@
     <div class="top-pd" id="inbox_provider_form">
       <span class="flash_message"></span>
       <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
-
-
       <div class="module">
         <table class="table table-striped" id="Broker-Employer-dataTable">
           <thead>
           <tr>
             <th><%= check_box_tag 'BrokerAgencyProfile-check-all' %></th>
-            <th>FEIN</th>
-            <th>Legal Name</th>
-            <th>EE Count</th>
-            <th>ER State</th>
-            <th>Effective Date</th>
-            <th>Broker</th>
-            <th>General Agency</th>
+            <th><%= l10n("fein")%></th>
+            <th><%= l10n("legal_name")%></th>
+            <th><%= l10n("broker_agencies.profiles.ee_count")%></th>
+            <th><%= l10n("broker_agencies.profiles.er_state")%></th>
+            <th><%= l10n("effective_date")%></th>
+            <th><%= l10n("broker")%></th>
+            <th><%= l10n("general_agency")%></th>
           </tr>
           </thead>
           <tbody>

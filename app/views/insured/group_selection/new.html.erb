@@ -5,14 +5,14 @@
   <div class="row">
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
-        <h1 class="darkblue">Choose Coverage for your Household</h1>
+        <h1 class="darkblue"><%= l10n("insured.group_selection.new.choose_coverage_for_your_household") %></h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
         <div style="font-size :18px" font-weight:normal>
         <%if @effective_on_date.present? || @new_effective_on %>
-          Effective Date: <span style="color: red;"><%= @optional_effective_on || @effective_on_date || @new_effective_on %></span>
+          <%= l10n("effective_date") %>: <span style="color: red;"><%= @optional_effective_on || @effective_on_date || @new_effective_on %></span>
         <%end%>
         </div>
-        <h3>Who Needs Coverage?</h3>
+        <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
@@ -31,7 +31,7 @@
 
           <% if can_shop_both_markets?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
-                <h3>Marketplace</h3>
+                <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
               <span class="clear" style="display: il"></span>
 
               <div class="n-radio-group">
@@ -42,9 +42,9 @@
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>
-                      Employer-Sponsored Benefits
+                        <%= l10n("insured.group_selection.new.employee_sponsored_benifits") %>
                       <% else %>
-                      Individual Benefits
+                        <%= l10n("insured.group_selection.new.individual_benifits") %>
                       <% end %>
                     </label>
                   </div>
@@ -68,7 +68,7 @@
           <% end %>
 
           <div id="coverage_kinds" class='row no-buffer'>
-              <h3>Benefit Type</h3>
+              <h3><%= l10n("benefit_type") %></h3>
 
               <div class="n-radio-group">
                 <div class="n-radio-row">
@@ -76,7 +76,7 @@
                     <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"),id: 'coverage_kind_health', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
-                    Health
+                    <%= l10n(".health") %>
                   </label>
                 </div>
 
@@ -85,7 +85,7 @@
                     <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
-                    Dental
+                    <%= l10n("dental") %>
                   </label>
                 </div>
               </div>
@@ -125,7 +125,7 @@
           <% end %>
           <br/>
         <br/>
-          <%= link_to "Back to my account", family_account_path, class: 'btn btn-default btn btn-lg' %>
+          <%= link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg' %>
         </div>
       <div class="col-xs-3 right-section pull-right">
           <% if @change_plan.blank?  && @market_kind == "individual" %>

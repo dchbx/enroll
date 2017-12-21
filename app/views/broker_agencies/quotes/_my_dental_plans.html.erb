@@ -1,8 +1,8 @@
 <div class="container-fluid">
     <div>
-      <h4>Step 3 - Select reference plans for comparison using Roster Cost to Employer</h4>
+      <h4><%= l10n("broker_agencies.quotes.step_3")%></h4>
 
-      <h5>Showing <strong id="x-of-plans"><%= @dental_plans.count %></strong> of <strong><%= @dental_plans.count %></strong>  plans based on your selection criteria</h5>
+      <h5><%= l10n("showing")%> <strong id="x-of-plans"><%= @dental_plans.count %></strong> <%= l10n("of")%> <strong><%= @dental_plans.count %></strong>  <%= l10n("plans_based_on_your_selection_criteria")%></h5>
       <div class="btn-group plan_buttons dental_plan_buttons" data-toggle="buttons" style='max-height: 340px; overflow-y: scroll' id="quote-dental-plan-list">
         <% @dental_plans.each_with_index do |p,index| %>
         <label class="btn dental_plan_buttons <%= "active" if params['plans'].try(:include?, p.id.to_s) %>" >
@@ -11,5 +11,5 @@
         <% end %>
       </div>
     </div>
-      <div class='btn btn-primary' id='DentalCostComparison'>Compare Dental Costs</div>
+    <div class='btn btn-primary' id='DentalCostComparison'><%= l10n("broker_agencies.quotes.compare_dental_costs")%></div>
 </div>

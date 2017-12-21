@@ -1,26 +1,29 @@
 <h1>Translations</h1>
 
-<ul>
-  <% @translations.each do |translation| %>
-    <li>
-      <%= translation.key %>: <%= translation.value %>
-    </li>
-  <% end %>
-</ul>
+<%= link_to "New Translation", new_translation_path %>
 
-<h2>Add Translation</h2>
-<%= form_tag translations_path do %>
- <p>
-   <%= label_tag :locale %><br />
-   <%= text_field_tag :locale %>
-  </p>
-  <p>
-    <%= label_tag :key %><br />
-    <%= text_field_tag :key %>
-  </p>
-  <p>
-    <%= label_tag :value %><br />
-    <%= text_field_tag :value %>
-  </p>
-  <p><%= submit_tag "Submit" %></p>
-<% end %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Language Key</th>
+      <th>Value</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @translations.each do |translation| %>
+      <tr>
+        <td><%= translation.key %></td>
+        <td><%= translation.value %></td>
+        <td><%= link_to 'Show', translation %></td>
+        <td><%= link_to 'Edit', edit_translation_path(translation) %></td>
+        <td><%= link_to 'Destroy', translation, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+
+</table>
+
+<br>
+
+<%= link_to "New Translation", new_translation_path %>

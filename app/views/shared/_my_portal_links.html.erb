@@ -8,7 +8,7 @@
 
   <% if portal_count == 1 %>
     <span>
-      <%= link_to "My Insured Portal", family_account_path(tab: 'home'), class: 'header-text' if insured %>
+      <%= link_to l10n(".my_insured_portal"), family_account_path(tab: 'home'), class: 'header-text' if insured %>
       <%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'header-text' if employer_staff.present? %>
       <%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' if broker %>
       <span> | </span>

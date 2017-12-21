@@ -8,7 +8,7 @@
             <% if paper_app.identifier.present? %>
               <td>
                 <% key = paper_app.identifier.split('#').last %>
-                <%= link_to "#{paper_app.subject} <i class='fa fa-cloud-download' aria-hidden='true'></i>".html_safe, "/insured/paper_applications/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>&nbsp;
+                <%= link_to "#{paper_app.subject} <i class='fa fa-cloud-download' aria-hidden='true'></i>".html_safe, "/insured/paper_applications/download/#{key}", title: l10n(".download"), data: {"toggle": "tooltip"} %>&nbsp;
                   <% if show_doc_status(paper_app.status) %>
                     <span class="label label-<%=doc_status_label(paper_app)%>"><%= paper_app.status.titleize %></span>
                   <% end %>

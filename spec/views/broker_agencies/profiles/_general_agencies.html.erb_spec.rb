@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb", dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
-  
+
   context "without default_general_agency_profile" do
     before :each do
       allow(broker_agency_profile).to receive(:default_general_agency_profile).and_return nil
@@ -31,7 +31,7 @@ RSpec.describe "broker_agencies/profiles/_general_agencies.html.erb", dbclean: :
     end
 
     it "should have hint msg for select default GA" do
-      expect(rendered).to have_content("You do not have default GA, to select your default GA click \"Select Default GA\" under your desired agency")
+      expect(rendered).to have_content("You do not have default GA, to select your default GA click 'Select Default GA' under your desired agency")
     end
   end
 
@@ -63,7 +63,7 @@ context "without default_general_agency_profile, not updateable" do
     end
 
     it "should have hint msg for select default GA" do
-      expect(rendered).to have_content("You do not have default GA, to select your default GA click \"Select Default GA\" under your desired agency")
+      expect(rendered).to have_content("You do not have default GA, to select your default GA click 'Select Default GA' under your desired agency")
     end
   end
 
@@ -95,7 +95,7 @@ context "without default_general_agency_profile, not updateable" do
     end
 
     it "should have hint msg for select default GA" do
-      expect(rendered).to have_content("#{broker_agency_profile.legal_name} - this is your default GA, to change your default GA click \"Select Default GA\" under your desired agency")
+      expect(rendered).to have_content("#{broker_agency_profile.legal_name} - this is your default GA, to change your default GA click 'Select Default GA' under your desired agency")
     end
 
     it "should show notice" do

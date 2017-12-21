@@ -3,7 +3,7 @@
     .row
       .col-lg-7.col-md-7.col-sm-8.col-xs-12
         - if @step == 'start'
-          %h4 Your identity could not be confirmed by Experian – the third-party service we use to verify your identity
+          = l10n(".failed_validation_html")
           = render partial: 'insured/interactive_identity_verifications/options_to_verify_identity'
         - else
           %br

@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-2">
       <br>
-      <%= link_to "Back to My Account",  family_account_path, class: 'btn btn-default btn-default' %>
+      <%= link_to l10n("back_to_my_account"),  family_account_path, class: 'btn btn-default btn-default' %>
     </div>
     <br class="clear"/>
     <br/>
@@ -16,7 +16,7 @@
             <div class="panel panel-default min-h">
 
               <div class="panel-heading">
-                <h4><%= plan.active_year %> Health Coverage <span class="separator">DCHL</span></h4>
+                <h4><%= plan.active_year %> <%= l10n("health_coverage") %> <span class="separator"><%= l10n("DCHL") %></span></h4>
                 <hr>
               </div>
 
@@ -29,14 +29,14 @@
                       <div><p><%= render_plan_type_details(plan) %></p></div>
                       <div>
                         <p>
-                          <label>Premium:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
-                          <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.hbx_id %></strong>
+                          <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/<%= l10n("month").to_s.downcase %>
+                          <label class="bullet-separator">&nbsp;<%= l10n("DCHL_ID") %>:</label> <strong><%= hbx_enrollment.hbx_id %></strong>
                         </p>
                       </div>
                         <% names = hbx_enrollment.covered_members_first_names %>
                         <div class="family-members">
                           <p>
-                            <label>Covered:</label>
+                            <label><%= l10n("covered") %>:</label>
                               <a href="#"><%= names.delete_at(0).camelcase %></a>
                               <% names.each do |name| %>
                                 <span class="separator"><a href="#"><%= name.camelcase %></a></span>
@@ -44,7 +44,7 @@
                           </p>
                         </div>
                         <div>
-                          <label>Effective date: </label>
+                          <label><%= l10n("effective_date") %>: </label>
                           <strong><%= hbx_enrollment.effective_on %></strong>
                         </div>
                       </div>
@@ -63,7 +63,7 @@
                       </div>
                       <div class="col-xs-4">
                         <a href="#">
-                          <i class="fa fa-phone fa-2x"></i><div class="fa-icon-label">Plan Contact Info</div>
+                          <i class="fa fa-phone fa-2x"></i><div class="fa-icon-label"><%= l10n("plan_contact_info") %></div>
                         </a>
                       </div>
                       <div class="col-xs-4">
@@ -82,11 +82,11 @@
             </div>
 
             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
-              <h3>Confirmation:</h3>
-              <p>Terminating this plan will terminate coverage for all members of your family. Do you wish to proceed? Y/N.</p>
+              <h3><%= l10n("confirmation") %>:</h3>
+              <p><%= l10n(".terminate_this_plan_do_you_wish_proceed") %></p>
               <div>
-                <%= radio_button_tag :agreement, "terminate-confirm-yes" %> yes <br>
-                <%= radio_button_tag :agreement, "terminate_confirm_no" %> no
+                <%= radio_button_tag :agreement, "terminate-confirm-yes" %><%= l10n("yes") %><br>
+                <%= radio_button_tag :agreement, "terminate_confirm_no" %><%= l10n("no") %>
               </div>
               <br/>
               
@@ -97,7 +97,7 @@
                  </div>
                  <div>
                    <br>
-                    <%= submit_tag "Terminate", class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-terminate', id: 'btn-terminate', :disabled => true %>
+                    <%= submit_tag l10n("terminate"), class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-terminate', id: 'btn-terminate', :disabled => true %>
                 </div>
             </div>
           </div>

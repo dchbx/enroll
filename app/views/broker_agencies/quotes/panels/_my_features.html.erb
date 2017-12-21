@@ -6,34 +6,34 @@
 <div class="panel panel-default">
   <div class="panel-heading" role="tab" id="feature-mgmt-header">
     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#feature-mgmt" aria-expanded="true" aria-controls="feature-mgmt">
-    <b>Health Features and cost criteria</b>
+    <b><%= l10n("broker_agencies.quotes.panels.health_features_and_cost_criteria")%></b>
     <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></a>
     <span style='margin-left: 50px; font-size: 120%;'  id='show_plan_criteria_count'>Plan count</span>
-    <label class='btn btn-normal hide' id='reset_criteria'> Reset Criteria</label>
+    <label class='btn btn-normal hide' id='reset_criteria'><%= l10n("reset_criteria")%></label>
   </div>
   <div id="feature-mgmt" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="">
     <div class="container-fluid">
       <div class='row-fluid'>
-        <h4>Step 1 - Define employer contribution percentages</h4>
+        <h4><%= l10n("broker_agencies.quotes.step_1")%></h4>
       </div>
       <div class='row-fluid'>
         <%= render partial: 'benefit_sliders'%>
       </div>
       <div class='row-fluid'>
-        <h4>Step 2 - Filter your plans / Selection criteria</h4>
+        <h4><%= l10n("broker_agencies.quotes.step_2")%></h4>
       </div>
       <div class='row-fluid'>
         <%= render partial: 'select_plans' %>
       </div>
       <div class='row-fluid'>
-        <h4>Step 3 - Select reference plans for comparison using Roster Cost to Employer</h4>
+        <h4><%= l10n("broker_agencies.quotes.step_3")%></h4>
       </div>
 
 <!-- Move this into Partial -->
       <div class="panel panel-default health-panel">
         <div class="container-fluid">
           <div>
-            <h5>Showing <strong id="x-of-plans"><%= @health_plans.count %></strong> of <strong><%= @health_plans.count %></strong>  plans based on your selection criteria</h5>
+            <h5><%= l10n("showing")%> <strong id="x-of-plans"><%= @health_plans.count %></strong> of <strong><%= @health_plans.count %></strong>  <%= l10n("  plans_based_on_your_selection_criteria")%></h5>
             <div class="btn-group plan_buttons health_plan_buttons" data-toggle="buttons" style='max-height: 300px; overflow-y: scroll' id="quote-plan-list">
               <% @health_plans.each_with_index do |p,index| %>
                 <label class="btn health_plan_buttons <%= "active" if params['plans'].try(:include?, p.id.to_s) %>" >
@@ -44,7 +44,7 @@
           </div>
           <br>
           <% submit_tag "Compare Costs", class: 'btn btn-primary', id: 'QuoteCalculation' %>
-          <div class='btn btn-primary' id='CostComparison'>Compare Benefits & Costs / Select Plan</div>
+          <div class='btn btn-primary' id='CostComparison'><%= l10n("compare_costs_select_plan")%></div>
           <br>
         </div>
         <div  id="benefit_plan_comparison_frame"></div>

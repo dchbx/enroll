@@ -34,7 +34,6 @@
           </td>
           <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
 
-
           <% @person.active_employee_roles.each do |employee_role| %>
 
             <% is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role) %>

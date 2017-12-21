@@ -3,24 +3,24 @@
   <table class="table table-condensed">
     <thead>
       <tr>
-        <th colspan="6">Primary Applicant</th>
-        <th colspan="8">Benefits</th>
+        <th colspan="6"><%= l10n(".primary_applicant") %></th>
+        <th colspan="8"><%= l10n("benefits") %></th>
       </tr>
       <tr>
-        <th>Name</th>
-        <th>SSN</th>
-        <th>DOB</th>
-        <th>HBX ID</th>
-        <th>Family Ct</th>
-        <th>Registered?</th>
+        <th><%= l10n("name") %></th>
+        <th><%= l10n("ssn") %></th>
+        <th><%= l10n("dob") %></th>
+        <th><%= l10n("hbx_id") %></th>
+        <th><%= l10n("family_ct") %></th>
+        <th><%= l10n("registered?") %></th>
 
-        <th>Market</th>
-        <th>Issuer</th>
-        <th>Broker</th>
-        <th>Benefit Type</th>
-        <th>Member Ct</th>
-        <th>Start Date</th>
-        <th>Status</th>
+        <th><%= l10n("market") %></th>
+        <th><%= l10n("issuer") %></th>
+        <th><%= l10n("broker") %></th>
+        <th><%= l10n("benefit_type") %></th>
+        <th><%= l10n("member_ct") %></th>
+        <th><%= l10n("start_date") %></th>
+        <th><%= l10n("status") %></th>
       </tr>
     </thead>
     <tbody>
@@ -37,16 +37,16 @@
         <td><%= format_date(pp.dob) %></td>
         <td><%= pp.hbx_id %></td>
         <td><%= family.active_family_members.size %></td>
-        <td><%= pp.user.present? ? "Yes" : "No" %></td>
+        <td><%= pp.user.present? ? l10n("yes") : l10n("no") %></td>
         <% if benefits.size == 0 %>
-          <td><%= "None given" %></td>
+          <td><%= l10n("none_given") %></td>
         <%#= content_tag(:td, "None given", class: "text-right") %>
         <%#= content_tag(:td, "", colspan: "6") %>
         <% else %>
           <%= render "insured/families/benefits_table", benefits: benefits %>
         <% end %>
         <% if pp.user.present? || pp.emails.present? %>
-          <td><%= link_to 'Send Secure Message'.html_safe,
+          <td><%= link_to l10n('send_secure_message'),
                new_insured_inbox_path(id: family.primary_applicant.person.id,
                 profile_id: current_user.person.hbx_staff_role.hbx_profile.id,
                to: family.primary_applicant.person.last_name + ', ' + family.primary_applicant.person.first_name),

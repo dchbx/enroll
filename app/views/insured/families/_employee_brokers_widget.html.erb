@@ -3,7 +3,7 @@
   <div class="panel-heading">
     <h3 class="panel-title">
       <strong>
-        <%= title.present? ? title : "Your Broker" %>
+        <%= title.present? ? title : l10n("insured.your_broker") %>
       </strong>
     </h3>
   </div>
@@ -32,7 +32,7 @@
         <br>
       </div>
       <% else %>
-      Your employer has no yet added a broker.
+        <%= l10n("families.your_employer_has_no_yet_added_broker") %>      
       <% end %>
     </div>
   </div>

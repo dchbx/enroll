@@ -3,14 +3,14 @@
 <% end %>
 <div class="module">
 <div class="vertically-aligned-row">
-	<h1 class="darkblue no-buffer">Documents</h1>
+	<h1 class="darkblue no-buffer"><%= l10n("documents") %></h1>
 	<span class='text-right'>
     <%= link_to "Download Tax Documents", download_tax_documents_form_insured_families_path(), class: "btn btn-primary" if show_download_tax_documents_button_on_documents_page? %>
 	</span>
 </div>
 <div class="documents-tab">
   <% if @person && @person.consumer_role %>
-      <h4 class="starter">We verify the information you give us using electronic data sources.
+      <h4 class="starter"><%= l10n(".verification_information") %></h4>
         If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.</h4>
 
       <%= render 'insured/families/verification/verification' %>

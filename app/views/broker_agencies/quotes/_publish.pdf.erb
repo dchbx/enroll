@@ -11,13 +11,13 @@
     <div class="pdf-body">
       <div class="row">
         <div class="col-md-12">
-          <h3>Quote Name: <%=@q.quote_name %></h3>
+          <h3><%= l10n("quote_name")%>: <%=@q.quote_name %></h3>
 
-          <h4>Employer Claim Code: &nbsp;<b><%=@q.claim_code%></b></h4>
+          <h4><%= l10n("employer_claim_code")%>: &nbsp;<b><%=@q.claim_code%></b></h4>
 
-          <p>Effective Date is <b><%=@q.start_on %></b></p>
+          <p><%= l10n("broker_agencies.quotes.effective_date_is")%><b><%=@q.start_on %></b></p>
 
-          <p>Costs are based on the roster associated with this quote of  <b><%= @q.quote_households.count %></b> families:</p>
+          <p><%= l10n("costs_based_on_roster")%>  <b><%= @q.quote_households.count %></b> <%= l10n("fam_ily")%>:</p>
           <% @q.quote_benefit_groups.each do |benefit_group| %>
           <%  unless benefit_group.plan.nil? %>
             <div class="panel-body">
@@ -27,9 +27,9 @@
               <table class="table table-striped table-hover table-sm panel panel-default">
                 <thead class="thead-default">
                   <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Relationship</th>
+                    <th><%= l10n("first_name")%></th>
+                    <th><%= l10n("last_name")%></th>
+                    <th><%= l10n("relationship")%></th>
                   </tr>
                 </thead>
                 <% @q.quote_households.each do |quote_household| %>
@@ -52,11 +52,11 @@
                   <table class="table table-striped table-hover table-sm panel panel-default">
                     <thead class="thead-default">
                       <tr>
-                        <th>Reference Plan</th>
-                        <th>Carrier</th>
-                        <th>Type</th>
-                        <th>Metal Level</th>
-                        <th>Plans By</th>
+                        <th><%= l10n("reference_plan")%></th>
+                        <th><%= l10n("carrier")%></th>
+                        <th><%= l10n("type")%>/</th>
+                        <th><%= l10n("metal_level")%></th>
+                        <th><%= l10n("plans_by")%></th>
                       </tr>
                     </thead>
                       <% if benefit_group.plan %>
@@ -81,12 +81,12 @@
                 </div>
                 <div class="col-xs-12 quote-details">
                   <div class="col-xs-12 quote-health-details">
-                    <p>Below is your Employer's Health Plan offering. Your offerings are based on <%=benefit_group.plan_option_kind.titleize%>.</p>
+                    <p><%= l10n("below_is_your")%> <%= l10n("plan_offering_spectrum")%> <%=benefit_group.plan_option_kind.titleize%>.</p>
                     <% if benefit_group.plan %>
                       <table class = "employer-health-contribution">
                         <tr>
-                          <th>Offered</th>
-                          <th>Employer Contribution</th>
+                          <th><%= l10n("offered")%></th>
+                          <th><%= l10n("employer_contribution")%></th>
                         </tr>
                         <% benefit_group.quote_relationship_benefits.each do|rb| %>
                           <% next if rb.relationship == "child_26_and_over" %>
@@ -106,7 +106,7 @@
                           <div class="row">
                             <div class="col-xs-4">
                               <div class="row">
-                                <span>Employer Estimated Maximum Monthly Cost</span>
+                                <span><%= l10n("employer_estimated_maximum_monthly_cost")%></span>
                                 <h2><%= number_to_currency(benefit_group.published_employer_cost)%></h2>
                               </div>
                             </div>
@@ -115,11 +115,11 @@
                                 <table>
                                   <tr>
                                     <th colspan ="2" ></th>
-                                    <th>Min</th>
-                                    <th>Max</th>
+                                    <th><%= l10n("min")%></th>
+                                    <th><%= l10n("max")%></th>
                                   </tr>
                                   <tr>
-                                    <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                                    <td colspan="2"><%= l10n("total_estimated_monthly_cost_for_plan_participants")%></td>
                                 <% cost_range = benefit_group.employee_cost_min_max %>
                                 <td><%= number_to_currency(cost_range[0])%></td>
                                 <td><%= number_to_currency(cost_range[1])%></td>
@@ -134,12 +134,12 @@
                   </div>
                   <% if benefit_group.dental_plan %>
                   <div class="col-xs-12 quote-dental-details">
-                    <p>Below is your Employer's Dental Plan offering. Your offerings are based on
+                    <p><%= l10n("emplyer_dental_plan_offering")%>
                      <%=display_dental_plan_option_kind benefit_group%>.</p>
                       <table class = "employer-dental-contribution">
                         <tr>
-                          <th>Offered</th>
-                          <th>Employer Contribution</th>
+                          <th><%= l10n("offered")%></th>
+                          <th><%= l10n("employer_contribution")%></th>
                         </tr>
                         <% benefit_group.quote_dental_relationship_benefits.each do|rb| %>
                           <% next if rb.relationship == "child_26_and_over" %>
@@ -159,7 +159,7 @@
                           <div class="row">
                             <div class="col-xs-4">
                               <div class="row">
-                                <span>Employer Estimated Maximum Monthly Cost</span>
+                                <span><%= l10n("employer_estimated_maximum_monthly_cost")%></span>
                                 <h2><%= number_to_currency(benefit_group.published_dental_employer_cost)%></h2>
                               </div>
                             </div>
@@ -168,11 +168,11 @@
                                 <table>
                                   <tr>
                                     <th colspan ="2" ></th>
-                                    <th>Min</th>
-                                    <th>Max</th>
+                                    <th><%= l10n("min")%></th>
+                                    <th><%= l10n("max")%></th>
                                   </tr>
                                   <tr>
-                                    <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                                    <td colspan="2"><%= l10n("total_estimated_monthly_cost_for_plan_participants")%></td>
                                 <% cost_range = benefit_group.employee_cost_min_max('dental') %>
                                 <td><%= number_to_currency(cost_range[0])%></td>
                                 <td><%= number_to_currency(cost_range[1])%></td>
@@ -181,7 +181,7 @@
                               </div>
                             </div>
                             <% if benefit_group.dental_plan_option_kind ==  'single_plan' %>
-                              Dental Plan Options:<br>
+                              <%= l10n("dental_plan_options")%>:<br>
                               <ul>
                               <% benefit_group.elected_dental_plans.each do |dental_option| %>
                                 <li><%= dental_option.name %> </li>
@@ -299,7 +299,7 @@
             <% end %>
           <% end %>
           <% end%>
-          <p>**Actual costs may vary.</p>
+          <p><%= l10n("broker_agencies.quotes.actual_costs_may_vary")%></p>
         </div>
       </div>
     </div>
