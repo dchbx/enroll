@@ -19,7 +19,7 @@ module Queries
     def build_scope()
       family = Person.for_admin_approval
       person = Person
-      
+
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)

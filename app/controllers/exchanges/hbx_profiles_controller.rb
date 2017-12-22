@@ -211,7 +211,6 @@ def employer_poc
     @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])
   end
 
-
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
