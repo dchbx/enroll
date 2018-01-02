@@ -27,6 +27,7 @@ Then the CONTINUE button will be ENABLED
 
 Scenario: CONTINUE button navigation
 Given that the user is on the FAA Household Info: Family Members page
+And at least one other household members exist
 When all applicants are in Info Completed state
 And user clicks CONTINUE
 Then the user will navigate to Family Relationships page
