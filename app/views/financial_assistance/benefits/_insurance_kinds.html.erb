@@ -38,7 +38,7 @@
       <% end %>
     </div>
     <div class="col-md-12 add-more-link-<%=insurance_kind%>" id="add-more-link">
-      <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{insurance_kind.titleize}".html_safe, "javascript:void(0);", :id => "add_new_insurance_kind", :class => "#{'hidden' unless @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present? }" %>
+      <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{insurance_kind.titleize}".html_safe, "javascript:void(0);", :id => "add_new_insurance_kind", :class => "#{'hidden' unless @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present? }" %>
     </div>
   </div>
 <% end %>

@@ -53,7 +53,7 @@
       <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
         <div id="<%= other_income_kind %>" class="other-income-kind run-glossary">
           <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
-            <div class="col-md-1">
+            <div class="col-md-1 checkbox-mr">
               <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
             </div>
             <div class="col-md-9 no-pd">
@@ -66,7 +66,7 @@
             <% end %>
           </div>
           <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
-            <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
+            <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
           </div>
 
           <div class='new-other-income-form hidden <%= other_income_kind %>'>

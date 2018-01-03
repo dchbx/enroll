@@ -63,7 +63,7 @@
 <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12 icon-mtb <%= pundit_class Family, :updateable?%>">
     <%= hidden_field_tag 'origin_source', @source %>
-    <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add New Person</b>" .html_safe, new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id)), :remote => true, :id => "household_info_add_member" %>
+    <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add New Person</b>" .html_safe, new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id)), :remote => true, :id => "household_info_add_member" %>
     <div class="help-to-decide">
       <% if @application.present? %>
         <a href="help_me_decide" data-toggle="modal" data-target="#help_me_decide" id="help_me_decide_not_sure" class="interaction-click-control-not-sure?"> Help me decide who to include in my household </a>
