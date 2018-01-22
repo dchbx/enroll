@@ -962,6 +962,39 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment.terminated_on).to eq nil
     end
   end
+
+   context "cancel_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
+
+
+   context "terminate_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected")}
+
+    it "should terminate enrollment" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+    end
+
+    it "should  populate terminate on" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
+    end
+  end
+
+
 end
 
 describe HbxEnrollment, dbclean: :after_each do

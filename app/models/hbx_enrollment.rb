@@ -1261,6 +1261,14 @@ class HbxEnrollment
                   to: :coverage_canceled
     end
 
+    event :cancel_for_non_payment, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
+                         :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
+                         :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
+                         :coverage_enrolled, :renewing_waived, :inactive],
+                  to: :coverage_canceled
+    end
+
     event :terminate_coverage, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
@@ -1269,6 +1277,14 @@ class HbxEnrollment
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
+    event :terminate_for_non_payment, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
+                         :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
+                         :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
+                         :enrolled_contingent, :unverified],
+                  to: :coverage_terminated, after: :propogate_terminate
+    end
+    
     event :invalidate_enrollment, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_canceled, :coverage_terminated],
                   to: :void,
