@@ -427,6 +427,13 @@ Rails.application.routes.draw do
           post :plan
         end
       end
+      namespace :mobile_api do
+        get :employers_list
+        get 'employer_details/:employer_profile_id', action: :employer_details, as: :employer_details
+        get 'employee_roster/:employer_profile_id', action: :employee_roster, as: :employee_roster
+        get :employer_details, action: :my_employer_details
+        get :employee_roster, action: :my_employee_roster
+      end
     end
   end
 
