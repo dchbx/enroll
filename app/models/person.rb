@@ -237,6 +237,7 @@ class Person
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
 #  ViewFunctions::Person.install_queries
+  scope :by_message_created_at_datetime_range,  ->(start_at, end_at){ where(:"inbox.messages.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
 
   validate :consumer_fields_validations
 

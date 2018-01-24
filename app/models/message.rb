@@ -20,6 +20,7 @@ class Message
   validate :message_has_content
 
   scope :by_message_id, ->(id){where(:id => id)}
+  scope :by_created_at_date_range,     ->(start_at, end_at) { where(:"created_at".gte => start_at, :"created_at".lte => end_at) }
 
   alias_method :message_read?, :message_read
 
