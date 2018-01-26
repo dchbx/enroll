@@ -1,0 +1,125 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Final Reminder – Action Required to Complete <%= notice.primary_fullname %> Application for Employer-sponsored Coverage with <%= Settings.site.short_name %> </h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:</td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Action is needed to complete your application for employer-sponsored health coverage with DC Health Link. To apply for coverage starting on <coverage start date>, please complete your application before <5th of the month prior to renewal date, MM/DD/YYYY >."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "For detailed information on how to complete your application for employer-sponsored coverage, please see this walkthrough guide on DC Health Link’s website. Additional resources can also be found on the Forms section of DC Health Link’s website and in the “Questions and Assistance” section below."} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "Please note in order to participate in DC Health Link, your group must meet eligibility requirements:",
+  listings: [["You must meet residency requirements:", ["Have your primary business address in the District of Columbia and you offer coverage to all full-time employees through DC Health Link, OR", "You offer coverage through DC Health Link to all full-time employees whose primary worksite is located in the District of Columbia and offer coverage to non-DC based employees through the SHOP exchange serving their primary worksite(s);"]],
+    "At least two-thirds of eligible employees enroll in your group health coverage or waive due to having other coverage; and",
+    "One non-owner employee enrolls in health coverage."]} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Once your group’s initial application for employer-sponsored coverage is finalized and submitted, you will receive additional information from DC Health Link with information on next steps for the group and its employees."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""],
+    heading: 'Next Steps', sub_heading: ''} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <li>
+        <ul style="list-style: circle solid;">
+          <strong>Log in to your <a href="www.DCHealthLink.com">www.DCHealthLink.com</a> Account</strong>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>Finalize List of Eligible Employees</strong> <br>
+          At a minimum, you must offer coverage to all employees working 30 hours or more per week.<br></br>
+          At the beginning of Open Enrollment, DC Health Link will send a notice to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a DC Health Link account and log in, review their plan options, and enroll into coverage.  You will also receive a copy of this open enrollment notice.<br></br>
+          During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan or waived coverage.
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>Finalize Coverage and Pay First Month’s Premium</strong><br> 
+          Your coverage will only be finalized upon payment of your first month’s premium.  Your first month’s premium payment must be received and cleared no later than 5:00 p.m. on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%> in order for your coverage to take effect on <%=notice.plan_year.start_on%>. Payments over the phone or online are required, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br></br>
+          If your first month’s premium is not received and cleared by 5:00 p.m. on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards.
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+           <strong>By calling <%=Settings.contact_center.phone_number%></strong>
+        </li>
+        </ul>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+           <strong>TTY: 711</strong>
+        </li>
+        </ul>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+           <strong>Online at <a href="www.DCHealthLink.com">www.DCHealthLink.com</a></strong>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 C.F.R. 155.720."} %>
