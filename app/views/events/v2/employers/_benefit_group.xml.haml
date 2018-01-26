@@ -1,4 +1,6 @@
 %benefit_group
+  %id
+    %id= benefit_group.id
   %name= benefit_group.title
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans

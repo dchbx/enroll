@@ -107,6 +107,10 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         expect(@doc.xpath("//x:shop_transfer/x:hbx_active_on", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq ""
       end
 
+      it "should have benefit group id" do
+        expect(@doc.xpath("//x:benefit_groups/x:benefit_group/x:id/x:id", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq benefit_group.id.to_s
+      end
+
       it "should be schema valid" do
         expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
       end
