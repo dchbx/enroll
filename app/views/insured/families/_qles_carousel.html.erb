@@ -4,26 +4,26 @@
         <div class="btn-group">
           <span type="button" class="btn btn-primary<% if @manually_picked_role == 'shop_market_events' %> active <% end %>">
             <% if controller.action_name == "find_sep" %>
-              <%= link_to "Employee", find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "shop_market_events") %>
+              <%= link_to l10n(".employee"), find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "shop_market_events") %>
             <% else %>
-              <%= link_to "Employee", family_account_path(tab: 'home', market: "shop_market_events") %>
+              <%= link_to l10n(".employee"), family_account_path(tab: 'home', market: "shop_market_events") %>
             <% end %>
           </span>
         </div>
-        <div class="btn-group">
-          <span type="button" class="btn btn-primary<% if @manually_picked_role == 'individual_market_events' %> active <% end %>">
-            <% if controller.action_name == "find_sep" %>
-              <%= link_to "Individual", find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "individual_market_events") %>
-            <% else %>
-              <%= link_to "Individual", family_account_path(tab: 'home', market: "individual_market_events") %>
-            <% end %> 
-          </span>
-        </div>
+          <div class="btn-group">
+            <span type="button" class="btn btn-primary<% if @manually_picked_role == 'individual_market_events' %> active <% end %>">
+              <% if controller.action_name == "find_sep" %>
+                <%= link_to l10n("individual"), find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "individual_market_events") %>
+              <% else %>
+                <%= link_to l10n("individual"), family_account_path(tab: 'home', market: "individual_market_events") %>
+              <% end %>
+            </span>
+          </div>
       </div>
     </div>
 <% end %>
 <div id="carousel-qles" class="carousel slide" data-ride="carousel">
-  <h5>TOP LIFE CHANGES</h5>
+  <h5><%= l10n("insured.top_life_changes").to_s.upcase %></h5>
   <% if @qualifying_life_events %>
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox" style='min-height: 180px;'>

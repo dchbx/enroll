@@ -1,27 +1,27 @@
 <div class="row no-buffer">
   <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
   <%= form_tag send_message_to_broker_insured_employee_index_path, method: :post, class: 'input-no-pd' do %>
-    <h3>New Message</h3>
+    <h3><%= l10n("new_message") %></h3>
 
     <table class="table table-message-wrapper">
       <tbody>
         <tr>
-          <th>Recipient:</th>
+          <th><%= l10n("recipient") %>:</th>
           <td>&nbsp; &nbsp;<b><%= @broker.person.full_name %></b></td>
         </tr>
         <tr>
-          <th>Subject<span class="text-danger">*</span>:</th>
-          <td><%= text_field_tag :subject, "", required: true, placeholder: 'Subject', value: "Help with plan shopping" %></td>
+          <th><%= l10n("subject") %><span class="text-danger">*</span>:</th>
+          <td><%= text_field_tag :subject, "", required: true, placeholder: l10n("subject"), value: "Help with plan shopping" %></td>
         </tr>
         <tr>
-          <th style="vertical-align: top;">Content<span class="text-danger">*</span>:</th>
+          <th style="vertical-align: top;"><%= l10n("content") %><span class="text-danger">*</span>:</th>
           <td><%= text_area_tag :body, "", class: "floatlabel form-control interaction-control-broker-message-body", required: true, rows: 10 %></td>
         </tr>
       </tbody>
     </table>
     <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) %>
-    <%= submit_tag 'Send Message', class: "btn btn-primary interaction-control-click-broker-message-send" %>
-    <a class="btn btn-default interaction-control-click-broker-message-cancel" href="#">Cancel</a>
+    <%= submit_tag l10n("send_message"), class: "btn btn-primary interaction-control-click-broker-message-send" %>
+    <a class="btn btn-default interaction-control-click-broker-message-cancel" href="#"><%= l10n("cancel") %></a>
     <% end %>
   </div>
 </div>

@@ -3,10 +3,10 @@
     <table class="table table-striped table-hover table-sm">
       <thead class="thead-default">
       <tr>
-        <th>Family Member</th>
+        <th><%= l10n("family_member") %></th>
 
         <% if current_user && current_user.has_hbx_staff_role? %>
-            <!--<th>Complete</th>-->
+            <!--<th><%#= l10n(".complete") %></th>-->
         <% end %>
         <th>Paper Application</th>
         <th></th>
@@ -23,7 +23,7 @@
             <td class="table-functions">
               <%= link_to "##{member.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => true, 'aria-controls' => "#{member.id}" } do %>
                 <% if member_has_uploaded_paper_applications(member) %>
-                  <span data-toggle="tooltip" title="View Documents" class="function-text">
+                  <span data-toggle="tooltip" title="<%= l10n('.view_documents') %>" class="function-text">
                   <i class="fa fa-caret-down fa-2x"></i>
                   </span>
                 <% end %>

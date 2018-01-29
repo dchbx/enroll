@@ -37,7 +37,7 @@
     </table>
 <% end %>
 
-<% if notice.aqhp_enrollments.present? && notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
+<% if notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
     <table class="total_table" border="0">
       <tbody>
       <tr>
@@ -53,7 +53,7 @@
       </tr>
       </tbody>
     </table>
-<% elsif notice.aqhp_enrollments.present? && notice.renewal_health_enrollments.present?  %>
+<% elsif notice.renewal_health_enrollments.present?  %>
     <table class="total_table" border="0">
       <tbody>
       <tr>
@@ -115,20 +115,13 @@
 <%= render partial: 'notices/shared/custom_listing', locals: {
     listing: "<strong>If you have auto-pay set up</strong> through your health and/or dental insurance plan(s), you must contact your insurance company to <strong>update your autopay</strong>. The same is true if you set-up auto-pay through another method, such as through your bank. <strong>If you do not make an update, your plan may be terminated</strong>"} %>
 
-<% if (notice.aqhp_enrollments.present? || notice.renewal_csr_enrollments.present?) && notice.documents_needed %>
+<% if notice.documents_needed %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
         previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline.",
         listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
-<% elsif notice.uqhp_individuals.present?  && notice.documents_needed %>
-    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
-
-    <%= render partial: 'notices/shared/unordered_list', locals: {
-        previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.",
-        listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
 <% end %>
 
 

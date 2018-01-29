@@ -13,7 +13,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted do
                             :notice_template => 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
                             :notice_builder => 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
                             :event_name => 'renewal_employer_open_enrollment_completed',
-                            :mpi_indicator => 'MPI_SHOP18',
+                            :mpi_indicator => 'SHOP_D018',
                             :title => "Group Open Enrollment Successfully Completed"})
                           }
     let(:valid_parmas) {{
@@ -65,6 +65,17 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted do
       @employer_notice.append_data
       expect(@employer_notice.notice.plan_year.start_on).to eq renewal_plan_year.start_on
     end
+
+    it "should render renewal_employer_open_enrollment_completed" do
+       expect(@employer_notice.template).to eq "notices/shop_employer_notices/renewal_employer_open_enrollment_completed"
+      end
+   
+       it "should generate pdf" do
+         @employer_notice.build
+         @employer_notice.append_data
+         @employer_notice.generate_pdf_notice
+         expect(File.exist?(@employer_notice.notice_path)).to be true
+      end
   end
 
 end

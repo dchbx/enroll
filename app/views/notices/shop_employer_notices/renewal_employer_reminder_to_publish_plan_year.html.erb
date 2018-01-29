@@ -1,6 +1,7 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <% case notice.notification_type %>
 <% when "renewal_employer_first_reminder_to_publish_plan_year" %>

@@ -7,6 +7,7 @@ site:
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
   website_name: "www.DCHealthLink.com"
+  forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
 
   social_media:
@@ -69,7 +70,9 @@ aca:
       # After submitting an ineligible plan year application, time period an Employer must wait
       ineligible_period_after_application_denial:
         days: 90
-      quiet_period_end_on: 28
+      quiet_period:
+        month_offset: -1
+        mday: 28
 
     renewal_application:
       earliest_start_prior_to_effective_on:
@@ -80,7 +83,9 @@ aca:
       open_enrollment:
         minimum_length:
           days: 3
-      quiet_period_end_on: 15
+      quiet_period:
+        month_offset: -1
+        mday: 15
 
     benefit_period:
       length_minimum:
@@ -117,6 +122,7 @@ checkbook_services:
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
   enrollment_max_smaller_than_applied: "Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC."
+  plan_premium_smaller_than_applied: "Applied APTC for any Enrollment cannot be greater than the Plan Premium."
   max_aptc_non_numeric: "Max APTC needs to be a numeric value."
   max_aptc_too_small: "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
   max_aptc_too_big: "Max APTC should be less than 9999.99"

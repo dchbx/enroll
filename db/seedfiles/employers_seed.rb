@@ -8,7 +8,9 @@ broker_agency_1 = BrokerAgencyProfile.last
 raise "Prerequisite of 2+ BrokerAgencies failed" unless broker_agency_0 != broker_agency_1
 
 puts "::: Creating Jetsons :::"
-address_00 = Address.new(kind: "work", address_1: "100 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
+aca_state = Settings.aca.state_abbreviation
+
+address_00 = Address.new(kind: "work", address_1: "100 Cosmic Way, NW", city: "Washington", state: aca_state, zip: "20001", county: "County")
 phone_00 = Phone.new(kind: "main", area_code: "202", number: "555-1213")
 email_00 = Email.new(kind: "work", address: "info@spacely.com")
 office_location_00 = OfficeLocation.new(is_primary: true, address: address_00, phone: phone_00)
@@ -19,19 +21,20 @@ spacely = Organization.create(
       office_locations: [office_location_00]
     )
 
-address_01 = Address.new(kind: "work", address_1: "100 Milky Way, SW", city: "Washington", state: "DC", zip: "20001")
+address_01 = Address.new(kind: "work", address_1: "100 Milky Way, SW", city: "Washington", state: aca_state, zip: "20001", county: "County")
 phone_01 = Phone.new(kind: "main", area_code: "202", number: "555-1214")
 email_01 = Email.new(kind: "work", address: "info@spacely.com")
 office_location_01 = OfficeLocation.new(is_primary: true, address: address_01, phone: phone_01)
 
-address_02 = Address.new(kind: "work", address_1: "311 Venus Pkwy, NW", city: "Washington", state: "DC", zip: "20001")
+address_02 = Address.new(kind: "work", address_1: "311 Venus Pkwy, NW", city: "Washington", state: aca_state, zip: "20001", county: "County")
 phone_02 = Phone.new(kind: "main", area_code: "202", number: "555-1215")
 email_02 = Email.new(kind: "work", address: "info@spacely.com")
 office_location_02 = OfficeLocation.new(is_primary: false, address: address_02, phone: phone_02)
 
 spacely_employer_profile = spacely.create_employer_profile(
     entity_kind: "s_corporation",
-    broker_agency_profile: broker_agency_0
+    broker_agency_profile: broker_agency_0,
+    sic_code: '1111'
   )
 
 admin_user = User.find_by(email: "admin@dc.gov")
@@ -74,7 +77,8 @@ cogswell = Organization.create(
 
 cogswell_employer_profile = cogswell.create_employer_profile(
     entity_kind: "s_corporation",
-    broker_agency_profile: broker_agency_1
+    broker_agency_profile: broker_agency_1,
+    sic_code: '1111'
   )
 
 jetson_1 = CensusEmployee.new(
@@ -87,7 +91,7 @@ cogswell.save!
 
 puts "::: Creating addresses for office location :::"
 # Employer addresses
-org_1_add = Address.new(kind: "work", address_1: "823 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
+org_1_add = Address.new(kind: "work", address_1: "823 Cosmic Way, NW", city: "Washington", state: aca_state, zip: "20001", county: "County")
 org_1_phone = Phone.new(kind: "main", area_code: "802", number: "123-1213")
 org_1_email = Email.new(kind: "work", address: "info@organization1.com")
 org_1_off_loc = OfficeLocation.new(is_primary: true, address: org_1_add, phone: org_1_phone)
@@ -101,7 +105,8 @@ org_1 = Organization.new(
 
 org_1_employer_profile = org_1.create_employer_profile(
     entity_kind: "s_corporation",
-    broker_agency_profile: broker_agency_1
+    broker_agency_profile: broker_agency_1,
+    sic_code: '1111'
   )
 
 org_1_jetson = CensusEmployee.new(
@@ -124,7 +129,7 @@ org_1_jetson = CensusEmployee.new(
 
 org_1.save!
 
-org_2_add = Address.new(kind: "work", address_1: "823 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
+org_2_add = Address.new(kind: "work", address_1: "823 Cosmic Way, NW", city: "Washington", state: aca_state, zip: "20001", county: "County")
 org_2_phone = Phone.new(kind: "main", area_code: "802", number: "123-1213")
 org_2_email = Email.new(kind: "work", address: "info@organization1.com")
 org_2_off_loc = OfficeLocation.new(is_primary: true, address: org_2_add, phone: org_2_phone)
@@ -138,7 +143,8 @@ org_2 = Organization.new(
 
 org_2_employer_profile = org_2.create_employer_profile(
     entity_kind: "c_corporation",
-    broker_agency_profile: broker_agency_1
+    broker_agency_profile: broker_agency_1,
+    sic_code: '1111'
   )
 
 org_2_jetson = CensusEmployee.new(

@@ -23,7 +23,6 @@ module PdfTemplates
     attribute :reference_plan, Object
     attribute :family_contribution, String
     attribute :data, Hash
-    attribute :plan_year, String
     attribute :coverage_end_on, Date
     attribute :coverage_start_on, Date
     attribute :to, String

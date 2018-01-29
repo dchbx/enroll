@@ -1,18 +1,18 @@
 <div class="container bottom-pd">
-  <h3>Broker Agency : <%= @broker_agency_profile.legal_name %></h3>
+  <h3><%= l10n("broker_agency")%> : <%= @broker_agency_profile.legal_name %></h3>
   <% if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role? %>
-    <%= link_to "Edit Broker Agency Profile", edit_broker_agencies_profile_path(@broker_agency_profile.id), class: 'btn btn-primary ' %>
+    <%= link_to "#{l10n('broker_agencies.profiles.edit_broker_agency_profile')}", edit_broker_agencies_profile_path(@broker_agency_profile.id), class: 'btn btn-primary ' %>
   <% end %>
   <p></p>
   <div class="table-border table-responsive">
     <table class="table">
       <thead>
-        <th>Legal Name</th>
-        <th>dba</th>
+        <th><%= l10n("legal_name")%></th>
+        <th><%= l10n("dba")%></th>
         <% if fein_display(@broker_agency_profile) %>
-          <th>Fein </th>
+          <th><%= l10n("fein").to_s.titleize%></th>
         <%end%>
-        <th>Market Kind</th>
+        <th><%= l10n("market_kind")%></th>
       </thead>
       <tbody>
         <td><%= @broker_agency_profile.legal_name %></td>

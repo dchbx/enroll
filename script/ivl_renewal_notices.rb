@@ -14,7 +14,7 @@ begin
   CSV.foreach(file_name,:headers =>true).each do |d|
     if @data_hash[d["ic_number"]].present?
       hbx_ids = @data_hash[d["ic_number"]].collect{|r| r['member_id']}
-      next if hbx_ids.include?(d["member_id"])
+      # next if hbx_ids.include?(d["member_id"])
       @data_hash[d["ic_number"]] << d
     else
       @data_hash[d["ic_number"]] = [d]
@@ -90,9 +90,9 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
       next if primary_member.nil?
-      next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
+      # next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
-      next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
+      # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
       next if !person.present?
       enrollments = valid_enrollments(person)

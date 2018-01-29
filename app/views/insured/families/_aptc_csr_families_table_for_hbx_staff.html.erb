@@ -12,17 +12,17 @@ $(document).ready(function(){
   <table class="table table-condensed">
     <thead>
       <tr>
-        <th colspan="6">APTC / CSR Enrollments</th>
+        <th colspan="6"><%= l10n("insured.families.aptc_or_csr_enrollments") %></th>
       </tr>
       <tr>
-        <th>HBX ID</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>DOB</th>
-        <th>SSN</th>
-        <th>Family <br />Count</th>
-        <th>Active <br />Enrollment(s)?</th>
-        <th>Edit <br />APTC/CSR</th>
+        <th><%= l10n("insured.families.hbx_id") %></th>
+        <th><%= l10n("last_name") %></th>
+        <th><%= l10n("first_name") %></th>
+        <th><%= l10n("dob") %></th>
+        <th><%= l10n("ssn") %></th>
+        <th><%= l10n("family") %><br /><%= l10n("count") %></th>
+        <th><%= l10n("active") %><br /><%= l10n("enrollments") %>?</th>
+        <th><%= l10n("edit") %><br /><%= l10n("insured.aptc_or_csr") %></th>
       </tr>
     </thead>
     <tbody>
@@ -41,16 +41,16 @@ $(document).ready(function(){
           <td>
               <% if all_active_enrollment_with_aptc(family).present?%>
                 <span class="glyphicon glyphicon-check">&nbsp;</span>
-                <a href="#" class="toggler" data-prod-cat="<%=ind%>">+ Enrollments</a>
+                <a href="#" class="toggler" data-prod-cat="<%=ind%>">+ <%= l10n("enrollments") %></a>
               <%else%>
                 <span class="glyphicon glyphicon-unchecked">
               <%end%> 
           </td>
           <td>
                 <%if all_active_enrollment_with_aptc(family).blank?%>
-                    <%= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
+                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
                 <%else%>
-                    <%= link_to 'Edit', edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
+                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
                 <%end%>
           </td>
         </tr>
@@ -58,7 +58,7 @@ $(document).ready(function(){
         <%all_active_enrollment_with_aptc(family).each do |hbx|%>
         <tr class="cat<%=ind%>" style="display:none">
           <td colspan = "1"></td>
-          <td colspan = "6">(<b>Members:</b> <%=hbx_member_names(hbx.hbx_enrollment_members)%>),  <b>Plan:</b> <%=hbx.plan.name%></td>
+          <td colspan = "6">(<b><%= l10n("members") %>:</b> <%=hbx_member_names(hbx.hbx_enrollment_members)%>),  <b>Plan:</b> <%=hbx.plan.name%></td>
         </tr>
         <%end%>
       <% end %>

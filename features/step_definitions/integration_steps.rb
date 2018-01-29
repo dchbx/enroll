@@ -676,16 +676,6 @@ Then(/^.+ should see the group selection page$/) do
   expect(page).to have_css('form')
 end
 
-Then(/^.+ should see the group selection page with health or dental dependents list$/) do
-  expect(page).to have_css('form')
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  find(:xpath, '//label[@for="coverage_kind_dental"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: true)
-  find(:xpath, '//label[@for="coverage_kind_health"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  expect(page).to have_selector('.group-selection-table.health', visible: true)
-end
-
 When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end

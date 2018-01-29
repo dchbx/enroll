@@ -291,11 +291,11 @@ When /^the broker set default ga$/ do
 end
 
 Then /^the broker should see default ga msg$/ do
-  expect(page).to have_content("this is your default GA, to change your default GA click \"Select Default GA\" under your desired agency.")
+  expect(page).to have_content("this is your default GA, to change your default GA click 'Select Default GA' under your desired agency.")
 end
 
 Then /^the broker should see no default ga msg$/ do
-  expect(page).to have_content("You do not have default GA, to select your default GA click \"Select Default GA\" under your desired agency.")
+  expect(page).to have_content("You do not have default GA, to select your default GA click 'Select Default GA' under your desired agency.")
 end
 
 Given /^call change default ga subscriber for ga1$/ do

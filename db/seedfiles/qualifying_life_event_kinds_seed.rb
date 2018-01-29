@@ -226,5 +226,21 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Enroll due to becoming newly eligibile"
   )
 
+QualifyingLifeEventKind.create!(
+    title: "Court order to provide coverage for someone",
+    tool_tip: "",
+    action_kind: "add_member",
+    market_kind: "shop",
+    event_kind_label: "Date that court orders that coverage starts",
+    ordinal_position: 100,
+    reason: "court_order",
+    edi_code: " ",
+    effective_on_kinds: ["exact_date"],
+    pre_event_sep_in_days: 0,
+    post_event_sep_in_days: 60,
+    is_self_attested: false,
+    date_options_available: false,
+)
+
 puts "::: QualifyingLifeEventKinds Complete :::"
 puts "*"*80

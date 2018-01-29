@@ -1,6 +1,7 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -90,7 +91,7 @@ content: "Please note that your employer’s annual Open Enrollment for Plan Yea
               Losing eligibility for coverage under a State Medicaid or CHIP program
             </li>
             <li style="margin-top: 5px;">
-              Unintentional, inadvertent, or erroneous failure to enroll that was the fault of a DC Health Link employee or the enrollment error was the result of error, misrepresentation, misconduct, or inaction by a broker or assister providing enrollment assistance, or an insurance company representative
+              Unintentional, inadvertent, or erroneous failure to enroll that was the fault of a <%= Settings.site.short_name %> employee or the enrollment error was the result of error, misrepresentation, misconduct, or inaction by a broker or assister providing enrollment assistance, or an insurance company representative
             </li>
             <li style="margin-top: 5px;">
               A qualified health plan substantially violates a material provision of its contract
@@ -125,7 +126,7 @@ content: "Please note that your employer’s annual Open Enrollment for Plan Yea
                 <li>Loss of pregnancy-related Medicaid coverage</li>
               </ul>
               <ul>
-                <li>DC Health Link system outage</li>
+                <li><%= Settings.site.short_name %> system outage</li>
               </ul>
             </li>
           </ul>
@@ -138,7 +139,7 @@ content: "Please note that your employer’s annual Open Enrollment for Plan Yea
 content: "Though your request was denied, you can still request a special enrollment period at any time during the year if you meet any of the requirements listed above. You may submit a new request for a special enrollment period at any time, with new information, by calling #{Settings.site.short_name} Contact Center at 1-855-532-5465 [TTY 711]."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If you have a complaint related to your health/dental company you can file a complaint with the DC Department of Insurance, Securities and Banking (DISB)</strong>, which regulates insurers and insurance brokers in the District of Columbia. You can file a complaint with DISB at the following link: <a href='http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0'>http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0</a>, by email at disb.complaints@dc.gov, or by calling 202-727-8000."} %>
+content: "<strong>If you have a complaint related to your health/dental company you can file a complaint with the DC Department of Insurance, Securities and Banking (DISB)</strong>, which regulates insurers and insurance brokers in the #{Settings.aca.state_name}. You can file a complaint with DISB at the following link: <a href='http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0'>http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0</a>, by email at disb.complaints@dc.gov, or by calling 202-727-8000."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Other Coverage You May Have</strong>"} %>
@@ -192,10 +193,10 @@ content: "If you do not qualify for a new Special Enrollment Period, your next o
 content: "<strong>Individual Market Enrollment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you do not qualify to enroll in employer-sponsored coverage or other coverage before then, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period you can enroll in individual market coverage through #{Settings.site.short_name} if you live in the District of Columbia. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. If you live outside the District of Columbia, you can apply during open enrollment through the health insurance exchange operating in your state."} %>
+content: "If you do not qualify to enroll in employer-sponsored coverage or other coverage before then, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period you can enroll in individual market coverage through #{Settings.site.short_name} if you live in the #{Settings.aca.state_name}. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. If you live outside the #{Settings.aca.state_name}, you can apply during open enrollment through the health insurance exchange operating in your state."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If you are a District of Columbia resident and think you might be eligible for an individual market Special Enrollment Period, you can contact #{Settings.site.short_name} to see if you are eligible to enroll through a Special Enrollment Period."} %>
+content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If you are a #{Settings.aca.state_name} resident and think you might be eligible for an individual market Special Enrollment Period, you can contact #{Settings.site.short_name} to see if you are eligible to enroll through a Special Enrollment Period."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
@@ -204,8 +205,8 @@ content: "There are separate eligibility rules for Special Enrollment Periods in
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:",
   listings: ["By calling #{notice.hbe.phone}.",
-            "TTY: 711",
-            "Online at <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>"]} %>
+            "TTY: #{Settings.contact_center.tty}",
+            "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>

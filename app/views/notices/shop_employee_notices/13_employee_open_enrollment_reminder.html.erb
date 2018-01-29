@@ -1,4 +1,7 @@
-<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -24,7 +27,7 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "To complete the enrollment process, please complete the following steps:",
-  listings: ["Go to <a href='www.DCHealthLink.com'>DCHealthLink.com</a>",
+  listings: ["Go to <a href=#{Settings.site.home_url}> #{Settings.site.website_name}</a>",
              "Log-in or create an account",
              "If necessary, update your household information add any dependents",
              "Select your health plan"] } %>

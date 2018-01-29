@@ -4,11 +4,11 @@
     <div class="panel-body">
         <div class="row flex">
         <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-          <strong>Enroll in health or dental coverage on the District of Columbia's individual market</strong>
+          <strong><%= l10n('enroll_in_health_or_dental_dc') %></strong>
         </div>
         <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
           <div class='image-area'></div>
-          <%= link_to 'Enroll', build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+          <%= link_to l10n('enroll'), build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
         </div>
       </div>
     </div>
@@ -16,11 +16,11 @@
     <div class="panel-body">
       <div class="row flex">
       <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-        <strong>Apply, renew, read notices or find out what documents are needed for Medicaid or tax credit assisted coverage</strong>
+        <strong><%= l10n('insured.families.apply_for_medicaid_widget') %></strong>
       </div>
       <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
         <div class='image-area'></div>
-          <%= link_to 'Medicaid & Tax Credits', navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
+          <%= link_to l10n("insured.families.medicaid_and_tax_credits"), navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
       </div>
     </div>
   </div>

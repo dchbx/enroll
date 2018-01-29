@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "delink_broker_general_agency")
 
-describe DelinkBrokerGeneralAgency do
+describe DelinkBrokerGeneralAgency, dbclean: :around_each do
   let(:given_task_name) { "delink_broker_general_agency" }
   subject { DelinkBrokerGeneralAgency.new(given_task_name, double(:current_scope => nil)) }
 

@@ -1,0 +1,29 @@
+.container.home.module.welcome
+  br
+  br
+  br
+  br
+  h1.no-buffer
+    strong
+      = l10n('.welcome_to_site_name', short_name: Settings.site.short_name)
+  h3.darkblue.no-buffer
+    = l10n('.site_byline')
+  br
+  - if user_signed_in?
+    strong
+      = l10n(".signed_in_as", current_user: current_user.oim_id)
+      = link_to(l10n('.sign_out'), destroy_user_session_path, class: 'btn btn-primary', :method => :delete)
+    br
+    br
+  = link_to l10n(".employee_portal"), privacy_insured_employee_index_path, class: "btn btn-default"
+  = link_to l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default"
+  = link_to l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default"
+  = link_to l10n(".returning_user"), family_account_path, class: "btn btn-default"
+  = link_to l10n(".employer_portal"), new_employers_employer_profile_path, class: "btn btn-default"
+  = link_to l10n(".broker_agency_portal"), broker_agencies_root_path, class: "btn btn-default"
+  = link_to l10n(".general_agency_portal"), general_agencies_root_path, class: "btn btn-default"
+  = link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-default"
+
+  - if !user_signed_in?
+    = link_to l10n(".broker_registration"), broker_registration_path, class: "btn btn-default"
+    = link_to l10n(".general_agency_registration"), general_agency_registration_path, class: "btn btn-default"

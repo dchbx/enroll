@@ -1,6 +1,7 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <br>
 <table class="total_table" border="0">
@@ -47,8 +48,8 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                    ["By calling #{notice.hbe.phone}.",
-                                                                    "TTY: 711",
-                                                                    "Online at <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>"] } %>
+                                                                    "TTY: #{Settings.contact_center.tty}",
+                                                                    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is being provided in accordance with 45 C.F.R. 155.735(g)."} %>

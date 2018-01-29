@@ -36,6 +36,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
     employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
     ce.update_attributes({employee_role: employee_role})
     family_rec = Family.find_or_build_from_employee_role(employee_role)
+    hbx_enrollment_mem=FactoryGirl.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_group.start_on)
 
     FactoryGirl.create(:hbx_enrollment,
       household: person.primary_family.active_household,
@@ -49,7 +50,8 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
       benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
       plan_id: plan.id,
       aasm_state: 'coverage_terminated',
-      external_enrollment: external_enrollment
+      external_enrollment: external_enrollment,
+      hbx_enrollment_members:[hbx_enrollment_mem]
       )
 
     family_rec.reload
@@ -96,5 +98,12 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
       expect(cobra_enrollment.coverage_selected?).to be_truthy
       expect(cobra_enrollment.effective_on).to eq coverage_terminated_on.next_day
     end
+
+    it 'cobra enrollment member coverage_start_on should cloned enrollment effective_on' do
+      generate_cobra_enrollment
+      cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
+      expect(cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq family.enrollments.first.effective_on
+    end
+
   end
 end

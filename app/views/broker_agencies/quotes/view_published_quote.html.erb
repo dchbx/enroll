@@ -3,12 +3,12 @@
     <div class="col-md-12">
 
 
-      <h3>Your Quote</h3>
+      <h3><%= l10n("your_quote")%></h3>
 
       <%= @quote.inspect %>
 
 
-      <%= link_to "Back to Quotes", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
+      <%= link_to l10n('back_to_quotes'), my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
 		</div>
 	</div>
 </div>

@@ -15,6 +15,10 @@ var Verification = (function(){
    function showExtendAction(target) {
        $('#'+target_id(target)+'-extend').fadeIn('slow');
    }
+
+   function showViewHistory(target) {
+       $('#'+target_id(target)+'-history').fadeIn('slow');
+   }
    function hideAllActions(target){
        hideVerifyAction(target);
        hideReturnForDef(target);
@@ -58,6 +62,10 @@ var Verification = (function(){
             hideAllActions($selected_id);
             showExtendAction($selected_id);
             break;
+         case 'View History':
+             hideAllActions($selected_id);
+             showViewHistory($selected_id);
+             break;
          default:
              hideAllActions($selected_id);
      }

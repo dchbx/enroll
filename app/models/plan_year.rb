@@ -222,6 +222,34 @@ class PlanYear
     write_attribute(:open_enrollment_start_on, new_date.beginning_of_day)
   end
 
+  def has_renewal_history?
+    workflow_state_transitions.where(:to_state.in => PlanYear::RENEWING).any?
+  end
+
+  def enrollment_quiet_period
+    PlanYear.enrollment_quiet_period(start_on: start_on, open_enrollment_end_on: open_enrollment_end_on, is_renewing: has_renewal_history?)
+  end
+
+  def self.enrollment_quiet_period(start_on:, open_enrollment_end_on: nil, is_renewing: false)
+    if open_enrollment_end_on.blank?
+      prev_month = start_on.prev_month
+      quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+    else
+      quiet_period_start = open_enrollment_end_on + 1.day
+    end
+
+    quiet_period_end = is_renewing ? renewal_quiet_period_end(start_on) : initial_quiet_period_end(start_on)
+    TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
+  end
+
+  def self.initial_quiet_period_end(start_on)
+    start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+  end
+
+  def self.renewal_quiet_period_end(start_on)
+    start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
+  end
+
   def open_enrollment_end_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String
     write_attribute(:open_enrollment_end_on, new_date.end_of_day)
@@ -289,14 +317,14 @@ class PlanYear
   end
 
   def carriers_offered
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.carriers_offered
     end.uniq
   end
 
   def dental_carriers_offered
     return [] unless is_offering_dental?
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.dental_carriers_offered
     end.uniq
   end
@@ -786,7 +814,7 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
+    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -828,7 +856,7 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -1111,15 +1139,6 @@ class PlanYear
       self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
-
-  def initial_employer_open_enrollment_begins
-    return true if (benefit_groups.any?{|bg| bg.is_congress?})
-    begin
-      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial open enrollment notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 

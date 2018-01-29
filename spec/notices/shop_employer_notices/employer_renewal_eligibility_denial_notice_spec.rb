@@ -17,9 +17,14 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice do
   }
   let(:employer_profile) { FactoryGirl.create :employer_profile, organization: organization}
   let(:calender_year) { TimeKeeper.date_of_record.year }
+  let(:calender_month) { (TimeKeeper.date_of_record + 2.months).month}
   let(:person){ create :person}
-  let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30)}
-  let!(:renewing_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_publish_pending, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30)}
+  let(:start_on) { Date.new(calender_year, calender_month, 1)}
+  let(:end_on) { start_on.next_year.prev_day }
+  let(:start_on_active) { start_on.prev_year }
+  let(:end_on_active) { start_on_active.next_year.prev_day}
+  let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => start_on_active, :end_on => end_on_active}
+  let!(:renewing_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_publish_pending, :start_on => start_on, :end_on => end_on}
   let(:warnings) { { primary_office_location: "primary location is outside washington dc"} }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Employer Annual Renewal - Denial of Eligibility',

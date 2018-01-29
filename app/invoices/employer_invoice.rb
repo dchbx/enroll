@@ -65,7 +65,7 @@ class EmployerInvoice
 
   def send_first_invoice_available_notice
     if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
-      @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
+      @organization.employer_profile.trigger_notices("initial_employer_first_invoice_available")
     end
   end
 

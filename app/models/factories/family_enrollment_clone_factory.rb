@@ -64,7 +64,7 @@ module Factories
         members << HbxEnrollmentMember.new({
           applicant_id: hbx_enrollment_member.applicant_id,
           eligibility_date: effective_on,
-          coverage_start_on: effective_on,
+          coverage_start_on: enrollment.effective_on,
           is_subscriber: hbx_enrollment_member.is_subscriber
         })
       end

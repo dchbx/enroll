@@ -3,17 +3,17 @@
   <table class="table table-condensed">
     <thead>
       <tr>
-        <th colspan="6">Primary Applicant</th>
+        <th colspan="6"><%= l10n(".primary_applicant") %></th>
       </tr>
       <tr>
-        <th>Name</th>
-        <th>SSN</th>
-        <th>DOB</th>
-        <th>HBX ID</th>
-        <th>Family Ct</th>
-        <th>Registered?</th>
-        <th>Consumer?</th>
-        <th>Employee?</th>
+        <th><%= l10n("name") %></th>
+        <th><%= l10n("ssn") %></th>
+        <th><%= l10n("dob") %></th>
+        <th><%= l10n("hbx_id") %></th>
+        <th><%= l10n("family_ct") %></th>
+        <th><%= l10n("registered?") %></th>
+        <th><%= l10n("consumer?") %></th>
+        <th><%= l10n("employee?") %></th>
         <th></th>
         <th></th>
       </tr>
@@ -27,24 +27,24 @@
         <td >
           <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id) %> <br/>
           <%= pundit_span Family, :updateable? %>
-            <%= link_to 'Paper', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper') %>
-            <%= link_to 'Phone', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'phone') %>
+            <%= link_to l10n('paper'), resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper') %>
+            <%= link_to l10n('phone'), resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'phone') %>
           </span>
         </td>
         <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
         <td><%= format_date(pp.dob) %></td>
         <td><%= pp.hbx_id %></td>
         <td><%= family.active_family_members.size %></td>
-        <td><%= pp.user.present? ? "Yes" : "No" %></td>
-        <td><%= pp.consumer_role.present?  ? "Yes" : "No" %></td>
-        <td><%= pp.active_employee_roles.present?  ? "Yes" : "No" %></td>
+        <td><%= pp.user.present? ? l10n("yes") : l10n("no") %></td>
+        <td><%= pp.consumer_role.present?  ? l10n("yes") : l10n("no") %></td>
+        <td><%= pp.active_employee_roles.present?  ? l10n("yes") : l10n("no") %></td>
         <td>
-          <%= link_to 'Edit DOB/SSN', edit_dob_ssn_path(id: family.primary_applicant.person.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-default btn-xs" + pundit_class(Family, :can_update_ssn?) , remote: true%>
+          <%= link_to l10n("insured.edit_DOB_or_SSN"), edit_dob_ssn_path(id: family.primary_applicant.person.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-default btn-xs" + pundit_class(Family, :can_update_ssn?) , remote: true%>
         </td>
         <% if (pp.user.present? || pp.emails.present?) && current_user.person.hbx_staff_role %>
           <td>
               <%= pundit_span  Family, :updateable? %>
-                <%= link_to 'Send Secure Message'.html_safe,
+                <%= link_to l10n("send_secure_message"),
                   new_insured_inbox_path(id: family.primary_applicant.person.id,
                   profile_id: current_user.person.hbx_staff_role.hbx_profile.id,
                   to: family.primary_applicant.person.last_name + ', ' + family.primary_applicant.person.first_name),

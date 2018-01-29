@@ -133,46 +133,23 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         end
 
         context "and termination effective on date is requested" do
-          let(:fifty_days_before_start_on)        { start_on - 50.days }
-          let(:thirty_five_days_before_start_on)  { start_on - 35.days }
-          let(:twenty_days_before_start_on)       { start_on - 20.days }
-          let(:ten_days_before_start_on)          { start_on - 10.days }
 
+          # No termination if coverage not yet started
           let(:five_days_after_start_on)          { start_on + 5.days }
           let(:twenty_days_after_start_on)        { start_on + 20.days }
 
           context "and termination is during open enrollment" do
 
-            it "termination date should be start_on date" do
-              expect(benefit_coverage_period.termination_effective_on_for(fifty_days_before_start_on)).to eq start_on
-            end
-
-            it "termination date should be start_on date" do
-              expect(benefit_coverage_period.termination_effective_on_for(thirty_five_days_before_start_on)).to eq start_on
-            end
-
-            context "and termination is before monthly enrollment due date" do
-              it "termination date should be start_on date" do
-                expect(benefit_coverage_period.termination_effective_on_for(twenty_days_before_start_on)).to eq start_on
-              end
-            end
-
-            context "and termination is after monthly enrollment deadline" do
-              it "termination date should be last day of month following start_on date" do
-                expect(benefit_coverage_period.termination_effective_on_for(ten_days_before_start_on)).to eq start_on.end_of_month
-              end
-            end
-
             context "and termination is after start_on date" do
               context "and before monthly enrollment deadline" do
                 it "termination date should be last day of month following start_on date" do
-                  expect(benefit_coverage_period.termination_effective_on_for(five_days_after_start_on)).to eq start_on.end_of_month
+                  expect(benefit_coverage_period.termination_effective_on_for(five_days_after_start_on)).to eq five_days_after_start_on
                 end
               end
 
               context "and after monthly enrollment deadline" do
                 it "termination date should be last day of next month following start_on date" do
-                  expect(benefit_coverage_period.termination_effective_on_for(twenty_days_after_start_on)).to eq start_on.next_month.end_of_month
+                  expect(benefit_coverage_period.termination_effective_on_for(twenty_days_after_start_on)).to eq twenty_days_after_start_on
                 end
               end
             end

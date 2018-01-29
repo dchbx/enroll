@@ -3,13 +3,13 @@
 
           <div data-toggle="collapse" data-parent="#accordion" href="#publish-quote" aria-expanded="true" aria-controls="publish-quote" style='display: inline; float_left' class='collapsed'>
             <a role="button">
-              Quote: <b><span id='quote-name'> <%=@q.quote_name%> </span></b>
+              <%= l10n(".quote")%>: <b><span id='quote-name'> <%=@q.quote_name%> </span></b>
               <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></a>
 
           </div>
 
     </div>
     <div id="publish-quote" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="">
-       Please create a quote after comparing health plan costs
+       <%= l10n("broker_agencies.quotes.panels.quote_after_comparing_health_plan_costs")%>
     </div>
   </div>

@@ -69,6 +69,28 @@ RSpec.describe DocumentsController, :type => :controller do
       end
     end
   end
+
+  describe 'POST Fed_Hub_Request' do
+    before :each do
+      request.env["HTTP_REFERER"] = "http://test.com"
+    end
+    context 'Call Hub for SSA verification' do
+      it 'should redirect if verification type is SSN or Citozenship' do
+        post :fed_hub_request, verification_type: 'Social Security Number',person_id: person.id, id: document.id
+        expect(response).to redirect_to :back
+        expect(flash[:success]).to eq('Request was sent to FedHub.')
+      end
+    end
+    context 'Call Hub for Residency verification' do
+      it 'should redirect if verification type is Residency' do
+        person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
+        post :fed_hub_request, verification_type: 'DC Residency',person_id: person.id, id: document.id
+        expect(response).to redirect_to :back
+        expect(flash[:success]).to eq('Request was sent to Local Residency.')
+      end
+    end
+  end
+
   describe "PUT extend due date" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"

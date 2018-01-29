@@ -8,8 +8,12 @@ namespace :nfp do
     if Dir.exists?(absolute_folder_path)
       Dir.entries(absolute_folder_path).each do |file|
         next if File.directory?(file) #skipping directories
-        puts "uploading file #{absolute_folder_path}/#{file}"
-        Organization.upload_invoice(absolute_folder_path+"/"+file,file)
+        org = Organization.by_invoice_filename(absolute_folder_path+"/"+file)
+        if org.present?
+          puts "uploading file #{absolute_folder_path}/#{file}"
+          Organization.upload_invoice(absolute_folder_path+"/"+file,file)
+          org.employer_profile.trigger_notices("employer_invoice_available")#send invoice available notice to ERs.
+        end
       end
     else
       puts "Folder #{absolute_folder_path} doesn't exist. Please check and rerun the rake"

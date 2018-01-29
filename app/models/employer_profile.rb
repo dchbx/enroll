@@ -147,7 +147,12 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    employer_broker_fired
     notify_broker_terminated
+  end
+
+  def employer_broker_fired
+    trigger_notices('employer_broker_fired')
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -714,8 +719,9 @@ class EmployerProfile
           end
         end
 
-        if new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on
-          effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
+        if new_date.prev_day.mday == Settings.aca.shop_market.initial_application.quiet_period.mday
+          effective_on = (new_date.prev_day.beginning_of_month - Settings.aca.shop_market.initial_application.quiet_period.month_offset.months).to_s(:db)
+
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
         end
 
@@ -1060,7 +1066,11 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+    end
   end
 
 private

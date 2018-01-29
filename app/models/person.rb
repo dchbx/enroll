@@ -3,6 +3,7 @@ class Person
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Mongoid::Attributes::Dynamic
 
   include Notify
   include UnsetableSparseFields
@@ -274,17 +275,7 @@ class Person
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } ) if need_to_notify?
-  end
-
-  def need_to_notify?
-    changed_fields = changed_attributes.keys
-    changed_fields << consumer_role.changed_attributes.keys if consumer_role.present?
-    changed_fields << employee_roles.map(&:changed_attributes).map(&:keys) if employee_roles.present?
-    changed_fields << employer_staff_roles.map(&:changed_attributes).map(&:keys) if employer_staff_roles.present?
-    changed_fields = changed_fields.flatten.compact.uniq
-    notify_fields = changed_fields.reject{|field| ["bookmark_url", "updated_at"].include?(field)}
-    notify_fields.present?
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def is_aqhp?
@@ -438,7 +429,7 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'DC Residency' if (consumer_role && age_on(TimeKeeper.date_of_record) > 19)
+    verification_types << 'DC Residency'
     verification_types << 'Social Security Number' if ssn
     verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
     if self.us_citizen
@@ -720,7 +711,7 @@ class Person
       if first_name.present? && last_name.present? && dob_query.present?
         first_exp = /^#{first_name}$/i
         last_exp = /^#{last_name}$/i
-        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
+        matches.concat Person.active.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
       end
       matches.uniq
     end

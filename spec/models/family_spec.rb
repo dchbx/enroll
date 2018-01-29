@@ -427,18 +427,24 @@ describe Family do
   end
 
   context "contingent_enrolled_family_members_due_dates" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:family_member) { FactoryGirl.build_stubbed(:family_member) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+    let(:family_member) { FactoryGirl.create(:family_member, :family => family, :person => person2) }
+    let(:primary_family_member) { family.primary_family_member }
     before do 
-      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([family.primary_family_member,family_member])
+      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([primary_family_member, family_member])
+      allow(person).to receive(:verification_types).and_return(["Immigration status"])
+      allow(person2).to receive(:verification_types).and_return(["Immigration status"])
     end
     it "should return uniq family members duedate" do
       allow(family).to receive(:document_due_date).and_return(TimeKeeper.date_of_record)
       expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record]
     end
-    it "should return sorted due dates" do 
-      allow(family).to receive(:document_due_date).with(family.primary_family_member,"Immigration status").and_return(TimeKeeper.date_of_record)
+    it "should return sorted due dates" do
+      allow(family).to receive(:document_due_date).with(primary_family_member,"Immigration status").and_return(TimeKeeper.date_of_record)
       allow(family).to receive(:document_due_date).with(family_member,"Immigration status").and_return(TimeKeeper.date_of_record+30)
+
       expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record,TimeKeeper.date_of_record+30]
     end
   end

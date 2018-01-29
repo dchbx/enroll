@@ -19,7 +19,9 @@
             %type= "urn:openhbx:terms:v1:enrollment#initial" ## this is hardcoded for now but needs to be changed once we have the proper models
             -if %w(unassisted_qhp insurance_assisted_qhp individual).include?(hbx_enrollment.kind)
               %market= "urn:openhbx:terms:v1:aca_marketplace#individual"
-            -elsif hbx_enrollment.kind == 'employer_sponsored'
+            -elsif hbx_enrollment.kind == "employer_sponsored_cobra"
+              %market= "urn:openhbx:terms:v1:aca_marketplace#cobra"
+            -elsif hbx_enrollment.kind == "employer_sponsored"
               %market= "urn:openhbx:terms:v1:aca_marketplace#shop"
             -elsif hbx_enrollment.kind == 'coverall'
               %market= "urn:openhbx:terms:v1:aca_marketplace#coverall"

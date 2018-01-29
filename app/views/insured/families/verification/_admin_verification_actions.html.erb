@@ -46,7 +46,11 @@
 <div class="row">
   <div class="fedhub-request col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-hub"%>>
     <div class="col-md-9">
-      <p>New request to the Federal Hub will be sent.</p>
+      <% if v_type == 'DC Residency' %>
+          <p>New request to the Local Residency will be sent.</p>
+      <% else %>
+          <p>New request to the Federal Hub will be sent.</p>
+      <% end %>
     </div>
     <%= form_tag fed_hub_request_documents_path, method: :post do %>
         <%= hidden_field_tag 'person_id', person.id  %>
@@ -68,6 +72,7 @@
     </div>
     <%= form_tag extend_due_date_documents_path, method: :put do %>
         <%= hidden_field_tag 'family_member_id', f_member.id  %>
+        <%= hidden_field_tag 'person_id', person.id  %>
         <%= hidden_field_tag 'verification_type', v_type%>
         <%= hidden_field_tag 'admin_action', 'extend' %>
 
@@ -81,3 +86,59 @@
   </div>
 </div>
 <!-- ==== Extend request ==== -->
+
+<!-- ***** View History ***** -->
+<div class="row">
+  <div class="view-history col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-history"%>>
+    <div>
+      <h5>Verification History</h5>
+      <table class="table table-bordered table-hover table-responsive">
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Date</th>
+          <th scope="col">Action</th>
+          <th scope="col">Modifier</th>
+          <th scope="col">Update Reason</th>
+          <th scope="col">Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% person.consumer_role.verification_type_history_elements.select{|el| el.verification_type == v_type }.each_with_index do |record, index| %>
+            <tr>
+              <th scope="row"><%= index + 1 %></th>
+              <td><%= record.created_at.in_time_zone('Eastern Time (US & Canada)') %></td>
+              <td><%= record.action.capitalize %></td>
+              <td><%= record.modifier %></td>
+              <td><%= record.update_reason %></td>
+              <td>
+                <% if request_response_details(person, record, v_type) %>
+                    <button type="button" data-toggle="modal" data-target=<%="#record_details_#{record.id}" %>>Payload</button>
+                <% end %>
+              </td>
+            </tr>
+            <div class="modal fade" id=<%="record_details_#{record.id}" %>  tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title"><%= "#{record.action.capitalize} payload" %></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <%= request_response_details(person, record, v_type) %>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ==== view history ==== -->

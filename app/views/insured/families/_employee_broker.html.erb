@@ -1,14 +1,14 @@
 <div class="panel panel-default module broker employee-broker">
   <div class="panel-heading">
     <h3 class="panel-title">
-      <%= title.present? ? title : "Your Broker" %>
+      <%= title.present? ? title : l10n("insured.your_broker") %>
     </h3>
   </div>
   <div class="panel-body">
     <div class="vertically-aligned-row">
       <div>
         <strong>
-          Broker Name:
+          <%= l10n("insured.broker_name") %>:
         </strong>
         <span>
           <%= @employee_role.employer_profile.broker_agency_profile.legal_name.capitalize %>
@@ -19,7 +19,7 @@
       <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone.present? %>
         <div>
           <strong>
-            Phone Number:
+            <%= l10n("phone_number") %>:
           </strong>
           <span>
             <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.phone %>
@@ -29,7 +29,7 @@
       <% if @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address.present? %>
         <div>
           <strong>
-            Email Address:
+            <%= l10n("email_address") %>:
           </strong>
           <span>
             <%= @employee_role.employer_profile.active_broker_agency_account.writing_agent.email.address %>

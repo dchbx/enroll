@@ -537,7 +537,6 @@ module ApplicationHelper
     'Confirm'
   end
 
-
   def qualify_qle_notice
     content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
@@ -545,7 +544,7 @@ module ApplicationHelper
       concat " to see if you qualify for a Special Enrollment period"
     end
   end
-
+  
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end

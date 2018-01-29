@@ -31,7 +31,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let(:quiet_period_end_on) {
-        Settings.aca.shop_market.initial_application.quiet_period_end_on
+        Settings.aca.shop_market.initial_application.quiet_period.mday
       }
 
       let(:quiet_period_end_date) {
@@ -193,7 +193,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let(:quiet_period_end_on) {
-        Settings.aca.shop_market.initial_application.quiet_period_end_on
+        Settings.aca.shop_market.initial_application.quiet_period.mday
       }
 
       let(:quiet_period_end_date) {

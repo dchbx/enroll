@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
+RSpec.describe ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
@@ -8,9 +8,9 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Initial Employer first invoice available in the account',
-                            :notice_template => 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
-                            :notice_builder => 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
-                            :event_name => 'initial_employer_invoice_available',
+                            :notice_template => 'notices/shop_employer_notices/initial_employer_first_invoice_available_notice',
+                            :notice_builder => 'ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable',
+                            :event_name => 'initial_employer_first_invoice_available',
                             :mpi_indicator => 'MPI_SHOP20',
                             :title => "Your Invoice for Employer Sponsored Coverage is Now Available"})
                           }
@@ -27,7 +27,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -35,7 +35,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
@@ -57,14 +57,35 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
-    end
-    it "should append necessary information" do
+      @employer_notice = ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable.new(employer_profile, valid_parmas)
       plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
-      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+      
       @employer_notice.append_data
-      expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
+    end
+    it "should return due date" do
+      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
+    end
+    it "should return start on" do
+      expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
+    end
+  end
+
+  describe "#generate_pdf_notice" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable.new(employer_profile, valid_parmas)
+    end
+
+    it "should render the notice template" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_first_invoice_available_notice"
+    end
+
+    it "should generate pdf" do
+      @employer_notice.build
+      @employer_notice.append_data
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
 

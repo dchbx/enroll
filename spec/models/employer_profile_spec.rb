@@ -352,6 +352,20 @@ describe EmployerProfile, dbclean: :after_each do
   context "has hired a broker" do
   end
 
+  context "trigger employer_invoice_available" do
+    let(:params)  { {} }
+    let(:employer_profile) {EmployerProfile.new(**params)}
+    it "should trigger renewal_notice job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer_profile.trigger_notices("employer_invoice_available")
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'employer_invoice_available']
+    end
+  end
+
   context "has employees that have enrolled in coverage" do
     let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
     let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
@@ -505,6 +519,8 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 1
       employer = Organization.find(employer.organization.id).employer_profile
       employer.hire_broker_agency(broker_agency_profile)
+      expect(employer).to receive(:employer_broker_fired)
+      employer.employer_broker_fired
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0

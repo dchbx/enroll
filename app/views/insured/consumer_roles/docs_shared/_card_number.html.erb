@@ -1,7 +1,7 @@
 <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-  <%= v.text_field :card_number, :placeholder => "Card Number", :pattern => "[a-zA-Z0-9]{13}", class: "doc_fields",
-  :title => "
+  <%= v.text_field :card_number, :placeholder => l10n("insured.consumer_roles.docs_shared.card_number"), :pattern => "[a-zA-Z0-9]{13}", class: "doc_fields",
+  :title => l10n("insured.consumer_roles.docs_shared.card_number_title") %><br>
   • Please enter the Card Number. The Card Number is exactly 13 letters and numbers. You must enter three letters followed by 10 numbers. You may not enter any special characters.
   • If you have a Resident Alien Card issued prior to December 1997, it does not contain a Card Number. In that case please enter three ‘A’s followed by 10 zeroes (i.e., 'AAA0000000000') so that you enter exactly 13 characters.
-  How to find the Card Number: The document number, also called a Card Number, is printed on the back of the current version of the card. Previous versions of the card featured the document number and expiration date on the front of the card." %><br>
+  How to find the Card Number: The document number, also called a Card Number, is printed on the back of the current version of the card. Previous versions of the card featured the document number and expiration date on the front of the card.<br>
 </div>

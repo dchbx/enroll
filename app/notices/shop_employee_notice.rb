@@ -27,15 +27,16 @@ class ShopEmployeeNotice < Notice
   def build
     notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
-    notice.primary_fullname = census_employee.employee_role.person.full_name
-    notice.employer_name = census_employee.employer_profile.legal_name
+    notice.primary_fullname = census_employee.employee_role.person.full_name.titleize
+    notice.employer_name = census_employee.employer_profile.legal_name.titleize
+    notice.primary_email = census_employee.employee_role.person.work_email_or_best
     append_hbe
     append_address(census_employee.employee_role.person.mailing_address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
   end
 
   def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
   end
 
   def non_discrimination_attachment

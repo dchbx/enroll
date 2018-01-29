@@ -115,41 +115,8 @@ class BenefitCoveragePeriod
   #
   # @return [ Date ] the earliest termination effective date.
   def termination_effective_on_for(date)
-    if open_enrollment_contains?(date)
-
-      ##  Scendario: Open Enrollment is 11/1 - 1/31
-        # 11/3  => 1/1
-        # 11/22 => 1/1
-        # 12/9  => 1/1
-        # 12/23 => 1/31
-        #   1/5 => 1/31
-        #  1/17 => 2/28
-
-      compare_date = date.end_of_month + 1.day
-
-      return case
-      when (compare_date < start_on)  # November
-        start_on
-      when compare_date == start_on   # December
-        if date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
-          start_on
-        else
-          start_on.end_of_month
-        end
-      when compare_date > start_on    # January and forward
-        if date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
-          date.end_of_month
-        else
-          date.next_month.end_of_month
-        end
-      end
-    else 
-     #  new rule
-        effective_date = date
-
-      # Add guard to prevent the temination date exceeding end date in the Individual Market
-      [effective_date, end_on].min
-    end
+    # Add guard to prevent the temination date exceeding end date in the Individual Market
+    [date, end_on].min # see 20996
   end
 
   # The earliest coverage start effective date, based on today's date and site settings

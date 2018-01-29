@@ -14,7 +14,7 @@
             <%= render "shared/plan_shoppings/more_plan_details" %>
             <p class="pull-right">
               <a href="javascript:void(0);" style="display: none;" class="btn btn-default compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
-                COMPARE PLANS
+                <%= l10n("compare_plans").to_s.upcase %>
               </a>
             </p>
 
@@ -28,17 +28,17 @@
 
               <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12" style="padding-right: 0;">
                 <div class="sort-area" style='margin:10px 0;'>
-                  <span><strong>Sort By</strong></span>
+                  <span><strong><%= l10n("sort_by") %></strong></span>
                   <div class="btn-group" role="group" id='sort_by'>
-                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-name'>Plan Name</a>
-                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-metal-premium'>Premium Amount</a>
-                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-metal-deductible'>Deductible</a>
-                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-carrier'>Carrier</a>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-name'><%= l10n("plan_name") %></a>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-metal-premium'><%= l10n("premium_amount") %></a>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-metal-deductible'><%= l10n("deductible") %></a>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-carrier'><%= l10n("carrier") %></a>
                   </div>
                 </div>
 
                 <div id="plans">
-                  <h3>Loading...</h3>
+                  <h3><%= l10n("loading") %>...</h3>
                 </div>
               </div>
             </div>
@@ -47,7 +47,7 @@
           <div class="row no-buffer">
             <p class="pull-right">
               <a href="javascript:void(0);" style="display: none;" class="btn btn-default compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
-                COMPARE PLANS
+                <%= l10n("compare_plans").to_s.upcase %>
               </a>
             </p>
           </div>
@@ -84,13 +84,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Plan Compare Alert</h4>
+        <h4 class="modal-title"><%= l10n("plan_compare_alert") %></h4>
       </div>
       <div class="modal-body">
-        <p style='color:red;'>Can not select more than 3 plans to compare.</p>
+        <p style='color:red;'><%= l10n(".can_not_select_more_than_n_plans_to_compare", number: 3) %></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("close") %></button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

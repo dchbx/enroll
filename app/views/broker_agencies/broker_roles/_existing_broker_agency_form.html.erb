@@ -27,12 +27,12 @@
       <div class="col-md-9 col-sm-9 col-xs-12 broker-agency-search">
         <div class="row search-dropdown-wrapper">
           <div class="col-md-12 col-sm-12 col-xs-12">
-            <h4>Select Your Broker Agency</h4>
+            <h4><%=l10n("broker_agencies.broker_roles.select_your_broker_agency")%></h4>
             <div class="col-md-4 col-sm-6 col-xs-12 input-group input-no-pd">
               <%= f.hidden_field :broker_agency_id %>
               <%= text_field_tag :agency_search, nil, placeholder: 'Name/FEIN', class: 'form-control' %>
               <div class="input-group-btn">
-                <a href="#" onclick="return false;" class="btn btn-select search" data-loading-text="Loading..."><i class="fa fa-search"></i> search</a>
+                <a href="#" onclick="return false;" class="btn btn-select search" data-loading-text="Loading..."><i class="fa fa-search"></i><%= l10n("search").to_s.downcase%></a>
               </div>
             </div>
           </div>
@@ -49,7 +49,7 @@
         <div class="row no-buffer">
           <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
             <button type="submit" class
-            ="btn btn-primary">Submit Application</button>
+            ="btn btn-primary"><%= l10n("submit_application")%></button>
           </div>
         </div>
       </div>

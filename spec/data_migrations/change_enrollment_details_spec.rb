@@ -120,16 +120,25 @@ describe ChangeEnrollmentDetails do
 
     end
 
-    context "it should cancel the enrollment" do
+    context "it should cancel the enrollment when it is eligible for cancelling" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
         allow(ENV).to receive(:[]).with("action").and_return "cancel"
-        subject.migrate
-        hbx_enrollment.reload
       end
 
-      it "should cancel the enrollment" do
+      it "should cancel the enrollment when it is eligible for cancelling" do
+        expect(hbx_enrollment.may_cancel_coverage?).to eq true
+        subject.migrate
+        hbx_enrollment.reload
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+      it "should not cancel the enrollment when it is not eligible for cancelling" do
+        hbx_enrollment.update_attributes(aasm_state:"coverage_terminated")
+        expect(hbx_enrollment.may_cancel_coverage?).to eq false
+        original_status = hbx_enrollment.aasm_state
+        hbx_enrollment.reload
+        expect(hbx_enrollment.aasm_state).not_to eq "coverage_canceled"
+        expect(hbx_enrollment.aasm_state).to eq original_status
       end
     end
 
@@ -144,6 +153,19 @@ describe ChangeEnrollmentDetails do
         subject.migrate
         hbx_enrollment.reload
         expect(hbx_enrollment.enrollment_signature.present?).to be_truthy
+      end
+    end
+
+    context "expire the enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "expire_enrollment"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should expire the enrollment" do
+        expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
       end
     end
   end

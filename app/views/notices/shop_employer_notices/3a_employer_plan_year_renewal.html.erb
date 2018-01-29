@@ -1,12 +1,12 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>RE: Application to Offer Group Health Coverage in DC Health Link</h3></td>
+      <td><h3>Application to Offer Group Health Coverage in <%= Settings.site.short_name %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -14,24 +14,26 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:  </td>
+      <td>Dear <%= notice.employer_name %>:  </td>
     </tr>
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Thank you for finalizing your plan offerings to your employees through #{Settings.site.short_name}."} %>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "Thank you for finalizing your plan offerings to your employees through #{Settings.site.short_name}.", top_margin: '10px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}."} %>
-<br>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}. Your employees can begin to enroll in coverage on <strong>#{notice.plan_year.open_enrollment_start_on}</strong>, employees must complete their enrollments no later than <strong>#{notice.plan_year.open_enrollment_end_on}</strong>. You can monitor your employee enrollments during your open enrollment period through your employer account – see the
+  <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf'>Employers Managing Your Employee Roster guide</a> for instructions.", bottom_margin: '5px'} %>
+
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note that your group will only obtain coverage if:",
-  listings: ["At least two-thirds of your eligible employees enroll in your group health coverage or waive due to having other coverage.",
-             "One non-owner employee enrolls in health coverage."] } %>
+  listings: ["At least two-thirds of your eligible employees enroll in your group health coverage or waive due to having other coverage; and",
+             "At least one non-owner employee enrolls in health coverage."] } %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you are unable to satisfy these requirements, you will only be able to offer #{Settings.site.short_name} coverage during the special annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without contributing 50% to employees’ premiums or meeting the two-thirds minimum participation requirement."} %>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "If you are unable to satisfy these requirements, you will only be able to offer #{Settings.site.short_name} coverage during the special annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without contributing 50% to employees’ premiums or meeting the two-thirds minimum participation requirement. You are still required to have 1 non-owner enroll in coverage during the January 1 exception period. If you are unable to meet these requirements by the end of the employee open enrollment period, #{Settings.site.short_name} will send a notice at the end of open enrollment with information on next steps.", bottom_margin: '5px'} %>
+
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
@@ -43,7 +45,8 @@
       <td>
         <ul style="list-style: circle solid;">
         <li style="margin-top: 0px;">
-          <strong>Employee Open Enrollment Period</strong><br>When your employee open enrollment period begins, we will send an email to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a <%= Settings.site.short_name %> account and log in, review their plan options, and enroll into coverage.<br>During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan.
+          <strong>Employee Open Enrollment Period</strong><br>When your employee open enrollment period begins, we will send a notice to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a <%= Settings.site.short_name %> account and log in, review their plan options, and enroll into coverage.<br><br>
+          During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan or waived coverage.
         </li>
         <li style="margin-top: 5px;">
           <strong>Review Employee Enrollments</strong><br>As your employees enroll, you are able to track their enrollment actions in your <%= Settings.site.short_name %> Employer account by clicking on “View Enrollment Reports”, including a breakdown of employer and employee premium contributions.
@@ -56,22 +59,14 @@
     </tr>
   </tbody>
 </table>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Please contact your broker for further assistance.  You can also contact DC Health Link with any questions:"],
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
     heading: 'For Questions or Assistance:', sub_heading: ''} %>
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-           <strong>By calling <%=Settings.contact_center.phone_number%></strong>
-        </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["By calling #{notice.hbe.phone}",
+    "TTY: #{Settings.contact_center.tty}",
+    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
@@ -80,4 +75,4 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)"} %>
+ content: "This notice is being provided in accordance with 45 C.F.R. 155.715(e)."} %>

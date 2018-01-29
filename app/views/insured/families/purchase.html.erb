@@ -1,20 +1,20 @@
 <div class="container bottom-pd">
   <div class="row">
   <div id="confirm_plan" class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
-    <h1 class="darkblue">Confirm Your Plan Selection</h1>
+    <h1 class="darkblue"><%= l10n("confirm_your_plan_selection") %></h1>
     <% if @terminate.present? %>
-      <p>Click Terminate Plan button to complete your termination from coverage.</p>
-      <p>You will remain enrolled in coverage until you terminate your plan selection below.</p>
+      <p><%= l10n("insured.families.purchase.click_terminate_plan_button") %></p>
+      <p><%= l10n("insured.families.purchase.remain_in_plan_until_terminate") %></p>
     <% else %>
-      <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
-      <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+      <p><%= l10n("insured.families.purchase.current_plan_selection_displayed_below") %></p>
+      <p><%= l10n("insured.families.purchase.not_complete_until_purchase") %></p>
     <% end %>
     <p>
       <% if @enrollment.employer_profile.present? %>
         <strong><%= @enrollment.employer_profile.legal_name %></strong><br>
       <% end %>
       <strong><%= @plan.name %></strong><br>
-      Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
+      <%= l10n("starting_on") %> : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
     </p>
 
     <br>
@@ -27,7 +27,7 @@
     <br />
 
     <% if @terminate.present? %>
-      <%= link_to("Terminate Plan", terminate_insured_plan_shopping_path(id: @enrollment.id, terminate_reason: @terminate_reason), {:class => "btn btn-primary pull-right", :method => :post}) %>
+      <%= link_to(l10n("terminate_plan"), terminate_insured_plan_shopping_path(id: @enrollment.id, terminate_reason: @terminate_reason), {:class => "btn btn-primary pull-right", :method => :post}) %>
     <% else %>
       <%= link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, change_plan: @change_plan), class: 'btn btn-primary pull-right', method: :post %>
     <% end %>

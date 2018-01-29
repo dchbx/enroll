@@ -208,7 +208,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     it "should redirect to family home if termination is possible" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_benefit)
-      expect(hbx_enrollment).to receive(:propogate_terminate).with(TimeKeeper.date_of_record)
+      expect(HbxEnrollment.aasm.state_machine.events[:terminate_coverage].transitions[0].opts.values.include?(:propogate_terminate)).to eq true
       expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
       expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record

@@ -1,0 +1,82 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3><%= Settings.site.short_name %> Invoice Available</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.employer_name %>,</td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+    {content: "Your #{TimeKeeper.date_of_record.next_month.strftime('%B')} invoice is now available in the billing tab of your #{Settings.site.short_name} account. Please follow the steps listed below for assistance making your premium payment."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "<strong>Make a Secure Online Payment</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "#{Settings.site.short_name} offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in this <a href=https://dchealthlink.com/sites/default/files/v2/forms/Employers-Paying-Your-Premiums-Online.pdf>guide</a> to make your premium payment online.</br><a href=#{"https://www.e-BillExpress.com/ebpp/DCHealthPay"}>https://www.e-BillExpress.com/ebpp/DCHealthPay</a>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+    {content: "<strong>To make a secure electronic check payment by phone</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+    {content: "Call #{notice.hbe.phone} (LINK)"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+    {content: "Select your language (1 for English, 2 for Spanish, additional language options available)"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+    {content: "Select option for Small Business Employer"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+    {content: "Select option for Need to Make a Payment", bottom_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => {listings:
+                                                                     ["Log in to your <a href= #{Settings.site.home_url} >#{Settings.site.website_name}</a> Account",
+                                                                      "Select “Employee” from the menu on the left of your account page",
+                                                                      "You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name} in the column titled “Current Enrollment Status” on your employee roster."], previous: "<strong>To view the activity of your employees’ enrollment activity:</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:"],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 0px;">
+          By calling <%= notice.hbe.phone %>
+        </li>
+        <li style="margin-top: 0px;">
+          TTY: <%= Settings.contact_center.tty%>
+        </li>
+        <li style="margin-top: 0px;">
+          Online at <a href= <%= Settings.site.home_url %> > <%= Settings.site.website_name %></a>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "This notice is being provided in accordance with 45 C.F.R. &sect;155.705(b)."} %>

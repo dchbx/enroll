@@ -1,3 +1,3 @@
 <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd doc_fields select_tag">
-  <%= v.select :country_of_citizenship, options_for_select(::VlpDocument::COUNTRIES_LIST, @country||="Country of Citizenship"), prompt: "Country of Citizenship", class: "select_tag" %><br>
+  <%= v.select :country_of_citizenship, options_for_select(::VlpDocument::COUNTRIES_LIST, @country||=l10n("insured.consumer_roles.docs_shared.country_of_citizenship")), prompt: l10n("insured.consumer_roles.docs_shared.country_of_citizenship"), class: "select_tag" %><br>
 </div>
