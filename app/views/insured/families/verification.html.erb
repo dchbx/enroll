@@ -4,7 +4,7 @@
 <h1 class="darkblue no-buffer"><%= l10n("documents") %></h1>
 <div class="documents-tab">
   <% if @person && @person.consumer_role %>
-     <h4 class="starter"><%= l10n("insured.verification_information") %></h4>
+     <h4 class="starter">Insured Verification Information</h4>
 
       <%= render 'insured/families/verification/verification' %>
   <% end %>
