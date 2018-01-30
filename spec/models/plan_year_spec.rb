@@ -2146,11 +2146,16 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 end
 
 describe PlanYear, "which has the concept of export eligibility" do
+
+  let(:employer_profile){ FactoryGirl.create(:employer_profile)}
+  let(:current_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
+  let(:future_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolled") }
+
   ALL_STATES = PlanYear.aasm.states.map(&:name).map(&:to_s)
   INVALID_EXPORT_STATES = PlanYear::INELIGIBLE_FOR_EXPORT_STATES
   EXPORTABLE_STATES = ALL_STATES - INVALID_EXPORT_STATES
 
-  subject { PlanYear.new(:aasm_state => export_state) }
+  subject { PlanYear.new(start_on:TimeKeeper.date_of_record.next_month.beginning_of_month, :aasm_state => export_state) }
 
   INVALID_EXPORT_STATES.each do |astate|
     describe "in #{astate} state" do
@@ -2165,11 +2170,105 @@ describe PlanYear, "which has the concept of export eligibility" do
     describe "in #{astate} state" do
       let(:export_state) { astate}
       it "is not eligible for export" do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.beginning_of_month + 15)
         expect(subject.eligible_for_export?).to eq true
       end
     end
   end
 
+
+  describe PlanYear, "exporting eligibile plan year for initial employer"  do
+
+    context "On/before 15th of month" do
+
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 14 }
+
+      before :each do
+        allow(current_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+        allow(employer_profile).to receive(:plan_years).and_return [current_plan_year]
+      end
+
+      it "should return false for current plan year" do
+        expect(current_plan_year.eligible_for_export?).to be_falsey
+      end
+
+      it "should not return plan year" do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq []
+      end
+    end
+
+    context "On/After 16th of the month" do
+
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 15 }
+
+      before :each do
+        allow(employer_profile).to receive(:plan_years).and_return [current_plan_year]
+        allow(current_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+      end
+
+      it "should return true for current plan year" do
+        expect(current_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return current plan year" do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq [current_plan_year]
+      end
+    end
+
+  end
+
+  describe PlanYear, "exporting eligibile plan year for renewal employer"  do
+
+    before :each do
+      allow(employer_profile).to receive(:plan_years).and_return [current_plan_year,future_plan_year]
+      allow(current_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year)
+      allow(future_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month)
+    end
+
+    context "On/Before 15th of month" do
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 14 }
+
+      before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+      end
+
+      it "should return true for past plan year(active plan year)" do
+        expect(current_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return only past plan year" do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq [current_plan_year]
+      end
+
+      it "should return false for future plan year(renewing plan year)" do
+        expect(future_plan_year.eligible_for_export?).to be_falsey
+      end
+
+    end
+
+    context "On/After 16th of the month" do
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 15 }
+
+      before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+      end
+
+      it "should return true for past plan year(active plan year)" do
+        expect(current_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return true for future plan year(renewing plan year)" do
+        expect(future_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return past and future plan years." do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq [current_plan_year,future_plan_year]
+      end
+    end
+
+  end
 
   describe PlanYear, "state machine transitions -- unhappy path" do
 
