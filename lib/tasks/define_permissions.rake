@@ -117,11 +117,6 @@ namespace :permissions do
 end
 
 namespace :permissions do
-  desc 'hbx admin can access accept reject identity documents'
-  DefinePermissions.define_task :hbx_admin_can_access_accept_reject_identity_documents => :environment
-end
-
-namespace :permissions do
   desc 'hbx admin and all csr access accept reject paper application documents'
   DefinePermissions.define_task :hbx_admin_can_access_accept_reject_paper_application_documents => :environment
 end
@@ -142,7 +137,6 @@ end
 #rake permissions:hbx_admin_access_new_consumer_application_sub_tab
 #rake permissions:hbx_admin_access_identity_verification_sub_tab
 #rake permissions:hbx_admin_access_outstanding_verification_sub_tab
-#rake permissions:hbx_admin_can_access_resident_application_sub_tab
 
 #RAILS_ENV=production bundle exec rake permissions:initial_hbx
 #RAILS_ENV=production bundle exec rake permissions:migrate_hbx
