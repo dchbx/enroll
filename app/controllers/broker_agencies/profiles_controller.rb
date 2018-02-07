@@ -5,7 +5,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history, :family_index]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -141,14 +141,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @q = params.permit(:q)[:q]
     id = params.permit(:id)[:id]
     page = params.permit([:page])[:page]
-    if current_user.has_broker_role?
-      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
-    elsif current_user.has_hbx_staff_role?
-      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
-    else
-      redirect_to new_broker_agencies_profile_path
-      return
-    end
+    # if current_user.has_broker_role?
+    #   @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    # elsif current_user.has_hbx_staff_role?
+    #   @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
+    # else
+    #   redirect_to new_broker_agencies_profile_path
+    #   return
+    # end
     #
     # total_families = @broker_agency_profile.families
     # @total = total_families.count

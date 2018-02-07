@@ -234,7 +234,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
-      xhr :get, :family_index, id: broker_agency_profile.id
+      xhr :get, :family_index, id: @broker_agency_profile1.id
       expect(response).to render_template("broker_agencies/profiles/family_index")
     end
   end
