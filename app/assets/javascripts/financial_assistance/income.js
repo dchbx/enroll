@@ -340,7 +340,7 @@ $(document).ready(function() {
   function enableSave(form){
     form.find('.interaction-click-control-save').removeClass('disabled');
   }
-  $(':input[required=""],:input[required]').on('change', function(){
+  $(':input[required=""],:input[required]').on('keypress change', function(){
     var form = $(this).closest('form');
     if (validateForm(form)){
       enableSave(form)
