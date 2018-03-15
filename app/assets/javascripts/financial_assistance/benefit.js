@@ -66,6 +66,7 @@ $(document).ready(function() {
         startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
         $(clonedForm).find('select').selectric();
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+        e.stopImmediatePropagation();
       } else {
         // prompt to delete all these benefits
         e.preventDefault();
@@ -105,6 +106,7 @@ $(document).ready(function() {
           startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
         $(clonedForm).find('select').selectric();
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+        e.stopImmediatePropagation();
     });
 
     /* edit existing benefits */
