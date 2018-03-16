@@ -20,7 +20,7 @@ site:
   long_name: ""
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
-  logo_file_name: "logo.png"
+  logo_file_name: "logo_dc.png"
   make_their_premium_payments_online: "https://www.mahealthconnector.org/business/employers/payment-information"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "mhc"
