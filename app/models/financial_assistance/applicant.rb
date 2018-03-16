@@ -416,9 +416,11 @@ class FinancialAssistance::Applicant
   end
 
   def other_questions_complete?
-    !has_daily_living_help.nil? &&
-      !need_help_paying_bills.nil? &&
-      !is_former_foster_care.nil? if self.age_of_the_applicant.between?(18,26)
+    if (age_of_the_applicant > 18 && age_of_the_applicant < 26)
+      !has_daily_living_help.nil? && !need_help_paying_bills.nil? && !is_former_foster_care.nil?
+    else
+      !has_daily_living_help.nil? && !need_help_paying_bills.nil?
+    end
   end
 
   def tax_info_complete?
