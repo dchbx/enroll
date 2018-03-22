@@ -225,7 +225,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 3
+      expect(helper.calculate_participation_minimum).to eq 4
     end
   end
 
@@ -282,6 +282,13 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should return bucket name with system name prepended and environment name appended" do
       bucket_name = "sample-bucket"
       expect(env_bucket_name(bucket_name)).to eq("dchbx-enroll-" + bucket_name + "-local")
+    end
+  end
+
+  describe "phone_number_format" do
+    it "should return phone number with brackets" do
+      number = Settings.contact_center.phone_number
+      expect(phone_number_format(number)).to eq "(855) 532-5465"
     end
   end
 
@@ -423,7 +430,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should not return next year" do
       expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
     end
-end
+  end
 
   describe ".notify_employer_when_employee_terminate_coverage" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}
@@ -501,7 +508,7 @@ end
     end
 
     it "should raise error when non boolean values are passed" do
-      expect{helper.convert_to_bool(val9)}.to raise_error
+      expect{helper.convert_to_bool(val9)}.to raise_error(ArgumentError)
     end
   end
 end
