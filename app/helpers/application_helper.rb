@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include ActionView::Helpers::NumberHelper
 
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
@@ -112,6 +113,12 @@ module ApplicationHelper
   def format_time_display(timestamp)
     timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
   end
+
+  def amount_color_style(amount)
+    return "" if amount.blank?
+    amount > 0 ? "class=red" : ""
+  end
+
 
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
@@ -285,6 +292,10 @@ module ApplicationHelper
       phone = nil
     end
     return phone
+  end
+
+  def phone_number_format(number)
+    number_to_phone(number.gsub(/^./, "").gsub('-',''), area_code: true)
   end
 
 # the following methods are used when we are embedding devise signin and signup pages in views other than devise.
@@ -494,7 +505,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+      return (@current_plan_year.eligible_to_enroll_count * 2.0 / 3.0).ceil
     end
   end
 
@@ -545,6 +556,18 @@ module ApplicationHelper
     end
   end
 
+  def ee_plan_selection_confirmation_sep_new_hire(enrollment)
+    if enrollment.is_shop? && (enrollment.enrollment_kind == "special_enrollment" || enrollment.census_employee.new_hire_enrollment_period.present?)
+      if enrollment.census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || enrollment.special_enrollment_period.present?
+        begin
+          ShopNoticesNotifierJob.perform_later(enrollment.census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire")
+        rescue Exception => e
+          (Rails.logger.error { "Unable to deliver Notices to #{enrollment.census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
+        end
+      end
+    end
+  end
+
   def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
     begin
       if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
@@ -576,8 +599,8 @@ module ApplicationHelper
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
-  def make_binder_checkbox_disabled(employer)
-    eligibility_criteria(employer)
+  def make_binder_checkbox_disabled(org)
+    eligibility_criteria(org)
     (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
   end
 
@@ -611,8 +634,9 @@ module ApplicationHelper
     census_employee.new_hire_enrollment_period.present?
   end
 
-  def eligibility_criteria(employer)
-    if employer.show_plan_year.present?
+  def eligibility_criteria(resource)
+    employer = resource.try(:employer_profile)
+    if employer.present? && employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
@@ -662,10 +686,14 @@ module ApplicationHelper
     TimeKeeper.date_of_record.prev_year.year
   end
 
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
   def convert_to_bool(val)
     return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
     return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
-    raise ArgumentError.new("invalid value for Boolean: \"#{val}\"")
+    raise raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
 end
 
