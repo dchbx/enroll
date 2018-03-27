@@ -1,4 +1,33 @@
 <script type="text/javascript">
+
+$(document).ready(function() {
+
+  function disableSubmit(form){
+    $('#tansition_family_submit').addClass("disabled");
+  }
+
+  function enableSubmit(form){
+    $('#tansition_family_submit').removeClass('disabled');
+  }
+  $('#tansition_family_submit').addClass("disabled");
+  $(':input[required]').on('keyup change', function(){
+    var form = $(this).closest('form');
+    if (validateForm(form)){
+      enableSubmit(form)
+    }else{
+      disableSubmit(form)
+    }
+  });
+
+  function validateForm(form) {
+    var isValid = true;
+    form.find(':input[required]').each(function() {
+      if ( $(this).val() == '' ||  $(this).val()=='0')
+        isValid = false;
+    });
+    return isValid;
+  }
+
   jQuery('[id^="cancel_hbx_"]').click(function($) {
     if (this.checked) {
       jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', false);
@@ -8,6 +37,8 @@
       //jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('checked', false);
     }
   });
+
+});
 </script>
 
 <td colspan="90%">
@@ -32,10 +63,10 @@
         <td><%= number_to_obscured_ssn(person.ssn) %></td>
         <td><%= person.dob %></td>
         <td><%= person.hbx_id %></td>
-        <td><%= check_box_tag "transition_user_#{person.id}", person.id %></td>
-        <td><%= select_tag "transition_market_kind_#{person.id}", options_for_select(IndividualMarketTransition::ROLE_TYPES, selected: "#{person.individual_market_transitions.first.role_type if person.individual_market_transitions.present?}"), prompt: 'no' %></td>
+        <td><%= check_box_tag "transition_user_#{person.id}", person.id, false, required: true %></td>
+        <td><%= select_tag "transition_market_kind_#{person.id}", options_for_select(IndividualMarketTransition::ROLE_TYPES, selected: "#{person.individual_market_transitions.first.role_type if person.individual_market_transitions.present?}"), prompt: 'no', required: true%></td>
         <td><%= select_tag "transition_reason_#{person.id}", options_for_select(IndividualMarketTransition::REASON_CODES, "1") %></td>
-        <td><%= text_field_tag "transition_effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "form-control date-field date-picker"%></td>
+        <td><%= text_field_tag "transition_effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "form-control date-field date-picker", required: true%></td>
       </tr>
       <% end %>
       <tr><td colspan = "12"><br /></td></tr>
@@ -44,7 +75,7 @@
           <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
           <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
           <%= hidden_field_tag :family, params[:family] %>
-          <%= submit_tag "Submit", class: 'btn btn-primary' %>
+          <%= submit_tag "Submit", class: 'btn btn-primary', id: 'tansition_family_submit'%>
         </td>
       </tr>
     </table>
