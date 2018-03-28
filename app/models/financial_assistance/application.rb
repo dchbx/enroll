@@ -730,13 +730,11 @@ private
     ## Remove  when copy method is fixed to exclude copying Tax Household
     active_applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
 
-    active_applicants.each do |applicant|
-      if applicant.is_claimed_as_tax_dependent?
-        # Assign applicant to the same THH that the person claiming this dependent belongs to.
-        thh_of_claimer = active_applicants.find(applicant.claimed_as_tax_dependent_by).tax_household
-        applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
-        applicant.update_attributes!(tax_filer_kind: 'dependent')
-      elsif applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.tax_household_of_spouse.present?
+    non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
+    tax_dependents= active_applicants.where(is_claimed_as_tax_dependent: true)
+
+    non_tax_dependents.each do |applicant|
+      if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.tax_household_of_spouse.present?
         # Assign joint filer to THH of Spouse.
         applicant.tax_household = applicant.tax_household_of_spouse
         applicant.update_attributes!(tax_filer_kind: 'tax_filer')
@@ -746,6 +744,13 @@ private
         applicant.tax_household = family.active_household.tax_households.create!(application_id: id)
         applicant.update_attributes!(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
       end
+    end
+
+    tax_dependents.each do |applicant|
+      # Assign applicant to the same THH that the person claiming this dependent belongs to.
+      thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).tax_household
+      applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
+      applicant.update_attributes!(tax_filer_kind: 'dependent')
     end
 
     # delete THH without any applicant.
