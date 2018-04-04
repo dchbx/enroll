@@ -1,0 +1,28 @@
+<h4 class="text-center mt-3">Available Sites</h4>
+
+<table class="table table-striped">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Site Key</th>
+      <th scope="col">Long Name</th>
+      <th scope="col">Short Name</th>
+      <th scope="col">By Line</th>
+      <th scope="col">Domain Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @sites.each do |site| %>
+      <tr>
+        <td><%= site.site_key %></td>
+        <td><%= site.long_name %></td>
+        <td><%= site.short_name %></td>
+        <td><%= site.byline %></td>
+        <td><%= site.domain_name %></td>
+        <td><%= link_to 'Edit Site', edit_site_path(site) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'New Site', new_site_path, class:'btn btn-primary'%>
