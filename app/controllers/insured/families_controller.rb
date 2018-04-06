@@ -305,7 +305,8 @@ class Insured::FamiliesController < FamiliesController
       if current_user.has_hbx_staff_role?
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role == "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
@@ -320,7 +321,7 @@ class Insured::FamiliesController < FamiliesController
         end
       else @person.consumer_role.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_without_transition_member_action
         else
           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         end
