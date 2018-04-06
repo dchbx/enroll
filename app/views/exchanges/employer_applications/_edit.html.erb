@@ -1,0 +1,15 @@
+<td colspan="8" class="form_<%= @application.id %>" style="border: none;">
+
+  <div class="row module forms">
+    <div class="col-sm-8 col-sm-offset-2 col-xs-12">
+
+      <% if can_terminate_application?(@application) %>
+      <%= render 'exchanges/employer_applications/terminate', application: @application, employer_profile: @employer_profile %>
+      <% elsif can_cancel_application?(@application) %>
+      <%= render 'exchanges/employer_applications/cancel', application: @application, employer_profile: @employer_profile %>
+      <% else %>
+      <%= render 'exchanges/employer_applications/no_action', :object => @application %>
+      <% end %>
+    </div>
+  </div>
+</td>

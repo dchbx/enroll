@@ -1,0 +1,65 @@
+<%= form_tag(exchanges_employer_application_terminate_path(@application), method: :put) do %>
+<%= hidden_field_tag 'employer_id', @employer_profile.id %>
+<div class="row no-buffer">
+  <div class="col-xs-12 form-group form-group-lg no-pd">
+    <div class="row">
+      <div class="col-xs-6">
+        <label for="planYearBegin" class='pull-right'>Plan Year Begin</label>
+      </div>
+      <div class="col-xs-6">
+        <span class="pull-left"><%= TimeKeeper.format_date @application.start_on %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 form-group form-group-lg no-pd">
+    <div class="row">
+      <div class="col-xs-6">
+        <label for="benefitGroup" class='pull-right'>Benefit Groups</label>
+      </div>
+      <div class="col-xs-6">
+        <span class="pull-left"><%= raw @application.benefit_groups.pluck(:title).join(', ') %></span>
+      </div>
+    </div>
+  </div>
+
+  <% if @application.active? || @application.expired? %>
+  <div class="col-xs-12 form-group form-group-lg no-pd">
+    <div class="row">
+      <div class="col-xs-6">
+        <label for="terminateReason" class='pull-right'>Reason for termination</label>
+      </div>
+      <div class="col-xs-6">
+        <div class="radio pull-left">
+          <input type="radio" name="termReason" id="nonPaymentRadio" value="non_payment" checked>
+          Non-payment of Premiums
+        </div>
+        <div class="radio">
+          <input type="radio" name="termReason" id="voluntaryRadio" value="voluntary">
+          Voluntary
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 form-group form-group-lg no-pd">
+    <div class="row">
+      <div class="col-xs-6">
+        <label for="terminateReason" class='pull-right'>Group Termination Date</label>
+      </div>
+      <div class="col-xs-6">
+        <div class="pull-left">
+          <%= text_field_tag 'end_on', '', placeholder: "mm/dd/yyyy",
+          class: "required date-picker qle-date-picker form-control", required: true %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+
+  <div class="col-xs-12 form-group form-group-lg no-pd">
+    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure to TERMINATE the plan year?')">Terminate</button>
+    <button type="button" class="btn btn-default" id="btnCancel">Cancel</button>
+  </div>
+</div>
+<% end %>

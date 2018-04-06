@@ -1196,6 +1196,28 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
   end
 end
 
+describe EmployerProfile, "terminate_scheduled_plan_years", dbclean: :after_each do
+  let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "termination_pending", end_on: TimeKeeper.date_of_record-1.day)}
+  let!(:organization) { employer_profile.organization }
+
+  before do
+    EmployerProfile.terminate_scheduled_plan_years
+  end
+
+  it "should move the plan year to terminated state" do
+    plan_year.reload
+    expect(plan_year.aasm_state).to eq "terminated"
+  end
+
+  it "should do nothing when there is no termination_pending plan year" do
+    plan_year.update_attributes!(:aasm_state => "active", :end_on => plan_year.start_on.next_year-1.days)
+    plan_year.reload
+    expect(plan_year.aasm_state).to eq "active"
+  end
+end
+
+
 
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }

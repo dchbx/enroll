@@ -1,0 +1,6 @@
+$('#collapse_<%= @application.id.to_s %>').html("<%= escape_javascript(render "edit") %>");
+$('#collapse_<%= @application.id.to_s %>').show();
+
+$('#collapse_<%= @application.id.to_s %>').find('#btnCancel').click(function() {
+  $('#collapse_<%= @application.id.to_s %>').hide();
+});

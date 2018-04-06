@@ -95,6 +95,12 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :employer_applications do
+      put :terminate
+      put :cancel
+      put :reinstate
+    end
+
     resources :agents do
       collection do
         get :home

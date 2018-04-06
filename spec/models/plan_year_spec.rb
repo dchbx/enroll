@@ -2490,3 +2490,183 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
     end
   end
 end
+
+describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean: :after_each do
+  let(:person) {FactoryGirl.create(:person)}
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', start_on: start_on)}
+  let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+  let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
+  let(:new_end_on) { start_on+2.months }
+
+  before do
+    plan_year.terminate!(new_end_on)
+    plan_year.update_attributes!(end_on: new_end_on, terminated_on: TimeKeeper.date_of_record)
+    benefit_group_assignment1.reload
+  end
+  context 'when plan year is terminated' do
+    it "should terminate employee benefit group assignments" do
+      expect(benefit_group_assignment1.end_on).to eq new_end_on
+    end
+
+    it "should deactivate benefit group assignment" do
+      expect(benefit_group_assignment1.is_active).to be_falsey
+    end
+  end
+end
+
+describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
+
+  let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+  let(:benefit_group1) { FactoryGirl.create(:benefit_group)}
+  let!(:active_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
+  let!(:renewal_plan_year)  { FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
+  let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,renewal_plan_year]) }
+  let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
+  let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}
+  let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let(:employee_role)   { FactoryGirl.build(:employee_role, employer_profile: employer_profile )}
+  let(:enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role)}
+  let(:enrollment2) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role,aasm_state:'auto_renewing')}
+  let(:active_benefit_group_assignment) {census_employee.benefit_group_assignments.where(:benefit_group_id.in =>[benefit_group.id]).first}
+  let(:renewal_benefit_group_assignment) {census_employee.benefit_group_assignments.where(:benefit_group_id.in =>[benefit_group1.id]).first}
+
+  context 'when initial plan year is canceled' do
+
+    before do
+      enrollment.update_attributes(benefit_group_id: benefit_group.id, aasm_state:'coverage_selected')
+      active_benefit_group_assignment.update_attributes(hbx_enrollment_id:enrollment.id,aasm_state:'coverage_selected')
+      active_plan_year.cancel!
+      active_benefit_group_assignment.reload
+    end
+
+    context '.cancel_employee_benefit_packages' do
+
+      it "should cancel employee benefit group assignments" do
+        expect(active_benefit_group_assignment.aasm_state).to eq "initialized"
+      end
+
+      it "should deactivate benefit group assignment" do
+        expect(active_benefit_group_assignment.is_active).to be_falsey
+      end
+    end
+
+    context '.cancel_employee_enrollments' do
+      it "should cancel enrollment" do
+        enrollment.reload
+        expect(enrollment.aasm_state).to eq "coverage_canceled"
+      end
+    end
+
+    context '.update_end_date' do
+      it "should update the initial plan year end date" do
+        expect(active_plan_year.end_on).to eq active_plan_year.start_on
+      end
+    end
+  end
+
+  context 'when renewal plan year is canceled' do
+
+    before do
+      enrollment.update_attributes(benefit_group_id: benefit_group.id, aasm_state:'coverage_selected')
+      enrollment2.update_attributes!(benefit_group_id: benefit_group1.id, aasm_state:'auto_renewing')
+      active_benefit_group_assignment.update_attributes(hbx_enrollment_id:enrollment.id,aasm_state:'coverage_selected')
+      renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id:enrollment2.id, is_active:true, aasm_state:'coverage_renewing')
+      renewal_plan_year.cancel_renewal!
+      renewal_benefit_group_assignment.reload
+    end
+
+    context '.cancel_employee_benefit_packages' do
+
+      it 'should not cancel active plan year benefit group assignments' do
+        expect(active_benefit_group_assignment.aasm_state).to eq "coverage_selected"
+      end
+
+      it 'should be active' do
+        expect(active_benefit_group_assignment.is_active).to be_truthy
+      end
+
+      it "should cancel employee renewing benefit group assignments" do
+        expect(renewal_benefit_group_assignment.aasm_state).to eq "initialized"
+      end
+
+      it "should deactivate renewing benefit group assignment" do
+        expect(renewal_benefit_group_assignment.is_active).to be_falsey
+      end
+    end
+
+    context '.update_end_date' do
+      it "should update the renewal plan year end date" do
+        expect(renewal_plan_year.end_on).to eq renewal_plan_year.start_on
+      end
+    end
+
+    context '.cancel_employee_enrollments' do
+
+      it "should cancel renewing enrollment" do
+        enrollment2.reload
+        expect(enrollment2.aasm_state).to eq "coverage_canceled"
+      end
+
+      it "should not cancel active enrollment" do
+        expect(enrollment.aasm_state).to eq "coverage_selected"
+      end
+    end
+  end
+end
+
+describe PlanYear, '.enrollments_for_plan_year', type: :model, dbclean: :after_each do
+  let(:person) { FactoryGirl.create(:person, :with_family)}
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', start_on: start_on)}
+  let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+  let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role.id,employer_profile_id: employer_profile.id) }
+  let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, benefit_group_id: benefit_group.id)}
+
+  it "should return enrollments for the plan year" do
+    expect(plan_year.enrollments_for_plan_year).to eq [hbx_enrollment]
+  end
+end
+
+describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :after_each do
+  let(:person) { FactoryGirl.create(:person, :with_family)}
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', start_on: start_on)}
+  let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+  let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role.id,employer_profile_id: employer_profile.id) }
+  let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, benefit_group_id: benefit_group.id)}
+
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
+  end
+
+  after do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
+  py_termination_dates = [TimeKeeper.date_of_record - 8.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 14.days]
+  py_termination_dates.each do |py_end_on|
+    context 'when plan year is terminated' do
+      it "should move the enrollment to coverage terminated/pending status" do
+        plan_year.schedule_termination!(py_end_on)
+        hbx_enrollment.reload
+        if py_end_on < TimeKeeper.date_of_record
+          expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
+        else
+          expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,74 @@
+<style>
+/*  .custom_filter{
+    margin-left: 15em;
+    margin-top: -15px;
+    position: absolute;
+    z-index: 999;
+  }
+  #upload{
+    position: absolute;
+    margin-left: 75em;
+  }
+
+  .attestation_form{
+    text-align: left !important;
+  }*/
+</style>
+
+
+<div class="container" id="attestation_documents_table">
+  <div class = "table-responsive table-override"> 
+  <h4> Applications </h4>
+  <% plan_years = @employer_profile.plan_years.where(:is_conversion => false) %>
+  <% if plan_years.present? %>
+    <table class = "table" style="table-layout: fixed;">
+      <thead>
+        <tr>
+         <th>Start Date</th>
+         <th>End Date</th>
+         <th>Open Enrollment Start</th>
+         <th>Open Enrollment end</th>
+         <th>Created On</th>
+         <th>Terminated On</th>
+         <th>Status</th>
+         <th>Action Button</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% plan_years.order('start_on DESC').each do |application| %>
+          <tr>
+            <td><%= TimeKeeper.format_date(application.start_on) %></td>
+            <td><%= TimeKeeper.format_date(application.end_on) %></td>
+            <td><%= TimeKeeper.format_date(application.open_enrollment_start_on) %></td>
+            <td><%= TimeKeeper.format_date(application.open_enrollment_end_on) %></td>
+            <td><%= TimeKeeper.format_date_time(application.created_at) %></td>
+            <td><%= TimeKeeper.format_date_time(application.terminated_on) if application.terminated_on.present? %></td>
+            <td><%= application.aasm_state.humanize %></td>
+            <td>
+              <%= link_to 'Update', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
+            </td>
+          </tr>
+          <tr id="collapse_<%= application.id %>">
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <h2>No valid plan years present for <%= @employer_profile.legal_name.titleize %></h2>
+  <% end %>
+</div>
+
+<div class="attestation_form"></div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+  jQuery('.buttons-csv').hide()
+  jQuery('.buttons-excel').hide()
+  function printDoc(id){
+    var window_obj=window.open();
+    window_obj.document.write($('#print_'+id).html());
+    window_obj.print();
+    window_obj.close();
+  }
+</script>
