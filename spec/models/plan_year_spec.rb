@@ -2490,3 +2490,35 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
     end
   end
 end
+
+describe "notify_employer_py_cancellation" do
+  context "notify employer plan year cancellation " do
+    let(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active',announced_externally:true)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
+
+    it "should notify event" do
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+      plan_year.cancel!
+    end
+
+    it "should not notify event" do
+      expect(plan_year).to receive(:notify).exactly(0).times
+      plan_year.revert_renewal!
+    end
+  end
+
+  context "notify renewal employer plan year cancellation " do
+    let(:renewal_plan_year) {FactoryGirl.build(:plan_year,aasm_state:'renewing_enrolled',announced_externally:true)}
+    let(:employer_profile) { employer_profile.plan_years << renewal_plan_year }
+
+    it "should notify event" do
+      expect(renewal_plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: renewal_plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+      renewal_plan_year.cancel_renewal!
+    end
+
+    it "should not notify event" do
+      expect(renewal_plan_year).to receive(:notify).exactly(0).times
+      renewal_plan_year.revert_renewal!
+    end
+  end
+end
