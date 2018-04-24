@@ -14,7 +14,11 @@
 
 <ul class="" id="dependent_ul">
   <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
-  <%= render "insured/family_members/dependent_coverall", dependent: dependent, person: @person %>
+    <% if dependent.person.is_consumer_role_active? %>
+        <%= render "insured/family_members/dependent", dependent: dependent, person: @person %>
+    <% else %>
+        <%= render "insured/family_members/dependent_coverall", dependent: dependent, person: @person %>
+    <% end %>
   <% end %>
 </ul>
 

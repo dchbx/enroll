@@ -1,6 +1,7 @@
 <div class="row row-form-wrapper no-buffer">
   <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
     <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
+
       <label class="static_label label-floatlabel" for="name"><%= l10n(".name").to_s.upcase %></label>
       <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
     </div>
@@ -14,7 +15,11 @@
 
 <ul class="" id="dependent_ul">
   <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
-  <%= render "insured/family_members/dependent", dependent: dependent, person: @person %>
+    <% if dependent.person.is_consumer_role_active? %>
+      <%= render "insured/family_members/dependent", dependent: dependent, person: @person %>
+    <% else %>
+      <%= render "insured/family_members/dependent_coverall", dependent: dependent, person: @person %>
+    <% end %>
   <% end %>
 </ul>
 

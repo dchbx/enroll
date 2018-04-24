@@ -105,7 +105,7 @@ class Insured::FamiliesController < FamiliesController
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
     @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
     @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
-    @resident = @person.resident_role.present?
+    @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
     end

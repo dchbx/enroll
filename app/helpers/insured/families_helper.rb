@@ -260,6 +260,21 @@ module Insured::FamiliesHelper
     end
   end
 
+  def build_consumer_role(person, family)
+    if family.primary_applicant.person == person
+      person.build_consumer_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_consumer_role({:is_applicant => false})
+      person.save!
+    end
+  end
+
+  def build_resident_role(person, family)
+    person.build_resident_role
+    person.save!
+  end
+
   def transition_reason(person)
     if person.is_consumer_role_active?
     @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first

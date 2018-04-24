@@ -32,6 +32,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:has_active_employee_role?).and_return(true)
     allow(person).to receive(:has_consumer_role?).and_return(true)
+    allow(person).to receive(:is_consumer_role_active?).and_return(true)
     allow(person).to receive(:has_resident_role?).and_return(true)
     allow(person).to receive(:inbox).and_return(inbox)
     allow(view).to receive(:enrollment_group_unverified?)
