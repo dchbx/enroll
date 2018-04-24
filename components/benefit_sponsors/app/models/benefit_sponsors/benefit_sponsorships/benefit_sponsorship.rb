@@ -62,10 +62,12 @@ module BenefitSponsors
       has_many    :service_areas, 
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
-      embeds_many :broker_agency_accounts, 
+      embeds_many :broker_agency_accounts,
+                  class_name: "::BenefitSponsors::Accounts::BrokerAgencyAccount",
                   validate: true
 
-      embeds_many :general_agency_accounts, 
+      embeds_many :general_agency_accounts,
+                  class_name: "::BenefitSponsors::Accounts::GeneralAgencyAccount",
                   validate: true
 
       has_many    :documents,
