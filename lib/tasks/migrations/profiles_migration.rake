@@ -14,21 +14,25 @@ task :profiles_migration => :environment do
   field_names = %w( organization_id hbx_id status)
 
   logger = Logger.new("#{Rails.root}/log/profile_migration_data.log")
-  logger.info "Script Start for #{profile_type}_#{TimeKeeper.datetime_of_record}"
+  logger.info "Script Start for #{profile_type}_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
-  CSV.open(file_name, 'w') do |csv|
-    csv << field_names
+  if site_key.present? && profile_type.present?
 
-    #build and create GeneralOrganization and its profiles
-    status = ProfilesMigration.create_profile(site_key, profile_type, csv, logger)
-    if status
-      puts "Rake Task execution completed, check carrier_profile_migration_data logs & carrier_profile_migration_status csv for additional information." unless Rails.env.test?
-    else
-      logger.info "Check if the inputed ENV values are valid" unless Rails.env.test?
-      puts "Rake Task execution failed for given input" unless Rails.env.test?
+    CSV.open(file_name, 'w') do |csv|
+      csv << field_names
+
+      #build and create GeneralOrganization and its profiles
+      status = ProfilesMigration.create_profile(site_key, profile_type, csv, logger)
+
+      if status
+        puts "Rake Task execution completed, check carrier_profile_migration_data logs & carrier_profile_migration_status csv for additional information." unless Rails.env.test?
+      else
+        logger.info "Check if the inputed ENV values are valid" unless Rails.env.test?
+        puts "Rake Task execution failed for given input" unless Rails.env.test?
+      end
     end
-    logger.info "End of the script for #{profile_type}" unless Rails.env.test?
+  else
+    puts "Please provide site_key & profile_type" unless Rails.env.test?
   end
+  logger.info "End of the script for #{profile_type}" unless Rails.env.test?
 end
-
-

@@ -1,11 +1,17 @@
 module ProfilesMigration
 
   def self.create_profile(site_key, profile_type, csv, logger)
-    #find or build site
-    site = self.find_site(site_key)
 
+    #find or build site
+    sites = self.find_site(site_key)
+    return false unless sites.present?
+    site = sites.first
+
+    #get main app organizations for migration
     old_organizations = get_old_organizations(profile_type)
     return false unless old_organizations.present?
+
+    #counters
     total_organizations = old_organizations.count
     existing_organization = 0
     success =0
@@ -18,7 +24,7 @@ module ProfilesMigration
           @old_profile = get_old_profile(old_org, profile_type)
 
           if profile_type == "employer_profile"
-            json_data = @old_profile.to_json(:except => [:_id, :broker_agency_accounts, :plan_years, :sic_code, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :sic_code, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             profile_class = "aca_shop_dc_employer_profile"
           elsif profile_type == "broker_agency_profile"
             json_data = @old_profile.to_json(:except => [:_id, :aasm_state_set_on, :inbox, :documents])
@@ -46,7 +52,7 @@ module ProfilesMigration
         logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id} , #{e.inspect}" unless Rails.env.test?
       end
     end
-    logger.info " There are Total #{total_organizations} old organizations for type: #{profile_type}." unless Rails.env.test?
+    logger.info " Total #{total_organizations} old organizations for type: #{profile_type}." unless Rails.env.test?
     logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{existing_organization} old organizations are already present in new DB." unless Rails.env.test?
@@ -54,7 +60,6 @@ module ProfilesMigration
   end
 
   def self.get_old_organizations(profile_type)
-    # Organization.unscoped.exists(carrier_profile: true)
     Organization.unscoped.exists("#{profile_type}".to_sym => true)
   end
 
@@ -71,7 +76,7 @@ module ProfilesMigration
   def self.initialize_new_profile(profile_type, profile_class, old_org, old_profile_params)
     new_profile = "BenefitSponsors::Organizations::#{profile_class.camelize}".constantize.new(old_profile_params)
 
-    build_inbox_messages(new_profile) if (profile_type =="employer_profile" || profile_type =="broker_agency_profile" || profile_type =="hbx_profile")
+    build_inbox_messages(new_profile) if (profile_type =="employer_profile" || profile_type =="broker_agency_profile")
     build_documents(old_org, new_profile)
     build_office_locations(old_org, new_profile)
     return new_profile
@@ -87,6 +92,7 @@ module ProfilesMigration
     old_org.documents.each do |document|
       new_profile.documents.new(document.attributes.except("_id"))
     end
+    #
   end
 
   def self.build_office_locations(old_org, new_profile)
@@ -122,8 +128,6 @@ module ProfilesMigration
   end
 
   def self.find_site(site_key)
-    sites = BenefitSponsors::Site.all.where(site_key: site_key.to_sym)
-    sites.present? ? sites.first : false
+    BenefitSponsors::Site.all.where(site_key: site_key.to_sym)  if site_key.present?
   end
-
 end
