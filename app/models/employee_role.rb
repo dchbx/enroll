@@ -8,6 +8,7 @@ class EmployeeRole
   embedded_in :person
 
   field :employer_profile_id, type: BSON::ObjectId
+  field :benefit_sponsor_employer_profile_id, type: BSON::ObjectId
   field :census_employee_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId  # TODO: Deprecate
   field :employment_status, type: String

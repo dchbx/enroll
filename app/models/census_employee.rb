@@ -31,6 +31,7 @@ class CensusEmployee < CensusMember
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
+  field :benefit_sponsor_employer_profile_id, type: BSON::ObjectId
 
   # Employee linked to this roster record
   field :employee_role_id, type: BSON::ObjectId
