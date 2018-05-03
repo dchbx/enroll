@@ -93,6 +93,35 @@ describe DefinePermissions, dbclean: :after_each do
         expect(Permission.developer.can_add_sep).to be false
       end
     end
+
+    describe 'update permissions for hbx staff role to be able transition family members' do
+      let(:given_task_name) {':hbx_admin_can_transition_family_members'}
+
+      before do
+        User.all.delete
+        Person.all.delete
+        @hbx_staff_person = FactoryGirl.create(:person)
+        @hbx_read_only_person = FactoryGirl.create(:person)
+        @hbx_csr_supervisor_person = FactoryGirl.create(:person)
+        @hbx_csr_tier1_person = FactoryGirl.create(:person)
+        @hbx_csr_tier2_person = FactoryGirl.create(:person)
+        hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        hbx_read_only_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
+        hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
+        hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
+        subject.hbx_admin_can_transition_family_members
+      end
+
+      it "updates can_transition_family_members to true/false based on staff roles" do
+        expect(Person.all.count).to eq(5)
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_transition_family_members).to be true
+        expect(@hbx_read_only_person.hbx_staff_role.permission.can_transition_family_members).to be false
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_transition_family_members).to be false
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_transition_family_members).to be false
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_transition_family_members).to be false
+      end
+    end
   end
 
   describe 'build test roles' do

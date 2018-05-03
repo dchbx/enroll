@@ -48,6 +48,8 @@ class Person
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
   VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
+  NON_SHOP_ROLES = ['Individual','Coverall']
+
   field :hbx_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String
@@ -104,6 +106,8 @@ class Person
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :resident_role, cascade_callbacks: true, validate: true
+  embeds_many :individual_market_transitions, cascade_callbacks: true, validate: true
+
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
@@ -143,6 +147,8 @@ class Person
   validates :encrypted_ssn, uniqueness: true, allow_blank: true
 
   validate :is_ssn_composition_correct?
+
+  validate :is_only_one_individual_role_active?
 
   validates :gender,
     allow_blank: true,
@@ -210,6 +216,7 @@ class Person
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
   scope :all_employer_staff_roles,    -> { exists(employer_staff_roles: true) }
+  scope :all_individual_market_transitions,  -> { exists(individual_market_transitions: true) }
 
   #scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
   scope :all_broker_roles,            -> { exists(broker_role: true) }
@@ -530,11 +537,19 @@ class Person
   end
 
   def has_active_consumer_role?
-    consumer_role.present? and consumer_role.is_active?
+     consumer_role.present? && consumer_role.is_active?
   end
 
   def has_active_resident_role?
-    resident_role.present? and resident_role.is_active?
+    resident_role.present? && resident_role.is_active?
+  end
+
+  def has_active_resident_member?
+    if self.primary_family.present?
+      active_resident_member = self.primary_family.active_family_members.detect { |member| member.person.is_resident_role_active? }
+      return true if active_resident_member.present?
+    end
+    return false
   end
 
   def can_report_shop_qle?
@@ -586,6 +601,34 @@ class Person
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
     return false
+  end
+
+  def current_individual_market_transition
+    if self.individual_market_transitions.present?
+      self.individual_market_transitions.last
+    else
+      nil
+    end
+  end
+
+  def active_individual_market_role
+    if current_individual_market_transition.present? && current_individual_market_transition.role_type
+      current_individual_market_transition.role_type
+    else
+      nil
+    end
+  end
+
+  def has_consumer_or_resident_role?
+    is_consumer_role_active? || is_resident_role_active?
+  end
+
+  def is_consumer_role_active?
+    self.active_individual_market_role == "consumer" ? true : false
+  end
+
+  def is_resident_role_active?
+     self.active_individual_market_role == "resident" ? true : false
   end
 
   class << self
@@ -910,6 +953,13 @@ class Person
       return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
     end
 
+    true
+  end
+
+  def is_only_one_individual_role_active?
+    if self.is_consumer_role_active? && self.is_resident_role_active?
+      self.errors.add(:base, "Resident role and Consumer role can't both be active at the same time.")
+    end
     true
   end
 

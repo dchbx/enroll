@@ -41,7 +41,7 @@
     </div>
   </div><br>
 
-  <% if @person.has_active_resident_role? %>
+  <% if @person.is_resident_role_active? %>
     <%= render 'shared/resident_fields', f: f %><br>
     <%= render 'shared/consumer_home_address_fields', f: f %><br>
   <% else %>
@@ -73,7 +73,7 @@
     <% end %>
 
      <div>
-      <% if @person.has_active_consumer_role? %>
+      <% if @person.is_consumer_role_active? %>
       <%= render 'shared/contact_preferences', {f: f, role: :consumer_role} %></br>
       <% else %>
       <%= render 'shared/contact_preferences', {f: f, role: :employee_roles} %></br>

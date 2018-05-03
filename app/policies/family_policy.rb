@@ -62,4 +62,9 @@ class FamilyPolicy < ApplicationPolicy
     role.permission.can_update_ssn
   end
 
+  def can_transition_family_members?
+    return false unless role = user.person && user.person.hbx_staff_role
+    role.permission.can_transition_family_members
+  end
+
 end

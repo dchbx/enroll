@@ -169,6 +169,8 @@ Rails.application.routes.draw do
         get 'family'
         get 'upload_notice_form'
         post 'upload_notice'
+        get 'transition_family_members'
+        post 'transition_family_members_update'
       end
 
       resources :people do

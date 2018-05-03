@@ -21,7 +21,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
 
     context "with consumer_role" do
       before :each do
-        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:is_consumer_role_active?).and_return true
         allow(person).to receive(:consumer_role).and_return consumer_role
         render :template => "people/landing_pages/_personal.html.erb"
       end
@@ -47,7 +47,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
 
     context "without consumer_role" do
       before :each do
-        allow(person).to receive(:has_active_consumer_role?).and_return false
+        allow(person).to receive(:is_consumer_role_active?).and_return false
         render :template => "people/landing_pages/_personal.html.erb"
       end
 
@@ -116,7 +116,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     before :each do
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
       allow(person).to receive(:consumer_role).and_return consumer_role
-      allow(person).to receive(:has_active_consumer_role?).and_return true
+      allow(person).to receive(:is_consumer_role_active?).and_return true
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign(:person, person)
       render :template => "people/landing_pages/_personal.html.erb"

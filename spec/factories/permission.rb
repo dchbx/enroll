@@ -9,6 +9,7 @@ FactoryGirl.define do
     approve_ga true
     modify_admin_tabs true
     view_admin_tabs  true
+    can_transition_family_members true
 
     trait :hbx_staff do
       can_complete_resident_application true

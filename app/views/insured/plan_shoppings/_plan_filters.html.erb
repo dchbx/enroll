@@ -162,7 +162,7 @@
           <%= hidden_field_tag :max_deductible, (@max_deductible || 5000) %>
         </div>
       </div>
-      <% if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual" %>
+      <% if @person.is_consumer_role_active? && @tax_household.present? && @market_kind == "individual" %>
       <div class="aptc">
         <hr />
         <div class="row">

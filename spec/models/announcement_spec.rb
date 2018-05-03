@@ -147,7 +147,7 @@ describe Announcement, dbclean: :after_each do
 
       it "when visit families/home with active_employee_role and active_consumer_role" do
         allow(person).to receive(:has_active_employee_role?).and_return true
-        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:is_consumer_role_active?).and_return true
         expect(Announcement.get_announcements_by_portal("dc.org/families/home", person)).to eq ["msg for Employee", "msg for IVL"]
       end
 
@@ -156,7 +156,7 @@ describe Announcement, dbclean: :after_each do
       end
 
       it "when consumer_role" do
-        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:is_consumer_role_active?).and_return true
         expect(Announcement.get_announcements_by_portal("dc.org/consumer", person)).to eq ["msg for IVL"]
       end
 
@@ -170,7 +170,7 @@ describe Announcement, dbclean: :after_each do
         end
 
         it "with consumer portal" do
-          allow(person).to receive(:has_active_consumer_role?).and_return true
+          allow(person).to receive(:is_consumer_role_active?).and_return true
           expect(Announcement.get_announcements_by_portal("dc.org/consumer_role", person)).to eq ["msg for IVL"]
         end
 

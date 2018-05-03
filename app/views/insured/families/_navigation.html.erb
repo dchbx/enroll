@@ -3,7 +3,7 @@
     <li <%= menu_tab_class(@tab, 'home') %>>
       <%= link_to l10n("my_site_short_name", site_short_name: Settings.site.short_name), family_account_path(tab: 'home') %>
     </li>
-    <% if ( @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present?) || ( @person.has_active_consumer_role? &&  @person.primary_family.current_broker_agency.present? ) %>
+    <% if ( @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present?) || ( @person.is_consumer_role_active? &&  @person.primary_family.current_broker_agency.present? ) %>
     <li <%= menu_tab_class(@tab, 'broker') %>>
         <%= link_to l10n("my_broker"), brokers_insured_families_path(tab: 'broker') %>
       </li>

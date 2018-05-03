@@ -75,6 +75,7 @@ When(/^\w+ clicks? on continue button$/) do
 end
 
 Then(/^.+ should see heading labeled personal information/) do
+  #binding.pry
   expect(page).to have_content("Personal Information")
 end
 
@@ -270,6 +271,7 @@ end
 
 
 When(/^I click on continue button on group selection page during a sep$/) do
+  #binding.pry
   expect(page).to have_content "Choose Coverage for your Household"
   click_button "CONTINUE"
 end

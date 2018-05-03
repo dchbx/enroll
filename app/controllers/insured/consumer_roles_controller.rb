@@ -7,6 +7,10 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role, only: [:edit, :update]
   #before_action :authorize_for, except: [:edit, :update]
 
+  # generate initial individual_market_transition as a placeholder for initial enrollment in IVL
+  after_action :create_initial_market_transition, only: [:create]
+
+
   def ssn_taken
   end
 
@@ -299,15 +303,26 @@ class Insured::ConsumerRolesController < ApplicationController
   def check_consumer_role
     set_current_person(required: false)
     # need this check for cover all
-    if @person.try(:has_active_resident_role?)
+    if @person.try(:is_resident_role_active?)
       redirect_to @person.resident_role.bookmark_url || family_account_path
-    elsif @person.try(:has_active_consumer_role?)
+    elsif @person.try(:is_consumer_role_active?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
       # render 'privacy'
     end
+  end
+
+  def create_initial_market_transition
+    transition = IndividualMarketTransition.new
+    transition.role_type = "consumer"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_consumer_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    transition.user_id = current_user.id
+    Person.find(session[:person_id]).individual_market_transitions << transition
+    #User.find(params[:person][:user_id]).person.individual_market_transitions << transition
   end
 
   def set_error_message(message)

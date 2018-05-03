@@ -297,6 +297,7 @@ INSURED_TRANSLATIONS = {
   "en.insured.group_selection.new.marketplace" => "Marketplace",
   "en.insured.group_selection.new.employee_sponsored_benifits" => "Employer-Sponsored Benefits",
   "en.insured.group_selection.new.individual_benifits" => "Individual Benefits",
+  "en.insured.group_selection.new.coverall_benifits" => "Cover All Benefits",
   "en.employer" => "Employer",
   "en.health" => "Health",
   "en.dental" => "Dental",

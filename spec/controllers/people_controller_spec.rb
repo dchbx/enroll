@@ -40,7 +40,7 @@ RSpec.describe PeopleController do
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(consumer_role).to receive(:check_for_critical_changes)
       allow(person).to receive(:update_attributes).and_return(true)
-      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
       person_attributes[:addresses_attributes] = addresses_attributes
       sign_in user
       post :update, id: person.id, person: person_attributes
@@ -56,7 +56,7 @@ RSpec.describe PeopleController do
 
       before do
         allow(request).to receive(:referer).and_return("insured/families/personal")
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
       end
       it "update person" do
         allow(consumer_role).to receive(:find_document).and_return(vlp_document)

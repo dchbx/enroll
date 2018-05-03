@@ -39,7 +39,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(user).to receive(:save!).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
-      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
+
       allow(consumer_role).to receive(:save!).and_return(true)
     end
 
@@ -159,11 +161,16 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
   context "POST create" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+    let(:person_user){ double("User") }
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:create_dep_consumer_role)
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(User).to receive(:find).and_return(person_user)
+      allow(person_user).to receive(:person).and_return(person)
+
     end
     it "should create new person/consumer role object" do
       sign_in user
@@ -177,8 +184,12 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
   context "POST create with failed construct_employee_role" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+    let(:person_user){ double("User") }
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_consumer_role).and_return(nil)
+      allow(User).to receive(:find).and_return(person_user)
+      allow(Person).to receive(:find).and_return(person)
+      allow(person_user).to receive(:person).and_return(person)
     end
     it "should throw a 500 error" do
       sign_in user
@@ -370,6 +381,10 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(mock_employee_candidate).to receive(:valid?).and_return(false)
       allow(mock_resident_candidate).to receive(:valid?).and_return(true)
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
+
+
     end
 
     context "with pre-existing consumer_role" do
@@ -384,6 +399,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     context "with pre-existing resident_role" do
       it "should navigate to family account page" do
         allow(person).to receive(:resident_role).and_return(resident_role)
+        allow(person).to receive(:is_resident_role_active?).and_return(true)
+
         post :match, :person => resident_parameters
         expect(user.person.resident_role).not_to be_nil
         expect(response).to redirect_to(family_account_path)
@@ -394,6 +411,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       it "should navigate to family account page" do
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(person).to receive(:resident_role).and_return(resident_role)
+        allow(person).to receive(:is_resident_role_active?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
         post :match, :person => resident_parameters
         expect(user.person.consumer_role).not_to be_nil
         expect(user.person.resident_role).not_to be_nil

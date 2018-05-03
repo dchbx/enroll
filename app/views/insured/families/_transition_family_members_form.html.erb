@@ -1,0 +1,90 @@
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  $('#tansition_family_submit').addClass("disabled");
+
+  function disableSubmit(form){
+    $('#tansition_family_submit').addClass("disabled");
+  }
+  function enableSubmit(form){
+    $('#tansition_family_submit').removeClass('disabled');
+  }
+
+  $('input[type=text], input[type=checkbox]').on('keyup change', function(){
+    var form = $(this).closest('form').find('.transition_form_row');
+    if (validateForm(form)){
+      enableSubmit(form)
+    }else{
+      disableSubmit(form)
+    }
+  });
+
+  function validateForm(form) {
+    var isValid = false;
+    form.each(function() {
+      if ($(this).find('input[type=text]').val() != '' &&  $(this).find('input[type=text]').val() != '0' && $(this).find('input[type=checkbox]').is(":checked"))
+        isValid = true;
+    });
+    return isValid;
+  }
+
+  jQuery('[id^="cancel_hbx_"]').click(function($) {
+    if (this.checked) {
+      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', false);
+    }
+    else {
+      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', true);
+    }
+  });
+
+});
+
+</script>
+
+<td colspan="90%">
+  <%= form_tag transition_family_members_update_insured_families_path, :method => :post, remote: true do %>
+    <h3 class='title'>Transition Family Members</h3>
+    <br />
+    <table  class="table table-striped">
+      <tr>
+        <th>Name</th>
+        <th>SSN</th>
+        <th>DOB</th>
+        <th>HBX ID</th>
+        <th>Current Market</th>
+        <th>New Market</th>
+        <th>Reason Code</th>
+        <th>Effective Date</th>
+        <th>Transition User?</th>
+      </tr>
+      <% @family_members.each do |family_member| %>
+      <tr class='transition_form_row'>
+        <% person = family_member.person %>
+        <td><%= person.full_name %></td>
+        <td><%= number_to_obscured_ssn(person.ssn) %></td>
+        <td><%= person.dob %></td>
+        <td><%= person.hbx_id %></td>
+        <td><%= label_tag "current_market_kind_#{person.id}", "#{ current_market_kind(person)}" %></td>
+        <td><%= label_tag "transition_market_kind_#{person.id}", "#{new_market_kind(person)}" %></td>
+        <td><%= label_tag "transition_reason_#{person.id}", "#{transition_reason(person).keys.first}" %></td>
+        <td><%= text_field_tag "transition_effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "floatlabel date-field date-picker", placeholder: 'EFFECTIVE ON  *'%></td>
+        <td><%= check_box_tag "transition_user_#{person.id}", person.id, false%></td>
+        <%= hidden_field_tag  "transition_market_kind_#{person.id}", "#{new_market_kind(person)}" %>
+        <%= hidden_field_tag "transition_reason_#{person.id}", "#{transition_reason(person).values.first}" %>
+      </tr>
+      <% end %>
+      <tr><td colspan = "12"><br /></td></tr>
+      <tr>
+        <td colspan = "12">
+          <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+          <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
+          <%= hidden_field_tag :family, params[:family] %>
+          <%= hidden_field_tag :qle_id, @qle.id.to_s %>
+          <%= submit_tag "Submit", class: 'btn btn-primary', id: 'tansition_family_submit' %>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+  <h6 align="right"> Requested by @<%= @current_user.person.full_name %> </h6>
+</td>

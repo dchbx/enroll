@@ -418,11 +418,11 @@ class User
       announcements.concat(Announcement.current_msg_for_employer) if has_employer_staff_role?
     when portal_path.include?("families/home")
       announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
-      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.has_active_consumer_role?)
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.is_consumer_role_active?)
     when portal_path.include?("employee")
       announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
     when portal_path.include?("consumer")
-      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.has_active_consumer_role?)
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.is_consumer_role_active?)
     when portal_path.include?("broker_agencies")
       announcements.concat(Announcement.current_msg_for_broker) if has_broker_role?
     when portal_path.include?("general_agencies")

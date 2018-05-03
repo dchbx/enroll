@@ -1,0 +1,13 @@
+var containing_row = $("#<%= @row %>").closest('TR');
+var $parent_row = containing_row;
+if ( $('tr.child-row:visible').length > 0 ) {
+  $('tr.child-row:visible').remove();
+  $("li>a:contains('Collapse Form')").addClass('disabled');
+}
+if ( $parent_row.next().hasClass('child-row') ) {} 
+else {
+  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "insured/families/transition_family_members_result", 
+  f: @family, formats: [:html] %></td></tr>');
+  $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
+  $('.dropdown.pull-right').removeClass('open');
+}

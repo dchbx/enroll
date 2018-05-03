@@ -44,7 +44,7 @@ Given (/a matched Employee exists with consumer role/) do
   benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
   bga = FactoryGirl.build :benefit_group_assignment, benefit_group: benefit_group
   FactoryGirl.create(:user)
-  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
+  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_active_consumer_role, first_name: "Employee", last_name: "E", user: user)
   employee_role = FactoryGirl.create :employee_role, person: @person, employer_profile: org.employer_profile
   ce =  FactoryGirl.build(:census_employee,
           first_name: @person.first_name, 
@@ -85,7 +85,7 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   sep = FactoryGirl.create :special_enrollment_period, family: @family
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  enrollment = FactoryGirl.create(:hbx_enrollment,
                                   household: @family.active_household,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
@@ -108,7 +108,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                   else
                     @person.active_employee_roles[1].employer_profile.plan_years[0].benefit_groups[0]
                   end
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  enrollment = FactoryGirl.create(:hbx_enrollment,
                                   household: @person.primary_family.active_household,
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,

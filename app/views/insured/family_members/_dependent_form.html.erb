@@ -100,11 +100,11 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>            
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>
           </div>
 
 
-          <% if @person.has_active_consumer_role? %>
+          <% if @person.is_consumer_role_active? %>
             <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
               <span id="is_applying_coverage_value_dep">Is <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> applying for coverage?</span>
             </div>
@@ -113,11 +113,11 @@
           <% end %>
         </div>
 
-        <% if @person.has_active_consumer_role? %>
+        <% if @person.is_consumer_role_active? %>
           <%= render 'shared/ssn_coverage_msg' %>
         <% end %>
 
-        <% if @person.has_active_consumer_role? %>
+        <% if @person.is_consumer_role_active? %>
           <br>
           <div id="consumer_fields_sets">
           <%= render 'shared/consumer_fields', f: f %>

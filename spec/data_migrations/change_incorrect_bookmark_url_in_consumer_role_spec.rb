@@ -13,7 +13,7 @@ describe ChangeIncorrectBookmarkUrlInConsumerRole, dbclean: :after_each do
   end
 
   describe "changing the incorrect bookmark url for a consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family, :with_active_consumer_role) }
     let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
     before(:each) do

@@ -42,7 +42,7 @@ class Insured::FamiliesController < FamiliesController
   def manage_family
     set_bookmark_url
     @family_members = @family.active_family_members
-    @resident = @person.has_active_resident_role?
+    @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -102,9 +102,9 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
 
     @family_members = @family.active_family_members
-    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
-    @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
-    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
+    @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
+    @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
     @resident = @person.resident_role.present?
     respond_to do |format|
       format.html
@@ -248,6 +248,29 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def transition_family_members
+    @row_id = params[:family_actions_id]
+    @family_members = @family.active_family_members
+    @non_shop_market_kinds = Person::NON_SHOP_ROLES
+    respond_to do |format|
+      format.js { render "insured/families/transition_family_members" }
+    end
+  end
+
+  def transition_family_members_update
+    @row_id = params[:family_actions_id]
+
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.transition_family_members
+
+    respond_to do |format|
+      format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
+    end
+  end
+  
   def is_ee_sep_request_accepted?
     !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
   end
@@ -305,7 +328,8 @@ class Insured::FamiliesController < FamiliesController
       if current_user.has_hbx_staff_role?
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role == "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
@@ -320,7 +344,7 @@ class Insured::FamiliesController < FamiliesController
         end
       else @person.consumer_role.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_without_transition_member_action
         else
           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         end
@@ -333,7 +357,7 @@ class Insured::FamiliesController < FamiliesController
       if @person.addresses.blank?
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
-    elsif @person.has_active_consumer_role?
+    elsif @person.is_consumer_role_active?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
       elsif @person.user && !@person.user.identity_verified?

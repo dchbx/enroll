@@ -15,6 +15,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", coverage_kind: "health", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false)}
     let(:coverage_kind) { hbx_enrollment.coverage_kind }
     let(:current_user) {FactoryGirl.create(:user)}
+    let (:individual_market_transition) { double ("IndividualMarketTransition") }
 
     before(:each) do
       assign(:person, person)
@@ -31,6 +32,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_employer_benefits?).and_return(true)
 
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(individual_market_transition).to receive(:role_type).and_return(nil)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
       #@eligibility = InsuredEligibleForBenefitRule.new(employee_role,'shop')
       #allow(@eligibility).to receive(:satisfied?).and_return([true, true, false])
       controller.request.path_parameters[:person_id] = person.id
@@ -100,6 +104,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
     let(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
     let(:current_user) {FactoryGirl.create(:user)}
+    let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: jail_person) }
     before(:each) do
       assign(:person, jail_person)
       assign(:coverage_household, coverage_household_jail)
@@ -114,6 +119,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
       allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
       allow(consumer_role3).to receive(:latest_active_tax_household_with_year).and_return nil
+      allow(person2).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(person3).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(individual_market_transition).to receive(:role_type).and_return('consumer')
+      allow(person2).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person2).to receive(:is_resident_role_active?).and_return(false)
+      allow(person3).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person3).to receive(:is_resident_role_active?).and_return(false)
       sign_in current_user
     end
 
@@ -219,6 +231,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group, person: person) }
     let(:hbx_enrollment) {HbxEnrollment.new}
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+    let (:individual_market_transition) { double ("IndividualMarketTransition") }
 
     before :each do
       assign :person, person
@@ -234,6 +247,10 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(individual_market_transition).to receive(:role_type).and_return(nil)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
     end
 
@@ -289,6 +306,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return []
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render file: "insured/group_selection/new.html.erb"
@@ -303,6 +322,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   context "change plan" do
     let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person) }
     let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
     let(:census_employee) { FactoryGirl.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
     let(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group) }
@@ -327,6 +347,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
+      allow(person).to receive(:active_individual_market_role).and_return(nil)
+      #allow(person).to receive(:try).with(:is_consumer_role_active?).and_return(nil)
+      allow(person).to receive(:current_individual_market_transition).and_return(double("IndividualMarketTransition",:role_type => nil))
     end
 
     it "should display title" do
@@ -398,6 +423,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:person) { employee_role.person }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person) }
+
 
     let(:hbx_enrollment) {HbxEnrollment.new}
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
@@ -416,6 +443,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:employee_role).and_return(nil)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(individual_market_transition).to receive(:role_type).and_return(nil)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
+      allow(person).to receive(:active_individual_market_role).and_return(nil)
     end
 
     it "should have the waive confirmation modal" do
@@ -442,6 +474,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
+
     end
 
     it "when present" do
@@ -471,6 +506,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   context "change plan with consumer role" do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :person => person)}
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
@@ -500,9 +536,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector('#coverage_kind_health')
     end
 
-    it "shouldn't see marketplace options" do
+    it "should see marketplace with individual and coverall Marketplaces" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+      expect(rendered).to have_selector('h3', text: 'Marketplace')
     end
   end
 
@@ -528,6 +564,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
     end
 
     it "shouldn't see waiver button" do
@@ -552,6 +590,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:health_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(view).to receive(:dental_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
 
@@ -568,6 +608,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   context "change plan with both roles" do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :person => person)}
     let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
     let(:census_employee) { FactoryGirl.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
     let(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group) }
@@ -593,6 +634,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should see dental radio option" do
+      #binding.pry
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector('#coverage_kind_dental')
     end

@@ -22,7 +22,7 @@ RSpec.describe Exchanges::ResidentsController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(person).to receive(:resident_role).and_return(resident_role)
-      allow(person).to receive(:has_active_resident_role?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
       allow(resident_role).to receive(:save!).and_return(true)
       sign_in user
     end
