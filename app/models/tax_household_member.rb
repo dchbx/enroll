@@ -4,6 +4,8 @@ class TaxHouseholdMember
   include BelongsToFamilyMember
   include ApplicationHelper
 
+  PDC_TYPES = [['In-eligible', 'is_ia_eligible'], ['Medicaid', 'is_medicaid_chip_eligible'] ]
+
   embedded_in :tax_household
   embeds_many :financial_statements
 
@@ -11,6 +13,7 @@ class TaxHouseholdMember
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_subscriber, type: Boolean, default: false
+  field :reason, type: String
 
   validate :strictly_boolean
 

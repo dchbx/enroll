@@ -17,6 +17,7 @@ class Permission
   field :can_update_ssn, type: Boolean, default: false
   field :can_complete_resident_application, type: Boolean, default: false
   field :can_add_sep, default: false
+  field :can_add_pdc, default: false
   field :can_view_username_and_email, type: Boolean, default: false
   
   class << self

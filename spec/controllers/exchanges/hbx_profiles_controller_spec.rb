@@ -467,6 +467,81 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   end
 
+  describe 'GET create_eligibility' do
+    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:permission_yes) { FactoryGirl.create(:permission, can_add_pdc: true) }
+    let(:params) do
+      { person_id: person.id,
+         family_actions_id: "family_actions_#{person.primary_family.id.to_s}",
+         format: 'js'
+       }
+    end
+
+    it "should render the create_eligibility partial" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      xhr :get, :create_eligibility, params
+
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template('create_eligibility')
+    end
+
+    context 'when can_add_pdc permission is not given' do
+      it "should not render the create_eligibility partial" do
+        sign_in(user)
+        xhr :get, :create_eligibility, params
+
+        expect(response).not_to render_template('create_eligibility')
+      end
+    end
+  end
+
+  describe 'POST update_tax_household_eligibility' do
+    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:max_aptc) { 12 }
+    let(:csr) { 100 }
+    let(:reason) { 'Test reason' }
+    let(:params) do
+      { person: {
+          person_id: person.id,
+          family_actions_id: "family_actions_#{person.primary_family.id.to_s}",
+          max_aptc: max_aptc,
+          csr: csr,
+          effective_date: "2018-04-13",
+          family_members: {
+            "#{person.primary_family.active_family_members.first.person.hbx_id}" => {
+              pdc_type: "is_medicaid_chip_eligible",
+              reason: reason
+            }
+          },
+          "jq_datepicker_ignore_person" => { "effective_date" => "04/13/2018" },
+          format: 'js'
+        }
+      }
+    end
+
+    it "should render update_tax_household_eligibility if save successful" do
+      sign_in(user)
+      xhr :get, :update_tax_household_eligibility, params
+      active_household = person.primary_family.active_household
+      latest_active_thh = active_household.reload.latest_active_thh
+      eligibility_deter = latest_active_thh.eligibility_determinations.first
+      tax_household_member = latest_active_thh.tax_household_members.first
+
+      expect(response).to have_http_status(:success)
+      expect(eligibility_deter.max_aptc).to eq(max_aptc.to_f)
+      expect(eligibility_deter.csr_percent_as_integer).to eq(csr)
+      expect(tax_household_member.is_medicaid_chip_eligible).to be_truthy
+      expect(tax_household_member.is_ia_eligible).to be_falsy
+      expect(tax_household_member.reason).to eq(reason)
+    end
+  end
+
 
   describe "POST update_dob_ssn" do
 

@@ -103,9 +103,19 @@ class TaxHousehold
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
-    hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
+    applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+    family_member_ids = hbx_enrollment.household.family_members.collect(&:id)
+    unenrolled = family_member_ids - applicant_ids
+    total_aptc_available = hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
       sum + (aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
     end
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+    slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+    hbx_enrollment.household.tax_households.last.tax_household_members.in(applicant_id: unenrolled).each do |member|
+    total_aptc_available -= slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date) || 0
+    end
+    total_aptc_available > 0 ? total_aptc_available : 0
   end
 
   def aptc_available_amount_by_member

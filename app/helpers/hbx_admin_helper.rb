@@ -53,4 +53,13 @@ module HbxAdminHelper
   def find_enrollment(hbx_id)
     HbxEnrollment.find(hbx_id)
   end
+
+  def active_enrollments?(person)
+    if person.primary_family.active_household.hbx_enrollments.active
+       .enrolled_and_renewing.present?
+      'Yes'
+    else
+      'No'
+    end
+  end
 end

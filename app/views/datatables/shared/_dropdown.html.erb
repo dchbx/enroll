@@ -11,7 +11,11 @@
     <li >
       <%case line[2]%>
       <%when "disabled"%>
-        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true%>
+        <% if line[0] == 'Edit APTC / CSR' %>
+          <%= link_to line[0], line[1], class: "btn btn-info btn-xs edit_aptc_csr_#{row_actions_id}", disabled: true, remote: true %>
+        <% else %>
+          <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true %>
+        <% end %>
       <%when "static"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs" %>
       <%when "post_ajax"%>
