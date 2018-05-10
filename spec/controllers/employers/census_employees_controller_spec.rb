@@ -429,7 +429,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:update_for_cobra).and_return false
           xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
           expect(response).to have_http_status(:success)
-          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact #{Settings.site.short_name} at #{Settings.contact_center.phone_number} for further assistance."
         end
       end
 
@@ -544,12 +544,12 @@ RSpec.describe Employers::CensusEmployeesController do
       expect(response).to render_template("benefit_group")
     end
   end
-  
+
   describe "Update census member email" do
-    it "expect census employee to have a email present" do 
+    it "expect census employee to have a email present" do
       expect(census_employee.email.present?).to eq true
     end
-    
+
     it "should allow emails to be updated to nil" do
       census_employee.email.update(address:'', kind:'')
       expect(census_employee.email.kind).to eq ''

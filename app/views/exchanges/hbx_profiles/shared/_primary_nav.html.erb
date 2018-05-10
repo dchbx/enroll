@@ -2,109 +2,181 @@
   <div class="mainmenu">
     <div class="container">
       <ul role="tablist" class="list-unstyled list-inline" id="myTab">
-        <li role="presentation"<%= menu_tab_class(active_tab, "hbx-profile-tab") %>>
-          <%= link_to(exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do  %>
-            <span title="HBX Profile" aria-hidden="true" class="glyphicon glyphicon-home"></span>
-          <% end %>
-        </li>
+      <li role="presentation"<%= menu_tab_class(active_tab, "hbx-profile-tab") %>>
+        <%= link_to(main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do  %>
+        <span title="HBX Profile" aria-hidden="true" class="glyphicon glyphicon-home"></span>
+        <% end %>
+      </li>
 
-  <li class="brokers-dropdown dropdown">
-        <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
-            <ul class="dropdown-menu">
+      <%if individual_market_is_enabled? %>
+        <li class="brokers-dropdown dropdown">
+          <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
+          <ul class="dropdown-menu">
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                             tab_name: 'families',
                                                                             link_path: family_index_dt_exchanges_hbx_profiles_path,
                                                                             display_name: 'Families',
-                                                                            active_tab: active_tab
+                                                                            active_tab: active_tab,
+                                                                            glyphicon_class: 'glyphicon-briefcase'
                                                                           } %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                               tab_name: 'outstanding-verifications',
                                                                               link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
                                                                               display_name: 'Outstanding Verifications',
-                                                                              active_tab: active_tab
+                                                                              active_tab: active_tab,
+                                                                              glyphicon_class: 'glyphicon-briefcase'
                                                                             } %>
-             
+          </ul>
+        </li>
+      <% else %>
+        <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
+        locals: {
+          tab_name: 'families',
+          link_path: main_app.family_index_dt_exchanges_hbx_profiles_path,
+          display_name: 'Families',
+          active_tab: active_tab,
+          glyphicon_class: 'glyphicon-heart'
+        }
+      %>
+      <% end %>
+
+      
+
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
+                  locals: {
+                    tab_name: 'employers-invoice',
+                    link_path: main_app.employer_invoice_exchanges_hbx_profiles_path,
+                    display_name: 'Employers',
+                    active_tab: active_tab,
+                    glyphicon_class: 'glyphicon-briefcase'
+                  }
+                  %>
+
+    <% if aca_user_accounts_enabled %>
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
+                  locals: {
+                    tab_name: 'user-account',
+                    link_path: main_app.user_account_index_exchanges_hbx_profiles_path,
+                    display_name: 'User Accounts',
+                    active_tab: active_tab,
+                    glyphicon_class: 'glyphicon-user'
+                  }
+                  %>
+
+    <% end %>
+
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
+                  locals: {
+                    tab_name: 'issuers',
+                    link_path: main_app.issuer_index_exchanges_hbx_profiles_path,
+                    display_name: 'Issuers',
+                    active_tab: active_tab,
+                    glyphicon_class: 'glyphicon-italic'
+                  }
+                  %>
+
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
+                  locals: {
+                          tab_name: 'products',
+                          link_path: main_app.product_index_exchanges_hbx_profiles_path,
+                          display_name: 'Products',
+                          active_tab: active_tab,
+                          glyphicon_class: 'glyphicon-usd'
+                        }
+      %>
+
+      <li class="brokers-dropdown dropdown">
+        <a href="#" class="broker dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Brokers <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                            tab_name: 'brokers',
+                                                                            link_path: main_app.exchanges_broker_applicants_path,
+                                                                            display_name: 'Broker Applications',
+                                                                            active_tab: active_tab,
+                                                                            glyphicon_class: 'glyphicon-pencil'
+                                                                          } %>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                              tab_name: 'broker-agencies',
+                                                                              link_path: main_app.broker_agency_index_exchanges_hbx_profiles_path,
+                                                                              display_name: 'Broker Agencies',
+                                                                              active_tab: active_tab,
+                                                                              glyphicon_class: 'glyphicon-phone'
+                                                                            } %>
+              <% if general_agency_enabled? %>
+                <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                              tab_name: 'general-agencies',
+                                                                              link_path: main_app.general_agency_index_exchanges_hbx_profiles_path,
+                                                                              display_name: 'General Agencies',
+                                                                              active_tab: active_tab,
+                                                                              glyphicon_class: 'glyphicon-phone'
+                                                                            } %>
+              <% end %>
             </ul>
         </li>
+    <li class="admin-dropdown dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <% if calendar_is_enabled? %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                            tab_name: 'calendar',
+                                                                            link_path: main_app.exchanges_scheduled_events_path,
+                                                                            display_name: 'Calendar',
+                                                                            active_tab: active_tab,
+                                                                            glyphicon_class:'glyphicon-calendar'
+                                                                          } %>
+          <% end %>
+          <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                          tab_name: 'configuration',
+                                                                          link_path: main_app.configuration_exchanges_hbx_profiles_path,
+                                                                          display_name: 'Config',
+                                                                          active_tab: active_tab,
+                                                                          glyphicon_class: 'glyphicon-cog'
+                                                                        }
+                                                                        %>
+        <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                        tab_name: 'staff',
+                                                                        link_path: main_app.staff_index_exchanges_hbx_profiles_path,
+                                                                        display_name: 'Staff',
+                                                                        active_tab: active_tab,
+                                                                        glyphicon_class: 'glyphicon-sunglasses'
+                                                                      }
+                                                                      %>
+
+        <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                        tab_name: 'users-orphans',
+                                                                        link_path: main_app.users_orphans_path,
+                                                                        display_name: 'Orphan Accounts',
+                                                                        active_tab: active_tab,
+                                                                        glyphicon_class: 'glyphicon-search'
+                                                                      } %>
+        </ul>
+    </li>
 
 
-        
-        <!-- <li role="presentation"<%= menu_tab_class(active_tab, "employers-tab") %>>
-         <%= link_to(employer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Employers</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
-         <% end %>
-        </li> -->
-        <li role="presentation"<%= menu_tab_class(active_tab, "employers-invoice") %>>
-          <%= link_to(employer_invoice_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers-invoices", "role" => "tab" ) do  %>
-              <span class="hidden-xs">Employers</span>
-              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
-          <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "broker-agencies-tab") %>>
-         <%= link_to(broker_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "broker_agencies", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Broker Agencies</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "brokers-tab") %>>
-         <%= link_to(exchanges_broker_applicants_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Brokers</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Brokers"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "general-agencies-tab") %>>
-         <%= link_to(general_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "general_agencies", "role" => "tab" ) do  %>
-            <span class="hidden-xs">General Agencies</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
-         <% end %>
-        </li>
+      <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>  class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
+        <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
+        <span class="badge message-unread"><%= @unread_messages %></span>
+        Inbox
+        <% end %>
+        <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+        <span class="hidden-xs">Inbox</span>
+        <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Inbox"></span>
+        <% end %>
+      </li>
 
-        <li role="presentation"<%= menu_tab_class(active_tab, "issuers-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(issuer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "issuers", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Issuers</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Issuers"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "products-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(product_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "products", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Products</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Products"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "users-orphans-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(users_orphans_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "users_orphans", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Orphan Accounts</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Orphan Accounts"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "configuration-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(configuration_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "configuration", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Config</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Configuration"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
-         <%= link_to(staff_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "staff", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Staff</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Staff"></span>
-         <% end %>
-        </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>  class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-          <%= link_to(inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
-            <span class="badge message-unread"><%= @unread_messages %></span>
-            Inbox
-          <% end %>
-          <%= link_to(inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Inbox</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Inbox"></span>
-          <% end %>
-        </li>
-        <!-- <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second">
-         <%= link_to(binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Binder Transition</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Binder"></span>
-         <% end %>
+      <li role="presentation"<%= menu_tab_class(active_tab, "notices-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
+
+        <%= link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do  %>
+          <span class="hidden-xs">Notices</span>
+          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Notices"></span>
+        <% end %>
+      </li>
+
+      <!-- <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second">
+       <%= link_to(main_app.binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do  %>
+        <span class="hidden-xs">Binder Transition</span>
+        <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Binder"></span>
+       <% end %>
        </li> -->
       </ul>
     </div>

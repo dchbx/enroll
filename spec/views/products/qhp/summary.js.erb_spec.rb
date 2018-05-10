@@ -1,7 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "products/qhp/summary.js.erb" do
+ let(:benefit_group) { double("BenefitGroup") }
   before :each do
+    assign(:benefit_group, benefit_group)
+    allow(benefit_group).to receive(:sole_source?).and_return(true)
     stub_template "shared/_summary.html.erb" => ''
     render file: "products/qhp/summary.js.erb"
   end

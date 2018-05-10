@@ -19,13 +19,13 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Thank you for applying to offer group health coverage through #{Settings.site.short_name}.  However, based on our eligibility criteria we are not able to offer group health coverage in #{Settings.site.short_name} for your employees at this time."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Thank you for applying to offer group health coverage through #{site_short_name}.  However, based on our eligibility criteria we are not able to offer group health coverage in #{site_short_name} for your employees at this time."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "At this time, you will not be able to offer coverage to your employees through #{Settings.site.short_name}.  If you would like to re-structure your benefit offering to encourage more employees to participate, you may do so by creating a new open enrollment period. "} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "At this time, you will not be able to offer coverage to your employees through #{site_short_name}.  If you would like to re-structure your benefit offering to encourage more employees to participate, you may do so by creating a new open enrollment period. "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "In addition, there is a special annual enrollment period at the end of each year during which employers can offer group health coverage effective January 1<sup>st</sup> without having a minimum level of employee enrollment."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your broker for further assistance.  You can also contact #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                   ["Online at <a href='#{notice.hbe.try(:url)}'>#{notice.hbe.try(:url)}</a>;",

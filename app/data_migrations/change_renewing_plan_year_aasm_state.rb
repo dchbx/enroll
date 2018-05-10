@@ -7,26 +7,35 @@ class ChangeRenewingPlanYearAasmState< MongoidMigrationTask
       if organization.present?
         return unless ENV['plan_year_start_on'].present?
         plan_year_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
+        aasm_state = ENV['state'].to_s if ENV['state'] == "renewing_enrolled"
         plan_year = organization.employer_profile.plan_years.where(:start_on => plan_year_start_on).first
         if plan_year.present?
-          if ENV['py_state_to'] == "renewing_draft"
-            previous_state = plan_year.aasm_state
-            plan_year.update_attributes(aasm_state:"renewing_draft")
-            plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: previous_state, to_state: plan_year.aasm_state)
-            puts "Plan year aasm state changed to #{plan_year.aasm_state}" unless Rails.env.test?
-          else
-            plan_year.revert_renewal! if plan_year.may_revert_renewal?
-            plan_year.withdraw_pending! if plan_year.renewing_publish_pending?
-            plan_year.renew_publish! if plan_year.may_renew_publish?
-            plan_year.advance_date! if plan_year.may_advance_date?
-            plan_year.advance_date! if ENV['py_state_to'] == "renewing_enrolled" && plan_year.is_enrollment_valid? && plan_year.may_advance_date?
-            if ENV['py_state_to'] == "renewing_enrolled" && !plan_year.is_enrollment_valid?   # for exception case like buniness requested only(roaster with no ce), updating plan year state to renewing enrolled.
-              previous_state = plan_year.aasm_state
-              plan_year.update_attributes(aasm_state:"renewing_enrolled")
-              plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: previous_state, to_state: plan_year.aasm_state)
+          plan_year.revert_renewal! if plan_year.may_revert_renewal?
+          plan_year.withdraw_pending! if plan_year.renewing_publish_pending?
+          plan_year.renew_publish! if plan_year.may_renew_publish?
+          plan_year.advance_date! if plan_year.may_advance_date? # renewing_enrolling
+          plan_year.advance_date! if plan_year.is_enrollment_valid? && plan_year.is_open_enrollment_closed? && plan_year.may_advance_date? && aasm_state.present? # to renewing_enrolled
+
+          if plan_year.renewing_enrolled? && plan_year.may_activate?  # for late renewal employer plan year already started employer moving plan year to active state.
+            employer_enroll_factory = Factories::EmployerEnrollFactory.new
+            employer_enroll_factory.date = TimeKeeper.date_of_record
+            employer_enroll_factory.employer_profile = organization.employer_profile
+            employer_enroll_factory.begin
+            if organization.employer_profile.plan_years.where(start_on:plan_year_start_on - 1.year).present?
+              expiring_plan_year = organization.employer_profile.plan_years.where(start_on:plan_year_start_on - 1.year).first
+              expiring_plan_year.hbx_enrollments.each do |enrollment|
+                enrollment.expire_coverage! if enrollment.may_expire_coverage?
+                if !enrollment.benefit_group_assignment_id.blank?
+                  assignment = enrollment.benefit_group_assignment
+                  assignment.expire_coverage! if assignment.may_expire_coverage?
+                  assignment.update_attributes(is_active: false) if assignment.is_active?
+                end
+                expiring_plan_year.expire! if expiring_plan_year.may_expire?
+              end
             end
-            puts "Plan year aasm state changed to #{plan_year.aasm_state}" unless Rails.env.test?
           end
+
+          puts "Plan year aasm state changed to #{plan_year.aasm_state}" unless Rails.env.test?
         end
       else
         puts "No organization was found by the given fein" unless Rails.env.test?

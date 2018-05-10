@@ -4,6 +4,7 @@ FactoryGirl.define do
     sequence(:last_name) {|n| "Vedder#{n}" }
     dob "1964-10-23".to_date
     gender "male"
+    expected_selection "enroll"
     employee_relationship "self"
     hired_on "2015-04-01".to_date
     sequence(:ssn) { |n| 222222220 + n }
@@ -19,12 +20,28 @@ FactoryGirl.define do
     transient do
       benefit_group { build(:benefit_group) }
       renewal_benefit_group { build(:benefit_group) }
+      create_with_spouse false
     end
+
+    after(:create) do |census_employee, evaluator|
+      census_employee.created_at = TimeKeeper.date_of_record
+      if evaluator.create_with_spouse
+        census_employee.census_dependents.create(employee_relationship: 'spouse')
+      end
+    end
+
 
     trait :owner do
       is_business_owner  true
     end
 
+    trait :with_spouse do
+
+    end
+
+    trait :blank_email do
+      email nil
+    end
     trait :termination_details do
       # aasm_state "employment_terminated"
       employment_terminated_on {TimeKeeper.date_of_record.last_month}
@@ -52,7 +69,7 @@ FactoryGirl.define do
 
     factory :census_employee_with_active_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee) 
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 

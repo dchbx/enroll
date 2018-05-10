@@ -1,5 +1,5 @@
  // check that dob entered is not a future date and 110 years ago
-$(document).on('change', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"]', function() {
+$(document).on('change', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob, #census_members_plan_design_census_employee_dob, [name="jq_datepicker_ignore_dependent[dob]"]', function() {
   var entered_date = $(this).val();
   var entered_dob = new Date($(this).val());
   var entered_year =  entered_date.substring(entered_date.length -4);

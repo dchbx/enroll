@@ -1,0 +1,10 @@
+<% if offers_nationwide_plans? %>
+  <th colspan="2"><%= plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
+<% else %>
+  <% if plan.network_information.present? %>
+    <span>
+      Network Notes
+      <i class='fa fa-question-circle' data-toggle="tooltip" title="<%= plan.network_information %>"></i>
+    </span>
+  <% end %>
+<% end %>

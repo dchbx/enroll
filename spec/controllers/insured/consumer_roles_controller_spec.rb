@@ -1,4 +1,19 @@
 require 'rails_helper'
+RSpec.describe Insured::ConsumerRolesController, :type => :controller do
+  let(:user){ FactoryGirl.create(:user, :consumer) }
+
+  context "When individual market is disabled" do
+    before do
+      Settings.aca.market_kinds = %W[shop]
+      sign_in user
+      get :search
+    end
+
+    it "redirects to root" do
+      expect(response).to redirect_to(root_path)
+    end
+  end
+end
 
 RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   let(:user){ FactoryGirl.create(:user, :consumer) }
@@ -7,6 +22,10 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   let(:family_member){ double("FamilyMember") }
   let(:consumer_role){ FactoryGirl.build(:consumer_role) }
   let(:bookmark_url) {'localhost:3000'}
+
+  before do
+    allow_any_instance_of(ApplicationController).to receive(:individual_market_is_enabled?).and_return(true)
+  end
 
   context "GET privacy" do
     before(:each) do

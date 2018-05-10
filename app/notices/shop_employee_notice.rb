@@ -12,7 +12,8 @@ class ShopEmployeeNotice < Notice
     args[:to] = census_employee.employee_role.person.work_email_or_best
     args[:name] = census_employee.employee_role.person.full_name
     args[:recipient_document_store]= census_employee.employee_role.person
-    self.header = "notices/shared/shop_header.html.erb"
+    args[:sep_qle_hash] = args[:options][:sep] if args[:options]
+    self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
 
@@ -20,31 +21,38 @@ class ShopEmployeeNotice < Notice
     build
     generate_pdf_notice
     attach_envelope
+    non_discrimination_attachment
     upload_and_send_secure_message
     send_generic_notice_alert
   end
 
   def build
+    notice.subject = self.subject
+    notice.first_name = census_employee.first_name
+    notice.last_name = census_employee.last_name
     notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employee_role.person.full_name.titleize
+    notice.primary_identifier = census_employee.employee_role.person.hbx_id
     notice.employer_name = census_employee.employer_profile.legal_name.titleize
     notice.primary_email = census_employee.employee_role.person.work_email_or_best
     append_hbe
     append_address(census_employee.employee_role.person.mailing_address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
-  end
-
-  def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
-  end
-
-  def employee_appeal_rights_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+    append_address(census_employee.employee_role.person.mailing_address)
+    append_sep_qle(self.sep)
   end
 
   def non_discrimination_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
+  end
+
+  def attach_envelope
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
+  end
+
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_employee_appeal_rights.pdf')]
   end
 
   def append_hbe
@@ -94,6 +102,16 @@ class ShopEmployeeNotice < Notice
         zip: location.address.zip
       })
     })
+  end
+
+  def append_sep_qle(sep)
+    if sep.present?
+      notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new(
+          title: sep[:sep_qle_title],
+          qle_on: sep[:sep_qle_on],
+          end_on: sep[:sep_qle_end_on]
+      )
+    end
   end
 
 end

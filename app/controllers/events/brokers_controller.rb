@@ -8,7 +8,7 @@ module Events
       broker_id = headers.stringify_keys["broker_id"]
       individual = Person.by_broker_role_npn(broker_id).first
       if !individual.nil?
-        response_payload = render_to_string "events/individuals/created", :formats => ["xml"], :locals => { :individual => individual }
+        response_payload = render_to_string "events/brokers/created", :formats => ["xml"], :locals => { :individual => individual }
         with_response_exchange(connection) do |ex|
           ex.publish(
             response_payload,

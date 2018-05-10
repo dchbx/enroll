@@ -45,12 +45,14 @@ RSpec.describe Insured::FamiliesController do
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
-  let(:employee_roles) { [double("EmployeeRole")] }
+  let(:census_employee) { FactoryGirl.create(:census_employee)}
+  let(:employee_roles) { [double("EmployeeRole", :census_employee => census_employee)] }
   let(:resident_role) { FactoryGirl.create(:resident_role) }
   let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
   let(:sep) { double("SpecialEnrollmentPeriod") }
+
 
   before :each do
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
@@ -576,6 +578,8 @@ RSpec.describe Insured::FamiliesController do
     end
 
     describe "with invalid params" do
+      let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
+
       it "returns qualified_date as false for invalid future date" do
         xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}
         expect(assigns['qualified_date']).to eq(false)
@@ -611,15 +615,18 @@ RSpec.describe Insured::FamiliesController do
         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
       end
 
+
       it "future_qualified_date should return nil when qle market kind is indiviual" do
         qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
         expect(response).to have_http_status(:success)
+        expect(controller).not_to receive(:sep_request_denial_notice)
         expect(assigns(:qualified_date)).to eq true
         expect(assigns(:future_qualified_date)).to eq(nil)
       end
+
       it "should not trigger sep_request_denial_notice unqualified date  when qle market kind is individual" do
         qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)

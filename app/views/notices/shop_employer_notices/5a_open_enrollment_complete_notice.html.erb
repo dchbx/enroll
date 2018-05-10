@@ -19,11 +19,11 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through #{Settings.site.short_name}.  Your group health plan coverage will take effect as of #{notice.try(:coverage_start_on).try(:to_s)}."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through #{site_short_name}.  Your group health plan coverage will take effect as of #{notice.try(:coverage_start_on).try(:to_s)}."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "If this is your first time offering coverage through #{Settings.site.short_name}, you must make a binder payment equal to the first month’s premium no later than the 12th of the month prior to your coverage start date or else your coverage will not take effect.  Binder payments must be received, processed, and cleared by the due date in order to be considered on time.   We recommend making initial binder payments online in order to ensure adequate time for processing. You can make this payment by following the steps below:"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "If this is your first time offering coverage through #{site_short_name}, you must make a binder payment equal to the first month’s premium no later than the 12th of the month prior to your coverage start date or else your coverage will not take effect.  Binder payments must be received, processed, and cleared by the due date in order to be considered on time.   We recommend making initial binder payments online in order to ensure adequate time for processing. You can make this payment by following the steps below:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Step 1 – Login to Online Bill Pay with your #{Settings.site.short_name} Account Number</strong>"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Step 1 – Login to Online Bill Pay with your #{site_short_name} Account Number</strong>"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Navigate to https://www.e-BillExpress.com/ebpp/DCHealthPay/",
@@ -55,14 +55,14 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "To view the activity of your employees’ open enrollment:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-	["Log in to your #{Settings.site.short_name} employer account",
+	["Log in to your #{site_short_name} employer account",
 	 "Select “Employee” from the menu at the top of your account page",
-	 ["You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name} during the open enrollment period. Each entry will have one of the following statuses:",
+	 ["You will see a list of all eligible employees showing each action they have taken on #{site_short_name} during the open enrollment period. Each entry will have one of the following statuses:",
 	 	["No Coverage Selected",
 	 	 "Coverage Selected",
 	 	 "Coverage Waived",
 	 	 "Terminated"]]] }%>
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Please contact your broker for further assistance.  You can also contact #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Online at #{notice.hbe.url};",

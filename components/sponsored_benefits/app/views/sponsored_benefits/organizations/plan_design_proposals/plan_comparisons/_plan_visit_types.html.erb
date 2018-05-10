@@ -1,0 +1,15 @@
+<% visit_types.each do |visit_type| %>
+  <tr>
+    <td><%= visit_type %></td>
+    <% qhps.each do |qhp|%>
+      <% service_visit = qhp.qhp_service_visits.detect{|a| a.visit_type == visit_type} %>
+      <% if service_visit.present? %>
+        <td colspan="1"><%= service_visit.copay_in_network_tier_1 %></td>
+        <td colspan="1"><%= service_visit.co_insurance_in_network_tier_1 %></td>
+      <% else %>
+        <td colspan="1"><%= "N/A" %></td>
+        <td colspan="1"><%= "N/A" %></td>
+      <% end %>
+    <% end %>
+  </tr>
+<%end%>

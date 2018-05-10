@@ -4,15 +4,8 @@
   </h1>
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
-      <p>
-        <strong>
-          Please read the information below and click the "CONTINUE" button to show you agree before proceeding.
-        </strong>
-      </p>
-      <p>
-        Your answers on this application will only be used to determine if you qualify for employer-sponsored health insurance through DC Health Link and to help you enroll. We will keep your information private as required by law.
-      </p>
-      <%= link_to "View Privacy Act Statement", "https://dchealthlink.com/privacy-operations", target: "_blank" %>
+      <%= l10n("insured.employee_roles.privacy.privacy_info_html", site_short_name: site_short_name) %>
+      <%= link_to l10n(".view_privacy_act_statement"), "https://dchealthlink.com/privacy-operations", target: "_blank" %>
 
     </div>
   </div>

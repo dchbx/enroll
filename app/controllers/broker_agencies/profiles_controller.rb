@@ -1,5 +1,6 @@
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
+  include Config::AcaConcern
   include DataTablesAdapter
 
   before_action :check_broker_agency_staff_role, only: [:new, :create]
@@ -9,6 +10,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
+  before_action :redirect_unless_general_agency_is_enabled?, only: [:assign, :update_assign]
+  before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
   layout 'single_column'
 
@@ -58,7 +61,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     params.permit!
 
     # lookup by the origanization and not BrokerAgencyProfile
-    #@organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
 
     @organization = Organization.find(params[:organization][:id])
     @organization_dup = @organization.office_locations.as_json
@@ -69,8 +72,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     person = @broker_agency_profile.primary_broker_role.person
 
     person.update_attributes(person_profile_params)
-
-    @broker_agency_profile.update_attributes(languages_spoken_params)
+    @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
 
 
     if @organization.update_attributes(broker_profile_params)
@@ -170,6 +172,42 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def commission_statements
+    permitted = params.permit(:id)
+    @id = permitted[:id]
+    if current_user.has_broker_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_hbx_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(@id))
+    else
+      redirect_to new_broker_agencies_profile_path
+      return
+    end
+    documents = @broker_agency_profile.organization.documents
+    if documents
+      @statements = get_commission_statements(documents)
+    end
+    collect_and_sort_commission_statements
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def show_commission_statement
+    options={}
+    options[:filename] = @commission_statement.title
+    options[:type] = 'application/pdf'
+    options[:disposition] = 'inline'
+    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+  end
+
+  def download_commission_statement
+    options={}
+    options[:content_type] = @commission_statement.type
+    options[:filename] = @commission_statement.title
+    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+  end
+
   def employers
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
@@ -214,7 +252,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employer_datatable
-
     order_by = EMPLOYER_DT_COLUMN_TO_FIELD_MAP[params[:order]["0"][:column]].try(:to_sym)
 
     cursor        = params[:start]  || 0
@@ -258,7 +295,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @records_filtered = is_search ? @orgs.count : total_records
     @total_records = total_records
     broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
+    if general_agency_is_enabled?
+      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
+    end
     @draw = dt_query.draw
     @employer_profiles = employer_profiles.present? ? employer_profiles : []
     render
@@ -329,6 +368,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def clear_assign_for_employer
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
+    
     authorize HbxProfile, :modify_admin_tabs?
     @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     if @employer_profile.present?
@@ -400,6 +442,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def languages_spoken_params
     params.require(:organization).permit(
+      :accept_new_clients,
+      :working_hours,
       :languages_spoken => []
     )
   end
@@ -413,6 +457,29 @@ class BrokerAgencies::ProfilesController < ApplicationController
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
       location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
     end
+  end
+
+  def check_and_download_commission_statement
+      @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+      authorize @broker_agency_profile, :access_to_broker_agency_profile?
+      @commission_statement = @broker_agency_profile.organization.documents.find(params[:statement_id])
+  end
+
+  def get_commission_statements(documents)
+    commission_statements = []
+    documents.each do |document|
+      # grab only documents that are commission statements by checking the bucket in which they are placed
+      if document.identifier.include?("commission-statements")
+        commission_statements << document
+      end
+    end
+    commission_statements
+  end
+
+  def collect_and_sort_commission_statements(sort_order='ASC')
+    @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
+    #sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse!
+    @statements.sort_by!(&:date).reverse!
   end
 
   def find_hbx_profile

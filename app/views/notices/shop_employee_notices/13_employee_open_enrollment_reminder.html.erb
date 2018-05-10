@@ -1,7 +1,7 @@
-<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
-<%= render partial: 'notices/shared/logo_and_address_shop' %>
-<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
-<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/address', :locals => {notice: notice} %>
+
 
 <table class="total_table" border="0">
   <tbody>
@@ -27,7 +27,7 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "To complete the enrollment process, please complete the following steps:",
-  listings: ["Go to <a href=#{Settings.site.home_url}> #{Settings.site.website_name}</a>",
+  listings: ["Go to <a href='https://enroll.mhc.hbxshop.org'> #{site_website_name}</a>",
              "Log-in or create an account",
              "If necessary, update your household information add any dependents",
              "Select your health plan"] } %>
@@ -36,18 +36,25 @@
   { content: "<strong>What is Open Enrollment?</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Open enrollment is your annual opportunity to enroll in your employer’s health plan or make changes to your current plan selection. Outside of this annual open enrollment period, you will only be allowed to make changes to your health plan enrollment if you experience certain life events such as marriage, birth, or adoption."} %>
+  { content: "Open enrollment is your annual opportunity to enroll in your employer’s health plan or make changes to your current plan selection.  Outside of this annual open enrollment period, you will only be allowed to make changes to your health plan enrollment if you experience certain life events, such as marriage, birth, or adoption, or other qualifying events."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
+
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling <a href='#{contact_center_phone_number}'>#{contact_center_phone_number}</a>",
+                                                                     "TTY: #{contact_center_tty_number}",
+                                                                     "Online at #{site_main_web_link}"] } %>
+
 <% if notice.broker.present? %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:"} %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling <a href='#{contact_center_phone_number}'>#{contact_center_phone_number}.</a>"} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   ["By calling #{notice.hbe.phone}."] } %>
+<%= render partial: 'notices/shared/paragraph', :locals =>
+{content: "This notice is being provided in accordance with 45 C.F.R. 155.720."} %>

@@ -1,0 +1,9 @@
+<% if @user.errors.blank? %>
+  $('#setUserEmailModal').modal('hide');
+  element = $('td.col-name:contains("<%= @user.oim_id %>")').siblings('.col-email')
+  $(element).html('<%= @user.email %>')
+  $.ajax({url: '/users/password', type: 'POST', data: {user: { email: '<%= @user.email %>' }}, dataType: 'script'})
+<% else %>
+  $('.alert-danger').remove()
+  $('.modal-questions-container').prepend("<%=escape_javascript(render partial: 'shared/error_messages', locals: { object: @user }) %>")
+<% end %>

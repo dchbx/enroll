@@ -211,7 +211,6 @@ module Effective
     #   User.all.group(:email).count will return a Hash
     def active_record_collection_size(collection)
       count = (collection.size rescue nil)
-
       case count
       when Integer
         count

@@ -20,6 +20,7 @@ Then /^they should see the new general agency form$/ do
 end
 
 When /^they complete the new general agency form and hit the 'Submit' button$/ do
+  FactoryGirl.create(:rating_area, zip_code: "01002", county: "Franklin", rating_area: Settings.aca.rating_areas.first)
   fill_in 'organization[first_name]', with: Forgery(:name).first_name
   fill_in 'organization[last_name]', with: Forgery(:name).last_name
   fill_in 'jq_datepicker_ignore_organization[dob]', with: (Time.now - rand(20..50).years).strftime('%m/%d/%Y')
@@ -41,7 +42,9 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   find(:xpath, "//p[contains(., 'SELECT STATE')]").click
   find(:xpath, "//li[contains(., 'DC')]").click
 
-  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '20001'
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01002'
+  wait_for_ajax
+  select "#{location[:county]}", :from => "organization[office_locations_attributes][0][address_attributes][county]"
 
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', with: Forgery(:address).phone.match(/\((\d\d\d)\)/)[1]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', with: Forgery(:address).phone.match(/\)(.*)$/)[1]
@@ -286,6 +289,10 @@ When /^the broker visits their general agencies page$/ do
   find(".interaction-click-control-general-agencies").click
 end
 
+Then /^the broker should not see the link General Agencies/ do
+  expect(page).should_not have_link('General Agencies')
+end
+
 When /^the broker set default ga$/ do
   first(:xpath, "//a[contains(., 'Select Default GA')]").click
 end
@@ -417,6 +424,14 @@ end
 
 When /^the broker click the link of clear default ga$/ do
   click_link "Clear Default GA"
+end
+
+Then(/^he should be able to see the Assign link under his profile$/) do
+ expect(page).to have_selector('#assign-tab')
+end
+
+Then(/^he should not be able to see the Assign link under his profile$/) do
+expect(page).not_to have_selector('#assign-tab')
 end
 
 When(/^the ga clicks on EDIT GENERAL AGENCY button\/link$/) do

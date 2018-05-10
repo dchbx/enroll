@@ -1,4 +1,4 @@
-Then(/^Hbx Admin should see searchbox$/) do
+Then(/^Hbx Admin should see search box$/) do
   wait_for_ajax
   page.find("input[type='search']").visible?
 end

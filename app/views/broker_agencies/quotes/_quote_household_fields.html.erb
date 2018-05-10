@@ -1,29 +1,29 @@
-<%= fields_for :quote_households do |qhh| %>
-  <% index= "#{(Time.now.to_f * 1000).to_i}" %>
-  <div class="panel panel-default">
-    <div id="family-panel">
-      <div class="panel-heading" role="tab" id="headingOne">
-        <h4 class="panel-title">
-        <%= qhh.text_field :family_id , {:name =>"quote[quote_households_attributes][#{index}][family_id]", :value => "1"}  %>
-        <button id="btn_add_emp" onclick="addFamilyMemberRow(this)" data-index="<%=index%>" type="button" class="btn btn-default" aria-label="Left Align">
-        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> <%= l10n("add_member_to_this_family")
-        </button>
-        <button type="button" href="#" id="remove_household_button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        </h4>
-      </div>
-      <div id="col" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading">
-        <div class="panel-body" id="family">
-          <%= qhh.fields_for :quote_members do |qm| %>
-            <div class="row form-inline">
-            <!-- Dynamically add the quote memeber -->
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </div>
+	<%= fields_for :quote_households do |qhh| %>
+	<% index= "#{(TimeKeeper.datetime_of_record.to_f * 1000).to_i}" %>
+		<div class="panel panel-default">
+			<div id="family-panel">
+				<div class="panel-heading" role="tab" id="headingOne">
+					<h4 class="panel-title">
+						<%= qhh.text_field :family_id , {:name =>"quote[quote_households_attributes][#{index}][family_id]", :value => "1"}  %>
+						<button id="btn_add_emp" onclick="addFamilyMemberRow(this)" data-index="<%=index%>" type="button" class="btn btn-default" aria-label="Left Align">
+							<span class="glyphicon glyphicon-user" aria-hidden="true"></span> <%= l10n("add_member_to_this_family")%>
+						</button>
+						<button type="button" href="#" id="remove_household_button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					</h4>
+				</div>
+				<div id="col" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading">
+					<div class="panel-body" id="family">
+						<%= qhh.fields_for :quote_members do |qm| %>
+						<div class="row form-inline">
+							<!-- Dynamically add the quote memeber -->
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+		</div>
 <% end %>
- 
+
 <script>
 var counter= 1;
 $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true,  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});

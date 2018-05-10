@@ -1,0 +1,13 @@
+<% benefit_group.census_employees.active.each do |census_employee| %>
+<tr>
+     <td> <%= census_employee.full_name %></td>
+     <td> <%= census_employee.census_dependents.count %></td>
+     <% if !benefit_group.single_plan_type? %>
+     <td> <%= number_to_currency(@benefit_group_costs[census_employee.id][:lowest_plan_cost]) %></td>
+     <% end %>
+     <td> <%= number_to_currency(@benefit_group_costs[census_employee.id][:ref_plan_cost]) %></td>
+     <% if !benefit_group.single_plan_type? %>
+     <td> <%= number_to_currency(@benefit_group_costs[census_employee.id][:highest_plan_cost]) %></td>
+     <% end %>
+</tr>
+<% end %>

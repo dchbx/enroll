@@ -19,8 +19,8 @@ describe Importers::ConversionEmployerUpdate, :dbclean => :after_each do
       primary_location_city: "sterling",
       primary_location_state: "dc",
       primary_location_zip: "99999",
+      primary_location_county: 'County',
       legal_name: "xyz llc",
-      carrier: "aetna",
       registered_on: TimeKeeper.date_of_record.beginning_of_month
     }
   }

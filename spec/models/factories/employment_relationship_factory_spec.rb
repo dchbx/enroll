@@ -2,18 +2,18 @@ require 'rails_helper'
 
 RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: :after_each do
 
-  let(:calender_year) { TimeKeeper.date_of_record.year }
+  let(:calendar_year) { TimeKeeper.date_of_record.year }
   let(:organization) {
     org = FactoryGirl.create :organization, legal_name: "Corp 1"
     TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
     employer_profile = FactoryGirl.create :employer_profile, organization: org
-    active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
-    :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5
-    renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolling, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-    :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5
+    active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
+    :open_enrollment_start_on => Date.new(calendar_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year - 1, 4, 10), fte_count: 5
+    renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolling, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+    :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
     benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year, effective_on_kind: "date_of_hire"
     renewing_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewing_plan_year
-    census_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years, hired_on: Date.new(calender_year, 3, 12)
+    census_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years, hired_on: Date.new(calendar_year, 3, 12)
 
     employer_profile.census_employees.each do |ce|
       ce.add_benefit_group_assignment benefit_group, benefit_group.start_on

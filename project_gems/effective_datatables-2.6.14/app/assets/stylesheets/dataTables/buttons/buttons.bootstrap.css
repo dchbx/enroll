@@ -100,3 +100,7 @@ div.dt-button-background {
     float: none;
   }
 }
+div > span.divider
+{
+    margin-left:3px;
+}

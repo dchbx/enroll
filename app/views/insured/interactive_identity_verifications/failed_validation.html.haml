@@ -3,12 +3,6 @@
     .col-xs-9
       - if @step == 'start'
         = l10n(".failed_validation_html")
-        %br
-        1. Complete your application at the DC Health Benefit Exchange Authority. Please call (202) 715-7576 to set up an appointment.
-        %br
-        %br
-        2. Complete a paper application form, scan it, and email it to info@dchealthlink.com. Click here for the paper application form. Be sure to fill out all the required information so that we can process your application as soon as possible.
-        %br
       - else
         %h4= t('insured.interactive_identity_verifications.failed_validation.contact_information', :ref_number => @verification_response.transaction_id)
 

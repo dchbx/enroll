@@ -30,7 +30,7 @@ describe Events::EmployersController do
           :headers => {
             :employer_id => employer_hbx_id,
             :return_status => "200"
-          }       
+          }
         })
         controller.resource(connection, di, props, "")
       end
@@ -45,7 +45,7 @@ describe Events::EmployersController do
           :headers => {
             :employer_id => employer_hbx_id,
             :return_status => "404"
-          }       
+          }
         })
         controller.resource(connection, di, props, "")
       end

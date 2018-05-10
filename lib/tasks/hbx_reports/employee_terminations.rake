@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
+      include Config::AcaHelper
 
       census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2015,10,1)))
 
@@ -13,7 +14,7 @@ namespace :reports do
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/public/employee_terminations.csv"
+      file_name = fetch_file_format('employee_terminations', 'EMPLOYEETERMINATIONS')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
@@ -45,6 +46,9 @@ namespace :reports do
           end
         end
       end
+
+      pubber = Publishers::Legacy::EmployeeTerminationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_start} - #{Date.today}, #{processed_count} employee terminations output to file: #{file_name}"
     end

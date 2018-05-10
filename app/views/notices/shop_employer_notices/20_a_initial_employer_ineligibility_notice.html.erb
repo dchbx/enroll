@@ -1,0 +1,70 @@
+<%= render partial: "notices/shared/cover", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<br><br><br><br><br>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td>Dear <%= notice.primary_fullname %>,  </td>
+  </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+                                                      content: "Your employee open enrollment period closed on #{notice.plan_year.open_enrollment_end_on} and your group did not meet the eligibility requirement listed below. As a result, your group is not eligible to obtain employer-sponsored health insurance effective #{notice.plan_year.start_on} at this time. "} %>
+<div style="display:block; page-break-inside: avoid;">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td class="left-align-footer mar20">
+          <strong> <%=notice.plan_year.warnings.join(' AND/OR ')%></strong>
+        </td>
+      </tr>   
+    </tbody>
+  </table>
+</div>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+                                                      content: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through <a href= '#{site_main_web_address_url}'>#{site_main_web_address}</a>. Please note that you must meet the following requirements to be eligible to obtain employer-sponsored health insurance through the #{site_short_name}:
+                                                      <ul><li>At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage. </li>
+                                                      <li>At least one non-owner employee enrolls in health coverage.</li></ul>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+                                                      content: "If you are unable to satisfy the minimum participation requirement, you will only be able to offer #{site_short_name} coverage during the special annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without contributing 50% to employees’ premiums or 33% to family member premiums, if offered, or meeting the seventy-five (75) percent minimum participation requirement. You are still required to have at least one non-owner enroll in coverage during the January 1 exception period. If you are unable to meet these requirements by the end of the employee open enrollment period, the #{site_short_name} will send a notice at the end of open enrollment with information on next steps."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: ["Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li class="notice-font">
+            By calling <%=contact_center_phone_number%><br>
+        </li>
+        <li class="notice-font">
+             TTY: <%=contact_center_tty_number%>
+        </li>
+        <li class="notice-font">
+            Online at <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number} or TTY: #{contact_center_tty_number} ."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 CFR 155.715(e)."} %>

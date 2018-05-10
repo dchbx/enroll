@@ -96,7 +96,6 @@ def phones
         "full_phone_number" => "3012146718",
         "kind" => "phone main"
       }
-    }  
+    }
   }
 end
-

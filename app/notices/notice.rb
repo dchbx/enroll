@@ -1,8 +1,12 @@
 class Notice
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
+  include Config::AcaHelper
+  include Config::SiteHelper
+  include Config::ContactCenterHelper
 
-  Required=[:subject,:mpi_indicator,:event_name,:template,:recipient,:notice,:market_kind,:recipient_document_store]
+  attr_accessor :from, :to, :options, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep, :state
+
+  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
 
   def initialize(params = {})
     validate_params(params)
@@ -15,7 +19,9 @@ class Notice
     self.recipient= params[:recipient]
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]
+    self.state = params[:options][:state] if params[:options]
     self.name = params[:name] || recipient.first_name
+    self.sep = params[:options][:sep] if params[:options]
   end
 
   def html(options = {})
@@ -71,20 +77,18 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
-          locals: { recipient: recipient, notice: notice}
+          locals: {recipient: recipient, notice: notice}
           }),
         }
     }
-    footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
-
-    options.merge!({footer: {
-      content: ApplicationController.new.render_to_string({
-        template: footer,
-        layout: false,
-        locals: {notice: notice}
-      })
-    }})
-
+    if market_kind == 'individual'
+      options.merge!({footer: {
+        content: ApplicationController.new.render_to_string({
+          template: "notices/shared/footer.html.erb",
+          layout: false
+        })
+      }})
+    end
     options
   end
 
@@ -168,7 +172,7 @@ class Notice
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
+    message = recipient.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
     message.save!
   end
 

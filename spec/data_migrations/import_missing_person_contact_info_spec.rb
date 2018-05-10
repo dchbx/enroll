@@ -33,7 +33,7 @@ describe ImportMissingPersonContactInfo do
       person.save
       subject.migrate
       person.reload
-      expect(person.addresses).to eq census_employee.address.to_a
+      expect(person.addresses).to eq [census_employee.address]
       expect(person.emails.first).to eq census_employee.email
       expect(person.emails.size).to eq 2
     end

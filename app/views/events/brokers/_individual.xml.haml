@@ -1,0 +1,39 @@
+%id
+  %id= individual.hbx_id
+= render :partial => "events/individuals/person", :object => individual
+- if individual.person_relationships.any?
+  %person_relationships
+    - individual.person_relationships.each do |rel|
+      %person_relationship
+        %subject_individual
+          %id= individual.hbx_id
+        %relationship_uri= "urn:openhbx:terms:v1:individual_relationship##{vocab_relationship_map(rel.kind)}"
+        %object_individual
+          %id= rel.relative.hbx_id
+= render :partial => "events/individuals/person_demographics", :object => individual
+- if individual.broker_role.present?
+  - if !individual.broker_role.broker_agency_profile_id.blank?
+    - broker_role = individual.broker_role
+    - broker_agency_profile = broker_role.broker_agency_profile
+    %broker_roles
+      %broker_role
+        %id
+          %id= broker_role.npn
+        %npn= broker_role.npn
+        %broker_agency
+          %id
+            %id= broker_agency_profile.id
+          %name= broker_agency_profile.legal_name
+          - if !broker_agency_profile.corporate_npn.blank?
+            %npn= broker_agency_profile.corporate_npn
+          - if broker_agency_profile.organization.primary_office_location.present?
+            - office_location = broker_agency_profile.organization.primary_office_location
+            %office_locations
+              = render :partial => "events/organizations/office_location", :object => office_location
+        - if  broker_agency_profile.ach_routing_number && broker_agency_profile.ach_account_number
+          %broker_payment_accounts
+            %broker_payment_account
+              %routing_number= broker_agency_profile.ach_routing_number
+              %account_number= broker_agency_profile.ach_account_number
+              %account_active_on= broker_role.latest_transition_time.strftime("%Y-%m-%d")
+        = render :partial => "events/shared/versioned_resource", :object => broker_role

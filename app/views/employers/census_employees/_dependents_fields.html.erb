@@ -1,0 +1,12 @@
+  <div class="col-md-12">
+    <% if @census_employee.census_dependents.present? %>
+      <h3>Dependents</h3>
+      <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
+        <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
+      <% end %>
+    <% else %>
+      <h3>Dependents (<%= @census_employee.census_dependents.size %>)</h3>
+    <% end %>
+
+    <%= render 'shared/add_dependents', { f: f } %>
+  </div>

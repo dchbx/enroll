@@ -375,7 +375,7 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason, 
+      :no_dc_address_reason,
       :id,
       :consumer_role,
       :is_applying_coverage

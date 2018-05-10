@@ -9,7 +9,9 @@ FactoryGirl.define do
     is_incarcerated false
     is_active true
     gender "male"
-
+    # us_citizen "true"
+    # indian_tribe_member "false"
+    # naturalized_citizen "false"
     #association :employee_role, strategy: :build
 
     after(:create) do |p, evaluator|

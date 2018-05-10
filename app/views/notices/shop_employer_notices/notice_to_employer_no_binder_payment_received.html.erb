@@ -1,0 +1,32 @@
+<%= render partial: 'notices/shared/cover', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<br><br><br><br><br>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/wish_by_name', :locals => {notice: notice} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+                                                      { content: "Thank you for applying to offer group health coverage through the Health Connector.  However, our records show we did not receive the payment of $ #{notice.plan_year.binder_payment_total} for the first month of coverage for your employees. The deadline for payment was #{notice.plan_year.binder_payment_due_date}. As a result of this non-payment, your group and all employees cannot obtain employer-sponsored coverage beginning on #{notice.plan_year.start_on} through the #{site_short_name}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+                                                      { content: "If you would like to obtain health coverage through the #{site_short_name} you may re-apply for coverage starting on a later start date. The earliest date you are eligible to apply for at this time is #{notice.plan_year.start_on.next_month}. The deadline for completing an employer application for coverage starting on #{notice.plan_year.start_on.next_month} is  #{(notice.plan_year.start_on).strftime("%m/#{Settings.aca.shop_market.initial_application.advertised_deadline_of_month}/%Y")}. You can find all deadlines for employer applications  <a href = '#{site_employer_application_deadline_link}'>here</a>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+                                                      { content: "If you believe you have made an initial payment, please call us at #{contact_center_phone_number}. "} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+    { heading: 'For Questions or Assistance:',
+      col_styles: ['margin-bottom: 0px']} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "Please contact your broker for further assistance. You can also contact the #{site_short_name} with any questions:",
+    listings: ["By calling #{contact_center_phone_number}. TTY: #{contact_center_tty_number}",
+               "By email: <a href='mailto:#{small_businesss_email}'>#{small_businesss_email}</a>"]}%>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "You can also find more information on our website at <a href= '#{site_main_web_address_url}'>#{site_main_web_address}</a> "}%>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
+<% end %>

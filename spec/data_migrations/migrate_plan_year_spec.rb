@@ -19,7 +19,7 @@ describe MigratePlanYear, dbclean: :after_each do
     let(:employer_profile)  { FactoryGirl.create(:employer_profile, plan_years: [plan_year], profile_source: "conversion") }
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.parent.fein)
+      allow(ENV).to receive(:[]).with("feins").and_return(employer_profile.parent.fein)
     end
 
     context "giving a new state" do

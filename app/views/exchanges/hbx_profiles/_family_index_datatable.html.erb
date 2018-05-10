@@ -7,27 +7,28 @@
 <%= raw render_datatable(@datatable) %>
 <div class="container">
   <div class="col-sm-12 col-md-12">
-  <%=pundit_span Family, :updateable? %>
-    <div class="row">
-         <ul class='col-xs-12 col-md-5 col-lg-5'>
-          <li> <%=link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(
-          original_application_type: 'phone')  %> <br/></li>
-
-          <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(
-          original_application_type: 'paper')  %> <br/></li>
-
-          <% if policy(:family).hbx_super_admin_visible? %>
-            <li> <%=link_to 'New DC Resident Application', begin_resident_enrollment_exchanges_residents_path(
-                 original_application_type: 'paper')  %> </li>
+    <%=pundit_span Family, :updateable? %>
+      <div class="row">
+        <ul class='col-xs-12 col-md-5 col-lg-5'>
+          <% if aca_shop_market_new_employee_paper_application_is_enabled? %>
+            <li> <%=link_to 'New Employee Paper Application', begin_employee_enrollment_exchanges_agents_path(original_application_type: 'paper'), class: 'new_employee_paper_application' %></li>
           <% end %>
-          </ul>
+          <% if individual_market_is_enabled? %>
+            <li> <%=link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'phone') %> </li>
+          <% end %>
+          <% if individual_market_is_enabled? %>
+            <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'paper') %> </li>
+          <% end %>
+          <% if individual_market_is_enabled? && policy(:family).hbx_super_admin_visible? %>
+            <li> <%=link_to 'New DC Resident Application', begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper') %></li>
+          <% end %>
+        </ul>
+        </br>
+      </div>
     </span>
-    </div>
-
     <div class="row">
       <p> After working on an enrollment return to this page via the person icon in the header </p>
     </div>
-
   </div>
 </div>
 

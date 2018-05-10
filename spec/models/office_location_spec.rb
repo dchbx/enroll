@@ -29,6 +29,40 @@ RSpec.describe OfficeLocation, :type => :model do
       end
     end
 
+    describe "validate address county" do
+      let(:address) { build(:address, kind: office_kind, county: county_name) }
+      let(:county_name) { "" }
+      let(:office_kind) { "primary" }
+
+      context "for non-employers" do
+
+      end
+
+      context "for an employer" do
+        let(:organization) { create(:employer) }
+        context "primary office" do
+          context "without a county provided" do
+            it "should not be valid" do
+              expect(OfficeLocation.new(**valid_params).save).to be_falsey if Settings.aca.validate_county == "true"
+            end
+          end
+          context "with a county provided" do
+            let(:county_name) { "County Name" }
+            it "should be valid" do
+              expect(OfficeLocation.new(**valid_params).save).to be_truthy
+            end
+          end
+        end
+
+        context "a non primary office" do
+          let(:office_kind) { "mailing" }
+          it "should be valid without a county" do
+            expect(OfficeLocation.new(**valid_params).save).to be_truthy
+          end
+        end
+      end
+    end
+
     context "with all valid arguments" do
       let(:params) {valid_params}
 

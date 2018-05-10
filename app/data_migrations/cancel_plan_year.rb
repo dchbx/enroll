@@ -2,27 +2,31 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CancelPlanYear < MongoidMigrationTask
   def migrate
-    organizations = Organization.where(fein: ENV['fein'])
+    feins=ENV['feins'].split(' ').uniq
+    feins.each do |fein|
+      organizations = Organization.where(fein: fein)
+      next puts "unable to find employer_profile with fein: #{fein}" if organizations.blank?
 
-    if organizations.size != 1
-      puts "Found No (or) more than 1 organization with the given fein" unless Rails.env.test?
-      return
-    end
+      if organizations.size > 1
+        raise 'more than 1 employer found with given fein'
+      end
 
-    plan_year = organizations.first.employer_profile.plan_years.where(aasm_state: ENV['plan_year_state'].to_s).first
-    enrollments = all_enrollments(plan_year.benefit_groups)
-    if enrollments.present?
-      enrollments.each { |enr| enr.cancel_coverage! if enr.may_cancel_coverage? }
-      puts "canceled enrollments for this plan year" unless Rails.env.test?
-    else
-      puts "No enrollments under this plan year" unless Rails.env.test?
-    end
-    if plan_year.may_cancel?
-      plan_year.cancel!
-      puts "canceled plan year" unless Rails.env.test?
-    elsif plan_year.may_cancel_renewal?
-      plan_year.cancel_renewal!
-      puts "canceled renewal plan year" unless Rails.env.test?
+      plan_year = organizations.first.employer_profile.plan_years.where(aasm_state: ENV['plan_year_state'].to_s).first
+      next puts "Present fein: #{fein} is found but it has different plan year assm state" if plan_year.nil?
+      enrollments = all_enrollments(plan_year.benefit_groups)
+      if enrollments.present?
+        enrollments.each { |enr| enr.cancel_coverage! if enr.may_cancel_coverage? }
+        puts "canceled enrollments for this plan year" unless Rails.env.test?
+      else
+        puts "No enrollments under this plan year" unless Rails.env.test?
+      end
+      if plan_year.may_cancel?
+        plan_year.cancel!
+        puts "canceled plan year" unless Rails.env.test?
+      elsif plan_year.may_cancel_renewal?
+        plan_year.cancel_renewal!
+        puts "canceled renewal plan year" unless Rails.env.test?
+      end
     end
   end
 

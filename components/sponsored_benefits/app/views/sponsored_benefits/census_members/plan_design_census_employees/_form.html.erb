@@ -1,0 +1,52 @@
+<div class="employee-add-tab census-employee-add content-bottom">
+  <div class="module">
+    <% page_title = @census_employee.persisted? ? "Update "+@census_employee.full_name.titleize : 'Add New Employee' %>
+    <h3><%= page_title %></h3>
+    <%#= render 'errors_if_any' %>
+
+    <% unless @census_employee.persisted? %>
+        <p class="twenty">
+          Enter employee information. Select 'Add Family Member' if applicable. When you're finished, select 'Create
+          Employee' to continue.
+        </p>
+    <% end %>
+
+    <%= render 'member_fields', f: f %>
+    <%#= render 'shared/census_employee_fields', {f: f} %>
+    <%#= render 'cobra_fields', f: f if show_cobra_fields?(@employer_profile, current_user) %>
+  
+    <div class="row">
+      <%= render 'dependents_fields', f:f %>
+    </div>
+
+    <div class="vertically-aligned-row">
+      <div>
+        <%#= link_to 'Cancel', employers_employer_profile_path(@employer_profile, :tab => "employees"), class: 'btn btn-default btn-lg return_to_employee_roster' %>
+      </div>
+      <div class="key-btn text-right <%#= pundit_class EmployerProfile, :updateable? %>">
+        <% if @census_employee.persisted? %>
+        <button class="btn btn-primary" type="submit">Update Employee</button>
+        <button class="btn btn-primary" type="cancel" onclick="cancelEdit();">Cancel</button>
+        <% else %>
+        <button class="btn btn-primary" type="submit">Create Employee</button>
+        <a class="btn btn-primary" type="cancel" onclick="cancelCreate();">Cancel</a>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function(){
+  function cancelEdit(){
+    var containing_row = $("#<%= 'plan_design_employee_' + @census_employee.id %>").closest('TR');
+    var $parent_row = containing_row;
+    if ( $('tr.child-row:visible').length > 0 ) {
+        $("li>a:contains('Collapse Form')").eq(containing_row.index()).addClass('disabled');
+        $('tr.child-row:visible').remove();  
+        $('.dropdown.pull-right').removeClass('open');
+    }
+  }
+})
+</script>
+

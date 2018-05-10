@@ -10,6 +10,8 @@ class HbxEnrollment
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Mongoid::History::Trackable
+  include Concerns::Observable
+  include ModelEvents::HbxEnrollment
 
   embedded_in :household
 
@@ -46,8 +48,7 @@ class HbxEnrollment
     "I have coverage through an individual market health plan",
     "I have coverage through Medicare",
     "I have coverage through Tricare",
-    "I have coverage through Medicaid",
-    "I do not have other coverage"
+    "I have coverage through Medicaid"
   ]
   CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected enrolled_contingent unverified coverage_enrolled)
 
@@ -213,6 +214,7 @@ class HbxEnrollment
 
   before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber
   after_save :check_created_at
+  after_save :notify_on_save
 
   # This method checks to see if there is at least one subscriber in the hbx_enrollment_members nested document.
   # If not, it assigns it to the oldest person.
@@ -335,24 +337,6 @@ class HbxEnrollment
       # end
 
       HbxEnrollment.terminate_scheduled_enrollments
-
-      #FIXME Families with duplicate renewals
-      families_with_effective_renewals_as_of(new_date).each do |family|
-        family.enrollments.renewing.each do |hbx_enrollment|
-          if hbx_enrollment.effective_on <= new_date
-            if census_employee = hbx_enrollment.census_employee
-              if census_employee.renewal_benefit_group_assignment.try(:may_select_coverage?)
-                census_employee.renewal_benefit_group_assignment.select_coverage!
-              end
-            end
-            hbx_enrollment.begin_coverage!
-          end
-        end
-      end
-    end
-
-    def families_with_effective_renewals_as_of(new_date)
-      Family.by_enrollment_shop_market.by_enrollment_renewing.where({ :"households.hbx_enrollments.effective_on".lte => new_date }).limit(10)
     end
 
     def update_individual_eligibilities_for(consumer_role)
@@ -852,6 +836,8 @@ class HbxEnrollment
     if self.is_shop?
       if benefit_group.is_congress
         PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
+      elsif self.composite_rated? && (!qhp_plan.dental?)
+        CompositeRatedPlanCostDecorator.new(qhp_plan, benefit_group, self.composite_rating_tier, is_cobra_status?)
       else
         reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
         PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
@@ -1220,9 +1206,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1380,6 +1366,8 @@ class HbxEnrollment
     if plan.present? && benefit_group.present?
       if benefit_group.is_congress #is_a? BenefitGroupCongress
         @cost_decorator = PlanCostDecoratorCongress.new(plan, self, benefit_group)
+      elsif self.composite_rated? && (!plan.dental?)
+        @cost_decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, self.composite_rating_tier, is_cobra_status?)
       else
         reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
         @cost_decorator = PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
@@ -1480,29 +1468,73 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
-  def ee_plan_selection_confirmation_sep_new_hire
-    if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
-      if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
-        begin
-          census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)
-        rescue Exception => e
-          (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
-        end
-      end
+  def dental?
+    coverage_kind == "dental"
+  end
+
+  # TODO: Implement behaviour by 16219.
+  def composite_rating_tier
+    @composite_rating_tier ||= cached_composite_rating_tier
+  end
+
+  def cached_composite_rating_tier
+    return nil unless is_shop?
+    return CompositeRatingTier::EMPLOYEE_ONLY unless hbx_enrollment_members.many?
+    relationships = hbx_enrollment_members.reject(&:is_subscriber?).map do |mem|
+      PlanCostDecorator.benefit_relationship(mem.primary_relationship)
+    end
+    if (relationships.include?("spouse") || relationships.include?("domestic_partner"))
+      relationships.many? ? CompositeRatingTier::FAMILY : CompositeRatingTier::EMPLOYEE_AND_SPOUSE
+    else
+      CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
     end
   end
 
-  def notify_employee_confirming_coverage_termination
-    if is_shop? && census_employee.present?
-      begin
-        census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
-        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "notify_employee_confirming_coverage_termination", hbx_enrollment_hbx_id: hbx_id.to_s)
-      rescue Exception => e
-        (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" })
+  def composite_rated?
+    return false if dental?
+    return false if benefit_group_id.blank?
+    benefit_group.sole_source?
+  end
+
+  def rating_area
+    return nil unless is_shop?
+    return nil if benefit_group_id.blank?
+    benefit_group.rating_area
+  end
+
+  def ee_select_plan_during_oe
+    begin
+      if is_shop? && self.census_employee.present? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "select_plan_year_during_oe", {:enrollment_hbx_id => self.hbx_id.to_s})
       end
+    rescue Exception => e
+      Rails.logger.error { "Unable to send MAE068 notice to #{self.census_employee.full_name} due to #{e.backtrace}" }
     end
   end
+
+  # def ee_plan_selection_confirmation_sep_new_hire
+  #   if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
+  #     if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
+  #       begin
+  #         census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+  #         ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)
+  #       rescue Exception => e
+  #         (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
+  #       end
+  #     end
+  #   end
+  # end
+
+  # def notify_employee_confirming_coverage_termination
+  #   if is_shop? && census_employee.present?
+  #     begin
+  #       census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+  #       ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "notify_employee_confirming_coverage_termination", hbx_enrollment_hbx_id: hbx_id.to_s)
+  #     rescue Exception => e
+  #       (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" })
+  #     end
+  #   end
+  # end
 
  def is_active_renewal_purchase?
    enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil

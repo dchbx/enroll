@@ -25,6 +25,31 @@ Then(/^.+ should see an initial fieldset to enter my name, ssn and dob$/) do
   @browser.button(value: /Search Person/).fire_event("onclick")
 end
 
+Then(/^.+ uploads an attestation document/) do
+  if (Settings.aca.enforce_employer_attestation.to_s == "true")
+    find('.interaction-click-control-documents').click
+    wait_for_ajax
+    find('.interaction-click-control-upload').click
+    wait_for_ajax
+    find('#subject_Employee_Attestation').click
+    # There is no way to actually trigger the click and upload functionality
+    # with a JS driver.
+    # So we commit 2 sins:
+    #   1) We make the file input visible so we can set it.
+    #   2) We make the submit button visible so we can click it.
+    execute_script(<<-JSCODE)
+    $('#modal-wrapper div.employee-upload input[type=file]').attr("style", "display: block;");
+    JSCODE
+    wait_for_ajax
+    attach_file("file", "#{Rails.root}/test/JavaScript.pdf")
+    execute_script(<<-JSCODE)
+    $('#modal-wrapper div.employee-upload input[type=submit]').css({"visibility": "visible", "display": "inline-block"});
+    JSCODE
+    find("input[type=submit][value=Upload]").click
+    wait_for_ajax
+  end
+end
+
 And(/^My user data from existing the fieldset values are prefilled using data from my existing account$/) do
   @browser.button(value: /This is my info/).wait_until_present
   screenshot("employer_portal_person_match_form")
@@ -264,6 +289,15 @@ And(/^.+ should see the census family is successfully rehired message$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Successfully rehired family.") }
 end
 
+And(/^Employer can( not)? see the important documents needed$/) do |negate|
+  if negate
+    expect(page).not_to have_content('Important Documents Needed')
+    # page.should_not have_content('Important Documents Needed')
+  else
+    expect(page).to have_content('Important Documents Needed')
+  end
+end
+
 When(/^I go to the Profile tab$/) do
   find('.interaction-click-control-update-business-info').click
   find('.interaction-click-control-cancel').click
@@ -276,13 +310,43 @@ When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
   click_link 'Benefits'
 end
 
+When(/^I go to MY Health Connector tab$/) do
+ find('.interaction-click-control-my-health-connector').click
+ wait_for_ajax
+  expect(page).to have_content('My Health Benefits Program')
+end
+
+And(/^Employer can see the plan information on home tab$/) do
+  sleep 1
+  within('.benefit-group') do
+    expect(page).to have_content('One Carrier')
+  end
+end
+
+And(/^Employer can see the sole source plan information on home tab$/) do
+  sleep 1
+  within('.benefit-group') do
+    expect(page).to have_content('A Single Plan')
+  end
+end
+
+And(/^Employer can see the plan information$/) do
+  sleep 1
+  within('.benefit-package') do
+    expect(page).to have_content('One Carrier')
+  end
+end
+
+And(/^Employer can see the sole source plan information$/) do
+  sleep 1
+  within('.benefit-package') do
+    expect(page).to have_content('A Single Plan')
+  end
+end
 
 And(/^.+ should see a button to create new plan year$/) do
   screenshot("employer_plan_year")
   #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
-  year = (Date.today + 2.months).year
-  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
-  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
   find('a.interaction-click-control-add-plan-year').click
 end
 
@@ -375,8 +439,12 @@ When(/^.+ clicks? on publish plan year$/) do
   find('.interaction-click-control-publish-plan-year').click
 end
 
+Then(/^.+ should see Action Needed button/) do
+  expect(find('.interaction-click-control-documents')).to have_content("Action Needed")
+end
+
 Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
-  expect(find('.modal-body')).to have_content('Has its principal business address in the District of Columbia')
+  expect(find('.modal-body')).to have_content("Primary office must be located in #{Settings.aca.state_name}")
 end
 
 Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
@@ -384,12 +452,13 @@ Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
+  screenshot("havent clicked cancel yet")
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 
 Then(/^.+ should be on the business info page with warnings$/) do
-  expect(page).to have_content 'Office Location'
-  expect(find('.alert-error')).to have_content('Has its principal business address in the District of Columbia')
+  expect(page).to have_content 'Primary Office Location'
+  expect(find('.alert-error')).to have_content("Primary office must be located in #{Settings.aca.state_name}")
 end
 
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
@@ -412,7 +481,7 @@ Then(/^.+ should see a plan year successfully saved message$/) do
 end
 
 When(/^.+ clicks? on employer my account link$/) do
-  click_link 'My DC Health Link'
+  click_link "My #{Settings.site.short_name}"
 end
 
 Then(/^.+ should see employee cost modal for current plan year$/) do
@@ -483,20 +552,21 @@ end
 And /^clicks on terminate employee$/ do
   expect(page).to have_content 'Employee Roster'
   employees.first
-  first(".fa-trash-o").click
+  first(".dropdown").click
+  first("a.interaction-click-control-terminate").click
+  wait_for_ajax(2,2)
+
   terminate_date = (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")
   page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
-  find('.interaction-click-control-terminate-employee').click
   expect(page).to have_content 'Employee Roster'
-  wait_for_ajax(2,2)
+  first("a.delete_confirm").trigger('click')
+  wait_for_ajax(3,2)
 end
 
 Then /^employer clicks on terminated filter$/ do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
-  find('.filter').click
+  find_by_id('Tab:terminated').click
   wait_for_ajax
-  page.execute_script("$('.filter-options').show();")
-  find("#terminated_yes").trigger('click')
 end
 
 Then /^employer should not see the Get Help from Broker$/ do
@@ -504,22 +574,22 @@ Then /^employer should not see the Get Help from Broker$/ do
 end
 
 Then /^employer sees termination date column$/ do
-  expect(page).to have_content 'Termination Date'
+  expect(page).to have_content 'Terminated On'
 end
 
 And /^employer clicks on terminated employee$/ do
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 And /^employer clicks on linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "employee_role_linked")
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 Then /^ER should land on (.*) EE tab$/ do |val|
-  expect(page).to have_content val.upcase
+  expect(page.html).to match /val/
 end
 
 And /^ER enters (.*) EE name on search bar$/ do |val|
@@ -560,7 +630,7 @@ end
 And /^employer clicks on linked employee without address$/ do
   employees.first.address.delete
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 Then /^employer should see the address on the roster$/ do
@@ -583,33 +653,32 @@ end
 
 And /^employer clicks on non-linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "eligible")
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 And /^employer clicks on non-linked employee without address$/ do
   employees.first.address.delete
   employees.first.update_attributes(aasm_state: "eligible")
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 Then /^employer should see employee roaster$/ do
   expect(page).to have_content "Employee Roster"
 end
 And /^employer should also see termination date$/ do
-  expect(page).to have_content "Termination Date"
+  expect(page).to have_content "Terminated On"
 end
 
 And /^employer clicks on all employees$/ do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
-  find('.filter').click
+  find_by_id('Tab:all').click
+
   wait_for_ajax
-  page.execute_script("$('.filter-options').show();")
-  find("#family_all").trigger('click')
 end
 
 Then /^employer should not see termination date column$/ do
   wait_for_ajax
-  expect(page).not_to have_content "Termination Date"
+  expect(page).not_to have_content "Terminated On"
 end
 
 Then /^they should see that employee's details$/ do
@@ -674,4 +743,68 @@ end
 
 Then(/^the employer sees a successful message$/) do
   expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
+end
+
+
+When(/^.+ go(?:es)? to the documents tab directly$/) do
+  #interaction-click-control-documents
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=documents"
+end
+
+When(/^.+ go(?:es)? to the documents tab$/) do
+   find('.interaction-click-control-documents').click
+  #interaction-click-control-documents
+  #visit employers_employer_profile_path(employer.employer_profile) + "?tab=documents"
+end
+
+Then(/^.+ should see upload button$/) do
+  expect(page).to have_content('Upload')
+end
+
+When(/^the employer clicks upload button$/) do
+  find('.interaction-click-control-upload').click
+end
+#
+Then(/^.+ should see model box with file upload$/) do
+  expect(page).to have_content('SELECT FILE TO UPLOAD')
+  expect(page).to have_content('Employer Attestation ')
+end
+
+
+Then(/^.+ fill the document form$/) do
+  Capybara.ignore_hidden_elements = false
+
+  script = "$('[name=\"file\"]').css({opacity: 100, display: 'block'});"
+  page.evaluate_script(script)
+
+  find(:xpath,"//*[@id='modal-wrapper']/div/form/label").trigger('click')
+  within '.upload_document' do
+    attach_file('file', "#{Rails.root}/test/JavaScript.pdf")
+  end
+  Capybara.ignore_hidden_elements = true
+end
+
+Then(/^the employer clicks the upload button in popup/) do
+   click_button('Upload')
+end
+
+Then(/^the employer should see the document list/) do
+  wait_for_ajax
+  expect(page).to have_content('JavaScript.pdf')
+  expect(page).to have_content('Submitted')
+end
+
+Then(/^Employer should see Action Needed under document/) do
+  expect(page).to have_content('Action Needed')
+end
+
+And(/^the employer clicks document name/) do
+  find(:xpath,"//*[@id='effective_datatable_wrapper']//a[contains(.,'JavaScript.pdf')]").trigger('click')
+end
+
+Then(/^the employer should see Download,Print Option/) do
+  wait_for_ajax
+
+  expect(page).to have_content('Download')
+  expect(page).to have_content('Print')
 end

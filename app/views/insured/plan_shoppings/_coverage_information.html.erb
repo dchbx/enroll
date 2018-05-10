@@ -16,9 +16,9 @@
           <td><%= member.person.full_name %></td>
           <td><%= member.primary_relationship %></td>
           <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-          <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
-          <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
-          <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+          <td class="text-right"><%= @plan.sole_source? && @enrollment.coverage_kind == "health" ? "--" : number_to_currency(@plan.premium_for(member)) %></td>
+          <td class="text-right"><%= @plan.sole_source? && @enrollment.coverage_kind == "health" ? "--" : number_to_currency(@plan.employer_contribution_for(member)) %></td>
+          <td class="text-right"><%= @plan.sole_source? && @enrollment.coverage_kind == "health" ? "--" : number_to_currency(@plan.employee_cost_for(member)) %></td>
         </tr>
       <% end %>
       <tr class="gray-row">

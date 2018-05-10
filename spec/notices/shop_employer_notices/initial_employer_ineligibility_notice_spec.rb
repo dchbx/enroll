@@ -6,9 +6,11 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
   let!(:person){ create :person}
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolling' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
+  let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'application_ineligible' ) }
+  let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Initial Employer ineligible to obtain coverage.',
-                            :notice_template => 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
+                            :name =>'Initial Group Ineligible to Obtain Coverage',
+                            :notice_template => 'notices/shop_employer_notices/20_a_initial_employer_ineligibility_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
                             :event_name => 'initial_employer_ineligibility_notice',
                             :mpi_indicator => 'SHOP_D020',
@@ -84,16 +86,16 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
 
     it "should return planyear warnings" do
       if plan_year.start_on.yday != 1
-        expect(@employer_notice.notice.plan_year.warnings).to eq ["At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
+        expect(@employer_notice.notice.plan_year.warnings).to eq ["At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
       else
         expect(@employer_notice.notice.plan_year.warnings).to eq []
       end
     end
 
     it "should render initial_employer_ineligibility_notice" do
-     expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_ineligibility_notice"
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/20_a_initial_employer_ineligibility_notice"
     end
- 
+
     it "should generate pdf" do
       @employer_notice.build
       @employer_notice.append_data

@@ -1,14 +1,21 @@
 <html>
 <body>
-  Dear <%= census_employee.full_name.humanize.titleize %>,
+  <% fname = census_employee.full_name %>
+  <% fname.slice! census_employee.last_name %>
+  Dear <%= fname.humanize.titleize %>,
 <br/>
 <br/>
 <div>
-  Good News! <%= census_employee.employer_profile.legal_name.titleize %>, has chosen to offer health insurance coverage to its employees through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
+  Good News! <%= census_employee.employer_profile.legal_name.titleize %> has chosen to offer <%= site_short_name %> coverage to its employees through The <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable. Your new open enrollment period begins on <%= census_employee.published_benefit_group_assignment.plan_year.open_enrollment_start_on.to_date.to_formatted_s %>.
 </div>
 <br/>
 <div>
-  In order to enroll into employer-sponsored coverage through <%= Settings.site.short_name %>, you must complete an application for enrollment by <%= census_employee.published_benefit_group_assignment.plan_year.open_enrollment_end_on.to_formatted_s %>, for coverage to be effective on <%= census_employee.published_benefit_group_assignment.plan_year.start_on.to_date.to_formatted_s %>. If you have other coverage, you will still want to “waive” coverage to preserve your special enrollment period rights for the plan year. 
+ You are now able to plan shop for insurance that will start on <%= census_employee.published_benefit_group_assignment.plan_year.start_on%>, as part of your open enrollment period. To enroll into employer-sponsored insurance through The <%= site_short_name %>, you must complete your application by <%= census_employee.published_benefit_group_assignment.plan_year.open_enrollment_end_on %>.
+</div>
+<br/>
+<div>
+If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name%> at this time, you should still “waive” coverage. Instructions for how to waive coverage are included in our <strong>Employee guide to waiving coverage,</strong> which you can find in the online <a href="#{site_business_resource_center_url}">Business Resource Center</a>.
+
 </div>
 <br/>
 <div>
@@ -16,24 +23,33 @@
     What is Open Enrollment?
   </b>
   <br/>
-    Open enrollment is your annual opportunity to enroll in health plans offered by your employer.  Outside of this annual open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain life events such as marriage, birth, or adoption.
+    Open enrollment is your annual opportunity to enroll in health plans offered by your employer.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
   <br/>
   <br/>
   <b>
     To See Plan Options and Enroll:
   </b>
   <br/>
-    If you have an existing <%= "#{Settings.site.short_name}" %> account, please log in at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%></a> to view the plan options chosen by your employer and complete the enrollment process. If you do not have an existing <%= "#{Settings.site.short_name}" %> account, please visit <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%></a> to create an account and proceed with plan shopping and enrollment.
+  To complete the application process, please follow the steps listed below. If you do not have an existing Health Connector account, follow the steps in our <strong> Employee guide to enrolling,</strong> which can be found in our <a href='#{site_business_resource_center_url}'>Business Resource Center</a>.
+    <ul style="list-style-type:circle">
+      <li>Go to <%= site_main_web_link %></li>
+      <li>Log-in or create an account as an employee
+      <li>If necessary, update your household information add any dependents, Make your plan selection(s) or waive coverage</li>
   <br/>
   <h2 style="color: #007bc4;">
     For Questions or Assistance:
   </h2>
-  You can contact <%= "#{Settings.site.short_name}" %> with any questions:
+  You can contact <%= site_short_name%> with any questions:
   <br/>
   <ul style="list-style-type:circle">
-    <li>By calling 855-532-5465;</li>
-    <li>Online at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%></a></li>
+    <li>By calling <%= contact_center_phone_number %>, TTY : <%= contact_center_tty_number%> </li>
+    <li>Online at <%= site_main_web_link %></li>
   </ul>
+  <br><br><br>
 </div>
 </body>
 </html>
+<br><br>
+<%= render "user_mailer/shared/taglines" %>
+<br><br>
+<%= render "user_mailer/shared/non_discrimination" %>

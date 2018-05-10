@@ -280,16 +280,16 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     context "and QLE is reported after the that has lapsed", dbclean: :after_each do
       let(:lapsed_qle_on_date)  { (TimeKeeper.date_of_record.beginning_of_month + 16.days) - 1.year }
-      
+
       let(:ivl_qle_sep) { FactoryGirl.create(:special_enrollment_period, family: family,
         qualifying_life_event_kind_id: ivl_qle.id, qle_on: lapsed_qle_on_date) }
-      
+
       let(:ivl_lost_insurance_qle_sep) { FactoryGirl.create(:special_enrollment_period, family: family,
         qualifying_life_event_kind_id: ivl_lost_insurance_qle.id, qle_on: lapsed_qle_on_date) }
-      
+
       let(:shop_lost_insurance_qle_sep) { FactoryGirl.create(:special_enrollment_period, family: family,
         qualifying_life_event_kind_id: shop_lost_insurance_qle.id, qle_on: lapsed_qle_on_date) }
-      
+
       let(:reporting_date)        { Date.current }
       let(:lapsed_effective_date) { ivl_qle_sep.end_on.end_of_month + 1.day }
 
@@ -474,9 +474,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
 
   context "is reporting a qle before the employer plan start_date" do
-    let(:plan_year_start_on) { Date.new(TimeKeeper.date_of_record.year, 04, 01) }
-    let(:sep_effective_on) { Date.new(TimeKeeper.date_of_record.year, 02, 01) }
-    let!(:published_plan_year) { FactoryGirl.create(:plan_year, start_on: plan_year_start_on) }
+    let!(:published_plan_year) { FactoryGirl.create(:next_month_plan_year) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(TimeKeeper.date_of_record.year, 03, 14)) }
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member)  }
 
@@ -484,7 +482,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       sep = shop_family.special_enrollment_periods.new
       sep.effective_on_kind = 'first_of_next_month'
       sep.qualifying_life_event_kind= qle_first_of_month
-      sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 03, 14)
+      sep.qle_on = published_plan_year.start_on - 16.days
       sep
     }
 
@@ -515,13 +513,12 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     it "should return a sep with an effective date that equals to sep date" do
       sep.update_attributes(:qle_on => organization.employer_profile.plan_years[0].end_on - 14.days )
-      expect(sep.effective_on).to eq sep.qle_on
+       expect(sep.effective_on).to eq sep.qle_on
     end
 
     it "should return a sep with an effective date that equals to first of month" do
-      sep.update_attributes(effective_on_kind: "first_of_month", 
-        qle_on: organization.employer_profile.plan_years[0].end_on - 14.days)
-      expect(sep.effective_on).to eq organization.employer_profile.plan_years[1].start_on
+      sep.update_attribute(:effective_on_kind, "first_of_month")
+      expect(sep.effective_on.day).to eq 1
     end
   end
 end

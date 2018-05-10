@@ -8,17 +8,30 @@ RSpec.describe ApplicationController do
   end
 
   context "when not signed in" do
-    before do
-  #    sign_in nil
-      get :index
+    context "with default sign in behavior" do
+      before do
+        allow_any_instance_of(ApplicationController).to receive(:site_uses_default_devise_path?).and_return(true)
+        get :index
+      end
+      it "redirect to the sign in page" do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+      it "should set portal in session" do
+        expect(session[:portal]).to eq "http://test.host/employers/employer_profiles"
+      end
     end
 
-    it "redirect to the sign in page" do
-      expect(response).to redirect_to(new_user_registration_path)
-    end
-
-    it "should set portal in session" do
-      expect(session[:portal]).to eq "http://test.host/employers/employer_profiles"
+    context "with overridden sign in behavior" do
+      before do
+        allow_any_instance_of(ApplicationController).to receive(:site_uses_default_devise_path?).and_return(false)
+        get :index
+      end
+      it "redirect to the sign up page" do
+        expect(response).to redirect_to(new_user_registration_path)
+      end
+      it "should set portal in session" do
+        expect(session[:portal]).to eq "http://test.host/employers/employer_profiles"
+      end
     end
   end
 

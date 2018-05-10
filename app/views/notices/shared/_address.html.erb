@@ -1,35 +1,25 @@
-<table class="total_table address" border="0">
+<table class="total_table address custom-address" border="0">
   <tbody>
+    <tr><td colspan="2"><br><br></td></tr>
     <tr>
-      <td><br></br></td>
+      <td colspan="2" class="fssize health-connector-address "><%= notice.primary_fullname %></td>
     </tr>
+    <% if notice.shop? %>
     <tr>
-      <td><%= notice.primary_fullname %></td>
+      <td colspan="2" class="fssize1 health-connector-address"><%= notice.employer_name %></td>
     </tr>
-    <tr class="fssize1">
-       <td><%= notice.primary_address.street_1 %></td>
+    <% end %>
+    <tr>
+       <td colspan="2" class="fssize1 health-connector-address"><%= notice.primary_address.street_1 %></td>
     </tr>
     <% if notice.primary_address.street_2.present? %>
-    <tr class="fssize1">
-      <td><%= notice.primary_address.street_2 %></td>
+    <tr>
+      <td colspan="2" class="fssize1 health-connector-address"><%= notice.primary_address.street_2 %></td>
     </tr>
     <% end %>
     <tr>
-    <td><%= notice.primary_address.city %>, <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
-    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
-    <% if (display_mpi_indicator.nil? && !notice.shop?) %>
-      <td style="text-align: right;"><%= notice.mpi_indicator %></td>
-    <% end %>
+      <td class="fssize1 health-connector-address"><%= notice.primary_address.city %> <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
+       <td align="right" style="padding-right: 15px"><%= notice.try(:mpi_indicator) || "SHOP_M001" %></td>
     </tr>
-    <tr>
-      <td>
-        <br>
-      </td>
-    </tr>
-    <% if !notice.primary_address.street_2.present? %>
-    <tr class="fssize1">
-      <td><br></td>
-    </tr>
-    <% end %>
   </tbody>
 </table>

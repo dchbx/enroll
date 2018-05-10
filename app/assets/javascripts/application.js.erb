@@ -45,7 +45,10 @@
 //= require freebies
 //= require responsive
 //= require effective_datatables
+//= require recurring_select
 //= require jquery.steps
+//= require chosen-jquery
+//= require bootstrap-treeview
 //= require_tree .
 
 var disableSelectric = false;
@@ -614,9 +617,18 @@ $(document).on('change', "#plan_year_start_on", function() {
   if(start_on_date != "") {
     $('.recommend #notice').html("<h4>Loading Suggested Dates...<h4>");
     var target_url = $("a#generate_recommend_dates").data("href");
+    var employer_profile_id = $('#employerProfileId').data('value');
+    var benefit_group_id = $('#benefitGroupId').data('value');
+    var location_id = $('.health .nav li').closest('fieldset').attr('id');
+
     $.ajax({
       type: "GET",
-      data:{start_on: start_on_date},
+      data:{
+        start_on: start_on_date,
+        benefit_group_id: benefit_group_id,
+        location_id: location_id,
+        employer_profile_id: employer_profile_id
+      },
       url: target_url
     });
   };
@@ -627,6 +639,11 @@ $(document).on('change', "#plan_year_start_on", function() {
   // assign fake location_id that will be overridden by js
   var location_id = $('.benefit-group-fields:last').attr('id');
   var active_year = $(this).val().substr(0,4);
+  if($.inArray(active_year, <%= Settings.aca.dental_plan_years_available %>) !== -1){
+    $(".show-dental-plans").show();
+  }else{
+    $(".show-dental-plans").hide();
+  }
   $.ajax({
     type: "GET",
     data:{
@@ -746,6 +763,7 @@ $(document).on('click', '#address_info + span.form-action', function(){
 
   //toggling of divs that show APTC Enrollments
   $('.nav-toggle').click(function(){
+
     //get collapse content selector
     var collapse_content_selector = $(this).attr('href');
 
@@ -761,6 +779,10 @@ $(document).on('click', '#address_info + span.form-action', function(){
       }
     });
   });
+
+var submitInvisibleRecaptchaForm = function () {
+    document.getElementById("invisible-recaptcha-form").submit();
+};
 
   $(document).ready(function(){
     $("#person_first_name").change(function() {

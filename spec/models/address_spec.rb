@@ -187,7 +187,7 @@ describe '#matches?' do
        zip: "21222"
      )
   }
-
+  
   context 'addresses are the same' do
     let(:second_address) { address.clone }
     it 'returns true' do

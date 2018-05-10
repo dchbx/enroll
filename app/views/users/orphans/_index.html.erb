@@ -1,42 +1,40 @@
-<div class="">
-<div id="users_orphans_accounts" class="col-md-12 col-xs-12 col-sm-12 no-pd">
+<div class="user-orphan-account-wrapper">
+  <div id="users_orphans_accounts" class="col-md-12 col-xs-12 col-sm-12 no-pd">
     <span class="flash_message"></span>
 
-      <h1>Orphan User Accounts<br/>
-      <small>User accounts without associated Person records</small>
+      <h1><%= l10n('.orphan_user_accounts') %><br/>
+      <small><%= l10n('.accounts_without_associated_person') %></small>
       </h1>
       <p>
-        When customers access the Enroll Application for the first time, a local account is created.  Once a
-        customer successfully completes the account screening process (to prevent duplicate identities), their Enroll account is linked with: 1) one Person record in the Enroll system, and 2) one Single Sign On (SSO) account in the enterprise identity management system.
+        <%= l10n('.customer_first_visit_contents') %>
       </p>
       <p>
-        Occasionally, accounts are created, but not linked, with a corresponding Person record.  This may result
-        from a number of scenarios. For example:
+        <%= l10n('.unlinked_person_record_contents') %>
       </p>
       <ol>
-        <li>Customer doesn't complete screening process</li>
-        <li>Customer fails screening process (attempts to create a new account for an existing identity)</li>
-        <li>An employee customer is unable to match using employer-entered roster values</li>
-        <li>Test accounts are created without completing screening process</li>
-        <li>An Enroll App error prevents the customer from proceeding</li>
+        <li><%= l10n('.incomplete_screen_process_list') %></li>
+        <li><%= l10n('.fail_screen_process_list') %></li>
+        <li><%= l10n('.mismatched_customer_list') %></li>
+        <li><%= l10n('.without_screen_process_list') %></li>
+        <li><%= l10n('.enroll_app_error_list') %></li>
       </ol>
       <p>
-        However, not all unlinked accounts are invalid.  For example, a customer may return later (via SSO) and complete the screeing process.
+        <%= l10n('.invalid_accounts_contents') %>
       </p>
       <p>
-        Incorrect usage of this feature can <strong>disable a customer's access to the HBX</strong> and should be done only by a knowledgable adminstrator and in conjunction with any necessary action on the Enterprise SSO record.
+        <%= l10n('.disable_customer_access_contents').html_safe %>
       </p>
 
-      <h3><%= @orphans.size %> User accounts without a matching Person</h3>
+      <h3><%= @orphans.size %> <%= l10n('.accounts_without_matching_person') %></h3>
       <table class="table table-condensed">
         <thead>
           <tr>
-            <th>Email Account ID (click to see details)</th>
-            <th>Created at</th>
-            <th>Last sign in</th>
-            <th>Sign in count</th>
-            <th>Enterprise ID</th>
-            <th>Delete?</th>
+            <th><%= l10n('.th_account_id') %></th>
+            <th><%= l10n('.th_created_at') %></th>
+            <th><%= l10n('.th_last_signin') %></th>
+            <th><%= l10n('.th_signin_count') %></th>
+            <tsh><%= l10n('.th_enterprise_id') %></tsh>
+            <th><%= l10n('.th_delete') %></th>
           </tr>
         </thead>
         <tbody>
@@ -54,6 +52,5 @@
       </table>
     </div>
 </div>
-<div id="show_orphan_account">
-</div>
+<div id="show_orphan_account"></div>
 </div>

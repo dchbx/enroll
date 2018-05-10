@@ -1,5 +1,28 @@
 module Importers
-  class ConversionEmployerPlanYear < ConversionEmployerPlanYearCommon
+  class ConversionEmployerPlanYear
+    NewHireCoveragePolicy = Struct.new(:kind, :offset)
+
+    include ActiveModel::Validations
+    include ActiveModel::Model
+
+    HIRE_COVERAGE_POLICIES = {
+#     "date of hire" => NewHireCoveragePolicy.new("date_of_hire", 0),
+#     "date of hire equal to effective date" => NewHireCoveragePolicy.new("date_of_hire", 0),
+      "first of the month following 30 days" => NewHireCoveragePolicy.new("first_of_month", 30),
+      "first of the month following 60 days" => NewHireCoveragePolicy.new("first_of_month", 60),
+      "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0),
+      "on the first of the month following date of employment" => NewHireCoveragePolicy.new("first_of_month", 0),
+      "first of the month following or coinciding with date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
+    }
+
+    CARRIER_MAPPING = {
+      "aetna" => "AHI",
+      "carefirst bluecross blueshield" => "GHMSI",
+      "kaiser permanente" => "KFMASI",
+      "united healthcare" => "UHIC",
+      "united health care" => "UHIC",
+      "unitedhealthcare" => "UHIC"
+    }
     validates_length_of :fein, is: 9
 
     validate :validate_fein
@@ -8,6 +31,51 @@ module Importers
 
     validates_presence_of :plan_selection, :allow_blank => false
     validates_numericality_of :enrolled_employee_count, :allow_blank => false
+
+    attr_reader :fein, :plan_selection, :carrier
+
+    attr_accessor :action,
+      :enrolled_employee_count,
+      :new_coverage_policy,
+      :new_coverage_policy_value,
+      :default_plan_year_start,
+      :most_common_hios_id,
+      :single_plan_hios_id,
+      :reference_plan_hios_id,
+      :coverage_start
+
+    attr_reader :warnings
+
+    include ::Importers::ConversionEmployerCarrierValue
+
+    def initialize(opts = {})
+      super(opts)
+      @warnings = ActiveModel::Errors.new(self)
+    end
+
+    include ValueParsers::OptimisticSsnParser.on(:fein)
+
+    def calculated_coverage_start
+      return @calculated_coverage_start if @calculated_coverage_start
+      default_plan_year_start
+    end
+
+    def new_coverage_policy=(val)
+      @new_coverage_policy = val
+      if val.blank?
+        @new_coverage_policy_value = nil
+        return val
+      end
+      @new_coverage_policy_value = HIRE_COVERAGE_POLICIES[val.strip.downcase]
+    end
+
+    def fein=(val)
+      @fein = prepend_zeros(val.to_s.gsub('-', '').strip, 9)
+    end
+
+    def plan_selection=(val)
+      @plan_selection = (val.to_s =~ /single plan/i) ? "single_plan" : "single_carrier"
+    end
 
     def validate_fein
       return true if fein.blank?
@@ -32,6 +100,7 @@ module Importers
     def validate_is_conversion_employer
       found_employer = find_employer
       return true unless found_employer
+      return true if action.to_s.downcase == 'update'
       if plan_years_are_active?(found_employer.plan_years) 
         errors.add(:fein, "already has active plan years")
       end
@@ -50,29 +119,16 @@ module Importers
       org.employer_profile
     end
 
-    def map_plan_year
-      employer = find_employer
-      found_carrier = find_carrier
-      plan_year_attrs = Factories::PlanYearFactory.default_dates_for_coverage_starting_on(calculated_coverage_start)
-      plan_year_attrs[:fte_count] = enrolled_employee_count
-      plan_year_attrs[:employer_profile] = employer
-      plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
-      # plan_year_attrs[:imported_plan_year] = true
-      plan_year_attrs[:aasm_state] = "active"
-      plan_year_attrs[:is_conversion] = true
-      PlanYear.new(plan_year_attrs)
-    end
-
     def select_most_common_plan(available_plans, most_expensive_plan)
-        if !most_common_hios_id.blank?
-          mc_hios = most_common_hios_id.strip
-          found_single_plan = available_plans.detect { |pl| (pl.hios_id == mc_hios) || (pl.hios_id == "#{mc_hios}-01") }
-          return found_single_plan if found_single_plan
-          warnings.add(:most_common_hios_id, "hios id #{most_common_hios_id.strip} not found for most common plan, defaulting to most expensive plan")
-        else
-          warnings.add(:most_common_hios_id, "no most common hios id specified, defaulting to most expensive plan")
-        end
-        most_expensive_plan
+      if !most_common_hios_id.blank?
+        mc_hios = most_common_hios_id.strip
+        found_single_plan = available_plans.detect { |pl| (pl.hios_id == mc_hios) || (pl.hios_id == "#{mc_hios}-01") }
+        return found_single_plan if found_single_plan
+        warnings.add(:most_common_hios_id, "hios id #{most_common_hios_id.strip} not found for most common plan, defaulting to most expensive plan")
+      else
+        warnings.add(:most_common_hios_id, "no most common hios id specified, defaulting to most expensive plan")
+      end
+      most_expensive_plan
     end
 
     def select_reference_plan(available_plans)
@@ -88,57 +144,8 @@ module Importers
           warnings.add(:single_plan_hios_id, "no hios id specified for single plan benefit group, defaulting to most common plan")
         end
       end
+
       select_most_common_plan(available_plans, most_expensive_plan)
-    end
-
-    def map_benefit_group(found_carrier)
-      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
-      begin
-        reference_plan = select_reference_plan(available_plans)
-        elected_plan_ids = (plan_selection == "single_plan") ? [reference_plan.id] : available_plans.map(&:id)
-        benefit_group_properties = {
-          :title => "Standard",
-          :plan_option_kind => plan_selection,
-        :relationship_benefits => map_relationship_benefits,
-        :reference_plan_id => reference_plan.id,
-        :elected_plan_ids => elected_plan_ids
-      }
-      if !new_coverage_policy_value.blank?
-         benefit_group_properties[:effective_on_offset] = new_coverage_policy_value.offset
-         benefit_group_properties[:effective_on_kind] = new_coverage_policy_value.kind
-      end
-      BenefitGroup.new(benefit_group_properties)
-      rescue => e
-        puts available_plans.inspect
-        raise e
-      end
-    end
-
-    def map_relationship_benefits
-      BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.map do |rel|
-        RelationshipBenefit.new({
-          :relationship => rel,
-          :offered => true,
-          :premium_pct => 50.00
-        })
-      end
-    end
-
-    def save
-      return false unless valid?
-      record = map_plan_year
-      save_result = record.save
-      propagate_errors(record)
-      if save_result
-        employer = find_employer
-        begin
-          employer.update_attributes!(:aasm_state => "enrolled", :profile_source => "conversion")
-        rescue Exception => e
-          raise "\n#{employer.fein} - #{employer.legal_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
-        end
-        map_employees_to_benefit_groups(employer, record)
-      end
-      return save_result
     end
 
     def map_employees_to_benefit_groups(employer, plan_year)
@@ -153,6 +160,11 @@ module Importers
           puts "\n#{employer.fein} - #{employer.legal_name} - #{ce.full_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
         end
       end
+    end
+
+    def prepend_zeros(number, n)
+      (n - number.to_s.size).times { number.prepend('0') }
+      number
     end
 
     def propagate_errors(plan_year)

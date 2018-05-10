@@ -6,7 +6,7 @@
                                     "https://dchealthlink.com/"
                                     target=
                                     "_blank">
-                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "200"  %>
+                                    <%= image_tag "#{Rails.root}/app/assets/images/health_connector.png", style: "height: auto; vertical-align: top;", width: "200"  %>
                                   </a></td>
     </tr>
   </tbody>
@@ -47,9 +47,9 @@
 </table>
 
 
-<%= notice_paragraph "Thank you for applying to offer group health coverage through #{Settings.site.short_name}.  However, based on our eligibility criteria we are not able to offer group health coverage in #{Settings.site.short_name} for your employees at this time." %>
+<%= notice_paragraph "Thank you for applying to offer group health coverage through #{site_short_name}.  However, based on our eligibility criteria we are not able to offer group health coverage in #{site_short_name} for your employees at this time." %>
 
-<%= notice_paragraph "At this time, you will not be able to offer coverage to your employees through #{Settings.site.short_name}.  If you would like to re-structure your benefit offering to encourage more employees to participate, you may do so by creating a new open enrollment period."%>
+<%= notice_paragraph "At this time, you will not be able to offer coverage to your employees through #{site_short_name}.  If you would like to re-structure your benefit offering to encourage more employees to participate, you may do so by creating a new open enrollment period."%>
 
 <%= notice_paragraph "In addition, there is a special annual enrollment period at the end of each year during which employers can offer group health coverage effective January 1st without having a minimum level of employee enrollment."%>
 
@@ -64,7 +64,7 @@
   <tbody>
      <tr>
       <td>
-        Contact your broker for further assistance.  You can also contact <%= Settings.site.short_name %> with any questions:
+        Contact your broker for further assistance.  You can also contact <%= site_short_name %> with any questions:
       </td>
     </tr>
     <tr>
@@ -74,5 +74,5 @@
 </table>
 
 <% if true %>
-<%= notice_paragraph_with_disclaimer("If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the \"Find a Broker\" link in your employer account or calling #{Settings.contact_center.phone_number}.", "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)") %>
+<%= notice_paragraph_with_disclaimer("If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the \"Find a Broker\" link in your employer account or calling #{contact_center_phone_number}.", "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)") %>
 <% end %>

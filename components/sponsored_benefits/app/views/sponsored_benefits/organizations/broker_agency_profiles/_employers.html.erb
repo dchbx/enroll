@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="tab-content" id="myTabContent">
+    <div class="row">
+      <div id= 'message_form'></div>
+      <div class="top-pd" id="inbox_provider_form">
+        <span class="flash_message"></span>
+      </div>
+      <div class='hide' id='collection_scope'><%= @broker_agency_profile._id %> </div>
+      <div class="row container">
+        <div class="pull-right">
+          <%= link_to "Add Prospect Employer", new_organizations_plan_design_organization_path(broker_agency_id: @broker_agency_profile.id), class:"btn btn-primary prospective-employer" if aca_broker_routing_information %>
+        </div>
+      </div>
+      <br>
+      <%= render_datatable(@datatable) %>
+    </div>
+  </div>
+
+  <% if general_agency_enabled? and @general_agency_profiles %>
+    <div class="col-md-4">
+      <h3><%= l10n("general_agencies")%></h3>
+      <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
+      <%= hidden_field_tag :from_assign, false %>
+      <%= submit_tag l10n("assign"), class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+      <%= submit_tag l10n("clear_assignment"), class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+    </div>
+  <% end %>
+</div>
+<script>
+  initializeDataTables();
+</script>
+

@@ -12,7 +12,7 @@
 
             <div class="row">
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <h4>Broker Agency Information</h4>
+                <h3>Broker Agency Information</h3>
                 <div class="row no-buffer row-form-wrapper">
                   <%= render "shared/organizations/entity_name_and_type_fields", f: f, entity_kinds: Organization::ENTITY_KINDS[0..3], readonly: 'readonly' %>
                 </div>
@@ -23,6 +23,13 @@
                 </div>
                 <div class="row no-buffer row-form-wrapper">
                   <%= render "shared/broker_agency_profile_fields", f: f, read_only_dropdown: 'read_only_dropdown' %>
+                </div>
+
+                <div class="action-group">
+                  <% if aca_broker_routing_information %>
+                    <%= render "broker_agencies/applicants/bank_information", f: f %>
+                    <p class="bank-name-container"></p>
+                  <% end %>
                 </div><br>
 
                 <div class="action-group">

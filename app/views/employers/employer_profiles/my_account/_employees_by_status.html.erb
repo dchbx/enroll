@@ -1,166 +1,32 @@
 <% if @search || params[:employee_search] %>
-<% if @census_employees.present? %>
-<% else %>
-<h4>No results found</h4>
+  <% if @census_employees.empty? %>
+    <h4>No results found</h4>
+  <% end %>
 <% end %>
-<% end %>
-  <div class="table-responsive">
-    <table class="table table-striped table-hover table-sm panel panel-default">
-      <thead class="thead-default">
-        <tr>
-          <th>Employee Name<!-- <i class="fa fa-caret-down"></i>--></th>
-          <th>Date of Birth</th>
-          <th>Date of Hire</th>
-          <th>Employee Account Status</th>
-          <th>Benefit Package</th>
-          <% if @employer_profile.renewing_plan_year.present? %>
-          <th>Renewal Benefit Package</th>
-          <% end %>
-          <% if ['terminated', 'all'].include?(status) %>
-            <th>Termination Date</th>
-          <% end %>
-          <th>Current Enrollment Status</th>
-          <% if @employer_profile.renewing_published_plan_year.present? %>
-              <th>Renewal Enrollment Status</th>
-          <% end %>
-          <th>
-            &nbsp;
-          </th>
-          <th>
-            &nbsp;
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-      <% if @census_employees.present? %>
-      <% @census_employees.each do |census_employee| %>
-        <tr class="terminated_<%= census_employee.employment_terminated? %> remove_<%= census_employee.id %> top <%= cycle('odd','even')%>">
-          <td>
-            <%= link_to name_to_listing(census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id, status: status) %>
-          </td>
-          <td><%= format_date census_employee.dob %></td>
-          <td><%= format_date census_employee.hired_on %></td>
-          <td style="text-transform: capitalize;"><%= employee_state_format(census_employee.aasm_state, census_employee.employment_terminated_on) %></td>
-          <td>
-          <% if census_employee.active_benefit_group_assignment.present? %>
-            <%= census_employee.active_benefit_group_assignment.benefit_group.title.capitalize %>
-          <% end %>
-          </td>
-          <% if @employer_profile.renewing_plan_year.present? %>
-          <td>
-          <% if census_employee.renewal_benefit_group_assignment.present? %>
-            <%= census_employee.renewal_benefit_group_assignment.benefit_group.title.capitalize %>
-          <% end %>
-          </td>
-          <% end %>
-          <% if ['terminated', 'all'].include?(status) %>
-            <td><%= format_date census_employee.employment_terminated_on %></td>
-          <% end %>
-          <td><%= enrollment_state(census_employee) %></td>
-          <% if @employer_profile.renewing_published_plan_year.present? %>
-              <td><%= renewal_enrollment_state(census_employee) %></td>
-          <% end %>
-          <% if census_employee.aasm_state == 'employment_terminated' %>
-            <td class="table-functions">
-              <a class="show_confirm btn btn-green-2 <%= pundit_class EmployerProfile, :updateable? %>" id="show_confirm_<%= census_employee.id %>">
-                <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$(this).closest('tr').nextAll('.rehire_<%= census_employee.id %>').toggle();">Rehire</span>
-              </a>
-            </td>
-          <% elsif census_employee.may_terminate_employee_role? %>
-            <td class="table-functions">
-              <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
-              <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
-            </td>
-          <% else %>
-            <td class="table-functions"></td>
-          <% end %>
-          <% if census_employee.can_elect_cobra? || census_employee.may_reinstate_eligibility? %>
-            <td class="table-functions">
-             <%= cobra_button(census_employee) %>
-            </td>
-          <% else %>
-            <td class="table-functions"></td>
-          <% end %>
-        </tr>
 
-        <% if census_employee.can_elect_cobra? %>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td class="confirm-terminate-wrapper" colspan="3">
-              <span>Employment Termination Date: </span>
-              <span><%= format_date census_employee.employment_terminated_on %></span>
-            </td>
-            <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
-              <%=cobra_effective_date(census_employee) %>
-            </td>
-            <td colspan="2">
-              <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
-                <strong>&nbsp;Submit</strong>
-              </a>
-            </td>
-          </tr>
-        <% end %>
-        <% if census_employee.may_reinstate_eligibility? %>
-         <tr class="unbrd cobra_confirm cobra_reinstate_<%= census_employee.id %> dn">
-            <td class="confirm-terminate-wrapper" colspan="3">
-              <span>Employment Termination Date: </span>
-              <span><%= format_date census_employee.employment_terminated_on %></span>
-            </td>
-            <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
-              <%=cobra_effective_date(census_employee) %>
-            </td>
-            <td colspan="2">
-              <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_reinstate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_reinstate', '<%= census_employee.id %>')">
-                <strong>&nbsp;Submit</strong>
-              </a>
-            </td>
-          </tr>
-          <%end%>
-        <% if census_employee.aasm_state == 'employment_terminated' %>
-        <tr class="unbrd  rehire_<%= census_employee.id %> dn">
-          <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="11" id="enter-date">
-            <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
-            <span class="confirm-terminate" style="display:inline;">
-              <input class="text-center date-picker" data-date-min="<%= rehire_date_min(census_employee) %>d" placeholder="e.g. 5/1/2015" type="text">
-              <a class="rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="rehire_<%= census_employee.id %>">
-                <strong>&nbsp;Submit</strong>
-              </a>
-            </span>
-          </td>
-        </tr>
-            <tr></tr>
-          <% elsif census_employee.may_terminate_employee_role? %>
-            <tr class="unbrd  remove_<%= census_employee.id %> dn">
-              <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">
-                <div class="confirm-terminate <%=pundit_class EmployerProfile, :updateable?%>">
-                  <h5 style="margin-top: 0; margin-bottom: 0;"><strong>Enter termination date to remove <%= name_to_listing(census_employee) %></strong>
-                    <br/>
-                    <span class="lg fourteen">(termination date must be within the past 60 days)</span>
-                  </h5>
-                  <div class="pull-right" style="margin-top: 2px;">
-                  <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
-                  <a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">
-                  Terminate Employee
-                  </a>
-                  <a class="terminate cancel" style="margin-right: 15px;">Cancel</a>
-                </div>
-                </div>
-              </td>
-            </tr>
-            <% end %>
-          <% end %>
-          <% end %>
-       </tbody>
-      </table>
-    </div>
-  <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
+<div class="col-xs-10" style="text-align: right; top: 80px; margin-left: 15%;" >
   <div class="row">
-    <div class="col-md-9">
-      <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
-      <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_search: params[:employee_search]) %>
-      <% end %>
-    </div>
-    <div class="col-md-3 text-right content-bottom">
-      <h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
-    </div>
+    <%= pundit_span(EmployerProfile, :updateable?) %>
+    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
+  </div>
+</div>
+
+  <div class= "effectivedatatable">
+    <%= raw render_datatable(@datatable) %>
+  </div>
+
+<script type="text/javascript" charset="utf-8">
+    initializeDataTables();
+    $('.buttons-csv').hide()
+    $('.buttons-excel').hide()
+</script>
+
+<%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
+
+<div class="row">
+  <div class="col-md-9">
+    <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
+        <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
+    <% end %>
   </div>
 </div>

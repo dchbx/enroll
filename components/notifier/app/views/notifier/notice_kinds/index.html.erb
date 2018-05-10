@@ -1,0 +1,78 @@
+<% if @errors.any? %>
+  <div class="alert alert-error">
+    <h4><%= pluralize(@errors.count, "notice error") %> found:</h4>
+    <ul>
+      <% @errors.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="content landing">
+  <%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
+  
+  <div class="home">
+
+    <div class="tab-row">
+      <div class="tab-content" id="myTabContent"></div>
+
+      <div class="container top-pd">
+        <div class="row">
+          <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane-hbx" role="tabpanel">
+            <div class="col-xs-12">
+              <div class="notices_index_list">
+                <div class='container'>
+                  <h1>Notices</h1>
+                </div>
+
+                  <span class="pull-right">
+                    <%= link_to 'Add Notice', new_notice_kind_path, class: "btn btn-primary notice-preview", remote: true %>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                      <i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Notices
+                    </button>
+                    <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Notices".html_safe, download_notices_notice_kinds_path, class: "btn btn-primary" %>
+                  </span>
+                <%= render_datatable(@datatable) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Upload Notices</h4>
+      </div>
+      <%= form_tag(upload_notices_notice_kinds_path, multipart: true, method: :post) do %>
+      <div class="modal-body">
+          <%= file_field_tag :file %>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <%= submit_tag 'Upload', class: 'btn btn-primary ' %>
+      </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+
+  $(document).ajaxComplete(function() {
+    CKEDITOR.replace('notice_kind_template_raw_body');
+  })
+</script>

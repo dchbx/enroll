@@ -30,7 +30,11 @@
   </div>
 
   <div class="metal-level-select reference-plan-content" style="<%= 'display:block;' if selected_kind_metal_level %>">
-    <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
+    <% metal_levels = Plan::REFERENCE_PLAN_METAL_LEVELS %>
+    <% if check_plan_options_title %>
+     <% metal_levels = enabled_metal_levels_for_single_carrier %>
+    <% end %>
+    <% metal_levels.each do |kind| %>
       <% show_this_metal_level = f.object.metal_level_for_elected_plan == kind && selected_kind_metal_level %>
       <% metal_level_plans = show_this_metal_level ? @plan_year.metal_level_plans_for(kind) : [] %>
       <div class="metal-level-<%= kind %> metal-level-content hidden_second_field" style="<%= 'display:block;' if show_this_metal_level %>">

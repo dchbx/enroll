@@ -39,6 +39,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group) 
       allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
     end
@@ -82,7 +83,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "individual"
       expect(assigns(:coverage_kind)).to eq "health"
-      expect(assigns(:benefit_group)).to be_falsey
+      expect(assigns(:benefit_group)).to be_truthy
       expect(assigns(:reference_plan)).to be_falsey
     end
 
@@ -95,7 +96,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "individual"
       expect(assigns(:coverage_kind)).to eq "dental"
-      expect(assigns(:benefit_group)).to be_falsey
+      expect(assigns(:benefit_group)).to be_truthy
       expect(assigns(:reference_plan)).to be_falsey
     end
   end

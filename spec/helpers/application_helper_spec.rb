@@ -29,17 +29,17 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#display_carrier_logo" do
-    let(:plan){ Maybe.new(FactoryGirl.build(:plan)) }
     let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
-    let(:plan_1){ Maybe.new(FactoryGirl.build(:plan, hios_id: "89789DC0010006-01", carrier_profile: carrier_profile)) }
+    let(:plan){ FactoryGirl.build(:plan, carrier_profile: carrier_profile) }
 
-    it "should return uhic logo" do
-      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/uhic.jpg\" alt=\"Uhic\" />"
+    before do
+      allow(plan).to receive(:carrier_profile).and_return(carrier_profile)
+      allow(carrier_profile).to receive_message_chain(:legal_name, :extract_value).and_return('kaiser')
+    end
+    it "should return the named logo" do
+      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
     end
 
-    it "should return non united logo" do
-      expect(helper.display_carrier_logo(plan_1)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
-    end
   end
 
   describe "#format_time_display" do
@@ -225,16 +225,16 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 4
+      expect(helper.calculate_participation_minimum.ceil).to eq 4
     end
   end
 
   describe "get_key_and_bucket" do
     it "should return array with key and bucket" do
-      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
       key, bucket = get_key_and_bucket(uri)
       expect(key).to eq("f21369fc-ae6c-4fa5-a299-370a555dc401")
-      expect(bucket).to eq("dchbx-sbc")
+      expect(bucket).to eq("#{Settings.site.s3_prefix}-sbc")
     end
   end
   describe "current_cost" do
@@ -279,9 +279,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "env_bucket_name" do
+    let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     it "should return bucket name with system name prepended and environment name appended" do
       bucket_name = "sample-bucket"
-      expect(env_bucket_name(bucket_name)).to eq("dchbx-enroll-" + bucket_name + "-local")
+      expect(env_bucket_name(bucket_name)).to eq("#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}")
     end
   end
 
@@ -312,8 +313,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "show_default_ga?", dbclean: :after_each do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, :shop_agency) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, :shop_agency) }
 
     it "should return false without broker_agency_profile" do
       expect(helper.show_default_ga?(general_agency_profile, nil)).to eq false
@@ -387,6 +388,21 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
     end
   end
+end
+
+  describe "Enabled/Disabled IVL market" do
+    shared_examples_for "IVL market status" do |value|
+       if value == true
+        it "should return true if IVL market is enabled" do
+          expect(helper.individual_market_is_enabled?).to eq  true
+        end
+       else
+        it "should return false if IVL market is disabled" do
+          expect(helper.individual_market_is_enabled?).to eq  false
+        end
+       end
+    it_behaves_like "IVL market status", Settings.aca.market_kinds.include?("individual")
+  end
 
   describe "#is_new_paper_application?" do
     let(:person_id) { double }
@@ -411,7 +427,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#previous_year" do
-
     it "should return past year" do
       expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
     end
@@ -423,38 +438,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should not return next year" do
       expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
     end
-end
-
-  describe ".notify_employer_when_employee_terminate_coverage" do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person:person)}
-    let(:active_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on:TimeKeeper.date_of_record.end_of_month,aasm_state: "active",benefit_groups:[benefit_group]) }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:employee_role) { FactoryGirl.create(:employee_role)}
-    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id)}
-
-    it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
-      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
-      allow(enrollment).to receive(:census_employee).and_return(census_employee)
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      helper.notify_employer_when_employee_terminate_coverage(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).not_to be_empty
-      expect(queued_job[:args].include?('notify_employer_when_employee_terminate_coverage')).to be_truthy
-      expect(queued_job[:args].include?("#{enrollment.employer_profile.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
-    end
   end
-
 
   describe "convert_to_bool" do
     let(:val1) {true }

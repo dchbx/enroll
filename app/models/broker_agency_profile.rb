@@ -3,17 +3,17 @@ class BrokerAgencyProfile
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include Config::AcaModelConcern
 
   embedded_in :organization
 
-  MARKET_KINDS = %W[individual shop both]
-
-  MARKET_KINDS_OPTIONS = {
+  MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
+  ALL_MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
-    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+    "Both - Individual & Family AND Small Business Marketplaces" => "both"
   }
-
+  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
 
   field :entity_kind, type: String
   field :market_kind, type: String
@@ -28,6 +28,9 @@ class BrokerAgencyProfile
   field :aasm_state, type: String
   field :aasm_state_set_on, type: Date
 
+  field :ach_routing_number, type: String
+  field :ach_account_number, type: String
+
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
   delegate :dba, :dba=, to: :organization, allow_nil: true
@@ -39,6 +42,7 @@ class BrokerAgencyProfile
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_many :documents, as: :documentable
+
   accepts_nested_attributes_for :inbox
 
   has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
@@ -53,7 +57,7 @@ class BrokerAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid practice area" },
+    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
     allow_blank: false
 
   validates :entity_kind,
@@ -64,7 +68,6 @@ class BrokerAgencyProfile
 
   scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
   scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
-
 
   # has_many employers
   def employer_clients
@@ -198,6 +201,11 @@ class BrokerAgencyProfile
     def find(id)
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+    end
+
+    def get_organization_from_broker_profile_id(id)
+      organizations = Organization.where("broker_agency_profile._id" => id).to_a
+      organizations.size > 0 ? organizations.first : nil
     end
   end
 

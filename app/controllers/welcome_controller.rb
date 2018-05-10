@@ -8,7 +8,6 @@ class WelcomeController < ApplicationController
   end
 
   def index
-
   end
 
   def form_template

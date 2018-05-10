@@ -10,7 +10,8 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
     :first_name => "yo",
     :last_name => "guy",
     :gender => "m",
-    :user_id => 20
+    :user_id => 20,
+    :is_applying_coverage => false
     } }
 
   let(:subject) { Forms::ConsumerCandidate.new(params) }

@@ -10,7 +10,7 @@
   <% end %>
   <%= render 'sep_message' if @active_sep.present? %>
   <div class="my-account-page">
-    <h1><%= l10n("my_site_short_name", site_short_name: Settings.site.short_name) %></h1>
+    <h1><%= l10n("my_site_short_name", site_short_name: site_short_name) %></h1>
   </div>
 
   <div class="row">
@@ -20,7 +20,9 @@
       <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present?%>
       <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
       <%= render partial: 'shop_for_plans_widget' %>
+      <% if individual_market_is_enabled? %>
       <%= render partial: 'apply_for_medicaid_widget' %>
+      <% end %>
     </div>
     <div class="col-md-4 right-column">
       <%= render 'right_column' %>

@@ -2,6 +2,7 @@ class SpecialEnrollmentPeriod
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include ScheduledEventService
   include TimeHelper
 
   embedded_in :family
@@ -14,6 +15,7 @@ class SpecialEnrollmentPeriod
 
   # Date Qualifying Life Event occurred
   field :qle_on, type: Date
+  field :is_valid, type: Boolean
 
   # Comments made by admin_comment
   # field :admin_comment, type: String  #Removing this, using polymorphic comment association.
@@ -210,7 +212,7 @@ private
 
 
   def first_of_month_effective_date
-    if @reference_date.day <= Setting.individual_market_monthly_enrollment_due_on
+    if @reference_date.day <= SpecialEnrollmentPeriod.individual_market_monthly_enrollment_due_on
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
     else
