@@ -273,7 +273,7 @@ private
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
       eligible_date = employee_role.census_employee.earliest_eligible_date
-      eligible_date <= TimeKeeper.date_of_record
+      eligible_date.present? && eligible_date <= TimeKeeper.date_of_record
     end
   end
 

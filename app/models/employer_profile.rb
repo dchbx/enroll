@@ -160,6 +160,13 @@ class EmployerProfile
   def employer_broker_fired
     trigger_notices('employer_broker_fired')
   end
+  
+  def remove_decertified_broker_agency(terminate_on = today)
+    return unless active_broker_agency_account
+    active_broker_agency_account.end_on = terminate_on
+    active_broker_agency_account.is_active = false
+    active_broker_agency_account.save!
+  end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
 
@@ -234,6 +241,11 @@ class EmployerProfile
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated
     self.trigger_notices("general_agency_terminated")
+  end
+  
+  def remove_general_agency_when_broker_decertified!(terminate_on = TimeKeeper.datetime_of_record)
+    return if active_general_agency_account.blank?
+    general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
   end
   alias_method :general_agency_profile=, :hire_general_agency
 

@@ -13,15 +13,14 @@ describe DisablePersonAccount do
   end
 
   describe "disable person account", dbclean: :after_each do
-    let(:person) { FactoryGirl.create(:person, is_active: true, is_disabled: nil) }
+    let(:person){FactoryGirl.create(:person,:with_family)}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
     end
-    it "should disable the person" do
+    it "should disable the person's primary family" do
       subject.migrate
       person.reload
-      expect(person.is_active).to eq false
-      expect(person.is_disabled).to eq true
+      expect(person.primary_family.is_active).to eq false
     end
   end
 end

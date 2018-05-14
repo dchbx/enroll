@@ -7,6 +7,7 @@ class BrokerRole
 
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
+  BROKER_DECERTIFIED_EVENT_NAME = "acapi.info.events.broker_role.decertified"
 
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
@@ -343,20 +344,24 @@ class BrokerRole
   def current_state
     aasm_state.gsub(/\_/,' ').camelcase
   end
+
+  def notify_broker_decertified
+    notify(BROKER_DECERTIFIED_EVENT_NAME, {:broker_role_id => self.id.to_s})
+  end
   
   def remove_broker_assignments
     @orgs = Organization.by_broker_role(id)
     @employers = @orgs.map(&:employer_profile)
     # Remove broker from employers
     @employers.each do |e|
-      e.fire_broker_agency
+      e.remove_decertified_broker_agency
       # Remove General Agency
-      e.fire_general_agency!(TimeKeeper.datetime_of_record)
+      e.remove_general_agency_when_broker_decertified!(TimeKeeper.datetime_of_record)
     end
     # Remove broker from families
     if has_broker_agency_profile?
-      families = self.broker_agency_profile.families
-      families.each do |f|
+      families = Family.by_broker_agency_profile_id(self.broker_agency_profile.id)
+      families.all.each do |f|
         f.terminate_broker_agency
       end
     end

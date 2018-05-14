@@ -2,6 +2,7 @@ module Eligibility
   module CensusEmployee
 
     def coverage_effective_on(benefit_group = nil)
+      return nil if (active_benefit_group_assignment || renewal_benefit_group_assignment).blank?
       benefit_group = (active_benefit_group_assignment || renewal_benefit_group_assignment).benefit_group if benefit_group.blank?
       if benefit_group.present?
 
