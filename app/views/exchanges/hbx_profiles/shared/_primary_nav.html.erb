@@ -14,17 +14,15 @@
           <ul class="dropdown-menu">
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                             tab_name: 'families',
-                                                                            link_path: family_index_dt_exchanges_hbx_profiles_path,
+                                                                            link_path: main_app.family_index_dt_exchanges_hbx_profiles_path,
                                                                             display_name: 'Families',
-                                                                            active_tab: active_tab,
-                                                                            glyphicon_class: 'glyphicon-briefcase'
+                                                                            active_tab: active_tab
                                                                           } %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                               tab_name: 'outstanding-verifications',
-                                                                              link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
+                                                                              link_path: main_app.outstanding_verification_dt_exchanges_hbx_profiles_path,
                                                                               display_name: 'Outstanding Verifications',
-                                                                              active_tab: active_tab,
-                                                                              glyphicon_class: 'glyphicon-briefcase'
+                                                                              active_tab: active_tab
                                                                             } %>
           </ul>
         </li>
