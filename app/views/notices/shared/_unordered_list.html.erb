@@ -1,5 +1,6 @@
-<table class="total_table" border="0" style="display:block; page-break-inside: avoid;">
-  <tbody>
+<% if individual_market_is_enabled? %>
+  <table class="total_table" border="0" style="display:block; page-break-inside: avoid;">
+    <tbody>
     <% if defined? previous %>
       <tr>
         <td style="padding-bottom: 6px">
@@ -16,8 +17,8 @@
               <%= listing[0].html_safe %>
               <ul style="list-style-type: circle;">
                 <% listing[1].each do |item| %>
-                  <li style="padding-top: 0px;" >
-                     <%= item.html_safe %>
+                  <li style="padding-top: 0px;">
+                    <%= item.html_safe %>
                   </li>
                 <% end %>
               </ul>
@@ -30,11 +31,54 @@
       </td>
     </tr>
     <% if defined? after %>
-    <tr>
-      <td style="padding-bottom: 0px;">
-        <%= after.html_safe %>
-      </td>
-    </tr>
+      <tr>
+        <td style="padding-bottom: 0px;">
+          <%= after.html_safe %>
+        </td>
+      </tr>
     <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
+
+<% else %>
+  <table class="total_table" border="0" style="display:block; page-break-inside: avoid;">
+    <tbody>
+      <% if defined? previous %>
+        <tr>
+          <td>
+            <%= previous.html_safe %>
+          </td>
+        </tr>
+      <% end %>
+      <tr>
+        <td>
+          <ul style="list-style: circle solid;">
+            <% listings.each do |listing| %>
+              <li style="margin-top: 2px; <%= 'page-break-inside: avoid' if listing.is_a?(Array) && listing[1].size <= 2 %>;">
+              <% if listing.is_a?(Array) %>
+                <%= listing[0].html_safe %>
+                <ul style="list-style-type: circle;">
+                  <% listing[1].each do |item| %>
+                    <li style="padding-top: 0px;" >
+                       <%= item.html_safe %>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <%= listing.html_safe %>
+              <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </td>
+      </tr>
+      <% if defined? after %>
+      <tr>
+        <td>
+          <%= after.html_safe %>
+        </td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

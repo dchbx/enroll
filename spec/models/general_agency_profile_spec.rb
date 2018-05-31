@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
+
   it { should validate_presence_of :market_kind }
   it { should delegate_method(:hbx_id).to :organization }
   it { should delegate_method(:legal_name).to :organization }
@@ -9,16 +10,20 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should delegate_method(:is_active).to :organization }
 
   let(:organization) {FactoryGirl.create(:organization)}
-  let(:market_kind) {"both"}
+  let(:market_kind) {"shop"}
   let(:bad_market_kind) {"commodities"}
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
+
+  before :each do
+    stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop', 'individual', 'both'])
+  end
 
   describe ".new" do
     let(:valid_params) do
       {
         organization: organization,
         market_kind: market_kind,
-        entity_kind: "s_corporation",
+        entity_kind: "s_corporation"
       }
     end
 
@@ -27,6 +32,18 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
 
       it "should not save" do
         expect(GeneralAgencyProfile.new(**params).save).to be_falsey
+      end
+    end
+
+    context "with individual disabled" do
+      let(:bad_market_kind) { "individual" }
+      before do
+        stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop'])
+      end
+      it "returns an error if individual is market kind" do
+        expect(
+          GeneralAgencyProfile.create(**valid_params.merge(market_kind: bad_market_kind)).errors[:market_kind]
+        ).to eq [market_kind_error_message]
       end
     end
 
@@ -216,22 +233,24 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
     end
   end
 
-  describe "general agency notice trigger", type: :model, dbclean: :after_all do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+  if general_agency_enabled?
+    describe "general agency notice trigger", type: :model, dbclean: :after_all do
+      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
 
-    it "should trigger general_agency_hired_notice job in queue" do
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      general_agency_profile.general_agency_hired_notice(employer_profile)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
+      it "should trigger general_agency_hired_notice job in queue" do
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        general_agency_profile.general_agency_hired_notice(employer_profile)
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == ShopNoticesNotifierJob
+        end
+
+          expect(queued_job[:args]).not_to be_empty
+          expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
+          expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+          expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
       end
-
-      expect(queued_job[:args]).not_to be_empty
-      expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
-      expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
     end
   end
 end

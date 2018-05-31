@@ -1,0 +1,19 @@
+<div class="container admin-calendar-wrapper">
+  <div class='container'>
+    <div class="row">
+      <%= link_to 'Create Event' , new_exchanges_scheduled_event_path , remote: true, class: "btn btn-default" %>
+      <%= link_to 'List Of Events' , list_exchanges_scheduled_events_path , remote: true, class: "btn btn-default" %>
+    </div>
+  	<div class="row">
+  		<h3 class="title-inline">Calendar</h3>
+  	</div>
+    <%= month_calendar events: @calendar_events do |day, events| %>
+      <div><strong><%= day.to_s(:long) %></strong></div>
+      <% events.each do |event| %>
+        <div>
+          <%= link_to event.event_name.humanize, exchanges_scheduled_event_path(event.id, time: event.start_time), class: "#{event.type}", remote: true %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

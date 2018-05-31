@@ -31,7 +31,7 @@ content: "<span #{@style_color_text}>[SHOP5C]</span><br>
 content: "Your employees have completed open enrollment.
 Unfortunately, you did not have enrollment for a non-owner employee.
 As a result, coverage will not be available to your employees as of #{notice.plan.try(:coverage_start_on).try(:to_s)}.
-Minimum participation requirements are necessary to ensure the viability of #{Settings.site.short_name} for all employers and their employees."} %>
+Minimum participation requirements are necessary to ensure the viability of #{site_short_name} for all employers and their employees."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you would like to re-structure your benefit offering to encourage more employees to participate, you may do so by
@@ -43,9 +43,9 @@ health coverage effective January 1<sup>st</sup> without having a minimum level 
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "To manage your employees’ open enrollment:",
-  listings: ["Log in to your #{Settings.site.short_name} employer account",
+  listings: ["Log in to your #{site_short_name} employer account",
              "Select “Employees” from the menu at the top of your account page",
-             ["You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name} during the open enrollment period.
+             ["You will see a list of all eligible employees showing each action they have taken on #{site_short_name} during the open enrollment period.
              Each entry will have one of the following statuses:", ["No Coverage Selected", "Coverage Selected", "Coverage Waived", "Terminated"]]] } %>
 
 
@@ -54,7 +54,7 @@ health coverage effective January 1<sup>st</sup> without having a minimum level 
  heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
  <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:",
+  previous: "Contact your broker for further assistance. You can also contact #{site_short_name} with any questions:",
   listings: ["Online at #{notice.hbe.url};",
              "By email at #{notice.hbe.email}; or",
              "By calling #{notice.hbe.phone}."] }%>

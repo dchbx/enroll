@@ -1,0 +1,133 @@
+<%= hidden_field_tag :plan_design_organization_id, plan_design_organization._id %>
+<%= hidden_field_tag :elected_plan_kind, plan_design_proposal.active_benefit_group.plan_option_kind %>
+<%= hidden_field_tag :reference_plan_id, plan_design_proposal.active_benefit_group.reference_plan_id %>
+<%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
+<%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
+<%= hidden_field_tag :benefit_groups_url, organizations_plan_design_proposal_benefit_groups_path(plan_design_proposal.id) %>
+<%= hidden_field_tag :plan_comparison_url, new_organizations_plan_design_proposal_plan_comparison_path(plan_design_proposal.id) %>
+<%= hidden_field_tag :employer_min_employee_contribution, aca_shop_market_employer_contribution_percent_minimum %>
+<%= hidden_field_tag :employer_min_family_contribution, aca_shop_market_employer_family_contribution_percent_minimum %>
+<%= hidden_field_tag :publish_proposal_url, sponsored_benefits.organizations_plan_design_proposal_publish_path(plan_design_proposal.id) %>
+<%= hidden_field_tag :copy_proposal_url, sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(plan_design_proposal.id) %>
+<div class="row">
+  <div class="col-md-12">
+      <div class="hidden">
+        <%= render 'shared/error_messages', :object => plan_design_form %>
+        <%= render 'sponsored_benefits/organizations/plan_design_proposals/proposal_info', f: f, read_only: true %>
+      </div>
+
+    <!--  Need below hidden button element to force form validations -->
+    <div class="pull-right hidden">
+      <%= f.submit "Save Quote", class: "btn btn-primary save-quote-btn" %>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <h2>Quote for <%= plan_design_organization.legal_name %></h2>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Benefit Model Selection</h3>
+      </div>
+      <div class="panel-body" id="pdp-bms">
+        <p>Select the type of options you want to offer enrollees.</p>
+        <%= render 'carrier_options', f: f %>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Employer Contributions</h3>
+      </div>
+      <div class="panel-body">
+        <p>Specify contribution levels for each enrollee type.</p>
+        <%= f.fields_for :profile, f.object.profile do |pr| %>
+          <%= pr.fields_for :benefit_sponsorship, pr.object.benefit_sponsorships.first do |s| %>
+            <%= s.fields_for :benefit_application, s.object.benefit_applications.first do |ba| %>
+              <%= ba.fields_for :benefit_group, ba.object.benefit_groups.first do |bg| %>
+                <%= render 'sponsored_benefits/organizations/plan_design_proposals/contributions/contribution_sliders', f: bg %>
+              <% end %>
+            <% end%>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Benefit Package Selection</h3>
+      </div>
+      <div class="panel-body">
+        <p>Select the plan you wish to offer to all enrollees.  Your maximum monthly cost will be based on the benefit cost, contribution amount and expected participation as specified on the employee roster.</p><br />
+        <div class="col-md-10">
+          <div class="reference-plans"></div>
+        </div>
+        <div class="col-md-2 plan-type-filters">
+        </div>
+        <div class="col-md-12">
+          <div class="col-md-6 col-md-offset-5">
+            <button class="btn btn-primary view-plans-button" id="view-comparison">Compare Plans</button>
+            <button class="btn btn-primary loading-plans-button" id="view-comparison"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+            <button class="btn btn-primary" id="clear-comparison">Clear All</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="plan-comparison-container" id="pdp-pcc"></div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Health Plan Information</h3>
+      </div>
+      <div class="panel-body">
+        <div class="selected-plan"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="col-md-3">
+          <h3>Employee Costs</h3>
+        </div>
+        <div class="col-md-7">
+          <br />
+          <p>Details of the minimum, maximum and reference costs for your members are shown below.  Values are based on the Benefit Package Type, Contribution Amounts and Reference Plan you have chosen above.</p>
+        </div>
+        <div class="col-md-2">
+          <br />
+          <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
+        </div>
+        <div class="collapse" id="collapseExample">
+          <div class="employee-costs"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('.employee-details-text').click(function() {
+    if ($(this).text() == "Show Details") {
+        $(this).text("Hide Details");
+    } else {
+        $(this).text("Show Details");
+    };
+  });
+</script>

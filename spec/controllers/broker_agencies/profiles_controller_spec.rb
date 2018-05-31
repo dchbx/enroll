@@ -69,6 +69,17 @@ RSpec.describe BrokerAgencies::ProfilesController do
     #let(:org) { double }
     let(:org) { FactoryGirl.create(:organization)}
     let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
+    let(:organization_params) do
+      {
+        id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
+        office_locations_attributes: {
+          "0"=> {
+            "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
+            "phone_attributes"=> {"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+          }
+        }
+      }
+    end
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
@@ -76,36 +87,30 @@ RSpec.describe BrokerAgencies::ProfilesController do
       allow(controller).to receive(:authorize).and_return(true)
     end
 
-    it "should success with valid params" do
-      allow(org).to receive(:update_attributes).and_return(true)
-      #post :update, id: broker_agency_profile.id, organization: {}
-      #expect(response).to have_http_status(:redirect)
-      #expect(flash[:notice]).to eq "Successfully Update Broker Agency Profile"
-    end
-
-    it "should failed with invalid params" do
-      allow(org).to receive(:update_attributes).and_return(false)
-      #post :update, id: broker_agency_profile.id, organization: {}
-      #expect(response).to render_template("edit")
-      #expect(response).to have_http_status(:redirect)
-      #expect(flash[:error]).to eq "Failed to Update Broker Agency Profile"
-    end
-
     it "should update person main phone" do
       broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
        broker_agency_profile.primary_broker_role.person.reload
        expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
     end
 
     it "should update person record" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
+    end
+
+    it "should update record without a phone extension" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
+      broker_agency_profile.primary_broker_role.person.reload
+      expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
+    end
+
+    it "should update record by saving accept new clients" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
+      broker_agency_profile.reload
+      expect(broker_agency_profile.accept_new_clients).to be_truthy
+      expect(broker_agency_profile.working_hours).to be_truthy
     end
   end
 
@@ -241,47 +246,76 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
   describe "eligible_brokers" do
 
-    before :each do
-      DatabaseCleaner.clean
-      org1 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
-      broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization:org1, market_kind:'individual')
-      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id, market_kind:'individual', aasm_state:'active')
+    context "when individual is enabled" do
+      before :each do
+        stub_const("BrokerAgencyProfile::MARKET_KINDS",%W[shop individual both])
+        DatabaseCleaner.clean
+        org1 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+        broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization:org1, market_kind:'individual')
+        FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id, market_kind:'individual', aasm_state:'active')
 
-      org2 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
-      broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization:org2, market_kind:'shop')
-      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
+        org2 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+        broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization:org2, market_kind:'shop')
+        FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
 
-      org3 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
-      broker_agency_profile3 = FactoryGirl.create(:broker_agency_profile, organization:org3, market_kind:'both')
-      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
+        org3 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+        broker_agency_profile3 = FactoryGirl.create(:broker_agency_profile, organization:org3, market_kind:'both')
+        FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
+      end
+      context "individual market user" do
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['consumer'])}
 
-    end
+        it "selects only 'individual' and 'both' market brokers" do
+          allow(subject).to receive(:current_user).and_return(user)
+          controller.instance_variable_set(:@person, person)
+          staff = subject.instance_eval{ eligible_brokers }
+          staff.each do |staff_person|
+           expect(["individual", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+          end
+        end
+        context "SHOP market user" do
+          let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+          let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
-    context "individual market user" do
-      let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
-      let(:user) {FactoryGirl.build(:user, person: person, roles: ['consumer'])}
+          it "selects only 'shop' and 'both' market brokers" do
+            allow(subject).to receive(:current_user).and_return(user)
+            controller.instance_variable_set(:@person, person)
+            staff = subject.instance_eval{ eligible_brokers }
 
-      it "selects only 'individual' and 'both' market brokers" do
-        allow(subject).to receive(:current_user).and_return(user)
-        controller.instance_variable_set(:@person, person)
-        staff = subject.instance_eval{ eligible_brokers }
-        staff.each do |staff_person|
-         expect(["individual", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+            staff.each do |staff_person|
+              expect(["shop", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+            end
+          end
         end
       end
     end
+
 
     context "SHOP market user" do
       let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
       let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
-      it "selects only 'shop' and 'both' market brokers" do
-        allow(subject).to receive(:current_user).and_return(user)
-        controller.instance_variable_set(:@person, person)
-        staff = subject.instance_eval{ eligible_brokers }
+      before :each do
+        DatabaseCleaner.clean
+        stub_const("BrokerAgencyProfile::MARKET_KINDS",%W[shop])
 
-        staff.each do |staff_person|
-          expect(["shop", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+        org2 = FactoryGirl.create(:organization, fein: 100000000 + rand(100000))
+        broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization:org2, market_kind:'shop')
+        FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
+      end
+      context "SHOP market user" do
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
+
+        it "selects only 'shop' market brokers" do
+          allow(subject).to receive(:current_user).and_return(user)
+          controller.instance_variable_set(:@person, person)
+          staff = subject.instance_eval{ eligible_brokers }
+
+          staff.each do |staff_person|
+            expect(["shop"].include? staff_person.broker_role.market_kind).to be_truthy
+          end
         end
       end
     end
@@ -292,21 +326,48 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    before :each do
-      sign_in user
-      xhr :get, :assign, id: broker_agency_profile.id, format: :js
+    context "when general agency is enabled via settings" do
+      before :each do
+        Settings.aca.general_agency_enabled = true
+        sign_in user
+        xhr :get, :assign, id: broker_agency_profile.id, format: :js
+      end
+
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should get general_agency_profiles" do
+        expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
+      end
+
+      it "should get employers" do
+        expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
+      end
     end
 
-    it "should return http success" do
-      expect(response).to have_http_status(:success)
-    end
+    context "when general agency is disabled via settings" do
+      before :each do
+        Settings.aca.general_agency_enabled = false
+        sign_in user
+        xhr :get, :assign, id: broker_agency_profile.id, format: :js
+      end
 
-    it "should get general_agency_profiles" do
-      expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
-    end
+      it "should return http redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
 
-    it "should get employers" do
-      expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
+      it "should redirect to broker_agency_profile" do
+        expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
+      end
+
+      it "general_agency_profiles should be nil" do
+        expect(assigns(:general_agency_profiles)).to be_nil
+      end
+
+      it "employers should be nil" do
+        expect(assigns(:employers)).to be_nil
+      end
     end
   end
 
@@ -349,14 +410,22 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET clear_assign_for_employer" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, aasm_state: "is_approved") }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:favorite_general_agency) { FactoryGirl.create(:favorite_general_agency, general_agency_profile_id: general_agency_profile.id, broker_role: broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+
     before :each do
       sign_in user
+      favorite_general_agency.reload
       xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
+    end
+
+    it "should assign general agency profiles" do
+      expect(assigns(:broker_role)).to eq broker_role
+      expect(assigns(:general_agency_profiles)).to eq [general_agency_profile]
     end
 
     it "should http success" do
@@ -366,6 +435,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should get employer_profile" do
       expect(assigns(:employer_profile)).to eq employer_profile
     end
+
   end
 
   describe "POST update_assign" do
@@ -374,36 +444,113 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    context "when we Assign agency" do
-      before :each do
-        sign_in user
-        xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+    context "when general agency is enabled via settings" do
+      before do
+        Settings.aca.general_agency_enabled = true
       end
+      context "when we Assign agency" do
+        before :each do
+          sign_in user
+          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        end
 
-      it "should render" do
-        expect(response).to render_template(:update_assign)
+        it "should render" do
+          expect(response).to render_template(:update_assign)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Assign successful.'
+        end
       end
+      context "when we Unassign agency" do
+        before :each do
+          sign_in user
+          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+        end
 
-      it "should get notice" do
-        expect(flash[:notice]).to eq 'Assign successful.'
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Unassign successful.'
+        end
+        it "should update aasm_state" do
+          employer_profile.reload
+          expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+        end
       end
     end
-    context "when we Unassign agency" do
-      before :each do
-        sign_in user
-        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
-      end
 
-      it "should redirect" do
-        expect(response).to have_http_status(:redirect)
+    context "when general agency is enabled via settings" do
+      before do
+        Settings.aca.general_agency_enabled = true
       end
+      context "when we Assign agency" do
+        before :each do
+          sign_in user
+          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        end
 
-      it "should get notice" do
-        expect(flash[:notice]).to eq 'Unassign successful.'
+        it "should render" do
+          expect(response).to render_template(:update_assign)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Assign successful.'
+        end
       end
-      it "should update aasm_state" do
-        employer_profile.reload
-        expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+      context "when we Unassign agency" do
+        before :each do
+          sign_in user
+          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+        end
+
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Unassign successful.'
+        end
+        it "should update aasm_state" do
+          employer_profile.reload
+          expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+        end
+      end
+    end
+
+    context "when general agency is disabled via settings" do
+      before do
+        Settings.aca.general_agency_enabled = false
+      end
+      context "when we Assign agency" do
+        before :each do
+          sign_in user
+          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        end
+
+        it "should return http redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should redirect to broker_agency_profile" do
+          expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
+        end
+      end
+      context "when we Unassign agency" do
+        before :each do
+          sign_in user
+          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+        end
+
+        it "should return http redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should redirect to broker_agency_profile" do
+          expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
+        end
       end
     end
   end

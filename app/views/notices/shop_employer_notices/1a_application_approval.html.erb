@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>RE: Application to Offer Group Health Coverage in <%= Settings.site.short_name %></h3></td>
+      <td><h3>RE: Application to Offer Group Health Coverage in <%= site_short_name %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -20,8 +20,8 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Thank you for applying to offer group health coverage through #{Settings.site.short_name}.<br><br>
-Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}.
+content: "Thank you for applying to offer group health coverage through #{site_short_name}.<br><br>
+Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{site_short_name}.
 You can proceed to the next steps outlined below. "} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -30,7 +30,7 @@ You can proceed to the next steps outlined below. "} %>
              "At least two-thirds of your eligible employees enroll in your group health coverage."] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you are unable to satisfy these requirements, you will only be able to offer #{Settings.site.short_name} coverage during the special
+content: "If you are unable to satisfy these requirements, you will only be able to offer #{site_short_name} coverage during the special
 annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without
 having a minimum level of employee enrollment."} %>
 
@@ -59,15 +59,15 @@ having a minimum level of employee enrollment."} %>
  Your contribution will remain fixed based on the reference plan.
  Employees enrolling in any other available plan will pay the difference in premium to 'buy-up' or 'buy-down'.
  If you are unable to contribute at least 50% of the cost of single coverage, you will only be able to offer
- coverage through #{Settings.site.short_name} during special annual enrollment period described above.",
+ coverage through #{site_short_name} during special annual enrollment period described above.",
  "<strong>Finalize List of Eligible Employees</strong><br>
  At a minimum, you must offer coverage to all employees working 30 hours or more per week.",
  "<strong>Select your Open Enrollment Period</strong><br>
  You must provide your employees with at least 10 days to review their plan options and select which plan they would like to enroll in.
  Open Enrollment must end no later than the 10th day of the month prior to your coverage effective date.<br>
 
- At the beginning of Open Enrollment, #{Settings.site.short_name} will send an email to your eligible employees to announce the beginning
- of their Open Enrollment Period and provide them with instructions on how to create a #{Settings.site.short_name} account and log in,
+ At the beginning of Open Enrollment, #{site_short_name} will send an email to your eligible employees to announce the beginning
+ of their Open Enrollment Period and provide them with instructions on how to create a #{site_short_name} account and log in,
  review their plan options, and enroll into coverage.  You will also receive a copy of this open enrollment notice.
  During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who
  have not yet enrolled in a plan.",
@@ -89,7 +89,7 @@ having a minimum level of employee enrollment."} %>
    heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
- previous: "Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:",
+ previous: "Please contact your broker for further assistance.  You can also contact #{site_short_name} with any questions:",
  listings: ["Online at #{notice.hbe.url};",
             "By email at #{notice.hbe.email}; or",
             "By calling #{notice.hbe.phone}."] } %>

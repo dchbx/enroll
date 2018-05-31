@@ -1,0 +1,112 @@
+<% links ||= [] %>
+<div class="col-xs-12 horizontal-status">
+  <div>
+    <div class="col-xs-4 step-one step">
+      <div class="row">
+        <div class="col-xs-2">
+          <% if links.any? %>
+            <%= link_to image_tag('ui/profilegreen_37.png'), links[0] %>
+          <% else %>
+            <%= image_tag('ui/profilegreen_37.png') %>
+          <% end %>
+        </div>
+        <div class="col-xs-10">
+          <span class="ttu dg twelve">
+            STEP 1
+          </span>
+          <br>
+          <span class="dg fourteen">
+            <strong>
+              Employer and Roster Info
+            </strong>
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 arrow">
+          <div class="row">
+          <%= image_tag('ui/darkgreenarrow_354.png') %>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-4 step-two step">
+      <div class="row">
+        <div class="col-xs-2">
+          <% if links.any? %>
+            <%= link_to image_tag('ui/cartgreen_40.png'), links[1] %>
+          <% else %>
+            <%= image_tag('ui/cartgreen_40.png') %>
+          <% end %>
+        </div>
+        <div class="col-xs-10">
+          <span class="ttu dg twelve">
+            STEP 2
+          </span>
+          <br>
+          <span class="dg fourteen">
+            <% if step >= 2 %>
+            <strong>
+              Compare and Select Plan
+            </strong>
+            <% else %>
+              Compare and Select Plan
+            <% end %>
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 arrow">
+          <div class="row">
+            <% if step >= 2 %>
+            <strong>
+              <%= image_tag('ui/darkgreenarrow_354.png') %>
+            </strong>
+            <% else %>
+              <%= image_tag('ui/lightgreenarrow_354.png') %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-4 step-three step">
+      <div class="row">
+        <div class="col-xs-2">
+          <% if links.any? %>
+            <%= link_to image_tag('ui/pointergreen_42.png'), links[2] %>
+          <% else %>
+            <%= image_tag('ui/pointergreen_42.png') %>
+          <% end %>
+        </div>
+        <div class="col-xs-10">
+          <span class="ttu dg twelve">
+            STEP 3
+          </span>
+          <br>
+          <span class="dg fourteen">
+            <% if step == 3 %>
+            <strong>
+              Review and Publish
+            </strong>
+            <% else %>
+              Review and Publish
+            <% end %>
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 arrow">
+          <div class="row">
+            <% if step == 3 %>
+            <strong>
+              <%= image_tag('ui/darkgreenarrow_354.png') %>
+            </strong>
+            <% else %>
+              <%= image_tag('ui/lightgreenarrow_354.png') %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

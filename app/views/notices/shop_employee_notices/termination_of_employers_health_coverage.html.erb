@@ -1,0 +1,59 @@
+<%= render partial: 'notices/shared/cover', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<br><br><br><br><br>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This letter is notification that your employer, #{notice.employer_name}, is not offering health coverage to employees through the #{site_long_name}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>Health coverage for you, and any of your enrolled family members, will not go into effect on #{notice.plan_year.start_on} as planned. </strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  {  heading: 'You May be Eligible for Other Coverage'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "You may be eligible to purchase coverage for yourself and your family members through the #{site_short_name}'s marketplace for individuals and families. You may also be eligible to lower the cost of your coverage if you are unable to afford the full cost of health insurance. \n"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "To get started, please create a new account at <a href = '#{site_main_web_address_url}'> #{site_website_name}</a> and complete the application for individuals and families.  After you apply, you will be able to view health plan options available to you and to learn whether you qualify for help paying for your insurance. \n"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you are not a resident of Massachusetts, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs.  To find the Health Insurance Marketplace in your state, go to <a href = '#{health_care_website_url}'> #{health_care_website}</a>. \n"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you are eligible to participate in another employer's plan, contact that employer promptly to enroll."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { heading:'For Questions or Assistance:'} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{site_short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                    ["By calling #{contact_center_phone_number}.","TTY: #{contact_center_tty_number}" ] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "You can also find more information on our website at <a href = '#{site_main_web_address_url}'> #{site_website_name}</a>"} %>   
+<br>                                                                 
+
+<% if notice.broker.present? %>                                                                     
+<%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% end %>
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is being provided in accordance with 45 C.F.R. 155.735(g)."} %>

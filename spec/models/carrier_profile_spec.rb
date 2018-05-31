@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CarrierProfile, :type => :model do
+RSpec.describe CarrierProfile, :type => :model, dbclean: :after_each do
   it { should delegate_method(:hbx_id).to :organization }
   it { should delegate_method(:legal_name).to :organization }
   it { should delegate_method(:dba).to :organization }
@@ -12,12 +12,27 @@ RSpec.describe CarrierProfile, :type => :model do
   let(:organization) {FactoryGirl.create(:organization)}
   let(:abbrev) {"uhc"}
 
+  describe "class methods" do
+    context "carrier_profile_service_area_pairs_for" do
+      let!(:carrier_profile) { create(:carrier_profile, with_service_areas: 0, issuer_hios_ids: ['99999']) }
+      let!(:carrier_service_area_2017) { create(:carrier_service_area, issuer_hios_id: carrier_profile.issuer_hios_ids.first, active_year: '2017') }
+      let!(:carrier_service_area_2018) { create(:carrier_service_area, issuer_hios_id: carrier_profile.issuer_hios_ids.first, active_year: '2018') }
+      let!(:employer) { create(:employer_profile) }
+
+      it "should return the appropriate service area based on year" do
+        expect(CarrierProfile.carrier_profile_service_area_pairs_for(employer, '2017' )).to contain_exactly([carrier_profile.id, carrier_service_area_2017.service_area_id])
+        expect(CarrierProfile.carrier_profile_service_area_pairs_for(employer, '2018' )).to contain_exactly([carrier_profile.id, carrier_service_area_2018.service_area_id])
+      end
+    end
+  end
+
   describe ".new" do
 
     let(:valid_params) do
       {
         organization: organization,
-        abbrev: abbrev
+        abbrev: abbrev,
+        issuer_hios_ids: ['11111', '22222']
       }
     end
 
@@ -36,6 +51,11 @@ RSpec.describe CarrierProfile, :type => :model do
       it "should save" do
         expect(carrier_profile.save).to be_truthy
       end
+
+      it "should not offer sole source" do
+        expect(carrier_profile.offers_sole_source?).to be_falsey
+      end
+
       context "and it is saved" do
         before do
           carrier_profile.save

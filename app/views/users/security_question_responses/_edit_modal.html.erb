@@ -1,0 +1,66 @@
+<div class="modal fade" id="securityQuestionModal" tabindex="-1" role="dialog" aria-labelledby="securityQuestionModal">
+ <div class="modal-dialog" role="document">
+   <div class="modal-content">
+     <div class="modal-header">
+       <h4 class="modal-title" id="securityQuestionModalLabel">Please helps us secure your account</h4>
+     </div>
+     <%= form_for [:user, current_user.security_question_responses.build], url: { controller: "users/security_question_responses", action: action, user_id: current_user.id, method: method }, name: "user_security_question_responses[]", remote: true do |f| %>
+       <div class="modal-body">
+         <p>Please take a moment to provide security responses for three choices from our available options</p>
+         <p>These questions help us confirm your identity if you forget your password, or if your account behaves suspiciously and is locked.</p>
+         <div class="modal-questions-container">
+             <% 3.times do |num| %>
+               <div class="question-wrapper" data-question-index=<%= num %>>
+
+                 <select class="security-question-select" name="security_question_responses[][security_question_id]" required="true" >
+                   <option name="id" value="">Please Select A Question</option>
+                   <% SecurityQuestion.visible.each do |question| %>
+                     <option name="id" value=<%= question.id %> data-question-number=<%= num %>><%= question.title %></option>
+                   <% end %>
+                 </select>
+
+                 <div class="input-wrapper">
+                   <%= f.text_field :question_answer, name: "security_question_responses[][question_answer]", required: true %>
+                 </div>
+               </div>
+             <% end %>
+         </div>
+       </div>
+       <div class="modal-footer">
+         <%= f.submit "Save Responses", class: "btn btn-primary" %>
+         <% unless action == 'create' %>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+         <% end %>
+       </div>
+     </div>
+   <% end %>
+
+ </div>
+</div>
+
+    <script>
+
+     $('.security-question-select').on('change', function(){
+       var questionId = $(this).val();
+       var selectedQuestions = [];
+
+       $.each($('.selectric-scroll li.selected'), function(propertyName, propertyValue){
+         var elemIndex = $(this).data('index');
+         if(elemIndex != 0) {
+           selectedQuestions.push(elemIndex);
+         }
+       });
+
+       $('.selectric-scroll li').show();
+       selectedQuestions.forEach(function(index){
+         $(".selectric-scroll li[data-index='" + index +"']").hide();
+       });
+
+       //[attribute!='value']
+       $.each($('.security-question-select').not(this), function(propertyName, propertyValue){
+         $(this).children("option").show();
+         $(this).children("option[value='" + questionId + "']").hide();
+       });
+
+     });
+    </script>

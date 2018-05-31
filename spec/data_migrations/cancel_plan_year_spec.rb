@@ -19,7 +19,7 @@ describe CancelPlanYear do
     let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
     before(:each) do
       allow(ENV).to receive(:[]).with('plan_year_state').and_return(plan_year.aasm_state)
-      allow(ENV).to receive(:[]).with('fein').and_return(plan_year.employer_profile.parent.fein)
+      allow(ENV).to receive(:[]).with('feins').and_return(plan_year.employer_profile.parent.fein)
       subject.migrate
       plan_year.reload
       enrollment.reload

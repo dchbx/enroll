@@ -10,14 +10,14 @@
     <table class="table table-bg-white table-employee-2">
       <thead>
         <tr>
-          <th>Employee</th>
-          <th>Dependent Count</th>
+          <th class="text-center">Employee</th>
+          <th class="text-center">Dependent Count</th>
           <% if !@benefit_group.single_plan_type? || @coverage_type == '.dental' %>
-          <th>Lowest Cost Available Plan</th>
+          <th class="text-right">Lowest Cost Available Plan</th>
           <% end %>
-          <th>Reference Plan</th>
+          <th class="text-right">Reference Plan</th>
           <% if !@benefit_group.single_plan_type? || @coverage_type == '.dental'%>
-          <th>Highest Cost Available Plan</th>
+          <th class="text-right">Highest Cost Available Plan</th>
           <% end %>
         </tr>
       </thead>

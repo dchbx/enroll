@@ -7,7 +7,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   let(:person){ Person.new(first_name: "first name", last_name: "last_name", dob: 20.years.ago) }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:plan_year){ FactoryGirl.create(:plan_year) }
-  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:relationship_benefit){ RelationshipBenefit.new(relationship: "employee") }
   let(:benefit_group) {BenefitGroup.new(title: "plan name", relationship_benefits: [relationship_benefit], dental_relationship_benefits: [relationship_benefit], plan_year: plan_year )}
   let(:benefit_group_assignment) { BenefitGroupAssignment.new(benefit_group: benefit_group) }
@@ -40,6 +40,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     sign_in user
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
     assign(:employer_profile, employer_profile)
+    assign(:datatable, Effective::Datatables::EmployeeDatatable.new({id: employer_profile.id}))
     assign(:census_employee, census_employee)
     assign(:benefit_group_assignment, benefit_group_assignment)
     assign(:hbx_enrollment, hbx_enrollment)
@@ -57,6 +58,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
     allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment])
     allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
+    allow(SicCodeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
+    allow(EmployerGroupSizeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
     allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
   end
 
@@ -79,6 +82,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(rendered).to match /CITY/
     expect(rendered).to match /SELECT STATE/
     expect(rendered).to match /ZIP/
+    expect(rendered).to match /Add Dependent/i
   end
 
   it "should not show the plan" do
@@ -136,7 +140,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
     context "when both ee and er have no benefit group assignment" do
       #to make sure census_employee.benefit_group_assignments.last
-      let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+      let(:census_employee) { create(:census_employee, first_name: "xz", last_name: "yz") }
       before do
         # to make sure census_employee.active_benefit_group_assignment = nil
         allow(census_employee).to receive(:active_benefit_group_assignment).and_return(nil)
@@ -150,7 +154,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
    end
 
   context 'with no email linked with census employee' do
-    let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+    let(:census_employee) { create(:census_employee, :blank_email, first_name: "xz", last_name: "yz") }
     it "should create a blank email record if there was no email for census employees" do
       expect(census_employee.email).to eq nil
       render template: "employers/census_employees/show.html.erb"
@@ -330,7 +334,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   #     end
   #
   #     it "should have cobra confirm area" do
-  #       expect(rendered).to have_selector('div.cobra_confirm')
+  #       expect(rendered).to have_selector('div.cobra-confirm')
   #       expect(rendered).to match /Employment Termination Date/
   #       expect(rendered).to have_selector('a.cobra_confirm_submit')
   #       expect(rendered).to have_selector('span.confirm-cobra-wrapper')
@@ -342,7 +346,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   #
   #     it "should have rehire area" do
   #       expect(rendered).to have_selector('div.confirm-terminate-wrapper')
-  #       expect(rendered).to have_selector('a.rehire_confirm')
+  #       expect(rendered).to have_selector('a.rehire-confirm')
   #     end
   #   end
   # end

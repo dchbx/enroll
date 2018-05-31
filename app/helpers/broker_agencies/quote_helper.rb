@@ -10,7 +10,7 @@ module BrokerAgencies::QuoteHelper
   def display_dental_plan_option_kind(bg)
     kind = bg.dental_plan_option_kind
     if kind == 'single_carrier'
-      'Single Carrier'
+      fetch_plan_title_for_single_carrier
     else
       'Custom'
     end

@@ -1,151 +1,84 @@
 <html>
-<body>
-  <b><%= Settings.site.short_name %> - Assistance Enrolling in Employer-sponsored Health Insurance</b>
-<br/>
-<br/>
-<div>Dear <%= first_name %>,</div>
-<br/>
-  You recently began an application for employer-sponsored health insurance through DC Health Link. Your application is currently incomplete and you are not eligible to enroll in coverage through the Small Business market through DC Health Link because we were unable to match you with the employer you listed in your application.
-<br><br/>
-<div>
-  If you believe this determination was made in error, please check the information entered on your application is correct and confirm with your employer that your demographic information is listed correctly on their roster. If you continue to experience difficulty matching to your employer and plan shopping on DC Health Link, please reach out to us at the options below. 
-  <br><br/>
+  <%= render :partial => "notices/shared/logo" %>
+  <span class="fssize1 health-connector-address" align="right" style="padding-right: 15px">"SHOP_M009"%></span><br><br><br><br><br>
+   <span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span>
+    <body>
+      <b> ASSISTANCE ENROLLING IN EMPLOYER-SPONSORED HEALTH INSURANCE</b>
+      <br/>
+      <br/>
+      <div>
+        Dear <%= first_name %>,
+      </div>
+        <br/>
+          You recently applied for employer-sponsored health insurance through the <%= site_short_name %>.  You are not eligible to enroll in coverage through the <%= site_short_name %> because we were unable to match you with an employer.
+        <br><br/>
+      <div>
+        If you believe this determination was made in error, please check the information entered on your application is correct and confirm with your employer that your demographic information is listed correctly on their roster. If you continue to experience difficulty matching to your employer and plan shopping on the <%= site_short_name %>, please reach out to us at the options below.
+        <br><br/>
 
-  You can contact DC Health Link with any questions:
-  <table class="total_table" border="0">
-    <tbody>
-      <tr>
-        <td>
-          <ul>
-          <li style="margin-top: 0px;">
-            By calling <%= Settings.contact_center.phone_number %>
-          </li>
-          <li style="margin-top: 5px;">
-            TTY: 711
-          </li>
-          <li style="margin-top: 5px;">
-            Online at <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>
-          </li>
-          </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        <h2 style="color: #007bc4;">
+          For Questions or Assistance:
+        </h2>
 
-  For more information about SHOP employee eligibility requirements, please see 45 C.F.R. 155.710.<br>
-  This notice is being provided in accordance with 45 CFR 155.715(f).
-</div>
+        Please contact your broker for further assistance. You can also contact the <%= site_short_name %> with any questions:
+        <table class="total_table" border="0">
+          <tbody>
+            <tr>
+              <td>
+                <ul style="list-style: circle;>
+                <li style="margin-top: 0px;">
+                  By calling <%=contact_center_phone_number%>. TTY: <%=contact_center_tty_number%>
+                </li>
+                <li style="margin-top: 5px;">
+                  By email: <a mail_to = "#{small_businesss_email}"><%=small_businesss_email %></a>
+                </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-<div>
-  <h3><u>DC Health Link SHOP Employee Appeal Rights</u></h3>
-  If you do not agree with our decision about whether or not you are an eligible employee, you have a right to appeal our decision and receive a Fair Hearing.  Employees have the right to appeal a denial of eligibility, the failure of DC Health Benefit Exchange (HBX) to provide a timely eligibility determination, or the failure of the DC HBX to provide a timely notice of an eligibility determination.
-  <br></br>
-  You have 90 days from the date of the eligibility notice to request an appeal.  If you do not appeal within 90 days, you may lose your appeal right.<br>
+        For more information about employee eligibility requirements, refer to the <%= site_short_name %>’s “Employee Eligibility and Verification” policy.<br>
+        This notice is being provided in accordance with 45 CFR 155.715(f).
+      </div>
 
-  <h2 style="color: #007bc4;">
-    How to Request an Appeal
-  </h2>
-  You may appeal through any of the following methods:
-  <table class="total_table" border="0">
-    <tbody>
-      <tr>
-        <td>
-          <ul>
-          <li style="margin-top: 0px;">
-            Calling <%= Settings.site.short_name %> Customer Service toll free at <%= Settings.contact_center.phone_number %>
-          </li>
-          <li style="margin-top: 5px;">
-            Completing a SHOP Request for Hearing Form, available at DCHealthLink.com/Forms
-            <ul>
-              <li>Can be mailed, faxed, or e-mailed</li>
-            </ul>
-          </li>
-          <li style="margin-top: 5px;">
-            Going to the Office of Administrative Hearings Resource Center, located at 441 4th Street, NW, Suite 450-North, Washington, <%= Settings.aca.state_abbreviation %> 20001, where you can fill out a Request for Hearing form.
-          </li>
-          </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <h2 style="color: #007bc4;">
-    What Happens When You Appeal
-  </h2>
-  Once your appeal is received, it simultaneously triggers both an informal and formal review process.<br>
-  <br>
-  <b><i>Informal Review</i></b> - You may be contacted by a staff member within HBX to review your eligibility and enrollment history with the intent of exploring whether your appeal can be resolved short of a formal hearing.  Engaging in this informal review is optional both for you and for HBX.<br></br>
-  <b><i>Formal Hearing</i></b> - You will be scheduled for a Fair Hearing before an Administrative Law Judge.  The Fair Hearing will take place at the DC Office of Administrative Hearings (OAH) at 441 4th Street, NW, Suite 450-North, Washington, DC 20001. OAH will contact you and your employer and tell you when and where your Fair Hearing will take place. OAH will send you and your employer a scheduling order, including the time and date of your Fair Hearing.<br></br>
-  At the Fair Hearing, you can testify, have others testify for you, and submit documents.  At the hearing, HBX representatives will also ask questions of you and other people who testify. HBX representatives will also be permitted to present witnesses and documents. You will be able to ask questions of the HBX witnesses.  After completion of the Fair Hearing, the Administrative Law Judge will make a decision in writing and sent it to you, your employer, and HBX.  The decision will also tell you what you can do if you do not agree with the decision.
+      <div>
+        <h2><u><%= aca_state_name %> <%= site_short_name %> Small Group Employee Appeal Rights</u></h2>
+        If you do not agree with our decision about whether or not you are an eligible employee, you have a right to appeal our decision and receive a hearing. Employees have the right to appeal a denial of eligibility, the failure of <%= site_short_name %> to provide a timely eligibility determination, or the failure of the <%= site_short_name %> to provide a timely notice of an eligibility determination.
+        <br></br>
+        You have 90 days from the date of the eligibility notice to request an appeal. If you do not appeal within 90 days, you may lose your appeal right.<br>
 
-  <h2 style="color: #007bc4;">
-    Ending your Appeal Early
-  </h2>
-  You may withdraw your request for a Fair Hearing at any time before the Administrative Law Judge makes a final written decision. This includes before the hearing, potentially as a result of your informal resolution with HBX.  To withdraw your request for a Fair Hearing, you must  send a written withdrawal request, including your name and case number, to the Office of Administrative Hearings by e-mail (<a href="oah.filing@dc.gov">oah.filing@dc.gov</a>) or regular mail (441 4th Street NW, Suite 450-North).  Please also send a copy of this request to HBX at <a href="SHOP.Appeals@dc.gov">SHOP.Appeals@dc.gov</a>.<br></br>
+        <h2 style="color: #007bc4;">
+          How to Request an Appeal
+        </h2>
+        You may appeal by completing an Appeal Request For <%= aca_state_name %> <%= site_short_name %> for Business, Employees Form, available at <%=site_main_web_address_text%>.<br>
+        The form can be mailed or faxed.<br>
+        <strong>Mail:</strong> <%= site_short_name %> <%= contact_center_appeal_name %>, <%= contact_center_appeal_address_one %>, <%= contact_center_appeal_city %>, <%= contact_center_appeal_state %> <%= contact_center_appeal_zip %><br>
+        <strong>Fax:</strong> <%= contact_center_fax_number%>
 
-  If you withdraw your request for a Fair Hearing because HBX has promised to change its decision, we will implement the new HBX decision. <b>If you stop your appeal before the agency has changed its decision, the eligibility determination will be implemented as it is written in the notice you first received before you filed your appeal.</b><br></br>
-</div>
+        <h2 style="color: #007bc4;">
+          What Happens When You Appeal
+        </h2>
+        Once your valid appeal is received, the <%= site_short_name %> will notify you and your employer that it has received the appeal, and will being both an informal and formal review process.<br>
+        <br>
+        <b><i>Informal Review</i></b> - You may be contacted by a staff member within the <%= site_short_name %> to review your eligibility and enrollment history with the intent of exploring whether your appeal can be resolved short of a formal hearing. Engaging in this informal review is optional both for you and for the <%= site_short_name %>.<br>
+        <b><i>Hearing</i></b> - You will be scheduled for a hearing before an independent hearing officer. The hearing will take place telephonically. The <%= site_short_name %> will contact you and tell you when and where your hearing will take place. The <%= site_short_name %> will send you a scheduling order, including the time and date of your hearing.<br>
+        At the hearing, you can testify, have others testify for you, and submit documents. At the hearing, the hearing officer will also ask questions of you and any other people who testify. After completion of the hearing, the hearing officer will make a decision in writing and sent it to you. The decision will also tell you what you can do if you do not agree with the decision.<br>
+        <strong>Any decisions by a hearing officer about your eligibility as an employee might also change the eligibility of your dependents.</strong>>
 
-<br>
-<div>
-  <b><u>Notice Regarding Nondiscrimination, Disability, and Language Access Services</u></b><br></br>
-  The D.C. Health Benefit Exchange Authority (DC HBX) complies with applicable Federal civil rights laws and does not discriminate on the basis of race, color, national origin, age, disability, or sex. This agency does not exclude people or treat them differently because of race, color, national origin, age, disability, or sex.<br></br>
-  DCHBX:
-  <ul>
-    <li>
-      Provides free support and services to people with disabilities to communicate effectively with us, such as:
-      <ul>
-        <li>
-          Qualified sign language interpreters
-        </li>
-        <li>
-          Written information in other formats (large print, audio, accessible electronic formats, other formats)
-        </li>
-      </ul>
-    </li>
-    <li>
-      Provides free language services to people whose primary language is not English, such as:
-      <ul>
-        <li>
-          Qualified interpreters
-        </li>
-        <li>
-          Information written in other languages
-        </li>
-      </ul>
-    </li>
-  </ul>
-  <table style="width: 100%">
-    <tr>
-      <td style="width: 25%"><strong>If you need these services, contact:</strong></td>
-      <td style="width: 75%"></td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%"><%= Settings.site.short_name %> Contact Center</td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%">Phone: <%= Settings.contact_center.phone_number %></td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%">TTY: 711</td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%">Email: <%= Settings.contact_center.email_address %></td>
-    </tr>
-  </table>
-  <br>
-  If you believe that the D.C. Health Benefit Exchange Authority has failed to provide these services or discriminated in another way on the basis of race, color, national origin, age, disability, or sex, you can file a grievance you can file a grievance in person or by mail, fax, or email. with: Jennifer Libster, Associate General Counsel, D.C. Health Benefit Exchange Authority, 1225 Eye Street NW, Suite 400, Washington DC 20005, (202) 715-7576, TTY: 711, <a href="1557.grievance@dc.gov">1557.grievance@dc.gov</a>;  Fax: (202) 730-1658. You must file a grievance within 60 days of the date you became aware of the alleged discriminatory action. Jennifer Libster is also available to help you with the grievance filing process.<br></br>
-  You can also file a civil rights complaint with the U.S. Department of Health and Human Services, Office for Civil Rights electronically through the Office for Civil Rights Complaint Portal, available at <a href="https://ocrportal.hhs.gov/ocr/portal/lobby.jsf">https://ocrportal.hhs.gov/ocr/portal/lobby.jsf</a>, or by mail or phone at:<br></br>
-  U.S. Department of Health and Human Services,<br>
-  200 Independence Avenue SW.,<br>
-  Room 509F, HHH Building,<br>
-  Washington, DC 20201<br>
-  1-800-868-1019, 1-800-537-7697 (TDD).<br></br>
+        <h2 style="color: #007bc4;">
+          Ending your Appeal Early
+        </h2>
+        You may withdraw your request for a hearing at any time before the hearing officer makes a final written decision. This includes before the hearing, potentially as a result of your informal resolution with the <%= site_short_name %>. To withdraw your request for a hearing, you must send a written withdrawal request, including your name and case number, to the <%= site_short_name %> by mail, e-mail, or fax.<br>
+        <strong>Mail:</strong> <%= site_short_name %> <%= contact_center_appeal_name %>, <%= contact_center_appeal_address_one %>, <%= contact_center_appeal_city %>, <%= contact_center_appeal_state %> <%= contact_center_appeal_zip %><br>
+        <strong>Email:</strong><a mail_to="#{contact_center_appeals_link}"><%= contact_center_appeals_link %></a><br>
+        <strong>Fax:</strong> <%= contact_center_fax_number%>
 
-  Complaint forms are available at <a href="http://www.hhs.gov/ocr/office/file/index.html">http://www.hhs.gov/ocr/office/file/index.html</a>.
-</div>
-</body>
+        If you withdraw your request for a hearing because the <%= site_short_name %> has promised to change its decision, we will implement the new <%= site_short_name %> decision.<strong>If you stop your appeal before the <%= site_short_name %> has changed its decision, the eligibility determination will be implemented as it is written in the notice you first received before you filed your appeal</strong>
+      </div>
+    </body>
 </html>
+<br><br>
+<%= render "user_mailer/shared/non_discrimination" %>
+<br><br>
+<%= render "user_mailer/shared/taglines" %>

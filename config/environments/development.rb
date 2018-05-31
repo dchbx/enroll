@@ -1,4 +1,3 @@
-require "acapi/subscribers/edi"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -55,6 +54,9 @@ Rails.application.configure do
   config.active_job.queue_adapter = :resque
 
   HbxIdGenerator.slug!
+  config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
+  config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
+
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

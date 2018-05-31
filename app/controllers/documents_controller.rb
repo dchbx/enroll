@@ -12,6 +12,10 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
+  def download_employer_document
+    send_file params[:path]
+  end
+
   def authorized_download
     begin
       model = params[:model].camelize
@@ -152,6 +156,62 @@ class DocumentsController < ApplicationController
     end
   end
 
+  def new
+    @document = Document.new
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def create
+    @employer_profile = Organization.all_employer_profiles.where(legal_name: params[:document][:creator]).last.employer_profile
+    @employer_profile.employer_attestation= EmployerAttestation.new() unless @employer_profile.employer_attestation
+    #@employer_profile.employer_attestation.employer_attestation_doccument = EmployerAttestationDocument.new() unless @employer_profile.employer_attestation.employer_attestation_doccument
+    document = @employer_profile.employer_attestation.upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
+    if document.save!
+      @employer_profile.employer_attestation.update_attributes(aasm_state: "submitted")
+    end
+    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+  end
+
+  def document_reader
+    content = @document.source.read
+    if stale?(etag: content, last_modified: @user.updated_at.utc, public: true)
+      send_data content, type: @document.source.file.content_type, disposition: "inline"
+      expires_in 0, public: true
+    end
+  end
+
+  def download_employer_document
+    send_file params[:path]
+  end
+
+  def download_documents
+    docs = Document.find(params[:ids])
+    docs.each do |doc|
+      send_file "#{Rails.root}"+"/tmp" + doc.source.url, file_name: doc.title, :type=>"application/pdf"
+    end
+
+  end
+
+  def delete_documents
+    begin
+      Document.any_in(:_id =>params[:ids]).destroy_all
+      render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
+    rescue => e
+      render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
+    end
+  end
+
+  def update_document
+    @document = EmployerProfile.find(params[:document_id]).employer_attestation
+    @reason = params[:reason_for_rejection] == "nil"? params[:other_reason] : params[:reason_for_rejection]
+    @document.employer_attestation_documents.find(params[:attestation_doc_id]).update_attributes(aasm_state: params[:status],reason_for_rejection: @reason)
+    @document.update_attributes(aasm_state: params[:status])
+
+    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+  end
+
   def add_type_history_element
     actor = current_user ? current_user.email : "external source or script"
     verification_type = params[:verification_type]
@@ -202,6 +262,14 @@ class DocumentsController < ApplicationController
     OpenStruct.new({:determined_at => Time.now,
                     :authority => "hbx"
                    })
+  end
+
+  def file_path(file)
+    file.tempfile.path
+  end
+
+  def file_name(file)
+    file.original_filename
   end
 
   def set_min_due_date_on_family

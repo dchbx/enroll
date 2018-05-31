@@ -30,6 +30,7 @@
                     <th><%= l10n("first_name")%></th>
                     <th><%= l10n("last_name")%></th>
                     <th><%= l10n("relationship")%></th>
+                    <th><%= l10n("dob")%></th>
                   </tr>
                 </thead>
                 <% @q.quote_households.each do |quote_household| %>
@@ -81,7 +82,7 @@
                 </div>
                 <div class="col-xs-12 quote-details">
                   <div class="col-xs-12 quote-health-details">
-                    <p><%= l10n("below_is_your")%> <%= l10n("plan_offering_spectrum")%> <%=benefit_group.plan_option_kind.titleize%>.</p>
+                    <p><%= l10n("below_is_your")%> <%= l10n("health")%> <%= l10n("plan_offering_spectrum")%> <%=benefit_group.plan_option_kind.titleize%>.</p>
                     <% if benefit_group.plan %>
                       <table class = "employer-health-contribution">
                         <tr>

@@ -2,7 +2,7 @@
   <div class="col-md-12 no-pd col-sm-12 col-xs-12">
 
 
-    <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true, :include_id => false do |address| %>
+    <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
       <% kind = address.object.kind %>
 
       <% style = "" %>
@@ -49,6 +49,7 @@
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
           <%= address.hidden_field :kind, value: address.object.kind %>
+          <%= address.hidden_field :_destroy %>
 
           <% required = kind=='home' ? "address_required" : '' %>
 

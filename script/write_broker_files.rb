@@ -14,6 +14,7 @@ ConnectionSlug = Struct.new(:broker_npn) do
   end
 
   def publish(payload, headers)
+    Dir.mkdir("broker_xmls") unless File.exists?("broker_xmls")
     File.open(File.join("broker_xmls", "#{broker_npn}.xml"), 'w') do |f|
       f.puts payload
     end
@@ -28,3 +29,4 @@ npn_list.each do |npn|
   properties_slug = PropertiesSlug.new("", {:broker_id => npn})
   controller.resource(ConnectionSlug.new(npn), "", properties_slug, "")
 end
+

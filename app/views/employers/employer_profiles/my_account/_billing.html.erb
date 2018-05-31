@@ -1,40 +1,46 @@
 <div class="billing-tab">
-  <h1 class="darkblue no-buffer">Invoices</h1>
+  <h1 class="no-buffer">Invoices</h1>
   <%= render partial: "employers/employer_profiles/employer_invoices_table" %>
   <br/>
-  <h1 class="darkblue no-buffer">Billing</h1>
-  <h4 class="starter">
-    <%= Settings.site.short_name %>
+  <h1 class="no-buffer">Billing</h1>
+  <p class="twenty">
+    <%= site_short_name %>
     will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of
     whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
-  </h4>
-  <h4>Your
-    <%= Settings.site.short_name %>
+  </p>
+  <p class="twenty">Your
+    <%= site_short_name %>
     account number:
     <strong><%= "#{@employer_profile.hbx_id}".upcase %></strong>
-  </h4>
-  <h3><%= Settings.site.short_name %>
+  </p>
+  <h3><%= site_short_name %>
     offers multiple payment options including:</h3>
-  <h4>
-    <ol>
-      <li>Pay Online -
-        <%= link_to 'How to Pay Online', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%></li>
+    <ol class="twenty">
+      <li>
+        <% if invoice_bill_url_helper %>
+          <%= link_to 'Pay Online', invoice_bill_url_helper, target: "_blank"%> -
+        <% else %>
+          Pay Online
+        <% end %>
+        <%= link_to 'How to Pay Online', payment_pdf_helper, target: "_blank"%>
+      </li>
       <br/>
       <li>Pay by Phone
         <div class="row col-md-offset-1">
-          855-532-LINK, select "Small Business Employer" then "Make a Payment"</li>
+          <%= payment_phone_number %>, select "Small Business Employer" then "Make a Payment"</li>
         <br/>
         <li>Pay by Mail
           <div class="row col-md-offset-1">
-            <%= Settings.site.short_name %></div>
+            <%= contact_center_mailing_address_name %></div>
           <div class="row col-md-offset-1">
-            PO Box 97022</div>
+            <%= contact_center_address_one %></div>
           <div class="row col-md-offset-1">
-            Washington, DC 20090</div>
+            <%= contact_center_city %>,&nbsp;<%= contact_center_state %></div>
+          <div class="row col-md-offset-1">
+            <%= contact_center_postal_code %></div>
         </li>
-      </h4>
     </ol>
-    <h4>**Please include your account number on your check.</h4>
-    <h4>Check that your mailing address is up to date - click on Update Business Info.</h4>
+    <p class="twenty">**Please include your account number on your check.</p>
+    <p class="twenty">Check that your mailing address is up to date - click on Update Business Info.</p>
   </div>
 </div>

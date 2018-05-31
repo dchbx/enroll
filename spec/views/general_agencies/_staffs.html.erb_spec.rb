@@ -3,8 +3,10 @@ require 'rails_helper'
 RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   let(:staff) { FactoryGirl.create(:general_agency_staff_role) }
   before :each do
-    assign :staffs, [staff] 
-    render template: "general_agencies/profiles/_staffs.html.erb" 
+    assign :staffs, [staff]
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
+    render template: "general_agencies/profiles/_staffs.html.erb"
   end
 
   it 'should have title' do

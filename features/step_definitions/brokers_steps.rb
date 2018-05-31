@@ -19,7 +19,7 @@ When(/^.+ enters personal information$/) do
   fill_in 'organization[npn]', with: '109109109'
 end
 
-And(/^.+ enters broker agency information$/) do
+And(/^.+ enters broker agency information for individual markets$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
   fill_in 'organization[dba]', with: "Logistics Inc"
   # Auto-Generates FEIN
@@ -30,7 +30,7 @@ And(/^.+ enters broker agency information$/) do
   # find(:xpath, "//li[contains(., 'C Corporation')]").click
 
   find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
-  find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
+  find(:xpath, "//li[contains(., 'Both - Individual & Family AND Small Business Marketplaces')]").click
 
   find('button.multiselect').click
   find(:xpath, '//label[input[@value="bn"]]').click
@@ -40,11 +40,40 @@ And(/^.+ enters broker agency information$/) do
   find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
 end
 
+And(/^.+ enters broker agency information for SHOP markets$/) do
+  fill_in 'organization[legal_name]', with: "Logistics Inc"
+  fill_in 'organization[dba]', with: "Logistics Inc"
+  # Auto-Generates FEIN
+  # fill_in 'organization[fein]', with: "890890891"
+
+  # this field was hidden 4/13/2016
+  # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
+  # find(:xpath, "//li[contains(., 'C Corporation')]").click
+
+  # find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
+  # find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
+
+  find('button.multiselect').click
+  find(:xpath, '//label[input[@value="bn"]]').click
+  find(:xpath, '//label[input[@value="fr"]]').click
+
+  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
+  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
+
+  fill_in 'organization[ach_record][routing_number]', with: '123456789'
+  fill_in 'organization[ach_record][routing_number_confirmation]', with: '123456789'
+  fill_in 'organization[ach_record][account_number]', with: '9999999999999999'
+end
+
 And(/^.+ clicks? on Create Broker Agency$/) do
-  click_button "Create Broker Agency"
+  wait_for_ajax
+  page.find('h1', text: 'Broker Registration').click
+  wait_for_ajax
+  click_button "Create Broker Agency", wait: 4
 end
 
 Then(/^.+ should see broker registration successful message$/) do
+  wait_for_ajax
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
@@ -52,14 +81,14 @@ And(/^.+ should see the list of broker applicants$/) do
 end
 
 Then(/^.+ clicks? on the current broker applicant show button$/) do
-  find('.interaction-click-control-broker-show').click
+  find('.interaction-click-control-broker-show').trigger('click')
 end
 
 And(/^.+ should see the broker application$/) do
 end
 
 And(/^.+ clicks? on approve broker button$/) do
-  find('.interaction-click-control-broker-approve').click
+  find('.interaction-click-control-broker-approve').trigger('click')
 end
 
 Then(/^.+ should see the broker successfully approved message$/) do
@@ -67,7 +96,7 @@ Then(/^.+ should see the broker successfully approved message$/) do
 end
 
 And(/^.+ should receive an invitation email$/) do
-  open_email("ricky.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name} ")
+  open_email("ricky.martin@example.com", :with_subject => "Congratulations! Your Broker Application for the #{Settings.site.short_name} for Business has been Approved!")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
   #current_email.should have_subject("Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} ")
 end
@@ -95,6 +124,10 @@ When(/^.+ registers? with valid information$/) do
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'
+end
+
+Then(/^.+ should see bank information$/) do
+  expect(page).to have_content('Big Bank')
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
@@ -185,19 +218,43 @@ Then(/^.* creates and publishes a plan year$/) do
 
   fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"
 
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
-
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax(10)
   find('.carriers-tab a').click
   wait_for_ajax(10,2)
   find('.reference-plan label').click
   wait_for_ajax(10)
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
+
   find('.interaction-click-control-create-plan-year').trigger('click')
   find('.alert-notice')
+
+  if (Settings.aca.enforce_employer_attestation.to_s == "true")
+    find('.interaction-click-control-documents').click
+    wait_for_ajax
+    find('.interaction-click-control-upload').click
+    wait_for_ajax
+    find('#subject_Employee_Attestation').click
+    # There is no way to actually trigger the click and upload functionality
+    # with a JS driver.
+    # So we commit 2 sins:
+    #   1) We make the file input visible so we can set it.
+    #   2) We make the submit button visible so we can click it.
+    execute_script(<<-JSCODE)
+     $('#modal-wrapper div.employee-upload input[type=file]').attr("style", "display: block;");
+    JSCODE
+    wait_for_ajax
+    attach_file("file", "#{Rails.root}/test/JavaScript.pdf")
+    execute_script(<<-JSCODE)
+     $('#modal-wrapper div.employee-upload input[type=submit]').css({"visibility": "visible", "display": "inline-block"});
+    JSCODE
+    find("input[type=submit][value=Upload]").click
+    wait_for_ajax
+  end
+
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-publish-plan-year').click
   wait_for_ajax
@@ -213,8 +270,6 @@ Then(/^(?:(?!Employee).)+ should see the matched employee record form$/) do
 end
 
 Then(/^Broker Assisted is a family$/) do
-  #
-  wait_for_ajax
   find(:xpath, "//li[contains(., 'Families')]/a").click
   expect(page).to have_content('Broker Assisted')
 end
@@ -247,4 +302,33 @@ end
 Then(/^.+ continues to the consumer home page$/) do
   wait_and_confirm_text(/Continue/)
   @browser.a(text: /Continue/).click
+end
+
+Given(/^zip code for county exists as rate reference$/) do
+  FactoryGirl.create(:rating_area, zip_code: '01010', county_name: 'Worcester', rating_area: Settings.aca.rating_areas.first,
+    zip_code_in_multiple_counties: true)
+end
+
+Given(/^a valid ach record exists$/) do
+  FactoryGirl.create(:ach_record, routing_number: '123456789', bank_name: 'Big Bank')
+end
+
+#
+Given(/^enters the existing zip code$/) do
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01010'
+end
+
+Then(/^the county should be autopopulated appropriately$/) do
+  wait_for_ajax
+  select 'Test County', :from => "organization[office_locations_attributes][0][address_attributes][county]"
+  expect(page).to have_select("organization[office_locations_attributes][0][address_attributes][county]", :selected => 'Test County')
+end
+
+Given(/^enters a non existing zip code$/) do
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '11011'
+end
+
+Then(/^the county should not be autopopulated appropriately$/) do
+  wait_for_ajax
+  expect(page).not_to have_select("organization[office_locations_attributes][0][address_attributes][county]", :options => ['Test County'])
 end

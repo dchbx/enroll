@@ -4,14 +4,16 @@ class GeneralAgencyProfile
   include Mongoid::Timestamps
   include AASM
   include AgencyProfile
+  include Config::AcaModelConcern
 
   # for market_kind
-  MARKET_KINDS = %W[individual shop both]
-  MARKET_KINDS_OPTIONS = {
+  MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
+  ALL_MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
-    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+    "Both - Individual & Family AND Small Business Marketplaces" => "both"
   }
+  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
 
 
   field :entity_kind, type: String
@@ -45,7 +47,7 @@ class GeneralAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
+    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
     allow_blank: false
 
   embeds_many :documents, as: :documentable
@@ -127,7 +129,7 @@ class GeneralAgencyProfile
     end
 
     def all_by_broker_role(broker_role, options={})
-      favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue [] 
+      favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue []
       all_ga = if options[:approved_only]
                  all.select{|ga| ga.aasm_state == 'is_approved'}
                else

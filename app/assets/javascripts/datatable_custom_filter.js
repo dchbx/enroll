@@ -1,4 +1,4 @@
-DT = ( function() {
+DT = (function() {
   var clear_level = function(level) {
     level_str = String(level)
     $('.custom_level_' + level_str).addClass("hide")
@@ -41,19 +41,29 @@ DT = ( function() {
       $(that).addClass('active')
       id = $(that).attr('id').substring(4).replace(/\//g,'-')
       $('.Filter-'+id).removeClass('hide')
-      $('.effective-datatable').DataTable().draw()
+      $('.effective-datatable').DataTable().draw();
     })
     $('#date_range_apply').click(function() {
       $('.effective-datatable').DataTable().draw()
     })
-    clear_button_todojf()
+    clear_button_todojf();
     extendDatatableServerParams = function(){
       var keys = {}
       DT.filter_params(keys, 1)
       keys["collection_scope"] = $('#collection_scope').html()
+      var attributes_for_filtering = {"custom_attributes": keys}
+      var current_filter = attributes_for_filtering['custom_attributes']['employers'];
+      var hiredOnCol = document.querySelector('.col-hired_on');
+      /*
+      if (current_filter === 'terminated') {
+        $(".effective-datatable").DataTable().columns('.col-terminated_on').visible(true)
+      } else if(current_filter === 'all'){
+        $(".effective-datatable").DataTable().columns('.col-terminated_on').visible(true)
+      } else {
+        $(".effective-datatable").DataTable().columns('.col-terminated_on').visible(false)
+      }*/
       keys["custom_datatable_date_from"] = $('#custom_datatable_date_from').val()
       keys["custom_datatable_date_to"] = $('#custom_datatable_date_to').val()
-      var attributes_for_filtering = {"custom_attributes": keys}
       return attributes_for_filtering;
     }
   }

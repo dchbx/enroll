@@ -20,8 +20,8 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
 
     let(:benefit_group) { FactoryGirl.create(:benefit_group, reference_plan_id:active_benefit_group_ref_plan.id, elected_plan_ids:[active_benefit_group_ref_plan.id]) }
     let (:active_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on:TimeKeeper.date_of_record.end_of_month,aasm_state: "active",benefit_groups:[benefit_group]) }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [active_plan_year]) }
+    let(:organization)  { employer_profile.organization}
 
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let(:employee_role) { FactoryGirl.create(:employee_role)}

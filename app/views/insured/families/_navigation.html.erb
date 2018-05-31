@@ -1,14 +1,13 @@
 <nav>
   <ul>
     <li <%= menu_tab_class(@tab, 'home') %>>
-      <%= link_to l10n("my_site_short_name", site_short_name: Settings.site.short_name), family_account_path(tab: 'home') %>
+      <%= link_to l10n("my_site_short_name", site_short_name: site_short_name), family_account_path(tab: 'home') %>
     </li>
     <% if ( @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present?) || ( @person.has_active_consumer_role? &&  @person.primary_family.current_broker_agency.present? ) %>
     <li <%= menu_tab_class(@tab, 'broker') %>>
         <%= link_to l10n("my_broker"), brokers_insured_families_path(tab: 'broker') %>
       </li>
     <% end %>
-
     <% if @person.has_consumer_role? %>
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to verification_insured_families_path(tab: 'verification') do %>
@@ -19,7 +18,6 @@
         <% end %>
       </li>
     <% end %>
-
     <% if current_user.has_hbx_staff_role? && @person.has_resident_role? %>
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to upload_application_insured_families_path(tab: 'verification') do %>
@@ -53,7 +51,6 @@
 	    <%= f.first_name %> <%= f.last_name %><br/>
 	  </span>
         <% end %>
-      <% else %>
       <% end %>
 	<br/>
 	<%= link_to l10n("manage_family"), manage_family_insured_families_path(tab: 'family'), class: 'btn btn-default btn-block' %>

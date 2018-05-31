@@ -1,0 +1,5 @@
+<% if user.locked? %>
+  <%= link_to l10n("devise.lockable.admin.unlock_user"), lockable_user_path(user.id), remote: true, class: 'btn btn-default lock-confirm-btn' %>
+<% else %>
+  <%= link_to l10n("devise.lockable.admin.lock_user"), lockable_user_path(user.id), remote: true, class: 'btn btn-default lock-confirm-btn' %>
+<% end %>

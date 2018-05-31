@@ -59,8 +59,7 @@ FactoryGirl.define do
       end
       after :create do |organization, evaluator|
         start_on = (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year
-        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "active",
-          :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5
+        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "active", :start_on => start_on, :end_on => start_on + 1.year - 1.day, fte_count: 5
         start_on = (TimeKeeper.date_of_record + 2.months).beginning_of_month
         renewing_plan_year = FactoryGirl.create(:future_plan_year, employer_profile: organization.employer_profile, aasm_state: "renewing_enrolling")
         benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
@@ -99,6 +98,22 @@ FactoryGirl.define do
     end
   end
 
+  trait :conversion_employer_with_expired_and_active_plan_years do
+    before :create do |organization, evaluator|
+      organization.employer_profile = FactoryGirl.create :employer_profile, organization: organization, registered_on: Date.new(2017,12,1), profile_source: "conversion"
+    end
+    after :create do |organization, evaluator|
+      start_on = (TimeKeeper.date_of_record).beginning_of_month - 1.year
+      expired_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "expired",
+                                             :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5, :is_conversion => true
+      start_on = (TimeKeeper.date_of_record).beginning_of_month
+      active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "active",
+                                            :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks, fte_count: 5, :is_conversion => true
+      expired_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: expired_plan_year
+      active_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
+    end
+  end
+
   factory :broker_agency, class: Organization do
     sequence(:legal_name) {|n| "Broker Agency#{n}" }
     sequence(:dba) {|n| "Broker Agency#{n}" }
@@ -114,6 +129,24 @@ FactoryGirl.define do
 
     after(:create) do |organization|
       FactoryGirl.create(:broker_agency_profile, organization: organization)
+    end
+
+    trait :shop_only do
+      after(:create) do |organization|
+        FactoryGirl.create(:broker_agency_profile, market_kind: "shop", organization: organization)
+      end
+    end
+
+    trait :ivl_only do
+      after(:create) do |organization|
+        FactoryGirl.create(:broker_agency_profile, market_kind: "individual", organization: organization)
+      end
+    end
+
+    trait :both_ivl_and_shop do
+      after(:create) do |organization|
+        FactoryGirl.create(:broker_agency_profile, market_kind: "both", organization: organization)
+      end
     end
   end
 

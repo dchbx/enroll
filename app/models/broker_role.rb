@@ -14,14 +14,18 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  BROKER_CARRIER_APPOINTMENTS = {"Aetna Health Inc" => nil,
-    "Aetna Life Insurance Company" => nil,
-     "Carefirst Bluechoice Inc" => nil,
-     "Group Hospitalization and Medical Services Inc" => nil,
-     "Kaiser Foundation" => nil,
-     "Optimum Choice" => nil,
-     "United Health Care Insurance" => nil,
-     "United Health Care Mid Atlantic" => nil}
+  BROKER_CARRIER_APPOINTMENTS = {"Altus" => nil,
+    "Blue Cross Blue Shield MA" => nil,
+     "Boston Medical Center Health Plan" => nil,
+     "Delta" => nil,
+     "FCHP" => nil,
+     "Guardian" => nil,
+     "Health New England" => nil,
+     "Harvard Pilgrim Health Care" => nil,
+     "Minuteman Health" => nil,
+     "Neighborhood Health Plan" => nil,
+     "Tufts Health Plan Direct" => nil,
+     "Tufts Health Plan Premier" => nil}
 
   embedded_in :person
 

@@ -149,7 +149,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date)
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
       sep_request_denial_notice
     elsif is_ee_sep_request_accepted?
       ee_sep_request_accepted_notice
@@ -241,10 +241,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def sep_request_denial_notice
+    # options will be {qle_reported_date: "%m/%d/%Y", qle_id: "59a068feb49a96cb6500000e"}
     begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice", qle_reported_date: @qle_date.to_s, qle_id: @qle.id.to_s)
     rescue Exception => e
-      log("#{e.message}; person_id: #{@person.id}")
+      log("#{e.message}; person_id: #{@person.hbx_id}")
     end
   end
 
@@ -313,18 +314,18 @@ class Insured::FamiliesController < FamiliesController
       end
     else
       if @person.active_employee_roles.present?
-        if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
-        else
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
-        end
-      else @person.consumer_role.present?
-        if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
-        else
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-        end
-      end
+         if current_user.has_hbx_staff_role?
+           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
+         else
+           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+         end
+       else @person.consumer_role.present?
+         if current_user.has_hbx_staff_role?
+           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+         else
+           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+         end
+       end
     end
   end
 
@@ -369,7 +370,7 @@ class Insured::FamiliesController < FamiliesController
   def notice_upload_email
     if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
       (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
-      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
+      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from #{site_short_name}", @person.work_email_or_best).deliver_now
     end
   end
 
@@ -377,7 +378,7 @@ class Insured::FamiliesController < FamiliesController
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
-    @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
+    @person.inbox.messages << Message.new(subject: subject, body: body, from: site_short_name)
     @person.save!
   end
 
@@ -387,7 +388,7 @@ class Insured::FamiliesController < FamiliesController
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
-    @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
+    @qle_date_calc = @qle_date - aca_qle_period.days
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id

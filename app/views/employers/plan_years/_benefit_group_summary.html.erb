@@ -1,0 +1,50 @@
+<% if bg.sole_source? %>
+  <div class="col-xs-12">
+    <table class="benefit-group-contribution-table">
+      <tr>
+        <th>Member Type</th>
+        <th class="text-center">Employer Share</th>
+        <th class="text-right">Employee</th>
+        <th class="text-right">Employer</th>
+        <th class="text-right">Total</th>
+      </tr>
+      <% bg.sorted_composite_tier_contributions.each_with_index do |ct, i| %>
+      <tr class="<% if ct.offered %>offered<% else %>not-offered <% end %>">
+        <td><%= ct.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= t("shop.composite_tiers.#{ct.composite_rating_tier}") %></td>
+        <td class="pct text-center">
+          <strong><%= number_to_percentage ct.employer_contribution_percent.ceil, precision: 0 %></strong>
+        </td>
+        <td class="text-right">
+          <strong><%= number_to_currency(ct.employee_contribution) %></strong>
+        </td>
+        <td class="text-right">
+           <strong><%= number_to_currency(ct.employer_contribution) %></strong>
+        </td>
+        <td class="text-right">
+          <strong><%= number_to_currency(ct.display_premium) %></strong>
+        </td>
+      </tr>
+      <% end %>
+      <tr></tr>
+    </table>
+  </div>
+<% else %>
+  <div class="col-xs-12">
+    <table class="benefit-group-contribution-table">
+      <tr>
+        <th>Offered</th>
+        <th>Employer
+          <% if bg.is_offering_dental? %>Health
+          <% end %>Contribution</th>
+      </tr>
+      <% bg.relationship_benefits.each_with_index do |rb, i| %>
+      <tr class="<% if rb.offered %>offered<% else %>not-offered <% end %>">
+        <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+        <td id="pct">
+          <strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong>
+        </td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+<% end %>

@@ -9,7 +9,7 @@
                                     "https://dchealthlink.com/"
                                     target=
                                     "_blank">
-                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "250"  %>
+                                    <%= image_tag "#{Rails.root}/app/assets/images/health_connector.png", style: "height: auto; vertical-align: top;", width: "250"  %>
                                   </a></td>
     </tr>
   </tbody>
@@ -124,7 +124,7 @@
       <td><h3 style="color:rgb(54,95,145);">Next Steps</h3></td>
     </tr>
 <tr class="mar20 fssizeuser">
-      <td>If you have not already, you will receive an invoice from your health plan or dental plan.  <strong>You must pay your premiums directly to the health plan or dental plan <span style="text-decoration:underline;">by the date indicated on that invoice.</span></strong>  <%= Settings.site.short_name %> is NOT responsible for collecting your premiums.</td>
+      <td>If you have not already, you will receive an invoice from your health plan or dental plan.  <strong>You must pay your premiums directly to the health plan or dental plan <span style="text-decoration:underline;">by the date indicated on that invoice.</span></strong>  <%= site_short_name %> is NOT responsible for collecting your premiums.</td>
     </tr>
 
     <tr class="mar20 fssizeuser">
@@ -184,7 +184,7 @@
       <td><h3 style="color:rgb(54,95,145);">Ending Your Health Insurance Coverage</h3></td>
     </tr>
 <tr class="mar20 fssizeuser">
-      <td>You have the right to terminate your health insurance coverage. You can terminate your coverage online using your "My Account", available at <%= Settings.site.website %>, by calling <%= Settings.contact_center.name %> toll-free at <%= Settings.contact_center.phone_number %>, or by contacting your health plan. Your health plan can tell you how much notice you must give, but the plan might require notice of up to fourteen (14) days before the requested coverage end date.</td>
+      <td>You have the right to terminate your health insurance coverage. You can terminate your coverage online using your "My Account", available at <%= site_home_url %>, by calling <%= contact_center_name %> toll-free at <%= contact_center_phone_number %>, or by contacting your health plan. Your health plan can tell you how much notice you must give, but the plan might require notice of up to fourteen (14) days before the requested coverage end date.</td>
     </tr>
 
     <tr class="mar20 fssizeuser">
@@ -199,11 +199,11 @@
       <td><h3 style="color:rgb(54,95,145);">Your Secure User Account</h3></td>
     </tr>
 <tr class="mar20 fssizeuser">
-      <td>Your "My Account" available at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%> is a place where important information about your account is stored.  You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it by calling the <%= Settings.contact_center.name %> toll free at <%= Settings.contact_center.phone_number %>.  There is also a "Forgot Password" feature on the website where you can reset the password after answering security questions you created when establishing your account.</td>
+      <td>Your "My Account" available at <%= site_home_link %> is a place where important information about your account is stored.  You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it by calling the <%= contact_center_name %> toll free at <%= contact_center_phone_number %>.  There is also a "Forgot Password" feature on the website where you can reset the password after answering security questions you created when establishing your account.</td>
     </tr>
 
     <tr class="mar20 fssizeuser">
-      <td><strong><i>If you do not have a "My Account"</i></strong>, you can create one at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>  On the main page, click on "Login" in the upper-right corner.  On the next page, click the third option, "Create Account."  Once the account is created, select "Find an already submitted application" and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= Settings.site.short_name %></td>
+      <td><strong><i>If you do not have a "My Account"</i></strong>, you can create one at <%= site_home_link %>  On the main page, click on "Login" in the upper-right corner.  On the next page, click the third option, "Create Account."  Once the account is created, select "Find an already submitted application" and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= site_short_name %></td>
     </tr>
     </tbody>
     </table>
@@ -215,7 +215,7 @@
       <td><h3 style="color:rgb(54,95,145);">REMINDER</h3></td>
     </tr>
 <tr class="mar20 fssizeuser">
-      <td>If your renewal is "Conditional", you still need to submit documents by the deadline indicated on the notices sent to you.  Failure to submit these documents could result in termination of your plan and you may not be able to enroll in coverage until 2017.  You can upload documents through your "My Account" available at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%> You can also mail in the documents or bring them into a service center.</td>
+      <td>If your renewal is "Conditional", you still need to submit documents by the deadline indicated on the notices sent to you.  Failure to submit these documents could result in termination of your plan and you may not be able to enroll in coverage until 2017.  You can upload documents through your "My Account" available at <%= site_home_link %>  You can also mail in the documents or bring them into a service center.</td>
     </tr>
     </tbody>
     </table>

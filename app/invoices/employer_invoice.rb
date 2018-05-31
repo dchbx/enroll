@@ -1,5 +1,8 @@
 class EmployerInvoice
   include InvoiceHelper
+  include Config::AcaHelper
+  include Config::SiteHelper
+  include Config::ContactCenterHelper
 
   attr_reader :errors
 
@@ -21,10 +24,20 @@ class EmployerInvoice
         FileUtils.mkdir_p(invoice_folder_path)
       end
       pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
+      unless fetch_invoices_addendum.blank?
+        join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', fetch_invoices_addendum)]
+      end
     rescue Exception => e
       @errors << "Unable to create PDF for #{@organization.hbx_id}."
       @errors << e.inspect
     end
+  end
+
+
+  def join_pdfs(pdfs)
+    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf << CombinePDF.load(pdfs[1])
+    pdf.save invoice_absolute_file_path
   end
 
   def save_to_cloud
@@ -48,11 +61,11 @@ class EmployerInvoice
   def send_email_notice
     unless (@organization.employer_profile.is_new_employer? && @organization.invoices.empty?)
       subject = "Invoice Now Available"
-      body = "Your invoice is now available in your employer profile under Billing tab. Thank You"
+      body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
       message_params = {
         sender_id: "admins",
         parent_message_id: @organization.employer_profile.id,
-        from: "DC Health Link",
+        from: Settings.site.short_name,
         to: "Employer Mailbox",
         subject: subject,
         body: body
@@ -65,9 +78,15 @@ class EmployerInvoice
     File.delete(file)
   end
 
+  # It will trigger initial invoice notice
+  # Should trigger for regular employers but on conversion employers
+  # should not trigger with plan year is in renewal related states
+  # should trigger on conversion employers who has PlanYear::PUBLISHED
   def send_first_invoice_available_notice
-    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
-      @organization.employer_profile.trigger_notices("initial_employer_first_invoice_available")
+    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting_with_renewal_state? && (@organization.invoices.size < 1)
+      plan_year = @organization.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
+      observer = Observers::Observer.new
+      observer.trigger_notice(recipient: @organization.employer_profile, event_object: plan_year, notice_event: "initial_employer_invoice_available") if plan_year.present?
     end
   end
 

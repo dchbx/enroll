@@ -24,7 +24,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
         content: "As we previously notified you, you and/or members of your household are eligible to enroll in a
-  health insurance plan through #{Settings.site.short_name} and receive tax credits to help pay for the cost of your insurance."} %>
+  health insurance plan through #{site_short_name} and receive tax credits to help pay for the cost of your insurance."} %>
 
 
 
@@ -62,10 +62,10 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments.inject([]){|plans, enrollment| plans << "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;#{enrollment.plan_name} at [#{enrollment.phone}]"}.join("<br>")} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-        contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.
-      If you don’t have an account already, you can create one by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}/a>.
-      You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer
-      Service toll-free at #{Settings.contact_center.phone_number}."],
+        contents: ["Important information is stored in your account on the #{site_short_name} website.
+      If you don’t have an account already, you can create one by going to #{site_home_link.html_safe}.
+      You can get help with logging in or creating an account by calling #{site_short_name} Customer
+      Service toll-free at #{contact_center_phone_number}."],
         heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<div style='text-decoration: underline;'>#{notice.enrollments[0].plan_name}</div>"], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
@@ -80,7 +80,7 @@
     <%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["Your Total Monthly Premium Cost:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(enrollment.premium)}"] } %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If you do not make your monthly premium payments on time, you could lose your health insurance.</strong> 45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment. <strong>You must pay your premiums directly to the health plan or dental plan <u>by the date indicated on that invoice</u></strong>.  #{Settings.site.short_name} is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously established with your health insurance company prior to enrolling through #{Settings.site.short_name} will not carry-over; you must make new payment arrangements."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If you do not make your monthly premium payments on time, you could lose your health insurance.</strong> 45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment. <strong>You must pay your premiums directly to the health plan or dental plan <u>by the date indicated on that invoice</u></strong>.  #{site_short_name} is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously established with your health insurance company prior to enrolling through #{site_short_name} will not carry-over; you must make new payment arrangements."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "The fastest way to pay the premium is by calling the health plan or dental plan directly at the numbers listed below.  <u>Call these numbers to ensure your premium is paid even if you have not received an invoice.</u>"} %>
 
@@ -94,7 +94,7 @@
                ['Dominion Dental', '(888) 518-5338']],
         col_styles: ['width: 50%;', 'width: 50%;']} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You did not apply for cost-sharing reductions. 45 C.F.R. §155.305(g). Therefore, your deductible, out-of-pocket maximum, and co-payments are not reduced. A more detailed explanation of costs and benefits can be found in your plan’s Summary of Benefits and Coverage, available on<a style='color:rgb(0,0,241)'> #{Settings.site.website_name}. </a>"], heading: 'What You Must Pay When You Receive Health Services', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You did not apply for cost-sharing reductions. 45 C.F.R. §155.305(g). Therefore, your deductible, out-of-pocket maximum, and co-payments are not reduced. A more detailed explanation of costs and benefits can be found in your plan’s Summary of Benefits and Coverage, available on #{site_home_link.html_safe}"], heading: 'What You Must Pay When You Receive Health Services', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You must report any changes that might affect you or your household member’s health coverage such as if:"], heading: 'Reporting Changes', sub_heading: ''} %>
 
@@ -105,10 +105,10 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "45 C.F.R. § 155.330(b)"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "To report changes, you can log in to your account on #{Settings.site.website_name} or call #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number}."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "To report changes, you can log in to your account on #{site_home_link.html_safe} or call #{contact_center_name} toll free at #{contact_center_phone_number}."} %>
 
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to #{Settings.site.website_name} or calling #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}. If you have a change in circumstances during #{notice.enrollments[0].effective_on.year}, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include:"], heading: 'Changing Plans', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to #{site_home_link.html_safe} or calling #{contact_center_name} at #{contact_center_phone_number}. If you have a change in circumstances during #{notice.enrollments[0].effective_on.year}, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include:"], heading: 'Changing Plans', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                           ["Getting married",
@@ -119,16 +119,16 @@
                                                                            "A change in income for you or others in your household.",
                                                                            "A change in the immigration status of your household members",
                                                                            "A material violation of your health or dental plan contract by your plan sponsor",
-                                                                           "Becoming eligible for Medicaid, employer-sponsored insurance, or other insurance outside of #{Settings.site.short_name}."] } %>
+                                                                           "Becoming eligible for Medicaid, employer-sponsored insurance, or other insurance outside of #{site_short_name}."] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "45 C.F.R. §155.420"} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have the right to terminate your health insurance coverage. You can terminate your coverage by logging into your account on #{Settings.site.website_name} or by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}. You need to tell us at least fourteen (14) days before you want your coverage to end."], heading: 'Ending Your Health Insurance Coverage', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have the right to terminate your health insurance coverage. You can terminate your coverage by logging into your account on #{site_home_link.html_safe} or by calling #{contact_center_name} toll-free at #{contact_center_phone_number}. You need to tell us at least fourteen (14) days before you want your coverage to end."], heading: 'Ending Your Health Insurance Coverage', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates that the information you put on your application has changed and you are no longer eligible for coverage. If your health insurance is going to be terminated without your request because it has been determined that you are no longer eligible for coverage, you will receive a notice in advance telling you the basis for the decision and you will be provided with information about how to contest the decision."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to <a style='color:rgb(0,0,241)'>#{Settings.site.website_name}.</a> You can get help with logging in or creating an account by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."], heading: 'Your Secure User Account', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Important information is stored in your account on the #{site_short_name} website.  If you don’t have an account already, you can create one by going to #{site_home_link.html_safe} You can get help with logging in or creating an account by calling #{contact_center_name} toll-free at #{contact_center_phone_number}."], heading: 'Your Secure User Account', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<b>Annual Renewal</b>: #{Settings.site.short_name} will notify you during the fall of each year if additional information is needed from you to renew your health insurance.  You can respond with new information if you believe any of the information we used is wrong. You can also pick a new plan during this time period if you want.  45 C.F.R. §155.335."], heading: 'Other Information', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<b>Annual Renewal</b>: #{site_short_name} will notify you during the fall of each year if additional information is needed from you to renew your health insurance.  You can respond with new information if you believe any of the information we used is wrong. You can also pick a new plan during this time period if you want.  45 C.F.R. §155.335."], heading: 'Other Information', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal by <b>#{(TimeKeeper.date_of_record + 95.days).strftime('%m/%d/%Y')}</b>.   #{Settings.site.short_name} will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  <b>See the insert for more information on your appeal rights.</b>  45 C.F.R. §155.520"], heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal by <b>#{(TimeKeeper.date_of_record + 95.days).strftime('%m/%d/%Y')}</b>.   #{site_short_name} will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  <b>See the insert for more information on your appeal rights.</b>  45 C.F.R. §155.520"], heading: 'If You Think We Made a Mistake', sub_heading: ''} %>

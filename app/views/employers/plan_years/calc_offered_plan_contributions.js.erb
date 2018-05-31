@@ -9,17 +9,37 @@ $("#<%= @location_id %> <%= @coverage_type %> .reference-steps .dental .nav-tabs
 $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .row:first").hide();
 $("#<%= @location_id %> .dental .reference-steps div:first").hide()
 $("#<%= @location_id %> <%= @coverage_type %> .col-md-12.top-pd").hide();
+$('.benefits-fields').css('pointer-events','');
+$('.composite-offerings').css('opacity','1');
+
+
+$(document).ready(function(){
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").datepicker( "option", "maxDate", "<%= @plan_year.start_on.prev_day %>");
+  setOpenEnrollmentDatePicker();
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").change(function(){
+    setOpenEnrollmentDatePicker();
+  });
+})
+
+function setOpenEnrollmentDatePicker(){
+  var d = new Date($("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val())
+  d.setDate(d.getDate()-5);
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "maxDate", d);
+}
 
 //unbind checkbox handlers
-$('#<%= @location_id %> <%= @coverage_type %> .checkbox label input[type="checkbox"]').unbind();
+//$('#<%= @location_id %> <%= @coverage_type %> .checkbox label input[type="checkbox"]').unbind();
 //$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
 
 // show dental config links
-$("#<%= @location_id %> .dental-config-links").show();
 
+<% if (Settings.aca.dental_plan_years_available.include? @plan_year.start_on.year.to_s) %>
+ $("#<%= @location_id %> .dental-config-links").show();
+  $("#<%= @location_id %> .show-dental-plans").show();
 if ( $("#<%= @location_id %> .edit-add-dental").is(':hidden') ) {
     $("#<%= @location_id %> .select-dental-plan").show();
 };
+<% end %>
 
 $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   // clear dental plan form
@@ -34,7 +54,7 @@ $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   $("#<%= @location_id %> .edit-add-dental").fadeIn();
   $("#<%= @location_id %> .dental-plan-offering, #<%= @location_id %> .reference-steps .dental:first").show();
   $("#<%= @location_id %> .select-dental-plan").prev().show();
-  validateEditPlanYear();
+  //validateEditPlanYear();
   $("#<%= @location_id %> .edit-add-dental, #<%= @location_id %> .dental .nav-tabs").show();
 
 });
@@ -71,15 +91,61 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
 
   } else {
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
+      $('.benefits-fields').css('pointer-events','none');
+      $('.composite-offerings').css('opacity','0.5');
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();
+      var position = $(this).closest('#<%= @location_id %>').find('.reference-steps:first').offset().top;
+      $('html, body').animate({
+                          scrollTop: position
+                      }, 500);
+     $(this).closest('.benefit-group-fields').find('.health .carriers-tab').show();
+
+     var start_on = $("#plan_year_start_on").val().substr(0,4);
+     var selected_carrier_level = $('.health .nav li input:checked').val();
+     var employer_profile_id = $('#employerProfileId').data('value');
+     var benefit_group_id = $('#benefitGroupId').data('value');
+     var location_id = $('.health .nav li:visible').closest('fieldset').attr('id');
+     $.ajax({
+       type: "GET",
+       data:{
+         start_on: start_on,
+         selected_carrier_level: selected_carrier_level,
+         benefit_group: benefit_group_id,
+         location_id: location_id
+       },
+       url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
+     });
+
+      var plan_options = $(this).closest('.benefit-group-fields').find('.health .plan-options');
+      plan_options.slideDown();
+
+      $('.tab-container').hide();
+      if (selected_carrier_level == 'sole_source') {
+        $('.sole-source-plan-tab').show();
+        plan_options.find('.sole-source-plan-tab').show();
+      } else if (selected_carrier_level == 'single_plan') {
+        $('.single-plan-tab').show();
+        plan_options.find('.single-plan-tab').show();
+      } else if (selected_carrier_level == 'metal_level') {
+        $('.metal-level-tab').show();
+        plan_options.find('.metals-tab').show();
+      } else if (selected_carrier_level == 'single_carrier') {
+        $('.single-carrier-tab').show();
+        plan_options.find('.carriers-tab').show();
+      }
+      $('.health .nav li input:checked').parent().addClass('active');
+
       $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
-      validateEditPlanYear();
+
+      //validateEditPlanYear();
     });
 
   }
   $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {
+    $('.benefits-fields').css('pointer-events','none');
+    $('.composite-offerings').css('opacity','0.5');
     $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').hide();
     if ( '<%= @coverage_type %>' == '.dental' ) {
       $(this).closest('.select-dental-plan').find('.edit-offering').show();
@@ -87,6 +153,37 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
     } else {
       $('#<%= @location_id %>').find('.reference-steps:first').show();
       $('#<%= @location_id %> <%= @coverage_type %>').find('.health').find('.nav-tabs').show();
+      var position = $(this).closest('#<%= @location_id %>').find('.reference-steps:first').offset().top;
+      $('html, body').animate({
+                          scrollTop: position
+                      }, 500);
+      $(this).closest('.benefit-group-fields').find('.health .carriers-tab').show();
+      var start_on = $("#plan_year_start_on").val().substr(0,4);
+      var selected_carrier_level = $('.health .nav li input:checked').val();
+      var employer_profile_id = $('#employerProfileId').data('value');
+      var benefit_group_id = $('#benefitGroupId').data('value');
+      var location_id = $('.health .nav li:visible').closest('fieldset').attr('id');
+      $.ajax({
+        type: "GET",
+        data:{
+          start_on: start_on,
+          selected_carrier_level: selected_carrier_level,
+          benefit_group: benefit_group_id,
+          location_id: location_id
+        },
+        url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
+      });
+      $('.tab-container').hide();
+      if (selected_carrier_level == 'sole_source') {
+        $('.sole-source-plan-tab').show();
+      } else if (selected_carrier_level == 'single_plan') {
+        $('.single-plan-tab').show();
+      } else if (selected_carrier_level == 'metal_level') {
+        $('.metal-level-tab').show();
+      } else if (selected_carrier_level == 'single_carrier') {
+        $('.single-carrier-tab').show();
+      }
+      $(this).closest('.benefit-group-fields').find('.health .plan-options').slideDown();
     }
   });
 

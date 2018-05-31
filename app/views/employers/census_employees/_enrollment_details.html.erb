@@ -22,9 +22,9 @@
         <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
         <td><%= number_to_currency(@plan.total_employee_cost) %></td>
         <% else %>
-        <td><%= number_to_currency(@plan.premium_for(member)) %></td>
-        <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
-        <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+        <td><%= @plan.sole_source? ? "--" : number_to_currency(@plan.premium_for(member)) %></td>
+        <td><%= @plan.sole_source? ? "--" : number_to_currency(@plan.employer_contribution_for(member)) %></td>
+        <td><%= @plan.sole_source? ? "--" : number_to_currency(@plan.employee_cost_for(member)) %></td>
         <% end %>
       </tr>
       <% end %>

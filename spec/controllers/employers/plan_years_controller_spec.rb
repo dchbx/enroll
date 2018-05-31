@@ -3,14 +3,23 @@ require 'rails_helper'
 RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:employer_profile_id) { EmployerProfile.new.id}
   let(:plan_year_proxy) { double(id: "id") }
-  let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
+  let(:service_area_one) { double(issuer_hios_id: '1', service_area_zipcode: '11111') }
+  let(:service_area_two) { double(issuer_hios_id: '2') }
+  let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
+  let(:organization) { double(:organization, primary_office_location: office_location) }
+  let(:address) { double(:address, zip: '11111', county: 'county', state: Settings.aca.state_abbreviation) }
+  let(:office_location) { double(:office_location, address: address) }
 
-  let(:user) { FactoryGirl.create(:user) } 
+  let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.create(:person, user: user) }
   let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
 
   describe "GET reference_plan_summary" do
     let(:qhp_cost_share_variance){ Products::QhpCostShareVariance.new }
+
+    before do
+      allow(EmployerProfile).to receive(:find).with('1111').and_return(employer_profile)
+    end
     it 'should return qhp cost share variance for the plan' do
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return([qhp_cost_share_variance])
       sign_in
@@ -24,38 +33,69 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   end
 
   describe "GET new" do
+    let(:address) { double(:address, zip: '10001') }
+    let(:office_location) { double(:office_location, address: address)}
+    let(:organization) { double(:organization, primary_office_location: office_location) }
+    let(:employer_profile) { double(:employer_profile, organization: organization, service_areas: service_areas) }
+    let(:employer_profile_no_service_area) { double(:employer_profile, organization: organization, service_areas: []) }
+    let(:service_areas) { [service_area] }
+    let(:service_area) { double }
 
-    before :each do
-      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
-      sign_in user
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
-      get :new, :employer_profile_id => employer_profile_id
+    context "when constrain_service_areas is false" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in user
+        allow(employer_profile).to receive(:constrain_service_areas?).and_return(false)
+        allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location).and_return({'id' => "legal_name"})
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
+
+        get :new, :employer_profile_id => employer_profile_id
+      end
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render the new template" do
+        expect(response).to render_template("new")
+      end
+
+      ## Don't generate carriers on page load anymore
+      it "should generate benefit_group with nil plan_option_kind" do
+        benefit_group = assigns(:plan_year).benefit_groups.first
+        expect(benefit_group.plan_option_kind).to eq nil
+      end
     end
 
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
-    end
+    context "when constrain_service_areas is true and no service areas" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in user
+        allow(employer_profile_no_service_area).to receive(:constrain_service_areas?).and_return(true)
+        allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile_no_service_area)
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location).and_return({'id' => "legal_name"})
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
 
-    it "should render the new template" do
-      expect(response).to render_template("new")
-    end
+        get :new, :employer_profile_id => employer_profile_id
+      end
 
-    it "should generate carriers" do
-      expect(assigns(:carrier_names)).to eq({'id' => "legal_name"})
-      expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
-    end
+      it "should be a redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
 
-    it "should generate benefit_group with nil plan_option_kind" do
-      benefit_group = assigns(:plan_year).benefit_groups.first
-      expect(benefit_group.plan_option_kind).to eq nil
+      it "should redirect back to Employer Profile page" do
+        expect(response).to redirect_to(employers_employer_profile_path(employer_profile_no_service_area, :tab => "benefits"))
+      end
     end
   end
 
   describe "GET calc_employer_contributions" do
-    let(:employer_profile){ double("EmployerProfile") }
+    let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
+    let(:carrier_profile) { double(:carrier_profile, id: 'carrier_id')}
     let(:reference_plan){ double("ReferencePlan", id: "id") }
     let(:plan_years){ [double("PlanYear")] }
+
     let(:benefit_groups){ [
       double(
         "BenefitGroup",
@@ -68,6 +108,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       it "should calculate employer contributions" do
         allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
         allow(Plan).to receive(:find).and_return(reference_plan)
+        allow(reference_plan).to receive(:carrier_profile_id).and_return('carrier_id')
         allow(Forms::PlanYearForm).to receive(:build).and_return(plan_years.first)
         allow(plan_years.first).to receive(:benefit_groups).and_return(benefit_groups)
         allow(benefit_groups.first).to receive(:reference_plan=).and_return(plan)
@@ -81,11 +122,13 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       let(:plan_year) {FactoryGirl.build(:plan_year)}
 
       before :each do
+        allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in user
-        allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+        allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
         allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
       end
 
       context "when draft state" do
@@ -103,6 +146,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
         it "should generate carriers" do
           expect(assigns(:carrier_names)).to eq({"id"=> "legal_name"})
+          expect(assigns(:carrier_names_with_sole_source)).to eq({"id"=> "sole_source_legal_name"})
           expect(assigns(:carriers_array)).to eq [["legal_name", "id"]]
         end
       end
@@ -194,6 +238,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     allow(benefit_group).to receive(:dental_plan_option_kind).and_return("single_carrier")
     allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
     allow(benefit_group).to receive(:elected_dental_plans_by_option_kind).and_return([])
+    allow(benefit_group).to receive(:build_estimated_composite_rates)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
@@ -329,6 +374,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   allow(benefit_group).to receive(:default=)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
+      allow(benefit_group).to receive(:sole_source?).and_return(false)
       allow(plan_year).to receive(:save).and_return(save_result)
       allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
@@ -443,6 +489,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:renewing_publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:application_errors)
+      allow(plan_year_proxy).to receive(:application_eligibility_warnings).and_return({})
     end
 
     context "plan year published sucessfully" do
@@ -473,8 +520,8 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     context "plan year did not publish due to warnings" do
       before :each do
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
-        allow(plan_year_proxy).to receive(:is_application_eligible?).and_return(false)
-        allow(plan_year_proxy).to receive(:application_eligibility_warnings)
+        allow(plan_year_proxy).to receive(:withdraw_pending!).and_return(true)
+        allow(plan_year_proxy).to receive(:application_eligibility_warnings).and_return({primary_office_location: "address located outside the state"})
       end
 
       it "should be a render modal box with warnings" do
@@ -536,7 +583,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
   end
 
-  describe "POST force publish" do
+  describe "POST Publish Anyways" do
     let(:plan_year_id) { "plan_year_id"}
     let(:plan_year_proxy) { instance_double("PlanYear", publish: double)}
 
@@ -595,8 +642,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET search_reference_plan" do
     let(:plan) {FactoryGirl.create(:plan)}
+    let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
+
     before :each do
       sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       xhr :get, :search_reference_plan, employer_profile_id: employer_profile_id, location_id: "test", reference_plan_id: plan.id, start_on: "2015-10-01", format: :js
     end
 
@@ -618,21 +668,26 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:census_employees) { double }
-
+    let(:plan) { double }
     before do
+      allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
       @employer_profile = FactoryGirl.create(:employer_profile)
       @reference_plan = benefit_group.reference_plan
       Caches::PlanDetails.load_record_cache!
       @census_employees = [census_employee, census_employee]
+      @carrier_profile = @reference_plan.carrier_profile
     end
 
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with(@employer_profile.id).and_return(@employer_profile)
       allow(Forms::PlanYearForm).to receive(:build).and_return(plan_year)
+      allow(Plan).to receive(:find).with(@reference_plan.id).and_return(@reference_plan)
+      allow(@reference_plan).to receive(:carrier_profile_id).and_return(@carrier_profile.id)
       allow(plan_year).to receive(:benefit_groups).and_return(benefit_group.to_a)
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)
       allow(plan_year).to receive(:employer_profile).and_return(@employer_profile)
+      allow(benefit_group).to receive(:employee_cost_for_plan).and_return(1)
       sign_in
       xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id, coverage_type: '.health'
 
@@ -646,7 +701,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       let(:bad_entity_kind) { "fraternity" }
       let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: Settings.aca.state_abbreviation, zip: "20002", county: "SomeCounty") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
@@ -679,13 +734,16 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         py.open_enrollment_end_on = py.open_enrollment_start_on - 1.day
         py
       end
-      let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+      let(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
 
       let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
       let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
-      let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+      let(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
 
       before do
+        allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
+        allow(employer_profile).to receive(:service_areas).and_return([double])
+        allow(employer_profile).to receive(:service_areas_available_on).with(plan_year.start_on).and_return([double])
         employer_profile.save(:validate => false)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in user
@@ -713,7 +771,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:bad_entity_kind) { "fraternity" }
     let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-    let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: Settings.aca.state_abbreviation, zip: "20002", county: "Bucks") }
     let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
@@ -725,7 +783,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         )
     end
 
-    let(:organization) { Organization.create(
+    let!(:organization) { Organization.create(
       legal_name: "Sail Adventures, Inc",
       dba: "Sail Away",
       fein: "001223333",
@@ -742,11 +800,15 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
-    let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let(:employer_profile)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year]) }
 
     let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
-    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+    let(:employer_profile1)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year, new_plan_year]) }
+
+    before :each do
+      allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
+    end
 
     context 'when same plan year' do
       before do

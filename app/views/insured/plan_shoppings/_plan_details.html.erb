@@ -40,28 +40,31 @@
         <table class="table gn-10">
           <thead>
           <tr>
-            <th>TYPE</th>
-            <th>LEVEL</th>
-            <th>NETWORK</th>
-            <th>
-              <% if @hbx_enrollment.hbx_enrollment_members.size > 1 %>
-                FAMILY DEDUCTIBLE
-              <% else %>
-                DEDUCTIBLE
-              <% end %>
-            </th>
+            <th><%= l10n("type").to_s.upcase %></th>
+            <th><%= l10n("level").to_s.upcase %></th>
+            <th><%= l10n("network").to_s.upcase %></th>
+            <th><%= l10n("deductible").to_s.upcase %></th>
           </tr>
           </thead>
           <tbody>
             <tr>
               <td><%= plan.plan_type ? plan.plan_type.upcase : "" %></td>
               <td>
-                <% plan_level = plan.metal_level.humanize %>
+                <% plan_level = plan.metal_level.titleize %>
                 <span class="<%= plan_level.downcase %>-icon">
-                  <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize %>
+                  <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).titleize %>
                 </span>
               </td>
-              <td><%= plan.nationwide ? "Nationwide" : "DC-Metro" %></td>
+              <td>
+                <% if offers_nationwide_plans? %>
+                  <%= plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                <% else %>
+                  <% if plan.network_information.present? %>
+                      Network Notes
+                      <i class='fa fa-question-circle' data-toggle="tooltip" title="<%= plan.network_information %>"></i>
+                  <% end %>
+                <% end %>
+              </td>
               <td> <%= deductible_display(@hbx_enrollment, plan) %> </td>
             </tr>
           </tbody>
@@ -73,7 +76,7 @@
         <div class="checkbox no-buffer">
           <label>
             <input id="compare_plan_checkbox" type="checkbox" class="checkbox-custom select-plan-for-comparison" data-hbx-id="<%= @hbx_enrollment.id %>" data-hios-id="<%= plan.hios_id %>" data-plan-year="<%= plan.active_year %>" data-plan-enrollment-kind="<%= @enrollment_kind %>" data-plan-change-plan="<%= @change_plan%>"></input>
-            <span for="compare_plan_checkbox" class="checkbox-custom-label" style="font-weight: bold;">Compare</span>
+            <span for="compare_plan_checkbox" class="checkbox-custom-label" style="font-weight: bold;"><%= l10n("compare") %></span>
           </label>
         </div>
       </div>
@@ -86,16 +89,16 @@
           <% if @person.primary_family.active_household.latest_active_tax_household.present? && params[:market_kind]=='individual'%>
             <% eligibility_kind = @person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind %>
             <% if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != "csr_100" && plan.metal_level != "silver" %>
-              <%= link_to "Select Plan", "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %> &nbsp;
-              <%= link_to("Select Plan", "javascript:void(0)", {class: 'dn btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
+              <%= link_to l10n("select_plan"), "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %> &nbsp;
+              <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'dn btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
               <%= render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan } %>
               <% else %>
-              <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
+              <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
             <% end %>
           <% else %>
-            <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
+            <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
           <% end %>
-          <%= link_to "See Details", summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default", :remote => true} %>
+          <%= link_to l10n("see_details"), summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default", :remote => true} %>
         </div>
     </div>
   </div>

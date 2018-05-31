@@ -16,13 +16,13 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through #{Settings.site.short_name}.  Your group health plan coverage will take effect as of #{notice.plan.try(:coverage_start_on).try(:to_s)}.".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through #{site_short_name}.  Your group health plan coverage will take effect as of #{notice.plan.try(:coverage_start_on).try(:to_s)}.".html_safe} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "Your bill will continue to be due on the last day of the month for the next month’s coverage.  The billing cycle and late payment grace period will remain the same for this coverage year.".html_safe} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "To view the activity of your employees’ open enrollment:<ul><li>Log in to your #{Settings.site.short_name} employer account</li>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "To view the activity of your employees’ open enrollment:<ul><li>Log in to your #{site_short_name} employer account</li>
   <li>Select “Employees” from the menu at the top of your account page</li>
-  <li>You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name} during the open enrollment period. Each entry will have one of the following statuses:<br/>
+  <li>You will see a list of all eligible employees showing each action they have taken on #{site_short_name} during the open enrollment period. Each entry will have one of the following statuses:<br/>
   <ul><li>No Coverage Selected</li>
   <li>Coverage Selected</li>
   <li>Coverage Waived</li>
@@ -31,7 +31,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: [], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <%= render partial: 'notices/shared/unordered_list', locals: {
- previous: "Contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:",
+ previous: "Contact your broker for further assistance. You can also contact #{site_short_name} with any questions:",
  listings: ["Online at #{notice.hbe.url};",
             "By email at #{notice.hbe.email}; or",
             "By calling #{notice.hbe.phone}."] }%>

@@ -1,0 +1,200 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 3} %>
+<% end %>
+<div class="container" id='printArea'>
+  <div class="employee-welocome">
+    <div class="row">
+      <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
+        <div class="col-md-12 col-sm-12 no-pd col-xs-12">
+
+          <h1>Enrollment Submitted</h1>
+          <p>Your enrollment has been submitted as of <%= format_datetime(@enrollment.updated_at) %>.</p>
+          <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
+          <% if @enrollment.employee_role.present? %>
+          <% else %>
+          <p><strong>Important:</strong> You must pay your first month’s premium directly to your carrier for your coverage to take effect. Select 'How to Pay' to learn more.</p>
+          <p>When you’re finished, select GO TO MY ACCOUNT to view the status of your enrollment. You can also contact your insurance carrier directly for additional information or to check the status of your enrollment.</p>
+          <% end %>
+
+          <p>
+            <% if @employer_profile.present? %>
+            <strong><%= @employer_profile.legal_name %></strong><br>
+            <% end %>
+            <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
+            Benefit: <%= @enrollment.coverage_kind %><br>
+            Market: <%= show_market_name_by_enrollment @enrollment %><br>
+            Metal level : <%= display_dental_metal_level @plan %>
+          </p>
+
+          <% if @enrollment.employee_role.present? %>
+          <%= render "insured/plan_shoppings/coverage_information" %>
+          <%else%>
+          <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
+          <% end %>
+
+          <% if @enrollment.is_cobra_status? %>
+            <p>* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.</p>
+          <% end %>
+        </div>
+        <% if @enrollment.employee_role.present? %>
+        <% else %>
+          <span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+        <% end %>
+        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
+      </div>
+
+      <div id="how_to_pay" class="modal fade" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title"><b>How to Pay</b></h4>
+            </div>
+            <div class="modal-body">
+
+              <% if @plan.coverage_kind == 'health' %>
+
+
+              <h4><strong><%= @plan.name %></strong></h4>
+              <br/>
+              <ol>
+                <li>
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>, and they will send you an invoice. If you don’t receive an invoice from <%= @plan.carrier_profile.legal_name %> within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage. You must make this payment directly to <%= @plan.carrier_profile.legal_name %>. <%= site_short_name %> doesn’t collect your premium payments.
+                  <br/>
+                </li>
+                <br>
+                <div class="carrier-numbers">
+                  <% if @plan.carrier_profile.legal_name == "CareFirst" %>
+                  <div>
+                    Call: <strong>1-855-444-3119</strong>
+                    <!-- comment out congressional phone numbers
+                    <br/>
+                    For Congressional Employees: <strong><a href="tel:+18557922587">1-855-792-2587</a></strong>
+                    -->
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "Aetna" %>
+                  <div>
+                    <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
+                    Call: <strong>1-855-586-6959</strong><br/>
+                    from 8am-6pm EST, Monday - Friday
+                    <br/>
+                    <br/>
+                    <strong>For Brokers and Employers</strong><br/>
+                    Call: <strong>1-888-422-2128</strong><br/>
+                    from 8am-5pm EST, Monday - Friday
+                    <br/>
+                    <br/>
+
+                    <strong>For Small Business Employees</strong><br/>
+                    Call: <strong>Call 1-855-885-3289</strong><br/>
+                    from 8am-6pm EST, Monday - Friday
+                    <br/>
+                    <!-- comment out congressional phone numbers
+
+                    <br/>
+
+                    <strong>For Congressional Employees</strong><br/>
+                    Call: <strong><a href="tel:+1-800-544-0526">1-800-544-0526</a></strong><br/>
+                    from 8am-8pm EST, Monday - Friday
+                    <br/>
+                    -->
+                  </div>
+
+                  <% elsif @plan.carrier_profile.legal_name == "Kaiser" %>
+                  <div>
+                    Call: <strong>1-844-524-7370</strong>
+                    <!-- comment out congressional phone numbers
+                    <br/>
+                    For Congressional Employees: <strong><a href="tel:+18552513209">1-855-251-3209</a></strong>
+                  -->
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "UnitedHealthcare" %>
+                  <div>
+                    Call: <strong>1-877-856-2430</strong><br/>
+                  </div>
+                  <% end %>
+                </div>
+
+
+                <br/>
+                <br/>
+
+                <li>
+                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
+                </li>
+              </ol>
+              <% else %>
+              <h4><strong><%= @plan.name %></strong></h4>
+              <br/>
+              <ol>
+                <li>
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>. <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.   <%= site_short_name %> does not collect premiums.
+                  <br/>
+                </li>
+                <div class="carrier-numbers">
+                  <% if @plan.carrier_profile.legal_name == "CareFirst" %>
+                  <div><br/>
+                    Call: <strong>1-855-444-3119</strong><br/>
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "Delta Dental" %>
+                  <div><br/>
+                    Call: <strong>1-800-471-0236</strong> or <strong>1-800-471-0275</strong>
+                    <br/>
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "MetLife" %>
+                  <div><br/>
+                    Call: <strong>1-855-638-2221</strong><br/>
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "Dentegra" %>
+                  <div><br/>
+                    Call: <strong>1-800-471-0284</strong><br/>
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "Dominion" %>
+                  <div><br/>
+                    Call: <strong>1-855-224-3016</strong><br/>
+                  </div>
+                  <% elsif @plan.carrier_profile.legal_name == "BestLife" %>
+                  <div><br/>
+                    Call: <strong>1-800-433-0088</strong><br/>
+                  </div>
+                  <% end %>
+                </div>
+
+
+                <br/>
+                <br/>
+
+                <li>
+                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you’ll need to start using your benefits (such as member number). They’ll also mail your insurance cards to you.<br/>
+                </li>
+              </ol>
+              <% end %>
+            </div>
+            <br/>
+            <br/>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section plan_receipt">
+        <% if @change_plan.blank? && @market_kind == "individual" %>
+        <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+        <%= render  partial: 'shared/individual_progress', locals: {step: '6'} %>
+        <% else %>
+        <%= render  partial: 'shared/sep_progress', locals: {step: '7'} %>
+        <% end %>
+        <% elsif @change_plan.blank? %>
+          <%= render  partial: 'shared/signup_progress', locals: {step: '7'} %>
+        <% elsif @change_plan == "change_by_qle" %>
+        <%= render partial: 'shared/qle_progress', locals: {step: '4'} %>
+        <% elsif @change_plan == "change_plan" %>
+        <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
+        <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '4'} %>
+        <% else %>
+        <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '3'} %>
+        <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div><br>

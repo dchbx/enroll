@@ -1,11 +1,13 @@
 Dear <%=applicant_name%>,
 <br/><br/>
-Thank you for submitting an application to DC Health Link to become an approved broker. 
-We show you have not yet completed the required training administered through <a href="https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e">NAHU’s online platform<a/>
-, and you are still missing carrier appointments with
-<%unchecked_carriers.each do |k,v| %>
-	<li><%=k%></li>
-<%end%>
-You can verify your carrier appointments <a href="https://sbs-dc.naic.org/Lion-Web/jsp/sbsreports/AgentLookup.jsp">here<a/> by searching by your name or NPN and clicking on your name.
-Please also review our <a href="https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf">Broker Registration Guide<a/> for the full list of required carriers.
-<br/><br/>
+Thank you for submitting an application to be a certified broker on Health Connector for Business platform. At this time, it does not appear that you have completed the required training administered through the National Association of Health Underwriters (NAHU). Please complete the NAHU broker training so your application can be approved.
+<br />
+<div>To be a certified broker on the Health Connector for Business platform, brokers need to fulfill the following requirements, as detailed on the <a href="https://www.mahealthconnector.org/business/brokers/certification">Broker Certification</a> page:
+	<ul>
+		<li>Maintain a current health producer license in good standing in <%= aca_state_name %> or a non-resident license </li>
+		<li>Complete <%= site_short_name %> training hosted by National Association of Health Underwriters (NAHU), either in-person or online</li>
+		<li>Complete the online registration process through the <%= site_short_name %> for Business platform</li>
+	</ul>
+</div>
+<br />
+<div>For any questions about the process for becoming a certified broker on the <%= site_short_name %> for Business platform, please contact <%= contact_center_phone_number %> (TTY: <%= contact_center_tty_number %>) or <a href="https://www.mahealthconnector.org/"><%= site_website_name %></a></div>

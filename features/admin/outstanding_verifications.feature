@@ -1,3 +1,5 @@
+@individual_enabled
+#TODO actually click through were button really is
 Feature: Outstanding Verifications screen
 
   Background:

@@ -31,12 +31,12 @@
       </td>
       <td>
         <p>
-          <%= @plan.metal_level.humanize %>
+          <%= @plan.metal_level.titleize %>
         </p>
       </td>
       <td style="padding-left: 0;">
         <p style="text-transform: capitalize;">
-          <%= @plan.nationwide ? 'Nationwide' : 'DC Metro' %>
+          <%= render partial: "shared/network_data", locals: {plan: @plan} %>
         </p>
       </td>
 

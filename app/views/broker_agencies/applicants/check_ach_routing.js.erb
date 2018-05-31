@@ -1,0 +1,5 @@
+$('#organization_ach_record_id').val("<%= @ach_record.id %>");
+$('button.interaction-click-control-create-broker-agency').attr('data-original-title', '').tooltip('hide');
+$('button.interaction-click-control-create-broker-agency').removeClass('invalid');
+$('button.interaction-click-control-create-broker-agency').addClass('valid');
+$('.bank-name-container').text("Bank Name: <%= @ach_record.bank_name.html_safe %>");

@@ -3,6 +3,7 @@ require 'rails_helper'
 describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
   let(:employer_profile)        { FactoryGirl.create(:employer_profile) }
+  let!(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
 
   def persisted_employer_profile
@@ -17,6 +18,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
   let(:binder_payment_due_on)   { open_enrollment_end_on + 2.days }
   let(:next_premium_due_on)     { binder_payment_due_on }
   let(:next_premium_amount)     { 3155.86 }
+  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
 
   let(:valid_params) do
     {

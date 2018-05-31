@@ -1,4 +1,19 @@
 require 'rails_helper'
+RSpec.describe Insured::ConsumerRolesController, :type => :controller do
+  let(:user){ FactoryGirl.create(:user, :consumer) }
+
+  context "When individual market is disabled" do
+    before do
+      Settings.aca.market_kinds = %W[shop]
+      sign_in user
+      get :search
+    end
+
+    it "redirects to root" do
+      expect(response).to redirect_to(root_path)
+    end
+  end
+end
 
 RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   let(:user){ FactoryGirl.create(:user, :consumer) }
@@ -7,6 +22,10 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   let(:family_member){ double("FamilyMember") }
   let(:consumer_role){ FactoryGirl.build(:consumer_role) }
   let(:bookmark_url) {'localhost:3000'}
+
+  before do
+    allow_any_instance_of(ApplicationController).to receive(:individual_market_is_enabled?).and_return(true)
+  end
 
   context "GET privacy" do
     before(:each) do
@@ -207,7 +226,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
   context "PUT update" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
-    let(:person){ FactoryGirl.build(:person) }
+    let(:person){ FactoryGirl.create(:person) }
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -216,6 +235,25 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
       sign_in user
+    end
+
+
+    context "to verify new addreses not created on updating the existing address" do
+      before :each do
+        put :update, person: person_params, id: "test"
+      end
+
+      it "should not empty the person's addresses on update" do
+        expect(person.addresses).not_to eq []
+      end
+
+      it "should not create new address instances on update" do
+        expect(person.addresses.map(&:id).map(&:to_s)).to eq person.addresses.map(&:id).map(&:to_s)
+      end
+
+      it "should have same number of addresses on update" do
+        expect(person.addresses.count).to eq 2
+      end
     end
 
     it "should update existing person" do

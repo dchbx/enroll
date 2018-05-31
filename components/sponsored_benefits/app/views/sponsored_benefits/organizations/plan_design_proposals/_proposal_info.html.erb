@@ -1,0 +1,59 @@
+<div class="row no-buffer row-form-wrapper">
+  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :title, class: "floatlabel form-control", disabled: read_only, required: true, placeholder: 'Quote Name' %>
+  </div>
+
+  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.select :effective_date, options_for_select(@plan_design_organization.calculate_start_on_options, selected: f.object.effective_date), {:include_blank => "SELECT START ON"}, disabled: read_only %>
+  </div>
+
+  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :quote_date, class: "floatlabel form-control", disabled: true, placeholder: 'Quote Date' %>
+  </div>
+
+  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :sic_code, class: "floatlabel form-control", disabled: true, placeholder: 'SIC' %>
+  </div>
+
+  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :zip_code, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'ZIP Code' %>
+  </div>
+
+  <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :county, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'County' %>
+  </div>
+</div>
+
+<script>
+
+$(function() {
+
+  function submitPlanDesignProposalInfo() {
+    if($("#forms_plan_design_proposal_title").val() != "" && $("#forms_plan_design_proposal_effective_date").val() != "") {
+      $.ajax({
+        type: "POST",
+        url: $("#new_forms_plan_design_proposal").attr('action'),
+        data: $("#new_forms_plan_design_proposal").serialize(),
+        dataType: "script",
+        success: function(data) {
+        }
+      });
+    }
+    else {
+      // $('.save-quote-btn').click();
+    }
+  }
+
+  $("#new_forms_plan_design_proposal input[type=text]").each(function(){
+    $(this).on("change", submitPlanDesignProposalInfo);
+  })
+
+  $("#forms_plan_design_proposal_effective_date").change(function(e) {
+      if(e.handled !== true) // This will prevent event triggering more then once
+        {
+            submitPlanDesignProposalInfo();
+            e.handled = true;
+        }
+  })
+});
+</script>

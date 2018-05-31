@@ -31,50 +31,50 @@
   <% if (notice.current_health_enrollment.plan.renewal_plan_type == "CFHSA") %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-      content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{Settings.site.short_name}."} %>
+      content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{site_short_name}."} %>
     <br>
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
       listings: ["Shopping is even more important this year because CareFirst BlueCross BlueShield is ending the plan in which you are currently enrolled and not offering other HSA plans.","Kaiser Permanente is offering HSA compatible plans. We are working on expanding access to HSA qualified plans for 2018.","People currently in the plan being discontinued will be automatically renewed into the most comparable CareFirst plan for 2017, unless they choose a new plan during open enrollment.","CareFirst has increased its premiums for 2017. The premium for the most similar CareFirst plan into which you will be renewed is indicated in the “Choose Your 2017 Plan” section of this notice."]} %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-      content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, #{Settings.site.short_name} certified insurance experts are ready to assist you."} %>
+      content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, #{site_short_name} certified insurance experts are ready to assist you."} %>
 
   <% elsif (notice.current_health_enrollment.plan.renewal_plan_type == "CFNONHSA") %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{Settings.site.short_name}."} %>
+    content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{site_short_name}."} %>
     <br>
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
       listings: ["Shopping is even more important this year because CareFirst BlueCross BlueShield is ending the plan in which you are currently enrolled.","People currently in the plan being discontinued will be automatically renewed into the most comparable CareFirst plan for 2017, unless they choose a new plan during open enrollment.","CareFirst has increased its premiums for 2017. The premium for the most similar CareFirst plan into which you will be renewed is indicated in the “Choose Your 2017 Plan” section of this notice."]} %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, #{Settings.site.short_name} certified insurance experts are ready to assist you."} %>
+    content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, #{site_short_name} certified insurance experts are ready to assist you."} %>
 
   <% elsif (notice.current_health_enrollment.plan.renewal_plan_type == "KP") || (notice.current_health_enrollment.plan.renewal_plan_type == "CFREG") %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{Settings.site.short_name}."} %>
+    content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{site_short_name}."} %>
     <br>
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "During open enrollment you can shop for new coverage. Here is what you need to know:",
       listings: ["Shopping is even more important this year because #{notice.current_health_enrollment.plan.plan_carrier} has increased its premiums for 2017. The premium for the <health insurance company> plan into which you will be renewed is indicated in the “Choose Your 2017 Plan” section of this notice."]} %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, #{Settings.site.short_name} certified insurance experts are ready to assist you."} %>
+    content: "To assist you in figuring out what plan best meets your needs, we have new online tools powered by Consumers’ CHECKBOOK. The Plan Match tool gives you an estimate of annual out-of-pocket costs by different plans and whether your doctors participate. New for 2017, Plan Match also shows you how each plan covers your prescription medication. If you’d like in person help, #{site_short_name} certified insurance experts are ready to assist you."} %>
 
   <% end %>
 
 <% elsif (notice.current_health_enrollment.blank?) && (notice.current_dental_enrollment.present?) %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{Settings.site.short_name}. During open enrollment you can shop for new coverage."} %>
+  content: "Open enrollment for health and dental insurance plans for 2017 began on November 1, 2016 and ends on January 31, 2017. Our records indicate that you are currently enrolled in health and/or dental insurance through #{site_short_name}. During open enrollment you can shop for new coverage."} %>
 
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You can review your plan options, search for plans that include your doctors and prescriptions, and get annual out-of-pocket estimates on #{Settings.site.website_name}. If you would like a different plan for 2017, you must choose it during open enrollment. The date your new plan will start depends on when you finish shopping for your new plan:"],
+ contents: ["You can review your plan options, search for plans that include your doctors and prescriptions, and get annual out-of-pocket estimates on www.dchealthlink.com. If you would like a different plan for 2017, you must choose it during open enrollment. The date your new plan will start depends on when you finish shopping for your new plan:"],
    heading: 'Choose Your 2017 Plan', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/table', locals: {headers: ['Date new plan is selected', 'Date new plan starts'], rows: [['November 1 - December 15, 2016', 'January 1, 2017'],['December 16 - January 15, 2017', 'February 1, 2017'],['January 16 - January 31, 2017', 'March 1, 2017']],
@@ -126,7 +126,7 @@ content: "<strong>If you have not already selected a new plan and do not select 
 content: "Your plan will send you a separate mailing about changes to your benefits, co-payments, co-insurance, and deductibles for 2017. Be sure to call or visit the plan’s website to make sure your doctor and other health care providers will be in the plan network next year. Also check to make sure any prescription medications you take will be covered."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You must continue to pay your premium for your 2016 plan to be renewed for 2017. <strong>If you miss a payment or do not pay the full amount each month, your coverage will not be renewed.</strong> If you believe your 2016 plan has been terminated and you want to enroll in plan for 2017, please call #{Settings.site.short_name} Customer Service at (855) 532-5465."],
+ contents: ["You must continue to pay your premium for your 2016 plan to be renewed for 2017. <strong>If you miss a payment or do not pay the full amount each month, your coverage will not be renewed.</strong> If you believe your 2016 plan has been terminated and you want to enroll in plan for 2017, please call #{site_short_name} Customer Service at (855) 532-5465."],
    heading: 'Pay Your Premiums', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -154,15 +154,15 @@ If any of the following changes happen to anyone in your household, you must rep
 <%= render partial: 'notices/shared/paragraph', :locals => {content: "45 C.F.R. § 155.420(d)"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account on #{Settings.site.website_name} or by calling #{Settings.site.short_name} Customer Service toll-free at (855) 532-5465. You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end."],
+ contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account on www.dchealthlink.com or by calling #{site_short_name} Customer Service toll-free at (855) 532-5465. You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end."],
    heading: 'Ending Your Health Insurance Coverage', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {content: "Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates that the information you put on your application, or on your renewal form, has changed and you are no longer eligible for coverage.  If your health insurance is going to be terminated without your request because it has been determined that you are no longer eligible for coverage, you will receive a notice in advance telling you the basis for the decision and you will be provided with information about how to contest the decision."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to #{Settings.site.website_name}. You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer Service toll-free at (855) 532-5465."],
+ contents: ["Important information is stored in your account on the #{site_short_name} website.  If you don’t have an account already, you can create one by going to www.dchealthlink.com. You can get help with logging in or creating an account by calling #{site_short_name} Customer Service toll-free at (855) 532-5465."],
    heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal by <strong>#{(TimeKeeper.date_of_record+95.days).strftime("%m/%d/%Y")}</strong>.   #{Settings.site.short_name} will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  <strong>See the insert for more information on your appeal rights.</strong>  45 C.F.R. §155.520."],
+ contents: ["If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal by <strong>#{(TimeKeeper.date_of_record+95.days).strftime("%m/%d/%Y")}</strong>.   #{site_short_name} will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  <strong>See the insert for more information on your appeal rights.</strong>  45 C.F.R. §155.520."],
    heading: 'If You Think We Made a Mistake', sub_heading: ''} %>

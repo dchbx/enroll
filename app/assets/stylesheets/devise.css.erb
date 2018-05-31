@@ -28,3 +28,25 @@
   color: #468847;
   text-align: left;
 }
+
+<% if Rails.env.test? %>
+  div, a, span, footer, header {
+      -webkit-transition: none !important;
+      -moz-transition: none !important;
+      -ms-transition: none !important;
+      -o-transition: none !important;
+      transition: none !important;
+  }
+
+  .modal {
+    display: none !important;
+  }
+
+  .modal.in {
+    display: block !important;
+  }
+
+  .modal-backdrop {
+    display: none !important;
+  }
+<% end %>

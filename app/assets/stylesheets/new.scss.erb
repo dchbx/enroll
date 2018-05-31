@@ -1,9 +1,9 @@
 @import "variables";
 // employer portal
-#home {
+#home, .plan_design_proposals {
   nav {
     ul {
-      background-color: #007bc4;
+      background-color: $brand-primary;
       padding: 20px 0;
       list-style-type: none;
       img {
@@ -32,16 +32,13 @@
           }
         }
         span {
-          background-color: #e72b2d;
+          background-color: $primary-notification;
         }
       }
     }
   }
   .employees-tab {
     .col-xs-12 {
-      &:first-of-type {
-        margin-bottom: 35px;
-      }
       .button-group-wrapper {
         margin-bottom: 0;
       }
@@ -52,12 +49,12 @@
     #employees-filter {
       position: relative;
       i {
-        color: #007bc4;
+        color: $primary-blue;
       }
     }
     .filter {
       font-size: 14px;
-      color: #007bc4;
+      color: $primary-blue;
       text-align: right;
       text-transform: uppercase;
       padding-top: 10px;
@@ -86,7 +83,7 @@
       label {
         display: block;
         text-align: right;
-        color: #007bc4;
+        color: $primary-blue;
         font-size: 18px;
         padding: 0;
         width: 100%;
@@ -149,7 +146,7 @@
         border-bottom: solid 2px #b2b2b2;
         padding-left: 20px;
         &:hover {
-          border-bottom: solid 2px #007bc4;
+          border-bottom: solid 2px $primary-blue;
 
         }
 
@@ -171,7 +168,7 @@
           }
 
           &:hover {
-            color: #007bc4;
+            color: $primary-blue;
 
           }
 
@@ -190,7 +187,7 @@
 
       span {
         &.name {
-          color: #007bc4;
+          color: $primary-blue;
           font-size: 14px;
         }
         &.benefit-group {
@@ -296,7 +293,13 @@
         }
       }
     }
+    .county-select {
+      display: none;
+    }
 
+    .county-select.primary-office-location {
+      display: inline-block;
+    }
   }
   .planyear-add-tab {
     .row-form-wrapper {
@@ -396,8 +399,16 @@
       padding: 0 2%;
       margin: auto;
       table-layout: fixed;
+
+      tr.not-offered {
+        opacity: 0.35;
+      }
+
       tr:first-of-type {
         border-top: none;
+        th:first-of-type {
+          width: 28%;
+        }
         th {
           font-weight: normal;
           text-transform: uppercase;
@@ -412,6 +423,7 @@
           padding: 15px 0;
           font-size: 16px;
           i {
+            margin-left: -15%;
             color: #69A30D;
             margin-right: 10px;
             cursor: default;
@@ -620,14 +632,32 @@
 
     }
     .health {
-      .offerings {
+      .offerings, .composite-offerings {
         .heading {
           border-top: solid 1px #d5d5d5;
         }
       }
     }
-    .offerings {
 
+    .composite-offerings .benefits-fields .row-form-wrapper {
+      padding: 15px 0;
+
+      .slide-label {
+        position: absolute;
+      }
+    }
+
+    .offerings {
+      .benefits-fields {
+        .row-form-wrapper {
+          padding: 15px 0;
+          &:last-of-type {
+            display: none;
+          }
+        }
+      }
+    }
+    .offerings, .composite-offerings {
       .storage-input {
         max-width: 100%;
       }
@@ -671,11 +701,15 @@
           }
 
         }
+        .composite_offering_slider_header div.col-xs-12 {
+          border-bottom: solid 1px #d5d5d5;
+          padding: 15px 0 25px;
+          text-align: center;
+        }
         .col-xs-6 {
           border-bottom: solid 1px #d5d5d5;
           padding: 15px 0 25px;
           text-align: center;
-
         }
         .row-form-wrapper {
           border: none;
@@ -688,20 +722,18 @@
 
 
         }
-      }
       .benefits-fields {
         .row-form-wrapper {
           padding: 15px 0;
-          &:last-of-type {
-            display: none;
-          }
         }
+      }
       }
     .row-form-wrapper {
       border: none;
     }
 
     }
+
     ul.nav.nav-tabs, .plan-options .col-xs-3 a {
       border-bottom: none;
       li {
@@ -730,7 +762,7 @@
             font-size: 18px;
             margin-right: 10px;
             padding: 10px;
-            background-color: #007bc4;
+            background-color: $primary-blue;
             border-bottom: solid 3px #003260;
             border-radius: 6px;
             width: 100%;
@@ -875,7 +907,7 @@
         border-bottom: solid 1px #d7d7d7;
 
         &:hover {
-          border-bottom: solid 1px #007bc4;
+          border-bottom: solid 1px $primary-blue;
           .col-xs-10 .panel .panel-body .view-summary {
             display: inline-block;
             &:hover {
@@ -1034,34 +1066,19 @@
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
   .planyear-add-tab, .employer-tab, .employer-edit-tab,
    .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab {
-    .btn-primary {
-      text-transform: uppercase;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 16px;
-      letter-spacing: 1px;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-      margin-top: 5px;
-      margin-right: 5px;
-      &.mtz {
-        margin-top: 0;
-      }
-    }
     .starter {
       max-width: 660px;
     }
     h1 {
       margin-top: 0;
-      color: #003260;
+      color: $primary-orange;
       &+.panel {
         border-radius: 0;
         ul {
           list-style: square;
           font-size: 14px;
           li {
-            color: #007bc4;
+            color: $primary-blue;
             margin-left: 17px;
             margin-bottom: 5px;
             &:last-of-type {
@@ -1072,7 +1089,7 @@
               display: inline-block;
             }
             a {
-              color: #007bc4;
+              color: $primary-blue;
             }
           }
         }
@@ -1083,7 +1100,7 @@
           &>.panel-heading {
             border-radius: 0;
             background-image: none;
-            background-color: #007bc4;
+            background-color: $primary-blue;
             border-bottom: none;
             padding: 0 20px;
             font-size: 14px;
@@ -1110,7 +1127,7 @@
             font-size: 18px;
             margin-top: 0;
             i {
-              color: #007bc4;
+              color: $primary-blue;
             }
           }
           .progress, .progress-wrapper {
@@ -1210,6 +1227,25 @@
       }
     }
   }
+  .add-new-employees{
+    text-align: right;
+    margin-left: 15%;
+  }
+
+  .document-modal{
+     width: 900px;
+     .document-modal-body{
+         margin:1em;
+         border: 1px solid;
+         padding: 1em;
+     }
+     .document-modal-buttons{
+          text-align: right;
+      }
+     iframe{
+         border: 0;
+     }
+  }
   .planyear-add-tab {
     margin-bottom: 50px;
   }
@@ -1292,7 +1328,7 @@
       h4 {
         padding: 0 40px;
         &:last-of-type {
-          color: #007bc4;
+          color: $primary-blue;
           margin-bottom: 30px;
 
         }
@@ -1314,7 +1350,7 @@
       }
     }
     .fa {
-      color: #007bc4;
+      color: $primary-blue;
       cursor: pointer;
       &.pull-right {
         margin: 6px 10px 0 0;
@@ -1335,7 +1371,7 @@
   .current {
     margin: 0 0 5px 0;
     .fa {
-      color: #007bc4;
+      color: $primary-blue;
       margin: 0 5px 0 0;
       &.published, &.enrolling {
         color: #FFD700;
@@ -1367,7 +1403,7 @@
     display: none;
   }
   h4.change-plan, h4.cancel-plan-change, h4.dental-config-reference-selection, h4.change-dental-reference-plan, h4.dental-view-summary, h4.health-view-summary {
-    color: #007bc4;
+    color: $primary-blue;
     &:hover {
       text-decoration: underline;
       cursor: pointer;
@@ -1486,4 +1522,11 @@
   .plan-details {
     display: none;
   }
+}
+
+.carrier-list-container .loading {
+  position: relative;
+  padding-top: 30px;
+  top: 50%;
+  text-align: center;
 }

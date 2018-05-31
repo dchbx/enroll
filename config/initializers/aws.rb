@@ -7,5 +7,7 @@ secret=ENV['AWS_SECRET_ACCESS_KEY']
 #ENV['AWS_SECRET_ACCESS_KEY']=secret
 #ENV['AWS_REGION']=region
 
+if Rails.env.production?
 Aws.config.update({region: 'us-east-1',
                    credentials: Aws::Credentials.new(akid, secret)})
+end

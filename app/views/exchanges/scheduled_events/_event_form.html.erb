@@ -1,0 +1,36 @@
+<div class="container content-bottom">
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <% types = ScheduledEvent::EVENT_TYPES; types = types.rotate %>
+    <%= f.select :type, options_for_select(types.map {|a| [a.to_s.humanize, a.to_s]}, f.object.type), {include_blank: "SELECT EVENT TYPE"}, required: true, id: 'selected_scheduled_event_type' %>
+  </div>
+  <div id="scheduled_event" class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <% if f.object.try(:type) == 'holiday' %>
+      <%= f.text_field :event_name, size: 20, placeholder: 'Event Name', class: "event_text_field" %>
+    <% else %>
+      <%= f.select :event_name, options_for_select(ScheduledEvent::SYSTEM_EVENTS.map { |s| [s.humanize, s] }, f.object.event_name), include_blank: "SELECT EVENT", required: true %>
+    <% end %>
+   </div>
+</div>
+
+<div class="container content-bottom">
+  <%= f.label :start_time %>
+  <%= f.text_field :start_time, class: "date-picker floatlabel form-control", placeholder: 'Start Date' %>
+</div>
+
+<div class="container content-bottom">
+  <%= f.label :recurring_rules %>
+  <%= f.select_recurring :recurring_rules, nil, allow_blank: true %>
+</div>
+
+<div class="container content-bottom">
+  <%= f.label :offset_rule %>
+  <%= f.number_field :offset_rule, placeholder: 0 %>
+</div>
+
+<div class="container content-bottom">
+  <%= f.submit %>
+  <%= link_to 'Cancel', exchanges_scheduled_events_path, class: "btn btn-default", remote: true %>
+  <% if params[:action].to_s.downcase == 'edit' %>
+    <%= link_to "Delete Event", exchanges_scheduled_event_path(scheduled_event), data: {:confirm => 'Are you sure?'}, class: "btn btn-danger", remote: true, method: :delete %>
+  <% end %>
+</div>

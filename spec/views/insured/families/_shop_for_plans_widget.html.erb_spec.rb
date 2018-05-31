@@ -27,8 +27,10 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       render "insured/families/shop_for_plans_widget"
     end
 
-    it 'should have title' do
-      expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
+    if aca_state_abbreviation == "DC"
+      it 'should have title' do
+        expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
+      end
     end
 
     it "should have image" do
@@ -55,8 +57,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       render "insured/families/shop_for_plans_widget"
     end
 
-    it "should have link without change_plan" do
-      expect(rendered).to have_selector("a[href='/insured/consumer_role/build']")
+    it "should not have link without change_plan" do
+      expect(rendered).not_to have_selector("a[href='/insured/consumer_role/build']")
     end
   end
 
@@ -121,26 +123,10 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       render "insured/families/shop_for_plans_widget"
     end
 
-    it "should have text about enrolling in Individual Market" do
-      expect(rendered).to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
+    it "should not show the text about enrolling in Individual Market" do
+      expect(rendered).not_to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
     end
   end
 
-  context "dual role person with IVL sep" do
-    let(:qle) { double("QualifyingLifeEventKind", title: "", market_kind: "Individual")}
-    let(:sep) { double("SpecialEnrollmentPeriod", qualifying_life_event_kind: qle)}
-    before :each do
-      assign :person, person
-      assign :family, family
-      sign_in(current_user)
-      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-      allow(person).to receive(:active_employee_roles).and_return [employee_role]
-      allow(family).to receive(:latest_active_sep).and_return sep
-      render "insured/families/shop_for_plans_widget"
-    end
 
-    it "should have SEP eligible text in pop up window" do
-      expect(rendered).to have_content "You qualify for a Special Enrollment Period (SEP) because you"
-    end
-  end
 end

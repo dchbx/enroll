@@ -1,4 +1,4 @@
-<!DOCTYPE html>   
+<!DOCTYPE html>
 <html>
 </head>
   <style type="text/css">
@@ -11,10 +11,10 @@
       color:#808080;
       font-family: "TimesNewRoman", Times, serif;
     }
-    
+
     .page_numbers{
-     text-align: right; 
-     font-size: 7pt
+     text-align: right;
+     font-size: 6pt
     }
   </style>
 
@@ -28,11 +28,12 @@
         var y = document.getElementsByClassName(x[i]);
         for(var j=0; j<y.length; ++j){
           if(j == 0 ){
-            if(x[i] == 'page' && vars[x[i]] > 3){
+            if(x[i] == 'page' && vars[x[i]] <= 3){
+            // if(x[i] == 'page' && vars[x[i]] > 3){
               continue;
             }
           }
-        y[j].textContent =  "Page "+vars[x[i]]+ " of " + vars[x[1]];
+        y[j].textContent = "Your Health Connector ID is: <%= notice.primary_identifier %>" + "| Page "+(vars[x[i]]-2)+ " of " + (vars[x[1]]-2);
         }
       }
     }

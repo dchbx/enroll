@@ -19,13 +19,13 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "#{Settings.site.short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017. Please review the information below and let us know by <strong>10/31/2016</strong> if anything will be different next year. We will be using the information we have for you to determine the amount of premium reductions you may qualify for to reduce your monthly 2017 premiums."} %>
+content: "#{site_short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017. Please review the information below and let us know by <strong>10/31/2016</strong> if anything will be different next year. We will be using the information we have for you to determine the amount of premium reductions you may qualify for to reduce your monthly 2017 premiums."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2016 has been cancelled or terminated, you must go to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a> during open enrollment to re-enroll for 2017.  If your coverage is terminated or cancelled for any reason, including for non-payment of premiums, now or before the end of the year, it will not be automatically renewed.</strong>"} %>
+content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2016 has been cancelled or terminated, you must go to #{site_home_link.html_safe} during open enrollment to re-enroll for 2017.  If your coverage is terminated or cancelled for any reason, including for non-payment of premiums, now or before the end of the year, it will not be automatically renewed.</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["To receive the correct premium reduction you must update the information below if it is not correct for 2017.  This information is for your entire tax household, which includes your spouse and tax dependents, even if they do not need coverage through #{Settings.site.short_name}."],
+ contents: ["To receive the correct premium reduction you must update the information below if it is not correct for 2017.  This information is for your entire tax household, which includes your spouse and tax dependents, even if they do not need coverage through #{site_short_name}."],
    heading: 'Review Your Information', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -44,7 +44,7 @@ content: "Information we have for you or other members of your household:"} %>
 <%end%>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong>  You can report any changes by calling #{Settings.site.short_name} Customer Service at (855) 532-5465."} %>
+content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong>  You can report any changes by calling #{site_short_name} Customer Service at (855) 532-5465."} %>
 
 <%if notice.individuals.first.uqhp_reason == "Over Income"%>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -71,15 +71,15 @@ content: "<strong>If any of this information is incorrect, or if you need to add
     listings: ["You told us you don’t plan to file a tax return.","You’re married and you told us you’ll file taxes separately from your spouse"]} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you told us you don’t plan to file a tax return or told us you’re married but planning to file separately, you can update your information and see if you can get help with the cost of your health insurance. You can update your information by logging into your #{Settings.site.short_name} account or by calling #{Settings.site.short_name} Customer Service at (855) 532-5465."} %>
+  content: "If you told us you don’t plan to file a tax return or told us you’re married but planning to file separately, you can update your information and see if you can get help with the cost of your health insurance. You can update your information by logging into your #{site_short_name} account or by calling #{site_short_name} Customer Service at (855) 532-5465."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "In general, if you’re married you must file a joint tax return with your spouse to be eligible for financial help through a premium tax credit."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "There are exceptions if you claim 'head of household' status on your tax return, or if you're a victim of domestic violence or an abandoned spouse. In these cases, you can indicate on your #{Settings.site.short_name} application an intention to file as “single”, even if you are married."} %>
+  content: "There are exceptions if you claim 'head of household' status on your tax return, or if you're a victim of domestic violence or an abandoned spouse. In these cases, you can indicate on your #{site_short_name} application an intention to file as “single”, even if you are married."} %>
 <%end%>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer Service toll-free at (855) 532-5465."],
+ contents: ["Important information is stored in your account on the #{site_short_name} website.  If you don’t have an account already, you can create one by going to #{site_home_link.html_safe}. You can get help with logging in or creating an account by calling #{site_short_name} Customer Service toll-free at (855) 532-5465."],
    heading: 'Your Secure User Account', sub_heading: ''} %>
