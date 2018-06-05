@@ -18,7 +18,7 @@ describe "insured/family_members/show.js.erb" do
       assign(:created, true)
       assign(:dependent, dependent)
       assign(:family, family)
-      allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
+      allow(FamilyMember).to receive(:find).with(family.primary_applicant.id).and_return(family.primary_applicant)
       allow(family_member).to receive(:primary_relationship).and_return("self")
       allow(family_member).to receive(:person).and_return person
       allow(person).to receive(:has_mailing_address?).and_return false
@@ -29,14 +29,17 @@ describe "insured/family_members/show.js.erb" do
     end
 
     it "should display notice when these are no FAAs are present" do
+      application = FactoryGirl.create(:application, family: family, aasm_state: "draft")
+      applicant   =  FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)
       render file: "insured/family_members/show.js.erb"
-      expect(rendered).to match /qle_flow_info/
+      expect(rendered).to match /#{person.first_name}/
       expect(rendered).to match /removeClass/
       expect(rendered).to match /hidden/
     end
 
     it "should render faa_popup when these are FAAs are present in draft" do
       application = FactoryGirl.create(:application, family: family, aasm_state: "draft")
+      applicant   =  FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id)
       controller.stub(:action_name).and_return('create')
       render file: "insured/family_members/show.js.erb"
       expect(view).to render_template("insured/family_members/_dependent")

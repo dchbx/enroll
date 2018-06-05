@@ -41,4 +41,6 @@ $("#dependent_buttons").removeClass('hidden');
 
   $(".container > .row > .col-md-2").html("<%= escape_javascript(render partial: 'financial_assistance/shared/left_nav') %>");
 
+$("#applicant_<%=@family.application_in_progress.primary_applicant.id %>").html("<%= escape_javascript(render partial: '/financial_assistance/shared/info_needed', locals: {applicant: @family.application_in_progress.primary_applicant}) %> ")
+
 <% end %>

@@ -1,9 +1,5 @@
-<div class="col-md-4 col-sm-10 no-pd form-group-lg app-status white-background">
-  <% if applicant.applicant_validation_complete? %>
-    <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Info Complete</span>
-  <% else %>
-    <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">Info Needed</span>
-  <% end %>
+<div class="col-md-4 col-sm-10 no-pd form-group-lg app-status white-background" id = "applicant_<%= applicant.id %>">
+  <%= render '/financial_assistance/shared/info_needed', applicant: applicant%>
 </div>
 
 <div class="col-md-8 col-sm-2 form-group-lg white-background right">
