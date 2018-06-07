@@ -77,7 +77,7 @@ Given(/^that a family has a Financial Assistance application with tax households
   visit financial_assistance_applications_path
   create_plan
   allow(application).to receive(:is_application_valid?).and_return(true)
-  create_dummy_tax_households(application)
+  create_dummy_eligibility(application)
 end
 
 Then(/^the user will navigate to the Eligibility Determination page and will not find CSR text present$/) do

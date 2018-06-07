@@ -34,7 +34,7 @@ module FinancialAssistanceWorld
     application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)    
   end
 
-  def create_dummy_tax_households(application)
+  def create_dummy_eligibility(application)
     coverage_year = TimeKeeper.date_of_record.year
     application.submit!
     application.tax_households.each do |txh|
