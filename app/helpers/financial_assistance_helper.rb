@@ -26,6 +26,15 @@ module FinancialAssistanceHelper
     application.active_applicants.where(eligibility_flag => true).map(&:person).map(&:full_name).map(&:titleize)
   end
 
+  def any_csr_ineligible_applicants?(application_id)
+    csr_eligible = []
+    application = FinancialAssistance::Application.find(application_id)
+    application.tax_households.each do |thh|
+      csr_eligible << thh.preferred_eligibility_determination.csr_percent_as_integer
+    end
+    csr_eligible.include?(0) ? true : false
+  end
+
   def applicant_age applicant
     now = Time.now.utc.to_date
     dob = applicant.family_member.person.dob

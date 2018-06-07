@@ -46,7 +46,9 @@
                   <h4><%=applicant_name%></h4>
                 </div>
               <%end%>
-              <p class="mt-10 mb-0">They also qualify for extra savings called <a class="glossary_lookup">cost-sharing reductions</a> - a benefit that lowers other costs like the annual deductible and copayments. This benefit is only available if these people select a <a class="glossary_lookup">silver plan</a>. Look for this check mark <i class="fa fa-check-square-o col-green" aria-hidden="true"></i> on plans that have this benefit.</p>
+              <%  unless any_csr_ineligible_applicants?(params[:id]) %>
+                <p class="mt-10 mb-0">They also qualify for extra savings called <a class="glossary_lookup">cost-sharing reductions</a> - a benefit that lowers other costs like the annual deductible and copayments. This benefit is only available if these people select a <a class="glossary_lookup">silver plan</a>. Look for this check mark <i class="fa fa-check-square-o col-green" aria-hidden="true"></i> on plans that have this benefit.</p>
+              <% end %>
             </div>
             <div class="border-bottom-1px"></div>
             <div class="er-success bg-success">

@@ -21,7 +21,7 @@ Then(/^the CONTINUE button will be disabled$/) do
 end
 
 Given(/^the primary member exists$/) do
-  expect(page).to have_content('Self')
+  expect(page).to have_content('SELF')
 end
 
 Given(/^NO other household members exist$/) do
