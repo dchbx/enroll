@@ -505,22 +505,13 @@ function validateForm(form) {
 
 $('body').on('keyup keydown keypress', '#financial_assistance_income_employer_phone_full_phone_number', function (e) {
   var key = e.which || e.keyCode || e.charCode;
-  $(this).attr('maxlength', '10');
+  $(this).mask('(000) 000-0000');
   return (key == 8 ||
     key == 9 ||
     key == 46 ||
     (key >= 37 && key <= 40) ||
     (key >= 48 && key <= 57) ||
     (key >= 96 && key <= 105) );
-})
-.on('focus', function () {
-  $(this).val($(this).val().replace(/\W+/g, ''));
-})
-.on('blur', function () {
-  $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d{4})+$/, "($1)-$2-$3"));
-})
-.on('keypress', function () {
-  $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d{4})+$/, "($1)-$2-$3"));
 });
 
 $('body').on('keyup keydown keypress', '#financial_assistance_income_employer_address_zip', function (e) {
