@@ -180,7 +180,7 @@ module Notifier
     end
 
     def special_enrollment_period_qle_reported_on
-      merge_model.special_enrollment_period.qle_reported_on = special_enrollment_period.qle_on.present? ? format_date(special_enrollment_period.qle_on) : format_date(TimeKeeper.date_of_record)
+      merge_model.special_enrollment_period.qle_reported_on || format_date(TimeKeeper.date_of_record)
     end
 
     def special_enrollment_period_start_on
