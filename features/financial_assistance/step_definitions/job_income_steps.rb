@@ -17,7 +17,7 @@ Then(/^self employment form should not show$/) do
   expect(page).not_to have_xpath("//*[@id='financial_assistance_income_amount']")
 end
 
-Given(/^the user answers yes to having and income from an employer$/) do
+Given(/^the user answers yes to having an income from an employer$/) do
   choose('has_job_income_true')
   sleep 1
 end
@@ -138,4 +138,8 @@ end
 
 When(/^the user saves the self employment information$/) do
   find('.interaction-click-control-save').click
+end
+
+Then(/^the user will navigate to Other Income page$/) do
+  expect(page).to have_content("Other Income for")
 end

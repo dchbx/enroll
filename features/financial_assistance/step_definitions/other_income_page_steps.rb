@@ -59,3 +59,7 @@ Then(/^the other income form should not show$/) do
   expect(page).to_not have_content "AMOUNT *"
   expect(page).to_not have_content "HOW OFTEN *"
 end
+
+Then(/^the user will navigate to Income Adjustments page$/) do
+  expect(page).to_not have_content "Other Income For"
+end

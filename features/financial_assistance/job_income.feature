@@ -18,7 +18,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     Then self employment form should not show
 
   Scenario: User answers yes to having job income
-    Given the user answers yes to having and income from an employer
+    Given the user answers yes to having an income from an employer
     Then the job income form should show
 
   Scenario: User answers yes to having self employment income
@@ -26,7 +26,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     Then self employment form should show
 
   Scenario: User enters employer information
-    Given the user answers yes to having and income from an employer
+    Given the user answers yes to having an income from an employer
     And the user fills out the required employer information
     Then the save button should be enabled
     And the user saves the employer information
@@ -58,3 +58,35 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the save button should be enabled
     And the user saves the self employment information
     Then the self employment information should be saved on the page
+  
+  Scenario: Navigation to Other Income page via continue button - no income
+    Given the user answers no to having an income from an employer
+    And the user answers no to having self employment income
+    When user clicks CONTINUE
+    Then the user will navigate to Other Income page
+  
+  Scenario: Navigation to Other Income page via continue button - with only self employment income
+    Given the user answers yes to having self employment income
+    And the user fills out the required self employment information
+    And the user saves the self employment information
+    And the user answers no to having an income from an employer
+    When user clicks CONTINUE
+    Then the user will navigate to Other Income page
+  
+  Scenario: Navigation to Other Income page via continue button - with only employer income
+    Given the user answers yes to having an income from an employer
+    And the user fills out the required employer information
+    And the user saves the employer information
+    And the user answers no to having self employment income
+    When user clicks CONTINUE
+    Then the user will navigate to Other Income page
+  
+  Scenario: Navigation to Other Income page via continue button - both income types
+    Given the user answers yes to having self employment income
+    And the user fills out the required self employment information
+    And the user saves the self employment information
+    And the user answers yes to having an income from an employer
+    And the user fills out the required employer information
+    And the user saves the employer information
+    When user clicks CONTINUE
+    Then the user will navigate to Other Income page

@@ -37,4 +37,17 @@ Feature: Other income page
     When the user cancels the form
     Then the other income checkbox should be unchecked 
     And the other income form should not show
+  
+  Scenario: Navigation to Income Adjustments page - with other income
+    Given the user answers yes to having other income
+    And the user checks a other income checkbox
+    And the user fills out the required other income information
+    And the user saves the other income information
+    When user clicks CONTINUE
+    Then the user will navigate to Income Adjustments page
+  
+  Scenario: Navigation to Income Adjustments page - no other income
+    Given the user answers no to having other income
+    When user clicks CONTINUE
+    Then the user will navigate to Income Adjustments page
     
