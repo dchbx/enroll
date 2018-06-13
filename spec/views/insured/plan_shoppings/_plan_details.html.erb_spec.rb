@@ -10,6 +10,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       metal_level: "bronze",
       is_standard_plan: true,
       nationwide: "true",
+      network_information: "This is a plan",
       total_employee_cost: 100,
       deductible: 500,
       family_deductible: "500 per person | $1000 per group",
@@ -26,7 +27,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       coverage_kind: "health",
       dental_level: "high",
       sbc_document: Document.new({title: 'sbc_file_name', subject: "SBC",
-                                    :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
+                                    :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
     )
   end
 
@@ -113,7 +114,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     end
 
     it "should have title text for standard plan " do
-      expect(rendered).to match /Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what’s best for them./i
+      expect(rendered).to match /#{Regexp.escape("Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what’s best for them.")}/i
     end
 
   end

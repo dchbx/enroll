@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_each do
 
-  let(:calender_year) { TimeKeeper.date_of_record.year }
-  let(:date_of_record_to_use) { Date.new(calender_year, 5, 1) }
+  let(:calendar_year) { TimeKeeper.date_of_record.year }
+  let(:date_of_record_to_use) { Date.new(calendar_year, 5, 1) }
 
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
@@ -13,8 +13,8 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     let(:organization) {
       org = FactoryGirl.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryGirl.create :employer_profile, organization: org
-      plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :enrolled, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5
+      plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
       benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
       owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
       2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
@@ -86,10 +86,10 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     let(:organization) {
       org = FactoryGirl.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryGirl.create :employer_profile, organization: org
-      active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5
-      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5
+      active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year - 1, 4, 10), fte_count: 5
+      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
       benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
       renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
       owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -187,10 +187,10 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
       let(:organization) {
         org = FactoryGirl.create :organization, legal_name: "Corp 1"
         employer_profile = FactoryGirl.create :employer_profile, organization: org
-        active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
-        :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5
-        renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-        :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5
+        active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
+        :open_enrollment_start_on => Date.new(calendar_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year - 1, 4, 10), fte_count: 5
+        renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+        :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
         benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
         renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
         owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile

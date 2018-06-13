@@ -60,7 +60,7 @@
   }
 
   .pagination > .active > a{
-    background-color: #337ab7 !important;
+    background-color: $brand-primary !important;
     border-color: #337ab7 !important;
     color: #ffffff !important;
   }
@@ -141,19 +141,25 @@
   }
 
   /* Hide the Sort Icons on Column Headers */
-  
+
   /* Prevented sort arrows from showing in thead */
-  
+
   /*table.dataTable thead .sorting:after,
   table.dataTable thead .sorting_asc:after,
   table.dataTable thead .sorting_desc:after,*/
-  
+
   table.dataTable thead .sorting_asc_disabled:after,
   table.dataTable thead .sorting_desc_disabled:after {
       display: none;
   }
 }
 
-.btns-group {
-  margin-left: 2px;
-}
+  .effectivedatatable .container{
+      width: 100%;
+  }
+
+  .word-break-attestation {
+      word-break: break-word;
+      width:200px;
+  }
+

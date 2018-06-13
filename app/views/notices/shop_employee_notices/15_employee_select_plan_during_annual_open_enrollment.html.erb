@@ -1,0 +1,54 @@
+<%= render partial: 'notices/shared/cover', :locals => {notice: notice} %>
+<br>
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/address', :locals => {notice: notice} %>
+<br><br><br><br><br>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td> Dear <%= notice.primary_fullname %>, </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Congratulations!  You successfully selected <strong>#{notice.plan.plan_name}</strong>." }%>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Your employer, <strong>#{notice.employer_name}</strong> will need to complete additional steps before your enrollment can be finalized.  If your employer successfully completes the final steps in this enrollment process and meets all eligibility requirements, your coverage will go into effect on <strong>#{notice.plan_year.start_on}.</strong>" }%>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Please note that if your coverage goes into effect on <strong>#{notice.plan_year.start_on}</strong>, your monthly premium contribution will be <strong>#{notice.enrollment.employee_cost}</strong>. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{notice.enrollment.responsible_amount}</strong> towards your monthly premium." }%>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If your employer is unable to meet all eligibility requirement and your coverage cannot go into effect, you will receive a notice informing you of next steps." }%>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+ 
+ <table class="notice_spacing_1" border="0">
+     <tbody>
+       <tr>
+         <td>Please contact the <%=site_short_name%> with any questions:
+             <ul style="list-style: circle solid;">
+               <li class="notice-font">
+                 By calling <%=contact_center_phone_number%><br>
+               </li>
+               <li class="notice-font">
+                 TTY: <%=contact_center_tty_number%>
+               </li>
+               <li class="notice-font">
+                 By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%>
+               </li>
+             </ul>
+         </td>
+       </tr>
+     </tbody>
+ </table>
+
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "You can also find more information on our website at #{site_website_name}." }%>  

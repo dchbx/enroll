@@ -32,9 +32,9 @@
 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', locals: {
-  contents: ["Your ability to offer group health coverage in #{Settings.site.short_name} is contingent on a minimum level of employee enrollment.If at least 66.67% of eligible employees do not enroll, you will not be able to offer group health coverage in #{Settings.site.short_name} at this time.  During open enrollment, you can monitor the number of eligible employees that have enrolled by logging into your #{Settings.site.short_name} account.",
+  contents: ["Your ability to offer group health coverage in #{site_short_name} is contingent on a minimum level of employee enrollment.If at least 66.67% of eligible employees do not enroll, you will not be able to offer group health coverage in #{site_short_name} at this time.  During open enrollment, you can monitor the number of eligible employees that have enrolled by logging into your #{site_short_name} account.",
   "Note that there is a special annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without having a minimum level of employee enrollment.",
-  "Thank you for providing health coverage to your employees through #{Settings.site.short_name}. We look forward to continuing to serve the health care needs of your organization and your employees."],
+  "Thank you for providing health coverage to your employees through #{site_short_name}. We look forward to continuing to serve the health care needs of your organization and your employees."],
   heading: '', sub_heading: 'Minimum Participation'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', locals: {
@@ -42,7 +42,7 @@
   heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:",
+  previous: "Contact your broker for further assistance.  You can also contact #{site_short_name} with any questions:",
  listings: ["Online at #{notice.hbe.url};",
             "By email at #{notice.hbe.email}; or",
             "By calling #{notice.hbe.phone}."] } %>

@@ -21,17 +21,17 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Good News! #{notice.employer_name}, has chosen to renew the offer of health insurance coverage to its employees through
-#{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable."} %>
+#{site_short_name} and will contribute to the monthly premium to make the cost of coverage more affordable."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Your Current Plan Election Will Automatically Renew</strong><br>
-Since you already enrolled in employer-sponsored coverage through #{Settings.site.short_name}, your current plan selection will automatically
+Since you already enrolled in employer-sponsored coverage through #{site_short_name}, your current plan selection will automatically
 be renewed  for the upcoming plan year beginning on #{notice.plan.try(:coverage_start_on).try(:to_s)} unless you change your choice prior to #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}. "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>You Are Able to Change Your Plan Selection during Open Enrollment</strong><br>
-In order to make a change to your employer-sponsored coverage through #{Settings.site.short_name}, you must complete your plan selection for enrollment
-by #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}, for coverage effective #{notice.plan.try(:coverage_start_on).try(:to_s)}. Please log-in to your existing #{Settings.site.short_name} account at #{notice.hbe.try(:url)}
+In order to make a change to your employer-sponsored coverage through #{site_short_name}, you must complete your plan selection for enrollment
+by #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}, for coverage effective #{notice.plan.try(:coverage_start_on).try(:to_s)}. Please log-in to your existing #{site_short_name} account at #{notice.hbe.try(:url)}
 to view your plan options and complete the enrollment process. "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -53,7 +53,7 @@ life events such as marriage, birth, or adoption."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "You can also contact #{Settings.site.short_name} with any questions:",
+  previous: "You can also contact #{site_short_name} with any questions:",
   listings: ["Online at <a href='#{notice.hbe.url}'>#{notice.hbe.url}</a>;",
              "By email at #{notice.hbe.email}; or",
              "By calling #{notice.hbe.phone}."] } %>

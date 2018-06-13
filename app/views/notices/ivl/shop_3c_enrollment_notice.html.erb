@@ -26,7 +26,7 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable. ".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{site_short_name} and will contribute to the monthly premium to make the cost of coverage more affordable. ".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Your Current Plan is No Longer Available</strong><br>
   The plan in which you are currently enrolled will no longer be available
@@ -45,7 +45,7 @@
   life events such as marriage, birth, or adoption.".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
-  Please log-in to your existing #{Settings.site.short_name} account at #{notice.hbe.url} to
+  Please log-in to your existing #{site_short_name} account at #{notice.hbe.url} to
   view your plan options and complete the enrollment process.".html_safe} %>
 
 <% if notice.broker.present? %>
@@ -54,10 +54,10 @@
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your employer for further assistance.".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:".html_safe} %> 
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{site_short_name} with any questions:".html_safe} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Online at #{Settings.site.website_name};".html_safe,
+  ["Online at #{site_home_link};".html_safe,
    "By email at employer.hbx@dc.gov; or".html_safe,
    "By calling 855-532-5465.".html_safe] } %>
 

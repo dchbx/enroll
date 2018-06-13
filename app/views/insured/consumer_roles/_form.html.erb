@@ -3,9 +3,9 @@
     <div class="row">
       <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
-        <h1 class="darkblue">Personal Information</h1>
-        <p>Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.</p>
-        <p class='memo'>* = required field</p>
+        <h1 class="darkblue"><%= l10n("personal_information") %></h1>
+        <p><%= l10n("insured.consumer_roles.help_question_info") %></p>
+        <p class='memo'>* = <%= l10n("required_field") %></p>
         <%= render "shared/error_messages", object: f.object %>
         <%= render 'shared/person/consumer_information', f: f %>
         <br>

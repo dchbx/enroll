@@ -27,7 +27,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "As we previously notified you, you and/or members of your household are eligible to enroll in a
-  health insurance plan through #{Settings.site.short_name} and receive tax credits to help pay for the cost of your insurance."} %>
+  health insurance plan through #{site_short_name} and receive tax credits to help pay for the cost of your insurance."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["On [date of plan selection], the following individual(s) selected the [plan 1 name] insurance plan"],
@@ -71,10 +71,10 @@
   <span #{@style_color_indent}>[IF More than One Plan Selected]</span> [plan N name] at [plan N main phone number]"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.
-    If you don’t have an account already, you can create one by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>.
-    You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer
-    Service toll-free at #{Settings.contact_center.phone_number}."],
+  contents: ["Important information is stored in your account on the #{site_short_name} website.
+    If you don’t have an account already, you can create one by going to #{site_home_link.html_safe}.
+    You can get help with logging in or creating an account by calling #{site_short_name} Customer
+    Service toll-free at #{contact_center_phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -128,8 +128,8 @@
   content: "<strong>If you do not make your monthly premium payments on time, you could lose your health insurance. </strong>
   45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment.
   <strong>You must pay your premiums directly to the health plan or dental plan <span style='text-decoration:underline;'>by the date indicated on that invoice.</span></strong>
-  #{Settings.site.short_name} is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously
-  established with the carrier prior to enrolling through #{Settings.site.short_name} will not carry-over; you must make new payment arrangements."} %>
+  #{site_short_name} is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously
+  established with the carrier prior to enrolling through #{site_short_name} will not carry-over; you must make new payment arrangements."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "The fastest way to pay the premium is by calling the health plan or dental plan directly at the numbers listed below.
@@ -144,7 +144,7 @@
   your income is higher than expected, you will have to pay back the extra premium tax credits you received. If your income is
   lower than expected, you will receive a refund for the difference. If you know your income is changing, it may be in your best
   interest to increase or decrease your premium tax credit amount. If you would like to make a change to your premium tax credit amount,
-  call the #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."} %>
+  call the #{contact_center_name} toll-free at #{contact_center_phone_number}."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["[PICK ONE]"],
@@ -159,7 +159,7 @@
   in a Silver Plan First Name]<br><br>
   Because the above individual(s)are eligible for extra help paying for your health insurance through cost-sharing reductions,
   and you selected a silver-level plan, the total amount [Plan Name]  can require you pay for health services in [coverage year] is reduced.
-  A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>.
+  A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on #{site_home_link.html_safe}.
   This information will include your deductible, or the amount you must pay for health services before your plan will begin paying the
   costs of your health services. Certain services will be covered even before you have paid the deductible.",
   "<span #{@style_color_text}>[IF Indian=No AND CSR-eligible NOT enrolled in Silver Plan]</span>
@@ -170,7 +170,7 @@
   [CSR-eligible Not Indian Not Silver First Name 1][CSR-eligible Not Indian Not Silver Last Name]<br><br>
   <span #{@style_color_text}>[IF Person N field populated]</span>
   [CSR-eligible Not Indian Not Silver First Name][CSR-eligible Not Indian Not Silver Last Name]<br><br>
-  A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage on <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>.
+  A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage on #{site_home_link.html_safe}.
   This information will include your deductible, or the amount you must pay for health services before your plan will begin
   paying the costs of your health services. Certain services will be covered even before you have paid the deductible.",
   "<span #{@style_color_text}>[IF Indian=No AND Not CSR-eligible]</span> Based on the information you entered on your application,
@@ -178,7 +178,7 @@
   extra help paying for your health insurance through cost-sharing reductions. 45 C.F.R. §155.305(g):<br><br>
   [Assisted 1 and Not CSR-eligible First Name][Assisted 1 and Not CSR-eligible Last Name]<br><br>
   <span #{@style_color_text}>[IF Person N field populated]</span> [Assisted N and Not CSR-eligible First Name][Assisted N and Not CSR-eligible Last Name]<br><br>
-  A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>.
+  A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on #{site_home_link.html_safe}.
   This information will include your deductible, or the amount you must pay for health services before your plan will begin paying the
    costs of your health services. Certain services will be covered even before you have paid the deductible.",
   "<span #{@style_color_text}>[IF Indian=Yes AND MAGI≤300% FPL]</span> Based on their American Indian status, the following members of
@@ -194,14 +194,14 @@
   <span #{@style_color_text}>[IF Person N field populated]</span> [American Indian N Over 300 First Name][American Indian N Over 300 Last Name]<br><br>
   Otherwise, the total amount [Plan Name] can require you to pay for health services in [coverage year] the same as non-Indians.
   A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on
-  <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>. This information will include your deductible, or the amount you
+  #{site_home_link.html_safe}. This information will include your deductible, or the amount you
   must pay for health services before your plan will begin paying the costs of your health services.
     Certain services will be covered even before you have paid the deductible."]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.
-    45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>
-    or calling #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}. If you have a change in circumstances during [coverage year], you may also
+    45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to #{site_home_link.html_safe}
+    or calling #{contact_center_name} at #{contact_center_phone_number}. If you have a change in circumstances during [coverage year], you may also
     qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: "],
     heading: 'Changing Plans', sub_heading: ''} %>
 
@@ -211,15 +211,15 @@
   listings: ["Getting married", ["Changes in your household size", ["New birth or adoption", "Death", "New tax dependents"]],
   "A change in income for you or others in your household.", "A change in the immigration status of your household members",
   "A material violation of your health or dental plan contract by your plan sponsor",
-  "Becoming eligible for Medicaid, employer-sponsored insurance, or other insurance outside of #{Settings.site.short_name}."]} %>
+  "Becoming eligible for Medicaid, employer-sponsored insurance, or other insurance outside of #{site_short_name}."]} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "45 C.F.R. §155.420"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You have the right to terminate your health insurance coverage. You can terminate your coverage by
-    logging into your account on <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a> or by calling #{Settings.contact_center.name}
-    toll-free at #{Settings.contact_center.phone_number}. You need to tell us at least fourteen (14) days before you want your coverage to end.<br><br>
+    logging into your account on #{site_home_link.html_safe} or by calling #{contact_center_name}
+    toll-free at #{contact_center_phone_number}. You need to tell us at least fourteen (14) days before you want your coverage to end.<br><br>
    Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates
    that the information you put on your application has changed and you are no longer eligible for coverage.
    If your health insurance is going to be terminated without your request because it has been determined that you are no

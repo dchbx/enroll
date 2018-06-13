@@ -1,86 +1,73 @@
-<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
-<%= render partial: 'notices/shared/logo_and_address_shop' %>
-<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
-<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<br><br><br><br><br>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>RE: Open Enrollment Completed</h3></td>
-    </tr>
-  </tbody>
-</table>
-
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>Dear <%= notice.primary_fullname %>:</td>
+      <td class="notice-font">Dear <%= notice.employer_name %>,</td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Congratulations! Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through #{Settings.site.short_name}. Your group health plan coverage will take effect as of #{notice.plan_year.start_on}."} %>
+  content: "Congratulations! Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through the #{site_short_name}. Your group health plan coverage will take effect as of #{notice.plan_year.start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Your first month’s premium payment must be received and cleared by 5:00 p.m. on #{notice.plan_year.binder_payment_due_date}, or your group’s coverage will be delayed. Payments over the phone or online are <strong>required</strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:"} %>
+  content: "Your first month’s premium payment must be received by 5:00 p.m. on #{notice.plan_year.binder_payment_due_date}, or your group’s coverage will be delayed and your employees may experience a gap in coverage. Payments over the phone or online are <strong><i>required</i></strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Make a Secure Online Payment"} %>
+  content: "<strong>Make a Secure Online Payment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "#{Settings.site.short_name} now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in Employers Paying Your Premiums Online to make your premium payment online."}%>
-
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "<a href='https://www.e-BillExpress.com/ebpp/DCHealthPay'>https://www.e-BillExpress.com/ebpp/DCHealthPay'.</a>"} %>
+  content: "The Massachusetts #{site_short_name} now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in our <strong>Employer guide paying premiums</strong> in the Business Resource Center. You can make your premium payment online through our website. "}%>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>To make a secure electronic check payment by phone</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "Call #{Settings.contact_center.phone_number} (LINK)"} %>
+  content: "Call #{contact_center_phone_number}"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "Select your language (1 for English, 2 for Spanish, additional language options available)"} %>
 
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "Select option for Small Business Employer"} %>
-
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "Select option for Need to Make a Payment"} %>
-<br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "<strong>To view the activity of your employees’ open enrollment:</strong>",
-  listings: ["Log in to your #{Settings.site.short_name} employer account",
+  listings: ["Log in to your #{site_short_name} employer account",
     "Select “Employee” from the menu on the left of your account page",
-    ["You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name} during the open enrollment period. Each entry will have one of the following statuses:",
+    ["You will see a list of all eligible employees showing each action they have taken on the #{site_short_name} during the open enrollment period. Each entry will have one of the following statuses:",
         ["Blank - No Coverage Selected",
           "Coverage Selected",
           "Coverage Waived ",
           "Terminated"]]]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
+  contents: ["Please contact your broker for further assistance.  You can also contact the #{site_short_name} with any questions:"],
     heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <table class="total_table" border="0">
   <tbody>
     <tr>
       <td>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-           <strong>By calling <%=Settings.contact_center.phone_number%></strong>
-        </li>
+        <ul style="list-style: circle ;">
+        <li class="notice-font" style="margin-top: 5px;">By calling <%=contact_center_phone_number%>. TTY: <%=contact_center_tty_number%>  </li>
+        <li class="notice-font" style="margin-top: 5px;">By Email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%></li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "You can also find more information on our website at <a href= '#{site_main_web_address_url}'>#{ site_main_web_address}</a>"} %>
+
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "This notice is being provided in accordance with 45 CFR 715€."} %>
+ content: "This notice is being provided in accordance with 45 CFR 155.715(e)."} %>

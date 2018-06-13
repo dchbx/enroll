@@ -97,6 +97,8 @@ FactoryGirl.define do
   end
 
   factory(:generative_broker_agency_profile, {class: BrokerAgencyProfile }) {
+    ach_routing_number "123456789"
+    ach_account_number "9999999999999999"
     organization { FactoryGirl.build_stubbed :generative_organization }
     corporate_npn "11234234"
   }

@@ -4,7 +4,7 @@ module Forms
     attr_accessor :id
     attr_accessor :person_id
     attr_accessor :person
-    attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein
+    attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein, :sic_code
     attr_reader :dob
     attr_accessor :office_locations
     attr_accessor :contact_method
@@ -137,7 +137,7 @@ module Forms
     def dob=(val)
       @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
     end
-    
+
     # Strip non-numeric characters
     def fein=(new_fein)
       @fein =  new_fein.to_s.gsub(/\D/, '') rescue nil

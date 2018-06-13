@@ -4,26 +4,35 @@
       <h1>Benefits - Coverage You Offer</h1>
     </div>
     <div class="col-xs-4">
-      <% if @employer_profile.is_new_employer? && @employer_profile.published_plan_year.blank? %>
-        <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#claimQUoteModal" }, class: 'btn btn-default btn-block' %>
+      <% if site_broker_claim_quoting_enabled? %>
+        <% if show_or_hide_claim_quote_button(@employer_profile) %>
+          <% claim_warnings, claim_modal_name = claim_quote_warnings(@employer_profile) %>
+
+          <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#{claim_modal_name}" }, class: 'btn btn-default btn-block' %>
+
+          <% if claim_warnings.present? %>
+            <%= render "employers/plan_years/claim_quote_warnings", warnings: claim_warnings %>
+          <% end %>
+        <% end %>
       <% end %>
+
       <%= pundit_span EmployerProfile,:updateable? %>
         <% if @plan_years.present? && @employer_profile.published_plan_year.blank? && !@employer_profile.draft_plan_year.present? %>
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-lg", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
         <% end %>
       </span>
     </div>
     <% unless @employer_profile.plan_years.blank? || @employer_profile.published_plan_year.present? %>
     <% if @employer_profile.renewing_plan_year.blank? || @employer_profile.active_plan_year.blank? %>
     <div class="col-xs-12">
-      <h4>Carefully review the plan information and pricing below. If you haven't added employees to your plan yet, select 'Employees' in the blue menu bar to the left and edit each of your employees to add them to your benefit package. If you want to
-        create more than one benefit package and offer different benefits to different employees, select 'Edit Plan Year' and then select 'Add Benefit Group' at bottom of the page. When you're satisfied with your benefit package(s), select 'Publish Plan Year'.</h4>
-      <h4>
+      <p class="twenty">Carefully review the plan information and pricing below. If you haven't added employees to your plan yet, select 'Employees' in the blue menu bar to the left and edit each of your employees to add them to your benefit package. If you want to
+        create more than one benefit package and offer different benefits to different employees, select 'Edit Plan Year' and then select 'Add Benefit Group' at bottom of the page. When you're satisfied with your benefit package(s), select 'Publish Plan Year'.</p>
+      <p class="twenty">
         <strong>
           IMPORTANT
         </strong>
         – Once you select 'Publish Plan Year', your employees will receive a notification and open enrollment will begin according to the timeline you selected for your plan year.
-      </h4>
+      </p>
       <br/>
     </div>
     <% end %>
@@ -35,10 +44,9 @@
   <div class="row no-buffer module plan-year">
     <div class="col-xs-6">
       <h3 class="no-buffer">
-        <div class="row">
           <span data-toggle="tooltip" title="<%= plan_year.aasm_state.to_s.humanize.titleize %>">
             <% if plan_year.draft? || plan_year.renewing_draft? %>
-            <i class="fa fa-file"></i>
+            <i class="fa fa-file icon-color"></i>
             <% elsif plan_year.enrolling? || plan_year.renewing_enrolling? %>
             <i class="fa fa-star enrolling"></i>
             <% elsif plan_year.published? || plan_year.renewing_published? %>
@@ -47,7 +55,6 @@
           </span>
           <%= plan_year.start_on.to_date.year%>
           Plan Year (<%= plan_year.aasm_state.to_s.humanize.titleize %>)
-        </div>
       </h3>
     </div>
     <div class="col-xs-6 above">
@@ -55,10 +62,11 @@
         <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
                 <% if plan_year.overlapping_published_plan_years.empty? %>
-                <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+
                 <% end %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
-            <% end %>  
+            <% end %>
             <%= pundit_span(EmployerProfile, :revert_application?) %>
                 <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
                   <span class="btn btn-default pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
@@ -69,6 +77,7 @@
       </div>
     </div>
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
+    <% bg.build_estimated_composite_rates %>
     <div class="benefit-group">
       <% next if bg.reference_plan_id.blank? %>
       <% if bg.default == true %>
@@ -201,13 +210,7 @@
                 </td>
                 <td>
                   <p>
-                    <% if bg.plan_option_kind == "single_carrier" %>
-                    All Plans From A Single Carrier
-                    <% elsif bg.plan_option_kind == "metal_level" %>
-                    All Plans From A Given Metal Level
-                    <% elsif bg.plan_option_kind == "single_plan" %>
-                    A Single Plan
-                    <% end %>
+                    <%= selected_benefit_plan(bg.plan_option_kind) %>
                   </p>
                 </td>
               </tr>
@@ -223,24 +226,7 @@
 
             <!--Health plan contribution: start-->
             <div class="col-xs-11 package-offering">
-              <div class="col-xs-12">
-                <table>
-                  <tr>
-                    <th>Offered</th>
-                    <th>Employer
-                      <% if bg.is_offering_dental? %>Health
-                      <% end %>Contribution</th>
-                  </tr>
-                  <% bg.relationship_benefits.each_with_index do |rb, i| %>
-                  <tr>
-                    <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-                    <td id="pct">
-                      <strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong>
-                    </td>
-                  </tr>
-                  <% end %>
-                </table>
-              </div>
+              <%= render partial: 'employers/plan_years/benefit_group_summary', locals: { bg: bg } %>
             </div>
             <!--Health plan contribution: end -->
 
@@ -277,8 +263,8 @@
                 </div>
                 <% else %>
                 <div class="row">
-                  <h4 class="starter">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
-                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
+                  <p class="twenty">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
+                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</p>
                 </div>
                 <% end %>
                 <% if bg.is_offering_dental? %>
@@ -348,7 +334,7 @@
                   <td>
                     <p>
                       <% if bg.dental_plan_option_kind == "single_carrier" %>
-                        All Plans From A Single Carrier
+                        All Plans From A <%= fetch_plan_title_for_single_carrier %>
                       <% elsif bg.dental_plan_option_kind == "single_plan" %>
                         <% if bg.elected_dental_plan_ids.count < 13 %>
                             Custom (<%= bg.elected_dental_plans.count %> Plans)
@@ -470,13 +456,12 @@
 
     <% end %>
     <% else %>
-      <h4>
+      <p class="twenty">
         It's time to create a benefits package. Select 'Add Plan Year' to create your first one. Most employers only create one benefits package but you'll have the opportunity to create more than one if you want to offer different benefits to different
         groups of employees.
-      </h4>
-      <br/>
+      </p>
       <%=pundit_span EmployerProfile, :updateable?%>
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-lg", data: {loading_text: "Loading..."} %>
       </span>
     <% end %>
   </div>

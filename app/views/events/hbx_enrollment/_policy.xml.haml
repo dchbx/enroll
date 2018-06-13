@@ -22,12 +22,16 @@
         %total_employer_responsible_amount=(hbx_enrollment.total_employer_contribution).round(2)
         - if hbx_enrollment.is_cobra_status?
           %cobra_eligibility_date= simple_date_for(hbx_enrollment.cobra_eligibility_date)
+        - if hbx_enrollment.composite_rated?
+          %composite_rating_tier_name= "urn:openhbx:terms:v1:composite_rating_tier##{hbx_enrollment.composite_rating_tier}"
     - else
       %individual_market
         %is_carrier_to_bill true
         %applied_aptc_amount= (hbx_enrollment.applied_aptc_amount).round(2)
     %premium_total_amount= hbx_enrollment.total_premium.round(2)
     %total_responsible_amount= (hbx_enrollment.is_shop? ? (hbx_enrollment.total_employee_cost) : (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)).round(2)
+    - if hbx_enrollment.rating_area.present?
+      %rating_area= hbx_enrollment.rating_area
     = render :partial => "events/hbx_enrollment/eligibility_event", :object => hbx_enrollment
   %request_submitted_timestamp= hbx_enrollment.created_at.strftime('%Y-%m-%dT%H:%M:%S') if hbx_enrollment.created_at
   %is_active= hbx_enrollment.is_active

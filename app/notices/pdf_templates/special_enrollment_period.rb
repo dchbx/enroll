@@ -1,6 +1,6 @@
 module PdfTemplates
-  class SpecialEnrollmentPeriod
-    include Virtus.model
+   class SpecialEnrollmentPeriod
+   	 include Virtus.model
 
     attribute :title, String
     attribute :reason, String

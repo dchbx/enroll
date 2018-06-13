@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>RE: Action Required for Renewal on <%= Settings.site.short_name %></h3></td>
+      <td><h3>RE: Action Required for Renewal on #{site_short_name}</h3></td>
     </tr>
   </tbody>
 </table>
@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on #{notice.plan_year.start_on.strftime("%m/%d/%Y")}. Renewal employers will need to complete their renewal applications before #{notice.plan_year.start_on.last_month.strftime("%m/#{Settings.aca.shop_market.renewal_application.publish_due_day_of_month}/%Y")}. #{Settings.site.short_name}’s Small Business Support Team would like to offer one-on-one assistance with you or your broker in completing the renewal application."} %>
+  content: "Action is needed in order for your employer-sponsored health coverage with #{site_short_name} to renew on #{notice.plan_year.start_on.strftime("%m/%d/%Y")}. Renewal employers will need to complete their renewal applications before #{(notice.plan_year.start_on - 1.month).strftime("%m/10/%Y")}. #{site_short_name}’s Small Business Support Team would like to offer one-on-one assistance with you or your broker in completing the renewal application."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Your employees will also have until #{notice.plan_year.start_on.last_month.strftime("%m/#{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on}/%Y")} to make their plan selections."} %>
@@ -29,15 +29,15 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Employer Renewal Process:",
     listings: [
-      ["<span class='mar20'><strong>Review “Draft Renewal Plan Year” on the Benefits tab of your My #{Settings.site.short_name} employer account.</strong></span>", 
-        ["Your draft renewal plan year is setup with the same selections you made for your current plan year, including plan offerings, reference plan, contributions, and family member eligibility. You can make changes to these selections for the upcoming plan year if you’d like by clicking the Edit Plan Year button.", "Please select your Open Enrollment dates to start right away so that your employees can maximize their time to review their plan options. The latest date to end your open enrollment period is #{notice.plan_year.start_on.last_month.strftime("%m/#{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on}/%Y")}.", "If you’d like to keep the same selections in the upcoming plan year, review your open enrollment dates and then proceed to the next step."]
-      ], 
-      ["<span class='mar20'><strong>Publish your “Renewal Plan Year” on the Benefits tab of your My #{Settings.site.short_name} employer account.</strong></span>", 
+      ["<span class='mar20'><strong>Review “Draft Renewal Plan Year” on the Benefits tab of your My #{site_short_name} employer account.</strong></span>",
+        ["Your draft renewal plan year is setup with the same selections you made for your current plan year, including plan offerings, reference plan, contributions, and family member eligibility. You can make changes to these selections for the upcoming plan year if you’d like by clicking the Edit Plan Year button.", "Please select your Open Enrollment dates to start right away so that your employees can maximize their time to review their plan options. The latest date to end your open enrollment period is #{notice.plan_year.start_on.strftime("%m/13/%Y")}.", "If you’d like to keep the same selections in the upcoming plan year, review your open enrollment dates and then proceed to the next step."]
+      ],
+      ["<span class='mar20'><strong>Publish your “Renewal Plan Year” on the Benefits tab of your My #{site_short_name} employer account.</strong></span>",
         ["Once you have reviewed and finalized your selections for the upcoming renewal plan year, click the Publish Plan Year button.", "Note: Only publish the plan year when you have made your final decision."]
-      ], 
-      ["<span class='mar20'><strong>Employee Renewal Open Enrollment Period</strong></span>", 
-        ["After you finalize your renewal plan year by publishing it, your employees will be able to log in to their My #{Settings.site.short_name} employee accounts, review their plan options for the upcoming plan year, and make any necessary changes to their plan selections. To shop for #{notice.plan_year.start_on.strftime("%Y")} plans your employees will need to click “Shop for Plans”.  Note:  If employees take no action during the employee renewal open enrollment period, they will be automatically re-enrolled in the same health plan for the upcoming plan year.", "See the attached guides for your employees to walk them through the employee renewal open enrollment process."]
-      ], 
+      ],
+      ["<span class='mar20'><strong>Employee Renewal Open Enrollment Period</strong></span>",
+        ["After you finalize your renewal plan year by publishing it, your employees will be able to log in to their My #{site_short_name} employee accounts, review their plan options for the upcoming plan year, and make any necessary changes to their plan selections. To shop for #{notice.plan_year.start_on.strftime("%Y")} plans your employees will need to click “Shop for Plans”.  Note:  If employees take no action during the employee renewal open enrollment period, they will be automatically re-enrolled in the same health plan for the upcoming plan year.", "See the attached guides for your employees to walk them through the employee renewal open enrollment process."]
+      ],
     ]
     } %>
 
@@ -48,15 +48,15 @@
   content: "If you have any further questions or need additional assistance, please do not hesitate to contact us."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Additional Resources for your New My #{Settings.site.short_name} Accounts:",
-  listings: ["Employers Managing Your Employee Roster: <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf'>https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf</a>", "Employers Enrolling as Employees: <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf'>https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf</a>", "Employers Logging in to the Update #{Settings.site.short_name} for the first time: <a href='https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf'>https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf</a>"]} %>
+  previous: "Additional Resources for your New My #{site_short_name} Accounts:",
+  listings: ["Employers Managing Your Employee Roster: <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf'>https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf</a>", "Employers Enrolling as Employees: <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf'>https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf</a>", "Employers Logging in to the Update #{site_short_name} for the first time: <a href='https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf'>https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf</a>"]} %>
 
 <br>
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

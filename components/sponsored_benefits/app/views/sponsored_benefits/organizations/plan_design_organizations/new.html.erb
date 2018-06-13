@@ -1,0 +1,18 @@
+<div class="container">
+  <div class="tab-content" id="myTabContent">
+    <div class="col-md-12">
+      <div class="row">
+        <h3>Add Prospect Employer</h3>
+      </div>
+      <div class="row">
+        <p>Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.</p>
+      </div>
+      <br />
+      <%= form_for @organization, as: :organization, url: {action: "create"} do |f| %>
+        <%= hidden_field_tag :broker_agency_id, @broker_agency_profile.id.to_s %>
+        <%= render 'shared/error_messages', :object => @organization %>
+        <%= render 'form', f: f %>
+      <% end %>
+    </div>
+  </div>
+</div>

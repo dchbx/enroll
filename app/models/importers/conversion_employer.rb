@@ -4,6 +4,15 @@ module Importers
     include ActiveModel::Model
     include ::Etl::ValueParsers
 
+    # CARRIER_MAPPING = {
+    #   "aetna" => "AHI",
+    #   "carefirst bluecross blueshield" => "GHMSI",
+    #   "kaiser permanente" => "KFMASI",
+    #   "united healthcare" => "UHIC",
+    #   "united health care" => "UHIC",
+    #   "unitedhealthcare" => "UHIC"
+    # }
+
     attr_converter :fein, :as => :optimistic_ssn
     attr_converter :tpa_fein, :as => :optimistic_ssn
 
@@ -16,6 +25,7 @@ module Importers
       :primary_location_address_2,
       :primary_location_city,
       :primary_location_state,
+      :primary_location_county,
       :mailing_location_address_1,
       :mailing_location_address_2,
       :mailing_location_city,
@@ -43,7 +53,7 @@ module Importers
 
     attr_reader :warnings
 
-    include ::Importers::ConversionEmployerCarrierValue
+    # include ::Importers::ConversionEmployerCarrierValue
 
     def initialize(opts = {})
       super(opts)
@@ -88,6 +98,10 @@ module Importers
       org.general_agency_profile
     end
 
+    def fein=(val)
+      @fein = prepend_zeros(val.to_s.gsub('-', '').strip, 9)
+    end
+
     def validate_new_fein
       return true if fein.blank?
       found_org = Organization.where(:fein => fein).first
@@ -107,17 +121,20 @@ module Importers
       end
     end
 
-    def map_office_locations
-      locations = []
-      main_address = Address.new(
+    def build_primary_address
+      Address.new(
         :kind => "work",
         :address_1 => primary_location_address_1,
         :address_2 => primary_location_address_2,
         :city =>  primary_location_city,
         :state => primary_location_state,
+        :county => primary_location_county,
         :zip => primary_location_zip
-      )
-      mailing_address = Address.new(
+        )
+    end
+
+    def build_mailing_address
+      Address.new(
         :kind => "mailing",
         :address_1 => mailing_location_address_1,
         :address_2 => mailing_location_address_2,
@@ -125,6 +142,12 @@ module Importers
         :state => mailing_location_state,
         :zip => mailing_location_zip
       )
+    end
+
+    def map_office_locations
+      locations = []
+      main_address = build_primary_address
+      mailing_address = build_mailing_address
       main_location = OfficeLocation.new({
         :address => main_address,
         :phone => Phone.new({
@@ -175,6 +198,10 @@ module Importers
         end
       end
       broker_agency_accounts
+    end
+
+    def employer_attestation_attributes
+      EmployerAttestation.new(aasm_state: "approved")
     end
 
     def map_poc(emp)
@@ -261,6 +288,11 @@ module Importers
           errors.add("office_location_#{idx}_" + attr.to_s, err)
         end
       end
+    end
+
+    def prepend_zeros(number, n)
+      (n - number.to_s.size).times { number.prepend('0') }
+      number
     end
   end
 end

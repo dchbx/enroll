@@ -1,0 +1,69 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default top-pd">
+      <div class="panel-heading">
+        <h3 class="panel-title">Employee Roster</h3>
+      </div>
+      <div class="panel-body">
+        <p>Use the detailed roster below to specify the enrollees for this business.  The details below are from this Employer's current roster.  You can upload a new roster for this quote if required.</p>
+
+        <div id="new_employee_form">
+        </div>
+
+        <div class="row">
+          <div class="col-xs-12" >
+            <div class= "effectivedatatable">
+              <% if @census_employees.empty? %>
+              <% else %>
+              <%= raw render_datatable(@datatable) %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <script type="text/javascript" charset="utf-8">
+        initializeDataTables();
+        $('.buttons-csv').hide()
+        $('.buttons-excel').hide()
+        </script>
+
+        <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
+
+        <div class="row">
+          <div class="col-md-9">
+            <%# if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
+            <%#= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
+            <%# end %>
+          </div>
+          <div class="col-md-3 text-right content-bottom">
+            <h4><%#= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-12 employee-btns">
+    <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe,new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id, modal: 'upload'), remote: 'true', class: "btn btn-default", :onclick=>"validateQuote(); return false;" %>
+    <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe,export_plan_design_employees_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal.proposal.id, format: :csv), class: "download-employees btn btn-default #{@plan_design_proposal.proposal.persisted? ? '' : 'disabled'}" %>
+    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id), :remote => true, class: "btn btn-default pull-right", :onclick=>"validateQuote(); return false;" %>
+  </div>
+</div>
+
+<script>
+$(function() {
+  $('.employee-btns a').each(function(){
+    if(!$(this).hasClass('download-employees')) {
+      $(this).click(function(e){
+        e.preventDefault();
+
+        if($("#forms_plan_design_proposal_title").val() == "" || $("#forms_plan_design_proposal_effective_date").val() == "") {
+          $('.save-quote-btn').click();
+          e.stopPropagation();
+        }
+      });
+    }
+  })
+});
+</script>
+

@@ -12,7 +12,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Subject: Denial of Eligibility for <%= Settings.site.short_name %> Enrollment</h3></td>
+      <td><h3>Subject: Denial of Eligibility for <%= site_short_name %> Enrollment</h3></td>
     </tr>
   </tbody>
 </table>
@@ -27,7 +27,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Thank you for the application you submitted and we processed on #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}.
-  Unfortunately, the following individual(s) are not qualified to enroll in health insurance through #{Settings.site.short_name} based on the information you provided to us."} %>
+  Unfortunately, the following individual(s) are not qualified to enroll in health insurance through #{site_short_name} based on the information you provided to us."} %>
 
 <% if notice.unverified_individuals.any? %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -37,12 +37,12 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
-    heading: 'Ineligibility for Assistance or Enrollment through #{Settings.site.short_name}', sub_heading: ''} %>
+    heading: 'Ineligibility for Assistance or Enrollment through #{site_short_name}', sub_heading: ''} %>
 
 <% if notice.residency_unverified.any? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "The following individual(s) are not qualified to enroll through #{Settings.site.short_name} because they are not residents of the #{Settings.aca.state_name}. They are encouraged to submit another application for the state where they live. You can find these applications at <a href='http://www.HealthCare.gov'>www.HealthCare.gov</a>.
+  content: "The following individual(s) are not qualified to enroll through #{site_short_name} because they are not residents of the #{aca_state_name}. They are encouraged to submit another application for the state where they live. You can find these applications at <a href='http://www.HealthCare.gov'>www.HealthCare.gov</a>.
     45 C.F.R. §155.305(a)(3)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -54,7 +54,7 @@
 <% if notice.incarcerated.any? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "The following individual(s) are not qualified to enroll through #{Settings.site.short_name} because they are in prison or jail serving a sentence. 45 C.F.R. §155.305(a)(2)."} %>
+ content: "The following individual(s) are not qualified to enroll through #{site_short_name} because they are in prison or jail serving a sentence. 45 C.F.R. §155.305(a)(2)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: notice.incarcerated.map(&:full_name).join("<br>")} %>
 
@@ -63,7 +63,7 @@
 <% if notice.citizenship_unverified.any? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "The following individual(s) are not qualified to enroll through #{Settings.site.short_name} because our records did not indicate that they were a U.S. Citizen or had another qualifying immigration status.
+ content: "The following individual(s) are not qualified to enroll through #{site_short_name} because our records did not indicate that they were a U.S. Citizen or had another qualifying immigration status.
  45 C.F.R. §155.305(a)(1)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -74,13 +74,13 @@
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>Because the above individual(s) are not eligible for enrollment in coverage through #{Settings.site.short_name},
-  they also cannot get tax credits or cost-sharing reductions through #{Settings.site.short_name}.</strong>  45 C.F.R. §155.305(f) & (g)."} %>
+  content: "<strong>Because the above individual(s) are not eligible for enrollment in coverage through #{site_short_name},
+  they also cannot get tax credits or cost-sharing reductions through #{site_short_name}.</strong>  45 C.F.R. §155.305(f) & (g)."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.
-    If you don’t have an account already, you can create one by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>.
-    You can get help with logging in or creating an account by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
+  contents: ["Important information is stored in your account on the #{site_short_name} website.
+    If you don’t have an account already, you can create one by going to #{site_home_link.html_safe}.
+    You can get help with logging in or creating an account by calling #{contact_center_name} toll-free at #{contact_center_phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

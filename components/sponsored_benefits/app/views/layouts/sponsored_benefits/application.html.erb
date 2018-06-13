@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
+  <%= stylesheet_link_tag "application", :media => "all" %>
+  <%= stylesheet_link_tag    "sponsored_benefits/application", media: "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "sponsored_benefits/application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body class="font">
+    <%= render 'layouts/header' %>
+    <%= render 'shared/engines/broker_menu' %>
+    <%= render_flash %>
+    <div class="content <%= controller_name %>">
+      <%= yield %>
+    </div>
+
+</body>
+</html>

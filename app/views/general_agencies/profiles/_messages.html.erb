@@ -2,6 +2,6 @@
   <h3> Staff Messages </h3>
   <%= render 'inbox' %>
 
-  <%#= link_to "Send Secure Message to #{Settings.site.short_name}".html_safe, broker_agencies_inbox_msg_to_portal_path(inbox_id: @provider.id,
+  <%#= link_to "Send Secure Message to #{site_short_name}".html_safe, broker_agencies_inbox_msg_to_portal_path(inbox_id: @provider.id,
        to: 'HBX_Admin', from: @provider.try(:full_name)||@provider.try(:legal_name), class: "btn btn-primary", remote: true) %>
 </div>

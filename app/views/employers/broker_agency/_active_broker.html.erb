@@ -3,7 +3,7 @@
     <div class="row">
       <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
         <div class="vertically-aligned-row">
-          <h1 class="darkblue no-buffer">Brokers</h1>
+          <h1 class="no-buffer">Brokers</h1>
           <div class="text-right">
             <% if current_user.can_change_broker? %>
               <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary", id: 'browse_brokers_link',
@@ -171,7 +171,7 @@
           </div>
           <div class="modal-footer">
             <%= link_to 'Terminate Broker'.html_safe, employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-primary  mtz" %>
-            <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Close</button>
+            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
           </div>
         </div>
       </div>
@@ -181,10 +181,10 @@
     <div class="col-xs-12 col-sm-4 col-md-4">
       <div class="row">
         <% if current_user.can_change_broker? %>
-          <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-block btn-block btn-lg", id: 'browse_brokers_link',
+          <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-lg", id: 'browse_brokers_link',
         onclick: '$("#brokers-empty").hide(); $("#active_broker_tab").hide(); $("#browse_brokers_link").hide()' %>
         <% else %>
-          <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary disabled btn-block btn-lg" %>
+          <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary disabled btn-lg" %>
         <% end %>
       </div>
     </div>

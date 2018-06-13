@@ -26,7 +26,7 @@
 This coverage will end on [Termination Effective Date].  <u>You must still pay all premiums due until that date.</u>
 "} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "The coverage termination dates listed above are based on federal regulations, which require the following termination dates for voluntary terminations when the request is made to #{Settings.site.short_name}:"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "The coverage termination dates listed above are based on federal regulations, which require the following termination dates for voluntary terminations when the request is made to #{site_short_name}:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
 	["The date requested by the customer if the request is made at least 14 days in advance.",
@@ -34,8 +34,8 @@ This coverage will end on [Termination Effective Date].  <u>You must still pay a
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "45 C.F.R. §155.430(d)(2)"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "When you told us to end this coverage, you did not ask us to enroll the individuals listed above in a different insurance plan.  Once this health insurance has ended, you will not be able to re-enroll in an insurance plan through #{Settings.site.short_name} for [coverage year] unless you meet circumstances that qualify you for a “special enrollment period”.  We want to remind you that individuals who voluntarily go without health insurance for 3 months or more may be required to pay a federal tax penalty based on the number of months they are without health insurance."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "When you told us to end this coverage, you did not ask us to enroll the individuals listed above in a different insurance plan.  Once this health insurance has ended, you will not be able to re-enroll in an insurance plan through #{site_short_name} for [coverage year] unless you meet circumstances that qualify you for a “special enrollment period”.  We want to remind you that individuals who voluntarily go without health insurance for 3 months or more may be required to pay a federal tax penalty based on the number of months they are without health insurance."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<u>You must still pay all premiums for coverage until [Termination Effective Date]</u>. These payments must be paid directly to your health plan. If you pay these premiums, you will continue to have health insurance coverage until <u>[Termination Request Date]</u>."], heading: 'Next Steps', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you want to stop this termination from taking effect, you must contact #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number} <u>as soon as possible</u>.  You cannot reverse this termination once it has taken effect."], heading: 'Stopping the Termination', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you want to stop this termination from taking effect, you must contact #{contact_center_name} toll free at #{contact_center_phone_number} <u>as soon as possible</u>.  You cannot reverse this termination once it has taken effect."], heading: 'Stopping the Termination', sub_heading: ''} %>

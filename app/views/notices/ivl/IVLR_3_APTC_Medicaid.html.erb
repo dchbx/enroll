@@ -19,13 +19,13 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "#{Settings.site.short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017.  Please review the information below and let us know by <strong>10/31/2016</strong> if anything will be different next year.   We will be using the information we have for you to determine the amount of premium reductions you may qualify for to reduce your monthly 2017 premiums."} %>
+content: "#{site_short_name} has started the process of renewing your health and/or dental insurance for the 2017 plan year, which begins on January 1, 2017.  Please review the information below and let us know by <strong>10/31/2016</strong> if anything will be different next year.   We will be using the information we have for you to determine the amount of premium reductions you may qualify for to reduce your monthly 2017 premiums."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2016 has been cancelled or terminated, you must go to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a> during open enrollment to re-enroll for 2017.  If your coverage is terminated or cancelled for any reason, including for non-payment of premiums, now or before the end of the year, it will not be automatically renewed.</strong>"} %>
+content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2016 has been cancelled or terminated, you must go to #{site_home_link.html_safe} during open enrollment to re-enroll for 2017.  If your coverage is terminated or cancelled for any reason, including for non-payment of premiums, now or before the end of the year, it will not be automatically renewed.</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["To receive the correct premium reduction you must update the information below if it is not correct for 2017.  This information is for your entire tax household, which includes your spouse and tax dependents, even if they do not need coverage through #{Settings.site.short_name}."],
+ contents: ["To receive the correct premium reduction you must update the information below if it is not correct for 2017.  This information is for your entire tax household, which includes your spouse and tax dependents, even if they do not need coverage through #{site_short_name}."],
    heading: 'Review Your Information', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -44,7 +44,7 @@ content: "Information we have for you or other members of your household:"} %>
 <%end%>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong>  You can report any changes by calling #{Settings.site.short_name} Customer Service at (855) 532-5465."} %>
+content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by 10/31/2016.</strong>  You can report any changes by calling #{site_short_name} Customer Service at (855) 532-5465."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Based on the information we have for you (detailed above), your household will NOT be eligible for the advanced premium tax credit or cost-sharing reductions in 2017. This is because the people listed below are eligible for Medicaid, based on your household income:"],
@@ -62,5 +62,5 @@ content: "Medicaid offers free, comprehensive health coverage.  You are still el
 content: "In order to receive a final eligibility notice for Medicaid, make sure your information is correct and respond to all requests for additional documentation.   Even if you do not respond to the requests for documentation, and are ultimately determined ineligible for Medicaid based on a failure to respond, you would still be ineligible for financial help through the advanced premium tax credit and cost-sharing reductions.  If you are eligible for Medicaid, enrollment information will be sent to you in a separate notice."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer Service toll-free at (855) 532-5465."],
+ contents: ["Important information is stored in your account on the #{site_short_name} website.  If you don’t have an account already, you can create one by going to #{site_home_link.html_safe}. You can get help with logging in or creating an account by calling #{site_short_name} Customer Service toll-free at (855) 532-5465."],
    heading: 'Your Secure User Account', sub_heading: ''} %>

@@ -76,6 +76,19 @@ When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
 end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
+  employer_profile = EmployerProfile.all.first
+  plan_year = EmployerProfile.all.first.plan_years.first.start_on.year
+  carrier_profile = EmployerProfile.all.first.plan_years.first.benefit_groups.first.reference_plan.carrier_profile
+  sic_factors = SicCodeRatingFactorSet.new(active_year: plan_year, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+    factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
+  end
+  sic_factors.save!
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: plan_year, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+    [0..5].each do |size|
+      factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
+    end
+  end
+  group_size_factors.save!
   wait_for_ajax(2,2)
   if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
@@ -115,6 +128,10 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sep_enr = enrollments.order_by(:'created_at'.asc).detect{|e| e.enrollment_kind == "special_enrollment"} if enrollments.present?
   enrollment = all('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
+  wait_for_condition_until(5) do
+    enrollment_selection_badges.count > 0
+  end
+  expect(enrollment_selection_badges.any? { |n| n.find_all('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y")).any? }).to be_truthy
 
   expect(all('.hbx-enrollment-panel').select{|panel|
     panel.has_selector?('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
@@ -201,9 +218,13 @@ When(/(.*) enters termination reason/) do |named_person|
   wait_for_ajax
 
   waiver_modal = find('.terminate_confirm')
-  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Please select terminate reason')]]").click
-  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I do not have other coverage')]").click
-  waiver_modal.find('.terminate_reason_submit').click
+  within('.terminate_confirm .modal-dialog') do
+    find('p', text: 'Please select terminate reason').click
+    within all('.selectric-scroll').last do
+      find('li', text: 'I have coverage through Medicaid').click
+    end
+   find('.terminate_reason_submit').click
+  end
 end
 
 Then(/(.*) should see termination confirmation/) do |named_person|
@@ -238,7 +259,7 @@ When(/Employee enters Qualifying Life Event/) do
   screenshot("future_qle_date")
   wait_for_ajax
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
-  click_link "CONTINUE"
+  find('.interaction-click-control-continue').click
   click_button "Continue"
   screenshot("completing SEP")
 end

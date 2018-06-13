@@ -1,5 +1,5 @@
 require 'rails_helper'
-
+  include Config::SiteHelper
 RSpec.describe UserMailer do
   describe 'generic_notice_alert' do
     let(:hbx_id) { rand(10000 )}
@@ -7,7 +7,7 @@ RSpec.describe UserMailer do
     let(:email){UserMailer.generic_notice_alert('john', hbx_id, 'john@dc.gov' , {"file_name" => file})}
 
     it 'should not allow a reply' do
-    	expect(email.from).to match(["no-reply@individual.dchealthlink.com"])
+    	expect(email.from).to match(["no-reply@individual.#{site_domain_name}"])
     end
 
     it 'should deliver to john' do
@@ -16,10 +16,10 @@ RSpec.describe UserMailer do
     end
 
     it "should have subject of #{Settings.site.short_name}" do
-      expect(email.subject).to match(/DC Health Link/)
+      expect(email.subject).to match(/#{Settings.site.short_name}/)
     end
 
-    it "should have one attachment" do 
+    it "should have one attachment" do
       expect(email.attachments.size).to eq 1
     end
 

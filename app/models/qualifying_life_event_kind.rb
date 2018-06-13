@@ -1,6 +1,7 @@
 class QualifyingLifeEventKind
   include Mongoid::Document
 	include Mongoid::Timestamps
+  include Config::AcaModelConcern
 
   # Model Changes to support IVL needs
   ## effective_on_kinds -- type changed to Array to support multiple choices (view to provide choice when size > 1)
@@ -203,6 +204,7 @@ class QualifyingLifeEventKind
     def individual_market_events_admin
       where(:market_kind => "individual").active.to_a
     end
+
   end
 
   def date_hint

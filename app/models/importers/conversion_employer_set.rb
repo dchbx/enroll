@@ -11,6 +11,7 @@ module Importers
         "City",
         "State",
         "Zip",
+        "County",
         "Mailing Address 1",
         "Mailing Address 2",
         "City",
@@ -62,6 +63,7 @@ module Importers
         :primary_location_city,
         :primary_location_state,
         :primary_location_zip,
+        :primary_location_county,
         :mailing_location_address_1,
         :mailing_location_address_2,
         :mailing_location_city,
@@ -83,7 +85,7 @@ module Importers
         :ignore,
         :tpa_fein,
         :ignore,
-        :carrier
+        :ignore
       ]
     end
 

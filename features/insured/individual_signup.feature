@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: Insured Plan Shopping on Individual market
 
   Background:

@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: CSR finishes shopping for Individual
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
@@ -31,4 +32,3 @@ Feature: CSR finishes shopping for Individual
       Then CSR clicks on New Consumer Paper Application
       Then CSR starts a new enrollment
       Then CSR logs out
-

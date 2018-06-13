@@ -7,6 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
+  include ApplicationHelper
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
@@ -57,9 +58,9 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    @enrollment.ee_plan_selection_confirmation_sep_new_hire
-
-    @enrollment.mid_year_plan_change_notice
+    employee_mid_year_plan_change(@person, @change_plan)
+    # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
+    # @enrollment.mid_year_plan_change_notice #mirror notice
 
     send_receipt_emails if @person.emails.first
   end
@@ -129,6 +130,19 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
   end
 
+    def employee_mid_year_plan_change(person,change_plan)
+     begin
+      ce = person.active_employee_roles.first.census_employee
+      if change_plan.present? or ce.new_hire_enrollment_period.present?
+        trigger_notice_observer(ce.employer_profile, @enrollment, 'ee_mid_year_plan_change_congressional_notice')
+      else
+        trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer')
+      end
+     rescue Exception => e
+       log("#{e.message}; person_id: #{person.id}")
+     end
+    end
+
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
@@ -137,8 +151,6 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      notify_employer_when_employee_terminate_coverage(hbx_enrollment)
-      hbx_enrollment.notify_employee_confirming_coverage_termination
       redirect_to family_account_path
     else
       redirect_to :back

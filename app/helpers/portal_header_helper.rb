@@ -1,16 +1,18 @@
 module PortalHeaderHelper
   include L10nHelper
+  include ApplicationHelper
+
   def portal_display_name(controller)
     if current_user.nil?
-      "<a class='portal'>#{l10n("welcome.index.byline")}</a>".html_safe
+      "<a class='portal'>#{l10n("welcome.index.welcome_to_site_header")}</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
-      link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, exchanges_hbx_profiles_root_path, class: "portal"
+      link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
     elsif current_user.person.try(:broker_role)
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, main_app.broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path, class: "portal"
     elsif current_user.person && current_user.person.active_employee_roles.any?
-      link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an #{controller=='employer_profiles'? 'Employer': 'Employee'}".html_safe, family_account_path, class: "portal"
+      link_to "#{image_tag exchange_icon_path('icon-individual.png')} &nbsp; I'm an #{controller=='employer_profiles'? 'Employer': 'Employee'}".html_safe, family_account_path, class: "portal"
     elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?))
       if current_user.identity_verified_date.present?
         link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, family_account_path, class: "portal"
@@ -24,7 +26,7 @@ module PortalHeaderHelper
     elsif current_user.has_general_agency_staff_role?
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path, class: "portal"
     else
-      "<a class='portal'>#{l10n("welcome.index.byline")}</a>".html_safe
+      "<a class='portal'>#{l10n("welcome.index.byline", welcome_text: "#{Settings.site.header_message}")}</a>".html_safe
     end
   end
 

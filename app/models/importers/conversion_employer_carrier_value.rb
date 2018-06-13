@@ -1,12 +1,4 @@
 module Importers::ConversionEmployerCarrierValue
-  CARRIER_MAPPING = {
-    "aetna" => "AHI",
-    "carefirst bluecross blueshield" => "GHMSI",
-    "kaiser permanente" => "KFMASI",
-    "united healthcare" => "UHIC",
-    "united health care" => "UHIC",
-    "unitedhealthcare" => "UHIC"
-  }
 
   def self.included(base) 
     base.class_eval do
@@ -22,13 +14,13 @@ module Importers::ConversionEmployerCarrierValue
       @carrier = nil
       return val
     end
-    @carrier = CARRIER_MAPPING[val.strip.downcase]
+    @carrier = self.class::CARRIER_MAPPING[val.strip.downcase]
   end
 
   def validate_carrier
     found_carrier = find_carrier
     if found_carrier.nil?
-      errors.add(:carrier, "invalid carrier specified (not one of #{CARRIER_MAPPING.keys.join(", ")})")
+      errors.add(:carrier, "invalid carrier specified (not one of #{self.class::CARRIER_MAPPING.keys.join(", ")})")
     end
   end
 

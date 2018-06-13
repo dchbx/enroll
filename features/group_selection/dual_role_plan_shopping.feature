@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: EE with consumer role plan purchase
 
   Scenario: when user purchase plan for self & having ineligible family member

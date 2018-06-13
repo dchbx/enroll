@@ -61,16 +61,23 @@
                 </span>
               </td>
               <td>
-                <span class="ttu lg twelve">
+                <span class="ttu lg twelve" style="margin-left: -10px">
                   Network
                 </span>
                 <br/>
-                <span class="ttu dg fourteen">
-                  <%= @plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                <span class="ttu dg fourteen" style="margin-left: -10px">
+                  <% if offers_nationwide_plans? %>
+                    <%= @plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                  <% else %>
+                    <% if @plan.network_information.present? %>
+                        Network Notes
+                        <i class='fa fa-question-circle' data-toggle="tooltip" title="<%= @plan.network_information %>"></i>
+                    <% end %>
+                  <% end %>
                 </span>
               </td>
               <td>
-                <span class="ttu lg twelve">
+                <span class="ttu lg twelve" style="margin-left: -10px">
                   <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
                   Family Deductible
                   <% else %>
@@ -78,7 +85,7 @@
                   <% end %>
                 </span>
                 <br/>
-                <span class="ttu dg fourteen">
+                <span class="ttu dg fourteen" style="margin-left: -10px">
                   <%= deductible_display(@hbx_enrollment, @plan) %>
                 </span>
               </td>
@@ -105,8 +112,12 @@
             <% end %>
           </div>
           <div class="col-xs-4">
-            <% if @plan.nationwide %>
-            <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
+            <% if offers_nationwide_plans? %>
+              <% if @plan.nationwide %>
+              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
+              <% end %>
+            <% else %>
+              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
             <% end %>
           </div>
         </div>
