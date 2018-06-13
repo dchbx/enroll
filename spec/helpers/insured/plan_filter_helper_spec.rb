@@ -1,19 +1,20 @@
 require "rails_helper"
+include Config::SiteHelper
 
 RSpec.describe Insured::PlanFilterHelper, :type => :helper do
-  context "Shows Find Your Doctor link based on market kind" do 
+  context "Shows Find Your Doctor link based on market kind" do
     it "should return link for shop" do
       @market_kind="shop"
-      expect(find_my_doctor).to eq "<a target=\"_blank\" href=\"https://dc.checkbookhealth.org/dcshop/\">Find Your Doctor</a>"
+      expect(find_my_doctor).to eq "<a target=\"_blank\" href=\"#{find_your_doctor_url}\">Find Your Doctor</a>"
     end
-    
+
     it "should return link for individual" do
       @market_kind="individual"
       expect(find_my_doctor).to eq "<a target=\"_blank\" href=\"https://dc.checkbookhealth.org/dc/\">Find Your Doctor</a>"
     end
   end
 
-  context ".estimate_your_costs" do 
+  context ".estimate_your_costs" do
     it "should return link for congressional employee" do
       @market_kind="shop"
       @dc_checkbook_url=Settings.checkbook_services.congress_url

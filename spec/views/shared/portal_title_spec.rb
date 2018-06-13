@@ -8,6 +8,10 @@ RSpec.describe "layouts/_header.html.erb" do
   let(:employer_profile){ FactoryGirl.build(:employer_profile) }
   let(:employer_staff_role){ FactoryGirl.build(:employer_staff_role, :person=>person_user, :employer_profile_id=>employer_profile.id)}
   let(:signed_in?){ true }
+  #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
+  before do
+    Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
+  end
   before(:each) do
   	sign_in current_user
   end
@@ -55,7 +59,7 @@ RSpec.describe "layouts/_header.html.erb" do
 
   it 'identifies default controller' do
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/Welcome to the District/)
+    expect(rendered).to match(/#{Settings.site.header_message}/)
   end
 
 end

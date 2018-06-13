@@ -17,12 +17,6 @@ class ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility < ShopEm
     notice.plan_year = PdfTemplates::PlanYear.new({
                       :start_on => plan_year.start_on
       })
-    hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    notice.enrollment = PdfTemplates::Enrollment.new({
-                      :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
-                      :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
-      })
   end
 
 end

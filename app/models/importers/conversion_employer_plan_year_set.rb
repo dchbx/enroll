@@ -11,6 +11,7 @@ module Importers
 "City",
 "State",
 "Zip",
+"County",
 "Mailing Address 1",
 "Mailing Address 2",
 "City",
@@ -71,6 +72,7 @@ module Importers
       :ignore,
       :ignore,
       :ignore,
+      :ignore,
       :enrolled_employee_count,
       :new_coverage_policy,
       :ignore,
@@ -109,7 +111,7 @@ module Importers
       when "update"
         ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       else
-        ::Importers::ConversionEmployerPlanYear.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
+        ::Importers::ConversionEmployerPlanYearCreate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       end
     end
   end

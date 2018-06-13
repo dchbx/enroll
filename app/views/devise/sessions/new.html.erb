@@ -1,3 +1,4 @@
+<%= render partial: 'devise/shared/captcha' if aca_recaptcha_enabled %>
 <div class="container signin top-pd module">
     <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div class="col-md-6 col-sm-8 col-xs-12">
@@ -13,17 +14,26 @@
 			    <%= f.password_field :password, autocomplete: "off", class: "form-control" %>
 			</div>
 
-			<% if devise_mapping.rememberable? -%>
+			<% if devise_mapping.rememberable? %>
 		        <div class="form-group">
 		          <%= f.check_box :remember_me %>
 		          <%= f.label :remember_me %>
 		        </div>
-			<% end -%>
-
+			<% end %>
+      <% unless resource.login.nil? %>
+        <% if User.login_captcha_required?(resource.login)  %>
+          <div class="recaptcha-error alert-error"><p></p></div>
+          <div class="recaptcha" id="captcha-widget"></div>
+        <% end %>
+      <% end %>
 			<div class="actions">
 				<%= f.submit "Sign in", class: "btn btn-primary btn-lg sm_full_width " %>
 			</div><br>
 			<%= render "devise/shared/links" %>
+			<br/>
+          <div>
+            <span> WARNING! This system is the property of the <%= "#{Settings.site.short_name}"%> and contains U.S. Government information. By accessing and using this computer system, you are consenting to system monitoring for law enforcement and other purposes. Unauthorized use of the system is prohibited, and unauthorized use of, or access to, this computer system may subject you to state and federal criminal prosecution and penalities as well as civil penalties.</span>
+          </div>
 		<% end %>
 	</div>
   </div>

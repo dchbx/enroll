@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "shared/_summary.html.erb" do
-  let(:aws_env) { ENV['AWS_ENV'] || "local" }
+  let(:aws_env) { ENV['AWS_ENV'] || "qa" }
   let(:person){ instance_double("Person") }
   let(:family) { instance_double("Family") }
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name") }
@@ -14,6 +14,7 @@ describe "shared/_summary.html.erb" do
       :metal_level => "Silver",
       :plan_type => "A plan type",
       :nationwide => true,
+      :network_information => "This is a test",
       :deductible => 0,
       :total_premium => 0,
       :total_employer_contribution => 0,
@@ -28,7 +29,7 @@ describe "shared/_summary.html.erb" do
       :is_standard_plan => true,
       :can_use_aptc? => true,
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-                                     :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
+                                     :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
       ) }
   let(:mock_qhp_cost_share_variance) { instance_double("Products::QhpCostShareVariance", :qhp_service_visits => []) }
 
@@ -69,7 +70,7 @@ describe "shared/_summary.html.erb" do
     end
 
     it "should have a link to download the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector("a[href='#{"http://test.host/document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
 
     it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
@@ -105,10 +106,18 @@ describe "shared/_summary.html.erb" do
       expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
-    it "should not have provider directory url if nationwide = false" do
+    it "should not have provider directory url if nationwide = false(for dc)" do
+      allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       allow(mock_plan).to receive(:nationwide).and_return(false)
       render "shared/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to_not match(/#{mock_plan.provider_directory_url}/)
+    end
+
+    it "should not have provider directory url if nationwide = false(for ma)" do
+      allow(view).to receive(:offers_nationwide_plans?).and_return(false)
+      allow(mock_plan).to receive(:nationwide).and_return(false)
+      render "shared/summary", :qhp => mock_qhp_cost_share_variance
+      expect(rendered).to match(/#{mock_plan.provider_directory_url}/)
     end
   end
 end

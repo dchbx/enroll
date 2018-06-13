@@ -1,9 +1,9 @@
 <div class="dropdown pull-right" id="<%= row_actions_id %>">
-  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    Actions 
+	<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
+    Actions
     <span class="caret"></span>
   </button>
-  <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+  <ul class="dropdown-menu" aria-labelledby="dropdown_for_<%= row_actions_id %>">
   <% dropdowns.each do |line| %>
     <!-- line[0] is Link Name (Eg: Add SEP)
          line[1] is Link Path
@@ -14,17 +14,22 @@
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true%>
       <%when "static"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs" %>
+			<% when "post" %>
+				<%= link_to line[0], line[1], method: :post, class: "btn btn-info btn-xs" %>
       <%when "post_ajax"%>
         <%= link_to line[0], line[1], method: :post, class: "btn btn-info btn-xs",remote: true  %>
       <%when "ajax"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", remote: true %>
+      <%when "ajax with confirm"%>
+        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", remote: true, data: { confirm: line[3] } %>
+      <%when "delete with confirm"%>
+        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method => 'delete', data: { confirm: line[3] } %>
+			<% when "delete ajax with confirm"%>
+				<%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method=> 'delete', data: { confirm: line[3] } %>
+      <% when "delete ajax with confirm and elementId"%>
+        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4] %>
       <%end%>
     </li>
   <% end %>
   </ul>
 </div>
-<script>
-  $("li>a:contains('Collapse Form')").addClass('disabled');
-</script>
-
-

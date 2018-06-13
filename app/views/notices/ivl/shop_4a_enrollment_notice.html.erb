@@ -26,7 +26,7 @@
   </tbody>
 </table>
 <br/>
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "This is a reminder that you have until <OE End Date> to enroll into health coverage offered by <Employer Name> through #{Settings.site.short_name}. ".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "This is a reminder that you have until <OE End Date> to enroll into health coverage offered by <Employer Name> through #{site_short_name}. ".html_safe} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
   To complete the enrollment process, please complete the following steps:".html_safe} %>
@@ -44,7 +44,7 @@
    <span style='color:#ff0000; font-weight:bold;'> [If ER does NOT have a Broker/Assister] </span> Contact your employer further assistance.
 ".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{site_short_name} with any questions:".html_safe} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
  ["Online at [HBEURL]".html_safe,
   "By email at [HBEEMAIL]; or".html_safe,

@@ -7,7 +7,7 @@
                                     "https://dchealthlink.com/"
                                     target=
                                     "_blank">
-                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "250"  %>
+                                    <%= image_tag "#{Rails.root}/app/assets/images/health_connector.png", style: "height: auto; vertical-align: top;", width: "250"  %>
                                   </a></td>
     </tr>
   </tbody>
@@ -32,7 +32,7 @@
         </td>
     </tr>
     <tr>
-      <td><h3><%= Settings.site.short_name %> Plan Year 2016Open Enrollment &PreliminaryRenewal Notice</h3></td>
+      <td><h3><%= site_short_name %> Plan Year 2016Open Enrollment &PreliminaryRenewal Notice</h3></td>
     </tr>
     <tr class="fssizeuser">
       <td>Dear <%= notice.primary_fullname.strip %>,</td>
@@ -42,14 +42,14 @@
 <table class="total_table" border="0">
   <tbody>
     <tr class="widn">
-      <td><%= Settings.site.short_name %> has started the process of renewing eligibility for the 2016 plan year, which begins on January 1, 2016.  This involves two steps.  </td>
+      <td><%= site_short_name %> has started the process of renewing eligibility for the 2016 plan year, which begins on January 1, 2016.  This involves two steps.  </td>
     </tr>
   </tbody>
 </table>
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><ul style="list-style:none;"><li class="mar20">1) We need to make sure that the information we have about you is up to date. This notice tells you whether you and any other individuals in your household are eligible to purchase a <%= Settings.site.short_name %> plan in 2016.  If you disagree with any of the information we used to make this determination, you should update us using the process described below.  </li><li  class="mar20"> 2)  You will have the opportunity to select a different health plan for 2016 once open enrollment for 2016 starts on November 1, 2015. This notice includes additional information about open enrollment. </li></ul></td>
+      <td><ul style="list-style:none;"><li class="mar20">1) We need to make sure that the information we have about you is up to date. This notice tells you whether you and any other individuals in your household are eligible to purchase a <%= site_short_name %> plan in 2016.  If you disagree with any of the information we used to make this determination, you should update us using the process described below.  </li><li  class="mar20"> 2)  You will have the opportunity to select a different health plan for 2016 once open enrollment for 2016 starts on November 1, 2015. This notice includes additional information about open enrollment. </li></ul></td>
       </tr>
 
   </tbody>
@@ -297,19 +297,19 @@
 <table class="total_table" border="0">
 <tbody>
 <tr class="mar20 fssizeuser">
-      <td>You can report any changes by calling <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %> and <span style="text-decoration:underline;">tell the customer service representative that you want to make changes to the information usedfor your 2016 renewal.</span>   </td>
+      <td>You can report any changes by calling <%= contact_center_name %> at <%= contact_center_phone_number %> and <span style="text-decoration:underline;">tell the customer service representative that you want to make changes to the information usedfor your 2016 renewal.</span>   </td>
     </tr>
      <tr>
       <td><h3 style="color:rgb(54,95,145);">Your Secure User Account</h3></td>
     </tr>
     <tr class="mar20 fssizeuser">
       <td>
-Your "My Account" available at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%></a> is a place where important information about your account is stored.  <strong>HOWEVER, YOUR "MY ACCOUNT" WILL NOT CONTAIN INFORMATION ABOUT 2016 OPEN ENROLLMENT UNTIL NOVEMBER 1, 2015.</strong> You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it either by:1) Using the "Forgot Password" feature on the login page and answering security questions you established when you setup the account or 2) calling the <%= Settings.contact_center.name %> toll free at <%= Settings.contact_center.phone_number %>.
+Your "My Account" available at <%= site_home_link %> is a place where important information about your account is stored.  <strong>HOWEVER, YOUR "MY ACCOUNT" WILL NOT CONTAIN INFORMATION ABOUT 2016 OPEN ENROLLMENT UNTIL NOVEMBER 1, 2015.</strong> You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it either by:1) Using the "Forgot Password" feature on the login page and answering security questions you established when you setup the account or 2) calling the <%= contact_center_name %> toll free at <%= contact_center_phone_number %>.
 </td>
     </tr>
 
     <tr class="mar20 fssizeuser">
-      <td>If you do not have a "My Account", you can create one at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%></a>  On the main page, click on "Apply Now" and enter your information.  Once the account is created, select "Find an already submitted application" and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to Your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= Settings.site.short_name %>.</td>
+      <td>If you do not have a "My Account", you can create one at <%= site_home_link %>  On the main page, click on "Apply Now" and enter your information.  Once the account is created, select "Find an already submitted application" and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to Your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= site_short_name %>.</td>
     </tr>
     </tbody>
     </table>

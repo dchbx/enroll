@@ -1,0 +1,83 @@
+@import "variables";
+
+@import "bootstrap";
+@import "dragtable";
+@import "custom";
+
+.compare-table {
+  tr {
+    td:first-of-type, th:first-of-type {
+      background-color: #E8E8E8;
+      border: none;
+      text-align: left;
+      vertical-align: center;
+      font-size: 12px;
+      &.row-title {
+        font-size: 24px;
+        color: #414141;
+        font-weight: 600;
+      }
+    }
+    th, td {
+      text-align: center;
+      vertical-align: center;
+      img {
+      }
+    }
+    td, th {
+      border-left: 1px solid #ddd;
+      border-right: none;
+      &:first-of-type {
+
+      }
+    }
+
+  }
+  .row-title {
+    font-size: 24px;
+    color: #414141;
+    font-weight: 600;
+  }
+}
+
+table.benefit-group-contribution-table {
+  padding: 0 2%;
+  margin: auto;
+  table-layout: fixed;
+
+  tr.not-offered {
+    opacity: 0.35;
+  }
+
+  tr:first-of-type {
+    border-top: none;
+    th:first-of-type {
+      width: 28%;
+    }
+    th {
+      font-weight: normal;
+      text-transform: uppercase;
+      padding: 10px 0;
+      color: #9b9b9b;
+    }
+
+  }
+  tr {
+    border-bottom: solid 1px #d5d5d5;
+
+    td {
+      padding: 15px 0;
+      font-size: 16px;
+      i {
+        margin-left: -17%;
+        color: #69A30D;
+        margin-right: 10px;
+        cursor: default;
+      }
+    }
+    &:last-of-type {
+      border-bottom: none;
+      display: none;
+    }
+  }
+}

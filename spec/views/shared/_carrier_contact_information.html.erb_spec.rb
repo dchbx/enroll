@@ -6,6 +6,6 @@ describe "shared/_carrier_contact_information.html.erb" do
   end
   it "should display the carrier name and number" do
     expect(rendered).to match plan.carrier_profile.legal_name
-    expect(rendered).to match("1-877-856-2430")
+    expect(rendered).to match("1-855-833-8120")
   end
 end

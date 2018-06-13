@@ -1,0 +1,17 @@
+<div class="modal claimQuoteWarning" id="claimQuoteWarning" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Create Plan Year by claiming a broker quote</h4>
+      </div>
+      <div class="modal-body">
+       <%= raw(warnings[0]) %>
+      </div>
+      <div class="modal-footer">
+        <%= link_to "Proceed", "", data: { toggle: "modal", target: "#claimQuoteModal", 'dismiss': 'modal' }, class: 'btn btn-default' %>
+        <%= link_to 'Cancel', "", class: 'btn btn-default', data: {'dismiss': 'modal' } %>
+      </div>
+    </div>
+  </div>
+</div>

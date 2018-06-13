@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>RE: Application to Offer Group Health Coverage in <%= Settings.site.short_name %></h3></td>
+      <td><h3>RE: Application to Offer Group Health Coverage in <%= site_short_name %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -19,28 +19,28 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Thank you for applying to offer group health coverage through #{Settings.site.short_name}.  However, based upon the information you have provided, we are unable to verify your eligibility to offer group health coverage in #{Settings.site.short_name} at this time."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Thank you for applying to offer group health coverage through #{site_short_name}.  However, based upon the information you have provided, we are unable to verify your eligibility to offer group health coverage in #{site_short_name} at this time."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "We have been unable to determine whether your organization meets #{Settings.site.short_name} eligibility criteria [Employer Eligibility Criteria “one”, “two”, “three” and/or “four”], as listed below."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "We have been unable to determine whether your organization meets #{site_short_name} eligibility criteria [Employer Eligibility Criteria “one”, “two”, “three” and/or “four”], as listed below."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "In order to participate in #{Settings.site.short_name}, federal and District regulations require that an employer:"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "In order to participate in #{site_short_name}, federal and District regulations require that an employer:"} %>
 
 <%= render partial: 'notices/shared/ordered_list', :locals => { listings:
 	["Has a valid Employer Identification Number (EIN);",
 	 "Has 50 or fewer full-time equivalent employees (FTEs);",
 	 "Offers coverage, at a minimum, to all full-time employees working 30 hours per week or more; and",
-	 "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full-time employees through #{Settings.site.short_name}, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>OR</strong><br>Offers coverage through #{Settings.site.short_name} to all full-time employees whose primary worksite is located in the #{Settings.aca.state_name}."]} %>
+	 "Has its principal business address in the #{aca_state_name} and offers coverage to all full-time employees through #{site_short_name}, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>OR</strong><br>Offers coverage through #{site_short_name} to all full-time employees whose primary worksite is located in the #{aca_state_name}."]} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<i>See 45 C.F.R. 155.710(b) for more information.</i>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Therefore, at this time, you will not be able to offer coverage to your employees through #{Settings.site.short_name}."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Therefore, at this time, you will not be able to offer coverage to your employees through #{site_short_name}."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have <strong><u>30 days from the date of this notification</u></strong> to provide supporting documentation related to your application to offer coverage in #{Settings.site.short_name}. Supporting documentation can be provided by:"], heading: 'What If I Think I Am Eligible?', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have <strong><u>30 days from the date of this notification</u></strong> to provide supporting documentation related to your application to offer coverage in #{site_short_name}. Supporting documentation can be provided by:"], heading: 'What If I Think I Am Eligible?', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                   ["Email: 	#{notice.hbe.email}",
                                                                    "Fax: 	#{notice.hbe.fax}",
-   "Mail:  	#{Settings.site.short_name}<br>
+   "Mail:  	#{site_short_name}<br>
    			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
    			Attn: Employer Eligibility Review<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -50,7 +50,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         #{notice.hbe.address.city}, #{notice.hbe.address.state} #{notice.hbe.address.zip}"] } %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "At the end of the 30-day period, if you are not able to provide documentation supporting your eligibility to offer health coverage through #{Settings.site.short_name}, we will notify you that you have been determined to be ineligible for #{Settings.site.short_name} and explain your right to appeal that determination."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "At the end of the 30-day period, if you are not able to provide documentation supporting your eligibility to offer health coverage through #{site_short_name}, we will notify you that you have been determined to be ineligible for #{site_short_name} and explain your right to appeal that determination."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you disagree with any of these findings, you have the right to an appeal. <u>There are deadlines to appeal, so you should act quickly</u>.  Details about the appeals process are included at the end of this notice."], heading: 'Your Right to Appeal', sub_heading: ''} %>
 
@@ -60,18 +60,18 @@
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                   ["Logging into your account at (#{notice.hbe.url})",
-   "Calling #{Settings.site.short_name} Contact Center at #{notice.hbe.phone}",
+   "Calling #{site_short_name} Contact Center at #{notice.hbe.phone}",
    ["Completing a Request for Hearing form and sending it via fax or email:",
     ["Fax: #{notice.hbe.fax}",
      "Email: #{notice.hbe.email}"]],
    "Going to any Department of Human Services Service Center (locations found at www.dhs.dc.gov) and filling out a Request for Hearing.",
    "Going to the Office of Administrative Hearings Resource Center, located at 441 4th Street NW, Suite 450-North, and filling out a Request for Hearing."] } %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<strong>Administrative Review</strong> – #{Settings.site.short_name} representatives will review your case prior to the hearing to try to resolve your issue.  You will be contacted by #{Settings.site.short_name} representatives to schedule a <u>voluntary</u> meeting to discuss your concerns and correct any mistakes #{Settings.site.short_name} may have made.  Please bring documents related to your eligibility to this meeting, as it will be easier for the representative to make any necessary changes to the decision."], heading: 'What to Expect From the Process', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<strong>Administrative Review</strong> – #{site_short_name} representatives will review your case prior to the hearing to try to resolve your issue.  You will be contacted by #{site_short_name} representatives to schedule a <u>voluntary</u> meeting to discuss your concerns and correct any mistakes #{site_short_name} may have made.  Please bring documents related to your eligibility to this meeting, as it will be easier for the representative to make any necessary changes to the decision."], heading: 'What to Expect From the Process', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Hearing</strong> - If you choose not to attend the voluntary meeting with #{Settings.site.short_name} representatives, or if you disagree with the decision they made, you can go to a hearing before an independent judge at the Office of Administrative Hearings (OAH).   You will be separately contacted by OAH regarding the date for the hearing.  If you receive a scheduling notice from OAH before your meeting with #{Settings.site.short_name} representatives, you are still encouraged to go the #{Settings.site.short_name} meeting."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Hearing</strong> - If you choose not to attend the voluntary meeting with #{site_short_name} representatives, or if you disagree with the decision they made, you can go to a hearing before an independent judge at the Office of Administrative Hearings (OAH).   You will be separately contacted by OAH regarding the date for the hearing.  If you receive a scheduling notice from OAH before your meeting with #{site_short_name} representatives, you are still encouraged to go the #{site_short_name} meeting."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "At the OAH hearing you can testify, have others testify on your behalf, and submit documents.  #{Settings.site.short_name} representatives will be able to ask questions of you or others that testify.  After you present your case, #{Settings.site.short_name} will present its own testimony and documents.  You will have the opportunity to ask questions of #{Settings.site.short_name} representatives.   After the hearing, the judge will make a decision in writing and will send it to you via mail.  The document from OAH will include details on your next course of action if you remain in disagreement with the decision."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "At the OAH hearing you can testify, have others testify on your behalf, and submit documents.  #{site_short_name} representatives will be able to ask questions of you or others that testify.  After you present your case, #{site_short_name} will present its own testimony and documents.  You will have the opportunity to ask questions of #{site_short_name} representatives.   After the hearing, the judge will make a decision in writing and will send it to you via mail.  The document from OAH will include details on your next course of action if you remain in disagreement with the decision."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have the right to represent yourself at the Administrative Review and/or at the Hearing.  You can also have a friend or family member represent you, or you can be represented by legal counsel.  If you want free legal counsel regarding the Administrative Review or Hearing process, you may contact one of the following agencies for assistance:"], heading: 'Obtaining Representation', sub_heading: ''} %>
 
@@ -113,9 +113,9 @@
 	</tr>
 </table>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Before a hearing decision is made, you can stop your appeal through any of the methods described above for requesting the appeal.  If you stop your appeal based on a new decision arrived upon during your meeting with #{Settings.site.short_name} representatives, your new eligibility will reflect the agreed upon changes.    However, if you stop your appeal before you meet with #{Settings.site.short_name} representatives or before #{Settings.site.short_name} has changed its decision, the original decision will be implemented as written in the notice you first received prior to appeal."], heading: 'Ending Your Appeal Early', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Before a hearing decision is made, you can stop your appeal through any of the methods described above for requesting the appeal.  If you stop your appeal based on a new decision arrived upon during your meeting with #{site_short_name} representatives, your new eligibility will reflect the agreed upon changes.    However, if you stop your appeal before you meet with #{site_short_name} representatives or before #{site_short_name} has changed its decision, the original decision will be implemented as written in the notice you first received prior to appeal."], heading: 'Ending Your Appeal Early', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Please contact your broker for further assistance.  You can also contact #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                   ["Online at #{notice.hbe.url};",

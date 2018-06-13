@@ -20,24 +20,24 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Welcome to DC Health Link! This notice contains important information about renewing your health insurance coverage for your small business. Your renewal will be processed through DC Health Link this year. The DC Health Link team has been working closely with our health insurance carriers on the renewal process, and <strong>[CARRIER NAME]</strong> has informed us that your policy is scheduled to be renewed on <strong>[RENEWAL DATE]</strong>."} %>
+content: "Welcome to #{site_short_name}! This notice contains important information about renewing your health insurance coverage for your small business. Your renewal will be processed through #{site_short_name} this year. The #{site_short_name} team has been working closely with our health insurance carriers on the renewal process, and <strong>[CARRIER NAME]</strong> has informed us that your policy is scheduled to be renewed on <strong>[RENEWAL DATE]</strong>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If you want to keep your current coverage, you won’t need to do anything.</strong> We will renew you automatically in the coverage you are currently offering. You will begin receiving monthly invoices from DC Health Link, not your carrier."} %>
+content: "<strong>If you want to keep your current coverage, you won’t need to do anything.</strong> We will renew you automatically in the coverage you are currently offering. You will begin receiving monthly invoices from #{site_short_name}, not your carrier."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If you work with a broker, your broker can do the renewal on your behalf.</strong> Brokers are able to manage your employee roster, make changes to your plan offerings prior to finalizing your plan offerings, and enroll employees once they have created an account on DC Health Link. If you would like to work with a broker and don’t have one, information about broker referrals is available on DCHealthLink.com under Get Help → Find a Broker."} %>
+content: "<strong>If you work with a broker, your broker can do the renewal on your behalf.</strong> Brokers are able to manage your employee roster, make changes to your plan offerings prior to finalizing your plan offerings, and enroll employees once they have created an account on #{site_short_name}. If you would like to work with a broker and don’t have one, information about broker referrals is available on DCHealthLink.com under Get Help → Find a Broker."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>DC Health Link offers 136 different plans from Aetna, CareFirst, Kaiser Permanente, and UnitedHealthcare.</strong> This includes high-deductible and zero deductible plans, PPOs, HMOs, and POS products. Many small businesses that have purchased coverage through DC Health Link saved on premiums and were able to offer their employees a choice of plans. In fact, our current customers include the DC Chamber of Commerce, the Greater Washington Hispanic Chamber of Commerce, and the Restaurant Association Metropolitan Washington – all saved on premiums and improved coverage offered to their employees when they purchased through DC Health Link."} %>
+content: "<strong>#{site_short_name} offers 136 different plans from Aetna, CareFirst, Kaiser Permanente, and UnitedHealthcare.</strong> This includes high-deductible and zero deductible plans, PPOs, HMOs, and POS products. Many small businesses that have purchased coverage through #{site_short_name} saved on premiums and were able to offer their employees a choice of plans. In fact, our current customers include the DC Chamber of Commerce, the Greater Washington Hispanic Chamber of Commerce, and the Restaurant Association Metropolitan Washington – all saved on premiums and improved coverage offered to their employees when they purchased through #{site_short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "DC Health Link makes offering choice to your employees easy for you. Based on your budget you can select a contribution and level of coverage and your employees can select a plan from all carriers. You still would get only one bill even when your employees choose coverage from different carriers."} %>
+content: "#{site_short_name} makes offering choice to your employees easy for you. Based on your budget you can select a contribution and level of coverage and your employees can select a plan from all carriers. You still would get only one bill even when your employees choose coverage from different carriers."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "<strong>If you want to take a look at what DC Health Link has to offer small businesses, just go to DCHealthLink.com and create an account.</strong> Here is what you can do once you create an account:",
+  previous: "<strong>If you want to take a look at what #{site_short_name} has to offer small businesses, just go to DCHealthLink.com and create an account.</strong> Here is what you can do once you create an account:",
   listings: ["Review the health insurance plans you offer your employees and how much you contribute to their health insurance premiums. After you enter information about your business, you will be able to see your employees’ information as well as your plan offerings. If you do not see this information, your FEIN may be incorrect and you or your broker should contact us right away at (855) 532-5465 if this occurs.",
-    "DC Health Link has the information for all of your employees enrolled in health insurance as of February 2016. If you have any new hires, recent terminations, or other employees who are eligible but not currently enrolled, work with your broker to include these changes to your employee roster prior to finalizing your plan offerings, so that these changes will reflect in your estimated monthly cost."] } %>
+    "#{site_short_name} has the information for all of your employees enrolled in health insurance as of February 2016. If you have any new hires, recent terminations, or other employees who are eligible but not currently enrolled, work with your broker to include these changes to your employee roster prior to finalizing your plan offerings, so that these changes will reflect in your estimated monthly cost."] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "After working with your broker to update your employees’ information, you can review your plan offerings, your contribution to your employee’s premiums, and select a reference plan which will fix your costs. Your employees will also have until [13th of month prior to renewal date], to make their plan selections."} %>
@@ -48,12 +48,12 @@ content: "We are excited to serve your small business in meeting your health ins
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Please review the following attachments to this letter:<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attachment 1 – When to go to your Carrier and to DC Health Link<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attachment 1 – When to go to your Carrier and to #{site_short_name}<br>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attachment 2 – Creating an Employer Account Walkthrough Guide<br>"} %>
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Thank you,<br><br>DC Health Link Small Business Marketplace Team"} %>
+content: "Thank you,<br><br>#{site_short_name} Small Business Marketplace Team"} %>
 
 
 

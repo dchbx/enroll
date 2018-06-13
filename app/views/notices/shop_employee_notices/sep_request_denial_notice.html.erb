@@ -1,220 +1,172 @@
-<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
-<%= render partial: 'notices/shared/logo_and_address_shop' %>
-<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
-<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover', :locals => {notice: notice}%>
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/address', :locals => {notice: notice} %>
+<br><br><br><br><br>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+  	<td> Dear <%= notice.primary_fullname %>,  </td>
+  </tr>
+  </tbody>
+</table>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You recently requested a special enrollment period due to experiencing a qualifying event, #{notice.qle.title}. Upon review of the information you provided on #{notice.qle.qle_reported_on.to_date}, your request has been denied. The date you submitted does not qualify you for a special enrollment period. <strong>You had through #{notice.qle.reporting_deadline} to report the event, based on the date you experienced this event, #{notice.qle.qle_on}.</strong> Qualifying events cannot be reported prior to the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. If you believe this decision is the result of an error, please contact the #{site_short_name} Contact Center at #{contact_center_phone_number} [TTY #{contact_center_tty_number}] for additional assistance."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+	content: "This means that, although you may be eligible to participate in the #{site_short_name}, you are not eligible to enroll in or make changes to your current plan through a special enrollment period.  This is because the annual open enrollment period is closed and you reported your qualifying event after #{notice.qle.reporting_deadline} or before the qualifying event occurred."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+	content: "Please note that your employer’s annual Open Enrollment for the #{notice.plan_year.start_on} Plan Year closed on <strong>#{notice.plan_year.open_enrollment_end_on}</strong>. Open enrollment occurs for a period of time each year when eligible employees can enroll into a plan for the first time, add or drop family members, change their plan, or terminate coverage. Once open enrollment ends each year, employees must meet certain criteria to be able to enroll, terminate, or make other changes to their coverage. This is called a Special Enrollment Period. Circumstances that allow employees to enroll in health plans through a Special Enrollment Period include the following, <u>when reported promptly</u> (usually within 30 days)."} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Special Enrollment Period Denial</h3></td>
-    </tr>
-  </tbody>
+      <td>
+        <ul>
+          <li style="margin-top: 0px;">
+            Gaining access to new health plans as a result of a permanent move
+            <ul>
+               <li>As long as you had previous comprehensive health coverage for at least one day of the 60 days prior to the move, or were moving from a foreign country or a U.S. territory</li>
+            </ul>
+               </li>
+               <li style="margin-top: 5px;">
+                 Birth, adoption, placement for adoption, or placement for foster care
+               </li>
+               <li style="margin-top: 5px;">
+                 Getting married or entering a domestic partnership
+               </li>
+               <li style="margin-top: 5px;">
+                 Getting divorced or terminating a domestic partnership
+               </li>
+               <li style="margin-top: 5px;">
+                 Death of an employee or dependent
+               </li>
+               <li style="margin-top: 5px;">
+                 Loss of minimum essential health coverage resulting from a loss of eligibility due to:
+	            <ul>
+	               <li>Termination of employment or change in employment status</li>
+	            </ul>
+	            <ul>
+	               <li>Loss of dependent status due to child aging off a parent’s plan</li>
+	            </ul>
+	            <ul>
+	               <li>No longer residing, living, or working in the health plan’s service area</li>
+	            </ul>
+	           </li>
+	           <li style="margin-top: 5px;">
+	             Loss of minimum essential coverage due to:
+	             <ul>
+	             	<li>Termination of employer contributions</li>
+	             </ul>
+	             <ul>
+	             	<li>Exhaustion of COBRA or state continuation coverage</li>
+	             </ul>
+	             <ul>
+	             	<li>Loss of pregnancy-related Medicaid coverage</li>
+	             </ul>
+	             <ul>
+	             	<li>Loss of medically needy Medicaid coverage</li>
+	             </ul>
+	             <ul>
+	             	<li>Any other involuntary loss of coverage</li>
+	             </ul>
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Losing access to employer-sponsored coverage because employee enrolls in Medicare
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Losing access to COBRA or state continuation coverage because employer failed to submit premiums on time
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Losing eligibility for coverage under a State Medicaid or CHIP program
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Unintentional, inadvertent, or erroneous failure to enroll that was the fault of a <%= "#{site_short_name}"%> employee or the enrollment error was the result of error, misrepresentation, misconduct, or inaction by a broker or assister providing enrollment assistance, or an insurance company representative
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  A qualified health plan substantially violates a material provision of its contract
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  An employee or dependent demonstrates that a material error related to plan benefits, service areas, or premium influenced their decision to enroll in a QHP
+	           </li>
+	           <li style="margin-top: 5px;">
+	              Being the victim of domestic abuse or spousal abandonment, or a dependent of the victim
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Losing eligibility for an exemption from the individual mandate penalty outside of an annual open enrollment period
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Starting or concluding service as an AmeriCorps State and Local, NCCC, or VISTA volunteer
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Being a registered member of a Native American tribe, or their dependent, under section 4 of the Indian Health Care Improvement Act
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Being court-ordered to obtain health coverage for yourself or someone else
+	           </li>
+	           <li style="margin-top: 5px;">
+	           	  Consumer prevented from enrolling during their annual open enrollment or special enrollment period due to:	  	  	  
+	           	<ul>
+	           		<li>Natural disaster such as an earthquake, massive flooding, or hurricane</li>
+	           	</ul>
+	           	<ul>
+	           		<li>Serious medical condition such as an unexpected hospitalization or temporary cognitive disability</li>
+	           	</ul>
+	           	<ul>
+	           		<li><%= "#{site_short_name}" %> system outage</li>
+	           	</ul>
+	           </li>
+	        </ul>
+	    </td>
+	</tr>
+  </tbody>	           				
 </table>
 
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>Dear <%= notice.primary_fullname %>:  </td>
-    </tr>
-  </tbody>
-</table>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+	content: "Though your request was denied, you can still request a special enrollment period at any time during the year if you meet any of the requirements listed above. You may submit a new request for a special enrollment period at any time, with new information, by calling the #{site_short_name}'s Contact Center at #{contact_center_alt_phone_number} [TTY #{contact_center_tty_number}]."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You recently requested a special enrollment period due to experiencing a qualifying event, #{notice.sep.title}. Upon review of the information you provided on #{notice.sep.qle_on}, your request has been denied. The date you submitted does not qualify you for a special enrollment period. You had through #{notice.sep.end_on} to report the event, based on the date you experienced this event, #{notice.sep.qle_on}. Qualifying events cannot be reported prior to the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. If you believe this decision is the result of an error, please contact the #{Settings.site.short_name} Contact Center at #{notice.hbe.phone} [TTY 711] for additional assistance."} %>
+	content: "<strong>Other Coverage You May Have</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This means that, although you may be eligible to participate in #{Settings.site.short_name}, you are not eligible to enroll in or make changes to your current plan through a special enrollment period. This is because the annual open enrollment period is closed and you reported your qualifying event more than 30 days after you experienced the qualifying event or before the qualifying event occurred."} %>
+	content: "<strong>If you currently have other coverage that is not part of this request (for example, if you are requesting to be enrolled into a health plan but you already have a separate dental plan), this denial does not impact that enrollment.</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Please note that your employer’s annual Open Enrollment for Plan Year 2017 closed on #{notice.plan_year.open_enrollment_end_on}. Open enrollment occurs for a period of time each year when eligible employees can enroll into a plan for the first time, add or drop family members, change their plan, or terminate coverage. Once open enrollment ends each year, employees must meet certain criteria to be able to enroll, terminate, or make other changes to their coverage. This is called a Special Enrollment Period. Circumstances that allow employees to enroll in health plans through a Special Enrollment Period include the following, when reported promptly (usually within 30 days)."} %>
-
-  <table class="total_table" border="0">
-    <tbody>
-      <tr>
-        <td>
-          <ul>
-            <li style="margin-top: 0px;">
-              Gaining access to new health plans as a result of a permanent move
-              <ul>
-                <li>As long as you had previous comprehensive health coverage for at least one day of the 60 days prior to the move, or were moving from a foreign country or a U.S. territory</li>
-              </ul>
-            </li>
-            <li style="margin-top: 5px;">
-              Birth, adoption, placement for adoption, or placement for foster care
-            </li>
-            <li style="margin-top: 5px;">
-              Getting married or entering a domestic partnership
-            </li>
-            <li style="margin-top: 5px;">
-              Getting divorced or terminating a domestic partnership
-            </li>
-            <li style="margin-top: 5px;">
-              Death of an employee or dependent
-            </li>
-            <li style="margin-top: 5px;">
-              Loss of minimum essential health coverage resulting from a loss of eligibility due to:
-              <ul>
-                <li>Termination of employment or change in employment status</li>
-              </ul>
-              <ul>
-                <li>Loss of dependent status due to child aging off a parent’s plan</li>
-              </ul>
-              <ul>
-                <li>No longer residing, living, or working in the health plan’s service area</li>
-              </ul>
-            </li>
-            <li style="margin-top: 5px;">
-              Loss of minimum essential coverage due to:
-              <ul>
-                <li>Termination of employer contributions</li>
-              </ul>
-              <ul>
-                <li>Exhaustion of COBRA or state continuation coverage</li>
-              </ul>
-              <ul>
-                <li>Loss of pregnancy-related Medicaid coverage</li>
-              </ul>
-              <ul>
-                <li>Loss of medically needy Medicaid coverage</li>
-              </ul>
-              <ul>
-                <li>Any other involuntary loss of coverage</li>
-              </ul>
-            </li>
-            <li style="margin-top: 5px;">
-              Losing access to employer-sponsored coverage because employee enrolls in Medicare
-            </li>
-            <li style="margin-top: 5px;">
-              Losing access to COBRA or state continuation coverage because employer failed to submit premiums on time
-            </li>
-            <li style="margin-top: 5px;">
-              Losing eligibility for coverage under a State Medicaid or CHIP program
-            </li>
-            <li style="margin-top: 5px;">
-              Unintentional, inadvertent, or erroneous failure to enroll that was the fault of a <%= Settings.site.short_name %> employee or the enrollment error was the result of error, misrepresentation, misconduct, or inaction by a broker or assister providing enrollment assistance, or an insurance company representative
-            </li>
-            <li style="margin-top: 5px;">
-              A qualified health plan substantially violates a material provision of its contract
-            </li>
-            <li style="margin-top: 5px;">
-              An employee or dependent demonstrates that a material error related to plan benefits, service areas, or premium influenced their decision to enroll in a QHP
-            </li>
-            <li style="margin-top: 5px;">
-              Being the victim of domestic abuse or spousal abandonment, or a dependent of the victim
-            </li>
-            <li style="margin-top: 5px;">
-              Losing eligibility for an exemption from the individual mandate penalty outside of an annual open enrollment period
-            </li>
-            <li style="margin-top: 5px;">
-              Starting or concluding service as an AmeriCorps State and Local, NCCC, or VISTA volunteer
-            </li>
-            <li style="margin-top: 5px;">
-              Being a registered member of Native American tribe, or their dependent, under section 4 of the Indian Health Care Improvement Act
-            </li>
-            <li style="margin-top: 5px;">
-              Being court-ordered to obtain health coverage for yourself or someone else
-            </li>
-            <li style="margin-top: 5px;">
-              Consumer prevented from enrolling during their annual open enrollment or special enrollment period due to:
-              <ul>
-                <li>Natural disaster such as an earthquake, massive flooding, or hurricane</li>
-              </ul>
-              <ul>
-                <li>Serious medical condition such as an unexpected hospitalization or temporary cognitive disability</li>
-              </ul>
-              <ul>
-                <li>Loss of pregnancy-related Medicaid coverage</li>
-              </ul>
-              <ul>
-                <li><%= Settings.site.short_name %> system outage</li>
-              </ul>
-            </li>
-          </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+	content: "<strong>Medicaid Enrollment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Though your request was denied, you can still request a special enrollment period at any time during the year if you meet any of the requirements listed above. You may submit a new request for a special enrollment period at any time, with new information, by calling #{Settings.site.short_name} Contact Center at 1-855-532-5465 [TTY 711]."} %>
+	content: "The enrollment period for Medicaid never closes. A person can apply for Medicaid coverage through MassHealth at any time of the year by completing an application for financial assistance on <a href= '#{site_main_web_address_url}'>#{site_main_web_address_text}</a>.  Nothing in this decision impacts the eligibility of anyone in your household who has already been determined eligible for Medicaid or may become eligible in the future."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If you have a complaint related to your health/dental company you can file a complaint with the DC Department of Insurance, Securities and Banking (DISB)</strong>, which regulates insurers and insurance brokers in the #{Settings.aca.state_name}. You can file a complaint with DISB at the following link: <a href='http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0'>http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0</a>, by email at disb.complaints@dc.gov, or by calling 202-727-8000."} %>
+	content: "<strong>Annual Open Enrollment Period</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Other Coverage You May Have</strong>"} %>
+	content: "If you do not qualify for a new Special Enrollment Period, your next opportunity to enroll in employer-sponsored coverage through the #{site_short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective #{notice.plan_year.renewing_start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If you currently have other coverage that is not part of this request (for example, if you are requesting to be enrolled into a health plan but you already have a separate dental plan), this denial does not impact that enrollment.</strong> Call your health insurance or dental company at the numbers below if you have any questions."} %>
-
-<table align="center" class="total_table" border="1">
-  <tbody>
-    <tr>
-      <td>Aetna</td>
-      <td>(855) 885-3289</td>
-      <td>Delta Dental </td>
-      <td>(800) 471-0236</td>
-    </tr>
-    <tr>
-      <td>CareFirst </td>
-      <td>(855) 444-3119</td>
-      <td>Dominion Dental</td>
-      <td>(888) 518-5338</td>
-    </tr>
-    <tr>
-      <td>Kaiser</td>
-      <td>(800) 777-7902</td>
-      <td>MetLife Dental</td>
-      <td>(855) 638-2221</td>
-    </tr>
-    <tr>
-      <td>UnitedHealthcare</td>
-      <td>(877) 856-2430</td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
-</table>
-
+	content: "<strong>Individual Market Enrollment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Medicaid Enrollment</strong>"} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "The enrollment period for Medicaid never closes. A person can apply for Medicaid coverage through #{Settings.site.short_name} at any time of the year by completing an application for financial assistance. Nothing in this decision impacts the eligibility of anyone in your household who has already been determined eligible for Medicaid or may become eligible in the future."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Annual Open Enrollment Period</strong>"} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you do not qualify for a new Special Enrollment Period, your next opportunity to enroll in employer-sponsored coverage through #{Settings.site.short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective #{notice.plan_year.start_on}."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Individual Market Enrollment</strong>"} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you do not qualify to enroll in employer-sponsored coverage or other coverage before then, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period you can enroll in individual market coverage through #{Settings.site.short_name} if you live in the #{Settings.aca.state_name}. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. If you live outside the #{Settings.aca.state_name}, you can apply during open enrollment through the health insurance exchange operating in your state."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If you are a #{Settings.aca.state_name} resident and think you might be eligible for an individual market Special Enrollment Period, you can contact #{Settings.site.short_name} to see if you are eligible to enroll through a Special Enrollment Period."} %>
+	content: "If you do not qualify to enroll in employer-sponsored coverage or other coverage before then, you may be eligible for a Special Enrollment Period in the #{site_short_name}’s individual market coverage.  If you are a #{aca_state_name} resident and think you might be eligible for an individual market Special Enrollment Period, you can contact the #{site_short_name}’s individual marketplace at #{contact_center_ivl_number} to see if you are eligible to enroll through a Special Enrollment Period."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: [""],
-  heading: 'For Questions or Assistance:', sub_heading: ''} %>
+	content: [""],
+	heading: 'For Questions or Assistance:',
+	col_styles: ['margin-bottom: 0px']} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:",
-  listings: ["By calling #{notice.hbe.phone}.",
-            "TTY: #{Settings.contact_center.tty}",
-            "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => {
+	previous: "Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:",
+	listings: ["By calling #{contact_center_phone_number}. TTY: #{contact_center_tty_number}",
+			  "By email: <a href='mailto:#{small_businesss_email}'>#{small_businesss_email}</a>"]} %>
 
-<% if notice.broker.present? %>
-  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
-<% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+	content: "You can also find more information on our website at <a href= '#{site_main_web_address_url}'>#{site_main_web_address_text}</a>."} %>
+<br>
+<% if notice.broker.present? %>					
+<%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "This notice is being provided in accordance with 45 C.F.R. §155.725 and 45 C.F.R. §155.420."} %>
- 
+	content: "This notice is being provided in accordance with 45 C.F.R. §155.725 and 45 C.F.R. §155.420."} %>                    	

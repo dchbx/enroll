@@ -59,3 +59,4 @@ class TranslationsController < ApplicationController
     params.require(:translation).permit(:key, :value)
   end
 end
+

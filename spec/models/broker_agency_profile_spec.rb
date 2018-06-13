@@ -17,8 +17,38 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   let(:bad_market_kind) {"commodities"}
   let(:primary_broker_role) { FactoryGirl.create(:broker_role) }
 
-  let(:market_kind_error_message) {"#{bad_market_kind} is not a valid practice area"}
+  let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
+  let(:enabled_market_kinds) { %W[shop individual both] }
 
+  before :each do
+    stub_const("BrokerAgencyProfile::MARKET_KINDS", enabled_market_kinds)
+  end
+
+  describe "individual market can be toggled..." do
+    let(:invalid_params) do
+      {
+        organization: organization,
+        market_kind: bad_market_kind,
+        entity_kind: "s_corporation",
+        primary_broker_role: primary_broker_role
+      }
+    end
+
+    context "when it is enabled" do
+      let(:bad_market_kind) { "commodities" }
+      it "should fail validation for individual" do
+        expect(BrokerAgencyProfile.create(**invalid_params).errors[:market_kind]).to eq [market_kind_error_message]
+      end
+    end
+
+    context "when it is disabled" do
+      let(:bad_market_kind) { "individual" }
+      let(:enabled_market_kinds) { %W[shop] }
+      it "should fail validation for individual" do
+        expect(BrokerAgencyProfile.create(**invalid_params).errors[:market_kind]).to eq [market_kind_error_message]
+      end
+    end
+  end
 
   describe ".new" do
     let(:valid_params) do
@@ -93,7 +123,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
           let(:broker_agency_account) { BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile.id,
                                           start_on: TimeKeeper.date_of_record, is_active: true)}
           let!(:my_clients)           { FactoryGirl.create_list(:employer_profile, my_client_count,
-                                          broker_agency_accounts: [broker_agency_account] )}
+                                          broker_agency_accounts: [broker_agency_account], sic_code: '1111' )}
 
           it "should find all my active employer clients" do
             expect(broker_agency_profile.employer_clients.to_a.size).to eq my_client_count
@@ -170,7 +200,8 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person)}
     let(:family1) {FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(10000), person:person)}
     let(:family2) {FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(10000))}
-    let(:organization) {FactoryGirl.create(:organization, fein: 333000535 + rand(1000))}
+    let!(:organization) {FactoryGirl.create(:organization, fein: 333000535 + rand(1000), employer_profile: employer)}
+    let(:employer) { build(:employer_profile, entity_kind: "partnership", sic_code: '1111', broker_agency_profile: broker_agency_profile) }
 
     it "should find a consumer family" do
       family1.hire_broker_agency(writing_agent.id)
@@ -183,7 +214,6 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
       expect(broker_agency_profile.families.count).to be(2)
     end
     it "should find a linked employee" do
-      employer = organization.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)
       employee_role = FactoryGirl.create(:employee_role, person: person, employer_profile: employer)
       expect(broker_agency_profile.linked_employees.count).to eq(1)
     end

@@ -7,7 +7,7 @@
                                     "https://dchealthlink.com/"
                                     target=
                                     "_blank">
-                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "250"  %>
+                                    <%= image_tag "#{Rails.root}/app/assets/images/health_connector.png", style: "height: auto; vertical-align: top;", width: "250"  %>
                                   </a></td>
     </tr>
   </tbody>
@@ -37,7 +37,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr class="widn">
-      <td>Based on the information you provided, you and/or other individuals in your household will be <strong>conditionally renewed</strong> in health insurance through <%= Settings.site.short_name %> for 2016.</td>
+      <td>Based on the information you provided, you and/or other individuals in your household will be <strong>conditionally renewed</strong> in health insurance through <%= site_short_name %> for 2016.</td>
     </tr>
     <tr class="widn">
       <td>Effective January 1, 2016, the following individual(s) will be enrolled in the health and/or dental insurance coverage listed below (as long as all premiums are paid).</td>
@@ -127,7 +127,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:0px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -190,7 +190,7 @@
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:0px;" border="1" bordercolor="#000">
 
 <tr>
-<td style="padding:3px 13px; font-size:13; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -205,7 +205,7 @@
       <td><ul>
           <li>Address;</li>
           <li>Incarceration;</li>
-          <li>Moving out of the <%= Settings.aca.state_name %>; or</li>
+          <li>Moving out of the <%= aca_state_name %>; or</li>
           <li>Immigration status;</li>
         </ul></td>
     </tr>
@@ -213,7 +213,7 @@
       <td>45 C.F.R. § 155.330(b)</td>
     </tr>
     <tr class="mar20">
-      <td>You can report changes by going online and logging in to your "My Account" or by calling <%= Settings.contact_center.name %> toll-free at <%= Settings.contact_center.phone_number %>.  Reporting changes is very important.</td>
+      <td>You can report changes by going online and logging in to your "My Account" or by calling <%= contact_center_name %> toll-free at <%= contact_center_phone_number %>.  Reporting changes is very important.</td>
     </tr>
   </tbody>
 </table>
@@ -253,14 +253,14 @@
       <td>[Repeat for as many member as is necessary]</td>
     </tr>
     <tr class="">
-      <td>Under federal law, 42 C.F.R. §435.910 and 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for Medicaid and <%= Settings.site.short_name %>. We will only use your Social Security Number to verify the information you told us on your application or renewal form. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency.</td>
+      <td>Under federal law, 42 C.F.R. §435.910 and 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for Medicaid and <%= site_short_name %>. We will only use your Social Security Number to verify the information you told us on your application or renewal form. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency.</td>
     </tr>
   </tbody>
 </table>
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:0px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -268,7 +268,7 @@
 <div class="page_break">
 <table class="mar20" border="0">
   <tbody>
-      <td>You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you Social Security Number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>.</td>
+      <td>You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you Social Security Number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact <%= contact_center_name %> at <%= contact_center_phone_number %>.</td>
     </tr>
     <tr class="mar20">
       <td><strong><span style="color:red;">[IF Citizenship/Immigration Unverified]</span> <span style="font-style:italic;">Documents of Citizenship or Immigration Status</span></strong>. We need proof of your U.S. citizenship or immigration status for the following applicant household members:</td>
@@ -334,7 +334,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:0px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13x; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13x; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -447,7 +447,7 @@
     <div class="footer">
     <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:0px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 
@@ -575,7 +575,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:20px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -602,7 +602,7 @@
               </td>
             </tr>
             <tr class="mar20">
-                <td>[<strong><span style="color:red;">IF Residency Unverified]</span> Documents Showing D.C. Residency.</strong> A document that shows that the following household members live in the <%= Settings.aca.state_name %>:</td>
+                <td>[<strong><span style="color:red;">IF Residency Unverified]</span> Documents Showing D.C. Residency.</strong> A document that shows that the following household members live in the <%= aca_state_name %>:</td>
             </tr>
         </tbody>
     </table>
@@ -642,7 +642,7 @@
                     <li>A phone or utility bill from within the past two months,</li>
                     <li>A signed statement with contact information from another District resident stating that the applicant lives at their address in the District,</li>
                     <li>D.C. Voter Registration Card,</li>
-                    <li>Non-expired <%= Settings.aca.state_name %> Motor Vehicle Registration or <%= Settings.aca.state_abbreviation %> DMV Identification Card,</li>
+                    <li>Non-expired <%= aca_state_name %> Motor Vehicle Registration or <%= aca_state_abbreviation %> DMV Identification Card,</li>
                     <li>Cancelled checks or receipts for mortgage or rental payments within the past 2 months,</li>
                     <li>Utility bills and payment receipts with D.C. address within the past 2 months,</li>
                     <li>Non-expired Automobile insurance statement with D.C. residency address.</li>
@@ -665,7 +665,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:20px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -796,7 +796,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:20px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -826,7 +826,7 @@
             </tr>
             <tr class="mar20">
             	<td>
-                	<strong>If you think you will not be able to submit your documents because of circumstances outside of your control, please contact us at <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>.If you need help then the Department of Human Services will work with you.</strong>
+                	<strong>If you think you will not be able to submit your documents because of circumstances outside of your control, please contact us at <%= contact_center_name %> at <%= contact_center_phone_number %>.If you need help then the Department of Human Services will work with you.</strong>
                 </td>
             </tr>
             <tr>
@@ -841,7 +841,7 @@
             </tr>
             <tr class="mar20">
             	<td>
-					If you think you will not be able to submit the requested documentation <strong>by<Date=Date of Notice +95 days></strong> due to circumstances outside of your control, please call <%= Settings.contact_center.name %> toll free at <%= Settings.contact_center.phone_number %>.  If you truly have a special need, a Department of Human Services representative will work with you to complete the verification process.</i>
+					If you think you will not be able to submit the requested documentation <strong>by<Date=Date of Notice +95 days></strong> due to circumstances outside of your control, please call <%= contact_center_name %> toll free at <%= contact_center_phone_number %>.  If you truly have a special need, a Department of Human Services representative will work with you to complete the verification process.</i>
                 </td>
             </tr>
         </tbody>
@@ -849,7 +849,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:20px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -876,7 +876,7 @@
                                 	<tr>
                                     	<td><strong>U.S. Postal Mail</strong></td>
                                         <td>
-                                        	<%= Settings.site.short_name %><br>
+                                        	<%= site_short_name %><br>
                                             Department of Human Services<br>
                                             P.O. Box 91560<br>
                                             Washington, DC 20090
@@ -885,7 +885,7 @@
                                 </tbody>
                             </table>
                         </li>
-                        <li><strong>In-Person</strong> – Take the document(s) to any Economic Security Administration Office (call the <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %> for locations)</li>
+                        <li><strong>In-Person</strong> – Take the document(s) to any Economic Security Administration Office (call the <%= contact_center_name %> at <%= contact_center_phone_number %> for locations)</li>
                     </ul>
                 </td>
             </tr>
@@ -896,7 +896,7 @@
             </tr>
             <tr class="mar20">
             	<td>
-                	You have the right to terminate your health insurance coverage. You can terminate your coverage online using your "My Account", available at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>, by calling <%= Settings.contact_center.name %> toll-free at <%= Settings.contact_center.phone_number %>, or by contacting your health plan. Your health plan can tell you how much notice you must give, but the plan might require notice of up to fourteen (14) days before the requested coverage end date.
+                	You have the right to terminate your health insurance coverage. You can terminate your coverage online using your "My Account", available at <%= site_home_link %>, by calling <%= contact_center_name %> toll-free at <%= contact_center_phone_number %>, or by contacting your health plan. Your health plan can tell you how much notice you must give, but the plan might require notice of up to fourteen (14) days before the requested coverage end date.
                 </td>
             </tr>
             <tr class="mar20">
@@ -909,12 +909,12 @@
             </tr>
             <tr class="mar20">
             	<td>
-					Your "My Account" available at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%> is a place where important information about your account is stored.  You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it by calling the <%= Settings.contact_center.name %> toll free at <%= Settings.contact_center.phone_number %>.  There is also a "Forgot Password" feature on the website where you can reset the password after answering security questions you created when establishing your account.
+					Your "My Account" available at <%= site_home_link %> is a place where important information about your account is stored.  You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it by calling the <%= contact_center_name %> toll free at <%= contact_center_phone_number %>.  There is also a "Forgot Password" feature on the website where you can reset the password after answering security questions you created when establishing your account.
                 </td>
             </tr>
             <tr class="mar20">
             	<td>
-					<i><strong>If you do not have a "My Account"</strong></i>, you can create one at <%= "#{Settings.site.website_name}" %>. On the main page, click on "Login" in the upper-right corner.  On the next page, click the third option, "Create Account."  Once the account is created, select "Find an already submitted application" </i>
+					<i><strong>If you do not have a "My Account"</strong></i>, you can create one at <%= site_home_link %>. On the main page, click on "Login" in the upper-right corner.  On the next page, click the third option, "Create Account."  Once the account is created, select "Find an already submitted application" </i>
                 </td>
             </tr>
         </tbody>
@@ -922,7 +922,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:20px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -932,7 +932,7 @@
       <table class="mar20" border="0">
     	<tbody>
         	<tr>
-            	<td>and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= Settings.site.short_name %>.</td>
+            	<td>and enter the information for the person listed as the primary applicant on your application.  Please note that you can only link an application to your My Account if you are the primary applicant on that application.  After linking the application to your My Account, you will be able to see information about your account, and select plans if you are eligible for private health coverage through <%= site_short_name %>.</td>
             </tr>
 
             <tr>
@@ -941,7 +941,7 @@
                 </td>
             </tr>
             <tr class="mar20">
-            	<td>If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal <strong>by <span>Appeal_Deadline</span></strong>. <%= Settings.site.short_name %> will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  See the insert for more information on your appeal rights.45 C.F.R. §155.520.</td>
+            	<td>If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal <strong>by <span>Appeal_Deadline</span></strong>. <%= site_short_name %> will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  See the insert for more information on your appeal rights.45 C.F.R. §155.520.</td>
             </tr>
             <tr class="mar20">
             	<td>Your health insurance may also be terminated without your request if you don't pay your premiums or if our data indicates that the information you put on your application, or on your renewal form, has changed and you are no longer eligible for coverage. If your health insurance is going to be terminated without your request because it has been determined that you are no longer eligible for coverage, you will receive a notice in advance telling you the basis for the decision and you will be provided with information about how to contest the decision.</td>
@@ -953,12 +953,12 @@
             </tr>
             <tr class="mar20">
             	<td>
-					Your "My Account" available at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%> is a place where important information about your account is stored.  You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it by calling the <%= Settings.contact_center.name %> toll free at <%= Settings.contact_center.phone_number %>.  There is also a "Forgot Password" feature on the website where you can reset the password after answering security questions you created when establishing your account.
+					Your "My Account" available at <%= site_home_link %> is a place where important information about your account is stored.  You must use your User ID and Password to access your account. You established these when you applied for benefits. If you forgot your User Name or Password, you can reset it by calling the <%= contact_center_name %> toll free at <%= contact_center_phone_number %>.  There is also a "Forgot Password" feature on the website where you can reset the password after answering security questions you created when establishing your account.
                 </td>
             </tr>
             <tr class="mar20">
             	<td>
-					<i><strong>If you do not have a "My Account"</strong></i>, you can create one at <%= "#{Settings.site.website_name}" %>. On the main page, click on "Login" in the upper-right corner.  On the next page, click the third option, "Create Account."  Once the account is created, select "Find an already submitted application" </i>
+					<i><strong>If you do not have a "My Account"</strong></i>, you can create one at <%= site_home_link %>. On the main page, click on "Login" in the upper-right corner.  On the next page, click the third option, "Create Account."  Once the account is created, select "Find an already submitted application" </i>
                 </td>
             </tr>
         </tbody>
@@ -966,7 +966,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:20px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>
@@ -976,7 +976,7 @@
 <table class="mar20" border="0">
   <tbody>
     <tr>
-      <td align="center"><h2 style="text-decoration:underline;"><%= Settings.site.short_name %> Appeal Rights</h2></td>
+      <td align="center"><h2 style="text-decoration:underline;"><%= site_short_name %> Appeal Rights</h2></td>
     </tr>
     <tr>
       <td style="font-size:12px !important;">If you do not agree with our decision about your health insurance coverage or assistance, you have a right to appeal our decision and receive a Fair Hearing.   You can appeal a denial, termination, or change in your eligibility for Medicaid, premium tax credits, cost-sharing assistance, or for an enrollment period.  You can also appeal if you disagree with the amount of your premium tax credits or cost-sharing assistance.  Once you appeal, you can go before an Administrative Law Judge and explain why you do not agree with our decision.</td>
@@ -996,7 +996,7 @@
     </tr>
     <tr class="mar20">
       <td><ul style="font-size:12px !important;">
-          <li>Calling <%= Settings.contact_center.name %> toll  free at <%= Settings.contact_center.phone_number %></li>
+          <li>Calling <%= contact_center_name %> toll  free at <%= contact_center_phone_number %></li>
           <li>Completing a Request for Hearing form and fax it to (202) 724-2041, or e-mail to <a href="#">DC.OARA@DC.GOV</a></li>
           <li>Going to any Department of Human Services Service Center (locations found at <a href="www.dhs.dc.gov">www.dhs.dc.gov</a>) and filling out a Request for Hearing.</li>
           <li>Going to the Office of Administrative Hearings Resource Center, located at 441 4th Street NW, Suite 450-North, Washington, DC 20001 and filling out a Request for Hearing form.</li>
@@ -1013,7 +1013,7 @@
       <td  style="font-size:12px !important;"><strong>Medicaid</strong> – If you get Medicaid<span style="text-decoration:underline;"> and file the appeal before your Medicaid ends</span> or within 15 days of the date of this notice – whichever is later - you will continue to be covered by Medicaid.  Even if you file the appeal after your Medicaid coverage has ended, but still within 90 days of the postmark of this eligibility notice, your appeal can still be heard but your coverage may not be re-started. </td>
     </tr>
     <tr class="mar20">
-      <td style="font-size:12px !important;"><strong>Premium Tax Credits & Cost-Sharing Assistance</strong> – If you already get help paying for your health insurance through <%= Settings.site.short_name %>, you have a choice to remain enrolled in your selected plan.  You will continue to get the same level of assistance you were eligible for before the denial, termination, or change made in the notice.  However, if you lose the appeal, you may be responsible for any benefits that you received during the appeal process. </td>
+      <td style="font-size:12px !important;"><strong>Premium Tax Credits & Cost-Sharing Assistance</strong> – If you already get help paying for your health insurance through <%= site_short_name %>, you have a choice to remain enrolled in your selected plan.  You will continue to get the same level of assistance you were eligible for before the denial, termination, or change made in the notice.  However, if you lose the appeal, you may be responsible for any benefits that you received during the appeal process. </td>
     </tr>
   </tbody>
 </table>
@@ -1023,7 +1023,7 @@
       <td><h3 style="color:rgb(54,95,145);">What Happens When You Appeal</h3></td>
     </tr>
     <tr>
-      <td style="font-size:12px !important;"><strong>Administrative Review</strong> – Once your appeal is received, you will be scheduled for an Administrative Review Conference at the Office of Administrative Review and Appeals (OARA).  This is a voluntary meeting with a Hearing Examiner from the <%= Settings.aca.state_name %> Department of Human Services (DHS) to identify and discuss your concerns.  You can bring your own representative if you choose to have one.  Your representative may, but does not have to be, an attorney.  Your representative may not be an employee of DHS. </td>
+      <td style="font-size:12px !important;"><strong>Administrative Review</strong> – Once your appeal is received, you will be scheduled for an Administrative Review Conference at the Office of Administrative Review and Appeals (OARA).  This is a voluntary meeting with a Hearing Examiner from the <%= aca_state_name %> Department of Human Services (DHS) to identify and discuss your concerns.  You can bring your own representative if you choose to have one.  Your representative may, but does not have to be, an attorney.  Your representative may not be an employee of DHS. </td>
     </tr>
     <tr class="mar20">
       <td style="font-size:12px !important;">Please bring documents related to your case to the meeting.  This will help the DHS Hearing Examiner identify and understand your concerns.  After the meeting Conference, the DHS Hearing Examiner will review your case and try to resolve your issues.   You will receive a written decision from the DHS Hearing Examiner regarding the issues of your case, including a summary of facts.  If you agree with the written decision, you may withdraw your request for a Fair Hearing.  If you do not agree with the DHS Hearing Examiner's written decision, your appeal still continues to a Fair Hearing.</td>
@@ -1033,7 +1033,7 @@
     <div class="footer">
     <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:0px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 
@@ -1081,15 +1081,15 @@
       <td><p>Neighborhood Legal Services </p>
         <p>1213 Good Hope Road</p>
         <p>(202) 678-2000</p></td>
-      <td><p>Legal Aid Society of the <%= Settings.aca.state_name %> </p>
+      <td><p>Legal Aid Society of the <%= aca_state_name %> </p>
         <p>1331 H St. NW Suite 350</p>
         <p>(202) 628-1161</p></td>
     </tr>
     <tr class="para">
-      <td><p>Legal Aid Society of the <%= Settings.aca.state_name %></p>
+      <td><p>Legal Aid Society of the <%= aca_state_name %></p>
         <p>2041 Martin Luther King Jr. Ave. SE, Suite LL-1</p>
         <p>(202 628-1161</p></td>
-      <td><p>Legal Aid Society of the <%= Settings.aca.state_name %> Friendship Baptist Church,</p>
+      <td><p>Legal Aid Society of the <%= aca_state_name %> Friendship Baptist Church,</p>
         <p>900 Delaware Ave., SW</p>
         <p>(202) 628-1161</p></td>
     </tr>
@@ -1121,7 +1121,7 @@
 <div class="footer">
 <table style="background:rgb(198,217,241); padding:3px 15px; margin-top:30px; margin-bottom:20px;" border="1" bordercolor="#000">
 <tr>
-<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %>/TTY <%= Settings.contact_center.phone_number %> or go online to <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%>. You may also contact <%= Settings.contact_center.name %> or go online to search for a broker or in-person assister to help you.</td>
+<td style="padding:3px 13px; font-size:13px; line-height:20px;"><strong style="color:rgb(54,95,145);">Questions?</strong>Call <%= contact_center_name %> at <%= contact_center_phone_number %>/TTY <%= contact_center_phone_number %> or go online to <%= site_home_link %>. You may also contact <%= contact_center_name %> or go online to search for a broker or in-person assister to help you.</td>
 </tr>
 </table>
 </div>

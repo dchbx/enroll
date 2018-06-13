@@ -1,5 +1,5 @@
-<h3>When would you like your coverage to start?</h3>
-<h4> (in the next 90 days) <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers can begin shopping for coverage on <%= Settings.site.short_name %> up to 3 months prior to the desired coverage effective date."></i></h4>
+<p class="twenty">When would you like your coverage to start?
+<small> (in the next <%= aca_shop_market_coverage_start_period %>) <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers can begin shopping for coverage on <%= site_short_name %> up to <%= Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs %> months prior to the desired coverage effective date."></i></small></p>
 <div class="row">
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="row row-form-wrapper no-buffer">
@@ -14,8 +14,8 @@
         <%= datepicker_control(f, :end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-start_on", :required => true, :placeholder => "END ON", readonly: true}) %>
       </div>
     </div>
-    <br/>
-    <h3>Select your open enrollment dates</h3> <h4> <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers offering coverage through <%= Settings.site.short_name %> for the first time must have an open enrollment period of no less than 14 days. Employers renewing their <%= Settings.site.short_name %> coverage must have an open enrollment period of at least 30 days."></i></h4>
+    
+    <p class="twenty">Select your open enrollment dates <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers offering coverage through <%= site_short_name %> for the first time must have an open enrollment period of no less than 14 days. Employers renewing their <%= site_short_name %> coverage must have an open enrollment period of at least 30 days."></i></p>
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <%= datepicker_control(f, :open_enrollment_start_on, {:class => "floatlabel form-control interaction-field-control-plan_year-open_enrollment_start_on", :required => true, :"data-date-min" => @plan_year.start_on ? (@plan_year.start_on - 2.months) : "" , :placeholder => "OPEN ENROLLMENT START DATE"}) %>
@@ -26,7 +26,7 @@
     </div>
 
 
-    <h3>Add the total number of employees in your workforce</h3>
+    <p class="twenty">Add the total number of employees in your workforce</p>
     <div class="row row-form-wrapper no-buffer" style="display: block;">
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :fte_count, class: "floatlabel form-control", required: true, placeholder: 'FULL TIME EMPLOYEES' %>

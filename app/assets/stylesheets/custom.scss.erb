@@ -6,6 +6,7 @@ html {
 * {
     font-family: 'Open Sans', sans-serif;
 }
+
 body {
     background-color: #f2f2f2;
     min-height: 100%;
@@ -13,10 +14,17 @@ body {
     padding-bottom: 70px;
 }
 
-h1, h2, h3, h4, h5, h6 {font-weight: 300; line-height: 1.6em;}
-#new_person_wrapper p, .group-selection p {
-  font-weight: 300;
-}
+h1, h2, h3, h4, h5, h6
+  {
+    font-family: $primary-header-font;
+    font-weight: 300;
+    line-height: 1.6em;
+    }
+
+  #new_person_wrapper p, .group-selection p {
+    font-weight: 300;
+  }
+
 .navbar-default {
     background-color: #eee;
     background-image: none;
@@ -561,6 +569,7 @@ a.family{
 }
 .input-lg, .form-group-lg .form-control{
   border-radius: 0;
+  height: 48px;
   border: none !important;
   font-size: 14px !important;
   font-weight: 300 !important;
@@ -1432,6 +1441,14 @@ a.close-1, a.close-2{
 .navbar-nav li li{
   display: block;
 }
+.nav-list .container {
+  padding-left: 0px;
+  padding-right: 0px;
+  width: inherit;
+  ul {
+    padding-left: 3%;
+  }
+}
 .social.aktif.open > a, .social.aktif.open > a:focus{
   background-color: rgba(0,0,0,0);
 }
@@ -2094,7 +2111,7 @@ input[type="checkbox"] + h4.agree {
 }
 
 .mainmenu {
-    background: #007bc4 none repeat scroll 0 0;
+    background: $brand-primary none repeat scroll 0 0;
 
     li.dropdown {
       a.dropdown-toggle {
@@ -2112,7 +2129,6 @@ input[type="checkbox"] + h4.agree {
       }
     }
 }
-
 .submenu {
     background: #00a3d9 none repeat scroll 0 0;
 }
@@ -2128,7 +2144,6 @@ input[type="checkbox"] + h4.agree {
 .mainmenu ul li:first-child, .submenu ul li:first-child {
     padding-left: 0;
 }
-
 
 .mainmenu ul li a, .submenu ul li a {
     color: #fff;
@@ -2148,7 +2163,7 @@ input[type="checkbox"] + h4.agree {
 }
 
 .mainmenu ul li a .badge, .submenu ul li a .badge {
-    background: #d41414 none repeat scroll 0 0;
+    background: $primary-notification none repeat scroll 0 0;
     border-radius: 50px;
     color: #fff;
     font-size: 10px;
@@ -3491,6 +3506,30 @@ table.table-list-wp tbody tr.brd td {
 .confirm-terminate-wrapper img {
     display: inline-block;
 }
+
+.confirm-rehire-wrapper a.rehire, .confirm-cobra-wrapper a.cobra {
+  color: #005fd6;
+  border-radius: 4px;
+  padding: 10px 10px;
+  border: solid 1px #005fd6;
+  font-size: 14px;
+  margin-right: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #005fd6;
+    color: #fff;
+  }
+}
+
+.confirm-rehire input, .confirm-cobra input {
+    width: 125px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    background-color: transparent;
+    border: solid 1px #005fd6;
+    color: #005fd6;
+}
+
 .confirm-terminate-wrapper a.terminate {
     color: #b94a48;
     border-radius: 4px;
@@ -3984,8 +4023,8 @@ h3.text-blue {
 }
 
 span.badge.message-badge {
-    background-color: #dedede;
-    color: #007bc4;
+    background-color: $primary-button;
+    color: #fff;
 }
 .form-border {
     background: #ffffff none repeat scroll 0 0;
@@ -4565,28 +4604,26 @@ table.table.table-no-sytle td {
 }
 
 .carousel-indicators li {
-  border-color: #337ab7;
+  border-color: $brand-primary;
 }
 
 .carousel-indicators .active {
-  background-color: #337ab7;
+  background-color: $brand-primary;
 }
 
 .carousel-control {
   width: 10%;
 }
-.carousel-control img {
+
+.carousel-control .fa {
+  color: #005e81;
   position: absolute;
   top: 35%;
   z-index: 5;
   display: inline-block;
-  &.left {
-    right: 0;
-  }
-  &.right {
-    left: 0;
-  }
+
 }
+
 .carousel-control .icon-prev,
 .carousel-control .fa-angle-left {
   left: 50%;
@@ -4612,8 +4649,8 @@ table.table.table-no-sytle td {
 
 #qle-header .info-wrapper h4{
   margin: 0;
-  color:#007BC4;
   line-height: 1.4em;
+  color: $qle-header-color;
 }
 
 #qle-menu h5 {
@@ -4865,3 +4902,16 @@ input:required:valid {
   margin-bottom: 10px;
 }
 
+.recaptcha-error{
+  color: #ff0000;
+  display: none;
+}
+.lock-confirm-btn {
+  float: right;
+}
+
+/* Employer Attestation */
+
+.employer_attestation_fields .radio{
+  background-color: transparent;
+}

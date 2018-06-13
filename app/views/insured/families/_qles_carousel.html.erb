@@ -10,6 +10,8 @@
             <% end %>
           </span>
         </div>
+
+        <% if individual_market_is_enabled?%>
           <div class="btn-group">
             <span type="button" class="btn btn-primary<% if @manually_picked_role == 'individual_market_events' %> active <% end %>">
               <% if controller.action_name == "find_sep" %>
@@ -19,6 +21,7 @@
               <% end %>
             </span>
           </div>
+        <% end %>
       </div>
     </div>
 <% end %>
@@ -49,10 +52,10 @@
 
     <!-- Controls -->
     <a class="left carousel-control" href="#carousel-qles" role="button" data-slide="prev" style='background-image: none;color:#007bc4;'>
-      <%= image_tag("ui/thinchevronblueleft_30.png", class: 'left') %>
+      <i class="fa fa-angle-left left fa-2x" aria-hidden="true"></i>
     </a>
     <a class="right carousel-control" href="#carousel-qles" role="button" data-slide="next" style='background-image: none;color:#007bc4;'>
-      <%= image_tag("ui/thinchevronblueright_30.png", class: 'right') %>
+      <i class="fa fa-angle-right right fa-2x" aria-hidden="true"></i>
     </a>
   <% end %>
 </div>

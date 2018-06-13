@@ -129,6 +129,15 @@ class BenefitGroupAssignment
     end
   end
 
+  def active_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.enrolled_and_renewal.select { |enrollment| enrollment.benefit_group_assignment_id == self.id }
+      end
+      enrollments
+    end
+  end
+
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
 

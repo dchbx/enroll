@@ -1,5 +1,7 @@
 conversions:
-  plan_year_date: 2016-05-01
-  employer_profile_date: 2017-02-01
-  employee_date: 2017-02-01
-  employee_policies_date: 2017-02-01
+  plan_year_date: 2017-01-01
+  employer_profile_date: 2017-10-01
+  employee_date: 2017-10-01
+  employee_policies_date: 2017-01-01
+  employee_policy_year: 2017
+  number_of_dependents: 8

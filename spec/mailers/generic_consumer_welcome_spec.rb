@@ -6,7 +6,7 @@ RSpec.describe UserMailer do
     let(:email){UserMailer.generic_consumer_welcome('john', hbx_id, 'john@dc.gov')}
 
     it 'should not allow a reply' do
-    	expect(email.from).to match(["no-reply@individual.dchealthlink.com"])
+    	expect(email.from.first).to match(/no-reply@individual.#{Settings.site.domain_name}/)
     end
 
     it 'should deliver to john' do
@@ -15,7 +15,7 @@ RSpec.describe UserMailer do
     end
 
     it "should have subject of #{Settings.site.short_name}" do
-      expect(email.subject).to match(/DC HealthLink/)
+      expect(email.subject).to match(/#{Settings.site.short_name}/)
     end
 
     it 'should have body text' do

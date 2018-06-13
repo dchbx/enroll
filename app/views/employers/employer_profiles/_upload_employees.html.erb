@@ -2,7 +2,7 @@
   <i class="fa fa-times fa-3x pull-right modal-close"></i>
   <h2>Upload Employee Roster</h2>
   <h4>If you completed your employee roster offline using our Microsoft Excel template, find the file on your computer and upload it here.</h4>
-  <%= link_to(document_download_path(env_bucket_name("templates"), "b4c0e3e6-cf9b-4b00-8194-403b110b4e01") + "?contenttype=application/vnd.ms-excel&filename=DCHL Employee Census.xlsx", class: "download") do %>
+  <%= link_to(document_download_path(env_bucket_name("templates"), aca_shop_market_census_employees_template_file) + "?contenttype=application/vnd.ms-excel&filename=#{aca_shop_market_census_employees_template_file}.xlsx", class: "download") do %>
   <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
         Download it now.
     <% end %>

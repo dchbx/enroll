@@ -4,9 +4,11 @@ namespace :employers do
   desc "Export employers to csv."
   # Usage rake employers:export
   task :export => [:environment] do
+    include Config::AcaHelper
+
     orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
-    FILE_PATH = Rails.root.join "employer_export.csv"
+    file_name = fetch_file_format('employer_export','EMPLOYEREXPORT')
 
     def get_primary_office_location(organization)
       organization.office_locations.detect do |office_location|
@@ -30,7 +32,7 @@ namespace :employers do
       broker_agency_account
     end
 
-    CSV.open(FILE_PATH, "w") do |csv|
+    CSV.open(file_name, "w") do |csv|
 
       headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer.sic_code employer_profile.profile_source employer.status ga_fein ga_agency_name ga_start_on
                                 office_location.is_primary office_location.address.address_1 office_location.address.address_2
@@ -134,8 +136,10 @@ namespace :employers do
       end
 
     end
+    pubber = Publishers::Legacy::EmployerExportPublisher.new
+    pubber.publish URI.join("file://", file_name)
 
-    puts "Output written to #{FILE_PATH}"
+    puts "Output written to #{file_name}"
 
   end
 end

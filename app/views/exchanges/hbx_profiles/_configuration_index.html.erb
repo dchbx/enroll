@@ -3,6 +3,9 @@
     <h3>Configuration</h3>
   <div class="input-no-pd">
     <%= link_to 'Announcements', exchanges_announcements_path, {class: 'btn btn-default'} %>
+    <% if aca_security_questions %>
+      <%= link_to 'Security Questions', exchanges_security_questions_path, {class: 'btn btn-default'} %>
+    <% end %>
 
     <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f|%>
       <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">

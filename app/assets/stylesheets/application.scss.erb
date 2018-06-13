@@ -15,8 +15,12 @@
  *= require font-awesome
  *= require bootstrap-slider
  *= require bootstrap-multiselect
+ *= require bootstrap-treeview
  *= require effective_datatables
+ *= require recurring_select
+ *= require simple_calendar
  *= require jquery-steps.css
+ *= require chosen
  *= require_self
  */
 
@@ -67,9 +71,9 @@
 }
 
 .custom-textarea {
-  max-width: 100% !important; 
-  width: 100% !important; 
-  height: 100% !important; 
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
   resize: none;
   overflow-y: hidden;
 }
@@ -294,4 +298,17 @@ img {
 .read_only_dropdown {
   cursor: not-allowed !important;
   pointer-events: none;
+}
+
+.event_text_field {
+  height:47px;
+  width: 200px;
+}
+
+.federal{
+  color: red;
+}
+
+.holiday{
+  color: blue;
 }

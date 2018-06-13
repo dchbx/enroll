@@ -9,6 +9,8 @@ RSpec.describe "general_agencies/profiles/_show.html.erb", dbclean: :after_each 
     assign(:general_agency_profile, general_agency_profile)
     user.person = person
     user.save
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/_show.html.erb"
   end
 

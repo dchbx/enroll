@@ -1,0 +1,65 @@
+<style>
+  .custom_filter{
+    margin-left: 15em;
+    margin-top: -15px;
+    position: absolute;
+    z-index: 999;
+  }
+  #upload{
+    position: absolute;
+    margin-left: 75em;
+  }
+
+  .attestation_form{
+    text-align: left !important;
+  }
+</style>
+
+
+<div class="container" id="attestation_documents_table">
+  <div class = "table-responsive table-override">
+  <h4> Attestation Documents </h4>
+
+  <table class = "table" style="table-layout: fixed;">
+    <thead>
+      <tr>
+       <th>Doc Status</th>
+       <th>Doc Name</th>
+       <th>Doc Type</th>
+       <th>Size</th>
+       <th>Submitted At</th>
+       <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @documents.each do |doc| %>
+        <tr>
+          <td><%= doc.aasm_state.camelcase %></td>
+          <td class='pull-left'><%= truncate doc.title %></td>
+          <td><%= "Employer Attestation" %>
+          </td>
+          <td></td>
+          <td><%= TimeKeeper.local_time(doc.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
+          <td>
+            <%= link_to 'View', employers_employer_attestation_verify_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
+          </td>
+        </tr>
+        <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="attestation_form"></div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+  jQuery('.buttons-csv').hide()
+  jQuery('.buttons-excel').hide()
+  function printDoc(id){
+    var window_obj=window.open();
+    window_obj.document.write($('#print_'+id).html());
+    window_obj.print();
+    window_obj.close();
+  }
+</script>

@@ -29,6 +29,21 @@
                 </div>
               </div>
               <div class="row">
+                <section class="col-xs-10">
+                  <header class="row">
+                    <h3 class="title no-buffer">
+                      <%= l10n("broker_agencies.quotes.quote_for_benefit_group", title: benefit_group.title) %>
+                    </h3>
+                  </header>
+                </section>
+                <div class="col-xs-2">
+                  <button class="nav-toggle row view" id="showhidebutton" data-toggle="collapse" href="#collapse-health-<%=benefit_group.id.to_s%>" onclick="QuotePageLoad.view_details($(this))"><%= l10n("view_details")%>
+                    <i class="fa fa-chevron-down fa-lg" data-toggle="collapse" href="#collapse-health-<%=benefit_group.id.to_s%>"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="row">
               <div class="col-md-2">
                 <p><%= l10n("coverage_year")%></p>
               </div>
@@ -59,75 +74,6 @@
                     </th>
                   </tr>
                   <% if benefit_group.plan %>
-                    <tr>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%=benefit_group.plan.name %>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%=benefit_group.plan.carrier_profile.legal_name %>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%= benefit_group.plan.plan_type.upcase %>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%=benefit_group.plan.metal_level.capitalize%>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%= benefit_group.plan_option_kind.titleize %>
-                        </p>
-                      </td>
-                    </tr>
-                    <%end%>
-                    <% if benefit_group.dental_plan %>
-                    <tr>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%=benefit_group.dental_plan.name %>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%=benefit_group.dental_plan.carrier_profile.legal_name %>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%= benefit_group.dental_plan.plan_type.upcase %>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%=benefit_group.dental_plan.metal_level.capitalize%>
-                        </p>
-                      </td>
-                      <td class="col-md-2 col-xs-2">
-                        <p>
-                          <%= display_dental_plan_option_kind benefit_group %>
-                          <% if benefit_group.dental_plan_option_kind == 'single_plan' %>
-                            <br/>
-                            <%= link_to "View Plans(" + benefit_group.elected_dental_plan_ids.count.to_s + ')',
-                             "", data: {toggle: "modal", target: "#electedDentalPlans_#{benefit_group.id}"} %>
-                          <% end %>
-                        </p>
-                      </td>
-                    </tr>
-                    <%end%>
-                  </table>
-            </div>
-            <br>
-            <div class="col-xs-12 table-responsive">
-
-              <table class="table table-striped table-hover table-sm panel panel-default">
-                <thead class="thead-default">
                   <tr>
                     <th>First Name</th>
                     <th>Last Name</th>
@@ -142,8 +88,30 @@
                     <td><%= member.last_name%></td>
                     <td><%= member.employee_relationship.humanize%></td>
                   </tr>
-                  <% end %>
-                  <% end %>
+                  <%end%>
+                </table>
+          </div>
+          <br>
+          <div class="col-xs-12 table-responsive">
+
+            <table class="table table-striped table-hover table-sm panel panel-default">
+              <thead class="thead-default">
+                <tr>
+                  <th><%= l10n("first_name")%></th>
+                  <th><%= l10n("last_name")%></th>
+                  <th><%= l10n("relationship")%></th>
+                  <th><%= l10n("dob")%></th>
+                </tr>
+              </thead>
+              <% @q.quote_households.each do |quote_household| %>
+                <% if quote_household.quote_benefit_group_id == benefit_group.id %>
+                  <% quote_household.quote_members.each do |member| %>
+                <tr>
+                  <td><%=member.first_name%></td>
+                  <td><%= member.last_name%></td>
+                  <td><%= member.employee_relationship.humanize%></td>
+                  <td><%= member.dob%></td>
+                </tr>
                 <% end %>
               </table>
             </div>

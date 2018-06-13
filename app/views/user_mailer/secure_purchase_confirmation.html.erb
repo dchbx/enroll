@@ -1,6 +1,5 @@
 <div style='width: 400px; margin-left: 50px'>
-<img src="/dc_health.png" style='margin-left: 100px; width: 200px;' title=<%= "#{Settings.site.short_name}" %>/>
-<br>
+  <img src="<%= asset_path( Settings.site.mailer_logo_file_name ) %>" style='margin-left: 140px; margin-top:30px; width: 200px; margin-bottom:30px;' title=<%= "#{site_short_name}" %>/>
 <p>
 Congratulations <%= @person.first_name + ' ' + @person.last_name%>,
 </p>
@@ -15,7 +14,7 @@ You're successfully enrolled in <%= @plan.name %>.
   Your coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
 </p>
 <p>
-  Thank you for enrolling into employer-sponsored coverage through <%= Settings.site.short_name %>.
+  Thank you for enrolling into employer-sponsored coverage through <%= site_short_name %>.
 </p>
 <% else %>
 <p>
@@ -31,11 +30,11 @@ You're successfully enrolled in <%= @plan.name %>.
 <p>Thank you for your order. </p>
 <% end %>
 
-<%= Settings.site.short_name %> <br>
-PHONE: <%= Settings.contact_center.phone_number %> <% Settings.contact_center.alt_phone_number %><br>
+<%= site_short_name %> <br>
+PHONE: <%= contact_center_phone_number %> <% contact_center_alt_phone_number %><br>
 TTY/TDD 711-1-532-5465<br>
 Monday-Saturday 8:00am - 8:00pm <br>
-E-Mail: <%= Settings.contact_center.email_address %>
+E-Mail: <%= contact_center_email_address %>
 <br>
 <br>
 <a href="https://www.facebook.com/pages/DC-Health-Benefit-Exchange/254860577970621" target="_blank" title="click to visit us on facebook">

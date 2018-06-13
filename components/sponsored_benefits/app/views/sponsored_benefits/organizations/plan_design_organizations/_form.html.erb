@@ -1,0 +1,9 @@
+<%= render "entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
+<br>
+<%= render "/sponsored_benefits/organizations/office_locations/office_locations", f: f %>
+
+<div class="row no-buffer pull-right sm_full_width">
+  <button type="submit" class="btn btn-primary pull-right sm_full_width">Confirm</button>
+</div>
+
+<input type="hidden" name="employer_id" id="employer_id" />

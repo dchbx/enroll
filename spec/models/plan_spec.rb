@@ -107,6 +107,92 @@ RSpec.describe Plan, dbclean: :after_each do
           expect(Plan.find(saved_plan.id).id.to_s).to eq saved_plan.id.to_s
         end
       end
+
+      context "check associations with plan model with renewal plan mapping" do
+        it "embeds_many assiciation check" do
+          association = Plan.reflect_on_association(:renewal_plan_mappings)
+          expect(association.macro).to eq (:embeds_many)
+          expect(association.name).to eq (:renewal_plan_mappings)
+        end
+      end
+    end
+
+    context "check plan offerings scope" do
+      let!(:sole_source_plan) { create(:plan, is_sole_source: true, is_horizontal: false, is_vertical: false) }
+      let!(:horizontal_plan) { create(:plan, is_horizontal: true, is_sole_source: false, is_vertical: false) }
+      let!(:vertical_plan) { create(:plan, is_vertical: true, is_sole_source: false, is_horizontal: false) }
+      let!(:regular_plan) { create(:plan) } # we are creating this because when it is creating it will assign :is_sole_source, :is_horizontal, :is_vertical with default true boolean value
+
+
+      it "should return only sole source plans" do
+        expect(Plan.check_plan_offerings_for_sole_source).to contain_exactly(sole_source_plan, regular_plan)
+      end
+
+      it "should return only horizantal plans" do
+        expect(Plan.check_plan_offerings_for_metal_level).to contain_exactly(horizontal_plan, regular_plan)
+      end
+
+      it "should return only vertical plans" do
+        expect(Plan.check_plan_offerings_for_single_carrier).to contain_exactly(vertical_plan, regular_plan)
+      end
+
+      it "should check for field for filtering available or not" do
+        is_expected.to have_attributes(:frozen_plan_year => nil)
+      end
+
+    end
+
+    context "renewal_plan_mapping filter by date" do
+      let(:calender_year) { TimeKeeper.date_of_record.year }
+      let!(:sole_source_plan) { create(:plan, is_sole_source: true, renewal_plan_id: renewal_health_plan.id, active_year: calender_year) }
+      let!(:renewal_health_plan) { create(:plan, coverage_kind: "health", active_year: calender_year + 1) }
+      let!(:neighbour_plan) { create(:plan, is_sole_source: true, active_year: calender_year + 1) }
+      let(:current_date) { Date.new(calender_year, 4, 10) }
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(current_date)
+      end
+
+      context "when carrier mappings not present" do
+        it "should return same carrier renewal plan" do
+          expect(sole_source_plan.renewal_plan).to eq renewal_health_plan
+        end
+      end
+
+      context "when carrier mapping present" do
+        let(:renewal_plan_status) { true }
+
+        let!(:renewal_plan_mappings1) {
+          sole_source_plan.renewal_plan_mappings.create({
+            start_on: Date.new(calender_year, 1, 1),
+            end_on: Date.new(calender_year, 5, 1).end_of_month,
+            renewal_plan_id: neighbour_plan.id,
+            is_active: renewal_plan_status
+          })
+        }
+
+        context "is not active" do
+          let(:renewal_plan_status) { false }
+
+          it "should return just regular renewal plan" do
+            expect(sole_source_plan.renewal_plan(current_date)).to eq renewal_health_plan
+          end
+        end
+
+        context "is active" do
+          it "should return renewal plan from mapping" do
+            expect(sole_source_plan.renewal_plan(current_date)).to eq neighbour_plan
+          end
+        end
+
+        context "is expired" do
+          let(:current_date) { Date.new(calender_year, 6, 10) }
+
+          it "should return just regular renewal plan" do
+            expect(sole_source_plan.renewal_plan(current_date)).to eq renewal_health_plan
+          end
+        end
+      end
     end
 
     context "with no metal_level" do
@@ -362,27 +448,30 @@ RSpec.describe Plan, dbclean: :after_each do
       1;
     end
 
+    let(:in_service_area_count) { platinum_count + individual_silver_count }
+
     let(:total_plan_count) { platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count }
 
     let(:organization) { FactoryGirl.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser") }
-    let(:carrier_profile_0) { FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization) }
+    let(:carrier_profile_0) { FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization, issuer_hios_ids: ['11111']) }
     let(:carrier_profile_1) { FactoryGirl.create(:carrier_profile) }
-
+    let(:carrier_service_area) { create(:carrier_service_area, issuer_hios_id: '11111', serves_entire_state: true, service_area_id: 'EX123') }
     let(:shop_count) { platinum_count + gold_count + shop_silver_count }
     let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
     let(:carrier_profile_0_count) { platinum_count + gold_count + bronze_count }
+    let(:carrier_profile_0_without_bronze_count) { platinum_count + gold_count }
     let(:carrier_profile_1_count) { shop_silver_count + individual_silver_count + catastrophic_count }
     let(:current_year) {TimeKeeper.date_of_record.year}
     let(:next_year) {current_year + 1}
 
     context "with plans loaded" do
       before do
-        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1)
-        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year)
-        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year)
-        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
-        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year)
-        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
+        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1, service_area_id: 'EX123')
+        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX111')
+        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX222')
+        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX123')
+        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX321')
+        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX321')
       end
 
       context "with no referenced scope" do
@@ -394,6 +483,12 @@ RSpec.describe Plan, dbclean: :after_each do
       context "by_active_year" do
         it "should return all plans of this year" do
           expect(Plan.by_active_year.count).to eq (total_plan_count - platinum_count)
+        end
+      end
+
+      context "for_service_areas" do
+        it 'should return all plans assigned the given service area ids' do
+          expect(Plan.for_service_areas(['EX123']).count).to eq(in_service_area_count)
         end
       end
 
@@ -452,6 +547,11 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       context "with referenced scopes" do
+        let(:enabled_metal_levels) { %w(platinum gold silver bronze) }
+
+        before do
+          allow(Plan).to receive(:enabled_metal_levels).and_return(enabled_metal_levels)
+        end
         it "should return correct counts for each metal scope" do
           expect(Plan.platinum_level.count).to eq platinum_count
           expect(Plan.gold_level.count).to eq gold_count
@@ -468,6 +568,14 @@ RSpec.describe Plan, dbclean: :after_each do
         it "should return correct counts for each carrier_profile scope" do
           expect(Plan.find_by_carrier_profile(carrier_profile_0).count).to eq carrier_profile_0_count
           expect(Plan.find_by_carrier_profile(carrier_profile_1).count).to eq carrier_profile_1_count
+        end
+
+        context "should return correct counts for carriers if metal levels are restricted" do
+          let(:enabled_metal_levels) { %w(platinum gold silver) }
+
+          it "returns a count less bronze plans" do
+            expect(Plan.find_by_carrier_profile(carrier_profile_0).with_enabled_metal_levels.count).to eq carrier_profile_0_without_bronze_count
+          end
         end
 
         it "should return correct counts for chained scopes" do

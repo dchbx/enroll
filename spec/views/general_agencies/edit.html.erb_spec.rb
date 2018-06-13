@@ -9,6 +9,8 @@ RSpec.describe "general_agencies/profiles/edit.html.erb" do
     assign :organization, org_form
     assign :general_agency_profile, general_agency_profile
     assign :id, general_agency_profile.id
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/edit.html.erb"
   end
 

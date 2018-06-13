@@ -1,0 +1,103 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>Document Name: <%= truncate(@document.title, length: 50) %></h2>
+      </div>
+
+      <div class="panel-body">
+        <p id="print_<%=@document.id%>">
+          <iframe src="<%= employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" style="border: 0" width="100%" height="500" frameborder="1" scrolling="no"></iframe>
+
+        </p>
+        <p class="text-right">
+          <button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span><%= link_to 'Download', employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline", target: '_blank' %></button>
+          <button class="btn btn-default" onclick='window.print();return false;'>Print</button>
+        </p>
+      </div>
+
+      <div class="panel-footer">
+        <% if !@employer_profile.employer_attestation.editable? %>
+          <div class="alert alert-warning" role="alert">This Employer Attestation is already <%= @employer_profile.employer_attestation.aasm_state.camelcase %>. It can't be modified.</div>
+        <% end %>
+
+        <div class="row employer_attestation_fields">
+          <div class="col-md-12">
+
+            <%= form_tag employers_employer_attestation_path(@employer_profile),:method => :put do |f| %>
+              <%= hidden_field_tag :employer_attestation_id, @document.id %>
+              <%= hidden_field_tag :prev_status, @document.aasm_state %>
+
+              <div class='row'>
+                <div class="col-sm-8">
+                  <div class="form-group">
+                    <h3>Employer Name: <%= @employer_profile.legal_name %></h3>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <% if @employer_profile.plan_years.non_canceled.present? %>
+                    <h3>Effective Date: <%= @employer_profile.plan_years.non_canceled.last.start_on.strftime('%m/%d/%Y') %></h3>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <div class='row'>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <div class="radio">
+                      <label><input type="radio" name="status" value="accepted" checked><span>  Approve<%#= l10n('.approve') %></span></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class='row'>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <div class="radio">
+                      <label><input type="radio" name="status" value="rejected"><span>  Reject<%#= l10n('.reject') %></span></label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-9">
+                  <div class="form-group rejection_reason hidden">
+                    <%= select_tag "reason_for_rejection", options_for_select(EmployerAttestationDocument::REASON_KINDS), prompt: "Reason for rejection",onchange: "rejectReason()" %>                  </div>
+                </div>
+              </div>
+
+              <div class='row'>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <div class="radio">
+                      <label><input type="radio" name="status" value="info_needed"><span>  Request Additional Information<%#= l10n('.reject') %></span></label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-9">
+                  <div class="form-group">
+                    <input name="other_reason" type="text" value="" placeholder="Other reason for rejection" class="form-control hidden">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                   <div class="form-group pull-right">
+                    <%if @document.may_accept? && @employer_profile.employer_attestation.editable? %>
+                       <button type="submit" id = "attestation_submit" class='btn btn-primary'>Submit</button>
+                    <%else%>
+                       <button type="button" class="btn disabled"> Submit </button>
+                    <%end%>
+                     <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <% end %>
+            </div> 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
