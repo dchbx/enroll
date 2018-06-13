@@ -1,6 +1,6 @@
 require 'rails_helper'
-require 'aasm/rspec'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe LawfulPresenceDetermination do
   let(:consumer_role) {
     FactoryGirl.create(:consumer_role_object)
@@ -118,4 +118,5 @@ describe LawfulPresenceDetermination do
       end
     end
   end
+end
 end

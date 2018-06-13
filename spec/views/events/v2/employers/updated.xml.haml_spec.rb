@@ -6,7 +6,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "CountyName") }
   let(:home_address)  { Address.new(kind: "home", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
@@ -61,7 +61,6 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     end
 
     context "when manual gen of cv = false" do
-
       before :each do
         allow(employer).to receive(:staff_roles).and_return([staff])
         allow(employer).to receive(:broker_agency_profile).and_return(broker_agency_profile)
@@ -110,7 +109,6 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       it "should be schema valid" do
         expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
       end
-
     end
 
     context "with dental plans" do
@@ -126,7 +124,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         end
 
         it "shows the dental plan in output" do
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer,manual_gen: false}
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
           expect(rendered).to include "new dental plan"
         end
       end

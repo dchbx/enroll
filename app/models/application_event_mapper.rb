@@ -12,7 +12,9 @@ class ApplicationEventMapper
 
   RESOURCE_MAP = {
     "EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
-    "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find)
+    "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find),
+    "EmployeeRole" => Resource.new(:employee, :id, :employee_role_id, :find),
+    "CensusEmployee" => Resource.new(:census_employee, :id, :census_employee_id, :find)
   }
 
   REVERSE_LOOKUP_MAP = RESOURCE_MAP.inject({}) do |acc, vals|

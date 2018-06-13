@@ -18,7 +18,7 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "On [date of plan selection], you requested that we switch you or others in your household to a different #{Settings.site.short_name} plan.  The following individual(s) are now enrolled in [plan 1 name] health insurance plan."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "On [date of plan selection], you requested that we switch you or others in your household to a different #{site_short_name} plan.  The following individual(s) are now enrolled in [plan 1 name] health insurance plan."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content:  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   [Plan 1 Enrollee First Name][Plan 1 Enrollee Last Name]
@@ -102,4 +102,4 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["By enrolling in a new Health Plan, you will be terminating your current plan. It will be terminated on [Termination Effective Date].   To make sure you do not have a break in your coverage, you must still pay all premiums for the old plan until that date.   Remember to tell the other household members listed above that their health insurance will also change on [Termination Effective Date]."], heading: 'Current Plan Coverage', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you want to stop this change from taking effect, you must contact #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number} <u>as quickly as possible</u>.  You cannot reverse these changes once they have taken effect. "], heading: 'Stopping the Change', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you want to stop this change from taking effect, you must contact #{contact_center_name} toll free at #{contact_center_phone_number} <u>as quickly as possible</u>.  You cannot reverse these changes once they have taken effect. "], heading: 'Stopping the Change', sub_heading: ''} %>

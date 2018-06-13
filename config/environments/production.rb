@@ -81,13 +81,15 @@ Rails.application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = Logger::SimpleJsonFormatter.new
-  
+
   # Do not dump schema after migrations.
 #  config.active_record.dump_schema_after_migration = false
   config.acapi.publish_amqp_events = true
-  config.acapi.app_id = "enroll" 
+  config.acapi.app_id = "enroll"
+  config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
+  config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
 
-  #Queue adapter 
+  #Queue adapter
   config.active_job.queue_adapter = :resque
 
   Mongoid.logger.level = Logger::ERROR

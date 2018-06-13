@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="row">
+
+    <div id= 'message_form'></div>
+    <div class="top-pd" id="inbox_provider_form">
+      <span class="flash_message"></span>
+    </div>
+    <div class='hide' id='collection_scope'><%= @plan_design_organization._id %> </div>
+    <div class="row container">
+      <div class="col-sm-12">
+        <div class="row no pd">
+          <h2 class="">Manage Quotes for <%= @plan_design_organization.legal_name %></h2>
+        </div>
+      <div class="pull-left">
+        <%= link_to "Back to Employer Index", employers_organizations_broker_agency_profile_path(@plan_design_organization.broker_agency_profile.id), class:"btn btn-primary new-plan-design-proposal"  %>
+      </div>
+      <div class="pull-right">
+        <%= link_to "Create New Quote", new_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization), class:"btn btn-primary new-plan-design-proposal"  %>
+      </div>
+    </div>
+    </div>
+    <br>
+    <%= render_datatable(@datatable) %>
+  </div>
+</div>
+<script>
+  initializeDataTables();
+</script>

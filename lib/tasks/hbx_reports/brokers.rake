@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "All Brokers"
     task :brokers => :environment do
+      include Config::AcaHelper
 
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
       brokers = Person.exists(broker_role: true).broker_role_having_agency
@@ -31,18 +32,18 @@ namespace :reports do
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/brokers_list_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
+      file_name = fetch_file_format('brokers_list', 'BROKERSLIST')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        brokers.each do |broker|  
+        brokers.each do |broker|
             csv << [
             broker.broker_role.npn,
             broker.broker_role.broker_agency_profile.try(:legal_name),
             broker.first_name,
-            broker.last_name, 
-            broker.broker_role.email_address, 
+            broker.last_name,
+            broker.broker_role.email_address,
             broker.broker_role.phone,
             broker.broker_role.broker_agency_profile.try(:market_kind),
             broker.broker_role.broker_agency_profile.try(:languages_spoken),
@@ -62,11 +63,16 @@ namespace :reports do
         end
       end
 
+      pubber = Publishers::Legacy::ShopBrokersReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
+
       puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} Brokers to output file: #{file_name}"
     end
 
     def organization_info(broker)
-      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil? or broker.broker_role.broker_agency_profile.organization.primary_office_location.nil?
+      validate_broker = broker.broker_role.broker_agency_profile.nil? && broker.broker_role.broker_agency_profile.organization.primary_office_location.nil?
+      return ["","","","",""] if validate_broker
+      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil? or broker.broker_role.broker_agency_profile.organization.primary_office_location.try(:address).nil?
       [
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_1,
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_2,

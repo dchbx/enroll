@@ -1,0 +1,17 @@
+$('#securityChallengeModal').replaceWith("<%= escape_javascript render partial: 'challenge', locals: { security_question: @security_question, user: user_from_email } %>");
+$('#securityChallengeModal').modal({
+  backdrop: 'static',
+  keyboard: false
+});
+$('.modal-backdrop').css({height: '800px'});
+$('button.submit-question-btn').on('click', function() {
+  $.post(
+    "<%= users_authenticate_path %>.js",
+    { security_question_response: {
+        question_answer: $('#questionAnswer').val(),
+        security_question_id: $('#questionId').val()
+      },
+      user_id: $('#userId').val() 
+    }
+  );
+});

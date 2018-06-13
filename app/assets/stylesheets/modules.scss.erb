@@ -25,7 +25,7 @@
   &.footer {
     font-size: 14px;
     color: $primary-white;
-    background-color: #003260;
+    background-color: $primary-color;
     padding: 15px;
     position: absolute;
     bottom: 0;
@@ -68,7 +68,7 @@
         }
         &:hover {
           .fa {
-            color: $primary-blue;
+            color: $brand-primary;
           }
         }
         .fa {
@@ -103,7 +103,7 @@
       }
       &:hover {
         .fa-stack-1x {
-          color: $primary-blue;
+          color: $brand-primary;
         }
       }
       .fa {
@@ -169,7 +169,7 @@
           text-decoration: underline;
         }
         .fa {
-          color: $primary-blue;
+          color: $brand-primary;
         }
       }
       &.important {
@@ -200,7 +200,9 @@
   }
   &.market-selection {
     padding: 0 15% 5%;
-    .btn-primary {
+
+
+    .btn-group .btn-primary {
       padding: 4%;
       font-size: 13px;
       background-color: transparent;
@@ -214,6 +216,7 @@
         }
       }
     }
+
   }
   &.modal-footer {
     .modal-sbc-link {
@@ -238,38 +241,25 @@
       border-bottom: none;
       padding: 0 20px;
       font-size: 14px;
-      text-transform: uppercase;
-      color: #ffffff;
       margin: 0;
-      padding: 0 15px;
+      padding: 0 10px;
       .panel-heading {
         background-color: #ffffff;
         background-image: none;
         border-bottom: none;
         padding: 0;
         font-size: 12px;
-        color: #333333;
-        text-transform: capitalize;
         text-align: center;
         h4 {
           font-weight: 600;
           font-size: 14px;
           margin-bottom: 0;
           max-width: 155px;
-          word-break: break-all;
-          a {
-
-          }
         }
       }
       .panel-body {
-        color: #9b9b9b;
-        text-transform: uppercase;
         font-size: 14px;
         text-align: center;
-        .fte-count {
-          color: #007bc4;
-        }
       }
     }
   }
@@ -328,7 +318,8 @@
 			text-transform: capitalize;
 		}
 	}
-  // ***** Consumer Documents Verification ******** //
+ 
+ // ***** Consumer Documents Verification ******** //
 
   &.verification-process {
     .family-member, .person {
@@ -405,6 +396,6 @@
       margin-bottom: 10px;
     }
   }
-
   // --- end of consumer verification --- //
 }
+

@@ -9,6 +9,8 @@ module Forms
     attr_accessor :market_kind, :languages_spoken
     attr_accessor :working_hours, :accept_new_clients, :home_page
     attr_accessor :broker_applicant_type, :email
+    attr_accessor :ach_record
+
     include NpnField
 
     validates :market_kind,
@@ -20,12 +22,14 @@ module Forms
     validates_format_of :email, :with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, message: "%{value} is not valid"
 
     validate :validate_duplicate_npn
+    validate :validate_ach_record
 
     class OrganizationAlreadyMatched < StandardError; end
 
     def initialize(attrs = {})
       self.fein = Organization.generate_fein
       self.is_fake_fein=true
+      self.ach_record = attrs[:ach_record] || {}
       super(attrs)
     end
 
@@ -38,6 +42,22 @@ module Forms
         :provider_kind => 'broker',
         :npn => self.npn
       })
+    end
+
+    def ach_record=(attrs)
+      @ach_record = AchRecord.new(attrs.merge(bank_name: 'Placeholder'))
+    end
+
+    def validate_ach_record
+      return false unless @ach_record
+      unless @ach_record.valid?
+        errors = @ach_record.errors
+        errors.each do |key, val|
+          unless key == :routing_number
+            self.errors.add('ach_record', val)
+          end
+        end
+      end
     end
 
     def save(current_user=nil)
@@ -59,6 +79,8 @@ module Forms
       organization = create_or_find_organization
       self.broker_agency_profile = organization.broker_agency_profile
       self.broker_agency_profile.primary_broker_role = person.broker_role
+      self.broker_agency_profile.ach_routing_number = @ach_record.routing_number
+      self.broker_agency_profile.ach_account_number = @ach_record.account_number
       self.broker_agency_profile.save!
       person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
       UserMailer.broker_application_confirmation(person).deliver_now
@@ -131,7 +153,6 @@ module Forms
       organization = broker_agency_profile.organization
       broker_role = broker_agency_profile.primary_broker_role
       person = broker_role.try(:person)
-
       record = self.new({
         id: organization.id,
         legal_name: organization.legal_name,
@@ -148,6 +169,11 @@ module Forms
         languages_spoken: broker_agency_profile.languages_spoken,
         working_hours: broker_agency_profile.working_hours,
         accept_new_clients: broker_agency_profile.accept_new_clients,
+        ach_record: {
+          routing_number: broker_agency_profile.ach_routing_number,
+          routing_number_confirmation: broker_agency_profile.ach_routing_number,
+          account_number: broker_agency_profile.ach_account_number,
+        },
         office_locations: organization.office_locations
       })
     end
@@ -198,7 +224,9 @@ module Forms
         :market_kind => market_kind,
         :languages_spoken => languages_spoken,
         :working_hours => working_hours,
-        :accept_new_clients => accept_new_clients
+        :accept_new_clients => accept_new_clients,
+        :ach_routing_number => ach_record.routing_number,
+        :ach_account_number => ach_record.account_number
       }
     end
 

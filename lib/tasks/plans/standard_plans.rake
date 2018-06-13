@@ -1,24 +1,44 @@
 namespace :xml do
   task :standard_plans, [:file] => :environment do |task,args|
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml", "**", "*.xlsx"))
+    files.each do |file|
+      year = file.split("/")[-2].to_i
 
-    puts "*"*80
-    puts "Start of 2016 plans being updated to standard plans... "
-    standard_hios_ids = ["94506DC0390001-01","94506DC0390005-01","94506DC0390007-01","94506DC0390011-01","86052DC0400001-01","86052DC0400002-01","86052DC0400007-01","86052DC0400008-01","78079DC0210001-01","78079DC0210002-01","78079DC0210003-01","78079DC0210004-01"]
-    Plan.by_active_year(2016).where(:hios_id.in => standard_hios_ids).each do |plan|
-      plan.update(is_standard_plan: true)
-      puts "#{plan.active_year} #{plan.carrier_profile.legal_name} Plan with hios_id #{plan.hios_id} updated to standard plan."
-    end
-    puts "end of 2016 plans being updated to standard plans... "
+      puts "*"*80
+      puts "Marking plans as standard or not-standard from #{file}..."
+      if file.present?
+        result = Roo::Spreadsheet.open(file)
+        sheets = ["MA SHOP QHP"]
+        sheets.each do |sheet_name|
+          sheet_data = result.sheet(sheet_name)
 
-    puts "*"*80
-    puts "start of 2017 plans being updated to standard plans... "
-    Plan.by_active_year(2017).each do |plan|
-      if plan.name.downcase.include?("std") || plan.name.downcase.include?("standard")
-        plan.update(is_standard_plan: true)
-        puts "#{plan.active_year} #{plan.name}(#{plan.carrier_profile.legal_name}) Plan with hios_id #{plan.hios_id} updated to standard plan."
+          @header_row = sheet_data.row(1)
+          assign_headers
+
+          last_row = sheet_data.last_row
+          (2..last_row).each do |row_number| # data starts from row 2, row 1 has headers
+            row_info = sheet_data.row(row_number)
+            hios_id = row_info[@headers["hios/standard component id"]].squish
+            plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
+            plans.each do |plan|
+              plan.is_standard_plan = row_info[@headers["standard plan?"]] == "Yes" ? true : false
+              plan.save
+            end
+          end
+        end
       end
     end
-    puts "end of 2017 plans being updated to standard plans... "
     puts "*"*80
+    puts "import complete"
+    puts "*"*80
+
+  end
+
+  def assign_headers
+    @headers = Hash.new
+    @header_row.each_with_index {|header,i|
+      @headers[header.to_s.underscore] = i
+    }
+    @headers
   end
 end

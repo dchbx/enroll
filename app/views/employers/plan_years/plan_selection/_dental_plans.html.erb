@@ -48,7 +48,7 @@
             <span class="plan-label">Type: </span><span><%= p.plan_type %></span><br>
             <span class="plan-label">Carrier: </span><span><%= p.carrier_profile.legal_name %></span><br>
             <span class="plan-label">Level: </span><span><%= display_dental_metal_level(p) %></span><br>
-            <span class="plan-label">Network: </span><span><%= p.nationwide ? 'Nationwide' : 'DC Metro' %></span><br/>
+            <span class="plan-label">Network: </span><span><%= p.nationwide ? 'Nationwide' : p.service_area_id %></span><br/>
             <%= link_to 'View Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: p.id, hios_id: p.hios_id, coverage_kind: p.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
           </div>
         </div>

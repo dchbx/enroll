@@ -3,7 +3,7 @@ Then(/^ the Hbx Admin should see the list of primary applicants and an Action bu
 end
 
 When(/^the Hbx Admin clicks on the Action button$/) do
-  find(:xpath, "//*[@id='dropdownMenu1']", :wait => 10).trigger("click")
+  click_button('Actions')
 end
 
 Then(/^the Add SEP option should be enabled$/) do
@@ -16,11 +16,11 @@ Then(/^the Add SEP option should be disabled$/) do
 end
 
 Then(/^the Cancel Enrollment option should be enabled$/) do
-  find_link('Cancel Enrollment')['data-remote'].should == 'true'
+  find_link('Cancel Enrollment')['data-remote'].should == nil
 end
 
 Then(/^the Terminate Enrollment option should be enabled$/) do
-  find_link('Terminate Enrollment')['data-remote'].should == 'true'
+  find_link('Terminate Enrollment')['data-remote'].should == nil
 end
 
 Then(/^the Cancel Enrollment option should be disabled$/) do

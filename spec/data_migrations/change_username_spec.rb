@@ -23,6 +23,7 @@ describe ChangeUsername, dbclean: :after_each do
       expect(user.oim_id).to eq "NewUsername"
     end
   end
+  
   describe "not change the username if the user not found" do
     let(:user) { FactoryGirl.create(:user) }
     before(:each) do
@@ -35,6 +36,22 @@ describe ChangeUsername, dbclean: :after_each do
       subject.migrate
       user.reload
       expect(user.oim_id).to eq username
+    end
+  end
+
+  describe "if new user already present in Enroll System" do
+    let(:user) { FactoryGirl.create(:user) }
+    let(:new_user) { FactoryGirl.create(:user) }
+    before(:each) do
+      allow(ENV).to receive(:[]).with("old_user_oimid").and_return(user.oim_id)
+      allow(ENV).to receive(:[]).with("new_user_oimid").and_return(new_user.oim_id)
+    end
+    it "should not change the new username of the user" do
+      username=user.oim_id
+      expect(user.oim_id).to eq username
+      subject.migrate
+      user.reload
+      expect(user.oim_id).not_to eq new_user.oim_id
     end
   end
 end

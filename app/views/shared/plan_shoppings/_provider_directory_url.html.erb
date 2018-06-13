@@ -1,0 +1,23 @@
+<% if offers_nationwide_plans? %>
+  <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
+    <tr>
+      <th></th>
+      <% qhps.each do |qhp|%>
+        <th colspan="2">
+          <% if qhp.plan.nationwide %>
+            <%= link_to "PROVIDER DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
+          <% end %>
+        </th>
+      <% end %>
+    </tr>
+  <% end %>
+<% else%>
+  <tr>
+    <th></th>
+    <% qhps.each do |qhp|%>
+      <th colspan="2">
+        <%= link_to "PROVIDER DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
+      </th>
+    <% end %>
+  </tr>
+<% end %>

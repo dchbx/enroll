@@ -27,7 +27,7 @@ RSpec.describe Exchanges::AgentsController do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("exchanges/agents/home")
     end
-    
+
     it 'begins enrollment' do
       sign_in current_user
       get :begin_employee_enrollment

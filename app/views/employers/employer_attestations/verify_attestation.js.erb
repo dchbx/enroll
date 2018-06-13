@@ -1,0 +1,56 @@
+$('.attestation_form').html("<%= escape_javascript(render "verify_attestation") %>");
+$('.attestation_form').show();
+$('#reviewClose').click(function() {
+    $('.attestation_form').hide();
+    event.preventDefault();
+    $('tr.child-row:visible').remove();
+    $('#attestation_documents_table').hide();
+});
+
+$("input[name='status']").click(function(){
+    if ($(this).val() === 'rejected' || $(this).val() === 'info_needed') {
+        $('.rejection_reason').removeClass('hidden');
+        $('#attestation_submit').addClass('disabled');
+        $("input[name='other_reason']").val('');
+    }
+    else {
+        $('.rejection_reason').addClass('hidden');
+        $("input[name='other_reason']").addClass('hidden');
+         $('#attestation_submit').removeClass('disabled');
+    }
+});
+
+function rejectReason() {
+    var x = $('select#reason_for_rejection').val();
+    if (x == "Other Reason") {
+        $("input[name='other_reason']").removeClass('hidden');
+        $('#attestation_submit').addClass('disabled');
+    } else if (x == "Reason for rejection") {
+        $("input[name='other_reason']").addClass('hidden');
+        $('#attestation_submit').addClass('disabled');
+    } else {
+        $("input[name='other_reason']").addClass('hidden');
+        $('#attestation_submit').removeClass('disabled');
+    }
+}
+
+$("input[name='other_reason']").on('change keydown paste input', function(){
+    if ($("input[name='other_reason']").val() == '') {
+        $('#attestation_submit').addClass('disabled');
+    }
+    else {
+        $('#attestation_submit').removeClass('disabled');
+    }
+});
+
+$('select#reason_for_rejection').on('selectric-init', function(event, element, selectric) {
+   $('.employer_attestation_fields .selectric-wrapper').css({'width': '315px'});
+   $("input[name='other_reason']").css({'margin-top': '8px'})
+});
+
+$('#attestation_submit').click(function() {
+    var confirmation = confirm('Are You Sure? Changing Employer Attestation Documentation status from '+ $("input[name='prev_status']").val() + ' to ' + $("input[name='status']:checked").val());
+    if (confirmation != true) {
+      return false;
+    }
+})

@@ -7,12 +7,12 @@
 					<%
 						disable_class = @quote.is_complete? ? " disabled" : ""
 					%>
-			    <%= submit_tag "Save Changes", class: "btn btn-primary #{disable_class}" %>
-					<%= submit_tag l10n("add_employee"), class: "btn btn-primary #{disable_class}" %>
-					<%= link_to 'Upload Roster' , "" , class: "btn btn-primary #{disable_class}", "data-url" => upload_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote)  ,id: "upload_employees" %>
-					<%= link_to 'Download Roster' , download_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}",id: "download_employees" %>
+			    <%= submit_tag l10n("save_changes"), class: "btn btn-primary #{disable_class}" %>
+					<%= submit_tag l10n("add_family"), class: "btn btn-primary #{disable_class}" %>
+					<%= link_to l10n('upload_roster'), upload_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}", id: "upload_employees" %>
+					<%= link_to l10n('download_roster'), download_employee_roster_broker_agencies_broker_role_quote_path(@broker, @quote) , class: "btn btn-primary #{disable_class}",id: "download_employees" %> <br>
 				</div>
-				<div class="col-8">
+				<div class="col-sm-2">
 					<%= link_to l10n('home'), my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', data: { no_turbolink: true } %>
 					<%= submit_tag l10n("create_quote"), class: "btn btn-primary #{disable_class}" %>
 				</div>

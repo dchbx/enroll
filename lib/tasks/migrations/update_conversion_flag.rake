@@ -3,6 +3,6 @@
 
 require File.join(Rails.root, "app", "data_migrations", "update_conversion_flag")
 namespace :migrations do
-  desc "Update Termination Date for an Employee"
+  desc "Update Employer Profile profile source using fein"
   UpdateConversionFlag.define_task :update_conversion_flag => :environment
 end

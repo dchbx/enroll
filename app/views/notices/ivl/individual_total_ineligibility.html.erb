@@ -13,7 +13,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Subject: Denial of Eligibility for #{Settings.site.short_name} Enrollment</h3></td>
+      <td><h3>Subject: Denial of Eligibility for #{site_short_name} Enrollment</h3></td>
     </tr>
   </tbody>
 </table>
@@ -29,7 +29,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Thank you for the application you submitted and we processed on <application date>.
   Unfortunately, the following individual(s) are not qualified to enroll in health insurance through
-  #{Settings.site.short_name} based on the information you provided to us."} %>
+  #{site_short_name} based on the information you provided to us."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "[QHP Ineligible 1 First Name] [QHP Ineligible 1 Last Name]<br>
@@ -37,10 +37,10 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["<span #{@style_color_text}>[PICK ALL THAT APPLY]</span><br><br>
-  <span #{@style_color_text}>[IF Anyone Ineligible Due to Residency]</span> The following individual(s) are not qualified to enroll through #{Settings.site.short_name} because
-  they are not residents of the #{Settings.aca.state_name}. They are encouraged to submit another application for the state where they live.
+  <span #{@style_color_text}>[IF Anyone Ineligible Due to Residency]</span> The following individual(s) are not qualified to enroll through #{site_short_name} because
+  they are not residents of the #{aca_state_name}. They are encouraged to submit another application for the state where they live.
   You can find these applications at <a href='http://www.HealthCare.gov'>www.HealthCare.gov</a>. 45 C.F.R. §155.305(a)(3)."],
-    heading: 'Ineligibility for Assistance or Enrollment through #{Settings.site.short_name}', sub_heading: ''} %>
+    heading: 'Ineligibility for Assistance or Enrollment through #{site_short_name}', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_text_indent}>[Residency Ineligible 1 First Name] [Residency Ineligible 1 Last Name]</span><br>
@@ -48,19 +48,19 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF Anyone Ineligible Due to Incarceration]</span> The following individual(s) are not qualified to enroll through
-  #{Settings.site.short_name} because they are in prison or jail serving a sentence. 45 C.F.R. §155.305(a)(2)."} %>
+  #{site_short_name} because they are in prison or jail serving a sentence. 45 C.F.R. §155.305(a)(2)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_text_indent}>[Incarceration Ineligible 1 First Name] [Incarceration Ineligible 1 Last Name]</span><br>
   <span #{@style_color_indent}'>[IF Person N field populated]</span> [Incarceration Ineligible N First Name] [Incarceration Ineligible N Last Name] "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Because the above individual(s) are not eligible for enrollment in coverage through #{Settings.site.short_name}, they also cannot get tax credits or cost-sharing
-  reductions through #{Settings.site.short_name}.  45 C.F.R. §155.305(f) & (g)."} %>
+  content: "Because the above individual(s) are not eligible for enrollment in coverage through #{site_short_name}, they also cannot get tax credits or cost-sharing
+  reductions through #{site_short_name}.  45 C.F.R. §155.305(f) & (g)."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one
-    by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.short_name}</a>. You can get help with logging in or creating an account by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
+  contents: ["Important information is stored in your account on the #{site_short_name} website.  If you don’t have an account already, you can create one
+    by going to #{site_home_link.html_safe}. You can get help with logging in or creating an account by calling #{contact_center_name} toll-free at #{contact_center_phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

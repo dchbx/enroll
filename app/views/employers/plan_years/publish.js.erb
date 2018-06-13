@@ -1,4 +1,7 @@
-<% @plan_year.application_eligibility_warnings.each_value do |warning| %>
-  $(".application-warnings").append("<li><%= warning %></li>");
+<% other_warning = @plan_year.application_eligibility_warnings %>
+<% warning_para = other_warning.delete(:fte_count2) %>
+<% other_warning.each_value do |warning| %>
+  $(".application-warnings").append("<li><%=h warning%></li>");
 <% end %>
+$(".warning-para").append("<p><%=h warning_para%></p>");
 $("#publishPlanYear").modal('show');

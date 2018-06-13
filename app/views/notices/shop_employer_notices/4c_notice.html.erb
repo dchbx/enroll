@@ -25,17 +25,17 @@ Employees have until #{notice.open_enrollment_end_on.try(:to_s)} to complete the
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "To manage your employees’ open enrollment:",
-  listings: ["Log in to your #{Settings.site.short_name} employer account",
+  listings: ["Log in to your #{site_short_name} employer account",
              "Select “Employees” from the menu at the top of your account page",
-             ["You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name} during the open enrollment period.
+             ["You will see a list of all eligible employees showing each action they have taken on #{site_short_name} during the open enrollment period.
              Each entry will have one of the following statuses:", ["No Coverage Selected", "Coverage Selected", "Coverage Waived", "Terminated"]]] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Minimum Participation:</strong> Your ability to offer group health coverage through #{Settings.site.short_name}
+content: "<strong>Minimum Participation:</strong> Your ability to offer group health coverage through #{site_short_name}
 is contingent on a minimum level of employee enrollment.  If at least 2/3 of eligible employees do not enroll or waive coverage,
- you will not be able to offer group health coverage through #{Settings.site.short_name} at this time.
+ you will not be able to offer group health coverage through #{site_short_name} at this time.
  During open enrollment, you can monitor the number of eligible employees that have enrolled by logging into your account on
- #{Settings.site.short_name}. Any employee that waives coverage due to have other minimum essential coverage (MEC) does count towards your
+ #{site_short_name}. Any employee that waives coverage due to have other minimum essential coverage (MEC) does count towards your
  minimum participation rate.<br><br>
  Minimum participation rate = (enrolled + waived due to other MEC)/all eligible employees"} %>
 
@@ -43,7 +43,7 @@ is contingent on a minimum level of employee enrollment.  If at least 2/3 of eli
 content: "<strong>What if We Do Not Meet Minimum Participation Requirements During This Open Enrollment?</strong>
 There is a special annual enrollment period at the end of each year during which employers can offer group health coverage
 effective January 1<sup>st</sup> without having a minimum level of employee enrollment. This annual enrollment is only available to
-employers who do not have existing #{Settings.site.short_name} coverage or whose plan year already begins January 1<sup>st</sup>. "} %>
+employers who do not have existing #{site_short_name} coverage or whose plan year already begins January 1<sup>st</sup>. "} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],

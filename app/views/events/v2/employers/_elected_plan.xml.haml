@@ -1,6 +1,10 @@
 %elected_plan
   %id
     %id= elected_plan.hios_id
+    - if !elected_plan.carrier_special_plan_identifier.blank?
+      %alias_ids
+        %alias_id
+          %id= carrier_special_plan_identifier_namespace + elected_plan.carrier_special_plan_identifier
   %name= elected_plan.name
   %active_year= elected_plan.active_year
   %is_dental_only= elected_plan.is_dental_only?

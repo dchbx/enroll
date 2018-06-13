@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_state_for_passive_enrollment")
 describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
-  let(:calender_year) { TimeKeeper.date_of_record.year }
+  let(:calendar_year) { TimeKeeper.date_of_record.year }
   let(:given_task_name) { "deactivate_consumer_role" }
   subject { ChangeStateForPassiveEnrollment.new(given_task_name, double(:current_scope => nil)) }
   describe "given a task name" do
@@ -14,8 +14,8 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
     let(:organization) {
       org = FactoryGirl.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryGirl.create :employer_profile, organization: org
-      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 4, 1), :end_on => Date.new(calender_year+1, 3, 31),
-      :open_enrollment_start_on => Date.new(calender_year, 3, 1), :open_enrollment_end_on => Date.new(calender_year, 3, 10), fte_count: 5
+      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 3, 1), :end_on => Date.new(calendar_year+1, 2, 28),
+      :open_enrollment_start_on => Date.new(calendar_year, 2, 1), :open_enrollment_end_on => Date.new(calendar_year, 2, 10), fte_count: 5
       renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
       census_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years
       employer_profile.census_employees.each do |census_employee|

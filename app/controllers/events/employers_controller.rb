@@ -21,7 +21,7 @@ module Events
                 :employer_id => employer_id
               }
             }
-          ) 
+          )
         end
       else
         with_response_exchange(connection) do |ex|
@@ -34,7 +34,7 @@ module Events
                 :employer_id => employer_id
               }
             }
-          ) 
+          )
         end
       end
     end

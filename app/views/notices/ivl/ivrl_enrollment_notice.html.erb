@@ -31,7 +31,7 @@
 </table>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["<b>Pay your premium:</b> You must make your premium payments directly to the insurance company by their payment deadline, which is listed on the invoice your insurance plan (not #{Settings.site.short_name}) sends you. If you miss the payment deadline, your plan will be cancelled and you may experience a break in coverage or be unable to sign up again for 2016 coverage.  The fastest way to pay your premium is by calling the health plan or dental plan directly at the numbers listed below.  You should call your health insurance company by December 31, 2015 even if you have not received your invoice.".html_safe] } %>
+  ["<b>Pay your premium:</b> You must make your premium payments directly to the insurance company by their payment deadline, which is listed on the invoice your insurance plan (not #{site_short_name}) sends you. If you miss the payment deadline, your plan will be cancelled and you may experience a break in coverage or be unable to sign up again for 2016 coverage.  The fastest way to pay your premium is by calling the health plan or dental plan directly at the numbers listed below.  You should call your health insurance company by December 31, 2015 even if you have not received your invoice.".html_safe] } %>
 
   <table border=1 width=75% align="center"%>
   	<tr>
@@ -57,19 +57,19 @@
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["<strong>Update your payment information:</strong> Your premium amount for 2016 has changed. If you have autopay set up for your insurance plan(s), you must contact your insurance plan to update the amount withdrawn every month. If you do not make an update, your carrier may terminate your plan and you experience a break in coverage or be unable to sign up for a new plan for 2016.".html_safe]} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["<strong>Provide documents:</strong> If you received an earlier notice from #{Settings.site.short_name} indicating that we need documentation of certain information, please be sure to submit those documents if you haven’t already.  An outstanding document request will not impact your renewal.  However, failing to submit the document(s) by the date indicated on the request may cause your coverage to be terminated in the future.".html_safe]} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["<strong>Provide documents:</strong> If you received an earlier notice from #{site_short_name} indicating that we need documentation of certain information, please be sure to submit those documents if you haven’t already.  An outstanding document request will not impact your renewal.  However, failing to submit the document(s) by the date indicated on the request may cause your coverage to be terminated in the future.".html_safe]} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2015 has already been cancelled or terminated, you must go to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>. before January 31, 2016 to re-enroll for 2016.  Your coverage will not be automatically renewed.".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2015 has already been cancelled or terminated, you must go to #{site_home_link.html_safe}. before January 31, 2016 to re-enroll for 2016.  Your coverage will not be automatically renewed.".html_safe} %>
 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: [], heading: '2016 Plan Enrollment', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account on <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>. or by calling #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}. You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end.".html_safe], heading: 'Ending Your Insurance Coverage', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account on #{site_home_link.html_safe}. or by calling #{contact_center_name} toll-free at #{contact_center_phone_number}. You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end.".html_safe], heading: 'Ending Your Insurance Coverage', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates that the information you put on your application, or on your renewal form, has changed and you are no longer eligible for coverage.  If your health insurance is going to be terminated without your request because it has been determined that you are no longer eligible for coverage, you will receive a notice in advance telling you the basis for the decision and you will be provided with information about how to contest the decision.".html_safe} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already,
-    you can create one by going to <a href='http://www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling
-    #{Settings.contact_center.name} toll-free at #{Settings.contact_center.phone_number}."],
+  contents: ["Important information is stored in your account on the #{site_short_name} website.  If you don’t have an account already,
+    you can create one by going to #{site_home_link.html_safe}. You can get help with logging in or creating an account by calling
+    #{contact_center_name} toll-free at #{contact_center_phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>

@@ -11,18 +11,22 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
     Given Employee has not signed up as an HBX user
     And Soren White visits the employee portal
     When Soren White creates an HBX account
+    And I select the all security question and give the answer
+    When I have submit the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Soren White
     Then Employee should not see the matched employee record form
     Then Soren White logs out
 
-  
+
   Scenario: New employee with existing person
     Given Employer for Soren White exists with a published health plan year
     And Employee has not signed up as an HBX user
     And Soren White visits the employee portal
     When Soren White creates an HBX account
+    And I select the all security question and give the answer
+    When I have submit the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Soren White

@@ -1,0 +1,42 @@
+<div class="break">
+<%= render :partial => "notices/shared/logo" %>
+<table class="total_table address custom-address" border="0">
+  <tbody>
+  <tr><td><br><br><br></td></tr>
+    <tr>
+      <td class="fssize health-connector-address" align="left"><%= recipient.first_name %> <%= recipient.last_name %></td>
+    </tr>
+    <tr>
+       <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.street_1 %></td>
+    </tr>
+    <% if recipient.mailing_address.street_2.present? %>
+    <tr>
+      <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.street_2 %></td>
+    </tr>
+    <% end %>
+    <tr>
+    <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
+    </tr>
+  </tbody>
+</table>
+<br><br><br><br><br><br><br>
+
+<h1 class="headers-notice" align="center"><strong>THIS IS A COVER PAGE</strong></h1>
+<p class="notice-font-padding1" align="center">___________________________________________________________________________________________________________________________________________________</p>
+<p class="notice-font-padding1"> The enclosed letter has important information about your health insurance, including steps you need to take to get or keep your insurance. </p><br><br><br><br><br><br><br><br><br>
+<p class="mpi_indicator"><%= notice_number %> </p>
+</div>
+
+<div class="page-break-after">
+  <table class="total_table" border="0">
+    <tbody>
+    <tr>
+      <td style="color: #b3b3b3; font-size: 18px; text-align: center; padding-top: 300px;">
+        This page intentionally left blank.
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page-break"></div>

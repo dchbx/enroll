@@ -4,8 +4,8 @@
 <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family &&has_writing_agent?(@person) %>
 <h1 class="darkblue no-buffer"><%= l10n('my_brokers') %></h1>
 <br/>
-<%= render 'consumer_broker', title: "Your Broker or Assister" %>
-<%= render 'employee_broker', title: "Employer Assigned Broker" %>
+<%= render 'consumer_broker', title: l10n(".your_broker_or_assister") %>
+<%= render 'employee_broker', title: l10n(".employer_assigned_broker") %>
 <% else %>
 <h1 class="darkblue no-buffer"><%= l10n('my_broker') %></h1>
 
@@ -19,7 +19,7 @@
 <div class="vertically-aligned-row">
   <div class="col-xs-12 col-sm-4 col-md-3">
     <div class="row">
-      <%= link_to "<i class='fa fa-caret-left' aria-hidden='true'></i>&nbsp; Back".html_safe, :back, class: 'btn btn-default btn-block' %>
+      <%= link_to "<i class='fa fa-caret-left' aria-hidden='true'></i>&nbsp; #{l10n('.back')}".html_safe, :back, class: 'btn btn-default btn-block' %>
     </div>
   </div>
 </div>

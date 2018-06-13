@@ -1,0 +1,46 @@
+CKEDITOR.editorConfig = function( config )
+{
+  $.ajax({
+    type:"GET",
+    url:"notice_kinds/get_tokens",
+    dataType:"json",
+    data: {builder: $('#notice_kind_recipient').val()},
+    success:function(result){
+
+      config.tokenStart = '#{';
+      config.tokenEnd = '}';
+      config.availableTokens = result.tokens;
+
+      // config.placeholder_selects = [
+      //   config.placeholder_select = {
+      //     key: 'placeholder_select',
+      //     title: 'Place Holder Select',
+      //     placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
+      //   }
+      // ];
+    }
+  });
+
+  config.tokenStart = '#{';
+  config.tokenEnd = '}';
+
+  config.removeButtons = "Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,About,Print,Save,NewPage,Preview,Save,Language,Flash,Smiley,Image,Iframe";
+
+  config.placeholder_selects = [
+      {
+        key: 'select_system_settings',
+        title: 'Select Application Settings',
+        placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.settings_placeholders.to_json %>
+      },
+      {
+        key: 'select_conditional_statement',
+        title: 'Select Condition/Loop',
+        placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
+      }
+     
+      ];
+
+
+  config.extraPlugins = 'button,lineutils,widgetselection,notification,toolbar,widget,dialogui,dialog,clipboard,token,placeholder,placeholder_select';
+  config.language = 'en';
+};

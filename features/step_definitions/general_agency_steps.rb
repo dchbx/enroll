@@ -3,6 +3,14 @@ When(/^.+ visit the HBX General Agency Registration form$/) do
   find(".interaction-click-control-general-agency-registration", wait: 10).click
 end
 
+When(/^.+ visit the main portal$/) do
+  visit '/'
+end
+
+Then(/^.+ should not see the New General Agency form/) do
+  expect(page).not_to have_content('General Agency')
+end
+
 Then(/^.+ should see the New General Agency form/) do
   expect(page).to have_content('General Agency / TPA Registration')
   expect(page).to have_css("#general_agency_form")
@@ -142,7 +150,7 @@ When(/^.+ registers with valid information for ga flow$/) do
 end
 
 Then(/^.+ should receive an invitation email for ga flow$/) do
-  open_email("broker.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name} ")
+  open_email("broker.martin@example.com", :with_subject => " Congratulations! You’re Broker Application for #{Settings.site.short_name} for Business has been Approved!")
   expect(current_email.to).to eq(["broker.martin@example.com"])
 end
 

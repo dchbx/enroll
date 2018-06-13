@@ -468,8 +468,8 @@ end
 describe EmployeeRole, dbclean: :after_each do
 
   let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-  let(:calender_year) { TimeKeeper.date_of_record.year }
-  let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
+  let(:calendar_year) { TimeKeeper.date_of_record.year }
+  let(:middle_of_prev_year) { Date.new(calendar_year - 1, 6, 10) }
 
   let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
   let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
@@ -483,10 +483,10 @@ describe EmployeeRole, dbclean: :after_each do
   }
 
   let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
-  let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
-  let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
-  let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
+  let(:plan_year_start_on) { Date.new(calendar_year, 1, 1) }
+  let(:plan_year_end_on) { Date.new(calendar_year, 12, 31) }
+  let(:open_enrollment_start_on) { Date.new(calendar_year - 1, 12, 1) }
+  let(:open_enrollment_end_on) { Date.new(calendar_year - 1, 12, 10) }
 
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)

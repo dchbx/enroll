@@ -2,7 +2,7 @@
 <body>
 <%= person_name %>,
 <br />
-<div>Your employer has created a Health Benefits Program through <%= Settings.site.short_name %>.</div>
-<div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to learn more about your benefits and sign up for insurance during open enrollment.</div>
+<div>Your employer has created a Health Benefits Program through <%= site_short_name %>.</div>
+<div>Please visit <%= link_to "#{site_short_name}", claim_invitation_url(invitation) %> to learn more about your benefits and sign up for insurance during open enrollment.</div>
 </body>
 </html>

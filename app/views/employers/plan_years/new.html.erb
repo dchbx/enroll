@@ -1,6 +1,7 @@
 <% content_for :navigation do %>
   <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
+
 <%= form_for @plan_year, url: employers_employer_profile_plan_years_path do |f| %>
   <%= render 'form', f: f %>
 <% end %>

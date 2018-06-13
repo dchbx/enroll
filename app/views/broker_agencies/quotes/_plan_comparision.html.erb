@@ -36,22 +36,13 @@
         <tr>
           <th><%= l10n("provider_network")%></th>
           <% qhps.each do |qhp|%>
-            <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
+            <th colspan="2">
+              <%= render partial: "shared/network_data", locals: {plan: qhp.plan} %>
+            </th>
           <% end %>
         </tr>
 
-        <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
-          <tr>
-            <th></th>
-            <% qhps.each do |qhp|%>
-              <th colspan="2">
-                <% if qhp.plan.nationwide %>
-                  <%= link_to "PROVIDER DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
-                <% end %>
-              </th>
-            <% end %>
-          </tr>
-        <% end %>
+        <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps}%>
 
         <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
           <tr>

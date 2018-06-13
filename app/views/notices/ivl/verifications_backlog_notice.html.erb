@@ -26,7 +26,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "When you enrolled in your insurance plan(s) through #{Settings.site.short_name}, some of your information did not match all the electronic data sources we are required by law to check.  As a result, we now need you to submit documents verifying the information you provided on your application. This notice lists the documents that we need below."} %>
+  content: "When you enrolled in your insurance plan(s) through #{site_short_name}, some of your information did not match all the electronic data sources we are required by law to check.  As a result, we now need you to submit documents verifying the information you provided on your application. This notice lists the documents that we need below."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "We need your documents <strong>by #{notice.due_date}</strong>. If we do not have your documents by then, your insurance plan(s) may be terminated."} %>
@@ -47,10 +47,10 @@
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.ssa_unverified.map{|individual| individual.full_name } } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for #{Settings.site.short_name}. We will only use your Social Security Number to verify the information you told us on your application or renewal form. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency."} %>
+  content: "Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for #{site_short_name}. We will only use your Social Security Number to verify the information you told us on your application or renewal form. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember your Social Security Number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact #{Settings.site.short_name} Customer Service at 1-855-532-5465."} %>
+  content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember your Social Security Number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact #{contact_center_alt_name} at #{contact_center_phone_number}."} %>
 <% end %>
 
 <% if notice.dhs_unverified.any? %>
@@ -68,7 +68,7 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "<u>Primary documentation</u>:  (Only One (1) is needed) ",
   listings: [["U.S. Passport", ["<i>Note</i>: Expired passports are acceptable."]],
-    "Certificate of Naturalization", 
+    "Certificate of Naturalization",
     "Certificate of Citizenship",
     "Consular report of Birth Abroad of U.S. Citizen",
     "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license.",
@@ -101,43 +101,43 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span class='mar20'><strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong></span>",
     listings: [
-      ["Permanent Resident Card (I-551, also known as Green Card)", 
+      ["Permanent Resident Card (I-551, also known as Green Card)",
         ["Alien registration number", "Card number"]
-      ], 
-      ["Temporary I-551 Stamp (on passport or I-94, I-94A)", 
-        ["Alien registration number"]
-      ], 
-      ["Immigrant Visa (with temporary I-551 language)", 
-        ["Alien registration number", "Passport number"]
-      ], 
-      ["Employment Authorization Card (EAD or I-766)", 
-        ["Alien registration number", "Card number", "Expiration date", "Category code"]
-      ], 
-      ["Arrival/Departure Record (I-94 or I-94A)", 
-        ["I-94 number"]
-      ], 
-      ["Arrival/Departure Record in foreign passport (I-94)", 
-        ["I-94 number", "Passport number", "Expiration date", "Country of issuance"]
-      ], 
-      ["Foreign passport", 
-        ["Passport number", "Expiration date"]
-      ], 
-      ["Country of issuance Reentry Permit (I-327)", 
+      ],
+      ["Temporary I-551 Stamp (on passport or I-94, I-94A)",
         ["Alien registration number"]
       ],
-      ["Refugee travel document (I-571)", 
+      ["Immigrant Visa (with temporary I-551 language)",
+        ["Alien registration number", "Passport number"]
+      ],
+      ["Employment Authorization Card (EAD or I-766)",
+        ["Alien registration number", "Card number", "Expiration date", "Category code"]
+      ],
+      ["Arrival/Departure Record (I-94 or I-94A)",
+        ["I-94 number"]
+      ],
+      ["Arrival/Departure Record in foreign passport (I-94)",
+        ["I-94 number", "Passport number", "Expiration date", "Country of issuance"]
+      ],
+      ["Foreign passport",
+        ["Passport number", "Expiration date"]
+      ],
+      ["Country of issuance Reentry Permit (I-327)",
         ["Alien registration number"]
-      ],     
-      ["Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)", 
+      ],
+      ["Refugee travel document (I-571)",
+        ["Alien registration number"]
+      ],
+      ["Certificate of Eligibility for Nonimmigrant (F-1) Student Status (I-20)",
         ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
       ],
-      ["Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)", 
+      ["Certificate of Eligibility for Exchange Visitor (J-1) Status (DS2019)",
         ["SEVIS ID"]
       ],
-      ["Notice of Action (I-797)", 
+      ["Notice of Action (I-797)",
         ["Alien registration number or an I-94 number"]
-      ], 
-      ["Other", 
+      ],
+      ["Other",
         ["Alien registration number or an I-94 number", "Description of the type or name of the document"]
       ]
     ]
@@ -156,7 +156,7 @@
   content: "We need your documents above by <strong>#{notice.due_date}</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our current records are correct. <u>Your health insurance coverage may be terminated</u>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you think you will not be able to submit the requested documentation by <strong>#{notice.due_date}</strong> due to circumstances outside of your control, please call #{Settings.site.short_name} Customer Service toll free at (855) 532-5465.  If you truly have a special need, we will work with you to complete the verification process."} %>
+  content: "If you think you will not be able to submit the requested documentation by <strong>#{notice.due_date}</strong> due to circumstances outside of your control, please call #{contact_center_alt_name} toll-free at #{contact_center_phone_number}.  If you truly have a special need, we will work with you to complete the verification process."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."],
@@ -187,15 +187,15 @@
                 <span style="width: 300px;">
                   <span style="float: left; width: 95px;"><strong>U.S. Postal Mail:</strong></span>
                   <span style="float: left; width: 205px;">
-                    <%= "#{Settings.site.short_name}" %> Exchange Contact Center<br>
-                    PO Box 44018<br>
-                    Washington, DC 20026<br><br>
+                    <%= contact_center_name %><br>
+                    <%= contact_center_address_one %><br>
+                    <%= "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}" %><br><br>
                   </span>
               </span>
             </li>
            </ul></div>
         </td>
-      </tr>   
+      </tr>
     </tbody>
   </table>
 </div>
@@ -207,7 +207,7 @@
       <td>
         <ul style="list-style: circle solid;">
         <li>
-          <strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office (call the <%= Settings.contact_center.name %> at <%= Settings.contact_center.phone_number %> for locations).
+          <strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office (call the <%= contact_center_name %> at <%= contact_center_phone_number %> for locations).
         </li>
         </ul>
       </td>
@@ -217,5 +217,5 @@
 </div>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Important information is stored in your account on the #{Settings.site.short_name} website.  If you don’t have an account already, you can create one by going to <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a>. You can get help with logging in or creating an account by calling #{Settings.site.short_name} Customer Service toll-free <br>at 1-855-532-5465."],
+  contents: ["Important information is stored in your account on the #{site_short_name} website.  If you don’t have an account already, you can create one by going to %(#{link_to(site_home_url, site_home_url)}).html_safe. You can get help with logging in or creating an account by calling #{contact_center_alt_name} toll-free <br>at #{contact_center_phone_number}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>

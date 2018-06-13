@@ -13,7 +13,8 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                                             ssn: person[:ssn],
                                                             dob: person[:dob_date]
 
-
+ employee_role = FactoryGirl.create(:employee_role, employer_profile: secondary_employer_profile)
+ secondary_employee.update_attributes!(employee_role_id: employee_role.id)
 
   open_enrollment_start_on = TimeKeeper.date_of_record
   open_enrollment_end_on = open_enrollment_start_on.end_of_month + 13.days
@@ -45,6 +46,21 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   secondary_employee.add_renew_benefit_group_assignment benefit_group
 
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+
+  benefit_group_carrier = benefit_group.reference_plan.carrier_profile
+  renewing_carrier = benefit_group.reference_plan.carrier_profile
+  [benefit_group_carrier, renewing_carrier].each do |carrier_profile|
+    sic_factors = SicCodeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+      factor_set.rating_factor_entries.new(factor_key: secondary_employer_profile.sic_code, factor_value: 1.0)
+    end
+    sic_factors.save!
+    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+      [0..5].each do |size|
+        factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
+      end
+    end
+    group_size_factors.save!
+  end
 end
 
 Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, plan_year|
@@ -252,7 +268,7 @@ When(/Employee select a past qle date/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find('.interaction-click-control-continue').click
   end
 end
 
@@ -260,7 +276,7 @@ When(/Employee select a qle date based on expired plan year/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 30.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find('.interaction-click-control-continue').click
   end
 end
 

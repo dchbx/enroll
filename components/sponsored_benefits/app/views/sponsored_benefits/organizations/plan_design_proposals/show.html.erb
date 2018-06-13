@@ -1,0 +1,77 @@
+<div class="container" id="myTabContent">
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Viewing <%= @plan_design_proposal.aasm_state.capitalize %> Quote </h3>
+      <h4>Claim Code: <%= @plan_design_proposal.claim_code %></h4>
+      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/proposal_info_readonly" %>
+      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_roster" %>
+      <!--Employer Costs Start-->
+      <div class="panel panel-default table">
+        <div class="panel-heading">
+          <h3 class="panel-title">Health Plan Information</h3>
+        </div>
+        <div class="panel-body">
+          <% if @plan %>
+            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details", locals: { plan_export_default_class: 'plan-saved' } %>
+          <% else %>
+            <div class="row">
+              <div class="col-xs-12">
+                No Reference Plan Assigned
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <!--Employer Costs End-->
+      <!--Employee Costs Start-->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="col-md-3">
+                <h3>Employee Costs</h3>
+              </div>
+              <div class="col-md-7">
+                <br />
+                <p>Details of the minimum, maximum and reference costs for your members are shown below.  Values are based on the Benefit Package Type, Contribution Amounts and Reference Plan you have chosen above.</p>
+              </div>
+              <div class="col-md-2">
+                <br />
+                <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
+              </div>
+
+              <div class="collapse" id="collapseExample">
+                <div class="employee-costs">
+                  <% if @benefit_group %>
+                    <% if @benefit_group.sole_source? %>
+                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs", locals: {benefit_group: @benefit_group} %>
+                    <% else %>
+                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group} %>
+                    <% end %>
+                  <% else %>
+                    <div class="row">
+                      <div class="col-md-3">
+                        No Reference Plan Assigned
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Employee Costs End-->
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="col-md-12">
+      <div class="pull-left">
+        <%= link_to "Back to all Quotes", organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization), class:"btn btn-primary new-plan-design-proposal"  %>
+      </div>
+  </div>
+  </div>
+</div>
+
+<script>$(".employer-cost-text").append("<br /> <%= number_to_currency(@employer_contribution_amount.to_f) %>");</script>

@@ -1,5 +1,6 @@
+@individual_enabled
 Feature: Insured Plan Shopping on Individual market
-  
+
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal outside of open enrollment

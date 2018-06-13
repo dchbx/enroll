@@ -1,4 +1,4 @@
 <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
 <h4> Address </h4>
-<%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
+<%= render partial: 'shared/office_location_fields', locals: {f: office_location, child_index: f.object.office_locations.length} %>
 <% end %>
