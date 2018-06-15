@@ -19,8 +19,7 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
         person.consumer_role.update_attributes(:ssn_validation => "valid",
                                                :ssn_update_reason => "data_fix_hub_response")
       when "American Indian Status"
-        person.consumer_role.update_attributes(:native_validation => "valid",
-                                               :native_update_reason => "data_fix_hub_response")
+        #do nothing
       when "DC Residency"
         # handle local residency
       else
@@ -44,7 +43,7 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
   def type_verified_by_hub(person, v_type)
     if v_type == "Social Security Number"
       return true if ssa_response(person) && parse_ssa(ssa_response(person)).first
-    else
+    elsif v_type.in? ["Citizenship", "Immigration status"]
       return true if ssa_response(person) && parse_ssa(ssa_response(person)).last
       return true if dhs_response(person) && parse_dhs(dhs_response(person)).first == "lawfully present"
     end
