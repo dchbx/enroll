@@ -1,0 +1,38 @@
+<div class="panel panel-default health-panel">
+    <div class="panel-heading" role="tab" id="plan-selection-mgmt-header">
+     
+         <a role='button'  data-toggle="collapse" data-parent="#accordion" href="#plan-selection-mgmt" aria-expanded="true" aria-controls="plan-selection-mgmt">
+            <b><%= l10n("health_plan_selection")%></b>
+            <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></a>
+            <span style='margin-left: 50px; font-size: 120%;'  id='show_plan_selected_count'><%= l10n("plan_count")%></span>
+            <label class='btn btn-normal' id='reset_selected'> <%= l10n("reset_selections")%></label>
+    </div>
+        <div id="plan-selection-mgmt" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="">
+            <div class="container-fluid">
+                <div>
+                  <h4><%= l10n("broker_agencies.quotes.step_4")%></h5>
+
+                  <h5><%= l10n("showing")%> <strong id="x-of-plans"><%= @health_plans.count %></strong> <%= l10n("of")%> <strong><%= @health_plans.count %></strong>  <%= l10n("plans_based_on_your_selection_criteria")%></h5>
+                  <div class="btn-group plan_buttons" data-toggle="buttons" style='max-height: 300px; overflow-y: scroll' id="quote-plan-list">
+                    <% @health_plans.each_with_index do |p,index| %>
+                    <label class="btn <%= "active" if params['plans'].try(:include?, p.id.to_s) %>" >
+                      <input name="plans[]" <%= "checked" if params['plans'].try(:include?, p.id.to_s) %> type="checkbox" autocomplete="off" value="<%= p.id %>">
+                      <%= p.name  + ' $'%><span class='employer_cost'>0</span></label>
+                    <% end %>
+                  </div>
+                </div>
+
+                  <br>
+                  <% submit_tag "Compare Costs", class: 'btn btn-primary', id: 'QuoteCalculation' %>
+                  <div class='btn btn-primary' id='CostComparison'><%= l10n("compare_costs_select_plan")%></div>
+                  <div class='btn btn-primary' id='PlanComparison'><%= l10n("compare_plans")%></div>
+                  <br><br>
+
+            </div>
+
+          <div class="panel panel-default">
+            <div class="panel-collapse collapse in" role="tabpanel" aria-labelledby="compare_benefits"  id="plan_comparison_frame">
+          </div>
+        </div>
+    </div>
+</div>

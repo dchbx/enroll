@@ -16,8 +16,9 @@ class V2GroupXmlGenerator
   XML_NS = "http://openhbx.org/api/terms/1.0"
 
   CARRIER_ABBREVIATIONS = {
-      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "UnitedHealthcare": "UHIC", "Delta Dental": "DDPA",
-      "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
+      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "UnitedHealthCare": "UHIC", "Delta Dental": "DDPA",
+      "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META", "Health New England, Inc.": "HNE", "Boston Medical Center HealthNet Plan": "BMCHP", "Fallon Community Health Plan, Inc.": "FCHP",
+      "Minuteman Health, Inc.": "MHI"}
 
   # Inputs
   # 1 Array of FEINS
@@ -36,6 +37,7 @@ class V2GroupXmlGenerator
     views = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
     views_helper = ActionView::Base.new views
     views_helper.class.send(:include, EventsHelper)
+    views_helper.class.send(:include, Config::AcaHelper)
 
     organizations_hash = {} # key is carrier name, value is the return object of remove_other_carrier_nodes()
 
@@ -50,7 +52,7 @@ class V2GroupXmlGenerator
       begin
         employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
 
-        benefit_groups = employer_profile.plan_years.select(&:eligible_for_export?).select do |py|
+        benefit_groups = employer_profile.plan_years.select{|plan_year| !(PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state)}.select do |py|
           py.start_on == Date.parse(@plan_year[:start_date])
         end.flat_map(&:benefit_groups)
 

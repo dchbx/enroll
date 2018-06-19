@@ -2,223 +2,129 @@
 <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
 <%= form_for @census_employee, url: employers_employer_profile_census_employee_path(@employer_profile, @census_employee.id), method: :put do |f| %>
-<% if @census_employee.errors.any? %>
-<div class="alert alert-error">
-  <h4>
-    <%= "#{pluralize(@census_employee.errors.size, "error")} prohibited this person from being saved:" %>
-  </h4>
-  <ul>
-    <% @census_employee.errors.delete(:address) %>
-    <% @census_employee.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% @census_employee.census_dependents.each do |dep| %>
-    <% dep.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% end %>
-    <% if @census_employee.address.present? %>
-    <% @census_employee.address.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% end %>
-    <% @census_employee.benefit_group_assignments.each do |bg| %>
-    <% bg.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% end %>
-  </ul>
-</div>
-<% end %>
-<%= hidden_field_tag 'status', "#{@status}" %>
-<div class="census-employee module content-bottom" data-census-employee-id="<%= @census_employee.id %>" data-rehire-url="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, @census_employee.id) %>" data-status="<%= @status %>" data-terminate-url="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, @census_employee.id) %>">
-  <div class="vertically-aligned-row">
-    <%= link_to "<i class='fa fa-caret-left' aria-hidden='true'></i> Back to Employee Roster (#{@status.capitalize})".html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: @status) %>
-  </div>
-  <div class="vertically-aligned-row">
-    <h1 class="darkblue no-buffer col-xs-4">
-      <div class="row">
-        <%= @census_employee.first_name.capitalize %>
-        <%= @census_employee.last_name.capitalize %>
-      </div>
-    </h1>
-    <div class="vertically-aligned-row auto-width">
-      <div class="text-right col-xs-4">
-        <div class="row">
-          <% if @census_employee.is_cobra_status? %>
-            <div id='cobra_bar'>
-              <div class='title'><strong>COBRA/Continuation</strong></div>
-              <div><strong>effective date:</strong><%= format_date @census_employee.cobra_begin_date %></div>
-            </div>
-          <% end %>
-          <span><strong><%= is_rehired(@census_employee) ? "Rehired:" : "Hired:" %></strong>
-          <%= format_date @census_employee.hired_on %></span>&nbsp;&nbsp;
-          <% if @census_employee.coverage_terminated_on.blank? %>
-          <span><strong>Added to Roster:</strong>
-            <%= format_date @census_employee.created_at %></span>&nbsp;&nbsp;
-            <% end %>
-          <% if is_terminated(@census_employee)%>
-            <span><strong>Terminated:</strong>
-            <%= format_date @census_employee.coverage_terminated_on %></span>&nbsp;&nbsp;
-          <% end %>
-          <h5 class="label label-success census-employee-aasm <%= @census_employee.aasm_state %>">
-            <%= @census_employee.aasm_state.titleize %>
-            <i class="fa fa-pencil employee-status manual" aria-hidden="true" data-toggle="popover" data-html="true" data-content='<%= display_employee_status_transitions(@census_employee)[0] %>' data-placement="bottom" onclick="Freebies.manualPopover($(this));"></i>
-          </h5>
+  <%= render 'errors_if_any' %>
+  <%= hidden_field_tag 'status', "#{@status}" %>
+  <div class="census-employee module content-bottom" data-census-employee-id="<%= @census_employee.id %>" data-rehire-url="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, @census_employee.id) %>" data-status="<%= @status %>" data-terminate-url="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, @census_employee.id) %>">
+
+    <div class="vertically-aligned-row">
+      <h1 class="no-buffer col-xs-4">
+        <div class="row"><h1>
+          <%= @census_employee.first_name.capitalize %>
+          <%= @census_employee.last_name.capitalize %></h1>
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="injected-edit-status">
-  </div>
-  <div class="row">
-    <div class="col-xs-12">
-      <h3>
-        Details
-      </h3>
-      <div class="panel panel-default module census-employee-details">
-        <div class="panel-body">
-          <div class="details">
-            <%= render 'member_fields', f: f %>
-            <%= render 'shared/census_employee_fields', {f: f} %>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-  <% if !@census_employee.is_linked? || !@census_employee.address.present? %>
-    <div class="col-md-6 col-sm-12">
-      <h3>
-        <%= @census_employee.address.kind.capitalize if @census_employee.address.present?  %>
-        Address
-      </h3>
-      <div class="panel panel-default module census-employee-address">
-        <div class="panel-body">
-          <div class="address">
-            <% census_employee_address = @census_employee.address.present? ? @census_employee.address : @census_employee.build_address%>
-            <%= f.fields_for :address, census_employee_address, errors: {}, fieldset: false do |address| %>
-            <%= render 'address_fields', f: address %>
+      </h1>
+      <div class="vertically-aligned-row auto-width">
+        <div class="text-right col-xs-4">
+          <div class="row">
+
+            <% if @census_employee.is_cobra_status? %>
+              <div id='cobra_bar'>
+                <div class='title'><strong>COBRA/Continuation</strong></div>
+                <div><strong>effective date:</strong><%= format_date @census_employee.cobra_begin_date %></div>
+              </div>
             <% end %>
-          </div>
-        </div>
-      </div>
-    </div>
-  <% end %>
-    <% @census_employee.email = Email.new if @census_employee.email.blank? %>
-    <div class="col-md-6 col-sm-12">
-      <h3>
-        Email
-      </h3>
-      <div class="panel panel-default module census-employee-email">
-        <div class="panel-body">
-          <div class="email">
-            <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
-            <%= render 'email_fields', f: email %>
+            <span><strong><%= is_rehired(@census_employee) ? "Rehired:" : "Hired:" %></strong>
+            <%= format_date @census_employee.hired_on %></span>&nbsp;&nbsp;
+            <% if @census_employee.coverage_terminated_on.blank? %>
+            <span><strong>Added to Roster:</strong>
+              <%= format_date TimeKeeper.date_according_to_exchange_at(@census_employee.created_at) %></span>&nbsp;&nbsp;
+              <% end %>
+            <% if is_terminated(@census_employee)%>
+              <span><strong>Terminated:</strong>
+              <%= format_date @census_employee.coverage_terminated_on %></span>&nbsp;&nbsp;
             <% end %>
+            <h5 class="label label-success census-employee-aasm <%= @census_employee.aasm_state %>">
+              <%= @census_employee.aasm_state.titleize %>
+              <i class="fa fa-pencil employee-status manual" aria-hidden="true" data-toggle="popover" data-html="true" data-content='<%= display_employee_status_transitions(@census_employee)[0] %>' data-placement="bottom" onclick="Freebies.manualPopover($(this));"></i>
+            </h5>
+
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Disable COBRA Functionality from this page for now. -->
-    <!--
-    <div class="col-xs-12 row">
-      <br/>
-      <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), class: 'btn btn-default return_to_employee_roster', "aria-expanded" => "true" %>
-      <%if @census_employee.aasm_state == "employment_terminated" %>
-          <a class="show_confirm btn btn-primary" id="show_confirm_<%= @census_employee.id %>">
-              <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$('.cobra_confirm_<%= @census_employee.id %>').toggle();">COBRA</span>
-            </a>
-      <%end%>
-      <% if @census_employee.aasm_state == 'employment_terminated' %>
-            <a class="show_confirm btn btn-primary" id="show_confirm_<%= @census_employee.id %>">
-              <span  class="hidden-xs hidden-sm visible-md visible-lg" onclick="$('.rehire_<%= @census_employee.id %>').toggle();">Rehire</span>
-            </a>
-      <%end%>
-      <div class="unbrd cobra_confirm cobra_confirm_<%= @census_employee.id %> dn">
-          <span class="confirm-terminate-wrapper">
-            <span>Employment Termination Date: </span>
-            <span><%= format_date @census_employee.employment_terminated_on %></span>
-          </span>
-          <span class="confirm-cobra-wrapper" id="enter-date">
-            <%=cobra_effective_date(@census_employee) %>
-          </span>
-         <span>
-            <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id,@census_employee.id) %>" href="javascript:;" id="cobra_<%= @census_employee.id %>">
-              <strong>&nbsp;Submit</strong>
-            </a>
-        </span>
-        </div>
-      <% if @census_employee.aasm_state == 'employment_terminated' %>
-        <div class="unbrd  rehire_<%= @census_employee.id %> dn">
-          <div class="confirm-terminate-wrapper show_confirm_<%= @census_employee.id %>" colspan="11" id="enter-date">
-            <span><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></span>
-            <span class="confirm-terminate" style="display:inline;">
-              <input class="text-center date-picker" data-date-min="<%= rehire_date_min(@census_employee) %>d" placeholder="e.g. 5/1/2015" type="text">
-              <a class="btn btn-default rehire_confirm" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, @census_employee.id) %>" href="javascript:;" id="rehire_<%= @census_employee.id %>">
-                <strong>&nbsp;Submit</strong>
-              </a>
-            </span>
+    <div class="injected-edit-status">
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <h3>
+          Details
+        </h3>
+        <div class="panel panel-default module census-employee-details">
+          <div class="panel-body">
+            <div class="details">
+              <%= render 'member_fields', f: f %>
+              <%= render 'shared/census_employee_fields', {f: f} %>
+            </div>
           </div>
         </div>
-      <%end%>
-  </div>-->
-  <div class="row">
-    <div class="col-xs-12">
-      <h3>
-        <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
-      </h3>
-      <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
-        <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
-          <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
-          <%= render 'shared/add_dependents', { f: f } if census_dependent.index + 1 == @census_employee.census_dependents.size %>
-        <% end %>
-      <% else %>
-      <div class="vertically-aligned-row">
-        <h4 class="add-dependent-text">Click "Add Dependent" to add a dependent</h4>
-      <%= render 'shared/add_dependents', { f: f } %>
+      </div>
+    </div>
+    <div class="row">
+    <% if !@census_employee.is_linked? || !@census_employee.address.present? %>
+      <div class="col-md-6 col-sm-12">
+        <h3>
+          <%= @census_employee.address.kind.capitalize if @census_employee.address.present?  %>
+          Address
+        </h3>
+        <div class="panel panel-default module census-employee-address">
+          <div class="panel-body">
+            <div class="address">
+              <% census_employee_address = @census_employee.address.present? ? @census_employee.address : @census_employee.build_address%>
+              <%= f.fields_for :address, census_employee_address, errors: {}, fieldset: false do |address| %>
+              <%= render 'address_fields', f: address %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+      <% @census_employee.email = Email.new if @census_employee.email.blank? %>
+      <div class="col-md-6 col-sm-12">
+        <h3>
+          Email
+        </h3>
+        <div class="panel panel-default module census-employee-email">
+          <div class="panel-body">
+            <div class="email">
+              <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
+              <%= render 'email_fields', f: email %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# It is been moved since we are using this page in edit action as well. %>
+    <%= render 'dependents_fields', f: f %>
+
+      <% @census_employee.enrollments_for_display.compact.each do |enrollment| %>
+      <div class="col-xs-12">
+        <h3>
+          <%= enrollment.coverage_kind.camelcase %> Enrollment
+        </h3>
+
+        <%= render "insured/families/enrollment", read_only: true, hbx_enrollment: enrollment %>
       </div>
       <% end %>
-    </div>
-  </div>
 
-  <div class="row">
-    <% @census_employee.enrollments_for_display.compact.each do |enrollment| %>
+    <%= render partial: 'shared/past_enrollments', locals: { hbx_enrollments: @past_enrollments } %>
+
     <div class="col-xs-12">
-      <h3>
-        <%= enrollment.coverage_kind.camelcase %> Enrollment
-      </h3>
-
-      <%= render "insured/families/enrollment", read_only: true, hbx_enrollment: enrollment %>
+      <div class="row">
+        <div class="col-sm-6 text-left">
+        <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: @status), class: 'btn btn-default btn-lg return_to_employee_roster', "aria-expanded" => "true" %>
+        </div>
+        <div class="col-sm-6 text-right">
+        <%= link_to 'Cancel'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: @status), class: 'btn btn-default btn-lg', "aria-expanded" => "true" %>
+        <button class="btn btn-primary btn-lg" type="submit">
+          <%= "Update Employee".html_safe %>
+        </button>
+        </div>
+      </div>
     </div>
     <% end %>
   </div>
-
-  <%= render partial: 'shared/past_enrollments', locals: { hbx_enrollments: @past_enrollments } %>
-
-  <br/>
-  <br/>
-  <div class="vertically-aligned-row">
-    <div class="text-left">
-      <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: @status), class: 'btn btn-default btn-lg return_to_employee_roster', "aria-expanded" => "true" %>
-    </div>
-    <div class="text-right">
-      <%= link_to 'Cancel'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: @status), class: 'btn btn-default btn-lg', "aria-expanded" => "true" %>
-      <button class="btn btn-primary btn-lg" type="submit">
-        <%= "Update Employee".html_safe %>
-      </button>
-    </div>
-  </div>
-  <% end %>
 </div>
 
 <script>

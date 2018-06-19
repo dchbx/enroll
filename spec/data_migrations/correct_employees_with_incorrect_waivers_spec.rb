@@ -25,16 +25,16 @@ describe CorrectEmployeesWithIncorrectWaivers do
     }
 
     let(:renewing_employer) {
-      FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on, 
-        renewal_plan_year_state: 'renewing_enrolling', 
-        reference_plan_id: plan.id, 
+      FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on,
+        renewal_plan_year_state: 'renewing_enrolling',
+        reference_plan_id: plan.id,
         renewal_reference_plan_id: renewal_plan.id,
         )
     }
 
     let(:renewing_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
-        benefit_group: renewing_employer.active_plan_year.benefit_groups.first, 
+      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+        benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
         renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first)
     }
 
@@ -63,7 +63,7 @@ describe CorrectEmployeesWithIncorrectWaivers do
 
       before do
         allow(ENV).to receive(:[]).with("year").and_return(renewing_employer.active_plan_year.start_on.year)
-        generate_renewal 
+        generate_renewal
       end
 
       it 'should cancel passive waiver and active waiver' do

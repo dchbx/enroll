@@ -3,6 +3,11 @@ include ActionView::Context
 RSpec.describe "insured/consumer_roles/_form.html.erb" do
   let(:person) { Person.new }
   let(:current_user) {FactoryGirl.create(:user)}
+
+  #before do
+    #Translation.create(key: "en.required_field", value: "\"required field\"")
+  #end
+
   before :each do
     helper = Object.new.extend ActionView::Helpers::FormHelper
     helper.extend ActionDispatch::Routing::PolymorphicRoutes

@@ -17,9 +17,17 @@ module Insured
     end
 
     def health_relationship_benefits(benefit_group)
-      if benefit_group.present?
-        benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
-      end
+      return unless benefit_group.present?
+
+      benefit_group.sole_source? ? composite_benefits(benefit_group) : traditional_benefits(benefit_group)
+    end
+
+    def composite_benefits(benefit_group)
+      benefit_group.composite_tier_contributions.select(&:offered).map(&:composite_rating_tier)
+    end
+
+    def traditional_benefits(benefit_group)
+      benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
     end
 
     def dental_relationship_benefits(benefit_group)
@@ -214,10 +222,14 @@ module Insured
     def shop_health_and_dental_attributes(family_member, employee_role)
       benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
 
-      health_offered_relationship_benefits, dental_offered_relationship_benefits = shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
+      health_offered_relationship_benefits, dental_offered_relationship_benefits = shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
 
-      is_health_coverage = coverage_relationship_check(health_offered_relationship_benefits, family_member, @new_effective_on)
-      is_health_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_health_coverage && @coverage_family_members_for_cobra.present?      
+      if benefit_group.sole_source?
+        is_health_coverage = composite_relationship_check(health_offered_relationship_benefits, family_member, @new_effective_on)
+      else
+        is_health_coverage = coverage_relationship_check(health_offered_relationship_benefits, family_member, @new_effective_on)
+      end
+      is_health_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_health_coverage && @coverage_family_members_for_cobra.present?
 
       is_dental_coverage = coverage_relationship_check(dental_offered_relationship_benefits, family_member, @new_effective_on)
       is_dental_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_dental_coverage && @coverage_family_members_for_cobra.present?
@@ -225,11 +237,12 @@ module Insured
       return is_health_coverage, is_dental_coverage
     end
 
-    def shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
-      health_offered_relationship_benefits = health_relationship_benefits(benefit_group) 
+    def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
 
-      if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment) 
-        dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group) 
+      health_offered_relationship_benefits = health_relationship_benefits(benefit_group)
+
+      if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
+        dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group)
       end
 
       return health_offered_relationship_benefits, dental_offered_relationship_benefits

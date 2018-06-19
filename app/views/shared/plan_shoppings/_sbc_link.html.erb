@@ -9,7 +9,7 @@
   <% text_class = "dental" unless plan.coverage_kind == "health" %>
 
   <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
-  <%= link_to(document_download_path(bucket, key) + "?content_type=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link #{text_class} vertically-aligned-row", :target => "_blank") do %>
+  <%= link_to(main_app.document_download_url(bucket, key) + "?content_type=application/pdf&filename=#{plan.name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link #{text_class} vertically-aligned-row", :target => "_blank") do %>
     <% if custom_css.present? %>
       <i class="fa fa-file-pdf-o fa-2x pull-left" ></i>
       <div class="fa-icon-label <%= text_class %>" style="display: inline; font-size: 10px;"><%= link_text %></div>
@@ -20,5 +20,5 @@
     <% end %>
   <% end %>
 <% else %>
-  <i class="fa fa-file-pdf-o fa-2x <%= text_class %>"></i><span class="<%= link_text_class %>"><%= link_text %></span>
+  <i class="fa fa-file-pdf-o fa-2x <%= text_class %> no-plan-sbc-doc-found"></i><span class="<%= link_text_class %>"><%= link_text %></span>
 <% end %>

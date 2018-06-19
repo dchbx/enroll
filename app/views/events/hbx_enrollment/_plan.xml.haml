@@ -1,6 +1,10 @@
 %plan
   %id
     %id= hbx_enrollment.plan.hios_id
+    - if !hbx_enrollment.plan.carrier_special_plan_identifier.blank?
+      %alias_ids
+        %alias_id
+          %id= carrier_special_plan_identifier_namespace + hbx_enrollment.plan.carrier_special_plan_identifier
   %name= hbx_enrollment.plan.name
   %active_year= hbx_enrollment.plan.active_year
   %is_dental_only= hbx_enrollment.plan.is_dental_only?

@@ -1,8 +1,8 @@
 <div class="employee-upload">
   <i class="fa fa-times fa-3x pull-right modal-close"></i>
-  <h2>Upload Employee Roster</h2>
-  <h4>If you completed your employee roster offline using our Microsoft Excel template, find the file on your computer and upload it here.</h4>
-  <%= link_to(document_download_path(env_bucket_name("templates"), "b4c0e3e6-cf9b-4b00-8194-403b110b4e01") + "?contenttype=application/vnd.ms-excel&filename=DCHL Employee Census.xlsx", class: "download") do %>
+  <h2><%= l10n("upload_employee_roster")%></h2>
+  <h4><%= l10n("broker_agencies.quotes.template_upload")%></h4>
+  <%= link_to(document_download_path(env_bucket_name("templates"), s3_template_bucket_key) + "?contenttype=application/vnd.ms-excel&filename=Health Connector - Employee Census Template.xlsx", class: "download") do %>
     <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
       Download it now.
     </h4>

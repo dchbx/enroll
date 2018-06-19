@@ -14,7 +14,7 @@ var Freebies = ( function( window, undefined ) {
 		  // apply floatlabels
 			floatLabels();
 		  // apply selectric
-		  selectric();
+		    selectric();
 			// apply popover
 			popover();
 			// apply maual popover
@@ -65,8 +65,9 @@ var Freebies = ( function( window, undefined ) {
 
 	function selectric() {
 		if (!disableSelectric) {
-			$("select[multiple!='multiple']").not('[name*="dataTable_length"]').selectric();
+			$("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select').selectric();
 		}
+		// apply selectric
 	}
 
 	// disabled enter key submitting disabeld forms in firefox -- add this to any element in the page onKeyPress="return disableEnterKey(event)"

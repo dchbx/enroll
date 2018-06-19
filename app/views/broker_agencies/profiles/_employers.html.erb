@@ -1,99 +1,32 @@
 <div class="container">
-  <div class="row">
-    <div id= 'message_form'></div>
-    <div class="top-pd" id="inbox_provider_form">
-      <span class="flash_message"></span>
-      <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
-      <div class="module">
-        <table class="table table-striped" id="Broker-Employer-dataTable">
-          <thead>
-          <tr>
-            <th><%= check_box_tag 'BrokerAgencyProfile-check-all' %></th>
-            <th><%= l10n("fein")%></th>
-            <th><%= l10n("legal_name")%></th>
-            <th><%= l10n("broker_agencies.profiles.ee_count")%></th>
-            <th><%= l10n("broker_agencies.profiles.er_state")%></th>
-            <th><%= l10n("effective_date")%></th>
-            <th><%= l10n("broker")%></th>
-            <th><%= l10n("general_agency")%></th>
-          </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-      </div>
-
-
-
-
-      <script type="text/javascript" charset="utf-8">
-        // datatables setup
-        $(document).ready(function() {
-          $('#Broker-Employer-dataTable').DataTable( {
-            "processing": true,
-            "serverSide": true,
-            "ordering" : true,
-            "order" : [[ 2, 'asc' ]],
-            "paging": true,
-            "lengthMenu": [ 10, 25, 50, 100],
-            "ajax": {
-              url: "<%= employer_datatable_broker_agencies_profile_path(id: @broker_agency_profile.id, :format => :json) %>",
-              type: "POST",
-              data: function ( d ) {
-                console.log("Broker-Employer-dataTable datatable")
-              }
-            },
-            "columns": [
-              { data: 'nothing'},
-              { data: 'fein' },
-              { data: 'legal_name' },
-              { data: 'ee_count'},
-              { data: 'er_state'},
-              { data: 'effective_date'},
-              { data: 'broker'},
-              { data: 'general_agency'},
-	      ],
-        columnDefs: [
-          { targets: [0,1,3,5,6,7], orderable: false}
-      ],
-  'dom': "<'row'" +
-            "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
-          ">" +
-          "<'row'" +
-            "<'col-sm-12 col-md-12'>" +
-          ">" +
-          "<'row'" +
-            "<'col-sm-12 col-md-12'tr>"+
-          ">" +
-          "<'row'" +
-            "<'col-sm-11 col-md-11'i><'col-sm-1 col-md-1'l>" +
-          ">" +
-          "<'row'" +
-            "<'col-sm-12 col-md-12'p>" +
-          ">"
-          } );
-        });
-
-        $('#BrokerAgencyProfile-check-all').click(function() {
-            var action = $(this).is(':checked') ? true : false;
-            var group = $('input[name="employer_ids[]"]');
-            group.each(function () {
-              $(this).prop("checked", action);
-            });
-        });
-
-
-      </script>
-
-
-        <div class="col-md-4">
-          <h3>General Agencies</h3>
-          <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
-          <%= hidden_field_tag :from_assign, false %>
-          <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
-          <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+  <%= form_tag(main_app.update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
+    <div class="tab-content" id="myTabContent">
+      <div class="row">
+        <div id= 'message_form'></div>
+        <div class="top-pd" id="inbox_provider_form">
+          <span class="flash_message"></span>
         </div>
-      <% end %>
+        <div class='hide' id='collection_scope'><%= @broker_agency_profile._id %> </div>
+        <div class="row container">
+          <div class="pull-right">
+          </div>
+        </div>
+        <br>
+        <%= render_datatable(Effective::Datatables::BrokerAgencyEmployerDatatable.new(profile_id: @broker_agency_profile._id, general_agency_is_enabled: general_agency_enabled?)) %>
+      </div>
     </div>
-  </div>
+
+    <% if general_agency_enabled? and @general_agency_profiles %>
+      <div class="col-md-4">
+        <h3><%= l10n("general_agencies")%></h3>
+        <%= select_tag "employers_general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
+        <%= hidden_field_tag :from_assign, false %>
+        <%= submit_tag l10n("assign"), class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+        <%= submit_tag l10n("clear_assignment"), class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+      </div>
+    <% end %>
+  <%end%>
 </div>
+<script>
+  initializeDataTables();
+</script>

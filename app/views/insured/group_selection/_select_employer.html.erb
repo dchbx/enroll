@@ -1,5 +1,5 @@
 <div id="employer-selection" class='row no-buffer'>
-  <h3><%= "Employer".pluralize(@employee_role.person.active_employee_roles.size)%></h3>
+  <p class="twenty"><%= l10n("employer").pluralize(@employee_role.person.active_employee_roles.size)%></p>
 
     <div class="n-radio-group">
       <% @person.active_employee_roles.each_with_index do |employee_role, index| %>

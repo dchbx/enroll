@@ -9,108 +9,174 @@
       <div class="modal-body">
         <i class="fa fa-phone fa-3x"></i>
         <% if plan.coverage_kind == 'health' %>
-        <div class="carrier-numbers">
-          <% if plan.carrier_profile.legal_name == "CareFirst" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18554443119">1-855-444-3119</a>
-            </strong>
+          <div class="carrier-numbers">
+            <% case plan.carrier_profile.legal_name %>
+            <% when "BMC HealthNet Plan" %>
+              <div>
+                <strong> Call: </strong>
+                <strong><a href="tel:+18558338120"> 1-855-833-8120 </a></strong> <br>
+                <strong> TTY: </strong> 711 TTY <br>
+                <strong>Hours: </strong>
+                 Monday through Friday from 8:00 a.m. to 6:00 p.m. Eastern Time
+                 <br>
+                <strong> Email: </strong> memberquestions@bmchp.org <br/>
+              </div>
+            <% when "Fallon Health" %>
+              <div>
+                <strong> Call: </strong>
+                <strong><a href="tel:+18008685200"> 1-800-868-5200 </a></strong> <br>
+                <strong> TTY: </strong> Please call TRS Relay 711  <br>
+                <strong> Hours: </strong> Monday, Tuesday, Thursday, and Friday from 8:00 a.m. to 6:00 p.m. Eastern Time, and Wednesday from 10:00 a.m. to 6:00 p.m. Eastern Time <br>
+                <strong> Email: </strong> FCHPcustomerservice@fallonhealth.org <br/>
+              </div>
+            <% when "Health New England" %>
+              <div>
+                <strong> Call: </strong>
+                <strong> Local: </strong> <a href="tel:+14137874004"> 1-413-787-4004 </a> <br>
+                <strong> Toll-free: </strong> <a href="tel:+18003102835"> 1-800-310-2835 </a> <br>
+                <strong> TTY/TDD: </strong> <a href="tel:+18004392370"> 1-800-439-2370 </a> <br>
+                <strong> Hours: </strong> Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time <br>
+                <strong> Email: </strong> memberservices@hne.com <br/>
+              </div>
+            <% when "Blue Cross Blue Shield MA" %>
+              <div>
+                <strong> Call: </strong>
+                <strong> For Small Group/FOM: </strong> <a href="tel:+18007823675"> 1-800-782-3675 </a> <br>
+                <strong> TTY: </strong> 711 TTY <br>
+                <strong> Hours: </strong> Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time <br>
+                <strong> Email: </strong> send secure email after login to member account <br/>
+              </div>
+            <% when "Harvard Pilgrim Health Care" %>
+              <div>
+                <strong> Call: </strong>
+                <a href="tel:+18779074742"> 1-877-907-4742 </a> <br>
+                <strong> TTY: </strong> 711 TTY <br>
+                <strong> Hours: </strong> Monday, Tuesday, & Thursday from 8:00 a.m. to 6:00 p.m.; Wednesday from 10:00 a.m. to 6:00 p.m.; and Friday from 8:00 a.m. to 5:30 p.m <br>
+                <strong> Email: </strong> send secure email after login to member account <br/>
+              </div>
+            <% when "Neighborhood Health Plan" %>
+              <div>
+                <strong> Call: </strong>
+                <a href="tel:+18664145533"> 1-866-414-5533 </a> <br>
+                <strong> TTY: </strong> 1-800-655-1761 (or 711) <br>
+                <strong> Hours: </strong> Monday, Tuesday, Wednesday, Friday from 8:00 a.m. to 6:00 p.m.; Thursday from 8:00 a.m. to 8:00 p.m.  <br>
+                <strong> Email: </strong> memberservices@nhp.org <br/>
+              </div>
+            <% when "Tufts Health Direct" %>
+              <div>
+                <strong> Call: </strong>
+                <a href="tel:+18882571985"> 1-888-257-1985 </a> <br>
+                <strong> Hours: </strong> Monday through Friday, from 8 a.m. to 5 p.m. <br>
+                <strong> Email: </strong><br/>
+              </div>
+            <% when "Tufts Health Plan Premier" %>
+              <div>
+                <strong> Call: </strong>
+                <a href="tel:+18004620224"> 1-800-462-0224 </a> <br>
+                <strong> Hours: </strong> Monday - Thursday 8:00 am - 7:00pm; Friday 8:00 am - 5:00pm <br>
+                <strong> Email: </strong><br/>
+              </div>
+            <% when "CareFirst" %>
+              <div>
+                Call:
+                <strong>
+                  <a href="tel:+18554443119">1-855-444-3119</a>
+                </strong>
+              </div>
+            <% when "Aetna" %>
+              <div>
+                <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
+                Call:
+                <strong>
+                  <a href="tel:+18555866959">1-855-586-6959</a>
+                </strong><br/>
+                from 8am-6pm EST, Monday - Friday
+                <br/>
+                <br/>
+                <strong>For Brokers and Employers</strong><br/>
+                Call:
+                <strong>
+                  <a href="tel:+18884222128">1-888-422-2128</a>
+                </strong><br/>
+                from 8am-5pm EST, Monday - Friday
+                <br/>
+                <br/>
+                <strong>For Small Business Employees</strong><br/>
+                Call:
+                <strong>
+                  <a href="tel:+1-855-885-3289">Call 1-855-885-3289</a>
+                </strong><br/>
+                from 8am-6pm EST, Monday - Friday
+                <br/>
+              </div>
+            <% when "Kaiser" %>
+              <div>
+                Call:
+              <strong>
+                <a href="tel:+18007777902">1-800-777-7902</a>
+              </strong>
+              </div>
+            <% when "UnitedHealthcare" %>
+              <div>
+                Call:
+                <strong>
+                  <a href="tel:+18778562430">1-877-856-2430</a>
+                </strong><br/>
+              </div>
+            <% end %>
           </div>
-          <% elsif plan.carrier_profile.legal_name == "Aetna" %>
-          <div>
-            <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
-            Call:
-            <strong>
-              <a href="tel:+18555866959">1-855-586-6959</a>
-            </strong><br/>
-            from 8am-6pm EST, Monday - Friday
-            <br/>
-            <br/>
-            <strong>For Brokers and Employers</strong><br/>
-            Call:
-            <strong>
-              <a href="tel:+18884222128">1-888-422-2128</a>
-            </strong><br/>
-            from 8am-5pm EST, Monday - Friday
-            <br/>
-            <br/>
-
-            <strong>For Small Business Employees</strong><br/>
-            Call:
-            <strong>
-              <a href="tel:+1-855-885-3289">Call 1-855-885-3289</a>
-            </strong><br/>
-            from 8am-6pm EST, Monday - Friday
-            <br/>
-          </div>
-          <% elsif plan.carrier_profile.legal_name == "Kaiser" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18007777902">1-800-777-7902</a>
-            </strong>
-          </div>
-          <% elsif plan.carrier_profile.legal_name == "UnitedHealthcare" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18778562430">1-877-856-2430</a>
-            </strong><br/>
-          </div>
-          <% end %>
-        </div>
         <% else %>
-        <div class="carrier-numbers">
-          <% if plan.carrier_profile.legal_name == "CareFirst" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18554443119">1-855-444-3119</a>
-            </strong><br/>
+          <div class="carrier-numbers">
+            <% case plan.carrier_profile.legal_name %>
+            <% when "CareFirst" %>
+                <div>
+                  Call:
+                  <strong>
+                  <a href="tel:+18554443119">1-855-444-3119</a>
+                  </strong><br/>
+                </div>
+            <% when  "Delta Dental"%>
+              <div>
+                Call:
+                <strong>
+                  <a href="tel:+18004710236">1-800-471-0236</a>
+                </strong>
+                or
+                <strong>
+                  <a href="tel:+18004710275">1-800-471-0275</a>
+                </strong>
+                <br/>
+              </div>
+            <% when "MetLife"%>
+              <div>
+                Call:
+                <strong>
+                  <a href="tel:+18556382221">1-855-638-2221</a>
+                </strong><br/>
+              </div>
+            <% when "Dentegra" %>
+              <div>
+                Call:
+                <strong>
+                  <a href="tel:+18004710284">1-800-471-0284</a>
+                </strong><br/>
+              </div>
+            <% when "Dominion" %>
+              <div>
+                Call:
+                <strong>
+                  <a href="tel:+18552243016">1-855-224-3016</a>
+                </strong><br/>
+              </div>
+            <% when "BestLife" %>
+              <div><br/>
+                Call:
+                <strong>
+                  <a href="tel:+18004330088">1-800-433-0088</a>
+                </strong><br/>
+              </div>
+            <% end %>
           </div>
-          <% elsif plan.carrier_profile.legal_name == "Delta Dental" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18004710236">1-800-471-0236</a>
-            </strong>
-            or
-            <strong>
-              <a href="tel:+18004710275">1-800-471-0275</a>
-            </strong>
-            <br/>
-          </div>
-          <% elsif plan.carrier_profile.legal_name == "MetLife" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18556382221">1-855-638-2221</a>
-            </strong><br/>
-          </div>
-          <% elsif plan.carrier_profile.legal_name == "Dentegra" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18004710284">1-800-471-0284</a>
-            </strong><br/>
-          </div>
-          <% elsif plan.carrier_profile.legal_name == "Dominion" %>
-          <div>
-            Call:
-            <strong>
-              <a href="tel:+18552243016">1-855-224-3016</a>
-            </strong><br/>
-          </div>
-          <% elsif plan.carrier_profile.legal_name == "BestLife" %>
-          <div><br/>
-            Call:
-            <strong>
-              <a href="tel:+18004330088">1-800-433-0088</a>
-            </strong><br/>
-          </div>
-          <% end %>
-        </div>
         <% end %>
       </div>
     </div>

@@ -17,6 +17,40 @@ FactoryGirl.define do
     family_deductible   "$500 per person | $1000 per group"
 
     # association :premium_tables, strategy: :build
+    #
+    trait :with_rating_factors do
+      after :create do |plan, evaluator|
+        active_year = plan.active_year
+        carrier_id = plan.carrier_profile_id
+        [active_year + 1, active_year, active_year - 1].each do |year|
+          SicCodeRatingFactorSet.create!({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0
+          })
+          EmployerGroupSizeRatingFactorSet.create!({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0,
+            :max_integer_factor_key => 1
+          })
+          EmployerParticipationRateRatingFactorSet.create!({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0
+          })
+          crtf = CompositeRatingTierFactorSet.new({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0
+            })
+          CompositeRatingTier::NAMES.each do |name|
+            crtf.rating_factor_entries << RatingFactorEntry.new(factor_key: name, factor_value: 1.0)
+          end
+          crtf.save!
+        end
+      end
+    end
 
     trait :with_dental_coverage do
       coverage_kind "dental"
@@ -32,7 +66,15 @@ FactoryGirl.define do
       after(:create) do |plan, evaluator|
         start_on = Date.new(plan.active_year,1,1)
         end_on = start_on + 1.year - 1.day
-        create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
+
+        unless Settings.aca.rating_areas.empty?
+          plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
+          plan.save!
+          rating_area = RatingArea.first.try(:rating_area) || FactoryGirl.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
+        else
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
+        end
       end
     end
 

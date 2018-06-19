@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: Customers go to Curam to view notices and verifications
 
   Scenario: Consumer can see the Navigation Button

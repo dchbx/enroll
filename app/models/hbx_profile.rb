@@ -1,5 +1,7 @@
 class HbxProfile
-
+  include Config::AcaModelConcern
+  include Config::SiteModelConcern
+  include Config::ContactCenterModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -40,7 +42,7 @@ class HbxProfile
   end
 
   def under_open_enrollment?
-    (benefit_sponsorship.present? && benefit_sponsorship.is_under_open_enrollment?) ?  true : false
+    (benefit_sponsorship.present? && benefit_sponsorship.is_coverage_period_under_open_enrollment?) ?  true : false
   end
 
   def active_employers
@@ -93,7 +95,7 @@ class HbxProfile
     end
 
     def current_hbx
-      find_by_state_abbreviation("DC")
+      find_by_state_abbreviation(aca_state_abbreviation)
     end
 
     def transmit_group_xml(employer_profile_ids)
@@ -123,11 +125,11 @@ class HbxProfile
   ## Application-level caching
 
   ## HBX general settings
-  StateName = "District of Columbia"
-  StateAbbreviation = "DC"
-  CallCenterName = "DC Health Link's Customer Care Center"
-  CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "DC Health Link"
+  StateName = aca_state_name
+  StateAbbreviation = aca_state_abbreviation
+  CallCenterName = contact_center_name
+  CallCenterPhoneNumber = contact_center_phone_number
+  ShortName = site_short_name
 
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension
@@ -211,6 +213,7 @@ class HbxProfile
 
   ShopOpenEnrollmentBeginDueDayOfMonth = Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days
   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
+  ShopOpenEnrollmentAdvBeginDueDayOfMonth = Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
 
 
   # ShopOpenEnrollmentStartMax
@@ -231,8 +234,8 @@ class HbxProfile
   end
 
   def save_inbox
-    welcome_subject = "Welcome to #{Settings.site.short_name}"
-    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{site_short_name}"
+    welcome_body = "#{site_short_name} is the #{aca_state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end

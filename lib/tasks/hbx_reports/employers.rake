@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "All Employers"
     task :employers => :environment do
+      include Config::AcaHelper
 
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
 
@@ -13,17 +14,17 @@ namespace :reports do
       orgs = Organization.exists(employer_profile: true).order_by([:legal_name])
 
       field_names  = %w(
-          fein       
-          legal_name        
-          dba       
+          fein
+          legal_name
+          dba
           employer_aasm_state
 
-          plan_year_start_on        
+          plan_year_start_on
           plan_year_aasm_state
 
           benefit_package_title
           plan_option_kind
-          ref_plan_name 
+          ref_plan_name
           ref_plan_year
           ref_plan_hios_id
           employee_contribution_pct
@@ -31,17 +32,18 @@ namespace :reports do
           domestic_partner_contribution_pct
           child_under_26_contribution_pct
 
-          staff_name        
-          staff_phone       
+          staff_name
+          staff_phone
           staff_email
 
-          broker_name     
-          broker_phone   
+          broker_name
+          broker_phone
           broker_email
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/public/employers.csv"
+
+      file_name = fetch_file_format('employers', 'EMPLOYERS')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
@@ -74,7 +76,7 @@ namespace :reports do
 
           plan_year_start_on    = plan_year.start_on
           plan_year_aasm_state  = plan_year.aasm_state
-          
+
           plan_year.benefit_groups.each do |bg|
             benefit_package_title = bg.title
             plan_option_kind      = bg.plan_option_kind
@@ -127,8 +129,12 @@ namespace :reports do
           end
         end
       end
+      pubber = Publishers::Legacy::EmployerReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} employers output to file: #{file_name}"
+      pubber = Publishers::LegacyShopReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
     end
   end
 end

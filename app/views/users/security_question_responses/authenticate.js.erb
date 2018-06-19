@@ -1,0 +1,3 @@
+$("#securityChallengeModal").modal('hide');
+$('#user_identity_confirmed_token').val("<%= @success_token %>");
+$("<%= @form_name %>").submit();

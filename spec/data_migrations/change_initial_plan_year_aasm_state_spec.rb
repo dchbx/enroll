@@ -16,8 +16,8 @@ describe ChangeInitialPlanYearAasmState, dbclean: :after_each do
   describe "updating aasm_state of the initial plan year", dbclean: :after_each do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:canceled_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month,open_enrollment_end_on:TimeKeeper.date_of_record,aasm_state: "canceled",benefit_groups:[benefit_group]) }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, aasm_state:'applicant',plan_years: [canceled_plan_year]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:employer_profile){ FactoryGirl.create(:employer_profile, aasm_state:'applicant',plan_years: [canceled_plan_year]) }
+    let(:organization)  { employer_profile.organization }
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment]) }
 

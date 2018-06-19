@@ -1,0 +1,20 @@
+<table class="total_table address custom-address" border="0">
+  <tbody>
+    <tr><td colspan="2"><br><br></td></tr>
+    <tr>
+      <td colspan="2" class="fssize health-connector-address "><%= recipient.first_name %> <%= recipient.last_name %></td>
+    </tr>
+    <tr>
+       <td colspan="2" class="fssize1 health-connector-address"><%= recipient.mailing_address.street_1 %></td>
+    </tr>
+    <% if recipient.mailing_address.street_2.present? %>
+    <tr>
+      <td colspan="2" class="fssize1 health-connector-address"><%= recipient.mailing_address.street_2 %></td>
+    </tr>
+    <% end %>
+    <tr>
+      <td class="fssize1 health-connector-address"><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
+       <td align="right" style="padding-right: 15px"><%= notice_number || "SHOP_M001" %></td>
+    </tr>
+  </tbody>
+</table>

@@ -5,8 +5,10 @@
     .row
       = form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f|
         .col-lg-7.col-md-7.col-sm-8.col-xs-12
-          %h1.darkblue Personal Information
-          %h4 First, we need to verify whether you're new to DC Health Link or affiliated with another account. Please enter your personal information. When you're finished, select CONTINUE.
+          %h1
+            = l10n("personal_information")
+          %h4
+            = "First, we need to verify whether you're new to #{site_short_name} or affiliated with another account. Please enter your personal information. When you're finished, select CONTINUE."
           %p.memo * = required field
           = render 'insured/consumer_roles/remote_search_form', f: f
         .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section

@@ -1,3 +1,4 @@
+@general_agency_enabled
 Feature: Broker Assigns a General Agency to an Employer
 
   Background:
@@ -116,6 +117,7 @@ Feature: Broker Assigns a General Agency to an Employer
     Then the ga2 should see the home of ga
     When the ga2 visits their Employers page
     Then the ga2 should not see the employer
+    Then the ga2 logs out
 
   Scenario: If broker already assigned some ERs, while the Broker remove his default GA, that particular GA should automatically loss the permission to those ERs
     When the employer login in

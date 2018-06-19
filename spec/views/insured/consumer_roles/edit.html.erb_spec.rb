@@ -4,6 +4,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
   let(:consumer_role) { FactoryGirl.create(:consumer_role) }
   let(:current_user) {FactoryGirl.create(:user)}
+  let(:individual_market_is_enabled) { true }
   before :each do
     assign(:person, person)
     assign(:consumer_role, consumer_role)
@@ -17,6 +18,8 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     allow(consumer_role).to receive(:find_document)
     sign_in current_user
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+    allow(view).to receive(:individual_market_is_enabled?).and_return(individual_market_is_enabled)
+
     render file: "insured/consumer_roles/edit.html.erb"
   end
 
@@ -50,29 +53,33 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).not_to match(/immigration_unexpired_foreign_passport_fields_container/)
   end
 
-  it "should display the consumer_fields" do
-    expect(rendered).to have_selector('#consumer_fields')
-  end
+  context "when individual market is enabled" do
+    let(:individual_market_is_enabled) { true }
 
-  it "should display the naturalized_citizen_container" do
-    expect(rendered).to have_selector('#naturalized_citizen_container')
-  end
+    it "should display the consumer_fields" do
+      expect(rendered).to have_selector('#consumer_fields')
+    end
 
-  it "should display the immigration_status_container" do
-    expect(rendered).to have_selector("#immigration_status_container")
-  end
+    it "should display the naturalized_citizen_container" do
+      expect(rendered).to have_selector('#naturalized_citizen_container')
+    end
 
-  it "should display the indian_tribe_area" do
-    expect(rendered).to have_selector("#indian_tribe_area")
-  end
+    it "should display the immigration_status_container" do
+      expect(rendered).to have_selector("#immigration_status_container")
+    end
 
-  it "should display the vlp document area" do
-    expect(rendered).to have_selector('#vlp_documents_container')
-    expect(rendered).to have_selector('#immigration_doc_type')
-    expect(rendered).to have_selector('#naturalization_doc_type')
-    expect(rendered).to have_selector('input#vlp_doc_target_id')
-    expect(rendered).to have_selector('input#vlp_doc_target_type')
-    expect(rendered).to have_selector('.vlp_doc_area')
+    it "should display the indian_tribe_area" do
+      expect(rendered).to have_selector("#indian_tribe_area")
+    end
+
+    it "should display the vlp document area" do
+      expect(rendered).to have_selector('#vlp_documents_container')
+      expect(rendered).to have_selector('#immigration_doc_type')
+      expect(rendered).to have_selector('#naturalization_doc_type')
+      expect(rendered).to have_selector('input#vlp_doc_target_id')
+      expect(rendered).to have_selector('input#vlp_doc_target_type')
+      expect(rendered).to have_selector('.vlp_doc_area')
+    end
   end
 
   it "shouldn't display the docs fields" do
@@ -91,28 +98,32 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).not_to match(/immigration_unexpired_foreign_passport_fields_container/)
   end
 
-  it "should display the consumer_fields" do
-    expect(rendered).to have_selector('#consumer_fields')
-  end
+  context "individual market is disabled" do
+    let(:individual_market_is_enabled) { false }
 
-  it "should display the naturalized_citizen_container" do
-    expect(rendered).to have_selector('#naturalized_citizen_container')
-  end
+    it "should not display the consumer_fields" do
+      expect(rendered).to_not have_selector('#consumer_fields')
+    end
 
-  it "should display the immigration_status_container" do
-    expect(rendered).to have_selector("#immigration_status_container")
-  end
+    it "should not display the naturalized_citizen_container" do
+      expect(rendered).to_not have_selector('#naturalized_citizen_container')
+    end
 
-  it "should display the indian_tribe_area" do
-    expect(rendered).to have_selector("#indian_tribe_area")
-  end
+    it "should not display the immigration_status_container" do
+      expect(rendered).to_not have_selector("#immigration_status_container")
+    end
 
-  it "should display the vlp document area" do
-    expect(rendered).to have_selector('#vlp_documents_container')
-    expect(rendered).to have_selector('#immigration_doc_type')
-    expect(rendered).to have_selector('#naturalization_doc_type')
-    expect(rendered).to have_selector('input#vlp_doc_target_id')
-    expect(rendered).to have_selector('input#vlp_doc_target_type')
-    expect(rendered).to have_selector('.vlp_doc_area')
+    it "should not display the indian_tribe_area" do
+      expect(rendered).to_not have_selector("#indian_tribe_area")
+    end
+
+    it "should not display the vlp document area" do
+      expect(rendered).to_not have_selector('#vlp_documents_container')
+      expect(rendered).to_not have_selector('#immigration_doc_type')
+      expect(rendered).to_not have_selector('#naturalization_doc_type')
+      expect(rendered).to_not have_selector('input#vlp_doc_target_id')
+      expect(rendered).to_not have_selector('input#vlp_doc_target_type')
+      expect(rendered).to_not have_selector('.vlp_doc_area')
+    end
   end
 end

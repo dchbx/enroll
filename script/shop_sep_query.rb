@@ -5,7 +5,7 @@ class ShopEnrollmentsPublisher
   extend Acapi::Notifiers
 
   def self.publish_action(action_name, hbx_id, action)
-    reply_to = "dc0.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler"
+    reply_to = "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler"
 
     notify(
       action_name, {
@@ -76,11 +76,6 @@ term_ids = Family.collection.aggregate([
   {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
 ]).map { |rec| rec["_id"] }
 
-def quiet_period_enrollment?(plan_year, submitted_at)
-  duration = (plan_year.is_renewing? ? 15 : 28)
-  submitted_at.in_time_zone("UTC") < TimeKeeper.start_of_exchange_day_from_utc(plan_year.start_on.prev_month + duration.days)
-end
-
 def is_valid_plan_year?(plan_year)
   %w(enrolled renewing_enrolled canceled expired renewing_canceled active terminated termination_pending).include?(plan_year.aasm_state)
 end
@@ -92,7 +87,7 @@ end
 def can_publish_enrollment?(enrollment, transition_at)
   plan_year = enrollment.benefit_group.plan_year
   if enrollment.employer_profile.aasm_state == "enrolled" || is_valid_plan_year?(plan_year)
-    return false if quiet_period_enrollment?(plan_year, transition_at) # don't transmit quiet period enrollment
+    return false if transition_at.in_time_zone("UTC") <= plan_year.enrollment_quiet_period.max # don't transmit enrollments until quiet period ended
     return true  if term_states.include?(enrollment.aasm_state) # new hire enrollment check not needed for terminated enrollments
     return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months))
     return true
@@ -101,8 +96,8 @@ def can_publish_enrollment?(enrollment, transition_at)
   end
 end
 
-puts purchase_ids.length
-puts term_ids.length
+puts purchase_ids.length unless Rails.env.test?
+puts term_ids.length unless Rails.env.test?
 
 purchase_families = Family.where("households.hbx_enrollments.hbx_id" => {"$in" => purchase_ids})
 

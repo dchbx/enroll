@@ -13,8 +13,8 @@ RSpec.describe "broker_agencies/profiles/edit.html.erb" do
   end
 
   it "should have title" do
-    expect(rendered).to have_selector('h4', text: 'Personal Information')
-    expect(rendered).to have_selector('h4', text: 'Broker Agency Information')
+    expect(rendered).to have_selector('h3', text: 'Personal Information')
+    expect(rendered).to have_selector('h3', text: 'Broker Agency Information')
   end
   it "should block the market kind dropdown refs #9818" do
     expect(rendered).to have_selector('.broker-agency-info.read_only_dropdown')

@@ -1,0 +1,8 @@
+$('.alert-danger').remove()
+$('.hbx_profiles').append("<%=escape_javascript(render partial: 'shared/modals/edit_email_form', locals: { user: @user }) %>")
+
+$('#setUserEmailModal').modal({
+    backdrop: 'static',
+    keyboard: false
+});
+$('.modal-backdrop').css({height: '800px'});
