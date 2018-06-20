@@ -1,0 +1,48 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: 'notices/shared/shop_address', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/email_notification_sent_to', :locals => {email: notice.primary_email} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><b>EMPLOYEE PLAN SELECTION CONFIRMATION</b></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px">Dear <b><%= notice.primary_fullname %></b>,</td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Congratulations! You successfully selected <strong>#{notice.plan.plan_name}</strong>."}%>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Your employer will need to complete additional steps before your enrollment can be finalized. If your employer successfully completes the final steps in this enrollment process and meets all eligibility requirements, your coverage will go into effect on <strong>#{notice.enrollment.effective_on}</strong>."}%>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Please note that if your coverage goes into effect on <strong>#{notice.enrollment.effective_on}</strong>, your monthly premium contribution will be <strong>#{number_to_currency(notice.enrollment.employee_cost, precision: 2)}</strong>. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{number_to_currency(notice.enrollment.employer_contribution, precision: 2)}</strong> towards your monthly premium." }%>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+  { content: "If your employer is unable to meet all eligibility requirement and your coverage cannot go into effect, you will receive a notice informing you of next steps.", top_margin: '10px', bottom_margin: '10px'}%>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', locals:
+  { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["By calling #{notice.hbe.phone}",
+    "TTY: #{Settings.contact_center.tty}",
+    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% end %>

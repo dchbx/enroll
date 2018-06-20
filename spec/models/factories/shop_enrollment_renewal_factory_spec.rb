@@ -112,6 +112,33 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model do
             expect(health_renewal.hbx_enrollment_members.collect{|e| e.hbx_id}).to eq [person.hbx_id, spouse.hbx_id]
           end
         end
+
+        context "should trigger state machine events after generating hbx_id for enrollment" do
+          let(:generate_passive_renewal) {
+            Factories::ShopEnrollmentRenewalFactory.new({
+              family: family, 
+              census_employee: employee.census_employee.reload, 
+              employer: renewing_employer, 
+              renewing_plan_year: renewing_employer.renewing_plan_year, 
+              enrollment: enrollment,
+              is_waiver: false,
+              coverage_kind: 'health'
+            }).generate_passive_renewal({aasm_event: "force_select_coverage"})
+          }
+
+          before do
+            renewing_employer.renewing_plan_year.update_attribute(:open_enrollment_end_on, TimeKeeper.date_of_record + 1.day)
+            generate_passive_renewal
+          end
+
+          it "should not have nil hbx_id" do
+            queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+              job_info[:job] == ShopNoticesNotifierJob
+            end
+
+            expect(queued_job[:args][2]["hbx_enrollment_hbx_id"]).not_to eq nil
+          end
+        end
       end
     end
   end

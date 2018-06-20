@@ -6,14 +6,16 @@ module Factories
         renewal_enrollment = family.active_household.hbx_enrollments.new
         renewal_enrollment = assign_common_attributes(enrollment, renewal_enrollment)
         renewal_enrollment = clone_shop_enrollment(enrollment, renewal_enrollment)
-        renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment))
+        # renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment))
         # renewal_enrollment.decorated_hbx_enrollment
-        save_renewal_enrollment(renewal_enrollment, enrollment)
+        save_renewal_enrollment(renewal_enrollment, enrollment, options)
       end
     end
 
-    def save_renewal_enrollment(renewal_enrollment, active_enrollment)
-      if renewal_enrollment.save
+    def save_renewal_enrollment(renewal_enrollment, active_enrollment, options={})
+      if renewal_enrollment.save # This will generate hbx_id to enrollment
+        renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment)) # After save, so that it will handle state machine hooks
+        renewal_enrollment.save
         renewal_enrollment
       else
         message = "Enrollment: #{active_enrollment.id}, \n" \

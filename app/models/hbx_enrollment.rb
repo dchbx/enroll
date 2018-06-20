@@ -1220,9 +1220,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1337,7 +1337,7 @@ class HbxEnrollment
     end
 
     event :force_select_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
+      transitions from: :shopping, to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe]
     end
 
   end
@@ -1478,6 +1478,19 @@ class HbxEnrollment
 
   def event_submission_date
     submitted_at.blank? ? Time.now : submitted_at
+  end
+
+  def ee_select_plan_during_oe
+    if self.census_employee.present?
+      begin
+        self.census_employee.update_attributes!(employee_role_id: self.employee_role.id.to_s ) if !census_employee.employee_role.present?
+        if self.is_open_enrollment? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.datetime_of_record)
+          ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment_hbx_id: self.hbx_id.to_s)
+        end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employee plan selection during OE notice to #{self.census_employee.id.to_s} due to #{e.backtrace}" }
+      end
+    end
   end
 
   def ee_plan_selection_confirmation_sep_new_hire
