@@ -13,7 +13,7 @@
       </div>
       <div class="col-md-3 fa-select select-box">
         <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
-        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), required: true, prompt: 'Choose' %>
+        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {prompt: 'Choose' }, {:required => true} %>
       </div>
       <div class="col-md-3">
         <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income.id}", class: "datepicker-js floatlabel" %>
@@ -39,7 +39,7 @@
         </div>
         <div class="col-md-4 fa-select select-box">
           <%= income_fields.label :state, 'State *', class: 'label-color' %>
-          <%= income_fields.select :state, options_for_select(state_options, selected: income.employer_address.try(:state)), required: true, prompt: 'Choose' %>
+          <%= income_fields.select :state, options_for_select(state_options, selected: income.employer_address.try(:state)), {prompt: 'Choose' }, {:required => true} %>
         </div>
         <div class="col-md-4">
           <%= income_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: income.employer_address.try(:zip), class: "floatlabel" %>
