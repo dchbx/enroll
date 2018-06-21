@@ -124,7 +124,8 @@
 
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-3">
-        <%= f.text_field :employee_cost, placeholder: 'AMOUNT*', required: true, class: "floatlabel" %>
+        <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
+        <%= f.text_field :amount, placeholder: '0.00', value: "", required: true %>
       </div>
       <div class="col-md-3 fa-select select-box">
         <%= f.label :employee_cost_frequency, 'How Often *', class: "label-color" %>
