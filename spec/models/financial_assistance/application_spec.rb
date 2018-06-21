@@ -225,4 +225,56 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       expect(new_application.hbx_id).not_to eq nil
     end
   end
+
+  describe "for create_tax_households" do
+
+    before :each do
+      application.update_attributes( family: family, hbx_id: "345334", applicant_kind: "user and/or family", request_kind: "request-kind",
+                                     motivation_kind: "motivation-kind", us_state: "DC", is_ridp_verified: true, assistance_year: TimeKeeper.date_of_record.year, aasm_state: "draft",
+                                     medicaid_terms: true, attestation_terms: true, submission_terms: true, medicaid_insurance_collection_terms: true,
+                                     report_change_terms: true, parent_living_out_of_home_terms: true)
+      allow(application).to receive(:is_application_valid?).and_return(true)
+    end
+
+
+    it "When there are two joint filers and one claimed as tax dependent - applicants looping order 1" do
+      applicant1.update_attributes(is_claimed_as_tax_dependent: false, tax_filer_kind: nil, is_joint_tax_filing: true, is_required_to_file_taxes: true)
+      applicant2.update_attributes(is_claimed_as_tax_dependent: true,claimed_as_tax_dependent_by: applicant1.id, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      applicant3.update_attributes(is_claimed_as_tax_dependent: false, tax_filer_kind: nil, is_joint_tax_filing: true, is_required_to_file_taxes: true)
+      application.submit!
+      expect(applicant1.tax_filer_kind).to eq "tax_filer"
+      expect(applicant2.tax_filer_kind).to eq "dependent"
+      expect(applicant3.tax_filer_kind).to eq "tax_filer"
+    end
+
+    it "When there is one tax filers and two claimed as tax dependent - applicants looping order 2" do
+      applicant1.update_attributes(is_claimed_as_tax_dependent: true, claimed_as_tax_dependent_by: applicant3.id, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      applicant2.update_attributes(is_claimed_as_tax_dependent: true, claimed_as_tax_dependent_by: applicant3.id, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      applicant3.update_attributes(is_claimed_as_tax_dependent: false, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: true)
+      application.submit!
+      expect(applicant1.tax_filer_kind).to eq "dependent"
+      expect(applicant2.tax_filer_kind).to eq "dependent"
+      expect(applicant3.tax_filer_kind).to eq "tax_filer"
+    end
+
+    it "When there is one tax filers and two claimed as tax dependent - applicants looping order 3" do
+      applicant1.update_attributes(is_claimed_as_tax_dependent: false, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: true)
+      applicant2.update_attributes(is_claimed_as_tax_dependent: true, claimed_as_tax_dependent_by: applicant1.id, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      applicant3.update_attributes(is_claimed_as_tax_dependent: false, claimed_as_tax_dependent_by: nil, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      application.submit!
+      expect(applicant1.tax_filer_kind).to eq "tax_filer"
+      expect(applicant2.tax_filer_kind).to eq "dependent"
+      expect(applicant3.tax_filer_kind).to eq "non_filer"
+    end
+
+    it "When there are two tax filers and one claimed as tax dependent - applicants looping order 4" do
+      applicant1.update_attributes(is_claimed_as_tax_dependent: false, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: true)
+      applicant2.update_attributes(is_claimed_as_tax_dependent: false, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: true)
+      applicant3.update_attributes(is_claimed_as_tax_dependent: true, claimed_as_tax_dependent_by: applicant1.id, tax_filer_kind: nil, is_joint_tax_filing: false, is_required_to_file_taxes: false)
+      application.submit!
+      expect(applicant1.tax_filer_kind).to eq "tax_filer"
+      expect(applicant2.tax_filer_kind).to eq "tax_filer"
+      expect(applicant3.tax_filer_kind).to eq "dependent"
+    end
+  end
 end
