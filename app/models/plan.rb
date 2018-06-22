@@ -284,6 +284,9 @@ class Plan
 
   scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
 
+  scope :by_nationwide, ->(types) { where(:nationwide => {"$in" => types})}
+  scope :by_dc_network, ->(types) { where(:dc_in_network => {"$in" => types})}
+
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
     where(carrier_profile_id: carrier_profile._id)

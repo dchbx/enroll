@@ -71,13 +71,13 @@ class ConsumerRole
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
 
-  field :native_validation, type: String, default: nil
+  field :native_validation, type: String, default: -> {"na"}
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
 
   # DC residency
   field :is_state_resident, type: Boolean, default: nil
   field :residency_determined_at, type: DateTime
-  field :local_residency_validation, type: String, default: "attested"
+  field :local_residency_validation, type: String, default: nil
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
 
   field :ssn_update_reason, type: String
@@ -705,7 +705,7 @@ class ConsumerRole
   def mark_residency_pending(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil,
-                      :local_residency_validation => nil)
+                      :local_residency_validation => "pending")
   end
 
   def mark_residency_authorized(*args)
@@ -727,7 +727,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    is_state_resident.nil?
+    local_residency_validation == "pending" || is_state_resident.nil?
   end
 
   def residency_denied?
@@ -735,7 +735,11 @@ class ConsumerRole
   end
 
   def residency_verified?
-    is_state_resident? || person.no_dc_address || local_residency_validation == "attested"
+    is_state_resident? || residency_attested?
+  end
+
+  def residency_attested?
+    local_residency_validation == "attested" || person.residency_eligible? || person.age_on(TimeKeeper.date_of_record) <= 18
   end
 
   def citizenship_verified?
@@ -902,18 +906,13 @@ class ConsumerRole
     end
   end
 
-  #check if consumer purchased a coverage and no response from hub in 24 hours
-  def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && no_changes_24_h?
+  def citizenship_immigration_processing?
+    dhs_pending? || ssa_pending?
   end
 
   def processing_residency_24h?
     return false if self.residency_determined_at.nil?
     residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
-  end
-
-  def no_changes_24_h?
-    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
   end
 
   def sensitive_information_changed(field, person_params)

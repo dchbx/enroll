@@ -12,14 +12,15 @@ class ShopEmployerNotice < Notice
     args[:to] = employer_profile.staff_roles.first.work_email_or_best
     args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
+    self.header = "notices/shared/shop_header.html.erb" 
     self.key = args[:key]
-    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
   def deliver
     build
     generate_pdf_notice
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert

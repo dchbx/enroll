@@ -22,6 +22,7 @@ module Factories
         if employer_offering_coverage_kind?
           generate_renewals
         end
+        trigger_notice_dental(enrollment_id: find_active_coverage.hbx_id.to_s) { "dental_carriers_exiting_shop_notice_to_ee" } if kind == 'dental' && find_active_coverage.present? && has_metlife_or_delta_plan?(find_active_coverage)
       end
 
       family
@@ -56,6 +57,11 @@ module Factories
       rescue Exception => e
         "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
+    end
+
+    def has_metlife_or_delta_plan?(active_enr)
+      carrier_name = active_enr.plan.carrier_profile.legal_name.downcase
+      (active_enr.benefit_group.plan_year.start_on < Date.new(2019,1,1)) && carrier_name && (["metlife", "delta dental"].include?(carrier_name))
     end
 
     def find_active_coverage
@@ -106,6 +112,19 @@ module Factories
         notice_name = yield
         begin
           ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
+        end
+      end
+    end
+
+    def trigger_notice_dental(enrollment_id: nil)
+      if !disable_notifications
+        notice_name = yield
+        begin
+          hbx_enrollment = HbxEnrollment.by_hbx_id(enrollment_id).first
+          census_employee.update_attributes!(employee_role_id: hbx_enrollment.employee_role.id.to_s ) if !census_employee.employee_role.present? && hbx_enrollment.present?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, :hbx_enrollment => enrollment_id) unless Rails.env.test?
         rescue Exception => e
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end

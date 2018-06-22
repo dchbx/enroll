@@ -106,4 +106,3 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
     person.consumer_role.lawful_presence_determination.vlp_responses.sort_by(&:received_at).last.try(:body)
   end
 end
-

@@ -5,6 +5,7 @@ require File.join(Rails.root, "app", "data_migrations", "updating_broker_agency_
 # RAILS_ENV=production bundle exec rake migrations:updating_broker_agency_account_or_profile org_fein='521565478 521696342 202025596' npn='61612' action="update_employer_broker_agency_accounts"
 # RAILS_ENV=production bundle exec rake migrations:updating_broker_agency_account_or_profile npn='61612' action="update_family_broker_agency_accounts"
 # RAILS_ENV=production bundle exec rake migrations:updating_broker_agency_account_or_profile npn='8417039' action="update_family_broker_agency_accounts"
+# RAILS_ENV=production bundle exec rake migrations:updating_broker_agency_account_or_profile fein='8417039' hbx_id='1234' action="update_family_broker_agency_account_with_writing_agent"
 namespace :migrations do
   desc "updating broker agency account and profile"
   UpdatingBrokerAgencyAccountOrProfile.define_task :updating_broker_agency_account_or_profile => :environment

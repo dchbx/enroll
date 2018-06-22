@@ -5,36 +5,40 @@
     </h4>
   </div>
   <br/>
-  <div class="left-icon-section section">
-    <div class="row">
-      <div class="col-xs-1">
-        <div class="row">
-          <%= image_tag('ui/expertgreen_50.png') %>
+  <% unless @employer_profile.broker_agency_profile.present?  %>
+    <div class="left-icon-section section">
+      <div class="row">
+        <div class="col-xs-1">
+          <div class="row">
+            <%= image_tag('ui/expertgreen_50.png') %>
+          </div>
         </div>
-      </div>
-      <div class="col-xs-11">
-        <h3 class="no-buffer">
-          Get Help From a Broker
-        </h3>
-        <h4>
-          You may want to select a Broker as your personal advocate and trusted adviser, who at no cost to you, can help you set up and administer your Health Benefits Program. If you'd like to select a Broker, we suggest doing so first.
-          <%= link_to '#', class: 'view-more' do %>
-          View More
-          <i class="fa fa-chevron-down"></i>
-          <% end %>
-        </h4>
-        <div class="empty-box x-right col-xs-12 dn">
-          <div class="col-xs-12">
-            <div class="row">
-              Select
-              <%= link_to "\"Brokers\"", employers_employer_profile_path(@employer_profile, tab: 'brokers') %>
-              on the blue menu to the left and follow the instructions. Once you've confirmed your selection, you can logout. Your Broker will be in touch shortly and will help you do everything else.
+
+        <div class="col-xs-11">
+          <h3 class="no-buffer">
+            Get Help From a Broker
+          </h3>
+          <h4>
+            You may want to select a Broker as your personal advocate and trusted adviser, who at no cost to you, can help you set up and administer your Health Benefits Program. If you'd like to select a Broker, we suggest doing so first.
+            <%= link_to '#', class: 'view-more' do %>
+            View More
+            <i class="fa fa-chevron-down"></i>
+            <% end %>
+          </h4>
+          <div class="empty-box x-right col-xs-12 dn">
+            <div class="col-xs-12">
+              <div class="row">
+                Select
+                <%= link_to "\"Brokers\"", employers_employer_profile_path(@employer_profile, tab: 'brokers') %>
+                on the blue menu to the left and follow the instructions. Once you've confirmed your selection, you can logout. Your Broker will be in touch shortly and will help you do everything else.
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  <% end %>
+
   <div class="left-icon-section section">
     <div class="row">
       <div class="col-xs-1">
@@ -87,7 +91,5 @@
         <% end %>
       </div>
     </div>
-
-
   </div>
 </div>

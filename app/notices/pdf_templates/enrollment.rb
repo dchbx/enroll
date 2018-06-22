@@ -14,11 +14,16 @@ module PdfTemplates
     attribute :aptc_amount, String
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
+    attribute :enrolled_count, String
     attribute :coverage_kind, String
     attribute :kind, String
     attribute :is_receiving_assistance, Boolean, :default => false
     attribute :plan_year, Date
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
+    attribute :employee_fullname, String
+    attribute :dependents, String
+    attribute :dependents_count, String
+    attribute :enrolled_count, String
   end
 end

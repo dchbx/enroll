@@ -89,7 +89,7 @@
               %>
 
               <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
-                <%= l10n("insured.you_are_not_under_open_enrollment_period") %>
+                <%#= l10n("insured.you_are_not_under_open_enrollment_period") %>
               <% else %>
                 <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
                   <%= format_date ivl_enrollment_effective_date %>.

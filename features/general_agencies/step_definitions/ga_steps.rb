@@ -418,3 +418,28 @@ end
 When /^the broker click the link of clear default ga$/ do
   click_link "Clear Default GA"
 end
+
+When(/^the ga clicks on EDIT GENERAL AGENCY button\/link$/) do
+  click_link "Edit General Agency"
+end
+
+Then(/^the ga should see ga profile form to update informaton$/) do
+  expect(page).to have_content('General Agency / TPA Modification')
+end
+
+When(/^the ga enters personal information or general agency information or office location$/) do
+  fill_in "organization[npn]", with: "3457684567"
+  fill_in "organization[legal_name]", with: "Sample General LLc"
+end
+
+And(/^the ga clicks update general agency$/) do
+  click_button "Update General Agency"
+end
+
+Then(/^the ga should see successful message\.$/) do
+  expect(page).to have_content('Successfully Update General Agency Profile')
+end
+
+Then(/^the ga should see updated informaton on page$/) do
+  expect(page).to have_content("Sample General LLc")
+end

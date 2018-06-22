@@ -1,0 +1,42 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td style="padding-top: 10px"><b>Employee of <%= notice.employer_name %> has made a change to their employer-sponsored coverage selection</b></td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td style="padding-top: 10px">Dear <%= notice.employer_name %>:</td>
+  </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "This notice is to inform you that an employee of <strong>#{notice.employer_name}</strong>, <strong>#{notice.employee.primary_fullname}</strong>, has made a change to their employer-sponsored coverage. The change will take effect on <strong>#{notice.enrollment.effective_on}</strong>. You can review the details of this change in your employer account. This change will be reflected on your next invoice.", top_margin: '10px', bottom_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""], heading: 'Why was the Change Made?', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "",
+  listings: ["<strong>New Hire Open Enrollment:</strong> A new hire may have chosen to enroll in employer-sponsored health insurance. Once added to the employer’s roster, a new hire’s 30-day new hire open enrollment period is triggered. Newly-hired employees have 30 days from the date they are added to the roster OR their date of hire, whichever is later, to enroll in employer-sponsored insurance or waive coverage.", "<strong> Qualifying Event:</strong> Your employee may have experienced a qualifying event that made them eligible to make changes to their enrollment. Employees who experience a qualifying event during the plan year may be eligible for a Special Enrollment Period (SEP) which allows them to enroll in a plan, make changes to their plan selection, add or drop family members, or drop coverage altogether. ", "<strong>Dependent Aged Off of Coverage:</strong> Your employee may have had a dependent on their policy that is no longer eligible for coverage. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the month in which they turn 26 and automatically terminates on the last day of that month."
+   ]} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Please contact your benefits office for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["By calling #{notice.hbe.phone}",
+    "TTY: #{Settings.contact_center.tty}",
+    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "This notice is being provided in accordance with 45 CFR 155.720(h)."} %>

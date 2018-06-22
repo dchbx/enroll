@@ -25,11 +25,7 @@ describe LinkEmployeesToEmployer, dbclean: :after_each do
     let(:census_employee5) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id)}
     
     before(:each) do
-      allow(ENV).to receive(:[]).with("ce1").and_return census_employee
-      allow(ENV).to receive(:[]).with("ce2").and_return census_employee2
-      allow(ENV).to receive(:[]).with("ce3").and_return census_employee3
-      allow(ENV).to receive(:[]).with("ce4").and_return census_employee4
-      allow(ENV).to receive(:[]).with("ce5").and_return census_employee5
+      allow(ENV).to receive(:[]).with("ce").and_return "#{census_employee.id},#{census_employee2.id},#{census_employee3.id},#{census_employee4.id},#{census_employee5.id}"
     end
     it "employees should have eligible state then employee role linked states" do
       plan_year.update(aasm_state:'published')

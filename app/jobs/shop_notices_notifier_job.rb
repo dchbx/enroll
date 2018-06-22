@@ -3,7 +3,7 @@ class ShopNoticesNotifierJob < ActiveJob::Base
 
   def perform(id, event, options = {})
     Resque.logger.level = Logger::DEBUG
-    profile = EmployerProfile.find(id) || CensusEmployee.where(id: id).first
+    profile = EmployerProfile.find(id) || GeneralAgencyProfile.find(id) || CensusEmployee.where(id: id).first
     event_kind = ApplicationEventKind.where(:event_name => event).first
     notice_trigger = event_kind.notice_triggers.first
     builder = notice_trigger.notice_builder.camelize.constantize.new(profile, {

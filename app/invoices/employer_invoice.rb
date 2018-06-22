@@ -46,17 +46,19 @@ class EmployerInvoice
   end
 
   def send_email_notice
-    subject = "Invoice Now Available"
-    body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
-    message_params = {
-      sender_id: "admins",
-      parent_message_id: @organization.employer_profile.id,
-      from: "DC Health Link",
-      to: "Employer Mailbox",
-      subject: subject,
-      body: body
-    }
-    create_secure_message message_params, @organization.employer_profile, :inbox
+    unless (@organization.employer_profile.is_new_employer? && @organization.invoices.empty?)
+      subject = "Invoice Now Available"
+      body = "Your invoice is now available in your employer profile under Billing tab. Thank You"
+      message_params = {
+        sender_id: "admins",
+        parent_message_id: @organization.employer_profile.id,
+        from: "DC Health Link",
+        to: "Employer Mailbox",
+        subject: subject,
+        body: body
+      }
+      create_secure_message message_params, @organization.employer_profile, :inbox
+    end
   end
 
   def clear_tmp(file)

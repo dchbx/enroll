@@ -1,7 +1,7 @@
 !!! XML
 %enrollment_event{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance" }
   %header
-    %hbx_id= hbx_enrollment.household.family.hbx_assigned_id
+    %hbx_id= Settings.site.exchange_hbx_id
     %submitted_timestamp= hbx_enrollment.event_submission_date.strftime('%Y-%m-%dT%H:%M:%S')
   %event
     %body

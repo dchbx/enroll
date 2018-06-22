@@ -3,10 +3,10 @@
     <h4>
       <% if can_show_due_date?(@person) %>
           <%= l10n("document_due_date") %>:&nbsp;&nbsp;
-          <% if (@person.primary_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= @person.primary_family.min_verification_due_date_on_family %> (Past Due)</span>
+          <% if (@person.primary_family.best_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
+              <span class="label label-danger"><%= @person.primary_family.best_verification_due_date %> (Past Due)</span>
           <% else %>
-              <span class="label label-warning"><%= (@person.primary_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) %></span>
+              <span class="label label-warning"><%= (@person.primary_family.best_verification_due_date || TimeKeeper.date_of_record + 95.days) %></span>
           <% end %>
       <% end %>
     </h4>
@@ -29,7 +29,7 @@
                   <div class="v-type-name col-md-2">
                     <%= v_type %>
                   </div>
-                  <div class="v-type-status col-md-2">
+                  <div class="v-type-status col-md-2 text-center">
                     <% if f_member.is_applying_coverage %>
                       <span class="label lb-md label-<%=verification_type_class(v_type, person, current_user.has_hbx_staff_role?)%>">
                         <%= show_v_type(v_type, person, current_user.has_hbx_staff_role?) %>
@@ -83,7 +83,7 @@
                           </div>
                           <div class="v-doc col-md-1">
                             <span class="<%=pundit_class(Family, :updateable?)%>" >
-                              <%= link_to document_path(vlp_doc, :person_id => person.id, :verification_type => v_type, :doc_title => vlp_doc.title.titleize), method: :delete, remote: true do %>
+                              <%= link_to document_path(vlp_doc, :person_id => person.id,:family_member_id => f_member.id, :verification_type => v_type, :doc_title => vlp_doc.title.titleize), method: :delete do %>
                                 <i class="fa fa-trash-o fa-lg pull-right" title="Delete"></i>
                               <% end %>
                             </span>

@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/dchbx/acapi.git
-  revision: 68001c0c7fec6632f47cb738cfd112e6a94692ca
-  branch: development
+  revision: a0248fd948e1a3c1d2faaf0abf5077a2b1db9203
+  branch: 1.0.0
   specs:
-    acapi (0.0.1)
+    acapi (1.0.0)
       activesupport (~> 4.2.0)
       bunny (~> 1.7.0)
 
@@ -217,11 +217,11 @@ GEM
     equalizer (0.0.11)
     erubis (2.7.0)
     execjs (2.7.0)
-    eye (0.9.3)
-      celluloid (~> 0.17.3)
+    eye (0.8)
+      celluloid (~> 0.17.2)
       celluloid-io (~> 0.17.0)
       sigar (~> 0.7.3)
-      state_machines
+      state_machine
       thor
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
@@ -350,7 +350,7 @@ GEM
     mongoid_userstamp (0.4.0)
       mongoid (>= 3.0.4)
     mono_logger (1.1.0)
-    multi_json (1.12.2)
+    multi_json (1.13.1)
     multi_test (0.1.2)
     multi_xml (0.6.0)
     net-scp (1.2.1)
@@ -393,8 +393,8 @@ GEM
       pry (>= 0.9.11)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
-    rack (1.6.8)
-    rack-protection (1.5.3)
+    rack (1.6.9)
+    rack-protection (1.5.5)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -416,7 +416,7 @@ GEM
       activesupport (>= 4.2.0.beta, < 5.0)
       nokogiri (~> 1.6)
       rails-deprecated_sanitizer (>= 1.0.1)
-    rails-html-sanitizer (1.0.3)
+    rails-html-sanitizer (1.0.4)
       loofah (~> 2.0)
     rails-i18n (4.0.8)
       i18n (~> 0.7)
@@ -546,7 +546,7 @@ GEM
     sshkit (1.15.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    state_machines (0.5.0)
+    state_machine (1.2.0)
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
     temple (0.8.0)
@@ -624,7 +624,7 @@ DEPENDENCIES
   devise (~> 3.4.1)
   effective_datatables!
   email_spec (= 2.0.0)
-  eye
+  eye (= 0.8.0)
   factory_girl_rails (= 4.6.0)
   fakeredis
   font-awesome-rails (= 4.5.0.1)

@@ -19,6 +19,7 @@ describe AddCoverageHouseholdMember, dbclean: :after_each do
 
     before do
       allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
+      allow(ENV).to receive(:[]).with('family_member_id').and_return family.family_members.first.id
     end
 
     it "should add a household" do

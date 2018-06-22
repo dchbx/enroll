@@ -268,11 +268,12 @@ private
 
 
   def is_eligible?
+    return true unless is_active?
     return true unless is_shop?
 
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
-      eligible_date = employee_role.census_employee.earliest_eligible_date
+      eligible_date = employee_role.census_employee.earliest_eligible_date 
       eligible_date <= TimeKeeper.date_of_record
     end
   end

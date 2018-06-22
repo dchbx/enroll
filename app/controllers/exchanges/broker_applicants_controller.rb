@@ -18,7 +18,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       page_no = cur_page_no(@page_alphabets.first)
       @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
     else
-      @broker_applicants = sort_by_latest_transition_time(@people).last(20)
+      @broker_applicants = sort_by_latest_transition_time(@people).limit(20).entries
     end
 
     respond_to do |format|
@@ -40,6 +40,11 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     if params['deny']
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."
+    elsif params['update']
+      all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
+      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
+      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
     elsif params['decertify']
       broker_role.decertify!
       flash[:notice] = "Broker applicant decertified."

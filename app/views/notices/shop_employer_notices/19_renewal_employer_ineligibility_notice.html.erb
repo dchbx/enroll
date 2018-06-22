@@ -1,15 +1,7 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
-
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></td>
-    </tr>
-  </tbody>
-</table>
-
+<%= render partial: 'notices/shared/email_notification_sent_to', :locals => {email: notice.employer_email} %>
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">

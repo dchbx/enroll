@@ -1,6 +1,6 @@
 module VerificationHelper
   include DocumentsVerificationStatus
-  
+
   def doc_status_label(doc)
     case doc.status
       when "not submitted"
@@ -18,20 +18,18 @@ module VerificationHelper
     case verification_type_status(type, member, admin)
       when "verified"
         "success"
-      when "in review"
+      when "review"
         "warning"
       when "outstanding"
-        if type == 'DC Residency'
-          member.consumer_role.processing_residency_24h? ? "info" : "danger"
-        else
-          member.consumer_role.processing_hub_24h? ? "info" : "danger"
-        end
-      when "curam"
+        "danger"
+      when "External Source"
         "default"
       when "attested"
         "default"
       when "valid"
         "success"
+      when "processing"
+        "info"
     end
   end
 
@@ -89,7 +87,7 @@ module VerificationHelper
       v_types_list = get_person_v_type_status(people)
       if !v_types_list.include?('outstanding')
         'success'
-      elsif v_types_list.include?('in review') && v_types_list.include?('outstanding')
+      elsif v_types_list.include?('review') && v_types_list.include?('outstanding')
         'info'
       else
         'default'
@@ -141,28 +139,7 @@ module VerificationHelper
   end
 
   def show_v_type(v_type, person, admin = false)
-    case verification_type_status(v_type, person, admin)
-      when "in review"
-        "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
-      when "verified"
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      when "valid"
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      when "attested"
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attested&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      when "curam"
-        admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      else
-        if v_type == 'DC Residency'
-          person.consumer_role.processing_residency_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
-        else
-          person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
-        end
-    end
-  end
-
-  def text_center(v_type, person)
-    (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    verification_type_status(v_type, person, admin).split.map(&:capitalize).join(' ').center(12).gsub(' ', '&nbsp;').html_safe
   end
 
   # returns vlp_documents array for verification type

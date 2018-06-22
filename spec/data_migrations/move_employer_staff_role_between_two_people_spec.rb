@@ -25,6 +25,7 @@ describe MoveEmployerStaffRoleBetweenTwoPeople do
       person1.reload
       person2.reload
       expect(person2.employer_staff_roles).to eq [employer_staff_role]
+      expect(person1.employer_staff_roles).to eq []
     end
   end
 end

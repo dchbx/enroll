@@ -43,6 +43,10 @@ describe ConsumerRole, dbclean: :after_each do
     context "with all valid arguments" do
       let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
 
+      it "should have a default value of native validation as na" do
+        expect(consumer_role.native_validation).to eq "na"
+      end
+
       it "should save" do
         expect(consumer_role.save).to be_truthy
       end

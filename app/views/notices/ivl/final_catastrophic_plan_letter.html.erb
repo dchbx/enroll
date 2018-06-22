@@ -1,11 +1,13 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Subject: Important Tax Information about your Catastrophic Health Coverage</h3></td>
+      <td><h3>TAX INFORMATION FOR YOUR CATASTROPHIC HEALTH PLAN</h3></td>
     </tr>
   </tbody>
 </table>
@@ -13,13 +15,40 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:  </td>
+      <td>Dear <%= notice.primary_fullname %>:</td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You are getting this letter because you were enrolled in a catastrophic health insurance plan through #{Settings.site.short_name} in 2016. A catastrophic health plan meets the requirements for maintaining a minimum level of health coverage for all the months you had your plan. We report your enrollment to the IRS, but do not send you a marketplace tax form (Form 1095-A) because the type of plan you were enrolled in does not qualify for a premium tax credit."} %>
+content: "You are receiving this letter because you were enrolled in a catastrophic health plan through #{Settings.site.short_name} in #{previous_year}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Your health insurance company may send you a Form 1095-B reporting your coverage for 2016. If you have questions about this form, please contact your health insurance company."} %>
+content: "Federal law requires most Americans to have a minimum level of health coverage through 2018. This requirement is known as the individual mandate. Your enrollment in a catastrophic plan meets this requirement. We report your enrollment status each month to the Internal Revenue Service (IRS).  These reports allow the IRS to verify the months that you were enrolled in coverage through #{Settings.site.short_name}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "You will not receive any tax forms from #{Settings.site.short_name} for your enrollment in a catastrophic health plan, because these plans do not qualify for an advance premium tax credit.  Only those enrolled in plans that qualify for an advance premium tax credit receive a tax form from #{Settings.site.short_name}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "You may receive a tax form from your health insurance company.  Health insurance companies are encouraged (but not required) to provide a tax form for those enrolled in catastrophic coverage.  Contact your insurance company directly for more information on this tax form."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "#{Settings.site.short_name} does not control the individual mandate and cannot provide tax advice. If you have questions about this letter or your catastrophic health plan, go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "For more information on these topics, consult a tax adviser or visit the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."} %>
+
+<br>
+
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "If you have questions or concerns, we’re here to help."} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+</div>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
+"Individual mandate: 26 U.S.C. §5000A",
+"Catastrophic plan ineligibility for advance premium tax credit: 26 U.S.C. §36B(c)(3)(A)"]} %>

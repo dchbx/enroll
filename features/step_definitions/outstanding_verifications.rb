@@ -11,6 +11,23 @@ When(/^Admin clicks Outstanding Verifications$/) do
   page.find('.interaction-click-control-outstanding-verifications').click
 end
 
+When(/^Admin clicks Families tab$/) do
+  page.find('.families.dropdown-toggle.interaction-click-control-families').click
+  within('.dropdown-menu') do
+    find('.interaction-click-control-families').click
+  end
+end
+
+Then(/^the Admin is navigated to the Families screen$/) do
+  expect(page).to have_xpath("//*[@id='inbox']/div/div[1]/h1", text: 'Families')
+end
+
+And 'I click on the name of a person of family list' do
+  within('table.effective-datatable tbody tr:last-child') do
+    find('td.col-name a').trigger('click')
+  end
+end
+
 Then(/^the Admin is navigated to the Outstanding Verifications screen$/) do
   expect(page).to have_xpath("//div[contains(@class, 'container')]/h1", text: 'Outstanding Verifications')
 end

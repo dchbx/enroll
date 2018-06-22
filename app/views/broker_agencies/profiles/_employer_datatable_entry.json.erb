@@ -12,8 +12,10 @@ end
 <%
       if employer_datatable_entry.active_general_agency_account.present?
         ga_legal_name = employer_datatable_entry.hashed_active_general_agency_legal_name(@general_agency_profiles)
-	clear_assign_path = pundit_span(EmployerProfile, :updateable?)  + raw('<br>') + link_to( "#{l10n('clear_assignment')}", clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: employer_datatable_entry.id), method: :post, remote: true, data: {  confirm: l10n("broker_agencies.profiles.remove_general_agency_assignment") })
-        general_agency = ga_legal_name + clear_assign_path
+        if pundit_span(EmployerProfile, :updateable?)
+          clear_assign_path = pundit_span(EmployerProfile, :updateable?) + raw('<br>') + link_to( "#{l10n('clear_assignment')}", clear_assign_for_employer_broker_agencies_profile_path(id: @broker_agency_profile.id, employer_id: employer_datatable_entry.id), method: :post, remote: true, data: {  confirm: l10n("broker_agencies.profiles.remove_general_agency_assignment") })
+        end
+        general_agency = ga_legal_name + clear_assign_path if ga_legal_name
       end
 %>
 
@@ -31,7 +33,7 @@ end
   "nothing": <%= raw checkbox_column.to_json %>,
   "fein": <%= raw employer_datatable_entry.fein.to_json %>,
   "legal_name" : <%= raw legal_name.to_json %>,
-  "ee_count": <%= raw employer_datatable_entry.roster_size.to_i.to_json %>,
+  "ee_count": "N/A",
   "er_state": <%= raw employer_datatable_entry.aasm_state.humanize.to_json %>,
   "broker": <%= raw broker.to_json %>,
   "general_agency": <%= raw general_agency.to_json %>,

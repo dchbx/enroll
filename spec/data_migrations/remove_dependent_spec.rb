@@ -4,7 +4,12 @@ require File.join(Rails.root, "app", "data_migrations", "remove_dependent")
 describe RemoveDependent, dbclean: :after_each do
 
   let(:given_task_name) { "remove_dependent" }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent)}
   subject { RemoveDependent.new(given_task_name, double(:current_scope => nil)) }
+
+  before do
+    allow(ENV).to receive(:[]).with("family_member_id").and_return(family.family_members.where(is_primary_applicant: false).first.id)
+  end
 
   describe "given a task name" do
     it "has the given task name" do
@@ -12,23 +17,28 @@ describe RemoveDependent, dbclean: :after_each do
     end
   end
 
-  describe "add family member to coverage household", dbclean: :after_each do
+  describe "Should not remove duplicate dependents", dbclean: :after_each do
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:family_member){FactoryGirl.create(:family_member, family: family,is_primary_applicant: false, is_active: true)}
+    it "should not remove duplicate family member" do
+      expect(family.family_members.size).to eq 3
+      subject.migrate
+      family.reload
+      expect(family.family_members.size).to eq 3
+    end
 
+  end
+
+  describe "Should remove duplicate dependents", dbclean: :after_each do
     before do
-      allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
-      allow(person).to receive(:primary_family).and_return(family)
+      fm = family.family_members.where(is_primary_applicant: false).first
+      family.remove_family_member(fm.person)
     end
 
     it "should remove duplicate family member" do
-      family_member_id=family_member.id
-      expect(person.primary_family.family_members.where(id:family_member_id).size).to eq 1     
-      subject.migrate 
+      expect(family.family_members.size).to eq 3
+      subject.migrate
       family.reload
-      expect(person.primary_family.family_members.where(id:family_member_id).size).to eq 0
+      expect(family.family_members.size).to eq 2
     end
   end
 end

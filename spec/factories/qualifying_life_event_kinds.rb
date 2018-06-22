@@ -27,5 +27,12 @@ FactoryGirl.define do
       effective_on_kinds ["first_of_next_month"]
       tool_tip "Enroll or add a family member because of marriage"
     end
+
+    trait :effective_on_event_date_and_first_month do
+      title "Had a baby"
+      edi_code "02-BIRTH"
+      effective_on_kinds ["date_of_event", "first_of_next_month"]
+      tool_tip "Enroll or add a family member due to birth"
+    end
   end
 end

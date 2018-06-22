@@ -166,7 +166,7 @@ module Insured::FamiliesHelper
     if enrollment.is_shop?
       true
     else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'renewing_coverage_selected', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
     end
   end
 
@@ -208,7 +208,7 @@ module Insured::FamiliesHelper
   end
 
   def person_has_any_roles?
-    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? 
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role?
   end
 
   def is_strictly_open_enrollment_case?
@@ -228,7 +228,7 @@ module Insured::FamiliesHelper
       false
     elsif @person.consumer_role.blank?
       false
-    elsif @person.consumer_role.present? 
+    elsif @person.consumer_role.present?
       true
     end
   end

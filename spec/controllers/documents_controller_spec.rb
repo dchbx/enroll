@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe DocumentsController, :type => :controller do
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family) }
   let(:consumer_role) {FactoryGirl.build(:consumer_role)}
   let(:document) {FactoryGirl.build(:vlp_document)}
   let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
@@ -14,8 +14,11 @@ RSpec.describe DocumentsController, :type => :controller do
 
   describe "destroy" do
     before :each do
+      family_member = FactoryGirl.build(:family_member, person: person, family: family)
+      person.families.first.family_members << family_member
+      allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
       person.consumer_role.vlp_documents = [document]
-      delete :destroy, person_id: person.id, id: document.id
+      delete :destroy, person_id: person.id, id: document.id, family_member_id: family_member.id
     end
     it "redirects_to verification page" do
       expect(response).to redirect_to verification_insured_families_path

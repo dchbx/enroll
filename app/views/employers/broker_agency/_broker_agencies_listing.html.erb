@@ -37,6 +37,11 @@
     </tbody>
   </table>
 </div>
+<div class="row container">
+  <div class="col-md-12" id="paginator">
+    <%= paginate @broker_agency_profiles, :remote => true, :param_name => "organization_page", :params => {:page => @page_alphabet || "A"} %>
+  </div>
+</div>
 <% if @page_alphabets.present? %>
 <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
 <% end %>

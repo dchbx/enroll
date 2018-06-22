@@ -5,6 +5,7 @@ require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
 require 'kaminari'
+require File.expand_path('app/models/services/checkbook_services')
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

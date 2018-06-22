@@ -130,6 +130,8 @@ class DocumentsController < ApplicationController
 
   def destroy
     @document.delete
+    family_member = FamilyMember.find(params[:family_member_id])
+    family_member.family.update_family_document_status!
     respond_to do |format|
       format.html { redirect_to verification_insured_families_path }
       format.js

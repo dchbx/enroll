@@ -9,7 +9,7 @@ module Effective
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => Proc.new { |row| row.vlp_documents_status}, :filter => false, :sortable => true
-        table_column :verification_due, :label => 'Verification Due',:proc => Proc.new { |row|  row.min_verification_due_date || TimeKeeper.date_of_record + 95.days }, :filter => false, :sortable => true
+        table_column :verification_due, :label => 'Verification Due',:proc => Proc.new { |row|  format_date(row.best_verification_due_date) || format_date(TimeKeeper.date_of_record + 95.days) }, :filter => false, :sortable => true
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => row.primary_applicant.person.id),"static"]

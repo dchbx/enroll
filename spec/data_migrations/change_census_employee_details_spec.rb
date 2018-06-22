@@ -58,4 +58,85 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
       end
     end
   end
+
+  describe "change_ssn" do
+    let(:census_employee) { FactoryGirl.create :census_employee}
+
+    before :each do
+      allow(ENV).to receive(:[]).with("encrypted_ssn").and_return census_employee.encrypted_ssn
+      allow(ENV).to receive(:[]).with("new_encrypted_ssn").and_return SymmetricEncryption.encrypt("123111222")
+    end
+
+    it "should change the SSN of census employee if in eligible status" do
+      subject.send(:change_ssn)
+      census_employee.reload
+      expect(census_employee.ssn).to eq "123111222"
+    end
+
+    it "should not change the SSN of census employee if in linked status" do
+      ssn = census_employee.ssn
+      census_employee.reload
+      census_employee.update_attributes(aasm_state: "employee_role_linked")
+      subject.send(:change_ssn)
+      expect(census_employee.ssn).to eq ssn
+    end
+  end
+
+  describe "delink_employee_role" do
+    let(:census_employee) { FactoryGirl.create :census_employee}
+    let(:employee_role) { FactoryGirl.create :employee_role}
+
+    before :each do
+      allow(ENV).to receive(:[]).with("encrypted_ssn").and_return census_employee.encrypted_ssn
+      census_employee.update_attributes(aasm_state: "employee_role_linked", employee_role_id: employee_role.id)
+    end
+
+    it "should delink the employee role" do
+      subject.send(:delink_employee_role)
+      census_employee.reload
+      expect(census_employee.employee_role_id).to eq nil
+      expect(census_employee.aasm_state).to eq "eligible"
+    end
+  end
+
+  describe "link_or_construct_employee_role" do
+    let!(:person) { FactoryGirl.create(:person, 
+      first_name: census_employee.first_name,
+      last_name: census_employee.last_name,
+      dob: census_employee.dob,
+      ssn: census_employee.ssn
+    )}
+    let(:census_employee) { FactoryGirl.create :census_employee_with_active_assignment}
+    let(:benefit_group) { FactoryGirl.create :benefit_group}
+    let(:employer_profile) { FactoryGirl.create :employer_profile}
+
+    before :each do
+      allow(ENV).to receive(:[]).with("encrypted_ssn").and_return census_employee.encrypted_ssn
+      allow(census_employee).to receive(:has_benefit_group_assignment?).and_return true
+      census_employee.active_benefit_group_assignment.update_attributes(benefit_group_id: benefit_group.id)
+      benefit_group.plan_year.update_attributes(aasm_state: "active")
+      census_employee.update_attributes(:employer_profile_id => employer_profile.id, aasm_state: "eligible")
+    end
+
+    it "should construct the employee role" do
+      expect(census_employee.employee_role).to eq nil
+      subject.send(:link_or_construct_employee_role)
+      census_employee.reload
+      expect(census_employee.employee_role).not_to eq nil
+    end
+
+    it "should link the employee role" do
+      subject.send(:link_or_construct_employee_role)
+      census_employee.reload
+      expect(census_employee.aasm_state).to eq "employee_role_linked"
+    end
+  end
+
+  before :each do
+    CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
+  end
+
+  after :each do
+    CensusEmployee.set_callback(:save, :after, :assign_default_benefit_package)
+  end
 end

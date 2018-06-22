@@ -259,6 +259,68 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
+  describe "GET show_profile" do
+    let(:user) do
+      double("user",
+             :person => person,
+             :last_portal_visited => "true",
+             :save => true,
+             :has_hbx_staff_role? => false,
+             :has_broker_role? => false,
+             :has_broker_agency_staff_role? => false,
+             :has_employer_staff_role? => true
+      )
+    end
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:employee_role) { person.employee_roles.first }
+    let(:benefit_group) { FactoryGirl.build(:benefit_group)}
+    let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
+    let(:employer_profile) { employee_role.employer_profile }
+    let(:policy) { double("policy") }
+
+    context 'When employee_roles not in EMPLOYMENT_ACTIVE_STATES then' do
+      before do
+        allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
+        allow(policy).to receive(:is_broker_for_employer?).and_return(false)
+        allow(policy).to receive(:authorize_show).and_return(true)
+        allow(user).to receive(:last_portal_visited=).and_return("true")
+        census_employee.update(aasm_state: 'employment_terminated')
+        employee_role.census_employee_id = census_employee.id
+        employee_role.save
+        allow(employer_profile).to receive(:plan_years).and_return([plan_year])
+        sign_in(user)
+      end
+
+      it "should get empty list of active employee" do
+        xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show_profile")
+        expect(assigns(:employees)).to be_empty
+      end
+    end
+
+    context 'When employee_roles in EMPLOYMENT_ACTIVE_STATES then' do
+      before do
+        allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
+        allow(policy).to receive(:is_broker_for_employer?).and_return(false)
+        allow(policy).to receive(:authorize_show).and_return(true)
+        allow(user).to receive(:last_portal_visited=).and_return("true")
+        employee_role.census_employee_id = census_employee.id
+        employee_role.save
+        allow(employer_profile).to receive(:plan_years).and_return([plan_year])
+        sign_in(user)
+      end
+
+      it "should get list of active employee" do
+        xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show_profile")
+        expect(assigns(:employees)).to eq([employee_role])
+      end
+    end
+  end
+
   describe "GET welcome" do
     let(:user) { double("user")}
     let(:person) { double("Person")}
@@ -397,7 +459,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     let(:save_result) { false }
 
-    let(:organization) { double(:employer_profile => double) }
+    let(:organization) { double(:employer_profile => double(:id => "emp pro id")) }
 
     before(:each) do
       @user = FactoryGirl.create(:user)
@@ -410,6 +472,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(organization).to receive(:save).and_return(save_result)
       
     end
+
     describe 'updateable organization' do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
@@ -470,7 +533,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("User", :idp_verified? => true) }
     let(:person) { double("Person", :id => "SOME PERSON ID") }
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:found_employer) { double("test", :save => validation_result, :employer_profile => double) }
+    let(:found_employer) { double("test", :save => validation_result, :employer_profile => double(:id => "emp pro id") ) }
     let(:office_locations){[double(address: double("address"), phone: double("phone"), email: double("email"))]}
     let(:organization) {double(office_locations: office_locations)}
 
@@ -483,8 +546,6 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
       
       allow(@user).to receive(:switch_to_idp!)
-#      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
-#      allow(found_employer).to receive(:organization).and_return(organization)
       post :create, :organization => employer_parameters
     end
 
@@ -493,6 +554,15 @@ RSpec.describe Employers::EmployerProfilesController do
 
       it "renders the 'edit' template" do
         expect(response).to have_http_status(:redirect)
+      end
+    end
+
+    context "after account creation" do
+      let(:validation_result) { true }
+
+      it "sends employer_account_creation_notice" do 
+        expect(controller).to receive(:employer_account_creation_notice)
+        controller.employer_account_creation_notice
       end
     end
   end
@@ -721,11 +791,11 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { FactoryGirl.create(:user) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
-   it "should export cvs" do
-     sign_in(user)
-     get :export_census_employees, employer_profile_id: employer_profile, format: :csv
-     expect(response).to have_http_status(:success)
-   end
-
+    it "should export cvs" do
+      sign_in(user)
+      get :export_census_employees, employer_profile_id: employer_profile, format: :csv
+      expect(response).to have_http_status(:success)
+    end
   end
+
 end

@@ -12,7 +12,7 @@ module Subscribers
           Rails.logger.error("PolicyTerminationsSubscriber") { "Began Processing" }
           Rails.logger.error("PolicyTerminationsSubscriber") { payload.inspect }
           stringed_payload = payload.stringify_keys
-          qr_uri = stringed_payload["qualifying_reason"]
+          qr_uri = stringed_payload["qualifying_reason"].present? ? stringed_payload["qualifying_reason"].split('#').last : nil
           policy_instance_uri = stringed_payload["resource_instance_uri"]
           end_effective_date_str = stringed_payload["event_effective_date"]
           hbx_enrollment_id_json_list = stringed_payload["hbx_enrollment_ids"]
@@ -29,12 +29,19 @@ module Subscribers
           enrollments.each do |en|
             if is_cancel
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as cancel" }
-              if en.may_cancel_coverage?
+              if en.may_cancel_for_non_payment? && qr_uri=='non_payment'
+                en.cancel_for_non_payment!
+              elsif en.may_cancel_coverage?
                 en.cancel_coverage!
               end
             else
               Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as termination" }
-              if en.may_terminate_coverage?
+              if en.may_terminate_for_non_payment? && qr_uri=='non_payment'
+                end_effective_date = Date.strptime(end_effective_date_str, "%Y%m%d") rescue nil
+                if end_effective_date
+                  en.terminate_for_non_payment!(end_effective_date)
+                end
+              elsif en.may_terminate_coverage?
                 end_effective_date = Date.strptime(end_effective_date_str, "%Y%m%d") rescue nil
                 if end_effective_date
                   en.terminate_coverage!(end_effective_date)

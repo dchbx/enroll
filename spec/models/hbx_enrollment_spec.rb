@@ -962,6 +962,39 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment.terminated_on).to eq nil
     end
   end
+
+   context "cancel_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
+
+
+   context "terminate_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected")}
+
+    it "should terminate enrollment" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+    end
+
+    it "should  populate terminate on" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
+    end
+  end
+
+
 end
 
 describe HbxEnrollment, dbclean: :after_each do
@@ -2443,6 +2476,42 @@ describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all
         expect(HbxEnrollment.find(hbx_enrollment.id).terminate_reason).to be_nil
       end
     end
+  end
+end
+
+describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :after_all do
+  let(:family)          { FactoryGirl.build(:individual_market_family) }
+  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, kind: 'individual') }
+
+  context "open enrollment" do
+    before do
+      hbx_enrollment.update(enrollment_kind: 'open_enrollment')
+    end
+
+    it "should return true when auto_renewing" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'auto_renewing')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return true when renewing_coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'renewing_coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return false when coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+    end
+  end
+
+  it "should return false when it is not open_enrollment" do
+    hbx_enrollment.update(enrollment_kind: 'special_enrollment')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+  end
+
+  it "should return false when it is individual" do
+    hbx_enrollment.update(kind: 'employer_sponsored')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
   end
 end
 

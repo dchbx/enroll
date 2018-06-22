@@ -7,14 +7,17 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
     args[:market_kind] = 'individual'
     args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/header_ivl.html.erb"
     super(args)
   end
 
   def deliver
+    append_hbe
     build
     generate_pdf_notice
-    prepend_envelope
+    attach_blank_page(notice_path)
+    attach_non_discrimination
+    attach_taglines
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -27,6 +30,7 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
   end
 
   def build
+    notice.mpi_indicator = self.mpi_indicator
     family = recipient.primary_family
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
@@ -52,5 +56,4 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
       x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
     end.join(' ')
   end
-
 end

@@ -55,6 +55,7 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable do
   end
 
   describe "append_data" do
+    let!(:terminated_employer_plan_year) { PlanYear.new(aasm_state:"terminated" , start_on: start_on)}
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)
@@ -65,6 +66,12 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable do
       @employer_notice.append_data
       expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
+    end
+
+     it "should append information for terminated employer" do
+      allow(employer_profile).to receive_message_chain("plan_years.where").and_return([terminated_employer_plan_year])
+      @employer_notice.append_data
+      expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
     end
   end
 

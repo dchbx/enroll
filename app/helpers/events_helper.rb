@@ -93,4 +93,9 @@ module EventsHelper
   def is_renewal_or_conversion_employer?(employer)
     is_new_conversion_employer?(employer) || is_renewal_employer?(employer) || is_renewing_conversion_employer?(employer)
   end
+
+  def plan_years_for_manual_export(employer)
+    plan_year_states = PlanYear::INELIGIBLE_FOR_EXPORT_STATES.delete_if{|py_state| ["renewing_enrolling","enrolling"].include?(py_state)}
+    employer.plan_years.select {|plan_year| !plan_year_states.include?(plan_year.aasm_state)}
+  end
 end

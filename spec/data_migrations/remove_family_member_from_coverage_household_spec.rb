@@ -18,7 +18,7 @@ describe RemoveFamilyMemberFromCoverageHousehold, dbclean: :after_each do
 
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
-      allow(ENV).to receive(:[]).with('family_member_hbx_id').and_return family_member.hbx_id
+      allow(ENV).to receive(:[]).with('family_member_id').and_return family_member.id
     end
 
     it "should remove a family member to household" do

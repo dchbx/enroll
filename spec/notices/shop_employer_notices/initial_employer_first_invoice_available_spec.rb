@@ -59,7 +59,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employer_notice = ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable.new(employer_profile, valid_parmas)
       plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
-      
+
       @employer_notice.append_data
     end
     it "should return due date" do
@@ -88,5 +88,4 @@ RSpec.describe ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable do
       expect(File.exist?(file.path)).to be true
     end
   end
-
 end

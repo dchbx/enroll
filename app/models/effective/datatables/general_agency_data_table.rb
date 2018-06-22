@@ -7,6 +7,7 @@ module Effective
         table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|  link_to row.employer_profile.legal_name, employers_employer_profile_path(row.employer_profile.id) + "?tab=home" }, :filter => false, :sortable => true
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| number_to_obscured_fein(row.employer_profile.fein) }, :filter => false, :sortable => false
         table_column :roster_size, :label => 'EE Ct', :proc => Proc.new { |row| row.employer_profile.roster_size  }, :filter => false, :sortable => false
+        table_column :roster_size, :label => 'EE Ct', :proc => Proc.new { |row| row.employer_profile.roster_size  }, :filter => false, :sortable => false
         table_column :aasm_state, :label => 'Enroll Status', :proc => Proc.new { |row| row.employer_profile.aasm_state.humanize }, :filter => false, :sortable => true
         table_column :effective_date, :label => 'Effective Date', :proc => Proc.new {  |row|
               content_tag(:span) do

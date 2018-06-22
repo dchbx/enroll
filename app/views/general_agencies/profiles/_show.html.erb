@@ -1,6 +1,8 @@
 <div class="container bottom-pd">
   <h3>General Agency : <%= @general_agency_profile.legal_name %></h3>
-
+  <% if current_user.has_general_agency_staff_role? || current_user.has_hbx_staff_role? %>
+      <%= link_to "Edit General Agency", edit_general_agencies_profile_path(@general_agency_profile.id), class: 'btn btn-primary ' %>
+  <% end %>
   <div class="table-border table-responsive">
     <table class="table">
       <thead>

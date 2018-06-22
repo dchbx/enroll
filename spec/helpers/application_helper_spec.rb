@@ -88,11 +88,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
 
-    context ">100 census employees" do
-      let!(:employees) { FactoryGirl.create_list(:census_employee, 101, employer_profile: employer_profile) }
+    context ">200 census employees" do
+      let!(:employees) { FactoryGirl.create_list(:census_employee, 201, employer_profile: employer_profile) }
+      context "greater than 200 employees " do
+        context "active employees count greater than 200" do
+          it "does not display if active census employees > 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+          end
+        end
 
-      it "does not display" do
-        expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+        context "active employees count greater than 200" do
+
+          before do
+            employees.take(5).each do |census_employee|
+              census_employee.terminate_employee_role!
+            end
+          end
+
+          it "should display progress bar if active census employees < 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
+          end
+        end
       end
     end
 
@@ -209,7 +225,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 3
+      expect(helper.calculate_participation_minimum).to eq 4
     end
   end
 
@@ -391,6 +407,101 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "should return false when the current user is an admin & not working on new paper application" do
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
+    end
+  end
+
+  describe "#previous_year" do
+
+    it "should return past year" do
+      expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
+    end
+
+    it "should not return current year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year)
+    end
+
+    it "should not return next year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
+    end
+end
+
+  describe ".notify_employer_when_employee_terminate_coverage" do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:person) {FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person:person)}
+    let(:active_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on:TimeKeeper.date_of_record.end_of_month,aasm_state: "active",benefit_groups:[benefit_group]) }
+    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year]) }
+    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:employee_role) { FactoryGirl.create(:employee_role)}
+    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id)}
+
+    it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:enrollment_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(enrollment).to receive(:census_employee).and_return(census_employee)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      helper.notify_employer_when_employee_terminate_coverage(enrollment)
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('notify_employer_when_employee_terminate_coverage')).to be_truthy
+      expect(queued_job[:args].include?("#{enrollment.employer_profile.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
+    end
+  end
+
+
+  describe "convert_to_bool" do
+    let(:val1) {true }
+    let(:val2) {false }
+    let(:val3) {"true" }
+    let(:val4) {"false" }
+    let(:val5) {0 }
+    let(:val6) {1 }
+    let(:val7) {"0" }
+    let(:val8) {"1" }
+    let(:val9) {"khsdbfkjs" }
+
+
+    it "should be true when true is passed" do
+      expect(helper.convert_to_bool(val1)).to eq true
+    end
+
+    it "should be false when false is passed" do
+      expect(helper.convert_to_bool(val2)).to eq false
+    end
+
+    it "should be true when string 'true' is passed" do
+      expect(helper.convert_to_bool(val3)).to eq true
+    end
+
+    it "should be false when string 'false' is passed" do
+      expect(helper.convert_to_bool(val4)).to eq false
+    end
+
+    it "should be false when int 0 is passed" do
+      expect(helper.convert_to_bool(val5)).to eq false
+    end
+
+    it "should be true when int 1 is passed" do
+      expect(helper.convert_to_bool(val6)).to eq true
+    end
+
+    it "should be false when string '0' is passed" do
+      expect(helper.convert_to_bool(val7)).to eq false
+    end
+
+    it "should be true when string '1' is passed" do
+      expect(helper.convert_to_bool(val8)).to eq true
+    end
+
+    it "should raise error when non boolean values are passed" do
+      expect{helper.convert_to_bool(val9)}.to raise_error(ArgumentError)
     end
   end
 end

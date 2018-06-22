@@ -10,7 +10,7 @@ describe AddNewEligibilityDetermination, dbclean: :after_each do
   end
   describe "add a new eligibility determination to the person" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:tax_household){FactoryGirl.create(:tax_household, household:family.active_household)}
+    let!(:tax_household){FactoryGirl.create(:tax_household, household:family.active_household,effective_ending_on: nil)}
     let!(:eligibility_determinations){FactoryGirl.create(:eligibility_determination, tax_household:tax_household)}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(family.person.hbx_id)

@@ -20,12 +20,13 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#verification_type_status" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-    let(:types) { ["Social Security Number", "Citizenship", "Immigration status", "American Indian Status"] }
-    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin|
+    let(:types) { ["DC Residency", "Social Security Number", "Citizenship", "Immigration status", "American Indian Status"] }
+    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin, dob|
       before do
         uploaded_doc ? person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
         person.consumer_role.revert!(verification_attr) unless current_state
         person.consumer_role.tribal_id = "444444444" if verification_type == "American Indian Status"
+        person.dob = dob || Date.new(1991,11,10)
         if curam
           person.consumer_role.import!(verification_attr) if current_state == "valid"
           person.consumer_role.vlp_authority = "curam"
@@ -51,55 +52,28 @@ RSpec.describe VerificationHelper, :type => :helper do
     context "consumer role" do
       it_behaves_like "verification type status", "outstanding", "Social Security Number", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "review", false, false
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "American Indian Status", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "review", false, false
       it_behaves_like "verification type status", "outstanding", "Citizenship", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "Citizenship", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "Citizenship", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "Citizenship", true, "review", false, false
       it_behaves_like "verification type status", "outstanding", "Immigration status", false, "outstanding", false, false
       it_behaves_like "verification type status", "valid", "Immigration status", false, "verified", false, false
-      it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review", false, false
-      it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", "curam", false
-      it_behaves_like "verification type status", "outstanding", "Residency", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "Immigration status", true, "review", false, false
+      it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", false, false
+      it_behaves_like "verification type status", "outstanding", "DC Residency", true, "review", false, false
+      it_behaves_like "verification type status", "valid", "DC Residency", true, "attested", false, false, Date.new(2005,11,10)
+      it_behaves_like "verification type status", "valid", "DC Residency", true, "verified", false, false
+      it_behaves_like "verification type status", "valid", "Citizenship", true, "verified", false, false, Date.new(2005,11,10)
     end
 
     context "admin role" do
-      it_behaves_like "verification type status", "valid", "Immigration status", true, "curam", "curam", "admin"
+      it_behaves_like "verification type status", "valid", "Immigration status", true, "External Source", "curam", "admin"
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
-      it_behaves_like "verification type status", "valid", "Citizenbship", true, "curam", "curam", "admin"
+      it_behaves_like "verification type status", "valid", "Citizenbship", true, "External Source", "curam", "admin"
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
-    end
-
-    context 'verification type status attested' do
-      before :each do
-        person.dob = Date.new(2010,11,10)
-      end
-      it 'returns attested if age <= 18 and type is residency' do
-        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
-      end
-
-      it 'returns attested if age <= 18 and type is residency' do
-        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
-      end
-
-      it 'does not return attested if age > 18 and type is residency' do
-        person.dob = Date.new(1988,11,10)
-        person.consumer_role.update_attributes!(local_residency_validation: 'valid')
-        expect(helper.verification_type_status('DC Residency', person)).not_to eq('attested')
-      end
-
-      it 'does not return attested if age <= 18 and type is social security number ' do
-        expect(helper.verification_type_status('Social Security Number', person)).not_to eq('attested')
-      end
-
-      it 'returns outstanding if age > 18 and type is residency' do
-        person.dob = Date.new(1988,11,10)
-        person.consumer_role.native_validation = "outstanding"
-        person.consumer_role.mark_residency_denied
-        expect(helper.verification_type_status('DC Residency', person)).to eq('outstanding')
-      end
     end
   end
 
@@ -290,29 +264,29 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
 
     it 'returns info when the status is in review and outstanding' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['in review', 'outstanding'])
+      allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'outstanding'])
       expect(helper.review_button_class(family)).to eq('info')
     end
 
     it 'returns success when the status is in review ' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['in review'])
+      allow(helper).to receive(:get_person_v_type_status).and_return(['review'])
       expect(helper.review_button_class(family)).to eq('success')
     end
 
     it 'returns sucsess when the status is verified and in review but no outstanding' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['in review', 'verified'])
+      allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'verified'])
       expect(helper.review_button_class(family)).to eq('success')
     end
   end
 
-  describe '#get_person_v_types' do
+  describe '#get_person_v_type_status' do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    it 'returns verification types of the person' do
+    it 'returns verification types states of the person' do
       status = 'verified'
       allow(helper).to receive(:verification_type_status).and_return(status)
       persons = family.family_members.map(&:person)
 
-      expect(helper.get_person_v_type_status(persons)).to eq([status])
+      expect(helper.get_person_v_type_status(persons)).to eq([status, status])
     end
   end
 
@@ -320,58 +294,58 @@ RSpec.describe VerificationHelper, :type => :helper do
     context "SSN" do
       it "returns in review if documents for ssn uploaded" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
-        expect(helper.show_v_type('Social Security Number', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Review")
       end
       it "returns verified if ssn_validation is valid" do
         person.consumer_role.ssn_validation = "valid"
-        expect(helper.show_v_type('Social Security Number', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Verified")
       end
       it "returns outstanding for unverified without documents and more than 24hs request" do
-        expect(helper.show_v_type('Social Security Number', person)).to eq("Outstanding")
+        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Outstanding")
       end
-      it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:processing_hub_24h?).and_return true
-        expect(helper.show_v_type('Social Security Number', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
+      it "returns processing if consumer has pending state" do
+        allow_any_instance_of(ConsumerRole).to receive(:ssa_pending?).and_return true
+        expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
     context "Citizenship" do
       it "returns in review if documents for citizenship uploaded" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "citizenship")
-        expect(helper.show_v_type('Citizenship', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Review")
       end
       it "returns verified if lawful_presence_determination successful" do
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
-        expect(helper.show_v_type('Citizenship', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Verified")
       end
       it "returns outstanding for unverified citizenship and more than 24hs request" do
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Citizenship', person)).to eq("Outstanding")
+        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Outstanding")
       end
       it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:processing_hub_24h?).and_return true
+        allow_any_instance_of(ConsumerRole).to receive(:citizenship_immigration_processing?).and_return true
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Citizenship', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
+        expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
     context "Immigration status" do
       it "returns in review if documents for citizenship uploaded" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Immigration status")
-        expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Review")
       end
       it "returns verified if lawful_presence_determination successful" do
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
-        expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Verified")
       end
       it "returns outstanding for unverified citizenship and more than 24hs request" do
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Immigration status', person)).to eq("Outstanding")
+        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Outstanding")
       end
       it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:processing_hub_24h?).and_return true
+        allow_any_instance_of(ConsumerRole).to receive(:citizenship_immigration_processing?).and_return true
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
+        expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
     context 'DC Residency' do
@@ -379,23 +353,23 @@ RSpec.describe VerificationHelper, :type => :helper do
         person.consumer_role.local_residency_validation = 'pending'
         person.consumer_role.is_state_resident = false
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "DC Residency")
-        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Review")
       end
       it 'returns verified if residency is valid' do
         allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return true
         person.consumer_role.local_residency_validation = 'valid'
-        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Verified")
       end
       it 'returns outstanding for residency outstanding' do
-        person.consumer_role.local_residency_validation = 'outstanding'
+        person.consumer_role.is_state_resident = false
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person)).to eq('Outstanding')
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq('Outstanding')
       end
       it 'returns processing if consumer has pending state and no response from hub less than 24hours' do
-        person.consumer_role.local_residency_validation = 'outstanding'
-        allow_any_instance_of(ConsumerRole).to receive(:processing_residency_24h?).and_return true
+        person.consumer_role.is_state_resident = false
+        person.consumer_role.local_residency_validation = "pending"
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
   end
@@ -535,7 +509,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe "#build_reject_reason_list" do
     shared_examples_for "reject reason dropdown list" do |type, reason_in, reason_out|
       before do
-        allow(helper).to receive(:verification_type_status).and_return "in review"
+        allow(helper).to receive(:verification_type_status).and_return "review"
       end
       it "includes #{reason_in} reject reason for #{type} verification type" do
         expect(helper.build_reject_reason_list(type)).to include reason_in

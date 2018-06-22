@@ -17,7 +17,8 @@
         <% if action_name == 'find_sep'%>
         <% url, http_method = record_sep_insured_families_path, :post %>
         <% end %>
-        <%= form_tag url, method: http_method, class: 'input-no-pd', id: 'qle_form' do %>
+        <div class="alert alert-danger hidden" id='qle_effective_on_kind_alert-4' role="alert">Please Select Effective Date</div>
+        <%= form_tag url, method: http_method, class: 'input-no-pd qle-detail-for-existing-kind', id: 'qle_form' do %>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div id='qle-date-chose'>
             <h3 class="qle-details-title darkblue text-center">I got married</h3>

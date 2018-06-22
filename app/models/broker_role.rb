@@ -112,6 +112,10 @@ class BrokerRole
     self.broker_agency_profile_id.present?
   end
 
+  def can_update_carrier_appointments?
+   active?
+  end
+
   def address=(new_address)
     parent.addresses << new_address
   end

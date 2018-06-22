@@ -61,6 +61,7 @@ class CensusEmployee < CensusMember
   after_save :assign_default_benefit_package
 
   before_save :allow_nil_ssn_updates_dependents
+  after_save :construct_employee_role
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -86,6 +87,7 @@ class CensusEmployee < CensusMember
   scope :without_cobra,     ->{ not_in(aasm_state: COBRA_STATES) }
   scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
+  scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -191,13 +193,11 @@ class CensusEmployee < CensusMember
   def employee_role=(new_employee_role)
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
-
     # Guard against linking employee roles with different employer/identifying information
     if (self.employer_profile_id == new_employee_role.employer_profile._id)
       self.employee_role_id = new_employee_role._id
-      self.link_employee_role
       @employee_role = new_employee_role
-      self
+      self.link_employee_role! if self.may_link_employee_role?
     else
       message =  "Identifying information mismatch error linking employee role: "\
                  "#{new_employee_role.inspect} "\
@@ -410,13 +410,20 @@ class CensusEmployee < CensusMember
     "employee"
   end
 
-  def build_from_params(census_employee_params, benefit_group_id)
-    self.attributes = census_employee_params
-
+  def assign_benefit_packages(benefit_group_id: nil, renewal_benefit_group_id: nil)
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-      new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, self)
-      self.benefit_group_assignments = new_benefit_group_assignment.to_a
+      
+      if active_benefit_group_assignment.blank? || (active_benefit_group_assignment.benefit_group_id != benefit_group.id)
+        find_or_create_benefit_group_assignment([benefit_group])
+      end
+    end
+
+    if renewal_benefit_group_id.present?
+      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
+      if renewal_benefit_group_assignment.blank? || (renewal_benefit_group_assignment.benefit_group_id != benefit_group.id)
+        add_renew_benefit_group_assignment(benefit_group)
+      end
     end
   end
 
@@ -431,15 +438,32 @@ class CensusEmployee < CensusMember
     false
   end
 
+  def construct_employee_role
+    return @construct_role if defined? @construct_role
+    @construct_role = true
+
+    if active_benefit_group_assignment.present?
+      send_invite! if _id_changed?
+
+      if employee_role.present?
+        self.link_employee_role! if may_link_employee_role?
+      else
+        construct_employee_role_for_match_person if has_benefit_group_assignment?
+      end
+    end
+  end
+
   def construct_employee_role_for_match_person
     employee_relationship = Forms::EmployeeCandidate.new({first_name: first_name,
                                                           last_name: last_name,
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
+
     return false if person.blank? || (person.present? &&
                                       person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
+    self.trigger_notices("employee_eligibility_notice")#sends EE eligibility notice to census employee
     return true
   end
 
@@ -465,6 +489,14 @@ class CensusEmployee < CensusMember
       end
     else
       aasm_state.humanize
+    end
+  end
+
+  def trigger_notice(event)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event.humanize} - notice to census employee - #{self.full_name} due to #{e}" }
     end
   end
 
@@ -768,6 +800,14 @@ class CensusEmployee < CensusMember
     COBRA_STATES.include? aasm_state
   end
 
+  def trigger_notices(event_name)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event_name)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event_name.humanize} to #{self.full_name} due to #{e}" }
+    end
+  end
+
   def existing_cobra=(cobra)
     self.aasm_state = 'cobra_eligible' if cobra == 'true'
   end
@@ -861,7 +901,7 @@ class CensusEmployee < CensusMember
 
   def has_no_hbx_enrollments?
     return true if employee_role.blank?
-    !benefit_group_assignments.detect { |bga| bga.hbx_enrollment.present? }
+    !benefit_group_assignments.detect { |bga| bga.hbx_enrollment.present? && !HbxEnrollment::CANCELED_STATUSES.include?(bga.hbx_enrollment.aasm_state)}
   end
 
   def check_employment_terminated_on

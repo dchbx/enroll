@@ -32,6 +32,7 @@
     %premium_amount= (hbx_enrollment.premium_for(hbx_enrollment_member).round(2))
     %begin_date= simple_date_for(hbx_enrollment.effective_on)
     - if (HbxEnrollment::TERMINATED_STATUSES + ['coverage_termination_pending']).include?(hbx_enrollment.aasm_state)
-      %end_date= simple_date_for(hbx_enrollment.terminated_on)
+      - if !hbx_enrollment.terminated_on.blank?
+        %end_date= simple_date_for(hbx_enrollment.terminated_on)
     - elsif (HbxEnrollment::CANCELED_STATUSES).include?(hbx_enrollment.aasm_state)
       %end_date= simple_date_for(hbx_enrollment.effective_on)

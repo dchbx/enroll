@@ -634,9 +634,19 @@ class Family
   # @example Which family members are non-primary applicants?
   #   model.dependents
   #
-  # @return [ Array<FamilyMember> ] the list of dependents
+  # @return [ Array<FamilyMember> ] the list of dependents are active and inactive
   def dependents
     family_members.reject(&:is_primary_applicant)
+  end
+
+  # Get list of family members who are not the primary applicant
+  #
+  # @example Which family members are non-primary applicants?
+  #   model.dependents
+  #
+  # @return [ Array<FamilyMember> ] the list of dependents are active
+  def active_dependents
+    family_members.reject(&:is_primary_applicant).find_all { |family_member| family_member.is_active? }
   end
 
   def people_relationship_map
@@ -1055,8 +1065,7 @@ class Family
   end
 
   def is_document_not_verified(type, person)
-    verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified" &&
-    verification_type_status(type, person, person.hbx_staff_role?) != "curam"
+    ["valid", "attested", "verified", "External Source"].include?(verification_type_status(type, person))?  false : true
   end
 
   def has_valid_e_case_id?

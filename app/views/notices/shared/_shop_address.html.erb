@@ -1,12 +1,14 @@
 <table class="total_table address" border="0">
   <tbody>
+  </br>
     <tr>
       <td><br></br></td>
     </tr>
     <tr>
       <td><%= notice.primary_fullname %></td>
     </tr>
-    <% if (notice.shop? && !notice.employee_notice?) %>
+    <% if (notice.shop? && !notice.employee_notice? && !notice.general_agency? && !notice.broker?) %>
+
     <tr class="fssize1">
       <td><%= notice.employer_name %></td>
     </tr>
@@ -26,12 +28,12 @@
       <td style="text-align: right;"><%= notice.mpi_indicator %></td>
     <% end %>
     </tr>
-    <% if (notice.primary_address.street_2.blank? || (notice.shop? && !notice.employee_notice?) == false) %>
+    <% if (notice.primary_address.street_2.blank? || (notice.shop? && !notice.employee_notice? && !notice.broker?) == false) %>
     <tr>
       <td><br></td>
     </tr>
     <% end %>
-    <% if (notice.shop? && !notice.employee_notice?) == false %>
+    <% if (notice.shop? && !notice.employee_notice? && !notice.broker?) == false %>
     <tr>
       <td><br></td>
     </tr>
