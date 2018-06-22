@@ -13,7 +13,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerIneligibilityNotice do
                             :notice_template => 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
                             :notice_builder => 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
                             :event_name => 'renewal_employer_ineligibility_notice',
-                            :mpi_indicator => 'MPI_SHOP19',
+                            :mpi_indicator => 'SHOP_D019',
                             :title => "Group Ineligible to Obtain Coverage"})
                           }
     let(:valid_parmas) {{

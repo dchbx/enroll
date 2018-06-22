@@ -434,7 +434,7 @@ shop_notice_triggers = [
         name: 'Renewal Group Ineligible to Obtain Coverage',
         notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_SHOP19',
+        mpi_indicator: 'SHOP_D019',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
