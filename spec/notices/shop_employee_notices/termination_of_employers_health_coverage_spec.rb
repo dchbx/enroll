@@ -14,7 +14,7 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
     start_on: benefit_coverage_period_2018.start_on + 1.year, 
     end_on: benefit_coverage_period_2018.end_on + 1.year, 
     open_enrollment_start_on: benefit_coverage_period_2018.open_enrollment_start_on+1.year, 
-    open_enrollment_end_on: benefit_coverage_period_2018.open_enrollment_end_on+1.year, 
+    open_enrollment_end_on: Date.new(2019,1,31), 
     benefit_sponsorship: benefit_sponsorship)}
 
   let(:plan) { FactoryGirl.create(:plan) }
