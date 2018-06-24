@@ -1,0 +1,32 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><%= notice.employer_name %> has Removed you as their Broker</td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px">Dear <%= notice.primary_fullname %>,</td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is to inform you that #{notice.primary_fullname} is no longer the broker of record for #{notice.employer_name} as of #{notice.termination_date}. You will no longer be authorized to access #{notice.employer_name}’s #{Settings.site.short_name} Account or take action on behalf of #{notice.employer_name} or any employees of #{notice.employer_name}."} %>
+<br>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph', locals: 
+  { content: "Please contact #{Settings.site.short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["By calling #{Settings.contact_center.phone_number}", "TTY: #{Settings.contact_center.tty}", "Online at <a href=#{Settings.site.home_url}> #{Settings.site.website_name}</a>"] } %>

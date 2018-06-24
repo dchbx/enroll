@@ -161,6 +161,7 @@ $(function () {
   });
 
 	/* QLE Date Validator */
+  $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
     if(check_qle_date()) {
       $('#qle_date').removeClass('input-error');
@@ -199,6 +200,24 @@ $(function () {
           $('#qle_effective_on_kind_alert').hide();
         }
       });
+    }
+  });
+
+  $(document).on('submit', '.qle-detail-for-existing', function(e) {
+    if($('#effective_on_option').val() == ''){
+      $('#qle_effective_on_kind_alert').removeClass('hidden');
+      e.preventDefault()
+    }else{
+      $('#qle_effective_on_kind_alert').addClass('hidden');
+    }
+  });
+
+  $(document).on('submit', '.qle-detail-for-existing-kind', function(e) {
+    if($('#qle_date').val() == ''){
+      $('#qle_effective_on_kind_alert-4').removeClass('hidden');
+      e.preventDefault()
+    }else{
+      $('#qle_effective_on_kind_alert-4').addClass('hidden');
     }
   });
 

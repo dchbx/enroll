@@ -1,10 +1,10 @@
 <% content_for :navigation do %>
     <%= render 'navigation' %>
 <% end %>
-<h1 class="darkblue no-buffer">Paper Application Upload</h1>
+<h1 class="no-buffer"><%= l10n("paper_application_upload") %></h1>
 <div class="documents-tab">
   <% if @person && @person.resident_role %>
-      <h4 class="starter">Please upload the paper application you received to complete the online enrollment
+      <h4 class="starter"><%= l10n(".upload_paper_application_to_complete") %></h4>
         application for CoverAll.</h4>
 
         <%= render 'insured/families/coverall/coverall' %>

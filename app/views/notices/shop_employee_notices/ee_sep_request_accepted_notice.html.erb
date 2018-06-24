@@ -1,0 +1,70 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: 'notices/shared/shop_address', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><strong>Email notification sent to:</strong> <%= notice.primary_email %></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Special Enrollment Period Approval</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Based on the information you provided on #{TimeKeeper.date_of_record}, you and any eligible dependents were determined eligible for a special enrollment period based on your qualifying event, #{notice.sep.title}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "If you have not already done so, you and any eligible dependents can now enroll in an employer-sponsored health insurance plan through #{Settings.site.short_name} with <strong>#{notice.employer_name}</strong>. If you are already enrolled in employer-sponsored health insurance through #{Settings.site.short_name}, you are now eligible to make changes to your insurance plan. If you are already enrolled in a #{Settings.site.short_name} plan and do not make any changes, your current plan enrollment will continue."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "<strong>You must make changes to your plan before #{notice.sep.end_on.strftime("%m/%d/%Y")}. The day the coverage changes take effect depends on the qualifying event you experienced</strong>. In most cases, the changes will take effect on the first day of the month after you experienced a qualifying event. In cases of birth, adoption, placement for adoption, and placement of a foster child, you are eligible to select an effective date on the date of the event."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "<strong>Selecting an Employer-sponsored Insurance Plan</strong>"} %>
+  
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "To select your new insurance plan, login to your online account and click on the life event you experienced in the “Have Life Changes?” menu on the right side of your account. For step-by-step instructions for how to enroll through your SEP, please see the walkthrough guides below. Additional resources are available in the <a href='https://dchealthlink.com/forms#en'>Forms</a> section on <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a> and in the “For Questions or Assistance” section below. "} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "",
+  listings: ["<a href='https://dchealthlink.com/sites/default/files/v2/forms/Qualifying_Life_Events_QLEs_Removing_a_Dependent.pdf'>Qualifying Life Events (QLEs) - Removing a Dependent</a>",
+            "<a href='https://dchealthlink.com/sites/default/files/v2/forms/Qualifying_Life_Events_QLEs_Enrolling_in_a_New_Plan.pdf'>Qualifying Life Events (QLEs) - Enrolling in a New Plan</a>",
+            "<a href='https://dchealthlink.com/sites/default/files/v2/forms/Qualifying_Life_Events_QLEs_Adding_a_Dependent.pdf'>Qualifying Life Events (QLEs) - Adding a Dependent</a>",
+            "<a href='https://dchealthlink.com/sites/default/files/v2/forms/Qualifying_Life_Events_QLEs_Terminating_Coverage.pdf'>Qualifying Life Events (QLEs) - Terminating Coverage</a>"]} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""],
+  heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:",
+  listings: ["By calling #{notice.hbe.phone}.",
+            "TTY: #{Settings.contact_center.tty}",
+            "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 CFR 155.725."} %>
+ 

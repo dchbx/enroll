@@ -28,6 +28,12 @@ RSpec.describe Employers::BrokerAgencyController do
 
   describe ".index" do
 
+    it "should render js template" do
+      sign_in(@user)
+      xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name
+      expect(response.content_type).to eq Mime::JS
+    end
+
     context 'with out search string' do
       before(:each) do
         sign_in(@user)
@@ -58,6 +64,41 @@ RSpec.describe Employers::BrokerAgencyController do
         expect(assigns(:broker_agency_profiles)).to eq([@org2.broker_agency_profile])
       end
     end
+
+    context 'with search string and pagination' do
+      before :each do
+        sign_in(@user)
+        xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name, organization_page: 1, format: :js
+      end
+
+      it 'should return matching agency' do
+        expect(assigns(:broker_agency_profiles)).to eq([@org2.broker_agency_profile])
+      end
+    end
+
+    context 'with page label and pagination' do
+      before :each do
+        sign_in(@user)
+        xhr :get, :index, employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 1, format: :js
+      end
+
+      it 'should return matching agency' do
+        expect(assigns(:broker_agency_profiles).count).to eq 2
+        expect(assigns(:broker_agency_profiles)).to eq([@org1.broker_agency_profile,@org2.broker_agency_profile])
+      end
+    end
+
+    context 'with page label and invalid pagination number' do
+      before :each do
+        sign_in(@user)
+        xhr :get, :index, employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 120, format: :js
+      end
+      it 'should return matching agency' do
+        expect(assigns(:broker_agency_profiles).count).to eq 0
+        expect(assigns(:broker_agency_profiles)).to eq([])
+      end
+    end
+
   end
 
   describe ".create" do
@@ -84,6 +125,29 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should be a success" do
         expect(flash[:error]).to match(/Access not allowed/)
+      end
+    end
+
+    context '#trigger notice' do
+      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, default_general_agency_profile_id: general_agency_profile.id) }
+      let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+      let(:person) { broker_role.person }
+      let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+      let(:organization) { FactoryGirl.create(:organization) }
+      let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile, organization: organization) }
+      let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
+
+      it "should call general_agency_hired_notice trigger " do
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in(@user)
+        post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role.id, broker_agency_id: broker_agency_profile.id
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs
+        expect(queued_job.any? {|h| (h[:args].include?('general_agency_hired_notice') && h[:job] == ShopNoticesNotifierJob)}).to eq true
+        expect(queued_job.any? {|h| (h[:args].include?("#{general_agency_profile.id.to_s}") && h[:job] == ShopNoticesNotifierJob)}).to eq true
+        expect(queued_job.any? {|h| (h[:args].third["employer_profile_id"]) == employer_profile.id.to_s if h[:args].include?('general_agency_hired_notice')}).to eq true
       end
     end
   end
@@ -176,6 +240,21 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+
+    end
+
+    it "should send notice to employer, broker and agency" do
+      @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
+      @org2.broker_agency_profile.save
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired"]}).to eq true
+      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_agency_hired"]}).to eq true
+      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired_confirmation_notice"]}).to eq true
     end
 
     context "send_broker_assigned_msg" do

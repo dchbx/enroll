@@ -2,11 +2,11 @@
   <div class="col-xs-6">
     <h4>
       <% if can_show_due_date?(@person) %>
-          Document Due Date:&nbsp;&nbsp;
-          <% if (@person.primary_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= @person.primary_family.min_verification_due_date_on_family %> (Past Due)</span>
+          <%= l10n("document_due_date") %>:&nbsp;&nbsp;
+          <% if (@person.primary_family.best_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
+              <span class="label label-danger"><%= @person.primary_family.best_verification_due_date %> (Past Due)</span>
           <% else %>
-              <span class="label label-warning"><%= (@person.primary_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) %></span>
+              <span class="label label-warning"><%= (@person.primary_family.best_verification_due_date || TimeKeeper.date_of_record + 95.days) %></span>
           <% end %>
       <% end %>
     </h4>
@@ -29,7 +29,7 @@
                   <div class="v-type-name col-md-2">
                     <%= v_type %>
                   </div>
-                  <div class="v-type-status col-md-2">
+                  <div class="v-type-status col-md-2 text-center">
                     <% if f_member.is_applying_coverage %>
                       <span class="label lb-md label-<%=verification_type_class(v_type, person, current_user.has_hbx_staff_role?)%>">
                         <%= show_v_type(v_type, person, current_user.has_hbx_staff_role?) %>
@@ -40,7 +40,7 @@
 
                   <div class="v-type-due-date col-md-3">
                     <% if can_show_due_date?(@person, f_member: f_member, v_type: v_type) %>
-                      <span class="text-danger">Due Date:</span>
+                      <span class="text-danger"><%= l10n('due_date') %></span>
                       <%= f_member.family.document_due_date(f_member, v_type).present? ? f_member.family.document_due_date(f_member, v_type).to_date : TimeKeeper.date_of_record + 95.days %>
                     <% end %>
                   </div>
@@ -50,7 +50,7 @@
                       <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
                         <span class="btn btn-default btn-file">
                           <i class="fa fa-upload" aria-hidden="true"></i>
-                          Upload Documents
+                          <%= l10n('upload_documents') %>
                           <%= file_field_tag "file[]", type: :file, accept: 'image/png,image/gif,image/jpeg,application/pdf', class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
                         </span  >
                         <%= hidden_field_tag 'family_member', f_member.id  %>
@@ -83,7 +83,7 @@
                           </div>
                           <div class="v-doc col-md-1">
                             <span class="<%=pundit_class(Family, :updateable?)%>" >
-                              <%= link_to document_path(vlp_doc, :person_id => person.id), method: :delete, remote: true do %>
+                              <%= link_to document_path(vlp_doc, :person_id => person.id,:family_member_id => f_member.id, :verification_type => v_type, :doc_title => vlp_doc.title.titleize), method: :delete do %>
                                 <i class="fa fa-trash-o fa-lg pull-right" title="Delete"></i>
                               <% end %>
                             </span>
@@ -105,12 +105,12 @@
 <div class="row">
   <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>
-      <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
+        <%= link_to l10n("insured.families.verification.complete_verification_for_enrollment"), enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: l10n("insured.families.verification.complete_verification_for_enrollment_confirm") } %>
     <% end %>
   </div>
   <div class="col-xs-6">
     <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button">
-    Documents FAQ
+      <%= l10n("insured.families.verification.documents_FAQ") %>
     </a>
   </div>
 </div>

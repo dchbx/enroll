@@ -4,9 +4,9 @@
 
   <div class="panel-heading">
     <h4>
-      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind.capitalize %> Coverage
+      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind.capitalize %> <%= l10n("coverage") %>
       <span class="separator">
-        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
+        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
       </span>
     </h4>
   </div>
@@ -20,7 +20,7 @@
           <div><p><%= render_plan_type_details(plan) %></p></div>
           <div>
             <p>
-              <label>Premium:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
+              <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/<%= l10n("month").to_s.downcase %>
               <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.hbx_id %></strong>
             </p>
           </div>
@@ -35,12 +35,12 @@
               </p>
             </div>
             <div>
-              <label>Effective date: </label>
+              <label><%= l10n("effective_date") %>: </label>
               <strong><%= hbx_enrollment.effective_on %></strong>
             </div>
             <% if hbx_enrollment.is_shop? %>
               <div>
-                <label>Termination date: </label>
+                <label><%= l10n("termination_date") %>: </label>
                 <strong><%= @family.terminate_date_for_shop_by_enrollment(hbx_enrollment) %></strong>
               </div>
             <% end %>
@@ -60,15 +60,15 @@
           </div>
           <div class="col-xs-4">
             <a href="#">
-              <i class="fa fa-phone fa-2x pull-left"></i><div class="fa-icon-label">Plan Contact Info</div>
+              <i class="fa fa-phone fa-2x pull-left"></i><div class="fa-icon-label"><%= l10n("plan_contact_info") %></div>
             </a>
           </div>
           <div class="col-xs-4">
 
             <% if hbx_enrollment.may_terminate_coverage? && ["individual", 'coverall'].include?(hbx_enrollment.kind) %>
-              <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-primary btn-md'} %>
+              <%= link_to l10n("terminate_plan"), terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-primary btn-md'} %>
               <% elsif hbx_enrollment.may_terminate_coverage? %>
-                <%= link_to 'Terminate Plan', '#', data: {toggle: "modal", target: "#terminate_confirm_#{hbx_enrollment.id}"}, class: 'btn btn-primary btn-md' %>
+                <%= link_to l10n("terminate_plan"), '#', data: {toggle: "modal", target: "#terminate_confirm_#{hbx_enrollment.id}"}, class: 'btn btn-primary btn-md' %>
                 <%= render :partial => "insured/families/terminate_confirmation", :locals => {:enrollment => hbx_enrollment} %>
               <% end %>
           </div>

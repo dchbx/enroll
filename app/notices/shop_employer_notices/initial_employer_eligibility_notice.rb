@@ -13,7 +13,7 @@ class ShopEmployerNotices::InitialEmployerEligibilityNotice < ShopEmployerNotice
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.first
+    plan_year = employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "published"]).first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
           :open_enrollment_start_on => plan_year.open_enrollment_start_on,

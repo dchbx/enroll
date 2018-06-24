@@ -1,0 +1,62 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: 'notices/shared/shop_address', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice}%>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Ineligible for SHOP Coverage Offered through <%= Settings.site.short_name %></h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>,</td>
+    </tr>
+  </tbody>
+</table>
+
+<% if !notice.census_employee.health_enrollment.present? && !notice.census_employee.dental_enrollment.present? %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+    { content: "This letter is notification that your employer, <strong>#{notice.employer_name}</strong>, removed you from their list of employees eligible for employer-sponsored insurance. Your employer has indicated that, effective <strong>#{notice.census_employee.employment_terminated_on}</strong>, you are no longer eligible for employer-sponsored insurance.", bottom_margin: '5px', top_margin: '5px'} %>
+<% end %>
+
+<% if notice.census_employee.health_enrollment.present? && !notice.census_employee.dental_enrollment.present?%>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+    { content: "This letter is notification that your employer, <strong>#{notice.employer_name}</strong>, removed you from their list of employees eligible for employer-sponsored insurance. Your coverage into <strong>#{notice.census_employee.health_enrollment.plan.plan_name}</strong> for you and any covered dependents ends on <strong>#{notice.census_employee.coverage_terminated_on}</strong>, due to your loss of eligibility on <strong>#{notice.census_employee.employment_terminated_on}</strong>.", bottom_margin: '5px', top_margin: '5px'} %>
+<% end %>
+
+<% if notice.census_employee.dental_enrollment.present? && notice.census_employee.health_enrollment.present?%>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
+    { content: "This letter is notification that your employer, <strong>#{notice.employer_name}</strong>, removed you from their list of employees eligible for employer-sponsored health insurance. Your coverage into <strong>#{notice.census_employee.health_enrollment.plan.plan_name}</strong> and <strong>#{notice.census_employee.dental_enrollment.plan.plan_name}</strong> for you and any covered dependents ends on <strong>#{notice.census_employee.coverage_terminated_on}</strong>, due to your loss of eligibility on <strong>#{notice.census_employee.employment_terminated_on}</strong>.", bottom_margin: '5px', top_margin: '5px'} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: ["If you are enrolled in <strong>#{notice.employer_name}</strong>’s health coverage, you may be eligible for a Special Enrollment Period (SEP), during which you can purchase coverage for yourself and your family members through #{Settings.site.short_name}’s individual marketplace. You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance."], heading: 'You May be Eligible for Other Coverage', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can report your loss of coverage to enroll through a Special Enrollment Period up to 60 days prior to the date of the loss of coverage and must report it no later than 60 days after the date of the loss of coverage, beginning #{notice.census_employee.coverage_terminated_on - 60.days} until #{notice.census_employee.coverage_terminated_on + 60.days}. To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment period, which begins <strong>November 1<sup>st</sup></strong> of each year. Please log into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you are not a resident of the #{Settings.aca.state_name}, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs. To find the Health Insurance Marketplace in your state, go to <a href=#{Settings.site.healthcare_url}>#{Settings.site.healthcare_name}</a>."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "If you are eligible to participate in another employer's plan, contact that employer promptly to enroll. While you may generally have a 60-day Special Enrollment Period to enroll in individual market #{Settings.site.short_name} coverage, you typically only have a 30-day Special Enrollment Period to enroll in another employer’s group health plan.", bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Please contact your employer or your broker for further assistance."} %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "Contact your employer further assistance."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling #{notice.hbe.phone}",
+                                                                    "TTY: #{Settings.contact_center.tty}",
+                                                                    "Online at <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a>"] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is being provided in accordance with 45 C.F.R. 155.715(f) and 155.735(g)."} %>

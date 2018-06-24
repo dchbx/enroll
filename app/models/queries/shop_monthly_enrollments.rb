@@ -126,7 +126,7 @@ module Queries
         "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
         "households.hbx_enrollments.effective_on" => @effective_on,
         # Exclude COBRA, for now
-        "households.hbx_enrollments.kind" => "employer_sponsored"
+        "households.hbx_enrollments.kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]}
       }
     end
 

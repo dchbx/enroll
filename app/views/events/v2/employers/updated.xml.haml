@@ -28,7 +28,7 @@
         :locals => { :employer_profile => employer }
     - if manual_gen
       %plan_years
-        = render :partial => "events/v2/employers/plan_year", :collection => [employer.published_plan_year, employer.renewing_published_plan_year].compact
+        = render :partial => "events/v2/employers/plan_year", :collection => plan_years_for_manual_export(employer)
     - elsif employer_plan_years(employer).present?
       %plan_years
         = render :partial => "events/v2/employers/plan_year", :collection => employer_plan_years(employer)

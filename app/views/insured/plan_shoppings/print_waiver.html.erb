@@ -6,12 +6,12 @@
 
           <h3>Waiver confirmation</h3>
           <p>You have successfully waived the coverage at <%= @hbx_enrollment.updated_at %>. </p>
-          <p>Waiver Reason : <%= @hbx_enrollment.waiver_reason %>. </p>
+          <%= l10n("insured.plan_shoppings.print_waiver.print_waiver_html", updated_at: @hbx_enrollment.updated_at, waiver_reason: @hbx_enrollment.waiver_reason) %>
           <p>Please print this page for your records. </p>
 
         </div>
 
-        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-waiver-confirmation", style: "float:left;" %>
+        <%= link_to l10n('print'), '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-waiver-confirmation", style: "float:left;" %>
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section waiver_receipt">

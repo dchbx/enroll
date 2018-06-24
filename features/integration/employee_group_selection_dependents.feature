@@ -20,7 +20,7 @@ Feature: Employee goes through plan shopping with dependents when employer offer
     When Employee clicks confirm member
     Then Employee should see 1 dependents
     When Employee clicks continue on the dependents page
-    Then Employee should see the group selection page with health or dental dependents list
+    Then Employee should see all the family members names
     When Employee clicks health radio on the group selection page
     When Employee clicks continue on the group selection page
     Then Employee should see the plan shopping page with no dependent

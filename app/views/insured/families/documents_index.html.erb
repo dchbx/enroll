@@ -5,16 +5,16 @@
 <div class="documents-tab">
   <div class="row">
     <div class="col-xs-8">
-      <h1>Documents</h1>
+      <h1><%= l10n("documents") %></h1>
       <h4 class="starter">
-        The Documents folder is a safe and convenient way for you to view and keep track of important notices and communications you receive from <%= Settings.site.short_name %>. You'll receive an email notification when there are new documents for you to review.
+        <%= l10n("insured.families.documents_view_important_noticies", site_short_name: Settings.site.short_name) %>
       </h4>
     </div>
     <div class="col-xs-4">
-      <%= link_to "Download Tax Documents", 'https://www.dchealthlink.com/individuals/tax-documents', class: "btn btn-primary  pull-right", target: '_blank' if @person.try(:consumer_role).present? %>
-      <%= link_to "Upload Document", document_upload_insured_families_path, class: "btn btn-primary  pull-right" if @person.try(:consumer_role).present? %>
+      <%= link_to l10n("download_tax_documents"), 'https://www.dchealthlink.com/individuals/tax-documents', class: "btn btn-primary  pull-right", target: '_blank' if @person.try(:consumer_role).present? %>
+      <%= link_to l10n("upload_document"), document_upload_insured_families_path, class: "btn btn-primary  pull-right" if @person.try(:consumer_role).present? %>
     </div>
   </div>
-  <h4 class="starter">We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.</h4>
+  <h4 class="starter"><%= l10n("insured.families.documents_index_verify_information") %></h4>
   <%= render partial: "documents_index" %>
 </div>

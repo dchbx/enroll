@@ -146,3 +146,11 @@ Scenario: A company  at least one active linked employer staff can delete pendin
     Then Point of Contact count is 2
     When Fred removes EmployerStaffRole from Sam
     Then Point of Contact count is 1
+
+Scenario: A employer should not see Get Help from Broker
+    Given an employer exists
+    Given the employer has draft plan year
+    Given the employer has broker agency profile
+    Given the employer is logged in
+    When they visit the Employer Home page
+    Then employer should not see the Get Help from Broker

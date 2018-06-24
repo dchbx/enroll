@@ -1,9 +1,9 @@
 <div class="container-fluid">
-  <h3 style='text-align:center'>Plan Comparison Chart</h3>
+  <h3 style='text-align:center'><%= l10n("plan_comparison_chart")%></h3>
   <div class="mygrid-wrapper-div">
    <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
         <tr>
-          <th class="row-title">Plans</th>
+          <th class="row-title"><%= l10n("plans")%></th>
           <% qhps.each do |qhp|%>
             <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'><%= display_carrier_logo(Maybe.new(qhp.plan), { width: 80, pdf: true }) %></th>
           <% end %>
@@ -23,7 +23,7 @@
           <% end %>
         </tr>
         <tr>
-          <th>Provider Network</th>
+          <th><%= l10n("provider_network")%></th>
           <% qhps.each do |qhp|%>
             <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
           <% end %>
@@ -48,7 +48,7 @@
             <% qhps.each do |qhp|%>
               <th colspan="2">
                 <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
-                  <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
+                  <%= link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank" %>
                 <% end %>
               </th>
             <% end %>
@@ -57,8 +57,8 @@
         <tr>
           <th>PLAN BENEFITS <br> (In Network)</th>
           <% qhps.each do |qhp|%>
-            <th colspan="1"> CO-PAY </th>
-            <th colspan="1"> COINSURANCE </th>
+            <th colspan="1"> <%= l10n("co_pay")%> </th>
+            <th colspan="1"> <%= l10n("coinsurance")%> </th>
           <% end %>
         </tr>
         <%= render partial: "plan_visit_types", locals: {qhps: qhps} %>

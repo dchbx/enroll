@@ -14,22 +14,37 @@ describe AddFamilyMemberToCoverageHousehold, dbclean: :after_each do
 
   describe "add family member to coverage household", dbclean: :after_each do
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:person) { FactoryGirl.create(:person, :with_family) }
+    let!(:dependent) { FactoryGirl.create(:person) }
+    let!(:family_member) { FactoryGirl.create(:family_member, family: person.primary_family ,person: dependent)}
+    let!(:coverage_household_member) { coverage_household.coverage_household_members.new(:family_member_id => family_member.id) }
+    let(:primary_family){person.primary_family}
+    let(:coverage_household){person.primary_family.active_household.immediate_family_coverage_household}
 
     before do
-      allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
+      allow(ENV).to receive(:[]).with('primary_hbx_id').and_return person.hbx_id
     end
 
-    it "should add a family member to household" do
-      family.active_household.immediate_family_coverage_household.coverage_household_members.each do |chm|
-        chm.delete
-        expect(family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq 0
-        subject.migrate
-        family.active_household.reload
-        expect(family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq 1
-      end
+    it "should add a family member to immediate family coverage household" do
+      allow(ENV).to receive(:[]).with('dependent_hbx_id').and_return dependent.hbx_id
+      expect(coverage_household.coverage_household_members.size).to eq 2
+      chm = coverage_household.coverage_household_members[1]
+      chm.destroy!
+      expect(coverage_household.coverage_household_members.size).to eq 1
+      subject.migrate
+      primary_family.active_household.reload
+      expect(coverage_household.coverage_household_members.size).to eq 1
     end
 
+    it "should add a primary applicant to immediate family coverage household" do
+      allow(ENV).to receive(:[]).with('dependent_hbx_id').and_return person.hbx_id
+      expect(coverage_household.coverage_household_members.size).to eq 2
+      chm = coverage_household.coverage_household_members[0]
+      chm.destroy!
+      expect(coverage_household.coverage_household_members.size).to eq 1
+      subject.migrate
+      primary_family.active_household.reload
+      expect(coverage_household.coverage_household_members.size).to eq 1
+    end
   end
 end

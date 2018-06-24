@@ -23,18 +23,18 @@
           </ul>
         </div>
         <div id='help_search' class='help_reset'>
-          <h4> Search by Name </h4>
-          First name:<br>
-          <input type="text" id="help_first_name">
-          <br>
-          Last name:<br>
-          <input type="text" id="help_last_name">
-          <div class='btn btn-primary' id='search_for_plan_shopping_help'> Search for Help</div>
-          <br/>
-          <h4 id='help_status'></h4>
-          <div class= 'hide' id='help_requestor'><%= @person.try(:id)%></div>
-          <div class= 'hide' id='help_requestor_email'><%= current_user.oim_id%></div>
-          <div class='hide' id='help_type'> </div>
+          <h4> <%= l10n("search_by_name") %></h4>
+            <%=  l10n("first_name") %>:<br>
+            <input type="text" id="help_first_name">
+            <br>
+            <%= l10n("last_name") %>:<br>
+            <input type="text" id="help_last_name">
+            <div class='btn btn-primary' id='search_for_plan_shopping_help'><%= l10n("search_for_help") %></div>
+             <br/>
+            <h4 id='help_status'></h4>
+            <div class= 'hide' id='help_requestor'><%= @person.try(:id)%></div>
+            <div class= 'hide' id='help_requestor_email'><%= current_user.oim_id%></div>
+            <div class='hide' id='help_type'> </div>
         </div>
         <div id='inbox' class='help_reset'><div class='col-md-10 col-md-12 col-lg-12'></div>
         </div>

@@ -4,19 +4,19 @@
       <ul role="tablist" class="list-unstyled list-inline" id="myTab">
         <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>>
           <%= link_to(broker_agencies_profile_path(@broker_agency_profile), "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Home</span>
+            <span class="hidden-xs"><%= l10n("home")%></span>
             <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
           <% end %>
         </li>
         <li role="presentation" id="employers-tab" <%= menu_tab_class(active_tab, "employers-tab") %>>
           <%= link_to(employers_broker_agencies_profiles_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Employers</span>
+            <span class="hidden-xs"><%= l10n("employers")%></span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
         </li>
         <li role="presentation" id="families-tab" <%= menu_tab_class(active_tab, "families-tab") %>>
           <%= link_to(family_index_broker_agencies_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Families</span>
+            <span class="hidden-xs"><%= l10n("families")%></span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
           <% end %>
         </li>
@@ -31,7 +31,7 @@
           <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
             <%#= link_to(agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
               <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
-              Agency Mail
+              <%= l10n("broker_agencies.profiles.agency_mail")%>
             <%# end %>
           </li>
           -->
@@ -63,9 +63,9 @@
         </li>
         -->
         <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
-          <%= link_to(messages_broker_agencies_profiles_path(id: @provider), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+          <%= link_to(messages_broker_agencies_profiles_path(id: @provider, profile_id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
             <span class="badge message-unread"><%=begin; @provider.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
-            Broker Mail
+            <%= l10n("broker_mail")%>
           <% end %>
         </li>
         <% if current_user.has_hbx_staff_role? %>
@@ -75,8 +75,8 @@
               First Time Applications for Medicaid
               <br/>
               and Premium Tax Credits
-          </li>
             <% end %>
+          </li>
         <% end %>
       </ul>
     </div>

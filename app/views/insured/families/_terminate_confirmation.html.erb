@@ -3,18 +3,18 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Select Terminate Reason</h4>
+        <h4 class="modal-title"><%= l10n("insured.select_terminate_reason") %></h4>
       </div>
       <%= form_tag(purchase_insured_families_path, method: :get) do %>
         <%= hidden_field_tag 'terminate', 'terminate' %>
         <%= hidden_field_tag 'change_plan', @change_plan %>
         <%= hidden_field_tag 'hbx_enrollment_id', enrollment.id %>
         <div class="modal-body">
-          <%= select_tag "terminate_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), {include_blank: "Please select terminate reason", onchange: "EmployeeRole.disableTerminateSubmit('#{enrollment.id}')"} %>
+          <%= select_tag "terminate_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), {include_blank: l10n("insured.please_select_terminate_reason"), onchange: "EmployeeRole.disableTerminateSubmit('#{enrollment.id}')"} %>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <%= submit_tag "Submit", class: 'btn btn-primary terminate_reason_submit', disabled: true %>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n('.close') %></button>
+          <%= submit_tag l10n('.submit'), class: 'btn btn-primary terminate_reason_submit', disabled: true %>
         </div>
       <% end %>
     </div>

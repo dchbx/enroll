@@ -2,7 +2,7 @@
 <%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 
 <div class="container">
-  <h3 class="title-inline">Families</h3>
+  <h3 class="title-inline"><%= l10n("families")%></h3>
 </div>
 
 <div class="container">
@@ -12,12 +12,12 @@
       <table class="table table-striped" id="Broker-Family-dataTable">
         <thead>
         <tr>
-          <th>Name</th>
-          <th>SSN</th>
-          <th>DOB</th>
-          <th>HBX ID</th>
-          <th>Family</th>
-          <th>Registered?</th>
+          <th><%= l10n("name")%></th>
+          <th><%= l10n("ssn")%></th>
+          <th><%= l10n("dob")%></th>
+          <th><%= l10n("hbx_id")%></th>
+          <th><%= l10n("family")%></th>
+          <th><%= l10n("registered?")%></th>
           <th>Consumer?</th>
           <th>Employee?</th>
         </tr>

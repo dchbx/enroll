@@ -9,9 +9,11 @@ module PdfTemplates
     attribute :primary_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :employer_name, String
+    attribute :primary_email, String
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
+    attribute :census_employee, PdfTemplates::CensusEmployee
     attribute :enrollment, PdfTemplates::Enrollment
     attribute :email, String
     attribute :plan_year, PdfTemplates::PlanYear
@@ -21,8 +23,16 @@ module PdfTemplates
       return true
     end
 
+    def broker?
+      return false
+    end
+
     def employee_notice?
       return true
+    end
+
+    def general_agency?
+      false
     end
   end
 end

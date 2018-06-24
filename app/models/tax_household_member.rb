@@ -1,23 +1,32 @@
 class TaxHouseholdMember
   include Mongoid::Document
   include Mongoid::Timestamps
+  include BelongsToFamilyMember
+  include ApplicationHelper
 
   embedded_in :tax_household
   embeds_many :financial_statements
 
   field :applicant_id, type: BSON::ObjectId
-
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_subscriber, type: Boolean, default: false
-
-  include BelongsToFamilyMember
 
   validate :strictly_boolean
 
   def eligibility_determinations
     return nil unless tax_household
     tax_household.eligibility_determinations
+  end
+
+  def update_eligibility_kinds eligibility_kinds
+    return if eligibility_kinds.blank?
+    if convert_to_bool(eligibility_kinds['is_ia_eligible']) && convert_to_bool(eligibility_kinds['is_medicaid_chip_eligible'])
+      return false
+    else
+      self.update_attributes eligibility_kinds
+      return true
+    end
   end
 
   def family
@@ -63,7 +72,7 @@ class TaxHouseholdMember
   def age_on_effective_date
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = person.dob
-    coverage_start_on = Forms::TimeKeeper.new.date_of_record
+    coverage_start_on = TimeKeeper.date_of_record
     return unless coverage_start_on.present?
     age = coverage_start_on.year - dob.year
 

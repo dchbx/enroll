@@ -1,8 +1,8 @@
 <thead>
   <tr class='row'>
-    <th class='col-sm-4'>Broker Name</th>
-    <th class='col-sm-3'>Agency Name</th>
-    <th class='col-sm-3'>Market Kind</th>
+    <th class='col-sm-4'><%= l10n("broker_name")%></th>
+    <th class='col-sm-3'><%= l10n("agency_name")%></th>
+    <th class='col-sm-3'><%= l10n("market_kind")%></th>
     <th class='col-sm-2'></th>
   </tr>
 </thead>
@@ -13,8 +13,8 @@
       <td class='col-sm-4'><%= staff.first_name + ' ' + staff.last_name %></td>
       <td class='col-sm-3'><%= BrokerAgencyProfile.find(staff.broker_role.broker_agency_profile_id).legal_name %></td>
       <td class='col-sm-3'><% market_kind = staff.broker_role.market_kind %>
-        <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %> Market</td>
-      <td class='col-sm-2'><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'>Select</a></td>
+        <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %><%= l10n("market")%></td>
+      <td class='col-sm-2'><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'><%= l10n("select")%></a></td>
    </tr>
   <% end %>
 </tbody>

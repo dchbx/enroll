@@ -15,7 +15,7 @@
         </div>
 
         <div id='dental-metals'>
-            <b>Coverage Level</b> </br>
+            <b><%= l10n("broker_agencies.quotes.coverage_level")%></b> </br>
             <%- @dental_selectors[:dental_levels].each do |dental_level| %>
                 <div>
                 <%- if dental_level == 'any' %>
@@ -28,7 +28,7 @@
         </div>
 
         <div id='dental-plan_types'>
-            <b>Plan Types</b> <br>
+            <b><%= l10n("plan_types")%></b> <br>
             <%- @dental_selectors[:plan_types].each do |plan_type| %>
             <div>
             <%- if plan_type == 'any' %>
@@ -41,7 +41,7 @@
         </div>
 
         <div id='dental-dc_in_network'>
-             <b>DC Network</b> <br>
+             <b><%= l10n("dc_network")%></b> <br>
           <%- @dental_selectors[:dc_network].each do |dc_network| %>
             <div>
             <%- if dc_network == 'any' %>
@@ -54,7 +54,7 @@
         </div>
 
         <div id='dental-nationwide'>
-            <b>Nationwide</b> <br>
+            <b><%= l10n("nationwide")%></b> <br>
           <%- @dental_selectors[:nationwide].each do |nationwide| %>
           <div>
             <%- if nationwide == 'any' %>

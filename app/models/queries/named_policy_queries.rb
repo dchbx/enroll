@@ -49,7 +49,7 @@ module Queries
         .project_enrollment_ids
       qs.evaluate.collect{|r| r['enrollment_hbx_id']}
     end
-
+    
     def self.shop_monthly_enrollments(feins, effective_on)
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
       qs.query_families_with_active_enrollments

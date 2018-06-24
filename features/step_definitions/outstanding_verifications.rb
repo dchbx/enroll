@@ -2,13 +2,30 @@ Given(/^oustanding verfications users exists$/) do
   person = FactoryGirl.create(:person, :with_consumer_role)
   @person_name = person.full_name
   family = FactoryGirl.create(:family, :with_primary_family_member, person: person)
-  enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent", kind: "individual")
+  enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent", kind: "individual", effective_on: TimeKeeper.date_of_record.beginning_of_year)
   families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
 end
 
 When(/^Admin clicks Outstanding Verifications$/) do
   page.find('.families.dropdown-toggle.interaction-click-control-families').click
   page.find('.interaction-click-control-outstanding-verifications').click
+end
+
+When(/^Admin clicks Families tab$/) do
+  page.find('.families.dropdown-toggle.interaction-click-control-families').click
+  within('.dropdown-menu') do
+    find('.interaction-click-control-families').click
+  end
+end
+
+Then(/^the Admin is navigated to the Families screen$/) do
+  expect(page).to have_xpath("//*[@id='inbox']/div/div[1]/h1", text: 'Families')
+end
+
+And 'I click on the name of a person of family list' do
+  within('table.effective-datatable tbody tr:last-child') do
+    find('td.col-name a').trigger('click')
+  end
 end
 
 Then(/^the Admin is navigated to the Outstanding Verifications screen$/) do

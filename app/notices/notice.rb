@@ -57,7 +57,7 @@ class Notice
   def pdf_options
     options = {
       margin:  {
-        top: 15,
+        top: 10,
         bottom: 20,
         left: 22,
         right: 22
@@ -71,12 +71,10 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
-
           locals: { recipient: recipient, notice: notice}
           }),
         }
     }
-
     footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
 
     options.merge!({footer: {
@@ -108,7 +106,7 @@ class Notice
     rescue Exception => e
       puts "#{e} #{e.backtrace}"
     end
-
+    # notice_path
     # clear_tmp
   end
 
@@ -159,7 +157,6 @@ class Notice
       identifier: doc_uri,
       format: "application/pdf"
     })
-
     if notice.save
       notice
     else

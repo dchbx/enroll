@@ -43,6 +43,9 @@
               <% if broker_or_staff_role.may_pending? %>
                 <%= submit_tag 'Pending', name: 'pending', class: "btn btn-primary interaction-click-control-broker-pending" %>
               <% end %>
+              <% if broker_or_staff_role.can_update_carrier_appointments? %>
+                  <%= submit_tag 'Update', name: 'update', class: "btn btn-primary interaction-click-control-broker-update" %>
+              <% end %>
               <% if broker_or_staff_role.may_broker_agency_decline? %>
                 <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary interaction-click-control-broker-deny" %>
               <% end %>

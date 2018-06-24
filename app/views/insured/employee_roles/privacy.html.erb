@@ -1,6 +1,6 @@
 <div class="container module employee-welcome">
   <h1 class="darkblue">
-    Your Information
+    <%= l10n(".your_information") %>
   </h1>
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
@@ -19,7 +19,7 @@
   <br/>
   <div class="row">
     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-      <%= link_to 'CONTINUE', search_insured_employee_index_path, class: 'btn btn-primary btn-block btn-lg' %>
+      <%= link_to l10n("continue").to_s.upcase, search_insured_employee_index_path, class: 'btn btn-primary btn-block btn-lg' %>
     </div>
   </div>
 </div>

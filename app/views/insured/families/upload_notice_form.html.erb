@@ -7,21 +7,21 @@
 <div class="col-xs-12 documents-tab">
   <div class="row">
     <div class="col-xs-8">
-      <h1>Upload New Notice</h1>
+      <h1><%=  l10n("upload_new_notice") %></h1>
       <h4 class="starter">
       </h4>
     </div>
   </div>
   <%= form_for @person, :url => upload_notice_insured_families_path, html: {multipart: true}, method: :post do |f| %>
       <div class="col-xs-10">
-      <div class="row"><div>Upload File </div><div><%= file_field_tag :file, required: true, accept: 'application/pdf' %></div> </div>
-      <div class="row"><div>Subject </div><div><%= text_field_tag :subject,nil , maxlength: 100, required: true %></div> </div>
-      <div class="row"><br/><%= f.submit 'Upload', class: "btn btn-primary"%> </div>
+      <div class="row"><div><%=l10n("upload_file") %> </div><div><%= file_field_tag :file, required: true, accept: 'application/pdf' %></div> </div>
+      <div class="row"><div><%= l10n("subject") %> </div><div><%= text_field_tag :subject,nil , maxlength: 100, required: true %></div> </div>
+      <div class="row"><br/><%= f.submit l10n('upload'), class: "btn btn-primary"%> </div>
       </div>
   <% end %>
 
   <br><br>
-  <h1>Uploaded Notices</h1>
+  <h1><%= l10n("uploaded_notices") %></h1>
   <ul>
   <% @notices.each do |notice|%>
       <li>

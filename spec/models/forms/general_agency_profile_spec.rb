@@ -271,7 +271,7 @@ describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :af
 end
 
 describe Forms::GeneralAgencyProfile, ".find", dbclean: :after_each do
-  let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+  let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, :with_staff) }
   let(:organization) { general_agency_profile.organization }
 
   before :each do
@@ -296,6 +296,6 @@ describe Forms::GeneralAgencyProfile, ".find", dbclean: :after_each do
   end
 
   it "should have correct npn" do
-    expect(@form.npn).to eq general_agency_profile.corporate_npn
+    expect(@form.npn).to eq general_agency_profile.primary_staff.npn
   end
 end

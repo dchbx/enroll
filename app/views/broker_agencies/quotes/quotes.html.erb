@@ -1,8 +1,8 @@
 <div class='container'>
-<h1> Quote Management for
+<h1> <%= l10n("quote_management_for")%>
    <%= @broker.broker_agency_profile.legal_name %>
-   <div class='hide' id='collection_scope'><%= @broker.id %></div>
-   <%= link_to "New Quote", new_broker_agencies_broker_role_quote_path, method: :get, class: 'btn btn-lg btn-primary', style: 'float: right' %>
+   <div class='hide' id='collection_scope'><%= @broker.id %> </div>
+   <%= link_to l10n('new_quote'), new_broker_agencies_broker_role_quote_path, method: :get, class: 'btn btn-lg btn-primary', style: 'float: right' %>
 </h1>
 <%= render_datatable(@datatable) %>
 </div>

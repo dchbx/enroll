@@ -16,15 +16,13 @@ module Insured
       person.try(:has_active_resident_role?)
     end
 
-    def health_relationship_benefits(employee_role)
-      benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
+    def health_relationship_benefits(benefit_group)
       if benefit_group.present?
         benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
 
-    def dental_relationship_benefits(employee_role)
-      benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
+    def dental_relationship_benefits(benefit_group)
       if benefit_group.present?
         benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
       end
@@ -57,9 +55,17 @@ module Insured
       end
     end
 
-    def select_benefit_group(qle)
-      if @market_kind == "shop"
-        @employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil
+    def get_benefit_group(benefit_group, employee_role, qle)
+      if benefit_group.present? && (employee_role.employer_profile == benefit_group.employer_profile )
+        benefit_group
+      else
+        select_benefit_group(qle, employee_role)
+      end
+    end
+
+    def select_benefit_group(qle, employee_role)
+      if @market_kind == "shop" && employee_role.present?
+        employee_role.benefit_group(qle: qle)
       else
         nil
       end
@@ -154,7 +160,7 @@ module Insured
       active_bg = employee_role.census_employee.active_benefit_group
 
       if change_plan != "change_by_qle"
-        if change_plan == "change_plan" && enrollment.present?
+        if change_plan == "change_plan" && enrollment.present? && enrollment.is_shop?
           enrollment.benefit_group.is_offering_dental?
         elsif employee_role.can_enroll_as_new_hire?
           active_bg.present? && active_bg.is_offering_dental?
@@ -174,6 +180,59 @@ module Insured
 
     def is_covered_plan_year?(plan_year, effective_on)
       (plan_year.start_on.beginning_of_day..plan_year.end_on.end_of_day).cover? effective_on
+    end
+
+    def is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage)
+      if benefit_type.present? && benefit_type != "health"
+        is_dental_coverage.nil? ? is_ivl_coverage : is_dental_coverage
+      else
+        is_health_coverage.nil? ? is_ivl_coverage : is_health_coverage
+      end
+    end
+
+    def class_for_ineligible_row(family_member, is_ivl_coverage)
+
+      class_names = @person.active_employee_roles.inject([]) do |class_names, employee_role|
+        is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role)
+
+        if !is_health_coverage && !is_health_coverage.nil?
+          class_names << "ineligible_health_row_#{employee_role.id}"
+        end
+
+        if !is_dental_coverage && !is_dental_coverage.nil?
+          class_names << "ineligible_dental_row_#{employee_role.id}"
+        end
+        class_names
+      end
+
+      class_names << "ineligible_ivl_row" if (!is_ivl_coverage.nil? && !is_ivl_coverage)
+      class_names << "is_primary" if family_member.is_primary_applicant?
+
+      class_names.to_sentence.gsub("and", '').gsub(",", "")
+    end
+
+    def shop_health_and_dental_attributes(family_member, employee_role)
+      benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
+
+      health_offered_relationship_benefits, dental_offered_relationship_benefits = shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
+
+      is_health_coverage = coverage_relationship_check(health_offered_relationship_benefits, family_member, @new_effective_on)
+      is_health_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_health_coverage && @coverage_family_members_for_cobra.present?      
+
+      is_dental_coverage = coverage_relationship_check(dental_offered_relationship_benefits, family_member, @new_effective_on)
+      is_dental_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_dental_coverage && @coverage_family_members_for_cobra.present?
+
+      return is_health_coverage, is_dental_coverage
+    end
+
+    def shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
+      health_offered_relationship_benefits = health_relationship_benefits(benefit_group) 
+
+      if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment) 
+        dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group) 
+      end
+
+      return health_offered_relationship_benefits, dental_offered_relationship_benefits
     end
   end
 end

@@ -101,11 +101,11 @@
 <!-- SSN -->
 
 <!-- Citizneship -->
-<% if notice.citizenstatus_unverified.any? %>
+<% if notice.dhs_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
      content: "<strong>Citizenship:</strong> We need proof of US citizenship for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.citizenstatus_unverified], top_margin: '5px'} %>
+   rows: [notice.dhs_unverified], top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
      content: "There are two types of documents you can use to prove citizenship status. We call the two types “primary” and “secondary”. If you provide primary documentation, no other documents are needed. If you provide secondary documentation, other identification (ID) is required for verification. Secondary documentation must include a copy of an identification card that has a recent photo and other identifying information.", bottom_margin: '5px'} %>
@@ -163,14 +163,14 @@
 <!-- Immigration -->
 <% if notice.immigration_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '-5px'} %>
+   content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.immigration_unverified], bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Documents you may be able to use to verify your immigration status include:",
-    listings: ["Permanent resident card (I-551, also known as a “green card”)","Temporary I-551 stamp (on passport or I-94, I-94A)","Immigrant visa (with temporary I-551 language)","Employment authorization card (EAD or I-766)","Arrival/departure record (I-94 or I-94A)","Arrival/departure record in foreign passport (I-94)","Foreign passport","Country of issuance reentry permit (I-327)","Refugee travel document (I-571)","Certificate of eligibility for nonimmigrant (F-1) student status (I-20)","Certificate of eligibility for exchange visitor (J-1) status (DS2019)","Notice of action (I-797)"]} %>
+    listings: ["Permanent resident card (I-551, also known as a “green card”)","Temporary I-551 stamp (on passport or I-94, I-94A)","Immigrant visa (with temporary I-551 language)","Employment authorization card (EAD or I-766)","Arrival/departure record (I-94 or I-94A)","Arrival/departure record in foreign passport (I-94)","Non-immigrant visa in a foreign passport","Country of issuance reentry permit (I-327)","Refugee travel document (I-571)","Certificate of eligibility for nonimmigrant (F-1) student status (I-20)","Certificate of eligibility for exchange visitor (J-1) status (DS2019)","Notice of action (I-797)"]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You can also list these documents or statuses:",
@@ -181,7 +181,7 @@
 <!-- Income Verification -->
 <% if notice.income_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '-5px'} %>
+    content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
     rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
@@ -200,7 +200,7 @@
     listings: ["Recent pay stubs (showing at least 4 weeks in a row)"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, Social Security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in #{notice.coverage_year}"]} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If your income has changed since your documents were issued, or you expect it to change, you should include an explanation of why you expect your income to be different from what the documents show.", top_margin: '-5px'} %>
+    content: "If your income has changed since your documents were issued, or you expect it to change, you should include an explanation of why you expect your income to be different from what the documents show.", top_margin: '-5px',  bottom_margin: '5px'} %>
 <% end %>
 
 <!-- Residency Verification -->
@@ -276,6 +276,14 @@
   "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
   "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)",
   "Eligibility appeals:  45 C.F.R. §155.500 et. seq."]} %>
+<% elsif notice.notification_type && notice.notification_type == "ivl_backlog_verification_notice_uqhp" %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility for enrollment in a qualified health plan: 45 CFR §155.305(a)",
+  "Social Security Number requests/use: 45 CFR §155.305(f)(6)",
+  "Verifying eligibility for enrollment in a qualified health plan: 45 CFR §155.315",
+  "Document requests: 45 CFR §155.315(f)(2)(ii)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
 <% else %>
   <%= render partial: 'notices/shared/reference_paragraph', :locals => {
   contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",

@@ -2,35 +2,21 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class AddNewEligibilityDetermination < MongoidMigrationTask
     def migrate
-      person = Person.where(hbx_id:ENV['hbx_id'])
-      if person.size==0
-        puts "No person was found with the given hbx_id" #unless Rails.env.test?
-        return
-      elsif person.size > 1
-        puts "More than one person was found with the given hbx_id" #unless Rails.env.test?
-        return
-      end
-      if person.first.primary_family.nil?
-        puts "No primary_family exists for person with the given hbx_id" unless Rails.env.test?
-        return
-      end
-      primary_family = person.first.primary_family
-
-      if primary_family.active_household.nil?
-        puts "No active household  exists for person with the given hbx_id" unless Rails.env.test?
-        return
-      end
-      active_household= primary_family.active_household
-      if  active_household.latest_active_tax_household.nil?
-        puts "No active tax household  exists for person with the given hbx_id" unless Rails.env.test?
-        return
-      end
-
-      date = Date.strptime(ENV['effective_date'].to_s, "%m/%d/%Y")
-
-      latest_active_household = active_household.latest_active_tax_household
-      latest_eligibility_determination = latest_active_household.latest_eligibility_determination
-      latest_active_household.eligibility_determinations.build({"determined_at"                 => date,
+      people=get_people
+      people.each do |person|
+        if person.primary_family.nil? || person.primary_family.active_household.nil? || person.primary_family.active_household.latest_active_tax_household.nil?
+          puts "No primary_family or active househod or latest_active_household exists for person with the given hbx_id #{person.hbx_id}" unless Rails.env.test?
+          return
+        end
+        active_household= person.primary_family.active_household
+        date = Date.strptime(ENV['effective_date'].to_s, "%m/%d/%Y")
+        if active_household.latest_active_tax_household_with_year(date.year).nil?
+          latest_active_tax_household = active_household.latest_active_tax_household
+        else
+          latest_active_tax_household = active_household.latest_active_tax_household_with_year(date.year)
+        end
+        latest_eligibility_determination = latest_active_tax_household.latest_eligibility_determination
+        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => date,
                                                                 "determined_on"                 => date,
                                                                 "csr_eligibility_kind"          => latest_eligibility_determination.csr_eligibility_kind,
                                                                 "premium_credit_strategy_kind"  => latest_eligibility_determination.premium_credit_strategy_kind,
@@ -40,6 +26,17 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
                                                                 "e_pdc_id"                      => latest_eligibility_determination.e_pdc_id,
                                                                 "source"                        => "Admin"
                                                                 }).save!
-      puts "Create eligibility_determinations for person with the given hbx_id #{ENV['hbx_id']}" unless Rails.env.test?
+        puts "Create eligibility_determinations for person with the given hbx_id #{person.hbx_id}" unless Rails.env.test?
+      end
+    end
+    def get_people
+      hbx_ids = "#{ENV['hbx_id']}".split(',').uniq
+      hbx_ids.inject([]) do |people, hbx_id|
+        if Person.where(hbx_id:hbx_id).size != 1
+          puts "No person was found with the given hbx_id #{hbx_id}" #unless Rails.env.test?
+        else
+          people << Person.where(hbx_id:hbx_id).first
+        end
+      end
     end
 end

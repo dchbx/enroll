@@ -5,10 +5,10 @@
         <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted'), class: 'pull-right') do %>
         <% if @folder == 'Deleted' %>
         <strong>
-          Deleted
+          <%= l10n("deleted") %>
         </strong>
         <% else %>
-        Deleted
+          <%= l10n("deleted") %>
         <% end %>
         <% end %>
         <span class="pull-right">
@@ -17,10 +17,10 @@
         <%= link_to(inbox_insured_families_path(@provider), class: 'pull-right') do %>
         <% if @folder == 'Inbox' %>
         <strong>
-          Inbox
+          <%= l10n("inbox") %>
         </strong>
         <% else %>
-        Inbox
+          <%= l10n("inbox") %>
         <% end %>
         <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
         <% end %>
@@ -28,10 +28,10 @@
         <%= link_to(inbox_insured_families_path(@provider, folder: 'Sent')) do%>
         <% if @folder == 'Sent' %>
         <strong>
-          Sent
+          <%= l10n("sent") %>          
         </strong>
         <% else %>
-        Sent
+          <%= l10n("sent") %>
         <% end %>
         <% end %>
         <% end %>
@@ -46,11 +46,11 @@
         <thead class="thead-default">
           <tr>
             <th>
-              From</th>
+              <%= l10n("from") %></th>
             <th>
-              Date
+              <%= l10n("date") %>
             </th>
-            <th>Subject</th>
+            <th><%= l10n("subject") %></th>
             <%- if @folder != 'Deleted' %>
             <th></th>
             <%- end %>

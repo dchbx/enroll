@@ -4,7 +4,6 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
 
   def migrate
     (1..12).each do |i|
-      start_on = Date.new(TimeKeeper.date_of_record.year,i,1)
       organizations = Organization.exists(:employer_profile => true).where(:'employer_profile.plan_years' => {:$elemMatch => plan_year_query(i)})
       count = 0
       organizations.each do |org|
@@ -22,7 +21,6 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
           active_coverage = enrollments.detect{|e| 
             ['coverage_selected', 'coverage_enrolled', 'coverage_expired'].include?(e.aasm_state.to_s)
           }
-
           if waiver.present? && active_coverage.present?
             next if waiver.created_at.blank? || active_coverage.created_at.blank?
             active_submitted_at = active_coverage.submitted_at || active_coverage.created_at
@@ -87,7 +85,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
 
   def plan_year_query(i)
     {
-      :start_on => Date.new(TimeKeeper.date_of_record.year,i,1), 
+      :start_on => Date.new(ENV['year'],i,1),
       :aasm_state.in => ['active', 'expired']
     }
   end

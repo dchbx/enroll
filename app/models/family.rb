@@ -199,7 +199,7 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
-
+  scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -634,9 +634,19 @@ class Family
   # @example Which family members are non-primary applicants?
   #   model.dependents
   #
-  # @return [ Array<FamilyMember> ] the list of dependents
+  # @return [ Array<FamilyMember> ] the list of dependents are active and inactive
   def dependents
     family_members.reject(&:is_primary_applicant)
+  end
+
+  # Get list of family members who are not the primary applicant
+  #
+  # @example Which family members are non-primary applicants?
+  #   model.dependents
+  #
+  # @return [ Array<FamilyMember> ] the list of dependents are active
+  def active_dependents
+    family_members.reject(&:is_primary_applicant).find_all { |family_member| family_member.is_active? }
   end
 
   def people_relationship_map
@@ -1055,8 +1065,7 @@ class Family
   end
 
   def is_document_not_verified(type, person)
-    verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified" &&
-    verification_type_status(type, person, person.hbx_staff_role?) != "curam"
+    ["valid", "attested", "verified", "External Source"].include?(verification_type_status(type, person))?  false : true
   end
 
   def has_valid_e_case_id?

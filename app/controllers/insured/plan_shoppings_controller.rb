@@ -57,6 +57,9 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @enrollment.ee_plan_selection_confirmation_sep_new_hire
+
+    @enrollment.mid_year_plan_change_notice
 
     send_receipt_emails if @person.emails.first
   end
@@ -77,7 +80,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment.reset_dates_on_previously_covered_members(@plan)
     @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     @family = @person.primary_family
-    
+
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
@@ -113,6 +116,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
@@ -133,7 +137,8 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      
+      notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+      hbx_enrollment.notify_employee_confirming_coverage_termination
       redirect_to family_account_path
     else
       redirect_to :back
@@ -159,6 +164,10 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:elected_aptc] = 0
     end
 
+    if params[:market_kind] == 'shop' && plan_match_dc
+      is_congress_employee = @hbx_enrollment.benefit_group.is_congress
+      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+    end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
@@ -266,7 +275,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end
-    
+
       @enrolled_plans.each do |enrolled_plan|
         if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
           @plans[plan_index] = enrolled_plan

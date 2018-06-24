@@ -4,24 +4,24 @@
       <% if @waivable %>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Select Waive Reason</h4>
+          <h4 class="modal-title"><%= l10n("select_waive_reason") %></h4>
         </div>
         <%= form_tag(waive_insured_plan_shopping_path(enrollment.id), method: :post) do %>
           <div class="modal-body">
-            <%= select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: "Please select waive reason" %>
+            <%= select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: l10n("please_select_waive_reason") %>
           </div>
           <div class="modal-footer <%= pundit_class Family, :updateable?%>">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <%= submit_tag "Submit", class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true %>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("close") %></button>
+            <%= submit_tag l10n("submit"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true %>
           </div>
         <% end %>
       <% else # not @waivable %>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Unable to Waive Coverage</h4>
+          <h4 class="modal-title"><%= l10n("unable_to_waive_coverage") %></h4>
         </div>
         <div class="modal-body">
-          You cannot waive coverage unless you’re in Open Enrollment or a Special Enrollment Period.
+          <%= l10n("insured.plan_shoppings.you_can_not_waive_confirmation_msg") %>
         </div>
         <div class="modal-footer">
         </div>

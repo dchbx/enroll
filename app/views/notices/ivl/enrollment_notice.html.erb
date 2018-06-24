@@ -199,6 +199,8 @@ listing: "<strong>Remember, you must pay your monthly premium by #{notice.latest
   listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
 
+<br>
+
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
 

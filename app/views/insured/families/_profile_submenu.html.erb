@@ -2,12 +2,12 @@
     <ul class="nav nav-tabs">
       <li role="presentation"<%= menu_tab_class(active_subtab, "personal-tab") %>>
         <%= link_to(personal_insured_families_path, "aria-expanded" => "true", "aria-controls" => "personal", "role" => "tab" ) do  %>
-        Personal
+          <%= l10n("personal") %>
         <% end %>
       </li>
       <li role="presentation"<%= menu_tab_class(active_subtab, "family-tab") %>>
         <%= link_to(manage_family_insured_families_path, "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab" ) do  %>
-        Family
+          <%= l10n("family") %>
         <% end %>
       </li>
     </ul>

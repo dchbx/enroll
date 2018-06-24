@@ -8,17 +8,21 @@ p3 = Person.where(last_name: "Curtin").first
 bk1 = BrokerRole.find_by_npn("2068981")
 bk0 = BrokerRole.find_by_npn("1682443")
 
-office0 = OfficeLocation.new(address: {kind: "work", address_1: "101 Main St", city: "Washington", state: "DC", zip: "20001"}, phone: {kind: "work", area_code: "202", number: "555-1212"})
-org0 = Organization.new(legal_name: "ACME Agency", fein: "034267010", office_locations: [office0], dba: "Acme")
-org0.create_broker_agency_profile(primary_broker_role: bk0, market_kind: "both", entity_kind: "c_corporation")
+supported_state_abbreviation = Settings.aca.state_abbreviation
+supported_market_type = Settings.aca.market_kinds.count == 2 ? 'both' : Settings.aca.market_kinds.first
 
-office1 = OfficeLocation.new(address: {kind: "work", address_1: "102 Main St", city: "Washington", state: "DC", zip: "20001"}, phone: {kind: "work", area_code: "202", number: "555-1213"})
+office0 = OfficeLocation.new(address: {kind: "work", address_1: "101 Main St", city: "Washington", state: supported_state_abbreviation, zip: "20001"}, phone: {kind: "work", area_code: "202", number: "555-1212"})
+org0 = Organization.new(legal_name: "ACME Agency", fein: "034267010", office_locations: [office0], dba: "Acme")
+org0.create_broker_agency_profile(primary_broker_role: bk0, market_kind: supported_market_type, entity_kind: "c_corporation")
+
+office1 = OfficeLocation.new(address: {kind: "work", address_1: "102 Main St", city: "Washington", state: supported_state_abbreviation, zip: "20001"}, phone: {kind: "work", area_code: "202", number: "555-1213"})
 org1 = Organization.new(legal_name: "Chase & Assoc", fein: "034267001", office_locations: [office1], dba: "Chase")
-org1.create_broker_agency_profile(primary_broker_role: bk1, broker_agency_contacts: [p1, p3], market_kind: "both", entity_kind: "c_corporation")
+org1.create_broker_agency_profile(primary_broker_role: bk1, broker_agency_contacts: [p1, p3], market_kind: supported_market_type, entity_kind: "c_corporation")
+
 p0.broker_role.broker_agency_profile_id  = org1.broker_agency_profile.id
-p0.broker_role.save
+p0.broker_role.save!
 p3.broker_role.broker_agency_profile_id  = org1.broker_agency_profile.id
-p3.broker_role.save
+p3.broker_role.save!
 
 broker_files = Dir.glob("#{Rails.root}/public/xml/brokerxmls/*")
 broker_files.each do |file|

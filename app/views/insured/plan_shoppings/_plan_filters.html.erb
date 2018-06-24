@@ -3,11 +3,15 @@
     <div class="checkbox-filter-wrapper">
       <% if !@hbx_enrollment.is_shop? %>
       <h4>
-        <%= link_to 'Estimate Your Costs', "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank' %>
+        <%= link_to l10n('estimate_your_costs'), "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank' %>
       </h4>
       <% end %>
       <h4>
         <%= find_my_doctor %>
+        </br>
+        <% if plan_match_dc %>
+        <%= estimate_your_costs %>
+        <% end %>
       </h4>
     </div>
   <h3 class="header-title">Filter Results</h3>
@@ -21,7 +25,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-platinum" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-platinum" type="checkbox" data-plan-metal-level-filter="platinum">
-            <label for="plan-metal-level-platinum" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Platinum means the plan is expected to pay 90% of medical expenses for the average population of consumers. Platinum plans typically have high premiums, but you pay less when you get covered services.">Platinum</span></label>
+            <label for="plan-metal-level-platinum" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_platinum_title_info') %>"><%= l10n("platinum") %></span></label>
           </label>
         </div>
       </li>
@@ -29,7 +33,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-gold" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-gold" type="checkbox" data-plan-metal-level-filter="gold">
-            <label for="plan-metal-level-gold" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Gold means the plan is expected to pay 80% of medical expenses for the average population of consumers. Gold plans typically have higher premiums, but you pay less when you get covered services." >Gold</span></label>
+            <label for="plan-metal-level-gold" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_gold_title_info') %>" ><%= l10n("gold") %></span></label>
           </label>
         </div>
       </li>
@@ -37,7 +41,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-silver" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-silver" type="checkbox" data-plan-metal-level-filter="silver">
-            <label for="plan-metal-level-silver" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Silver means the plan is expected to pay 70% of medical expenses for the average population of consumers. Silver plans generally have lower premiums, but you pay more when you get covered services.">Silver</span></label>
+            <label for="plan-metal-level-silver" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_silver_title_info') %>"><%= l10n("silver") %></span></label>
           </label>
         </div>
       </li>
@@ -45,7 +49,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-bronze" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-bronze" type="checkbox" data-plan-metal-level-filter="bronze">
-            <label for="plan-metal-level-bronze" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="Bronze means the plan is expected to pay 60% of medical expenses for the average population of consumers. Bronze plans generally have low premiums, but you pay more when you get covered services.">Bronze</span></label>
+            <label for="plan-metal-level-bronze" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_bronze_title_info') %>"><%= l10n("bronze") %></span></label>
           </label>
         </div>
       </li>
@@ -53,7 +57,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-catastrophic" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-catastrophic" type="checkbox" data-plan-metal-level-filter="catastrophic">
-            <label for="plan-metal-level-catastrophic" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="While not a metal level plan, catastrophic plans are another group of plans that have low monthly premiums and high annual deductibles. The plans are designed to protect consumers from worst case situations like a serious illness or an accident. Catastrophic plans are only available to people under 30 or people with a hardship exemption.">Catastrophic</span></label>
+            <label for="plan-metal-level-catastrophic" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_catastrophic_title_info') %>"><%= l10n("catastrophic") %></span></label>
           </label>
         </div>
       </li>
@@ -69,14 +73,14 @@
       </div>
       <% end %>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>Plan Type</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong><%= l10n(".plan_type") %></strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.plan_type_title_info") %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
         <ul class="list-unstyled">
           <li>
             <div class="checkbox">
               <label>
                 <input id="checkbox-10" class="plan-type-selection-filter checkbox-custom" name="checkbox-10" type="checkbox" data-plan-category-filter="hmo">
-                <label for="checkbox-10" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won't cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.">HMO</span></label>
+                <label for="checkbox-10" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n("insured.plan_shoppings.HMO_title_info") %>"><%= l10n("HMO") %></span></label>
               </label>
             </div>
           </li>
@@ -84,7 +88,7 @@
             <div class="checkbox">
               <label>
                 <input id="checkbox-11" class="plan-type-selection-filter checkbox-custom" name="checkbox-11" type="checkbox" data-plan-category-filter="ppo">
-                <label for="checkbox-11" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="A PPO (Preferred Provider Organization) plan covers care from in-network and out-of-network providers. You pay less if you use providers that belong to the plan’s network. You can use providers outside of the network for an additional cost.">PPO</span></label>
+                <label for="checkbox-11" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n("insured.plan_shoppings.PPO_title_info") %>"><%= l10n("PPO") %></span></label>
               </label>
             </div>
           </li>
@@ -92,21 +96,21 @@
             <div class="checkbox">
               <label>
                 <input id="checkbox-12" class="plan-type-selection-filter checkbox-custom" name="checkbox-12" type="checkbox" data-plan-category-filter="pos">
-                <label for="checkbox-12" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="A POS (Point-of-Service) plan is a combination of an HMO and a PPO. Typically it has a network that functions like an HMO – you pick a primary care doctor, who manages and coordinates your care within the network. Similar to a PPO, POS plans usually also allow you to use a provider who is not in the network.">POS</span></label>
+                <label for="checkbox-12" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n("insured.plan_shoppings.POS_title_info") %>"><%= l10n("POS") %></span></label>
               </label>
             </div>
           </li>
         </ul>
       </div>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>Network</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="Doctors, specialists, other providers, facilities and suppliers that a health insurance company contracts with to provide health care services to plan members."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong><%= l10n("network") %></strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.network_title_info") %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
         <ul class="list-unstyled">
           <li>
             <div class="checkbox">
               <label>
                 <input id="checkbox-13" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-13" type="checkbox" data-plan-metal-network-filter="nationwide">
-                <label for="checkbox-13" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">Nationwide</span></label>
+                <label for="checkbox-13" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.nationwide_title_info') %>"><%= l10n("nationwide") %></span></label>
               </label>
             </div>
           </li>
@@ -114,14 +118,14 @@
             <div class="checkbox">
               <label>
                 <input id="checkbox-14" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-14" type="checkbox" data-plan-metal-network-filter="dc metro">
-                <label for="checkbox-14" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a local network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">DC-Metro</span></label>
+                <label for="checkbox-14" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.DC-Metro_title_info') %>"><%= l10n("DC-Metro") %></span></label>
               </label>
             </div>
           </li>
         </ul>
       </div>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>Carrier</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="filter by the carrier"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong><%= l10n("carrier") %></strong> <a href="#" data-toggle="tooltip" data-placement="right" title="<%= l10n('filter_by_the_carrier') %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <ul class="list-unstyled">
           <li>
             <div class="filter-input-block">
@@ -131,7 +135,7 @@
         </ul>
       </div>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>HSA Eligible</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong><%= l10n("hsa_eligible") %></strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.hsa_eligible_title_info") %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <ul class="list-unstyled">
           <li>
             <div class="filter-input-block">
@@ -141,7 +145,7 @@
         </ul>
       </div>
       <div class="checkbox-filter-wrapper">
-        <h5><strong>Premium Amount</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Will filter by Your Cost"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong><%= l10n("premium_amount") %></strong> <a href="#" data-toggle="tooltip" data-placement="right" title="<%= l10n('insured.plan_shoppings.premium_amount_title_info') %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <div class="filter-input-block">
           <input type="text" class="plan-metal-premium-from-selection-filter form-control" placeholder="$0" value='0'>
           <small>To</small>
@@ -150,7 +154,7 @@
         </div>
         <br/>
         <br/>
-        <h5><strong>Deductible Amount</strong></h5>
+        <h5><strong><%= l10n("deductible_amount") %></strong></h5>
         <div class="filter-input-block">
           <input type="text" class="plan-metal-deductible-from-selection-filter form-control" placeholder="$0" value='0'>
           <small>To</small>
@@ -163,13 +167,13 @@
         <hr />
         <div class="row">
           <div class="col-xs-6">
-            <p class='title'>APTC</p>
-            <p class='title'>Available</p>
+            <p class='title'><%= l10n("aptc").to_s.upcase %></p>
+            <p class='title'><%= l10n("available") %></p>
             <p><span><%= number_to_currency(@max_aptc, precision: 2) %></span></p>
           </div>
           <div class="col-xs-6">
             <p class='title'><br /></p>
-            <p class='title'>Used</p>
+            <p class='title'><%= l10n("used") %></p>
             <p>$ <input type="text" id='elected_aptc' value="<%= number_with_precision(@elected_aptc, precision: 2) %>" onchange="setMinMax(this, <%=@max_aptc%>)" /></p>
           </div>
         </div>
@@ -183,8 +187,8 @@
       <% end %>
       <div class="checkbox-filter-wrapper">
         <div class="form-inline search-apply-wrapper">
-          <a href="javascript:void(0);" class="btn btn-primary apply-btn  mz">Apply</a>
-          <a href="javascript:void(0);" class="btn btn-default reset-btn">Reset</a>
+          <a href="javascript:void(0);" class="btn btn-primary apply-btn  mz"><%= l10n("apply") %></a>
+          <a href="javascript:void(0);" class="btn btn-default reset-btn"><%= l10n("reset") %></a>
         </div>
       </div>
     </div>

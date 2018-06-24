@@ -2,7 +2,7 @@
   <div class="">
     <div class="profile-content top-pd">
     <span class="flash_message"></span>
-      <h2>Assign</h2>
+      <h2><%= l10n("assign")%></h2>
       <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
         <div class="row">
           <div class="col-md-6">
@@ -17,17 +17,17 @@
         </div>
         <div class="row">
           <div class="col-md-12">
-            <h3>Employers</h3>
+            <h3><%= l10n("employers")%></h3>
             <table class="table">
               <thead>
                 <tr>
                   <th><%= check_box_tag '', true, false, id: 'select_all_tag' %></th>
-                  <th>HBX Acct</th>
-                  <th>Legal Name</th>
-                  <th>FEIN</th>
-                  <th>EE Ct</th>
-                  <th>Enroll Status</th>
-                  <th>Assigned Agency</th>
+                  <th><%= l10n("hbx_acct")%></th>
+                  <th><%= l10n("legal_name")%></th>
+                  <th><%= l10n("fein")%></th>
+                  <th><%= l10n("ee_ct")%></th>
+                  <th><%= l10n("enroll_status")%></th>
+                  <th><%= l10n(".assigned_agency")%></th>
                   <th>&nbsp;</th>
                 </tr>
               </thead>

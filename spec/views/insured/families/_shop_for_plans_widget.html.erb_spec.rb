@@ -77,6 +77,19 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       sign_in(current_user)
     end
 
+    context "during non-open enrollment period" do
+      before :each do
+        allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+        @employee_role = employee_role
+        allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      end
+
+      it "should not have the text 'You are not under open enrollment period.'" do
+        render "insured/families/shop_for_plans_widget"
+        expect(rendered).not_to have_content "You are not under open enrollment period."
+      end
+    end
+
     it "should have the updated description with link to 'enroll today' text" do
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_content 'coverage will begin'

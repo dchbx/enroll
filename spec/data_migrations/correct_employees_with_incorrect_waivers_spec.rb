@@ -62,6 +62,7 @@ describe CorrectEmployeesWithIncorrectWaivers do
     context "when family has incorrect passive waiver", dbclean: :after_each do
 
       before do
+        allow(ENV).to receive(:[]).with("year").and_return(renewing_employer.active_plan_year.start_on.year)
         generate_renewal 
       end
 

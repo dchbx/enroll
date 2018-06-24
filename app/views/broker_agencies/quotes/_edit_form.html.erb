@@ -5,15 +5,15 @@
 			<div class="panel-heading" role="tab" id="headingOne">
 				<h3 class="panel-title">
 					<a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-group" aria-expanded="true" aria-controls="quote-group">
-						Quote Information
+						<%= l10n("broker_agencies.quotes.quote_information")%>
 					</a>
 				</h3>
 			</div>
 			<div id="quote-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
 				<div class="panel-body" id="quote-info">
 					<div class="row form-inline">
-						<div class="form-group col-sm-6">Quote Name: <%= f.text_field :quote_name, {required: true, :placeholder => 'Quote Name'}%></div>
-						<div class="form-group col-sm-6">Quote Effective Date:
+						<div class="form-group col-sm-6"><%= l10n("quote_name")%>: <%= f.text_field :quote_name, {required: true, :placeholder => "#{l10n('quote_name')}"}%> </div>
+						<div class="form-group col-sm-6"><%= l10n("quote_effective_date")%>:
 							<% plan_year_start_dates = PlanYear.calculate_start_on_options %>
 							<% if f.object.start_on.present? && !plan_year_start_dates.any?{|set| set[1] == f.object.start_on.try(:to_s, :db) } %>
 								<% plan_year_start_dates << [f.object.start_on.strftime("%m/%d/%Y"), f.object.start_on.try(:to_s, :db)]%>
@@ -45,7 +45,7 @@
 			<div class="panel-heading" role="tab" id="headingTwo">
 				<h3 class="panel-title">
 					<a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group" aria-expanded="true" aria-controls="quote-benefit-group">
-						Quote Benefit Group Selection
+						<%= l10n("broker_agencies.quote_benefit_group_selection")%>
 					</a>
 				</h3>
 			</div>
@@ -71,9 +71,9 @@
 
 		<div>&nbsp;</div>
 
-    <h3>Quote Roster</h3>
+    <h3><%= l10n("broker_agencies.quotes.quote_roster")%></h3>
 
-    <p>The roster you build below will be used to estimate employee and employer costs for each benefit group.</p>
+    <p><%= l10n("broker_agencies.quotes.roster_build_to_estimate_employee_and_employer_costs")%></p>
 
 		<div id="family-container">
 		<%= f.fields_for :quote_households do |qhh| %>

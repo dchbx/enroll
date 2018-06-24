@@ -76,6 +76,10 @@ RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingS
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
     end
 
+    it "should append plan year start_on date" do
+      expect(@employee_notice.notice.plan.coverage_start_on).to eq hbx_enrollment.benefit_group.plan_year.start_on
+    end
+
     it "should append plan year end_on date" do
       expect(@employee_notice.notice.plan.coverage_end_on).to eq hbx_enrollment.benefit_group.plan_year.end_on
     end

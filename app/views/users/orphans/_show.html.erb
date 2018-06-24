@@ -1,29 +1,29 @@
 <div class="col-md-8 col-xs-12 col-sm-12 no-pd">
   <span class="flash_message"></span>
-  <h1>Orphan User Account<br/>
-    <span class="small"><strong>Email Account ID:</strong> <%= @orphan.email %></span>
+  <h1><%= l10n('.orphan_user_account') %><br/>
+    <span class="small"><strong><%= l10n('.email_account_id') %></strong> <%= @orphan.email %></span>
   </h1>
   <div class="form-border">
     <dl class="dl-horizontal no-buffer">
-      <dt>Created at</dt>
+      <dt><%= l10n('.created_at') %></dt>
       <dd><%= format_datetime @orphan.created_at %></dd>
-      <dt>Last sign in</dt>
+      <dt><%= l10n('.last_signin') %></dt>
       <dd><%= format_datetime @orphan.last_sign_in_at %></dd>
-      <dt>Last sign in IP</dt>
+      <dt><%= l10n('.last_signin_ip') %></dt>
       <dd><%= @orphan.last_sign_in_ip %></dd>
-      <dt>Last portal visited</dt>
+      <dt><%= l10n('.last_visited') %></dt>
       <dd><%= @orphan.last_portal_visited %></dd>
-      <dt>Sign in count</dt>
+      <dt><%= l10n('.signin_count') %></dt>
       <dd><%= @orphan.sign_in_count %></dd>
-      <dt>IDP verified?</dt>
+      <dt><%= l10n('.verified_idp') %></dt>
       <dd><%= boolean_to_human @orphan.idp_verified %></dd>
-      <dt>OIM ID</dt>
+      <dt><%= l10n('.oim_id') %></dt>
       <dd><%= @orphan.oim_id %></dd>
     </dl>
     <div class="row">
       <div class="col-md-4 col-md-offset-8">
-        <%= link_to 'Back', '#', class: "orphans-back-link btn btn-primary" %>
-        <%= link_to 'Delete', users_orphan_path(@orphan), class: "btn btn-default", method: :delete, data: { confirm: 'Are you sure?' } %>
+        <%= link_to l10n('.back'), '#', class: "orphans-back-link btn btn-primary" %>
+        <%= link_to l10n('.delete'), users_orphan_path(@orphan), class: "btn btn-default", method: :delete, data: { confirm: 'Are you sure?' } %>
       </div>
     </div>
   </div>
@@ -37,8 +37,3 @@ $('#users_orphans_accounts').show();
   })
 })
 </script>
-
-
-
-
-

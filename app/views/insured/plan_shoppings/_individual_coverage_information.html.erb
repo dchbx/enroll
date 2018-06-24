@@ -3,12 +3,12 @@
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Relationship</th>
-        <th>Age</th>
-        <th class="text-right">Premium</th>
-        <th class="text-right">APTC amount <span><i class='fa fa-question-circle' data-toggle="tooltip" title="If you submitted a formal application for financial assistance before shopping for coverage and were approved to receive Advanced Premium Tax Credit savings to reduce your monthly insurance premiums, the amount you’ll save is listed in this column."></i></span></th>
-        <th class="text-right" width="50">You Pay</th>
+        <th><%= l10n("name") %></th>
+        <th><%= l10n("relationship") %></th>
+        <th><%= l10n("age") %></th>
+        <th class="text-right"><%= l10n("premium") %></th>
+        <th class="text-right"><%= l10n("APTC_amount") %> <span><i class='fa fa-question-circle' data-toggle="tooltip" title="<%= l10n('APTC_amount_title_info') %>"></i></span></th>
+        <th class="text-right" width="50"><%= l10n("you_pay") %></th>
       </tr>
     </thead>
     <tbody>
@@ -28,7 +28,7 @@
         </tr>
       <% end %>
       <tr class="gray-row">
-        <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
+        <td colspan="3" class="text-right capital"><strong><%= l10n("totals") %></strong></td>
         <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
         <% if calculate %>
           <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
@@ -39,7 +39,7 @@
         <% end %>
       </tr>
       <tr>
-        <td colspan="5" class="text-right">Your coverage start date :</td>
+        <td colspan="5" class="text-right"><%= l10n("your_coverage_start_date") %> :</td>
         <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
       </tr>
     </tbody>

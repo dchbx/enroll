@@ -9,6 +9,7 @@ RSpec.describe Insured::FamilyMembersController do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
   let(:employee_role_id) { employee_role.id }
+  let(:census_employee) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -184,6 +185,24 @@ RSpec.describe Insured::FamilyMembersController do
 
     describe "with a valid dependent" do
       let(:save_result) { true }
+
+      it "should assign the dependent" do
+        expect(assigns(:dependent)).to eq dependent
+      end
+
+      it "should assign the created" do
+        expect(assigns(:created)).to eq true
+      end
+
+      it "should render the show template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show")
+      end
+    end
+
+    describe "with a valid dependent but not applying for coverage" do
+      let(:save_result) { true }
+      let(:dependent_properties) { { "is_applying_coverage" => "false" } }
 
       it "should assign the dependent" do
         expect(assigns(:dependent)).to eq dependent

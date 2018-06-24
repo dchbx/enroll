@@ -3,13 +3,13 @@
 		<%= render "shared/organization_staff_search", f: f %>
 		<div class="row">
 		<div class="col-md-9 col-sm-9 col-xs-12">
-			<h4>Broker Agency Information</h4>
+			<h4><%= l10n("broker_agency_information")%></h4>
 			<div class="row no-buffer row-form-wrapper">
 				<%= render "shared/organizations/entity_name_and_type_fields", f: f, entity_kinds: Organization::ENTITY_KINDS[0..3] %>
 			</div>
 			<div class="row no-buffer row-form-wrapper">
 				<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-					<%= f.text_field :home_page, class: "floatlabel form-control", placeholder: 'WEBSITE URL' %>
+					<%= f.text_field :home_page, class: "floatlabel form-control", placeholder: "#{l10n('website_url')}" %>
 				</div>
 			</div>
 			<div class="row no-buffer row-form-wrapper">
@@ -19,7 +19,7 @@
 				<%= render "shared/office_locations", f: f %>
 
 				<div class="row no-buffer">
-					<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-user-plus"></i> Create Broker Agency</button>
+					<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-user-plus"></i><%= l10n("create_broker_agency")%></button>
 				</div>
      		</div>
 		</div>

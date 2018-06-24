@@ -35,7 +35,7 @@
   { content: "We have notified your employer about #{notice.plan.plan_carrier}’s decision, as well as the upcoming change to your current dental coverage. You should contact your employer’s benefits administrator to learn more about this change and to learn what employer-sponsored coverage options will be available to you going forward." }%>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "If you are a #{Settings.aca.state_abbreviation} resident and would like to enroll in dental coverage through the individual market, you can enroll during #{Settings.site.short_name}’s annual open enrollment period, which runs from #{Settings.aca.individual_market.open_enrollment.start_on.strftime("%B %d, %Y")} through #{Settings.aca.individual_market.open_enrollment.end_on.strftime("%B %d, %Y")}.  If you are not a resident of the #{Settings.aca.state_name}, you should contact the Health Insurance Marketplace located in your state of residence to inquire about enrolling. To find the Health Insurance Marketplace in your state, go to #{Settings.site.website_url}." }%>
+  { content: "You may be eligible for a Special Enrollment Period to enroll into dental coverage through #{Settings.site.short_name}’s Individual Marketplace at the end of your employer’s plan year. If you are not a resident of the #{Settings.aca.state_name}, you should contact the Health Insurance Marketplace located in your state of residence to inquire about enrolling, including open enrollment and special enrollment opportunities. To find the Health Insurance Marketplace in your state, go to <a href=#{Settings.site.healthcare_url}>#{Settings.site.healthcare_name}</a>." }%>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "As always, our Contact Center is available at #{notice.hbe.phone} to answer any of your questions, from 8:00am-6:00pm Monday through Friday." }%>
@@ -44,7 +44,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', locals: 
+<%= render partial: 'notices/shared/paragraph', locals:
   { content: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:

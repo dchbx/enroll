@@ -1,9 +1,9 @@
 <div class="container-fluid">
-  <h2>Quote Employer Cost Comparison Results</h2>
+  <h2><%= l10n("quote_employer_cost_comparison_results")%></h2>
 
-  <p>Your results are based on your quote <strong><%= @qbg.quote_name %></strong> effective on <strong><%= @qbg.start_on %></strong></p>
-  <p> Here are the costs for Benefit Group <strong><%= @qbg.title %></strong> </p>
-  <p>The following employer percentage contributions were used for calculation of cost:</p>
+  <p><%= l10n("your_results_are_based_on_your_quote")%> <strong><%= @qbg.quote_name %></strong> <%= l10n("effective_on")%> <strong><%= @qbg.start_on %></strong></p>
+  <p> <%= l10n("here_are_the_costs_for_benefit_group")%> <strong><%= @qbg.title %></strong> </p>
+  <p><%= l10n("employer_percentage_contributions")%>:</p>
   <ul>
     <% @qbg.quote_relationship_benefits.each do |qrb|
       unless @employee_relationship_map[qrb.relationship].blank? %>
@@ -17,16 +17,16 @@
 
   <table class="quote-detail-cost">
     <tr>
-      <td class="quote_detail_plan_header">Offering Option: </td>
-      <td class="quote_detail_plan_header">By Single Plan</td>
-      <td class="quote_detail_plan_header">By Single Carrier</td>
-      <td class="quote_detail_plan_header">By Metal Level</td>
+      <td class="quote_detail_plan_header"><%= l10n("offering_option")%>: </td>
+      <td class="quote_detail_plan_header"><%= l10n("by_single_plan")%></td>
+      <td class="quote_detail_plan_header"><%= l10n("by_single_carrier")%></td>
+      <td class="quote_detail_plan_header"><%= l10n("by_metal_level")%></td>
     </tr>
     <tr>
-      <td class="quote_detail_results_header" >Plan</td>
-      <td class="quote_detail_results_header text-center">Reference</td>
-      <td class="quote_detail_results_header text-center">Reference</td>
-      <td class="quote_detail_results_header text-center">Reference</td>
+      <td class="quote_detail_results_header" ><%= l10n("plan")%></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
     </tr>
     <% i = 0 %>
    <% @quote_results.each do |k,v| %>

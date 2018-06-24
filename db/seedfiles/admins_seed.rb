@@ -1,14 +1,19 @@
 puts "*"*80
 puts "::: Creating HBX Admin:::"
 
-
-address  = Address.new(kind: "work", address_1: "1225 I St, NW", city: "Washington", state: "DC", zip: "20002")
+aca_state_abbreviation = Settings.aca.state_abbreviation
+address  = Address.new(kind: "work", address_1: "1225 I St, NW", city: "Washington", state: aca_state_abbreviation, zip: "20002")
 phone    = Phone.new(kind: "main", area_code: "855", number: "532-5465")
 # email    = Email.new(kind: "work", address: "admin@dc.gov")
 office_location = OfficeLocation.new(is_primary: true, address: address, phone: phone)
+
+supported_states_to_fip = {
+  'DC': '11001',
+  'MA': '25001'
+}
 geographic_rating_area = GeographicRatingArea.new(
     rating_area_code: "R-DC001",
-    us_counties: UsCounty.where(county_fips_code: "11001").to_a
+    us_counties: UsCounty.where(county_fips_code: supported_states_to_fip[aca_state_abbreviation]).to_a
   )
 
 organization = Organization.new(
@@ -19,11 +24,11 @@ organization = Organization.new(
     )
 
 hbx_profile = organization.build_hbx_profile(
-    cms_id: "DC0",
-    us_state_abbreviation: "DC",
+    cms_id: "#{aca_state_abbreviation}0",
+    us_state_abbreviation: aca_state_abbreviation,
     benefit_sponsorship: BenefitSponsorship.new(
         geographic_rating_areas: [geographic_rating_area],
-        service_markets: ["shop", "individual"],
+        service_markets: Settings.aca.market_kinds,
         benefit_coverage_periods: [
             BenefitCoveragePeriod.new(
                 start_on: Date.new(2015, 1, 1),
@@ -87,6 +92,7 @@ cac = [
 
 
 staff = assisters + csr + cac
+# This would create staff members for HBX
 staff.each{|member| create_staff member}
 
 puts "::: HBX Admins including CSR, CAC and Assisters Complete :::"

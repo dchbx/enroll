@@ -1,7 +1,7 @@
 <div>
   <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? %>
     <div class="module brokers-widget">
-      <%= render 'employee_brokers_widget', title: "Employer Assigned Broker" %>
+      <%= render 'employee_brokers_widget', title: l10n("insured.employer_assigned_broker") %>
     </div>
     <div class="module brokers-widget">
       <%= render 'consumer_brokers_widget', title: nil %>

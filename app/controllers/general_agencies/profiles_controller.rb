@@ -17,6 +17,45 @@ class GeneralAgencies::ProfilesController < ApplicationController
     @general_agency_profiles = GeneralAgencyProfile.all
   end
 
+  def edit
+    @organization = ::Forms::GeneralAgencyProfile.find(@general_agency_profile.id)
+    @id = params[:id]
+  end
+
+  def update
+    authorize HbxProfile, :modify_admin_tabs?
+    sanitize_agency_profile_params
+    params.permit!
+
+    @organization = Organization.find(params[:organization][:id])
+    @organization_dup = @organization.office_locations.as_json
+
+    #clear office_locations, don't worry, we will recreate
+    @organization.assign_attributes(:office_locations => [])
+    @organization.save(validate: false)
+    person = @general_agency_profile.primary_staff.person
+
+    person.update_attributes(person_profile_params)
+
+    @general_agency_profile.update_attributes(languages_spoken_params)
+
+
+    if @organization.update_attributes(ga_profile_params)
+      office_location = @organization.primary_office_location
+      if office_location.present?
+        update_ga_staff_phone(office_location, person)
+      end
+      flash[:notice] = "Successfully Update General Agency Profile"
+      redirect_to general_agencies_profile_path(@general_agency_profile)
+    else
+      @organization.assign_attributes(:office_locations => @organization_dup)
+      @organization.save(validate: false)
+      flash[:error] = "Failed to Update General Agency Profile"
+      redirect_to general_agencies_profile_path(@general_agency_profile)
+
+    end
+  end
+
   def new_agency
     @organization = ::Forms::GeneralAgencyProfile.new
   end
@@ -166,6 +205,52 @@ class GeneralAgencies::ProfilesController < ApplicationController
         :phone_attributes => [:kind, :area_code, :number, :extension]
       ]
     )
+  end
+
+  def sanitize_agency_profile_params
+    params[:organization][:office_locations_attributes].each do |key, location|
+      params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
+    end
+  end
+
+  def person_profile_params
+    params.require(:organization).permit(:first_name, :last_name, :dob)
+  end
+
+  def languages_spoken_params
+    params.require(:organization).permit(
+      :languages_spoken => []
+    )
+  end
+
+  def ga_profile_params
+    params.require(:organization).permit(
+      :legal_name,
+      :dba,
+      :home_page,
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :phone_attributes => [:kind, :area_code, :number, :extension],
+        :email_attributes => [:kind, :address]
+      ]
+    )
+  end
+
+  def update_ga_staff_phone(office_location, person)
+    phone = office_location.phone
+    broker_main_phone = person.phones.where(kind: "phone main").first
+    if broker_main_phone.present?
+      broker_main_phone.update_attributes!(
+        kind: phone.kind,
+        country_code: phone.country_code,
+        area_code: phone.area_code,
+        number: phone.number,
+        extension: phone.extension,
+        full_phone_number: phone.full_phone_number
+      )
+    end
+    person.save!
   end
 
   def send_secure_message_to_general_agency(staff_role)

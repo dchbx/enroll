@@ -14,14 +14,15 @@
     <div class="panel-body">
       <div class="row">
       <% url, http_method = '/insured/family_members', :get %>
-        <%= form_tag url, method: http_method, class: 'input-no-pd', id: 'qle_form' do %>
+        <%= form_tag url, method: http_method, class: 'input-no-pd qle-detail-for-existing', id: 'qle_form' do %>
           <%= hidden_field_tag 'change_plan', qle.title %>
           <%= hidden_field_tag 'qle_id', qle.id %>
           <%= hidden_field_tag 'sep_id', @active_sep.id %>
           <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
           <p class=" darkblue text-center">
-            <strong id="qle-input-info">Choose the date you want your plan to start.</strong><br>
+            <strong id="qle-input-info"><%= l10n("insured.choose_the_date_you_want_your_plan_start") %></strong><br>
           </p>
+          <div class="alert alert-danger hidden" id='qle_effective_on_kind_alert' role="alert">Please Select Effective Date</div>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <% if qle.date_options_available? && @active_sep.optional_effective_on.present?%> <!--Show Dropdown if there are choice Dates available.-->
               <div class="alert alert-danger" id='qle_effective_on_kind_alert' role="alert" style='display:none'>Please Select Effective Date</div>
@@ -32,7 +33,7 @@
               <%= hidden_field_tag 'effective_on_option', @active_sep.next_poss_effective_date %>
             <% end %>
             <br />
-            <div align="center"> <%= submit_tag 'Continue', class: 'btn btn-primary' %> </div>
+            <div align="center"> <%= submit_tag l10n('.continue'), class: 'btn btn-primary' %> </div>
           </div>
         <% end %> <!--End Form tag-->
       </div>

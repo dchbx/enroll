@@ -3,6 +3,7 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   click_link 'Consumer/Family Portal'
   FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
 
   Caches::PlanDetails.load_record_cache!
   screenshot("individual_start")
@@ -35,6 +36,22 @@ Then(/Individual creates HBX account$/) do
   click_button "Create account"
 end
 
+And(/^I can see the select effective date$/) do
+  expect(page).to have_content "SELECT EFFECTIVE DATE"
+end
+
+When 'I click on continue button on select effective date' do
+  click_button "Continue"
+end
+
+Then(/^I can see the error message (.*?)$/) do |message|
+  expect(page).to have_content(message)
+end
+
+And 'I select a effective date from list' do
+  select 'Date of event', from: 'effective_on_kind'
+end
+
 And(/user should see your information page$/) do
   expect(page).to have_content("Your Information")
   expect(page).to have_content("CONTINUE")
@@ -54,10 +71,10 @@ end
 
 When(/^\w+ clicks? on continue button$/) do
   wait_for_ajax
-  click_link "Continue"
+  find('.btn', text: 'CONTINUE').click
 end
 
-Then(/^user should see heading labeled personal information/) do
+Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_content("Personal Information")
 end
 
@@ -82,6 +99,41 @@ Then(/Individual should see a form to enter personal information$/) do
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
   screenshot("personal_form")
+end
+
+And(/^.+ selects (.*) for coverage$/) do |coverage|
+  if coverage == "applying"
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+  else
+    find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  end
+end
+
+Then(/^.+ should see error message (.*)$/) do |text|
+  page.should have_content(text)
+end
+
+Then(/^.+ should not see error message (.*)$/) do |text|
+  page.should have_no_content(text)
+end
+
+And(/(.*) selects eligible immigration status$/) do |text|
+  if text == "Dependent"
+    find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
+    find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+  else
+    find(:xpath, '//label[@for="person_us_citizen_false"]').click
+    find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+  end
+end
+
+And(/Individual edits dependent/) do
+  find('.fa-pencil').click
+  wait_for_ajax
+end
+
+And(/Individual clicks on confirm member/) do
+  all(:css, ".mz").last.click
 end
 
 When(/Individual clicks on Save and Exit/) do
@@ -205,7 +257,7 @@ And(/I click on log out link$/) do
   find('.interaction-click-control-logout').click
 end
 
-And(/I click on sign in existing account$/) do
+And(/^.+ click on sign in existing account$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
   find('.interaction-click-control-sign-in-existing-account').click
 end
@@ -335,7 +387,7 @@ Then(/Individual asks for help$/) do
   expect(page).to have_content "Help"
   click_link "Help from a Customer Service Representative"
   wait_for_ajax(5,2.5)
-  expect(page).to have_content "First name"
+  expect(page).to have_content "First Name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
@@ -566,18 +618,7 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   screenshot("aptc_ivl_home")
 end
 
-And(/consumer has a dependent in "child" relationship/) do
-  family = Family.all.first
-  child = FactoryGirl.create :person, :with_consumer_role, dob: TimeKeeper.date_of_record - 5.years
-  fm = FactoryGirl.create :family_member, family: family, person: child
-  user.person.person_relationships << PersonRelationship.new(kind: "child", relative_id: child.id)
-  ch = family.active_household.immediate_family_coverage_household
-  ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
-  ch.save
-  user.person.save
-end
-
-And(/consumer visits home page after successful ridp/) do
+When(/consumer visits home page after successful ridp/) do
   user.identity_final_decision_code = "acc"
   user.save
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
@@ -587,33 +628,4 @@ end
 
 And(/consumer clicked on "Married" qle/) do
   click_link "Married"
-end
-
-And(/ivl clicked continue on household info page/) do
-  find_all("#btn_household_continue")[1].trigger('click')
-end
-
-And(/consumer unchecks the primary person/) do
-  find("#family_member_ids_0").set(false)
-end
-
-Then(/consumer should see all the family members names/) do
-  people = Person.all
-  people.each do |person|
-    expect(page).to have_content "#{person.full_name}"
-  end
-end
-
-And(/consumer clicked on shop for new plan/) do
-  find(".interaction-click-control-shop-for-new-plan").click
-end
-
-Then(/consumer should see both dependent and primary/) do
-  primary = Person.all.select { |person| person.primary_family.present? }.first
-  expect(page).to have_content "COVERAGE FOR: #{primary.full_name} + 1 Dependent"
-end
-
-Then(/consumer should only see the dependent name/) do
-  dependent = Person.all.select { |person| person.primary_family.blank? }.first
-  expect(page).to have_content "COVERAGE FOR: #{dependent.full_name}"
 end

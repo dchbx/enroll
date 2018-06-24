@@ -3,7 +3,7 @@ require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder')
 
 describe QhpRateBuilder do
 
-  let(:plan){ FactoryGirl.create(:plan) }
+  let(:plan){ FactoryGirl.create(:plan, active_year: 2017) }
 
   it "should return qhp builder object" do
     @rates_hash = {
@@ -25,5 +25,4 @@ describe QhpRateBuilder do
     expect(plan.premium_tables.first.start_on.to_date).to eq @rates_hash[:items].first[:effective_date].to_date
     expect(plan.premium_tables.first.end_on.to_date).to eq @rates_hash[:items].first[:expiration_date].to_date
   end
-
 end

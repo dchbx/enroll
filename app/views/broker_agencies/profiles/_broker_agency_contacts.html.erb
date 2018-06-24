@@ -1,13 +1,13 @@
-<h3>Broker Agency Contacts</h3>
+<h3><%= l10n("broker_agencies.profiles.broker_agency_contacts")%></h3>
 
 <div class="table-border">
   <table class="table">
     <% if broker_agency_contacts.present? %>
         <thead>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Dob</th>
-          <th>Primary Broker Role Info (npn / provider kind / active)</th>
+          <th><%= l10n("first_name")%></th>
+          <th><%= l10n("last_name")%></th>
+          <th><%= l10n("dob")%></th>
+          <th><%= l10n("broker_agencies.profiles.primary_broker_role_info")%></th>
         </thead>
         <% broker_agency_contacts.each do |broker_agency_contact| %>
           <tbody>
@@ -18,7 +18,7 @@
           </tbody>
         <% end %>
     <% else %>
-      <tr><td>No Broker Agency Contacts found.</td></tr>
+      <tr><td><%= l10n("broker_agencies.profiles.no_broker_agency_contacts_found")%></td></tr>
     <% end %>
   </table>
 </div>

@@ -6,12 +6,12 @@
     - individual.person_relationships.each do |rel|
       %person_relationship
         %subject_individual
-          %id= individual.hbx_id
+          %id= rel.relative.hbx_id
         %relationship_uri= "urn:openhbx:terms:v1:individual_relationship##{vocab_relationship_map(rel.kind)}"
         %object_individual
-          %id= rel.relative.hbx_id
+          %id= individual.hbx_id
 = render :partial => "events/individuals/person_demographics", :object => individual
-- if individual.broker_role.present? 
+- if individual.broker_role.present?
   - if !individual.broker_role.broker_agency_profile_id.blank?
     - broker_role = individual.broker_role
     - broker_agency_profile = broker_role.broker_agency_profile

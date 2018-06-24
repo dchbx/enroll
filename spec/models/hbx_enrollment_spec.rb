@@ -962,6 +962,39 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment.terminated_on).to eq nil
     end
   end
+
+   context "cancel_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
+
+
+   context "terminate_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected")}
+
+    it "should terminate enrollment" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+    end
+
+    it "should  populate terminate on" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
+    end
+  end
+
+
 end
 
 describe HbxEnrollment, dbclean: :after_each do
@@ -2446,6 +2479,42 @@ describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all
   end
 end
 
+describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :after_all do
+  let(:family)          { FactoryGirl.build(:individual_market_family) }
+  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, kind: 'individual') }
+
+  context "open enrollment" do
+    before do
+      hbx_enrollment.update(enrollment_kind: 'open_enrollment')
+    end
+
+    it "should return true when auto_renewing" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'auto_renewing')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return true when renewing_coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'renewing_coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return false when coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+    end
+  end
+
+  it "should return false when it is not open_enrollment" do
+    hbx_enrollment.update(enrollment_kind: 'special_enrollment')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+  end
+
+  it "should return false when it is individual" do
+    hbx_enrollment.update(kind: 'employer_sponsored')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+  end
+end
+
 describe HbxEnrollment, 'state machine' do
   let(:family) { FactoryGirl.build(:individual_market_family) }
   subject { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household ) }
@@ -2653,6 +2722,60 @@ describe HbxEnrollment, dbclean: :after_all do
     it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
       @enrollment2.cancel_previous(TimeKeeper.date_of_record.year)
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
+    end
+  end
+
+  describe "#trigger ee_plan_selection_confirmation_sep_new_hire" do
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: @household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)  }
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+
+    before :each do
+      @household = mikes_family.households.first
+    end
+
+    it "should trigger ee_plan_selection_confirmation_sep_new_hire job in queue" do
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+
+      hbx_enrollment.ee_plan_selection_confirmation_sep_new_hire
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('ee_plan_selection_confirmation_sep_new_hire')).to be_truthy
+      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment"]).to eq hbx_enrollment.hbx_id.to_s
+    end
+  end
+
+  describe "#trigger notify_employee_confirming_coverage_termination" do
+    let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)  }
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+
+    before :each do
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+    end
+
+    it "should trigger notify_employee_confirming_coverage_termination job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      hbx_enrollment.notify_employee_confirming_coverage_termination
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('notify_employee_confirming_coverage_termination')).to be_truthy
+      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
     end
   end
 end

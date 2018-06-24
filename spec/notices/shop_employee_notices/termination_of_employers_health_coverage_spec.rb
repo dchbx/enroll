@@ -4,8 +4,18 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
 
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
   let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
-  let!(:benefit_coverage_period_2018) { FactoryGirl.create(:benefit_coverage_period, start_on: Date.new(2018,1,1), end_on: Date.new(2018,12,31), open_enrollment_start_on: Date.new(2017,11,1), open_enrollment_end_on: Date.new(2018,1,31), title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
-  let!(:benefit_coverage_period_2019) {FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: Date.new(2018,11,01), open_enrollment_end_on: Date.new(2019,1,31),start_on: Date.new(2019,1,1),end_on: Date.new(2019,12,31),benefit_sponsorship: benefit_sponsorship)}
+  let!(:benefit_coverage_period_2018) { FactoryGirl.create(:benefit_coverage_period, 
+    start_on: TimeKeeper.date_of_record.beginning_of_year, 
+    end_on: TimeKeeper.date_of_record.end_of_year, 
+    open_enrollment_start_on: Settings.aca.individual_market.open_enrollment.start_on, 
+    open_enrollment_end_on:  Settings.aca.individual_market.open_enrollment.end_on, 
+    title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
+  let!(:benefit_coverage_period_2019) {FactoryGirl.create(:benefit_coverage_period, 
+    start_on: benefit_coverage_period_2018.start_on + 1.year, 
+    end_on: benefit_coverage_period_2018.end_on + 1.year, 
+    open_enrollment_start_on: benefit_coverage_period_2018.open_enrollment_start_on+1.year, 
+    open_enrollment_end_on: benefit_coverage_period_2018.open_enrollment_end_on+1.year, 
+    benefit_sponsorship: benefit_sponsorship)}
 
   let(:plan) { FactoryGirl.create(:plan) }
   let(:plan2) { FactoryGirl.create(:plan) }
@@ -21,7 +31,7 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
                             :name =>"Notice to EEs that ER’s plan year will not be written",
                             :notice_template => 'notices/shop_employee_notices/termination_of_employers_health_coverage',
                             :notice_builder => 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
-                            :event_name => 'notice_to_employee_for_missing_binder_payment',
+                            :event_name => 'notice_to_ee_that_er_plan_year_will_not_be_written',
                             :mpi_indicator => 'SHOP_D064',
                             :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
                           }
@@ -33,10 +43,11 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
       :template => application_event.notice_template
   }}
 
+  before do
+    @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
+  end
+
   describe "New" do
-    before do
-      @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
-    end
     context "valid params" do
       it "should initialze" do
         expect{ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)}.not_to raise_error
@@ -54,11 +65,7 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
   end
 
   describe "Build" do
-    before do
-      @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
-    end
     it "should build notice with all necessory info" do
-
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
@@ -67,7 +74,6 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
 
   describe "append data" do
     before do
-      @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
       @employee_notice.append_data
     end
 
@@ -78,7 +84,6 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
     context "with current IVL Open Enrollment(2018)" do
       before do
         allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2017,12,31))
-        @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
         @employee_notice.append_data
       end
 
@@ -90,11 +95,8 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
 
     context "after current IVL OE closed(2018)" do
       before do
-        allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2018,02,1))
-        @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
         @employee_notice.append_data
       end
-
       it "should append next year IVL OE dates(2019)" do
         expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2019.open_enrollment_start_on
         expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2019.open_enrollment_end_on
@@ -105,10 +107,9 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
   describe "Rendering termination_of_employers_health_coverage template and generate pdf" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
     end
     it "should match event_name" do
-      expect(@employee_notice.event_name).to eq "notice_to_employee_for_missing_binder_payment"
+      expect(@employee_notice.event_name).to eq "notice_to_ee_that_er_plan_year_will_not_be_written"
     end
     it "should render termination_of_employers_health_coverage" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/termination_of_employers_health_coverage"

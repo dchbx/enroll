@@ -23,7 +23,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li><a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
             <span class="header-text">
-              Call Customer Service
+              <%= l10n(".call_customer_service") %>
             </span>
             <br/>
             <span>
@@ -49,7 +49,7 @@
                 <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
                 <% unless current_user.try(:person).try(:hbx_id).nil? %>
                   &nbsp;
-                  <span>My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
+                  <span><%= l10n(".my_id") %>: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
                 <% end %>
               </span>
             </li>
@@ -65,15 +65,16 @@
     // check time until logout
     function check_time_until_logout(){
       $.ajax({
-        url: '/check_time_until_logout',
-        type: 'GET',
+        url: '<%= check_time_until_logout_path(:format => :js) %>',
+	dataType: "script",
+        method: 'GET',
         success: function(response){
         },
         error: function(response){
         }
       });
     }
-    setTimeout(check_time_until_logout, 87000);
+    var logout_check_timer = setTimeout(check_time_until_logout, 87000);
   </script>
 <% end %>
 <script>

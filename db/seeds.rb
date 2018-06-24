@@ -104,6 +104,11 @@ if missing_plan_dumps
   puts "::: Mapping Plans to SBC pdfs seed complete :::"
 
   puts "*"*80
+  puts "::: Updating network info for 2017 plans :::"
+  system "bundle exec rake import:network_information"
+  puts "::: Updating network info for 2017 plans complete:::"
+
+  # puts "*"*80
   system "bundle exec rake migrations:cat_age_off_renewal_plan"
   puts "*"*80
 

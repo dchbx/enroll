@@ -6,12 +6,12 @@
         <div class="col-md-3">Family Id: <%= qhh.text_field :family_id, { size: 2, style: "width: 50px;", type: "number", readonly: "true"  } %></div>
         <div class="col-md-3"><%= qhh.collection_select :quote_benefit_group_id, @quote_benefit_group_dropdown, :id, :title, {}, {:class => "floatlabel custom_selectric form-control", :prompt => true}   %></div>
         <div class="col-md-3"><button type="button" style="float: right"  class="btn btn-primary interaction-click-control-add-member-to-this-family" aria-label="Left Align" onclick="addEmployeeRowToFamily('<%=qhh.object.id.to_s%>','<%= qhh.index %>')">
-          <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Add member to this family</button>
+          <span class="glyphicon glyphicon-user" aria-hidden="true"></span> <%= l10n("add_member_to_this_family")%></button>
         </div>
         <div class="col-md-2">
           <% #if qhh.object.persisted? %>
             <select class="floatlabel custom_selectric form-control" id="duplicate-family-id-<%=qhh.object.id%>" data-family-id=<%=qhh.object.family_id%> data-household-id="<%= qhh.object.id %>">
-              <option>Duplicate by:</option>
+              <option><%= l10n("broker_agencies.quotes.duplicate_by")%>:</option>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>

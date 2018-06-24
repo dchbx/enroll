@@ -1,12 +1,12 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
-      <h1 class="darkblue">Special Enrollment Period</h1>
+      <h1 class="darkblue"><%= l10n("insured.families.special_enrollment_period") %></h1>
       <div class="seps-panel panel panel-default">
         <div class="panel-heading" style="margin-bottom: 10px;">
           <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-              <h4><strong>Have you or anyone in your household recently experienced any of the following events?</strong></h4>
+              <h4><strong><%= l10n("insured.families.final_sep_experienced_any_events") %></strong></h4>
             </div>
           </div>
           <hr>
@@ -26,7 +26,7 @@
       <%= hidden_field_tag 'market_kind', @market_kind %>
       <%= hidden_field_tag 'coverage_kind', @coverage_kind %>
       <div style="text-align: center; margin-bottom: 15px;">
-        <input type="checkbox" id="no_qle_checkbox" name="no_qualifying_event" value="true"> None of the situations listed above apply.
+        <input type="checkbox" id="no_qle_checkbox" name="no_qualifying_event" value="true"><%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
       </div>
       <%# end %>
 
@@ -50,14 +50,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Outside Open Enrollment</h4>
+        <h4 class="modal-title"><%= l10n("insured.families.outside_open_enrollment") %></h4>
       </div>
       <div class="modal-body">
-        <p>Open enrollment starts on <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y")%>. To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e")%>.</p>
+        <p><%= l10n("insured.families.final_sep_open_enrollment_body", next_ivl_open_enrollment_date: @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y"), next_ivl_open_enrollment_period: @next_ivl_open_enrollment_date.try(:strftime, "%B %e") ) %>.</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <%= link_to 'Back To My Account', family_account_path, class: 'btn btn-primary' %>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("close") %></button>
+        <%= link_to l10n('back_to_my_account_title'), family_account_path, class: 'btn btn-primary' %>
       </div>
     </div>
   </div>

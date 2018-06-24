@@ -43,6 +43,20 @@ Feature: Consumer verification process
     And the consumer should see documents verification page
     Then verification types have to be visible
 
+  Scenario: Consumer is from Curam and is fully verified and shows verification types as verified
+    Given a consumer exists
+    And the consumer is logged in
+    When the consumer is completely verified from curam
+    Then the consumer visits verification page
+    And the consumer should see documents verification page
+    Then verification types should display as verified state
 
-
-
+  Scenario: Admin clicks on documents tab for Curam verified person
+    Given a consumer exists
+    And the consumer is logged in
+    When the consumer is completely verified from curam
+    Then the consumer visits verification page
+    And consumer logs out
+    When an HBX admin exists
+    And clicks on the person in families tab
+    Then verification types should display as external source

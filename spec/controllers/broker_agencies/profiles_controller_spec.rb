@@ -410,10 +410,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
   describe "POST set_default_ga" do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, default_general_agency_profile_id: general_agency_profile.id) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:organization) { FactoryGirl.create(:organization) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile, organization: organization) }
+    let!(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
+
     before :each do
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end
@@ -422,6 +426,20 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
+    end
+
+    it "should call general_agency_hired_notice trigger " do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
+      expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
     end
 
     it "should clear default general_agency_profile" do
@@ -476,6 +494,46 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should search for employers in BrokerAgencies with empty search string" do
       xhr :get, :employer_datatable, id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: ''}
       expect(assigns(:employer_profiles).count).to   eq(2)
+    end
+  end
+
+  describe "messages action" do
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:person) { broker_role.person }
+    let(:user_broker) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+
+    let(:person1) { FactoryGirl.create(:person)}
+    let(:user_hbx) { FactoryGirl.create(:user, person: person1, roles: ['hbx_staff']) }
+
+    it "should render the messages template and Broker sees all messages in Broker Mail tab" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should render the messages template and Admin should see the messages in Broker Mail tab" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should pass broker data to @provider if you login as Broker User" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq broker_agency_profile.primary_broker_role.person
+    end
+
+    it "should pass admin records to @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq user_hbx.person
+    end
+
+    it "should not have broker data in @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).not_to eq broker_agency_profile.primary_broker_role.person
     end
   end
 end

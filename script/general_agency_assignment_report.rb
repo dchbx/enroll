@@ -8,6 +8,7 @@ field_names  = %w(
            Group_name
            Employer_FEIN
            General_Agency_Name
+           General_Agency_Staff_Name
            Agency_NPN
            Assignment_start_date
            Assignment_end_date
@@ -26,6 +27,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << [
           employer.legal_name,
           employer.fein,
+          ga_account.general_agency_profile.legal_name,
           ga_account.general_agency_profile.general_agency_staff_roles.first.person.full_name,
           ga_account.general_agency_profile.general_agency_staff_roles.first.npn,
           ga_account.start_on,

@@ -10,18 +10,18 @@
            <h3 class="blue-text"><%= params[:change_plan] %>, on: <%= @change_plan_date %></h3>
         <% end %>
 
-        <h1 class="darkblue">Household Info: Family Members</h1>
-        <h4>If you need to get insurance coverage for other members of your household, select 'Add Member'. When you’re finished, select CONTINUE.</h4>
-        <p class='memo'>* = required field</p>
+        <h1><%= l10n("household_info") %>: <%= l10n("family_members") %></h1>
+        <h4><%= l10n("insured.family_members.index.continue_to_get_insurance") %></h4>
+        <p class='memo'>* = <%= l10n("required_field") %></p>
 
         <div class="row no-buffer">
           <div class="col-md-12 col-sm-12 col-xs-12 no-pd first">
             <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
-              <label class="static_label label-floatlabel" for="name">NAME</label>
+              <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
               <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
             </div>
             <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
-              <label class="static_label label-floatlabel" for="relation">RELATION</label>
+              <label class="static_label label-floatlabel" for="relation"><%= l10n(".relation").to_s.upcase %></label>
               <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
             </div>
           </div>
@@ -30,12 +30,12 @@
         <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
           <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
             <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-              <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
+              <p class="fail"><%= l10n("family_members.index.add_member_info_html") %></p>
               <br>
               <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
-                <%= link_to "Add Member", new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
+                <%= link_to l10n("add_member"), new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
                   &nbsp; &nbsp;
-                <a class="text-center btn btn-success">Continue</a>
+                <a class="text-center btn btn-success"><%= l10n("continue") %></a>
               </div>
             </div>
           </div>
@@ -52,13 +52,13 @@
 
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
           <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
-            <%= link_to 'Add Member'.html_safe, new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
+            <%= link_to l10n("add_member"), new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
             <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, resident_role_id: @resident_role.try(:id), change_plan: @change_plan, market_kind: @market_kind) %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
 
             <% if @change_plan.present? %>
               <%=
-                link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_url,
+                link_to "<i class='fa fa-user-plus'></i> #{l10n('.continue')}".html_safe, group_selection_url,
                  class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue'
               %>
             <% end %>

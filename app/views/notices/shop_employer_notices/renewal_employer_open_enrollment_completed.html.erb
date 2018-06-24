@@ -1,12 +1,21 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><strong>Email notification sent to:<strong> <%= notice.employer_email %> </td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Subject: Group Open Enrollment Successfully Completed</h3></td>
+      <td><h3><strong>Group Open Enrollment Successfully Completed</strong></h3></td>
     </tr>
   </tbody>
 </table>
@@ -14,7 +23,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>,</td>
+      <td>Dear <%= notice.employer_name.titleize %>,</td>
     </tr>
   </tbody>
 </table>
@@ -26,13 +35,13 @@
   content: "You will continue to receive regular monthly invoices from #{Settings.site.short_name}, which you can access in the billing tab in your account. Invoices are also mailed to the group. Please continue to make all premium payments directly to #{Settings.site.short_name} online, by phone or by mail."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>Make a Secure Online Payment</strong>"} %>
+  content: "<strong>Make a secure online payment</strong>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "#{Settings.site.short_name} offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in Employers Paying Your Premiums Online to make your premium payment online."}%>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "<a href='https://www.e-BillExpress.com/ebpp/DCHealthPay'>https://www.e-BillExpress.com/ebpp/DCHealthPay'.</a>"} %>
+  content: "<a href='https://www.e-BillExpress.com/ebpp/DCHealthPay'>https://www.e-BillExpress.com/ebpp/DCHealthPay.</a>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>To make a secure electronic check payment by phone</strong>"} %>
@@ -52,44 +61,27 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "<strong>To view the activity of your employees’ open enrollment:</strong>",
   listings: ["Log in to your #{Settings.site.short_name} employer account",
-    "Select “Employee” from the menu on the left of your account page",
+    "Select “Employees” from the menu on the left of your account page",
     ["You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name} during the open enrollment period. Each entry will have one of the following statuses:",
         ["Blank - No Coverage Selected",
-          "Coverage Selected",
-          "Coverage Waived ",
-          "Terminated"]]]} %>
+         "Coverage Selected",
+         "Coverage Waived ",
+         "Terminated"]]]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
     heading: 'For Questions or Assistance:', sub_heading: ''} %>
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-          By calling <%= Settings.contact_center.phone_number %>
-        </li>
-        </ul>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-          TTY: <%= Settings.contact_center.tty %>
-        </li>
-        </ul>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-          Online at <a href="#{Settings.site.website_name}"><%= Settings.site.website_name%></a>
-        </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["By calling #{notice.hbe.phone}",
+     "TTY: #{Settings.contact_center.tty}",
+     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

@@ -2,14 +2,14 @@
 <%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 
 <div class="row container">
-    <%= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
+    <%= link_to l10n("insured.switch_to_aptc_or_csr_families"), aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
 </div>
 
 <div class="row container">
   <h3 class="title-inline">Families</h3>
   <div class="form-inline button-group-wrapper families_search_div">
     <div class="input-group search-wp">
-      <%= render 'shared/search', url: family_index_exchanges_hbx_profiles_path, q: @q, placeholder: "Name, HBX ID, SSN", remote: true %>
+      <%= render 'shared/search', url: family_index_exchanges_hbx_profiles_path, q: @q, placeholder: l10n("name_hbx_id_ssn"), remote: true %>
     </div>
   </div>
 </div>
@@ -36,5 +36,5 @@
   <%= render 'exchanges/residents/resident_application_link' %>
 </div>
 <div class='row container'>
-  <p> After working on an enrollment return to this page via the person icon in the header </p>
+  <p><%= l10n("insured.return_to_index_for_hbx_staff_page") %></p>
 </div>

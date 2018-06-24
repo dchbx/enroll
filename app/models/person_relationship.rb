@@ -104,6 +104,12 @@ class PersonRelationship
             allow_nil:   false,
             inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
 
+  after_save :notify_updated
+
+  def notify_updated
+    person.notify_updated
+  end
+
   def parent
     raise "undefined parent class: Person" unless person?
     self.person

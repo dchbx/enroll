@@ -12,7 +12,7 @@ class ShopEmployerNotices::InitialEmployerDenialNotice < ShopEmployerNotice
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.first
+    plan_year = employer_profile.plan_years.where(aasm_state: 'publish_pending').last
     plan_year_warnings = []
     plan_year.application_eligibility_warnings.each do |k, v|
       case k.to_s

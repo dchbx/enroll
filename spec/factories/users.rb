@@ -112,6 +112,12 @@ FactoryGirl.define do
     end
   end
 
+  trait :with_resident_role do
+    after :create do |user|
+      FactoryGirl.create :person, :with_resident_role, :with_family, :user => user
+    end
+  end
+
   trait :with_csr_sub_role do
     after :create do |user|
       FactoryGirl.create :person, :with_csr_role, :with_family, :user => user

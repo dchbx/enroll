@@ -40,6 +40,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
     allow(person).to receive(:has_active_employee_role?).and_return true
     allow(employee_role).to receive(:benefit_group).and_return benefit_group
+    allow(coverage_household).to receive(:household).and_return(household)
+    allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
   end
 
   context "GET new" do
@@ -133,11 +135,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     context "it should set the instance variables" do
+      let(:census_employee) {FactoryGirl.build(:census_employee)}
 
       before do
         controller.instance_variable_set(:@hbx_enrollment, hbx_enrollment)
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
         allow(hbx_enrollment).to receive(:kind).and_return "individual"
+        allow(employee_role).to receive(:census_employee).and_return census_employee
         sign_in user
         get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan'
       end
@@ -148,6 +152,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
       it "should set the coverage kind when user click on make changes in open enrollment" do
         expect(assigns(:mc_coverage_kind)).to eq hbx_enrollment.coverage_kind
+      end
+
+      it "should set effective on date" do
+        expect(assigns(:effective_on)).to eq hbx_enrollment.effective_on
       end
     end
 
@@ -208,7 +216,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     it "should redirect to family home if termination is possible" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_benefit)
-      expect(hbx_enrollment).to receive(:propogate_terminate).with(TimeKeeper.date_of_record)
+      expect(HbxEnrollment.aasm.state_machine.events[:terminate_coverage].transitions[0].opts.values.include?(:propogate_terminate)).to eq true
       expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
       expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record

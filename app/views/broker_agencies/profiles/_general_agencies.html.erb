@@ -1,9 +1,9 @@
 <div class="container" id="inbox_provider_form">
   <div class="row">
     <div class="col-md-12">
-      <h3 class="title-inline">General Agencies</h3>
+      <h3 class="title-inline"><%= l10n("general_agencies")%></h3>
       <%=pundit_span HbxProfile, :modify_admin_tabs? %>
-        <%= link_to 'Clear Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
+        <%= link_to "#{l10n('broker_agencies.profiles.clear_default_ga')}", set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
       </span>  
     </div>
     <div class="col-md-12">
@@ -15,9 +15,9 @@
       <% end %>
 
       <% if @broker_agency_profile.default_general_agency_profile.present? %>
-        <p><%= @broker_agency_profile.default_general_agency_profile.try(:legal_name) %> - this is your default GA, to change your default GA click "Select Default GA" under your desired agency.</p>
+        <p><%= @broker_agency_profile.default_general_agency_profile.try(:legal_name) %> - <%= l10n("broker_agencies.profiles.default_general_agency_profile")%></p>
       <% else %>
-        <p>You do not have default GA, to select your default GA click "Select Default GA" under your desired agency.</p>
+        <p><%= l10n("broker_agencies.profiles.no_default_general_agency_profile")%></p>
       <% end %>
     </div>
   </div>
@@ -27,12 +27,12 @@
       <table class="table">
       <% if @general_agency_profiles.present? %>
         <thead>
-          <th>Legal Name</th>
-          <th>dba</th>
-          <th>Fein</th>
-          <th>Entity Kind</th>
-          <th>Market Kind</th>
-          <th>State</th>
+          <th><%= l10n("legal_name")%></th>
+          <th><%= l10n("dba")%></th>
+          <th><%= l10n("fein")%></th>
+          <th><%= l10n("entity_kind")%></th>
+          <th><%= l10n("market_kind")%></th>
+          <th><%= l10n("state")%></th>
           <th></th>
         </thead>
         <% @general_agency_profiles.each do |general_agency_profile| %>
@@ -41,7 +41,7 @@
               <%= general_agency_profile.legal_name %>
               <% if @broker_role.present? %>
                 <%= link_to favorite_broker_agencies_broker_role_path(id: @broker_role.id, general_agency_profile_id: general_agency_profile.id), remote: true do %>
-                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true" data-toggle="tooltip" title="favorite General Agency will list on top of other General Agency on assignment page"></span>
+                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true" data-toggle="tooltip" title= "<%= l10n('broker_agencies.profiles.favorite_general_agency_title') %>"></span>
                 <% end %>
               <% end %>
             </td>
@@ -52,17 +52,17 @@
             <td><%= general_agency_profile.current_state %></td>
             <td>
               <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
-                <div class="ga_status">Default GA</div>
+                <div class="ga_status"><%= l10n("broker_agencies.profiles.default_ga")%></div>
               <% else %>
                 <%= pundit_span HbxProfile, :modify_admin_tabs? %>
-                  <%= link_to 'Select Default GA', set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+                  <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
                 </span>
               <% end %>
             </td>
           </tbody>
         <% end %>
       <% else %>
-        <tr><td>No General Agency Profiles found.</td></tr>
+        <tr><td><%= l10n("broker_agencies.profiles.no_general_agency_profiles_found")%></td></tr>
       <% end %>
       </table>
     </div>

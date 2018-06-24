@@ -7,7 +7,7 @@
     <h3 class="no-buffer">
       <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
       <span class="separator">
-        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
+        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
       </span>
     </h3>
     <%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>
@@ -26,24 +26,24 @@
       <div class="col-xs-12 vertically-aligned-row">
         <div class="enrollment-premium info vertical-align-top">
           <p>
-            <strong>Premium:</strong>
+            <strong><%= l10n("premium") %>:</strong>
             <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
           </p>
         </div>
         <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? %>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Effective Date:
+          <strong><%= l10n("effective_date") %>:
           </strong>
           <%= hbx_enrollment.effective_on %>
         </div>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Coverage End:
+          <strong><%= l10n("coverage_end") %>:
           </strong>
           <%= enrollment_coverage_end(hbx_enrollment) %>
         </div>
         <% else %>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Plan Start:
+          <strong><%= l10n("plan_start") %>:
           </strong>
           <%= hbx_enrollment.effective_on %>
           <% if read_only == true %>
@@ -62,14 +62,14 @@
       <div class="col-xs-12 vertically-aligned-row">
         <% unless hide_policy_selected_date?(hbx_enrollment) %>
         <div class="enrollment-created-at info vertical-align-top">
-          <strong>Plan Selected:
+          <strong><%= l10n("plan_selected") %>:
           </strong>
           <%= format_policy_purchase_date(hbx_enrollment) %>
           (<%= format_policy_purchase_time(hbx_enrollment) %>)
         </div>
         <% end %>
         <div class="enrollment-type info vertical-align-top">
-          <strong>Plan Type:
+          <strong><%= l10n("plan_type") %>:
           </strong>
           <%= render_plan_type_details(plan) %>
         </div>
@@ -77,13 +77,13 @@
       <% if read_only == true %>
       <div class="col-xs-12 vertically-aligned-row">
         <div class="benefit-group info vertical-align-top">
-          <strong>Benefit Group:
+          <strong><%= l10n("benefit_group") %>:
           </strong>
           <%= @benefit_group.try(:title) %>
         </div>
         <% if @census_employee.employee_role.present? && employee_role = @census_employee.employee_role %>
         <div class="hired-on info vertical-align-top">
-          <strong>Hired On:
+          <strong><%= l10n("hired_on") %>:
           </strong>
           <%= @census_employee.employee_role.try(:hired_on) %></p>
       </div>
@@ -92,13 +92,13 @@
     <% if hbx_enrollment.is_coverage_waived? %>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="benefit-group info vertical-align-top">
-        <strong>Enrollment Status:
+        <strong><%= l10n("enrollment_status") %>:
         </strong>
-        Coverage Waived
+        <%= l10n("coverage_waived") %>
       </div>
       <% if @census_employee.employee_role.present? && employee_role = @census_employee.employee_role %>
       <div class="hired-on info vertical-align-top">
-        <strong>Waiver Reason:
+        <strong><%= l10n("waiver_reason") %>:
         </strong>
         <%= hbx_enrollment.waiver_reason %>
       </div>
@@ -110,7 +110,7 @@
       <div class="col-xs-12 vertically-aligned-row">
         <div class="enrollment-effective info">
           <p>
-            <strong>Future enrollment termination date: </strong>
+            <strong><%= l10n("insured.families.future_enrollment_termination_date") %>:</strong>
             <%= hbx_enrollment.future_enrollment_termination_date %>
           </p>
         </div>
@@ -120,7 +120,7 @@
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info">
         <p>
-          <strong>Market Type: </strong>
+          <strong><%= l10n("market_type") %>: </strong>
           <%= show_market_name_by_enrollment hbx_enrollment %>
         </p>
       </div>
@@ -128,15 +128,14 @@
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">
         <p>
-          <strong class="bullet-separator"><%= HbxProfile::ShortName %>
-            ID:</strong>
+          <strong class="bullet-separator"><%= HbxProfile::ShortName %> <%= l10n("enrollment_id") %>:</strong>
           <%= hbx_enrollment.hbx_id %>
         </p>
       </div>
       <div>
         <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
         <p>
-          <label>APTC amount:</label>
+          <label><%= l10n("APTC_amount") %>:</label>
           <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month
         </p>
         <% else %>
@@ -149,7 +148,7 @@
       <% if names.present? %>
       <div class="family-members info vertical-align-top">
         <p>
-          <strong>Covered:</strong>
+          <strong><%= l10n("covered") %>:</strong>
           <a href="#"><%= names.delete_at(0).camelcase %></a>
           <% names.each do |name| %>
           <span class="separator">
@@ -177,7 +176,7 @@
     <div>
       <a class="vertically-aligned-row" data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
         <i class="fa fa-phone fa-2x pull-right"></i>
-        <span>Plan Contact Info</span>
+        <span><%= l10n(".plan_contact_info") %></span>
       </a>
       <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
     </div>
@@ -186,14 +185,14 @@
         <div class="row <%if disable_make_changes_button?(hbx_enrollment)%>cna<%end%>">
           <% if @family.is_eligible_to_enroll? && !hbx_enrollment.coverage_terminated? %>
             <%= pundit_span Family, :updateable? %>
-              <%= link_to "Make Changes", new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-default btn-block, disabled: disable_make_changes_button?(hbx_enrollment)" %>
+              <%= link_to l10n("make_changes"), new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), class: "btn btn-default btn-block, disabled: disable_make_changes_button?(hbx_enrollment)" %>
             </span>
           <% elsif hbx_enrollment.may_terminate_coverage? && hbx_enrollment.kind == "individual" %>
             <%= pundit_span Family, :updateable? %>
-              <%= link_to "Terminate Plan", terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-default btn-block' } %>
+              <%= link_to l10n("terminate_plan"), terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-default btn-block' } %>
             </span>
           <% end %>
-          <%= link_to "View Details", summary_products_plans_path({standard_component_id: plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %>
+          <%= link_to l10n("view_details"), summary_products_plans_path({standard_component_id: plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %>
         </div>
       </div>
     <% end %>
@@ -201,4 +200,3 @@
 </div>
 </div>
 <% end %>
-

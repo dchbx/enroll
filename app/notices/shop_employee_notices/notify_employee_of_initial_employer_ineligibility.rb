@@ -13,9 +13,9 @@ class ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility < ShopEm
   end
 
   def append_data
-    active_plan_year = census_employee.employer_profile.plan_years.first
+    plan_year = census_employee.employer_profile.plan_years.where(aasm_state: 'application_ineligible').last
     notice.plan_year = PdfTemplates::PlanYear.new({
-                      :start_on => active_plan_year.start_on
+                      :start_on => plan_year.start_on
       })
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }

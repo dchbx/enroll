@@ -4,13 +4,12 @@
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
-          <div class="col-md-12"><i class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body"
-                                    title= "Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what's best for them." > STANDARD PLAN </i></div>
+          <div class="col-md-12"><i class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>" > <%= l10n("standard_plan").to_s.upcase %> </i></div>
       <% end %>
     </div>
     <div class="row">
       <% if @enrolled_hbx_enrollment_plan_ids.include?(plan.id) %>
-          <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i>YOUR CURRENT <%= plan.try(:active_year) %> PLAN </h5>
+          <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i><%= l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase %></h5>
       <% end %>
     </div>
     <div class="row">
@@ -30,7 +29,7 @@
       <div class="col-md-3">
         <div class="price-wrapper pull-right">
           <h2 class="no-buffer plan-premium"><%= number_to_currency(current_cost(plan.total_employee_cost, plan.ehb, nil, 'shopping', plan.can_use_aptc?)) %></h2>
-          <small>/Month</small>
+          <small>/<%= l10n("month") %></small>
         </div>
       </div>
     </div>

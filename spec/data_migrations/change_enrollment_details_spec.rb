@@ -33,6 +33,8 @@ describe ChangeEnrollmentDetails do
     let(:term_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
     let(:term_enrollment2) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
     let(:term_enrollment3) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household, kind: "individual")}
+    let(:new_plan) { FactoryGirl.create(:plan) }
+    let(:new_benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return("#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}")
@@ -120,16 +122,44 @@ describe ChangeEnrollmentDetails do
 
     end
 
-    context "it should cancel the enrollment" do
+
+    context "change enrollment aasm state" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("action").and_return "cancel"
-        subject.migrate
+        allow(ENV).to receive(:[]).with("action").and_return "change_enrollment_status"
+        allow(ENV).to receive(:[]).with("new_aasm_state").and_return "move_to_enrolled"
+        hbx_enrollment.update_attribute("aasm_state","enrolled_contingent")
         hbx_enrollment.reload
       end
 
-      it "should cancel the enrollment" do
+      it "should change the aasm state " do
+        expect(hbx_enrollment.may_move_to_enrolled?).to eq true
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
+      end
+
+    end
+
+    context "it should cancel the enrollment when it is eligible for cancelling" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "cancel"
+      end
+
+      it "should cancel the enrollment when it is eligible for cancelling" do
+        expect(hbx_enrollment.may_cancel_coverage?).to eq true
+        subject.migrate
+        hbx_enrollment.reload
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+      it "should not cancel the enrollment when it is not eligible for cancelling" do
+        hbx_enrollment.update_attributes(aasm_state:"coverage_terminated")
+        expect(hbx_enrollment.may_cancel_coverage?).to eq false
+        original_status = hbx_enrollment.aasm_state
+        hbx_enrollment.reload
+        expect(hbx_enrollment.aasm_state).not_to eq "coverage_canceled"
+        expect(hbx_enrollment.aasm_state).to eq original_status
       end
     end
 
@@ -157,6 +187,34 @@ describe ChangeEnrollmentDetails do
 
       it "should expire the enrollment" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
+      end
+    end
+
+    context "change the plan of enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("new_plan_id").and_return(new_plan.id)
+        allow(ENV).to receive(:[]).with("action").and_return "change_plan"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should change the plan of enrollment" do
+        expect(hbx_enrollment.plan_id).to eq new_plan.id
+      end
+    end
+
+    context "change the benefit group of enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("new_benefit_group_id").and_return(new_benefit_group.id)
+        allow(ENV).to receive(:[]).with("action").and_return "change_benefit_group"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should change the benefit group of enrollment" do
+        expect(hbx_enrollment.benefit_group_id).to eq new_benefit_group.id
       end
     end
   end

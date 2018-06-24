@@ -7,20 +7,20 @@
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
 
-          <h1 class="darkblue">Confirm Your Plan Selection</h1>
+          <h1 class="darkblue"><%= l10n('confirm_your_plan_selection') %></h1>
           <h4>Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.</h4>
           <% if @enrollment.employee_role.present? %>
           <% else %>
-            <h4><strong>Important:</strong> You must complete these steps to enroll.</h4>
+            <h4><strong><%= l10n("important") %>:</strong> <%= l10n("insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll") %></h4>
           <% end %>
           <p>
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
-            Benefit: <%= @enrollment.coverage_kind %><br>
-            Metal level : <%= display_dental_metal_level @plan %><br>
-            Market: <%= show_market_name_by_enrollment @enrollment %>
+            <%= l10n("benefit") %>: <%= @enrollment.coverage_kind %><br>
+            <%= l10n("metal_level") %> : <%= display_dental_metal_level @plan %><br>
+            <%= l10n("market") %>: <%= show_market_name_by_enrollment @enrollment %>
 
           </p>
 
@@ -34,7 +34,7 @@
           <% end %>
 
           <% if @enrollment.is_cobra_status? %>
-            <p>* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.</p>
+            <p><%= l10n("insured.plan_shoppings.thankyou.additional_administration_msg") %></p>
           <% end %>
         </div>
 

@@ -1,7 +1,7 @@
 
 <div class="container">
 	<hr/>
-	<%= link_to 'Upload Employee Roster' , upload_employee_roster_broker_agencies_quotes_path , class: "btn btn-trans" , remote: true  ,id: "upload_employees" %> <br>
+	<%= link_to l10n('upload_employee_roster') , upload_employee_roster_broker_agencies_quotes_path , class: "btn btn-trans" , remote: true  ,id: "upload_employees" %> <br>
 
 	<%= form_for Quote.new, url: {action: "create"}, metion: "post" , class: "form-inline" do |f| %>
 		<hr/>
@@ -11,15 +11,15 @@
 			<div class="row">
 				<%=label_tag 'Name of the Quote'%> <%=f.text_field :quote_name %>
 				<%=label_tag 'Quote Effective Date'%> <%=f.text_field :start_on, {:class => "uidatepicker" }  %>			
-				<%= link_to 'New Household' , new_household_broker_agencies_quotes_path , class: "btn btn-trans" , remote: true  %> 	
+				<%= link_to l10n('new_household') , new_household_broker_agencies_quotes_path , class: "btn btn-trans" , remote: true  %> 	
 			</div>
 		<hr/>
 		<div id="quote_container">
 			<%=render "quote_household_fields" , f: f %>
 		</div>
 		<hr/>
-		<%= link_to 'Back' , broker_agencies_quotes_root_path , class: "btn btn-primary" %>
-		<%= submit_tag "Update Roster", class: 'btn btn-primary' %>
+		<%= link_to l10n('back') , broker_agencies_quotes_root_path , class: "btn btn-primary" %>
+		<%= submit_tag l10n("update_roster"), class: 'btn btn-primary' %>
 		<input type="submit" class= "btn btn-primary" value="Save Quote" id="submit"/>
 	<% end %>
 </div>

@@ -2,15 +2,15 @@
 <%= hidden_field_tag 'current_sort', @sort_by  %>
 <%= hidden_field_tag 'plan_ids' %>
 <div class="container-fluid">
-  <h3>Plan Comparison Chart</h3>
+  <h3><%= l10n("plan_comparison_chart")%></h3>
   <ul style="padding-left: 18px;">
-    <li> Plans can be rearranged by dragging the beginning of the company name </li>
-    <li> Use <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> to sort by copay </li>
+    <li> <%= l10n("broker_agencies.quotes.rearranged_plans")%> </li>
+    <li> <%= l10n("use")%> <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> <%= l10n("broker_agencies.quotes.to_sort_by_copay")%> </li>
   </ul>
   <div class="mygrid-wrapper-div">
    <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
         <tr>
-          <th class="row-title">Plans</th>
+          <th class="row-title"><%= l10n("plan")%></th>
           <% qhps.each do |qhp|%>
             <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'>
               <%= hidden_field_tag 'plan_id-#{qhp.plan.id}', qhp.plan.id, class: 'plan_id' %>
@@ -34,7 +34,7 @@
           <% end %>
         </tr>
         <tr>
-          <th>Provider Network</th>
+          <th><%= l10n("provider_network")%></th>
           <% qhps.each do |qhp|%>
             <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
           <% end %>
@@ -59,7 +59,7 @@
             <% qhps.each do |qhp|%>
               <th colspan="2">
                 <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
-                  <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
+                  <%= link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank" %>
                 <% end %>
               </th>
             <% end %>
@@ -68,8 +68,8 @@
         <tr>
           <th>PLAN BENEFITS <br> (In Network)</th>
           <% qhps.each do |qhp|%>
-            <th colspan="1"> CO-PAY </th>
-            <th colspan="1"> COINSURANCE </th>
+            <th colspan="1"> <%= l10n("co_pay")%> </th>
+            <th colspan="1"> <%= l10n("coinsurance")%> </th>
           <% end %>
         </tr>
         <%= render partial: "plan_visit_types", locals: {qhps: qhps} %>
@@ -86,6 +86,6 @@
     </table>
   </div>
   <br>
-    <%= link_to "Export to PDF", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id), class: "btn btn-info", target: "_blank" %>
+    <%= link_to "#{l10n('broker_agencies.quotes.export_to_pdf')}", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id), class: "btn btn-info", target: "_blank" %>
   <br><br>
 </div>

@@ -37,7 +37,7 @@ class User
   def password_complexity
     if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
       errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
-    elsif password.present? and password.match(/#{Regexp.escape(oim_id)}/i)
+    elsif password.present? and password.match(/#{::Regexp.escape(oim_id)}/i)
       errors.add :password, "cannot contain username"
     elsif password.present? and password_repeated_chars_limit(password)
       errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
@@ -81,7 +81,7 @@ class User
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     if login = conditions.delete(:login).downcase
-      where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
+      where(conditions).where('$or' => [ {:oim_id => /^#{::Regexp.escape(login)}$/i}, {:email => /^#{::Regexp.escape(login)}$/i} ]).first
     else
       where(conditions).first
     end
@@ -355,8 +355,8 @@ class User
   end
 
   def handle_headless_records
-    headless_with_email = User.where(email: /^#{Regexp.quote(email)}$/i)
-    headless_with_oim_id = User.where(oim_id: /^#{Regexp.quote(oim_id)}$/i)
+    headless_with_email = User.where(email: /^#{::Regexp.quote(email)}$/i)
+    headless_with_oim_id = User.where(oim_id: /^#{::Regexp.quote(oim_id)}$/i)
     headless_users = headless_with_email + headless_with_oim_id
     headless_users.each do |headless|
       headless.destroy if !headless.person.present?

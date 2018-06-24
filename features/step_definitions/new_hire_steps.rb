@@ -116,7 +116,7 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   enrollment = all('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
 
-  expect(all('.hbx-enrollment-panel').select{|panel| 
+  expect(all('.hbx-enrollment-panel').select{|panel|
     panel.has_selector?('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
   }.present?).to be_truthy
 

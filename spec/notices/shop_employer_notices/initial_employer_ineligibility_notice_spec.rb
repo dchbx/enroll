@@ -11,7 +11,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
                             :notice_template => 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
                             :event_name => 'initial_employer_ineligibility_notice',
-                            :mpi_indicator => 'MPI_SHOP32',
+                            :mpi_indicator => 'SHOP_D020',
                             :title => "Group Ineligible to Obtain Coverage"})
                           }
     let(:valid_parmas) {{
@@ -88,6 +88,17 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
       else
         expect(@employer_notice.notice.plan_year.warnings).to eq []
       end
+    end
+
+    it "should render initial_employer_ineligibility_notice" do
+     expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_ineligibility_notice"
+    end
+ 
+    it "should generate pdf" do
+      @employer_notice.build
+      @employer_notice.append_data
+      @employer_notice.generate_pdf_notice
+      expect(File.exist?(@employer_notice.notice_path)).to be true
     end
   end
 

@@ -43,10 +43,18 @@ module PdfTemplates
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
     end
 
+    def general_agency?
+      false
+    end
+
     def shop?
       false
     end
 
+    def broker?
+      return false
+    end
+     
     def employee_notice?
       false
     end

@@ -1,12 +1,21 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><b>Email notification sent to:</b> <%= notice.employer_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Group Ineligible to Obtain Coverage</h3></td>
+      <td style="padding-top: 10px"><b><b>Group Ineligible to Obtain Coverage</b></b></td>
     </tr>
   </tbody>
 </table>
@@ -14,7 +23,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:</td>
+      <td style="padding-top: 10px">Dear <%= notice.employer_name %>:</td>
     </tr>
   </tbody>
 </table>
@@ -22,47 +31,33 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Your employee open enrollment period closed on #{notice.plan_year.open_enrollment_end_on} and your group did not meet the eligibility requirement listed below. As a result, your group is not eligible to obtain employer-sponsored health insurance effective #{notice.plan_year.start_on} at this time."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "**<strong>#{notice.plan_year.warnings.join(' and ')}</strong>**"} %>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "**<strong>#{notice.plan_year.warnings.join(' and ')}</strong>**", top_margin: '10px', bottom_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through DCHealthLink.com. Please note that you must meet the following requirements to be eligible to obtain employer-sponsored health insurance through #{Settings.site.short_name}:",
+  previous: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>. Please note that you must meet the following requirements to be eligible to obtain employer-sponsored health insurance through #{Settings.site.short_name}:",
   listings: ["At least two-thirds of your eligible employees enroll in your group health coverage or waive due to having other coverage.",
-    "One non-owner employee enrolls in health coverage."]} %>
+    "At least one non-owner employee enrolls in health coverage."]} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "If you are unable to satisfy the minimum participation requirement, you will only be able to offer #{Settings.site.short_name} coverage during the special annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without contributing 50% to employees’ premiums or meeting the two-thirds minimum participation requirement. Groups must have at least one non-owner employee enrolled to be eligible for coverage through #{Settings.site.short_name}, including during the special annual enrollment period."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you do not have any eligible non-owner employees to enroll and therefore cannot qualify for employer-sponsored coverage, you can apply for coverage through the Individual and Families market based on each individual(s) state of residence."}%>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "If you do not have any eligible non-owner employees to enroll and therefore cannot qualify for employer-sponsored coverage, you can apply for coverage through the Individual and Families market based on each individual(s) state of residence.", top_margin: '10px', bottom_margin: '10px'}%>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
     heading: 'For Questions or Assistance:', sub_heading: ''} %>
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-          By calling <%=Settings.contact_center.phone_number%>
-        </li>
-        <li style="margin-top: 5px;">
-          TTY: 711
-        </li>
-        <li style="margin-top: 5px;">
-          Online at <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>
-        </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["By calling #{notice.hbe.phone}",
+    "TTY: #{Settings.contact_center.tty}",
+    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

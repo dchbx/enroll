@@ -2,7 +2,7 @@
   .container
     .col-xs-9
       - if @step == 'start'
-        %h4 To keep your data secure, we are required to verify your identity electronically using the credit reporting agency Experian. Unfortunately, Experian was unable to confirm your identity based on the information you provided. You have two options for completing your application:
+        = l10n(".failed_validation_html")
         %br
         1. Complete your application at the DC Health Benefit Exchange Authority. Please call (202) 715-7576 to set up an appointment.
         %br
@@ -15,6 +15,6 @@
       %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_response.transaction_id), :method => :put, :class => "btn btn-primary  btn-small interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))
       %br
       .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
-        Help me sign up
+        =l10n("help_me_sign_up")
     %br
       = render partial: 'insured/plan_shoppings/help_with_plan'

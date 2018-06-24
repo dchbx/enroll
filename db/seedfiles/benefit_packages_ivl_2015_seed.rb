@@ -2,7 +2,7 @@ puts "::: Creating IVL 2015 benefit packages :::"
 
 ## 2015 Benefit Packages
 
-hbx = HbxProfile.find_by_state_abbreviation("dc")
+hbx = HbxProfile.current_hbx
 
 # Second lowest cost silver plan
 slcsp_2015 = Plan.where(active_year: 2015).and(hios_id: "94506DC0390006-01").first

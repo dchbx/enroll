@@ -2,18 +2,18 @@
   <div class="panel-heading vertically-aligned-row">
     <div>
       <h3 class="panel-title">
-        <%= title.present? ? title : "Your Broker" %>
+        <%= title.present? ? title : l10n("insured.your_broker") %>
       </h3>
     </div>
     <div class="text-right">
-      <%= link_to "Delete Broker &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>".html_safe, delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: "Are you sure you want to delete?" }, class: 'btn btn-default'+pundit_class(Family,:updateable?) %>
+      <%= link_to "#{l10n('insured.delete_broker')} &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>".html_safe, delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: l10n("confirm_delete_msg") }, class: 'btn btn-default'+pundit_class(Family,:updateable?) %>
     </div>
   </div>
   <div class="panel-body">
     <div class="vertically-aligned-row">
     <div>
         <strong>
-          Broker Name:
+          <%= l10n("insured.broker_name") %>:
         </strong>
         <span>
           <%= @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.capitalize %>
@@ -32,7 +32,7 @@
       <% if @person.primary_family.current_broker_agency.writing_agent.phone.present? %>
         <div>
           <strong>
-            Phone Number:
+            <%= l10n("phone_number") %>:
           </strong>
           <span>
             <%= @person.primary_family.current_broker_agency.writing_agent.phone %>
@@ -42,7 +42,7 @@
       <% if @person.primary_family.current_broker_agency.writing_agent.email.address.present? %>
         <div>
           <strong>
-            Email Address:
+            <%= l10n("email_address") %>:
           </strong>
           <span>
             <%= @person.primary_family.current_broker_agency.writing_agent.email.address %>

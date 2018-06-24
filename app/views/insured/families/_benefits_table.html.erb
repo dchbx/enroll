@@ -1,9 +1,9 @@
 <% benefits.each do |b| %>
-  <td><%= b.employer_profile.present? ? "SHOP" : "Individual" %>
-  <td><%= "Issuer placeholder" %>
-  <td><%= b.broker_agency_profile.present? ? b.broker_agency_profile.dba : "None" %>
-  <td><%= "Benefit type placeholder" %>
+  <td><%= b.employer_profile.present? ? l10n("shop").to_s.upcase : l10n("individual") %>
+  <td><%= l10n("insured.issuer_placeholder") %>
+  <td><%= b.broker_agency_profile.present? ? b.broker_agency_profile.dba : l10n("none") %>
+  <td><%= l10n("insured.benefit_type_placeholder") %>
   <td><%= b.hbx_enrollment_members.size %>
   <td><%= format_date(b.effective_on) %></td>
-  <td><%= "Status placeholder" %></td>
+  <td><%= l10n("insured.status_placeholder") %></td>
 <% end %>

@@ -1,7 +1,8 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
+  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date]
+  before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
   respond_to :html, :js
 
   def download
@@ -74,10 +75,15 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    @person.consumer_role.redetermine!(verification_attr)
+    if params[:verification_type] == 'DC Residency'
+      @person.consumer_role.invoke_residency_verification!
+    else
+      @person.consumer_role.redetermine_verification!(verification_attr)
+    end
     respond_to do |format|
       format.html {
-        flash[:success] = "Request was sent to FedHub."
+        hub =  params[:verification_type] == 'DC Residency' ? 'Local Residency' : 'FedHub'
+        flash[:success] = "Request was sent to #{hub}."
         redirect_to :back
       }
       format.js
@@ -100,6 +106,7 @@ class DocumentsController < ApplicationController
     v_type = params[:verification_type]
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
+      add_type_history_element
       sv = @family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
       if sv.present?
         new_date = sv.due_date.to_date + 30.days
@@ -123,6 +130,8 @@ class DocumentsController < ApplicationController
 
   def destroy
     @document.delete
+    family_member = FamilyMember.find(params[:family_member_id])
+    family_member.family.update_family_document_status!
     respond_to do |format|
       format.html { redirect_to verification_insured_families_path }
       format.js
@@ -140,6 +149,20 @@ class DocumentsController < ApplicationController
     respond_to do |format|
       format.html {redirect_to verification_insured_families_path, notice: "Document Status Updated"}
       format.js
+    end
+  end
+
+  def add_type_history_element
+    actor = current_user ? current_user.email : "external source or script"
+    verification_type = params[:verification_type]
+    action = params[:admin_action] || params[:action]
+    action = "Delete #{params[:doc_title]}" if action == "destroy"
+    reason = params[:verification_reason]
+    if @person
+      @person.consumer_role.add_type_history_element(verification_type: verification_type,
+                                                     action: action.split('_').join(' '),
+                                                     modifier: actor,
+                                                     update_reason: reason)
     end
   end
 
@@ -172,7 +195,7 @@ class DocumentsController < ApplicationController
   end
 
   def set_person
-    @person = Person.find(params[:person_id])
+    @person = Person.find(params[:person_id]) if params[:person_id]
   end
 
   def verification_attr

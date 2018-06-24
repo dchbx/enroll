@@ -5,7 +5,8 @@
     .row
       .col-lg-7.col-md-7.col-sm-8.col-xs-12
         = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
-          %h3 Personal Information
+          %h3
+            = l10n("personal_information")
           = render 'insured/employee_roles/remote_search_form', f: f
           = render "no_match"
       .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section

@@ -38,7 +38,7 @@
 <% if notice.notification_type == "projected_eligibility_notice_1" %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Review your household information, and make sure it’s correct",
-               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
+               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
                "Review your projected eligibility results for #{notice.coverage_year}"]} %>
 <% end %>
 
@@ -46,7 +46,7 @@
   <% if notice.irs_consent_needed %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Review your household information, and make sure it’s correct",
-               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
+               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
                "Review your projected eligibility results for #{notice.coverage_year}"]} %>
   <% else %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -80,7 +80,7 @@
 
 <% if notice.notification_type == "projected_eligibility_notice_2"%>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
+   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by #{(TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y")}. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
   <% notice.individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
                                rows: [['Household Member:', "#{member.first_name.titleize} #{member.last_name.titleize}  Age: #{member.age}"],
@@ -96,7 +96,7 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
- contents: ["Based on the information we have in our records about your household, your projected results are listed below. This is not a final eligibility decision. Your eligibility may change once we get more information from you, or from our electronic data sources. You will get another notice with your final eligibility determination for #{notice.coverage_year} in about a month."],
+ contents: ["Based on the information we have in our records about your household, your projected results are listed below. <strong>This is not a final eligibility decision. Your eligibility may change once we get more information from you, or from our electronic data sources</strong>. You will get another notice with your final eligibility determination for #{notice.coverage_year} in about a month."],
    heading: "Your Projected Eligibility Results for #{notice.coverage_year}", sub_heading: '', top_margin: '8px'} %>
 
 <!-- [If likely MAGI Medicaid=YES] -->
@@ -112,7 +112,17 @@
       previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
       listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
     <% notice.tax_households.each do |thh|%>
-      <% if thh.max_aptc.present? %>
+      <% if thh.max_aptc.present? && thh.max_aptc.to_i > 0 %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+          content: "<strong>Advance Premium Tax Credit Savings:</strong> &nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp #{thh.max_aptc.to_f}/month", bottom_margin: '5px'} %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+          content: "This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan.", bottom_margin: '5px'} %>
+      <% elsif thh.max_aptc.present? && thh.max_aptc.to_i == 0 %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+          content: "<strong>Advance Premium Tax Credit Savings:</strong> &nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp #{thh.max_aptc.to_f}/month", bottom_margin: '5px'} %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+          content: "This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is projected to be $0, because a silver plan will cost you less than what the federal government expects you to spend each month on health insurance.", bottom_margin: '5px'} %>
+      <% else %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> The people listed above are projected to be eligible for a tax credit to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. We’ll let you know the amount of your tax credit before open enrollment begins.", bottom_margin: '5px'} %>
       <% end %>
@@ -158,40 +168,48 @@
     listings: notice.ineligible_applicants} %>
 <% end %>
 
-<% if notice.notification_type == "projected_eligibility_notice_1"%>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["If your household meets certain income and other requirements, you may be able to get help paying for your health coverage in #{notice.coverage_year}. There are several types of help that may be available to you:"],
-     heading: 'Need Help Paying for Your Health Plan?', sub_heading: '', top_margin: '8px'} %>
+<div style="page-break-inside: avoid;">
+  <% if notice.notification_type == "projected_eligibility_notice_1"%>
+    <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+     contents: ["If your household meets certain income and other requirements, you may be able to get help paying for your health coverage in #{notice.coverage_year}. There are several types of help that may be available to you:"],
+       heading: 'Need Help Paying for Your Health Plan?', sub_heading: '', top_margin: '8px'} %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "",
-    listings: ["<strong>Medicaid</strong> – free, comprehensive health coverage",
-              "<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance",
-              "<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services"]} %>
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "",
+      listings: ["<strong>Medicaid</strong> – free, comprehensive health coverage",
+                "<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance",
+                "<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services"]} %>
 
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "To see if you can get help, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, and apply for Medicaid and tax credits. When you do, we’ll also see if you qualify for cost-sharing reductions. You can also call us at #{notice.hbe.phone}."} %>
-<% end %>
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+     content: "To see if you can get help, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, and apply for Medicaid and tax credits. When you do, we’ll also see if you qualify for cost-sharing reductions. You can also call us at #{notice.hbe.phone}."} %>
+  <% end %>
+</div>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["If your plan is terminated, or cancelled for any reason before the end of the year, it will not be automatically renewed. You must go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> during open enrollment to enroll for #{notice.coverage_year}.","Open enrollment for #{notice.coverage_year} begins on #{notice.ivl_open_enrollment_start_on.strftime("%B %d, %Y")}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
+ contents: ["If your plan is terminated, or cancelled for any reason before the end of the year, <strong>it will not be automatically renewed</strong>. You must go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> during open enrollment to enroll for #{notice.coverage_year}.","Open enrollment for #{notice.coverage_year} begins on #{notice.ivl_open_enrollment_start_on.strftime("%B %d, %Y")}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
    heading: 'What if I Don’t Have a Plan Anymore?', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-content: "If you have questions or concerns, we’re here to help.<br><br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________", top_margin: '10px'} %>
+<br>
 
-<%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
-"Basic exchange eligibility standards: 45 CFR §155.305(a)",
-"Advanced premium tax credit eligibility standards: 45 CFR §155.305(f)",
-"Cost-sharing reduction eligibility standards: 45 CFR §155.305(g)",
-"Annual eligibility redetermination and renewal standards: 45 CFR §155.335",
-"Open enrollment period: 45 CFR §155.410",
-"<i>Medicaid Regulations</i>",
-"State residence: 42 CFR § 435.403",
-"Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
-"Medicaid use of modified adjusted gross income:  42 CFR § 435.603",
-"Medicaid determination of eligibility: 42 CFR § 435.911",
-"Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)",
-"Verification of other non-financial information: 42 CFR § 435.956",
-"Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "If you have questions or concerns, we’re here to help.<br><br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+</div>
+
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
+  "Basic exchange eligibility standards: 45 CFR §155.305(a)",
+  "Advanced premium tax credit eligibility standards: 45 CFR §155.305(f)",
+  "Cost-sharing reduction eligibility standards: 45 CFR §155.305(g)",
+  "Annual eligibility redetermination and renewal standards: 45 CFR §155.335",
+  "Open enrollment period: 45 CFR §155.410",
+  "<i>Medicaid Regulations</i>",
+  "State residence: 42 CFR § 435.403",
+  "Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
+  "Medicaid use of modified adjusted gross income:  42 CFR § 435.603",
+  "Medicaid determination of eligibility: 42 CFR § 435.911",
+  "Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)",
+  "Verification of other non-financial information: 42 CFR § 435.956",
+  "Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>
+</div>

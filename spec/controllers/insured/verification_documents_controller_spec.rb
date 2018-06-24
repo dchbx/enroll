@@ -61,10 +61,10 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
     describe "file upload" do
       let(:file) { [:temp_file] }
-      let(:person) { instance_double(Person) }
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
-      let(:params) { {person: {consumer_role: ''}, file: file} }
+      let(:params) { {person: {consumer_role: person.consumer_role}, file: file} }
       let(:bucket_name) { 'id-verification' }
       let(:doc_uri) { "doc_uri" }
       let(:file_path) { 'temp_file' } # a sample file path

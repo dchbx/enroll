@@ -1,20 +1,20 @@
 <nav>
   <ul>
     <li <%= menu_tab_class(@tab, 'home') %>>
-      <%= link_to "My #{Settings.site.short_name}", family_account_path(tab: 'home') %>
+      <%= link_to l10n("my_site_short_name", site_short_name: Settings.site.short_name), family_account_path(tab: 'home') %>
     </li>
     <% if ( @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present?) || ( @person.has_active_consumer_role? &&  @person.primary_family.current_broker_agency.present? ) %>
     <li <%= menu_tab_class(@tab, 'broker') %>>
-        <%= link_to "My Broker", brokers_insured_families_path(tab: 'broker') %>
+        <%= link_to l10n("my_broker"), brokers_insured_families_path(tab: 'broker') %>
       </li>
     <% end %>
 
     <% if @person.has_consumer_role? %>
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to verification_insured_families_path(tab: 'verification') do %>
-            Documents
+            <%= l10n("documents") %>
           <% if enrollment_group_unverified?(@person) && verification_needed?(@person) && !documents_uploaded %>
-            <span class="badge message-unread">Action Needed</span>
+            <span class="badge message-unread"><%= l10n("action_needed") %></span>
           <% end %>
         <% end %>
       </li>
@@ -23,19 +23,19 @@
     <% if current_user.has_hbx_staff_role? && @person.has_resident_role? %>
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to upload_application_insured_families_path(tab: 'verification') do %>
-            Upload Paper Application
+            <%= l10n("upload_paper_application") %>
         <% end %>
       </li>
     <% end %>
     <li <%= menu_tab_class(@tab, 'messages') %>>
       <%= link_to(inbox_insured_families_path(tab: 'messages')) do  %>
-        Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.size %></span>
+        <%= l10n("messages") %> <span class="badge message-unread"><%= @person.inbox.unread_messages.size %></span>
       <% end %>
     </li>
   </ul>
   <div class="module my-account-widget panel panel-default">
     <div class="panel-heading">
-      <h4>My Account</h4>
+      <h4><%= l10n("my_account") %></h4>
     </div>
     <div class="panel-body" style="padding: 0;">
       <span class="dg ttc">
@@ -56,7 +56,7 @@
       <% else %>
       <% end %>
 	<br/>
-	<%= link_to "Manage Family", manage_family_insured_families_path(tab: 'family'), class: 'btn btn-default btn-block' %>
+	<%= link_to l10n("manage_family"), manage_family_insured_families_path(tab: 'family'), class: 'btn btn-default btn-block' %>
 	<br/>
 </div>
   </div>

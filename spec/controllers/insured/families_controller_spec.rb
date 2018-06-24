@@ -126,6 +126,41 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
+
+
+    context "#init_qle" do
+      before :each do
+        @controller = Insured::FamiliesController.new
+        @qle = FactoryGirl.create(:qualifying_life_event_kind)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        allow(person).to receive(:user).and_return(user)
+        allow(user).to receive(:identity_verified?).and_return(false)
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:active_employee_roles).and_return([])
+        allow(person).to receive(:employee_roles).and_return([])
+        allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
+        allow(family).to receive(:check_for_consumer_role).and_return true
+        allow(family).to receive(:active_family_members).and_return(family_members)
+        sign_in user
+      end
+      after do
+        QualifyingLifeEventKind.destroy_all
+      end
+
+      it "should return qles" do
+        allow(@controller).to receive(:params).and_return({})
+        expect(@controller.instance_eval { init_qualifying_life_events }).to eq ([@qle])
+      end
+
+
+      it "should return qles" do
+        allow(@controller).to receive(:params).and_return({market: "individual_market_events"})
+        expect(@controller.instance_eval { init_qualifying_life_events }).to eq ([])
+      end
+    end
+
     context "for SHOP market" do
 
       let(:employee_roles) { double }
@@ -453,7 +488,8 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "POST record_sep" do
+  describe "POST record_sep", dbclean: :after_each do
+
     before :each do
       date = TimeKeeper.date_of_record - 10.days
       @qle = FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date)
@@ -466,6 +502,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:primary_family).and_return(@family)
       allow(person).to receive(:hbx_staff_role).and_return(nil)
     end
+
     context 'when its initial enrollment' do
       before :each do
         post :record_sep, qle_id: @qle.id, qle_date: Date.today
@@ -557,6 +594,7 @@ RSpec.describe Insured::FamiliesController do
     before(:each) do
       sign_in(user)
       allow(person).to receive(:resident_role?).and_return(false)
+      allow(controller).to receive(:is_ee_sep_request_accepted?).and_return false
     end
 
     it "renders the 'check_qle_date' template" do

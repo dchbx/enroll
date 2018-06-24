@@ -12,7 +12,6 @@ require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
-
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
 require "rspec/rails"
 
@@ -41,7 +40,8 @@ ActionController::Base.allow_rescue = false
 # Remove/comment out the lines below if your app doesn't have a database.
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
-  DatabaseCleaner.strategy = :truncation
+  load Rails.root + "db/seedfiles/english_translations_seed.rb"
+  DatabaseCleaner.strategy = :truncation, {:except => %w[translations]}
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end

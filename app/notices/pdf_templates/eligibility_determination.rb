@@ -11,5 +11,9 @@ module PdfTemplates
     def shop?
       false
     end
+
+    def general_agency?
+      false
+    end
   end
 end

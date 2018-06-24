@@ -3,7 +3,7 @@
     - check = (index == 0 ? true : false)
     %input.n-radio{ :type=>"radio", :class=> "employer-sponsored", :checked=>check, :id=>"new_employee-sponsored-benefits#{er.object_id}", :name=>"healthcare-marketplace" }
     %span.n-radio
-    ="Enroll as an employee of #{er.employer_name}"
+    =l10n("insured.employee_roles.enroll_as_an_employee", employer_name: er.employer_name)
 = form_for(er, :url => insured_employee_index_path, :as => :employment_relationship, :html => {:class => "new_employee-sponsored-benefits#{er.object_id}"}, :method => :post) do |f|
   = f.submit :class => "hidden", :id => "employee-sponsored-benefits#{er.object_id}"
   = f.hidden_field :first_name

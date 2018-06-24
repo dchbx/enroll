@@ -7,22 +7,22 @@
         <table class="table table-border">
           <tbody>
             <tr>
-              <th>Legal Name:</th>
+              <th><%= l10n("legal_name")%>:</th>
               <td><%= agency.try(:legal_name) %></td>
             </tr>
 
             <tr>
-              <th>FEIN:</th>
+              <th><%= l10n("fein").to_s.upcase%>:</th>
               <td><%= agency.try(:fein) %></td>
             </tr>
 
             <tr>
-              <th>Primary Broker Name:</th>
+              <th><%= l10n("primary_broker_name")%>:</th>
               <td><%= agency.try(:primary_broker_role).try(:person).try(:full_name) %></td>
             </tr>
 
             <tr>
-              <td colspan="2"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency pull-right' data-broker_agency_profile_id="<%= agency._id %>">select this broker agency</a></td>
+              <td colspan="2"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency pull-right' data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("broker_agencies.broker_roles.select_this_broker_agency")%></a></td>
             </tr>
           </tbody>
         </table>

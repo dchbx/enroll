@@ -1,10 +1,10 @@
 <% if @qle.effective_on_kinds.count > 1 %>
-  <div class="alert alert-danger" id='qle_effective_on_kind_alert' role="alert" style='display:none'>Please Select Effective Date</div>
+  <div class="alert alert-danger" id='qle_effective_on_kind_alert' role="alert" style='display:none'><%= l10n(".please_select_effective_date") %></div>
   <div style='margin: 0 auto;max-width:250px;'>
     <% if @qle.reason == 'birth' || @qle.reason == 'adoption' %>
-      <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle.effective_on_kinds, @qle_date)), include_blank: 'SELECT EFFECTIVE DATE *' %>
+      <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle.effective_on_kinds, @qle_date)), include_blank: "#{l10n('.select_effective_date').to_s.upcase} *" %>
     <% else %>
-      <%= select_tag 'effective_on_kind', options_for_select(@qle.effective_on_kinds.map{|k| [k.humanize, k]}), include_blank: 'SELECT EFFECTIVE DATE *' %>
+      <%= select_tag 'effective_on_kind', options_for_select(@qle.effective_on_kinds.map{|k| [k.humanize, k]}), include_blank: "#{l10n('.select_effective_date').to_s.upcase} *" %>
     <% end %>
   </div>
 <% else %>

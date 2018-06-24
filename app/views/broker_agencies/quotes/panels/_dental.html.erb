@@ -1,12 +1,12 @@
  <div class="panel panel-default dental-panel">
    <div class="panel-heading" role="tab" id="dental-feature-mgmt-header">
      <a role="button" data-toggle="collapse" data-parent="#accordion" href="#dental-feature-mgmt" aria-expanded="false" aria-controls="dental-feature-mgmt">
-       <b>Dental Features and cost criteria</b>
+       <b><%= l10n("broker_agencies.quotes.panels.dental_features_and_cost_criteria")%></b>
      </a>
     <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-    <span style='margin-left: 50px; font-size: 120%;'  id='show_dental_plan_criteria_count'>Plan count</span>
-    <span class="pull-right" style='margin-left: 50px; font-size: 100%;font-weight: bolder;'>Optional</span>
-    <label class='btn btn-normal hide' id='reset_criteria'> Reset Criteria</label>
+    <span style='margin-left: 50px; font-size: 120%;'  id='show_dental_plan_criteria_count'><%= l10n("plan_count")%></span>
+    <span class="pull-right" style='margin-left: 50px; font-size: 100%;font-weight: bolder;'><%= l10n("optional")%></span>
+    <label class='btn btn-normal hide' id='reset_criteria'><%= l10n("reset_criteria")%></label>
    </div>
    <div id="dental-feature-mgmt" class="panel-collapse collapse" role="tabpanel" aria-labelledby="">
       <%= render partial: 'my_dental_features' %>

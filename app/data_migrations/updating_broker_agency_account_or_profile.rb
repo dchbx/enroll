@@ -15,6 +15,8 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
         update_family_broker_agency_accounts
       when "update_employer_broker_agency_accounts"
         update_employer_broker_agency_account
+      when "update_family_broker_agency_account_with_writing_agent"
+        update_family_broker_agency_account_with_writing_agent
       else
         exit
     end
@@ -29,7 +31,7 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
                                                           entity_kind: "s_corporation",
                                                           primary_broker_role_id: writing_agent.id,
                                                           default_general_agency_profile_id: ENV['defualt_general_agency_id'])
-      org = Organization.create(office_locations: [create_new_primary_office_location], fein: ENV['fein'], legal_name: ENV['legal_name'], 
+      org = Organization.create(office_locations: [create_new_primary_office_location], fein: ENV['fein'], legal_name: ENV['legal_name'],
                                 is_fake_fein: true, broker_agency_profile: broker_agency_profile)
       org.broker_agency_profile.approve!
       org.save!
@@ -66,7 +68,7 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
   def update_broker_role
     writing_agent= BrokerRole.by_npn(ENV['npn']).first
     broker_agency_profile = BrokerAgencyProfile.find(ENV['broker_agency_profile_id'])
-  
+
     if broker_agency_profile.present? && writing_agent.present?
       writing_agent.update_attributes!(:market_kind => ENV['market_kind'],broker_agency_profile_id: broker_agency_profile.id)
       puts "Updated broker's broker agency profile and market kind" unless Rails.env.test?
@@ -121,6 +123,28 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
     else
       puts "writing_agent not found" if !Rails.env.test?  && writing_agent.blank?
       puts "broker_agency_profile not found for broker" if !Rails.env.test? && broker_agency_profile.blank?
+    end
+  end
+
+  def update_family_broker_agency_account_with_writing_agent
+    return "Fein not found" if ENV['org_fein'].blank?
+    return "hbx_id not found" if ENV['hbx_id'].blank?
+
+    broker_agency_profile = Organization.where(:fein => ENV['org_fein']).first.broker_agency_profile
+    writing_agent = broker_agency_profile.primary_broker_role
+    person = Person.where(hbx_id: ENV['hbx_id']).first
+
+    if person.primary_family.present? && writing_agent.present? && broker_agency_profile.present?
+      person.primary_family.broker_agency_accounts.unscoped.each do |agency_account|
+        if agency_account.broker_agency_profile_id == BSON::ObjectId(broker_agency_profile.id)
+          agency_account.update_attributes!(writing_agent_id: writing_agent.id)
+          puts "updated writing_agent for broker_agency_accounts" unless Rails.env.test?
+        end
+      end
+    else
+      puts "broker_agency_profile not found for broker" if !Rails.env.test? && broker_agency_profile.blank?
+      puts "writing_agent not found" if !Rails.env.test?  && writing_agent.blank?
+      puts "person not found" if !Rails.env.test? && person.blank?
     end
   end
 end

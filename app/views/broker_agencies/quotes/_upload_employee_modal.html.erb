@@ -1,7 +1,7 @@
 <div class="employee-upload">
   <i class="fa fa-times fa-3x pull-right modal-close"></i>
   <h2>Upload Employee Roster</h2>
-  <h4>If you completed your employee roster offline using our Microsift Excel template, find the file on your computer and upload it here.</h4>
+  <h4>If you completed your employee roster offline using our Microsoft Excel template, find the file on your computer and upload it here.</h4>
   <%= link_to(document_download_path(env_bucket_name("templates"), "b4c0e3e6-cf9b-4b00-8194-403b110b4e01") + "?contenttype=application/vnd.ms-excel&filename=DCHL Employee Census.xlsx", class: "download") do %>
     <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
       Download it now.
@@ -12,6 +12,6 @@
   <%= form_tag({action: :build_employee_roster}, multipart: true, class: "upload_csv") do %>
     <%= file_field_tag :employee_roster_file %>
     <%= label_tag :employee_roster_file, 'Select File To Upload', class: 'select btn btn-primary btn-br' %>
-    <%= submit_tag 'Upload', class: 'btn btn-primary btn-br'%>
+    <%= submit_tag l10n("upload"), class: 'btn btn-primary btn-br'%>
   <%end%>
 </div>

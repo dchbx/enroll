@@ -2,7 +2,7 @@
   <div class="health">
     <div class="row" style='margin-top:2%;'>
       <div class="col-sm-2 text-right">
-          % for Employee:
+          % <%= l10n(".for_employee")%>:
       </div>
       <div class='col-sm-1'>
         <%= number_field_tag 'employee_slide_input', '', {  class: "slider_input hidden-param" } %>
@@ -14,7 +14,7 @@
         <span id='employee_slide_label' class="slide-label pull-right">0%</span>
       </div>
       <div class="col-sm-2 text-right">
-          % for Spouse:
+          % <%= l10n(".for_spouse")%>:
       </div>
       <div class='col-sm-1'>
         <%= number_field_tag 'spouse_input', '', {  class: "slider_input right_slider_input hidden-param" } %>
@@ -28,7 +28,7 @@
     </div>
     <div class="row" style='margin-top:5%;'>
       <div class="col-sm-2 text-right">
-          % for Domestic Partner:
+          % <%= l10n(".for_domestic_partner")%>:
       </div>
       <div class='col-sm-1'>
         <%= number_field_tag 'domestic_input', '', {  class: "slider_input hidden-param" } %>
@@ -40,7 +40,7 @@
         <span id='domestic_label' class="slide-label pull-right">0%</span>
       </div>
       <div class="col-sm-2 text-right">
-          % for Child:
+          % <%= l10n(".for_child")%>:
       </div>
       <div class='col-sm-1'>
         <%= number_field_tag 'child_input', '', {  class: "slider_input right_slider_input hidden-param" } %>

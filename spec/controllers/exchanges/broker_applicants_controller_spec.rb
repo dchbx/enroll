@@ -109,6 +109,27 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         end
       end
 
+      context 'when application is updated' do
+        before :each do
+          broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
+          broker_role.approve!
+          put :update, id: broker_role.person.id, update: true, person: { broker_role_attributes: { training: true , carrier_appointments: {"Aetna Health Inc"=>"true", "United Health Care Insurance"=>"true"}} } , format: :js
+          broker_role.reload
+        end
+
+        it "should change applicant status to active" do
+          expect(assigns(:broker_applicant))
+          expect(broker_role.aasm_state).to eq 'active'
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to('/exchanges/hbx_profiles')
+          expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc"=>"true", "Aetna Life Insurance Company"=>nil, "Carefirst Bluechoice Inc"=>nil, "Group Hospitalization and Medical Services Inc"=>nil, "Kaiser Foundation"=>nil, "Optimum Choice"=>nil, "United Health Care Insurance"=>"true", "United Health Care Mid Atlantic"=>nil})
+        end
+
+        it "should have training as true in broker role attributes" do
+          expect(broker_role.training).to eq true
+        end
+      end
+
       context 'when application is pending' do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })

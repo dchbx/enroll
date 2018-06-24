@@ -7,12 +7,12 @@
         </div>
         <div class="col-xs-10">
           <span class="ttu dg twelve">
-            STEP 1
+            <%= l10n("step", number: 1) %>
           </span>
           <br>
           <span class="dg fourteen">
             <strong>
-              Tell us about yourself
+              <%= l10n("tell_us_about_yourself") %>
             </strong>
           </span>
         </div>
@@ -32,16 +32,16 @@
         </div>
         <div class="col-xs-10">
           <span class="ttu dg twelve">
-            STEP 2
+            <%= l10n("step", number: 2) %>
           </span>
           <br>
           <span class="dg fourteen">
             <% if step >= 2 %>
             <strong>
-              Compare plans and choose
+              <%= l10n("compare_plans_and_choose") %>
             </strong>
             <% else %>
-              Compare plans and choose
+              <%= l10n("compare_plans_and_choose") %>
             <% end %>
           </span>
         </div>
@@ -67,16 +67,16 @@
         </div>
         <div class="col-xs-10">
           <span class="ttu dg twelve">
-            STEP 3
+            <%= l10n("step", number: 3) %>
           </span>
           <br>
           <span class="dg fourteen">
             <% if step == 3 %>
             <strong>
-              Enroll
+              <%= l10n("enroll") %>
             </strong>
             <% else %>
-              Enroll
+              <%= l10n("enroll") %>
             <% end %>
           </span>
         </div>

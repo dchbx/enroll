@@ -4,17 +4,17 @@
       <div class="container">
         <div class="row">
           <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post) do %>
-          <h3>Manage Employers for <%= @general_agency_profile.legal_name %></h3>
+          <h3><%= l10n("broker_agencies.profiles.manage_employers_for")%><%= @general_agency_profile.legal_name %></h3>
           <table class="table">
             <thead>
               <tr>
                 <th>#</th>
-                <th>HBX Acct</th>
-                <th>Legal Name</th>
-                <th>FEIN</th>
-                <th>EE Ct</th>
-                <th>Enroll Status</th>
-                <th>Effective Date</th>
+                <th><%= l10n("hbx_acct")%></th>
+                <th><%= l10n("legal_name")%></th>
+                <th><%= l10n("fein")%></th>
+                <th><%= l10n("ee_ct")%></th>
+                <th><%= l10n("enroll_status")%></th>
+                <th><%= l10n("effective_date")%></th>
                 <th>&nbsp;</th>
               </tr>
             </thead>
@@ -28,14 +28,14 @@
                   <td><%= er.roster_size %></td>
                   <td><%= er.aasm_state.humanize %></td>
                   <td><%= er.published_plan_year.try(:effective_date) %>
-                  <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
+                  <%= link_to "(#{l10n('review')})", employers_premium_statement_path(er) %></td>
                 </tr>
               <% end %>
             </tbody>
           </table>
           <%= hidden_field_tag 'general_agency_id', @general_agency_profile.id %>
           <%= hidden_field_tag 'type', 'fire' %>
-          <%= submit_tag "Remove these selected employers", class: 'btn btn-primary' %>
+          <%= submit_tag l10n("broker_agencies.profiles.remove_these_selected_employers"), class: 'btn btn-primary' %>
         <% end %>
         </div>
       </div>

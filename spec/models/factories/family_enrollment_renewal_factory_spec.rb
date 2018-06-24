@@ -94,6 +94,36 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
               passive_waiver = current_family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where(:aasm_state => 'renewing_waived').first
               expect(passive_waiver.present?).to be_falsey
             end
+
+            context 'when an employee has metlife/delta dental plan in 2017-2018' do
+              let!(:organization) { FactoryGirl.create(:organization, legal_name: "Delta Dental") }
+              let!(:carrier_profile) {FactoryGirl.create(:carrier_profile, organization: organization, abbrev: "DDPA")}
+              let!(:plan) {
+                FactoryGirl.create(:plan, :with_premium_tables, name: "Delta Dental PPO Basic Plan for Families", market: 'shop', metal_level: plan_metal_level, active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: coverage_kind, dental_level: dental_level, carrier_profile: carrier_profile)
+              }
+
+              it 'should trigger dental carrier exiting notice' do
+                factory = Factories::FamilyEnrollmentRenewalFactory.new
+                factory.family = current_employee.person.primary_family.reload
+                factory.census_employee = current_employee.census_employee.reload
+                factory.employer = renewing_employer.reload
+                factory.renewing_plan_year = renewing_employer.renewing_plan_year.reload
+                expect(factory).to receive(:trigger_notice_dental) if coverage_kind == 'dental'
+                factory.renew
+              end
+            end
+
+            context 'when an employee has NON - metlife/delta dental plan' do
+              it 'should not trigger dental carrier exiting notice' do
+                factory = Factories::FamilyEnrollmentRenewalFactory.new
+                factory.family = current_employee.person.primary_family.reload
+                factory.census_employee = current_employee.census_employee.reload
+                factory.employer = renewing_employer.reload
+                factory.renewing_plan_year = renewing_employer.renewing_plan_year.reload
+                expect(factory).not_to receive(:trigger_notice_dental)
+                factory.renew
+              end
+            end
           end
         end
 

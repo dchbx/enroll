@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <div class='plan_selectors'>
-        <div  id='carriers' style='width: 200px'>
-            <b>Carriers</b><br/>
+        <div  id='carriers' style='width: 200px;'>
+            <b><%= l10n("carriers")%></b><br/>
             <%- @health_selectors[:carriers].each do |carrier| %>
                 <div class='criteria_style' style='width:200px'>
                     <%- if carrier[1] == 'any' %>
@@ -13,7 +13,7 @@
              <% end %>
         </div>
         <div id='metals'>
-            <b>Metal Levels</b> </br>
+            <b><%= l10n("metal_levels")%></b> </br>
             <%- @health_selectors[:metals].each do |metal| %>
                 <div class='criteria_style'>
                     <%- if metal == 'any' %>
@@ -25,7 +25,7 @@
             <% end %>
         </div>
         <div id='plan_types'>
-            <b>Plan Types</b> <br>
+            <b><%= l10n("plan_types")%></b> <br>
             <%- @health_selectors[:plan_types].each do |type| %>
             <div class='criteria_style'>
 

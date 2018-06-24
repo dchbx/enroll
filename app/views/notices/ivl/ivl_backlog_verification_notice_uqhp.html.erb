@@ -1,0 +1,42 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td><h3>KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY <%= notice.due_date.strftime("%B %d, %Y") %> </h3></td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+  </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "You enrolled in or renewed a plan through #{Settings.site.short_name} for #{notice.coverage_year}. We're writing to let you know that you must submit documents if you want to keep your insurance. "} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "#{Settings.site.short_name} is required by federal law to be sure that people who enroll in health insurance through our system are eligible.  ", top_margin: '10px'} %>
+
+<% if notice.documents_needed %>
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+        content: "<strong>Send Us Documents</strong>", top_margin: '5px', bottom_margin: '5px'} %>
+
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+        previous: "You need to send documents to #{Settings.site.short_name}. <b> The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline. </b>",
+        listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+<% end %>
+
+<br>
+<%= render partial: 'notices/shared/paragraph_with_margins', locals:
+    { content: "If you have questions or concerns, we're here to help.<br></br>""The #{Settings.site.short_name} Team"}%>
+

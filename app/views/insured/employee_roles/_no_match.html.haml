@@ -4,8 +4,8 @@
       %i.fa.fa-exclamation-triangle
 
   .col-md-10.col-sm-10.col-xs-10.no-pd.error-text
-    %strong No employer found.
-    = "Please check the information entered above and confirm with your employer that your demographic information is listed correctly on their roster. For further assistance, please contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number}."
+    %strong= l10n("insured.employee_roles.no_employer_found")
+    = l10n("insured.employee_roles.no_match_info", contact_center_name: Settings.contact_center.name, contact_center_phone_number: Settings.contact_center.phone_number)
 
   .col-md-1.col-sm-1.col-xs-2.no-pd
     = link_to image_tag('member-close.png'), '#', class: 'close-fail'

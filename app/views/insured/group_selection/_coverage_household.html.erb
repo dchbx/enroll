@@ -1,21 +1,48 @@
 <table class="table table-wrapper table-condensed group-selection-tbl">
   <tbody>
+    <% benefit_type = (@change_plan == "change_plan" && @hbx_enrollment.present?) ? @hbx_enrollment.coverage_kind : nil %>
+    <% if benefit_type.present? && @hbx_enrollment.is_shop? %>
+      <% current_employee_role = @hbx_enrollment.employee_role %>
+    <% end %>
 
-    <% offered_relationship_benefits = (coverage_kind == 'health') ? health_relationship_benefits(@employee_role) : dental_relationship_benefits(@employee_role) %>
-
-    <%# show_residency_alert = false %>
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
 
-        <% is_coverage = offered_relationship_benefits.present? ? coverage_relationship_check(offered_relationship_benefits, family_member, @new_effective_on) : true
-        is_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_coverage && @coverage_family_members_for_cobra.present?
-        is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
-        %>
-        <tr class="<%='ineligible_row' unless is_coverage%>">
+        <% if can_shop_shop?(@person) %>
+
+          <% is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role)) %>
+
+        <% end %>
+
+        <% if (can_shop_individual?(@person) || can_shop_resident?(@person)) %>
+        <%
+            #Handle When Implementing - People with Both Consumer Role & Resident Role
+            role = (family_member.person.consumer_role || family_member.person.resident_role)
+            family = family_member.family
+            rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on})
+            is_ivl_coverage, errors = rule.satisfied?
+            @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
+            errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
+          %>
+        <% end %>
+
+        <% is_checked = is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
+
+
+        <tr class='<%= class_for_ineligible_row(family_member, is_ivl_coverage) %>'>
           <td width="20">
-            <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>
+            <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
           </td>
           <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
-          <td><%= "This dependent is ineligible for employer-sponsored #{coverage_kind} coverage."  if !is_coverage %></td>
+
+          <% @person.active_employee_roles.each do |employee_role| %>
+
+            <% is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role) %>
+
+            <td class='<%= "health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></td>
+            <td class='<%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_dental_coverage && !is_dental_coverage.nil? %></td>
+          <% end %>
+
+          <td class="ivl_errors"><%= raw(errors.join(', ')) if errors.present? %></td>
         </tr>
     <% end %>
   </tbody>

@@ -11,13 +11,16 @@ class SessionTimeoutController < ApplicationController
 
   def check_time_until_logout
     @time_left = Devise.timeout_in - (Time.now - user_session["last_request_at"]).to_i.round
-    respond_to do |format|
-      format.js { render 'devise/sessions/session_expiration_warning' }
+    if @time_left <= 0
+      sign_out(current_user)
+      respond_to do |format|
+        format.js { render 'devise/sessions/sign_out_user' }
+      end
+    else
+      respond_to do |format|
+        format.js { render 'devise/sessions/session_expiration_warning' }
+      end
     end
-  end
-
-  def has_user_timed_out
-    @has_timed_out = (!current_user) or (current_user.timedout? (user_session["last_request_at"]))
   end
 
   def reset_user_clock

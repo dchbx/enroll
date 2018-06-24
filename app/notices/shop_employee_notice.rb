@@ -27,8 +27,8 @@ class ShopEmployeeNotice < Notice
   def build
     notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
-    notice.primary_fullname = census_employee.employee_role.person.full_name
-    notice.employer_name = census_employee.employer_profile.legal_name
+    notice.primary_fullname = census_employee.employee_role.person.full_name.titleize
+    notice.employer_name = census_employee.employer_profile.legal_name.titleize
     notice.primary_email = census_employee.employee_role.person.work_email_or_best
     append_hbe
     append_address(census_employee.employee_role.person.mailing_address)
@@ -36,7 +36,15 @@ class ShopEmployeeNotice < Notice
   end
 
   def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
+  end
+
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+  end
+
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
   end
 
   def non_discrimination_attachment
@@ -77,8 +85,8 @@ class ShopEmployeeNotice < Notice
     return if person.blank? || location.blank?
 
     notice.broker = PdfTemplates::Broker.new({
-      primary_fullname: person.full_name,
-      organization: broker.legal_name,
+      primary_fullname: person.full_name.titleize,
+      organization: broker.legal_name.titleize,
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
       web_address: broker.home_page,

@@ -370,10 +370,17 @@
       font-size: 0.9em;
       vertical-align: middle;
     }
-    .verification-update-reason, .return-for-def-reason, .fedhub-request, .extend-request {
+    .label {
+      min-width: 100px !important;
+      display: inline-block !important;
+    }
+    .verification-update-reason, .return-for-def-reason, .fedhub-request, .extend-request, .view-history {
       margin-top: 10px;
       padding-bottom: 10px;
       display: none;
+      .modal-body {
+        overflow-x: auto;
+      }
     }
     .verification-document {
       border: $new-style-gray-border;

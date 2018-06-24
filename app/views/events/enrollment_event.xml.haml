@@ -1,7 +1,7 @@
 !!! XML
 %enrollment_event{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance" }
   %header
-    %hbx_id= hbx_enrollment.household.family.hbx_assigned_id
+    %hbx_id= Settings.site.exchange_hbx_id
     %submitted_timestamp= hbx_enrollment.event_submission_date.strftime('%Y-%m-%dT%H:%M:%S')
   %event
     %body
@@ -19,7 +19,9 @@
             %type= "urn:openhbx:terms:v1:enrollment#initial" ## this is hardcoded for now but needs to be changed once we have the proper models
             -if %w(unassisted_qhp insurance_assisted_qhp individual).include?(hbx_enrollment.kind)
               %market= "urn:openhbx:terms:v1:aca_marketplace#individual"
-            -elsif hbx_enrollment.kind == 'employer_sponsored'
+            -elsif hbx_enrollment.kind == "employer_sponsored_cobra"
+              %market= "urn:openhbx:terms:v1:aca_marketplace#cobra"
+            -elsif hbx_enrollment.kind == "employer_sponsored"
               %market= "urn:openhbx:terms:v1:aca_marketplace#shop"
             -elsif hbx_enrollment.kind == 'coverall'
               %market= "urn:openhbx:terms:v1:aca_marketplace#coverall"
