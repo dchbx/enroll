@@ -6,6 +6,7 @@ module PdfTemplates
     attribute :mpi_indicator, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
+    attribute :primary_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :employer_name, String
     attribute :primary_email, String

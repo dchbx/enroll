@@ -1,0 +1,75 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.primary_email %></td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+
+<table class="total_table" border="0" >
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>TERMINATION OF EMPLOYER'S HEALTH COVERAGE OFFERED THROUGH <%= Settings.site.short_name.upcase %></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px">Dear <%= notice.primary_fullname.titleize %>, </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This letter is notification that your employer, <strong>#{notice.employer_name}</strong>, is not offering health coverage to employees through the #{Settings.site.short_name}.", top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>If you selected a plan during your employer’s Open Enrollment period, the health coverage you selected for you and any of your enrolled family members will not go into effect on #{notice.plan_year.start_on} as planned.</strong>", top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'You May be Eligible for Other Coverage', sub_heading: '', top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "You may be eligible to purchase coverage for yourself and your family members through the #{Settings.site.short_name}'s  individual marketplace. You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance. Please log into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "The next Open Enrollment period begins on <strong>#{notice.enrollment.ivl_open_enrollment_start_on}</strong> and ends on <strong>#{notice.enrollment.ivl_open_enrollment_end_on}</strong>.", top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you are not a resident of the District of Columbia, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs. To find the Health Insurance Marketplace in your state, go to <a href="">www.healthcare.gov</a>", top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you are eligible to participate in another employer's plan, contact that employer promptly to enroll.", top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: '', top_margin: '10px'} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals =>
+    { content: "Contact your employer or your broker for further assistance."} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals =>
+    { content: "Contact your employer further assistance."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:", top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["By calling #{notice.hbe.phone}",
+    "TTY: #{Settings.contact_center.tty}",
+    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is being provided in accordance with 45 C.F.R. 155.735(g)."} %>
