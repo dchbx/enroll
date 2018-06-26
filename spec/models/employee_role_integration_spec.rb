@@ -43,6 +43,7 @@ describe EmployeeRole do
 
                 context "and the first plan year is published" do
                   before do
+                    RatingArea.find_or_create_by(county_name: organization.primary_office_location.address.county, zip_code: organization.primary_office_location.address.zip, rating_area: "R-MA001" )
                     plan_year_a.publish!
                   end
 

@@ -5,7 +5,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Reference Plan Details</h4>
+        <h4 class="modal-title"><%= l10n("employers.plan_years.reference_plan_details") %></h4>
       </div>
 
       <% if @plan.coverage_kind == "health" %>
@@ -13,9 +13,9 @@
           <div class="modal-body-swap">
             <table class="table bordered compare-table", border = "1", style="font-size:11px;" >
               <tr>
-                <th>PLAN BENEFITS</th>
-                <th>CO-PAY</th>
-                <th>COINSURANCE</th>
+                <th><%= l10n("employers.plan_years.plan_benefits") %></th>
+                <th><%= l10n("employers.plan_years.co_pay") %></th>
+                <th><%= l10n("employers.plan_years.coinsurance") %></th>
               </tr>
               <%= render partial: "shared/plan_shoppings/plan_visit_types", locals: { details: @details } %>
             </table>
@@ -24,9 +24,9 @@
           <div class="modal-body">
             <table class="table bordered compare-table", border = "1", style="font-size:11px;" >
               <tr>
-                <th>PLAN BENEFITS</th>
-                <th>CO-PAY</th>
-                <th>COINSURANCE</th>
+                <th><%= l10n("employers.plan_years.plan_benefits") %></th>
+                <th><%= l10n("employers.plan_years.co_pay") %></th>
+                <th><%= l10n("employers.plan_years.coinsurance") %></th>
               </tr>
               <%= render partial: "shared/plan_shoppings/plan_visit_types" %>
             </table>
@@ -39,10 +39,9 @@
           <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
         </div>
         <%= link_to reference_plan_summary_employers_employer_profile_plan_years_path(@employer_profile, ref_plan_id: @reference_plan_id, hios_id: @hios_id, coverage_kind: @coverage_kind, start_on: @start_on, details: 'details'), remote: 'true' do %>
-          <span class="btn btn-default btn-small btn-more-details">More Details</span>
+          <span class="btn btn-default btn-small btn-more-details"><%= l10n("employers.plan_years.more_details") %></span>
         <% end %>
-
-        <span class="btn btn-default btn-small" data-dismiss="modal">Close</span>
+        <span class="btn btn-default btn-small divider pull-right" data-dismiss="modal"><%= l10n("close") %></span>
       </div>
     </div>
   </div>

@@ -18,8 +18,8 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER AGENCY STAFF"
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(rendered).to have_selector('a', text: /my dc health link/i)
-    expect(rendered).to match(/li.*class.*active.*my dc health link/mi)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
     expect(rendered).to match(/tab=employees/)
     expect(rendered).to match(/tab=benefits/)
     expect(rendered).to match(/tab=documents/)
@@ -61,8 +61,9 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER of employer" 
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(rendered).to have_selector('a', text: /my dc health link/i)
-    expect(rendered).to match(/li.*class.*active.*my dc health link/mi)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to have_selector('a', text: /brokers/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
     expect(rendered).to match(/tab=employees/)
     expect(rendered).to match(/tab=benefits/)
     expect(rendered).to match(/tab=documents/)
@@ -73,6 +74,7 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER of employer" 
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     render "employers/employer_profiles/primary_nav", active_tab: "brokers"
+    expect(rendered).to have_selector('a', text: /brokers/i)
     expect(rendered).to match(/li.*class.*active.*brokers/mi)
   end
 end
@@ -95,8 +97,8 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER - NOT of empl
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(rendered).to have_selector('a', text: /my dc health link/i)
-    expect(rendered).to match(/li.*class.*active.*my dc health link/mi)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
     expect(rendered).to match(/tab=employees/)
     expect(rendered).to match(/tab=benefits/)
     expect(rendered).to match(/tab=documents/)
@@ -128,8 +130,8 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS GeneralAgency" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(rendered).to have_selector('a', text: /my dc health link/i)
-    expect(rendered).to match(/li.*class.*active.*my dc health link/mi)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
     expect(rendered).to match(/tab=employees/)
     expect(rendered).to match(/tab=benefits/)
     expect(rendered).to match(/tab=documents/)

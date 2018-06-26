@@ -177,7 +177,7 @@ describe '#clean_fields' do
   end
 end
 
-describe '#matches?' do
+describe '#matches_addresses?' do
   let(:address) {
      Address.new(
        address_1: "An address line 1",
@@ -187,17 +187,17 @@ describe '#matches?' do
        zip: "21222"
      )
   }
-
+  
   context 'addresses are the same' do
     let(:second_address) { address.clone }
     it 'returns true' do
-      expect(address.matches?(second_address)).to be_truthy
+      expect(address.matches_addresses?(second_address)).to be_truthy
     end
 
     context 'mismatched case' do
       before { second_address.address_1.upcase! }
       it 'returns true' do
-        expect(address.matches?(second_address)).to be_truthy
+        expect(address.matches_addresses?(second_address)).to be_truthy
       end
     end
   end
@@ -209,7 +209,7 @@ describe '#matches?' do
       a
     end
     it 'returns false' do
-      expect(address.matches?(second_address)).to be_falsey
+      expect(address.matches_addresses?(second_address)).to be_falsey
     end
   end
 end

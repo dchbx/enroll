@@ -4,6 +4,8 @@ namespace :reports do
 
     desc "Report of Initial/Renewal/Conversion ERs that Failed Minimum Participation or Non-Owner Rule"
     task :employers_failing_minimum_participation => :environment do
+      include Config::AcaHelper
+
       window_date = Date.today
       valid_states = PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::PUBLISHED
       employers = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
@@ -11,7 +13,8 @@ namespace :reports do
         :open_enrollment_end_on => {"$gte" => window_date},
         :aasm_state.in => valid_states}})
 
-      file_name = "#{Rails.root}/public/employers_failing_minimum_participation.csv"
+      file_name = fetch_file_format('employers_failing_minimum_participation', 'EMPLOYERSFAILINGMINIMUMPARTICIPATION')
+
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 
       CSV.open(file_name, "w") do |csv|
@@ -43,6 +46,9 @@ namespace :reports do
         end
 
       end
+
+      pubber = Publishers::Legacy::EmployersFailingParticipationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
     end
 
     def clean_JSON_dump(json_errors)

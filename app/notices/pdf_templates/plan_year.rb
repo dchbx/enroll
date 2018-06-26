@@ -6,6 +6,8 @@ module PdfTemplates
     attribute :open_enrollment_end_on, Date
     attribute :start_on, Date
     attribute :end_on, Date
+    attribute :terminated_on, Date
+    attribute :group_lost_on, Date
     attribute :carrier_name, String
     attribute :warnings, Array[String]
     attribute :binder_payment_due_date, Date

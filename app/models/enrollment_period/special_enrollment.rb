@@ -1,4 +1,5 @@
 class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
+  include ScheduledEventService
 
   embedded_in :family
 
@@ -105,7 +106,7 @@ private
   end
 
   def first_of_month_effective_date
-    if @reference_date.day <= Setting.individual_market_monthly_enrollment_due_on
+    if @reference_date.day <= EnrollmentPeriod::SpecialEnrollment.individual_market_monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
     else
       @earliest_effective_date.next_month.end_of_month + 1.day

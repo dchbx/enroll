@@ -18,6 +18,10 @@ module PdfTemplates
     attribute :hbx_id, String
     attribute :employer_first_name, String
     attribute :employer_last_name, String
+    attribute :assignment_date, Date
+    attribute :assignment_end_date, Date
+    attribute :phone, String
+    attribute :email, String
 
     def shop?
       return true

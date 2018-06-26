@@ -1,15 +1,15 @@
 <html>
 <body>
-  <b>You Have Been Invited to Sign Up for Employer-Sponsored Coverage through <%= Settings.site.short_name %></b>
+  <b>You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the Massachusetts <%= site_short_name %></b>
 <br/>
 <br/>
-<div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
+<div>Dear <%= census_employee.first_name.humanize.titleize %>,</div>
 <br/><br/>
-  Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored health insurance through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
+  Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored health insurance through the <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
 </div>
 <br/>
 <div>
-  You are able to begin plan shopping on <%= census_employee.hired_on.to_formatted_s %> for coverage that will start on <%= census_employee.coverage_effective_on.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through <%= Settings.site.short_name %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>.
+  You are able to begin plan shopping on <%= census_employee.hired_on.to_formatted_s %> for coverage that will start on <%= census_employee.coverage_effective_on.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through the <%= site_short_name %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>.
   <br/>
   <br/>
   <b> What is New Hire Open Enrollment? </b>
@@ -18,7 +18,7 @@
   <br/>
   <b>To See Plan Options and Enroll: </b>
   <br/>
-  To complete the application process, please follow the steps below. You can also use <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">this guide</a> for <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">New Hires to Enroll in Health Coverage through <% Settings.site.short_name %></a> for additional assistance.
+  To complete the application process, please follow the steps below. You can also use our <b>Employee guide to enrolling</b> for help with this process. You can find this guide in our online <%= link_to_site_business_resource_center %>.
   <br/>
   <table class="total_table" border="0">
     <tbody>
@@ -26,7 +26,7 @@
         <td>
           <ul>
           <li style="margin-top: 0px;">
-            Go to <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>
+            Go to <%= site_website_address %>
           </li>
           <li style="margin-top: 5px;">
             Log-in or create an account as an employee
@@ -43,116 +43,52 @@
     </tbody>
   </table>
 
-  <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Doing so preserves your right to enroll in your employer-sponsored health insurance through a special enrollment period (SEP), if you qualify, at a later date this year. Instructions for how to waive coverage are included in <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">this walkthrough guide</a>.
+  <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Instructions for how to waive coverage are included in our <b>Employee guide to waiving coverage</b>, also available in the <%= link_to_site_business_resource_center %>.
 
-  <b>What If I Already Have Coverage through <%= Settings.site.short_name %>?</b>
-  If you currently have individual market coverage through <%= Settings.site.short_name %> and would like to terminate that coverage when you enroll in your employer-sponsored health coverage with <%= Settings.site.short_name %>, you will need to contact <%= Settings.site.short_name %> at <%= Settings.contact_center.phone_number %>.  To end individual market coverage through <%= Settings.site.short_name %>, you need to submit a request to terminate your plan.
+  <b>What If I Already Have Coverage through the <%= site_short_name %>?</b>
+  If you currently have individual market coverage through the <%= site_short_name %> and would like to terminate that coverage when you enroll in your employer-sponsored health coverage, you will need to contact the <%= site_short_name %> at <%= contact_center_ivl_number %>.
 
   <h2 style="color: #007bc4;">
     For Questions or Assistance:
   </h2>
-  You can contact <%= Settings.site.short_name %> with any questions:
+  Please contact your broker for further assistance. You can also contact the <%= site_short_name %> with any questions:
   <br/>
   <ul style="list-style-type:circle">
-    <li>By calling <%= Settings.contact_center.phone_number %></li>
-    <li>TTY: 711</li>
-    <li>Online at <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a>.</li>
+    <li>By calling <%= contact_center_phone_number %>. TTY: <%= contact_center_tty_number %></li>
+    <li> By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%> </li>
   </ul>
+  You can also find more information on our website at <%= site_website_address %>.
+  <br/>
   <% broker = census_employee.employer_profile.broker_agency_profile%>
-  <% location = broker.organization.primary_office_location %>
-  <% if broker.present? && broker.primary_broker_role.person.present? && location.present? %>
-    <table style="width: 100%">
-      <tr>
-        <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;</strong></td>
-        <td style="width: 85%"><%= broker.primary_broker_role.person.full_name.titleize if broker.primary_broker_role.present?%></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= broker.organization.legal_name.titleize %></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= location.try(:phone) %></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= location.try(:email) %></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"></td>
-      </tr>
-    </table>
+  <% if broker.present? %>
+    <% location = broker.organization.primary_office_location %>
+    <% if broker.primary_broker_role.person.present? && location.present? %>
+      <table style="width: 100%">
+        <tr>
+          <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;</strong></td>
+          <td style="width: 85%"><%= broker.primary_broker_role.person.full_name.titleize if broker.primary_broker_role.present?%></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= broker.organization.legal_name.titleize %></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= location.try(:phone) %></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= location.try(:email) %></td>
+        </tr>
+      </table>
 
-  <% else%>
-    If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling <%= Settings.contact_center.phone_number%>.
+    <% end %>
   <% end %>
   This notice is being provided in accordance with 45 CFR 155.725.
 </div>
-<br></br>
-<div>
-  <b><u>Notice Regarding Nondiscrimination, Disability, and Language Access Services</u></b><br></br>
-  The D.C. Health Benefit Exchange Authority (DC HBX) complies with applicable Federal civil rights laws and does not discriminate on the basis of race, color, national origin, age, disability, or sex. This agency does not exclude people or treat them differently because of race, color, national origin, age, disability, or sex.<br></br>
-  DCHBX:
-  <ul>
-    <li>
-      Provides free support and services to people with disabilities to communicate effectively with us, such as:
-      <ul>
-        <li>
-          Qualified sign language interpreters
-        </li>
-        <li>
-          Written information in other formats (large print, audio, accessible electronic formats, other formats)
-        </li>
-      </ul>
-    </li>
-    <li>
-      Provides free language services to people whose primary language is not English, such as:
-      <ul>
-        <li>
-          Qualified interpreters
-        </li>
-        <li>
-          Information written in other languages
-        </li>
-      </ul>
-    </li>
-  </ul>
-  <table style="width: 100%">
-    <tr>
-      <td style="width: 25%"><strong>If you need these services, contact:</strong></td>
-      <td style="width: 75%"></td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%"><%= Settings.site.short_name %> Contact Center</td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%">Phone: <%= Settings.contact_center.phone_number %></td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%">TTY: 711</td>
-    </tr>
-    <tr>
-      <td style="width: 15%"></td>
-      <td style="width: 85%">Email: <%= Settings.contact_center.email_address %></td>
-    </tr>
-  </table>
-  If you believe that the D.C. Health Benefit Exchange Authority has failed to provide these services or discriminated in another way on the basis of race, color, national origin, age, disability, or sex, you can file a grievance you can file a grievance in person or by mail, fax, or email. with: Jennifer Libster, Associate General Counsel, D.C. Health Benefit Exchange Authority, 1225 Eye Street NW, Suite 400, Washington DC 20005, (202) 715-7576, TTY: 711, <a href="1557.grievance@dc.gov">1557.grievance@dc.gov</a>;  Fax: (202) 730-1658. You must file a grievance within 60 days of the date you became aware of the alleged discriminatory action. Jennifer Libster is also available to help you with the grievance filing process.<br></br>
-  You can also file a civil rights complaint with the U.S. Department of Health and Human Services, Office for Civil Rights electronically through the Office for Civil Rights Complaint Portal, available at <a href="https://ocrportal.hhs.gov/ocr/portal/lobby.jsf">https://ocrportal.hhs.gov/ocr/portal/lobby.jsf</a>, or by mail or phone at:<br></br>
-  U.S. Department of Health and Human<br>
-  Services, 200 Independence Avenue SW.,<br>
-  Room 509F, HHH Building,<br>
-  Washington, DC 20201<br>
-  1–800–868–1019, 1-800–537–7697 (TDD).<br></br>
-
-  Complaint forms are available at <a href="http://www.hhs.gov/ocr/office/file/index.html">http://www.hhs.gov/ocr/office/file/index.html</a>.
-</div>
 </body>
 </html>
+<br/><br/>
+ <%= render "user_mailer/shared/taglines" %>
+ <br/><br/>
+ <%= render "user_mailer/shared/non_discrimination" %>

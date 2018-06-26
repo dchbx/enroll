@@ -75,6 +75,19 @@ RSpec.describe "insured/show" do
     expect(rendered).to have_selector('strong#plans-count')
   end
 
+  it "should display special note related to plan cost" do
+    sign_in consumer_user
+    allow(benefit_group).to receive(:sole_source?).and_return(true)
+    render :template => "insured/plan_shoppings/show.html.erb"
+    expect(rendered).to match(/Please note your final cost may change based on the final enrollment of all employees/)
+  end
+
+  it "should not display note for benefit_groups other than sole_source" do
+    sign_in consumer_user
+    render :template => "insured/plan_shoppings/show.html.erb"
+    expect(rendered).to_not match(/Please note your final cost may change based on the final enrollment of all employees/)
+  end
+
   it "should not render waive_confirmation partial" do
     sign_in current_broker_user
     allow(@hbx_enrollment).to receive(:employee_role).and_return(false)

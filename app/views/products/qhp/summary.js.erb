@@ -4,8 +4,10 @@ $("#plan-summary").html("<%= escape_javascript(render partial: "shared/summary",
 $("#all-plans").hide();
 $("a.all-plans").on('click', function() {
   $('h1:first').text('Choose Plan');
-  $('.switch-header').text('Find a quality, affordable health insurance plan that\'s right for you, or for you and your family. Use \'Filter Results\', \'Compare\' and \'Details\' features to narrow your choices. When you find the plan you want, \'Select Plan\'.');
-
+  $('.switch-header').text('Find a quality, affordable health insurance plan that\'s right for you, or for you and your family. Use \'Filter Results\', \'Compare\' and \'Details\' features to narrow your choices. When you find the plan you want, \'Select Plan\'. ');
+    <% if check_plan_options_title  && @benefit_group.sole_source? %>
+    $('.switch-header').append("<b>Please note your final cost may change based on the final enrollment of all employees.</b>");
+    <% end %>
 });
 $("#account-detail").hide();
 $("#plan-summary").show();

@@ -4,11 +4,13 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <%= favicon_link_tag 'favicon.ico', :rel => 'shortcut icon', :type => 'image/vnd.microsoft.icon' %>
+    <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => 'image/vnd.microsoft.icon' %>
 
-    <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{Settings.site.short_name} | #{Settings.site.short_name}" %></title>
+    <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= stylesheet_link_tag "application", :media => "all" %>
+    <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
     <%= javascript_include_tag "application" %>
+    <%= javascript_include_tag "sponsored_benefits/application" %>
     <%= csrf_meta_tags %>
 
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
@@ -34,8 +36,10 @@
     <%= render 'layouts/header' %>
     <%= yield :horizontal_menu %>
     <%= render_flash %>
+    <%= render 'users/security_question_responses/modal' %>
 
     <div class="content <%= controller_name %> content-bottom">
+
         <%= yield %>
     </div>
 

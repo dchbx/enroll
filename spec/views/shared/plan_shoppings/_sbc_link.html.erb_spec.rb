@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
 
-  let(:aws_env) { ENV['AWS_ENV'] || "local" }
+  let(:aws_env) { ENV['AWS_ENV'] || "qa" }
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name") }
   let(:mock_plan) { double("Plan",
       :name => "A Plan Name",
@@ -20,7 +20,7 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
       :id => "1234234234",
       :sbc_file => "THE SBC FILE.PDF",
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-                                     :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
+                                     :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
       ) }
 
   before :each do
@@ -28,7 +28,7 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
   end
 
   it "should have the sbc link" do
-    expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+    expect(rendered).to have_selector("a[href='#{"http://test.host/document/download/#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
   end
 
   context "with dental coverage_kind" do

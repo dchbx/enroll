@@ -176,7 +176,7 @@ describe BenefitGroup, type: :model do
     let!(:benefit_group_one) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "1st one") }
     let!(:benefit_group_two) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "2nd one")}
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: benefit_group_one.plan_year.employer_profile)}
-    
+
     it "should have a default benefit group assignment with 1st benefit group" do
       expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_truthy
       expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 0
@@ -216,11 +216,78 @@ describe BenefitGroup, type: :model do
   end
 end
 
+describe BenefitGroup, type: :model do
+  let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
+  let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month) }
+  let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
+  let!(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
+
+  let!(:census_employee_1){FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let!(:census_employee_2){FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let!(:census_employee_3){FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let!(:census_employee_4){FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let(:census_employees) {[census_employee_1, census_employee_2, census_employee_3, census_employee_4]}
+
+  context "#participation_rate" do
+    it "should return 4 census_employees" do
+      expect(benefit_group.targeted_census_employees_participation.count).to eq 4
+      expect(benefit_group.participation_rate).to eq 1.0
+    end
+
+    it "should return 4 census_employees if coverage_terminated_on is in future(considers todays date)" do
+      census_employee_2.terminate_employment!(TimeKeeper.date_of_record + 3.months)
+      expect(benefit_group.targeted_census_employees_participation.count).to eq 4
+      expect(benefit_group.participation_rate).to eq 1.0
+    end
+
+    it "should return 3 census_employees if coverage_terminated_on is in past" do
+      census_employee_3.terminate_employment!(TimeKeeper.date_of_record)
+      expect(benefit_group.targeted_census_employees_participation.count).to eq 3
+      expect(benefit_group.participation_rate).to eq 1.0
+    end
+
+    it "should return participation_rate = 0.75 if one census employee does not participate" do
+      census_employee_3.update_attributes(expected_selection: "will_not_participate")
+      expect(benefit_group.targeted_census_employees_participation.count).to eq 4
+      expect(benefit_group.participation_rate.round(2)).to eq 0.75
+    end
+
+    it "should return participation_rate = 0.67 if one census employee does not participate and one census employee coverage_terinated_on is in past" do
+      census_employee_3.update_attributes(expected_selection: "will_not_participate")
+      census_employee_2.terminate_employment!(TimeKeeper.date_of_record)
+      expect(benefit_group.targeted_census_employees_participation.count).to eq 3
+      expect(benefit_group.participation_rate.round(2)).to eq 0.67
+    end
+
+    it "should return participation_rate = 0.67 if one census employee does not participate and one census employee coverage_terinated_on is in past" do
+      census_employee_3.update_attributes(expected_selection: "will_not_participate")
+      census_employee_2.terminate_employment!(TimeKeeper.date_of_record + 3.months)
+      expect(benefit_group.targeted_census_employees_participation.count).to eq 4
+      expect(benefit_group.participation_rate.round(2)).to eq 0.75
+    end
+  end
+end
 
 describe BenefitGroup, type: :model do
 
+  let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
+  let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+  let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
+  let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
+
+  let(:plan_year_valid_params) do
+    {
+      employer_profile: employer_profile,
+      start_on: valid_plan_year_start_on,
+      end_on: valid_plan_year_end_on,
+      open_enrollment_start_on: valid_open_enrollment_start_on,
+      open_enrollment_end_on: valid_open_enrollment_end_on,
+    }
+  end
+
   let(:title)                   { "Employee Perks" }
-  let(:plan_year)               { FactoryGirl.build(:plan_year) }
+  let(:plan_year)               { PlanYear.new(plan_year_valid_params) }
   let(:reference_plan)          { FactoryGirl.build(:plan) }
   let(:plan_option_kind)        { "single_plan" }
   let(:effective_on_kind)       { "first_of_month" }
@@ -232,7 +299,6 @@ describe BenefitGroup, type: :model do
   let(:terminate_on_kind_default)     { "end_of_month" }
 
   let(:elected_plans)                 { reference_plan.to_a }
-
 
   let(:relationship_benefits) do
     [
@@ -260,6 +326,59 @@ describe BenefitGroup, type: :model do
   end
 
   context "a new instance" do
+
+    context "should build some basic composite tier benefits" do
+      subject { create(:benefit_group) }
+      let!(:employee) { create(:census_employee, create_with_spouse: true) }
+
+      before do
+        subject.build_composite_tier_contributions
+      end
+
+      it "assigns each composite tier type" do
+        expect(subject.composite_tier_contributions).to_not be_empty
+      end
+
+      it "updates dependent composition_tiers" do
+        family_tier = subject.composite_tier_contributions.last
+        family_tier.employer_contribution_percent = 50
+        subject.save!
+
+        dependent_tiers = subject.composite_tier_contributions.pluck(:employer_contribution_percent)[1,2]
+
+        expect(dependent_tiers).to match_array([50.0,50.0])
+      end
+
+      context "with family tier disabled" do
+        it "returns the correct effective_composite_tier" do
+          family_tier = subject.composite_tier_contributions.last
+          family_tier.offered = false
+          subject.save!
+          expect(subject.effective_composite_tier(employee)).to eq("employee_only")
+        end
+      end
+
+      context "with family tier enabled" do
+        it "returns the correct effective_composite_tier" do
+          expect(subject.effective_composite_tier(employee)).to eq("employee_and_spouse")
+        end
+      end
+    end
+
+    context 'sorted composite tiers' do
+      subject { create(:benefit_group) }
+      before do
+        subject.build_composite_tier_contributions
+      end
+      it "should return sorted composite tier contributions" do
+        composite_tier_contributions = subject.sorted_composite_tier_contributions
+        expect(composite_tier_contributions[0].composite_rating_tier).to eq 'employee_only'
+        expect(composite_tier_contributions[1].composite_rating_tier).to eq 'employee_and_spouse'
+        expect(composite_tier_contributions[2].composite_rating_tier).to eq 'employee_and_one_or_more_dependents'
+        expect(composite_tier_contributions[3].composite_rating_tier).to eq 'family'
+      end
+    end
+
     context "with no arguments" do
       let(:params) {{}}
 
@@ -395,6 +514,19 @@ describe BenefitGroup, type: :model do
     end
   end
 
+  context "#monthly_min_employee_cost" do
+    let(:params)                { valid_params }
+    let(:benefit_group)         { BenefitGroup.create(**params) }
+    let(:census_employees)      {create_list(:census_employee, 200, employer_profile_id: benefit_group.plan_year.employer_profile.id)}
+
+    it "should return zero" do
+      expect(census_employees.size).to eq 200
+      expect(benefit_group.monthly_employee_cost).to eq [0]
+      expect(benefit_group.monthly_min_employee_cost).to eq 0
+      expect(benefit_group.monthly_max_employee_cost).to eq 0
+    end
+  end
+
   context "and a reference plan is selected" do
     let(:params)                { valid_params }
     let(:benefit_group)         { BenefitGroup.new(**params) }
@@ -454,28 +586,30 @@ describe BenefitGroup, type: :model do
     end
 
     context "and the 'carrier plans' option is offered" do
-      let(:organization)            { FactoryGirl.create(:organization) }
-      let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
-      let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile, organization: organization) }
-      let!(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
-      let!(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
-      let!(:elected_plan_set) do
+      let(:organization)            { employer_profile.organization }
+      let(:carrier_profile)         { FactoryGirl.create(:carrier_profile, organization: organization) }
+      let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
+      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "gold") }
+      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile_1) }
+      let(:bronze_plan_choice)      { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
+      let(:elected_plan_set) do
         plans = [1, 2, 3].collect do
-          FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile)
+          FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile)
         end
-        plans.concat([reference_plan_choice, elected_plan_choice])
+        plans.concat([reference_plan_choice, elected_plan_choice, bronze_plan_choice])
         plans
       end
 
-      context '.carriers_offered' do    
+      context "when one carrier is selected" do
         before do
-          benefit_group.plan_option_kind = :metal_level
+          benefit_group.plan_option_kind = :single_carrier
           benefit_group.reference_plan = reference_plan_choice
           benefit_group.elected_plans = elected_plan_set
         end
 
-        it "should return the carrier ids" do
-          expect(benefit_group.carriers_offered).to eq [carrier_profile.id, carrier_profile_1.id]
+        it "should contain 4 plans which are gold and silver." do
+          expect(benefit_group.elected_plans_by_option_kind.size).to eq 4
+          expect(benefit_group.elected_plans_by_option_kind.map(&:metal_level).uniq).to eq ["gold", "silver"]
         end
       end
 
@@ -602,6 +736,57 @@ describe BenefitGroup, type: :model do
       end
     end
   end
+
+  describe BenefitGroup, dbclean: :after_each do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: plan)}
+    let(:default_benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: default_carrier_plan)}
+    let(:carrier_profile_one) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111']) }
+    let(:composite_carrier_two) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['22222']) }
+    let(:number_of_employees) { 1 }
+    let!(:plan) { FactoryGirl.create(:plan, carrier_profile: carrier_profile_one)}
+    let!(:default_carrier_plan) { FactoryGirl.create(:plan, carrier_profile: composite_carrier_two)}
+
+    let(:carrier_one_size_3) { build(:rating_factor_entry, factor_key: 3, factor_value: 1.101) }
+    let(:carrier_one_size_6) { build(:rating_factor_entry, factor_key: 6, factor_value: 1.07) }
+    let(:carrier_one_size_10) { build(:rating_factor_entry, factor_key: 10, factor_value: 1.05) }
+    let!(:employer_group_size_rating_factor_set) { create(:employer_group_size_rating_factor_set, carrier_profile: carrier_profile_one, rating_factor_entries: [carrier_one_size_3, carrier_one_size_6, carrier_one_size_10], max_integer_factor_key: 10)}
+    let!(:census_employees) { (1..number_of_employees).map { |em| build(:census_employee, expected_selection: 'enroll') } }
+
+    context "group_size_factor_for" do
+      context "with small groups" do
+        let(:number_of_employees) { 3 }
+
+        it "returns a factor for group size of 3" do
+          allow(benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.101
+        end
+
+        it "still returns a default" do
+          allow(default_benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.0
+        end
+      end
+
+      context "with mid range groups" do
+        let(:number_of_employees) { 6 }
+
+        it "when census employees greater than 5 but less than 10" do
+          allow(benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.07
+        end
+      end
+
+      context "with large groups" do
+        let(:number_of_employees) { 15 }
+
+        it "when census employees greater than max integer factor" do
+          allow(benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.05
+        end
+      end
+    end
+  end
+
 
   describe BenefitGroup, dbclean: :after_each do
     context "effective_title_by_offset" do
@@ -771,19 +956,19 @@ describe BenefitGroup, type: :model do
       context 'when plan is off-exchange plan year' do
         let(:is_conversion) { true }
 
-        context '.valid_plan_year' do 
+        context '.valid_plan_year' do
           it 'should return renewing plan year' do
             expect(offexchange_benefit_group.valid_plan_year).to eq renewing_planyear
           end
         end
 
-        context '.date_of_hire_effective_on_for' do 
+        context '.date_of_hire_effective_on_for' do
           it 'should return effection on as renewal plan year start' do
             expect(offexchange_benefit_group.date_of_hire_effective_on_for(hired_on)).to eq renewing_planyear.start_on
           end
         end
 
-        context '.first_of_month_effective_on_for' do 
+        context '.first_of_month_effective_on_for' do
           it 'should return effective on as renewal plan year start' do
             expect(offexchange_benefit_group.first_of_month_effective_on_for(hired_on)).to eq renewing_planyear.start_on
           end
@@ -792,28 +977,28 @@ describe BenefitGroup, type: :model do
 
       context 'when plan year is not an off-exchange plan year' do
 
-        before do 
+        before do
           employer_profile.update_attributes(:registered_on => Date.new(2015,4,1))
         end
 
-        context '.valid_plan_year' do 
+        context '.valid_plan_year' do
           it 'should return plan year as is' do
             expect(offexchange_benefit_group.valid_plan_year).to eq off_exchange_planyear
-          end 
+          end
         end
 
-        context '.date_of_hire_effective_on_for' do 
+        context '.date_of_hire_effective_on_for' do
           it 'should return date of hire as effective date' do
             expect(offexchange_benefit_group.date_of_hire_effective_on_for(hired_on)).to eq hired_on
           end
         end
 
-        context '.first_of_month_effective_on_for' do 
+        context '.first_of_month_effective_on_for' do
           it 'should return first of next month as effective date' do
             expect(offexchange_benefit_group.first_of_month_effective_on_for(hired_on)).to eq hired_on.next_month.beginning_of_month
           end
         end
-      end    
+      end
     end
 
   end

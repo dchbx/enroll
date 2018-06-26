@@ -4,7 +4,7 @@ RSpec.describe CensusMember, :dbclean => :after_each do
   it { should validate_presence_of :first_name }
   it { should validate_presence_of :last_name }
   it { should validate_presence_of :dob }
-  
+
   let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
@@ -24,7 +24,7 @@ RSpec.describe CensusMember, :dbclean => :after_each do
     end
 
     it "dob_string" do
-      expect(census_employee.dob_string).to eq "19801201"
+      expect(census_employee.dob_to_string).to eq "19801201"
     end
 
     it "date_of_birth" do

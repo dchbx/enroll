@@ -3,21 +3,15 @@
     <%= render partial: "employers/broker_agency/active_broker", locals: {direct_terminate: true} %>
   <% else %>
   <div id="brokers-empty">
-    <h1 class="darkblue no-buffer">Brokers</h1>
-    <h4 class="starter">
-      You have no active Broker. A Broker is your personal advocate and trusted adviser who at no cost to you, can help you set up and administer your Health Benefits Program. You can get help from a Broker at any time.
-      <br/><br/>
-      To learn more about what a Broker can do for you, Download <%= Settings.site.short_name %>'s <%= link_to 'Guidance for Business Owners', "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf", {:target => 'pdfWindow'} %>.
-      <br/><br/>
-      Select 'Browse Brokers' to continue.
-    </h4>
-    <br/>
+    <h1 class="no-buffer">Brokers</h1>
+    <p class="twenty">
+      You have no active Broker. A Broker is your personal advocate and trusted adviser who at no cost to you, can help you set up and administer your Health Benefits Program. You can get help from a Broker at any time.</p>
+    <p class="twenty">To learn more about what a Broker can do for you, Download <%= site_short_name %>'s <%= link_to 'Guidance for Business Owners', site_guidance_for_business_owners_url, {:target => 'pdfWindow'} %>.</p>
+    <p class="twenty">Select 'Browse Brokers' to continue.</p>
     <%#= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary ", onclick: '$("#brokers-empty").hide();' %>
   </div>
-  <div class="row">
-    <div class="col-xs-12" id="browse_brokers">
+    <div id="browse_brokers">
       <%= render "employers/broker_agency/active_broker" %>
     </div>
-  </div>
   <% end %>
 </div>

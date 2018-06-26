@@ -15,6 +15,7 @@
         <% end %>
 
         <%= phone.hidden_field :kind %>
+        <%= phone.hidden_field :_destroy %>
         <%= phone.text_field :full_phone_number, placeholder: "#{kind} PHONE", class: "#{required} number textfield floatlabel phone_number form-control" %>
       </div>
     </div>

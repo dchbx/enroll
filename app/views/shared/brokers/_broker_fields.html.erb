@@ -3,38 +3,38 @@
     <table class="table table-message-wrapper none_margin_bottom none_margin_top">
       <tbody>
         <tr>
-          <th>Applicant Name:</th>
+          <th><%= l10n("applicant_name") %>:</th>
           <td><%= @broker_applicant.full_name %></td>
         </tr>
         <% if broker_or_staff_role.respond_to?(:npn) %>
           <tr>
-            <th>NPN:</th>
+            <th><%= l10n("npn") %>:</th>
             <td><%= broker_or_staff_role.npn %></td>
           </tr>
         <% end %>
         <tr>
-          <th>Email:</th>
+          <th><%= l10n("email") %>:</th>
           <td><%= broker_or_staff_role.email_address %></td>
         </tr>
         <tr>
-          <th>Broker:</th>
+          <th><%= l10n("broker") %>:</th>
           <td><%= broker_or_staff_role.broker_agency_profile.legal_name %></td>
         </tr>
         <tr>
-          <th>Market Kinds:
+          <th><%= l10n("market_kinds") %>:
           </th>
           <td>
             <%= broker_or_staff_role.broker_agency_profile.try(:market_kind).try(:capitalize) %>
           </td>
         </tr>
         <tr>
-          <th>Languages:</th>
+          <th><%= l10n("languages") %>:</th>
           <td>
             <%= broker_or_staff_role.broker_agency_profile.languages_spoken.map do |lang| lang.upcase end.to_sentence %>
           </td>
         </tr>
         <tr>
-          <th>Office Locations:</th>
+          <th><%= l10n("office_locations") %>:</th>
           <td>
             <% broker_or_staff_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
             <%= office_location.address.to_html %>
@@ -42,11 +42,11 @@
           </td>
         </tr>
         <tr>
-          <th>Phone Number:</th>
+          <th><%= l10n("phone_number") %>:</th>
           <td><%= broker_or_staff_role.broker_agency_profile.phone %></td>
         </tr>
         <tr>
-          <th>History</th>
+          <th><%= l10n("history") %></th>
           <td>
             <% broker_or_staff_role.workflow_state_transitions.each do |transition| %>
             <%= transition.to_html %>
@@ -54,12 +54,12 @@
           </td>
         </tr>
         <tr>
-          <th>Application Status:</th>
+          <th><%= l10n("application_status") %>:</th>
           <td><%= broker_or_staff_role.current_state %></td>
         </tr>
         <%= f.fields_for :broker_role do |broker_role_fields| %>
           <tr>
-            <th class="">License:</th>
+            <th class=""><%= l10n("license") %>:</th>
             <td>
               <div class="enroll-checkbox">
                 <div class="checkbox">
@@ -75,7 +75,7 @@
             </td>
           </tr>
           <tr>
-            <th class="remove-top-bdr">Training:</th>
+            <th class="remove-top-bdr"><%= l10n("training") %>:</th>
             <td class="remove-top-bdr">
               <div class="enroll-checkbox">
                 <div class="checkbox">
@@ -91,7 +91,7 @@
             </td>
           </tr>
           <tr>
-            <th class="remove-top-bdr">Carrier Appointments:</th>
+            <th class="remove-top-bdr"><%= l10n("carrier_appointments") %>:</th>
             <td class="remove-top-bdr">
               <% broker_role_fields.object.carrier_appointments.each do |name,value| %>
                 <div class="col-xs-6">
@@ -99,7 +99,11 @@
                     <div class="enroll-checkbox">
                       <div class="checkbox">
                         <label>
+                        <%unless broker_carrier_appointments_enabled?%>
                           <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", value == "true" ? true : false %>
+                        <%else%>
+                          <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", true, disabled: true %>
+                        <%end%>
                           <%= label_tag "person[broker_role_attributes][carrier_appointments][#{name}]" do %>
                             <i class="fa fa-check-square-o fa-2x"></i>
                             <i class="fa fa-square-o fa-2x"></i>
@@ -119,14 +123,18 @@
                   </div>
                 </div>
               <% end %>
+              <%if broker_carrier_appointments_enabled?%>
+                <p class="text-info"><span class="glyphicon glyphicon-info-sign"></span>
+                <%= l10n("broker_carrier_appointments_enabled_note", site_long_name: site_long_name) %></p>
+              <%end%>
             </td>
           </tr>
           <% disabled = (broker_or_staff_role.active? || broker_or_staff_role.agency_pending?) ? true : false %>
           <tr>
-            <th style="vertical-align: top;">Reason
+            <th style="vertical-align: top;"><%= l10n("reason") %>
               <span class="text-danger"></span>:
             </th>
-            <td><%= broker_role_fields.text_area :reason, class: "floatlabel form-control", placeholder: 'Write here...', rows: 6, disabled: disabled %></td>
+            <td><%= broker_role_fields.text_area :reason, class: "floatlabel form-control", placeholder: "#{l10n('write_here')}...", rows: 6, disabled: disabled %></td>
           </tr>
         <% end %>
       </tbody>

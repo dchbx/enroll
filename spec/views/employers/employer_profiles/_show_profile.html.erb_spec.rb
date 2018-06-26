@@ -36,6 +36,8 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
   end
 
   it "should display the Employees content" do
+    assign(:datatable,
+           Effective::Datatables::EmployeeDatatable.new({id: @employer_profile.id, scopes: []}))
     @tab = 'employees'
     assign(:page_alphabets, ['a', 'b', 'c'])
     render template: "employers/employer_profiles/show_profile"

@@ -5,30 +5,30 @@ namespace :reports do
 
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
+      include Config::AcaHelper
 
-      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2015,10,1)))
+      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2017,10,1)))
 
       field_names  = %w(
-          employer_name last_name first_name ssn dob aasm_state hired_on employment_terminated_on updated_at
+          employee_name employee_hbx_id employer_legal_name employer_hbx_id date_of_hire date_added_to_roster employment_status date_of_termination date_terminated_on_roster
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/public/employee_terminations.csv"
+      file_name = fetch_file_format('employee_terminations', 'EMPLOYEETERMINATIONS')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
         census_employees.each do |census_employee|
-          last_name                 = census_employee.last_name
-          first_name                = census_employee.first_name
-          ssn                       = census_employee.ssn
-          dob                       = census_employee.dob
-          hired_on                  = census_employee.hired_on
-          employment_terminated_on  = census_employee.employment_terminated_on
-          aasm_state                = census_employee.aasm_state
-          updated_at                = census_employee.updated_at.localtime
-
-          employer_name = census_employee.employer_profile.organization.legal_name
+          employee_name             = census_employee.full_name
+          employee_hbx_id           = census_employee.try(:employee_role).try(:person).try(:hbx_id)
+          employer_legal_name       = census_employee.employer_profile.organization.legal_name
+          employer_hbx_id           = census_employee.try(:employer_profile).try(:hbx_id)
+          date_of_hire              = census_employee.hired_on
+          date_added_to_roster      = census_employee.created_at
+          employment_status         = census_employee.aasm_state
+          date_of_termination       = census_employee.employment_terminated_on
+          date_terminated_on_roster = census_employee.coverage_terminated_on
 
           # Only include ERs active on the HBX
           active_states = %w(registered eligible binder_paid enrolled suspended)
@@ -45,6 +45,9 @@ namespace :reports do
           end
         end
       end
+
+      pubber = Publishers::Legacy::EmployeeTerminationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_start} - #{Date.today}, #{processed_count} employee terminations output to file: #{file_name}"
     end

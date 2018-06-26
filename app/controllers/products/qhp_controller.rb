@@ -50,6 +50,7 @@ class Products::QhpController < ApplicationController
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
     @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.plan)
     @plan = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.plan)
+    @benefit_group = @hbx_enrollment.benefit_group
 
     respond_to do |format|
       format.html

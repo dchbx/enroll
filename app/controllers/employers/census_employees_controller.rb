@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
@@ -72,7 +72,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
       flash[:notice] = "Census Employee is successfully updated."
       if benefit_group_id.blank?
-        flash[:notice] += " Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group."
+        flash[:notice] += " Note: new employee cannot enroll on #{site_short_name} until they are assigned a benefit group."
       end
 
       redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
@@ -94,7 +94,7 @@ class Employers::CensusEmployeesController < ApplicationController
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
       if termination_date >= (TimeKeeper.date_of_record - 60.days)
-        @fa = @census_employee.terminate_employment(termination_date) && @census_employee.save
+        @fa = @census_employee.terminate_employment(termination_date)
         notify_employee_of_termination
       end
     end
@@ -156,6 +156,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def cobra
     cobra_date = params["cobra_date"]
+
     if cobra_date.present?
       @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
     else
@@ -166,11 +167,16 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.update_for_cobra(@cobra_date, current_user)
         flash[:notice] = "Successfully update Census Employee."
       else
-        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
       end
     else
       flash[:error] = "Please enter cobra date."
     end
+  end
+
+  def confirm_effective_date
+    confirmation_type = params[:type]
+    render "#{confirmation_type}_effective_date"
   end
 
   def cobra_reinstate
@@ -221,6 +227,20 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+  end
+
+  def change_expected_selection
+    if params[:ids]
+      begin
+        census_employees = CensusEmployee.find(params[:ids])
+        census_employees.each do |census_employee|
+          census_employee.update_attributes(:expected_selection=>params[:expected_selection].downcase)
+        end
+        render json: { status: 200, message: 'successfully submitted the selected Employees participation status' }
+      rescue => e
+        render json: { status: 500, message: 'An error occured while submitting employees participation status' }
+      end
+    end
   end
 
   def notify_employee_of_termination
@@ -289,6 +309,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build
     @census_employee
   end
+
   private
 
 end

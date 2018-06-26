@@ -1,0 +1,57 @@
+<div class="content landing">
+  <%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
+  <div class="home">
+    <div class="tab-row">
+      <div class="tab-content" id="myTabContent"></div>
+      <div class="container top-pd">
+        <div class="row">
+          <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane-hbx" role="tabpanel">
+            <div class="col-xs-12">
+
+              <div id='message_form'></div>
+              <div class="top-pd row" id="inbox_provider_form">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <h3 class="title-inline">Security Questions</h3>
+                  <div class="form-inline button-group-wrapper">
+                    <div class="col-xs-12 search-wp">
+                      <%= link_to 'New Question', new_exchanges_security_question_path, class: 'btn btn-default' %>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="table-responsive">
+                    <table class="table table-wrapper" style="opacity: 1;">
+                      <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Created at</th>
+                        <th>Actions</th>
+                      </tr>
+                      </thead>
+
+                      <tbody>
+                      <% @questions.each do |question| %>
+                          <tr>
+                            <td><%= question.title %></td>
+                            <td><%= question.status %></td>
+                            <td><%= question.created_at %></td>
+                            <td>
+                              <%= link_to 'Edit', edit_exchanges_security_question_path(question), class: 'btn btn-default' %>
+                              <%= link_to 'Delete', exchanges_security_question_path(question), class: 'btn btn-default', method: :delete, data: { confirm: 'Are you sure' } %>
+                            </td>
+                          </tr>
+                      <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

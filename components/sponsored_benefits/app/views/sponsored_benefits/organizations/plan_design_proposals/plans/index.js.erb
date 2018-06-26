@@ -1,0 +1,5 @@
+$('.reference-plans').html("<%= escape_javascript(render(partial: 'plans', locals: { :plans => @plans })).html_safe %>")
+$('.plan-type-filters').html("<%= escape_javascript(render(partial: 'plan_search_fields', locals: { search_options: @search_options, search_titles: @search_option_titles })).html_safe %>");
+$('.reference-plans').show();
+hideDetailComparisons();
+clearComparisons();

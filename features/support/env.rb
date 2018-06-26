@@ -3,6 +3,7 @@
 # newer version of cucumber-rails. Consider adding your own code to a new file
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
+require_relative '../../spec/ivl_helper'
 
 require 'cucumber/rails'
 require 'email_spec/cucumber'
@@ -10,6 +11,7 @@ require 'rspec/expectations'
 require 'capybara/cucumber'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
+require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
@@ -67,12 +69,16 @@ end
 Cucumber::Rails::Database.javascript_strategy = :truncation
 Capybara.default_driver = :poltergeist
 Capybara.javascript_driver = :poltergeist
+phantomjs_options = ['--ignore-ssl-errors=yes', '--ssl-protocol=any', '--load-images=no']
+phantomjs_options.push('--proxy=localhost:9050', '--proxy-type=socks5') if Rails.env.production? || Rails.env.development?
+
 Capybara.register_driver :poltergeist do |app|
   options = {
+      :port => (51674 + ENV['TEST_ENV_NUMBER'].to_i),
       :js_errors => true,
       :timeout => 120,
       :debug => false,
-      :phantomjs_options => ['--load-images=no', '--disk-cache=false'],
+      :phantomjs_options => phantomjs_options,
       :inspector => true,
       :window_size => [1280,720],
       :phantomjs_logger => File.open("log/phantomjs_test.log", "a"),

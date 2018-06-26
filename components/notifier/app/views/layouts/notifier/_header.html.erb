@@ -1,0 +1,86 @@
+<div class='hide' id='dchbx_enroll_date_of_record'><%= TimeKeeper.date_of_record.iso8601 %></div>
+  <nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" id="ma_logo" href= '<%= "#{site_main_web_address_business}" %>'>
+          <%= image_tag Settings.site.logo_file_name %>
+        </a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><h4 class="no-buffer"><%= get_header_text(controller_name) %></h4></a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li><a class="call-customer-service" href="tel:<%= contact_center_phone_number %>">
+            <span class="header-text">
+              Call Customer Service
+            </span>
+            <br/>
+            <span>
+              <i class="fa fa-phone fa-lg"></i>
+              <strong>
+                <%= contact_center_phone_number %>
+              </strong>
+            </span>
+          </a>
+          </li>
+          <% if signed_in? %>
+            <li>
+              <span class="my-portal-links">
+                <%= render partial: "shared/my_portal_links"%>
+                <span>
+                  <%= link_to 'Help', site_help_url, target: '_blank', class: 'header-text' %>
+                </span>
+                <span> | </span>
+                <span>
+                  <%= link_to 'Logout', main_app.destroy_user_session_path, method: "delete", class: "header-text" %>
+                </span>
+                <br/>
+                <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
+                <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                  &nbsp;
+                  <span>My ID: <%= truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '') %></span>
+                <% end %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+</div>
+
+<% if user_signed_in? %>
+  <script>
+    // check time until logout
+    function check_time_until_logout(){
+      $.ajax({
+        url: "<%= main_app.check_time_until_logout_path(format: :js) %>",
+        method: 'GET',
+        dataType: 'script',
+        success: function(response){
+        },
+        error: function(response){
+        }
+      });
+    }
+    var logout_check_timer = setTimeout(check_time_until_logout, 87000);
+  </script>
+<% end %>
+<script>
+  if (bowser.msie && bowser.version <= 8 || bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
+    $('body').before('<div id="modal-wrapper"></div>')
+    $('#modal-wrapper').html('<%= escape_javascript(render(:partial => "shared/update_browser_warning")) %>');
+    $('#modal-wrapper').fadeIn();
+  }
+</script>

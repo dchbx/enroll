@@ -1,18 +1,50 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
-#  mount Resque::Server, at: '/jobs'
-  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
+
+  mount TransportGateway::Engine,       at: "/transport_gateway"
+  mount TransportProfiles::Engine,      at: "/transport_profiles"
+  mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
+  mount Notifier::Engine, at: "/notifier"
+
+  require 'resque/server'
+  mount Resque::Server, at: '/jobs'
+  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
+
+  namespace :uis do
+    resources :bootstrap3_examples do
+      collection do
+        get :index
+        get :components
+        get :getting_started
+      end
+    end
+  end
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
 
+  match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
 
+  post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
+
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
+    post :challenge, controller: 'security_question_responses', action: 'challenge'
+    post :authenticate, controller: 'security_question_responses', action: 'authenticate'
+  end
+
+  resources :users do
+    resources :security_question_responses, controller: "users/security_question_responses"
+    post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
+
+    member do
+      get :reset_password, :lockable, :confirm_lock, :login_history, :edit
+      put :confirm_reset_password, :update
+      post :unlock, :change_password
+    end
   end
 
   resources :saml, only: [] do
@@ -41,6 +73,14 @@ Rails.application.routes.draw do
       get :find_sep, on: :collection
     end
 
+    resources :scheduled_events do
+      collection do
+        get 'current_events'
+        get 'delete_current_event'
+        get 'list'
+      end
+    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -56,7 +96,7 @@ Rails.application.routes.draw do
         post :employer_invoice_datatable
         post :generate_invoice
         get :broker_agency_index
-        get :general_agency_index
+        get :general_agency_index if Settings.aca.general_agency_enabled
         get :issuer_index
         get :product_index
         get :configuration
@@ -69,6 +109,7 @@ Rails.application.routes.draw do
         get :binder_index
         get :binder_index_datatable
         post :binder_paid
+        get :verification_index
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
@@ -79,6 +120,8 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :calendar_index
+        get :user_account_index
         get :get_user_info
       end
 
@@ -109,6 +152,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
+    resources :security_questions
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
@@ -208,7 +252,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -238,6 +282,13 @@ Rails.application.routes.draw do
         post 'match'
       end
     end
+
+    resources :employer_attestations do
+      get 'authorized_download'
+      get 'verify_attestation'
+      delete 'delete_attestation_documents'
+      #get 'revert_attestation'
+    end
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
       get 'new'
@@ -248,20 +299,29 @@ Rails.application.routes.draw do
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+
       member do
         get "download_invoice"
+        get 'new_document'
+        post 'download_documents'
+        post 'delete_documents'
+        post 'upload_document'
         post 'generate_checkbook_urls'
       end
+
       collection do
         get 'welcome'
         get 'search'
         post 'match'
         get 'inbox'
+        get 'counties_for_zip_code'
+        get 'generate_sic_tree'
       end
       resources :plan_years do
         get 'reference_plans'
         get 'dental_reference_plans'
         get 'generate_dental_carriers_and_plans'
+        get 'generate_health_carriers_and_plans', on: :collection
         get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection
@@ -290,6 +350,10 @@ Rails.application.routes.draw do
         get :terminate
         get :rehire
         get :cobra
+        collection do
+          get :confirm_effective_date
+          post :change_expected_selection
+        end
         get :cobra_reinstate
         get :benefit_group, on: :member
       end
@@ -297,7 +361,9 @@ Rails.application.routes.draw do
   end
 
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
+
   match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
+  match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -319,9 +385,12 @@ Rails.application.routes.draw do
         get :staff_index
         get :agency_messages
         get :assign_history
+        get  :commission_statements
       end
       member do
-        get :general_agency_index
+        if Settings.aca.general_agency_enabled
+          get :general_agency_index
+        end
         get :manage_employers
         post :clear_assign_for_employer
         get :assign
@@ -329,6 +398,8 @@ Rails.application.routes.draw do
         post :employer_datatable
         post :family_datatable
         post :set_default_ga
+        get :download_commission_statement
+        get :show_commission_statement
       end
 
       resources :applicants
@@ -393,31 +464,32 @@ Rails.application.routes.draw do
     end
   end
 
-  match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
-  namespace :general_agencies do
-    root 'profiles#new'
-    resources :profiles do
-      collection do
-        get :new_agency_staff
-        get :search_general_agency
-        get :new_agency
-        get :messages
-        get :agency_messages
-        get :inbox
-        get :edit_staff
-        post :update_staff
+  if Settings.aca.general_agency_enabled
+    match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
+    namespace :general_agencies do
+      root 'profiles#new'
+      resources :profiles do
+        collection do
+          get :new_agency_staff
+          get :search_general_agency
+          get :new_agency
+          get :messages
+          get :agency_messages
+          get :inbox
+          get :edit_staff
+          post :update_staff
+        end
+        member do
+          get :employers
+          get :families
+          get :staffs
+        end
       end
-      member do
-        get :employers
-        get :families
-        get :staffs
+      resources :inboxes, only: [:new, :create, :show, :destroy] do
+        get :msg_to_portal
       end
-    end
-    resources :inboxes, only: [:new, :create, :show, :destroy] do
-      get :msg_to_portal
     end
   end
-
   resources :translations
 
   namespace :api, :defaults => {:format => 'xml'} do
@@ -488,17 +560,26 @@ Rails.application.routes.draw do
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
 
-
-  resources :documents, only: [:update, :destroy, :update] do
+  resources :documents, only: [ :new, :create, :destroy, :update] do
+    get :document_reader,on: :member
+    get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state
       get :show_docs
       put :update_verification_type
       get :enrollment_verification
       put :extend_due_date
+      get :fed_hub_request
+      post 'download_documents'
+      post 'delete_documents'
       post :fed_hub_request
     end
+
+    member do
+      get :download_employer_document
+    end
   end
+
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

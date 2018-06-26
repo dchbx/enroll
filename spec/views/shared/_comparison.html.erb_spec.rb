@@ -16,6 +16,7 @@ describe "shared/_comparison.html.erb" do
       :metal_level => "Silver",
       :plan_type => "A plan type",
       :nationwide => true,
+      :network_information => "This is a test",
       :deductible => 0,
       :total_premium => 100,
       :rx_formulary_url => "http://www.example.com",
@@ -26,7 +27,7 @@ describe "shared/_comparison.html.erb" do
       :id => "1234234234",
       :coverage_kind => "health",
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-      :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
+      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-qa#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
       ) }
   let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "A Plan Name")}
   let(:mock_qhps) {[mock_qhp]}
@@ -79,11 +80,11 @@ describe "shared/_comparison.html.erb" do
     end
 
     it "should have a link to open the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector("a[href='#{"http://test.host/document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
 
     it "should contain some readable text" do
-      ["$30.00", "Nationwide", "A Plan Name", "A PLAN TYPE"].each do |t|
+      ["$30.00", "A Plan Name", "A PLAN TYPE"].each do |t|
         expect(rendered).to have_content(t)
       end
     end
@@ -136,7 +137,7 @@ describe "shared/_comparison.html.erb" do
     it "should have rx formulary url coverage_kind = health" do
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{mock_plan.rx_formulary_url}/)
-      expect(rendered).to match("DOCTOR DIRECTORY")
+      expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
     it "should not have rx_formulary_url coverage_kind = dental" do
@@ -152,7 +153,9 @@ describe "shared/_comparison.html.erb" do
     end
 
     it "should not have provider directory url if nationwide = false" do
+      allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       allow(mock_plan).to receive(:nationwide).and_return(false)
+      allow(mock_plan).to receive(:service_area_id).and_return('XX-111')
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to_not match(/#{mock_plan.provider_directory_url}/)
     end

@@ -7,9 +7,9 @@
   <div id="select_plan_wrapper">
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-        <div class="ct-1">
-          <h1 class="darkblue">Choose Plan</h1>
-          <h4 class="switch-header">Find a quality, affordable health insurance plan that's right for you, or for you and your family. Use 'Filter Results', 'Compare' and 'Details' features to narrow your choices. When you find the plan you want, 'Select Plan'.</h4>
+        <div>
+          <h1><%= l10n("choose_plan") %></h1>
+          <p class="twenty switch-header"><%= l10n(".choose_plan_filter_results_header") %><% if display_plan_cost_warning(@benefit_group) %><b>Please note your final cost may change based on the final enrollment of all employees.</b><% end %></p>
           <div class="row no-buffer">
             <%= render "shared/plan_shoppings/more_plan_details" %>
             <p class="pull-right">
@@ -117,4 +117,4 @@ $(document).ready(function() {
 });
 
 
-</script>
+  </script>

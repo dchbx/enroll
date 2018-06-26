@@ -1,5 +1,69 @@
 @import "variables";
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  color: $primary-orange;
+}
+
+/*.two_column_layout {
+  @include make-row();
+}
+.content-main {
+  @include make-lg-column(8);
+}
+.content-secondary {
+  @include make-lg-column(3);
+  @include make-lg-column-offset(1);
+}*/
+
+/* panel-variant mixin takes 4 args: $border, $heading-text-color, $heading-bg-color, and $heading-border */
+.panelrow {
+  /*@include panel-variant(#d01919, #1cf21c, #000000, #bad017);*/
+}
+
+/* button-variant mixin takes three arguments – $color, $background, and $border */
+.custom-btn {
+  /*@include button-variant(#cece19, #000000, #2dbe27);*/
+}
+
+/* gradient-horizontal mixin takes four arguments – $start-color, $end-color, $start-percent, $end-percent */
+.example {
+  /*@include gradient-horizontal(#1834cc, #1dc937, 0%, 100%);*/
+}
+
+
+.nav-sidebar {
+  padding: 8px 15px;
+  margin-bottom: 20px;
+
+  background-color: #111; /* Black*/
+}
+
+/* The navigation menu links */
+.nav-sidebar a {
+/*    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+*/}
+
+/* When you mouse over the navigation links, change their color */
+.nav-sidebar a:hover, .offcanvas a:focus{
+    /*color: #f1f1f1;*/
+}
+
 body {
   opacity: 0;
   display: none;
@@ -8,7 +72,7 @@ body {
 .navbar {
   margin-bottom: 0;
   background-color: $primary-button-text;
-  border-bottom: solid 3px $primary-blue;
+  border-bottom: solid 3px $brand-primary;
   .navbar-header {
     .navbar-brand {
       border-right: solid 1px #d7d7d7;
@@ -47,7 +111,7 @@ body {
         span:first-of-type {}
         span:last-of-type {
           .fa {
-            color: $primary-blue;
+            color: $brand-primary;
           }
           strong {
             line-height: 0;
@@ -67,64 +131,6 @@ body {
       }
     }
   }
-}
-
-.btn-primary {
-  color: $primary-white;
-  background-color: $primary-red;
-  border-color: $primary-button-border;
-  text-transform: $primary-button-text-casing;
-  font-weight: $primary-bold;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  text-shadow: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  border-bottom-width: medium;
-}
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary.focus,
-.btn-primary:active,
-.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
-  color: $primary-white;
-  background-color: $primary-button-border;
-  border-color: $primary-button-border;
-}
-.btn-primary:active,
-.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
-  background-image: none;
-}
-.btn-primary.disabled,
-.btn-primary[disabled],
-fieldset[disabled] .btn-primary,
-.btn-primary.disabled:hover,
-.btn-primary[disabled]:hover,
-fieldset[disabled] .btn-primary:hover,
-.btn-primary.disabled:focus,
-.btn-primary[disabled]:focus,
-fieldset[disabled] .btn-primary:focus,
-.btn-primary.disabled.focus,
-.btn-primary[disabled].focus,
-fieldset[disabled] .btn-primary.focus,
-.btn-primary.disabled:active,
-.btn-primary[disabled]:active,
-fieldset[disabled] .btn-primary:active,
-.btn-primary.disabled.active,
-.btn-primary[disabled].active,
-fieldset[disabled] .btn-primary.active {
-  background-color: $primary-button-disabled;
-  border-color: $primary-button-borer-disabled;
-}
-.btn-primary .badge {
-  color: #337ab7;
-  background-color: #fff;
 }
 
 .btn {

@@ -6,7 +6,9 @@
   <% if @person && @person.consumer_role %>
      <h4 class="starter"><%= l10n("insured.verification_information") %></h4>
 
-      <%= render 'insured/families/verification/verification' %>
+      <% if individual_market_is_enabled? %>
+      	<%= render 'insured/families/verification/verification' %>
+      <% end %>
   <% end %>
 </div>
 &nbsp;
