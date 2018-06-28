@@ -25,7 +25,7 @@
         </div>
         <div class="col-md-4 fa-select select-box">
           <%= benefit_fields.label :state, 'State *', class: "label-color" %>
-          <%= benefit_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), prompt: 'Choose', required: true %>
+          <%= benefit_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), {prompt: 'Choose' }, {:required => true} %>
         </div>
         <div class="col-md-4">
           <%= benefit_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: benefit.employer_address.try(:zip), class: "floatlabel zip" %>
@@ -100,7 +100,7 @@
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-6 fa-select select-box">
         <%= f.label :esi_covered, 'Who Can be Covered? *', class: "label-color" %>
-        <%= f.select :esi_covered, options_for_select({"Self" => "self", "Self And Spouse" => "self_and_spouse", "Family" => "family" }, selected: benefit.esi_covered), prompt: 'Choose',  required: true %>
+        <%= f.select :esi_covered, options_for_select({"Self" => "self", "Self And Spouse" => "self_and_spouse", "Family" => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:required => true} %>
       </div>
       <div class="col-md-6">
         <div class="col-md-6">
@@ -128,7 +128,7 @@
       </div>
       <div class="col-md-3 fa-select select-box">
         <%= f.label :employee_cost_frequency, 'How Often *', class: "label-color" %>
-        <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), required: true, prompt: 'Choose' %>
+        <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {:required => true} %>
       </div>
     </div>
   </div>
