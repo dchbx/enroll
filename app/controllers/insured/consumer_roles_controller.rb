@@ -6,7 +6,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
-  before_filter :load_support_texts, only: [:edit, :search, :match]
+  before_filter :load_support_texts, only: [:edit, :search, :match, :update]
 
   def ssn_taken
   end
