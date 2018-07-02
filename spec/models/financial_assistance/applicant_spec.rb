@@ -84,7 +84,10 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       end
 
       it "should return the dob of the person associated to the applicant" do
-        expect(applicant2.age_on_effective_date).to eq 45
+        now = TimeKeeper.date_of_record
+        dob = applicant2.person.dob
+        current_age = now.year - dob.year - (now.strftime('%m%d') < dob.strftime('%m%d') ? 1 : 0)
+        expect(applicant2.age_on_effective_date).to eq current_age
         expect(applicant2.age_on_effective_date).not_to eq 25
       end
 
@@ -246,6 +249,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_self_attested_blind).and_return(false)
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:has_daily_living_help).and_return(false)
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:need_help_paying_bills).and_return(false)
+        applicant1.update_attributes!(is_required_to_file_taxes: true, is_joint_tax_filing: true, has_job_income: true)
         driver_qns.each { |attribute|  applicant1.send("#{attribute}=", false) }
       end
 
@@ -273,6 +277,31 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
           applicant1.send("#{attribute}=", false)
           allow(applicant1).to receive(instance_check_method).and_return true
           expect(applicant1.applicant_validation_complete?).to eq false
+        end
+
+        it "should validate applicant for former_foster_care, if age is between 18 and 25 and is_former_foster_care is not nil" do
+          applicant1.send("#{attribute}=", false)
+          now = TimeKeeper.date_of_record
+          applicant1.person.dob = Date.new((now.year - 20) ,1,1)
+          expect(applicant1.is_former_foster_care).to eq nil
+          applicant1.update_attributes!(is_former_foster_care: true)
+          expect(applicant1.applicant_validation_complete?).to eq true
+        end
+
+        it "should validate applicant for former_foster_care, if age is between 18 and 25 and is_former_foster_care is nil" do
+          applicant1.send("#{attribute}=", false)
+          now = TimeKeeper.date_of_record
+          applicant1.person.dob = Date.new((now.year - 20) ,1,1)
+          expect(applicant1.is_former_foster_care).to eq nil
+          expect(applicant1.applicant_validation_complete?).to eq false
+        end
+
+        it "should not validate applicant for former_foster_care, if age is not between 18 and 25" do
+          applicant1.send("#{attribute}=", false)
+          now = TimeKeeper.date_of_record
+          applicant1.person.dob = Date.new((now.year - 30) ,1,1)
+          expect(applicant1.is_former_foster_care).to eq nil
+          expect(applicant1.applicant_validation_complete?).to eq true
         end
       end
     end
