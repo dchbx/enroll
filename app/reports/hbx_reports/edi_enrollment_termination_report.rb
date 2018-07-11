@@ -5,7 +5,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
 
   def migrate
     families = get_families
-        field_names  = %w(
+    field_names = %w(
                    Enrolled_Member_HBX_ID
                    Enrolled_Member_First_Name
                    Enrolled_Member_Last_Name
@@ -27,54 +27,58 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
                    Member_relationship
                    Coverage_state_occured)
 
-        processed_count = 0
+    processed_count = 0
 
-        file_name = fetch_file_format('edi_enrollment_termination_report', 'EDIENROLLMENTTERMINATION')
+    file_name = fetch_file_format('edi_enrollment_termination_report', 'EDIENROLLMENTTERMINATION')
 
-        CSV.open(file_name, "w", force_quotes: true) do |csv|
-          csv << field_names
-          families.each do |family|
-            if family.try(:primary_family_member).try(:person).try(:active_employee_roles).try(:any?) || family.try(:primary_family_member).try(:person).try(:consumer_role).try(:present?)
-              hbx_enrollments = family.active_household.hbx_enrollments.select{|enrollment| enrollment_for_report?(enrollment) }
-              hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
-              hbx_enrollment_members.each do |hbx_enrollment_member|
-                if hbx_enrollment_member
-                  person = hbx_enrollment_member.person
-                  enrollment = hbx_enrollment_member.hbx_enrollment
-                  primary_person = family.primary_family_member.person
-                  employer = enrollment.try(:employer_profile)
-                  census_employee = person.try(:employee_roles).try(:first).try(:census_employee)
-                  csv << [
-                      person.hbx_id,
-                      person.first_name,
-                      person.last_name,
-                      employer ? employer.legal_name : "IVL",
-                      employer ? employer.fein : "IVL",
-                      census_employee ? census_employee.aasm_state : "IVL",
-                      primary_person.hbx_id,
-                      primary_person.first_name,
-                      primary_person.last_name,
-                      enrollment.kind,
-                      enrollment.plan.carrier_profile.legal_name,
-                      enrollment.plan.name,
-                      enrollment.coverage_kind,
-                      enrollment.plan.hios_id,
-                      enrollment.hbx_id,
-                      enrollment.aasm_state,
-                      enrollment.effective_on,
-                      enrollment.terminated_on,
-                      primary_person.find_relationship_with(person),
-                      transition_date(enrollment)
-                  ]
-                end
-                processed_count += 1
-              end
+    CSV.open(file_name, "w", force_quotes: true) do |csv|
+      csv << field_names
+      families.each do |family|
+        if family.try(:primary_family_member).try(:person).try(:active_employee_roles).try(:any?) || family.try(:primary_family_member).try(:person).try(:consumer_role).try(:present?)
+          hbx_enrollments = family.active_household.hbx_enrollments.select {|enrollment| enrollment_for_report?(enrollment)}
+          hbx_enrollment_members = hbx_enrollments.flat_map(&:hbx_enrollment_members)
+          hbx_enrollment_members.each do |hbx_enrollment_member|
+            if hbx_enrollment_member
+              person = hbx_enrollment_member.person
+              enrollment = hbx_enrollment_member.hbx_enrollment
+              primary_person = family.primary_family_member.person
+              employer = enrollment.try(:employer_profile)
+              census_employee = person.try(:employee_roles).try(:first).try(:census_employee)
+              csv << [
+                  person.hbx_id,
+                  person.first_name,
+                  person.last_name,
+                  employer ? employer.legal_name : "IVL",
+                  employer ? employer.fein : "IVL",
+                  census_employee ? census_employee.aasm_state : "IVL",
+                  primary_person.hbx_id,
+                  primary_person.first_name,
+                  primary_person.last_name,
+                  enrollment.kind,
+                  enrollment.product.issuer_profile.legal_name,
+                  enrollment.product.name,
+                  enrollment.coverage_kind,
+                  enrollment.product.hios_id,
+                  enrollment.hbx_id,
+                  enrollment.aasm_state,
+                  enrollment.effective_on,
+                  enrollment.terminated_on,
+                  primary_person.find_relationship_with(person),
+                  transition_date(enrollment)
+              ]
             end
+            processed_count += 1
           end
-          pubber = Publishers::Legacy::EdiEnrollmentTerminationReportPublisher.new
-          pubber.publish URI.join("file://", file_name)
-          puts "For date #{date_of_termination}, total terminated hbx_enrollments count #{processed_count} and output file is: #{file_name}" unless Rails.env.test?
         end
+      end
+
+      if Rails.env.production?
+        pubber = Publishers::Legacy::EdiEnrollmentTerminationReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
+      end
+
+      puts "For date #{date_of_termination}, total terminated hbx_enrollments count #{processed_count} and output file is: #{file_name}" unless Rails.env.test?
+    end
   end
 
   def get_families
