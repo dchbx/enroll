@@ -1,8 +1,11 @@
 <html>
 <body>
-<%= person_name %>,
+Dear <%= person_name %>,
 <br />
-<div>Thank you for registering as a broker though <%= Settings.site.short_name %>.</div>
-<div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to create your broker account and manage your clients.</div>
+<div>Congratulations! Your application to become a certified broker on the <%= site_short_name %> for Business platform has been approved!</div><br />
+<div>
+	<p>To access your broker portal and start assisting your small business clients, please go to the <%= link_to "#{site_short_name}", claim_invitation_url(invitation) %> for Business to create your broker account and manage your clients.<br />For any questions or assistance with accessing your broker portal, please contact the Health Connector for Business at <%= contact_center_phone_number %> (TTY: <%=contact_center_tty_number %>) or <a href="https://www.mahealthconnector.org/"><%= site_website_name %></a>
+	</p>
+</div>
 </body>
 </html>

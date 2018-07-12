@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIB
+  key: en.APTC_amount_title_info
+  value: '"If you submitted a formal application for financial assistance before shopping
+    for coverage and were approved to receive Advanced Premium Tax Credit savings
+    to reduce your monthly insurance premiums, the amount you’ll save is listed in
+    this column."'

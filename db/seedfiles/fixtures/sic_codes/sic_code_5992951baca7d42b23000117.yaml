@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAEX
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '26'
+  major_group_label: Paper And Allied Products
+  industry_group_code: '265'
+  industry_group_label: Paperboard Containers And Boxes
+  sic_code: '2652'
+  sic_label: Setup Paperboard Boxes

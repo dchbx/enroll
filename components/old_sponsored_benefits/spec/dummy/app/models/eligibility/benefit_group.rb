@@ -1,0 +1,2 @@
+module Eligibility::BenefitGroup
+end

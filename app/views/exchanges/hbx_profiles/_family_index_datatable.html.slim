@@ -1,0 +1,31 @@
+p#notice 
+  = notice
+h1.heading-text Families
+
+= raw render_datatable(@datatable)
+
+div
+  ul.col-xs-12.col-md-5.col-lg-5
+    span class=(pundit_class Family, :updateable?)
+      - if aca_shop_market_new_employee_paper_application_is_enabled?
+        li
+          = link_to 'New Employee Paper Application', begin_employee_enrollment_exchanges_agents_path(original_application_type: 'paper'), class: 'new_employee_paper_application'
+      - if individual_market_is_enabled?
+        li
+          = link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'phone')
+        li
+          = link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'paper')
+      - if individual_market_is_enabled? && policy(:family).hbx_super_admin_visible?
+        li
+          = link_to 'New DC Resident Application', begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper')
+
+.row
+  p.ml-1 After working on an enrollment return to this page via the person icon in the header
+
+javascript:
+  initializeDataTables();
+
+- if @selector == 'assited'
+  javascript:
+    $('#Tab\\:by_enrollment_individual_market').click();
+    $('#Tab\\:by_enrollment_individual_market-all_assistance_receiving').addClass('active');

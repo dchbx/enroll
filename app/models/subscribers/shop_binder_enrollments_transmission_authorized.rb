@@ -25,9 +25,9 @@ module Subscribers
           return
         end
         employer = if employer_id.blank?
-                     Organization.where(:fein => employer_fein).first
+                     ::BenefitSponsors::Organizations::Organization.employer_by_fein(employer_fein).first
                    else
-                     Organization.employer_by_hbx_id(employer_id).first
+                     ::BenefitSponsors::Organizations::Organization.employer_by_hbx_id(employer_id).first
                    end
         if employer.nil?
           notify("acapi.error.events.employer.binder_enrollments_transmission_authorized.employer_not_found", {
@@ -37,7 +37,7 @@ module Subscribers
             :return_status => "422"
           })
         else
-          query_results = Queries::NamedPolicyQueries.shop_monthly_enrollments([employer.fein], effective_on)
+          query_results = Queries::NamedEnrollmentQueries.shop_initial_enrollments(employer, effective_on)
           query_results.each do |hbx_enrollment_id|
             notify("acapi.info.events.hbx_enrollment.coverage_selected", {
               :hbx_enrollment_id => hbx_enrollment_id,

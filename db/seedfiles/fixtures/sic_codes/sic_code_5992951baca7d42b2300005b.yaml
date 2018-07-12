@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABb
+  division_code: B
+  division_label: Mining
+  major_group_code: '12'
+  major_group_label: Coal Mining
+  industry_group_code: '122'
+  industry_group_label: Bituminous Coal And Lignite Mining
+  sic_code: '1221'
+  sic_label: Bituminous Coal and Lignite Surface Mining

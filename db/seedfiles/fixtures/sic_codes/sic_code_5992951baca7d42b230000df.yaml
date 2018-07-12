@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAADf
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '23'
+  major_group_label: Apparel And Other Finished Products Made From Fabrics And Similar
+    Materials
+  industry_group_code: '233'
+  industry_group_label: Women's, Misses', And Juniors' Outerwear
+  sic_code: '2335'
+  sic_label: Women's, Misses', and Juniors' Dresses

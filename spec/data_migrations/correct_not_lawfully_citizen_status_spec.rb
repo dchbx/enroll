@@ -1,4 +1,5 @@
 require 'rails_helper'
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "correct_not_lawfully_citizen_status")
 
 describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
@@ -37,4 +38,5 @@ describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
     it_behaves_like 'correct_not_lawfully_citizen_status', 'non_native_not_lawfully_present_in_us', 'alien_lawfully_present', 'alien_lawfully_present'
   end
 
+end
 end

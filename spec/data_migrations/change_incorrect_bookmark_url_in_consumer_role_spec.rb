@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "change_incorrect_bookmark_url_in_consumer_role")
 describe ChangeIncorrectBookmarkUrlInConsumerRole, dbclean: :after_each do
 
@@ -52,4 +53,5 @@ describe ChangeIncorrectBookmarkUrlInConsumerRole, dbclean: :after_each do
       expect(person.consumer_role.bookmark_url).to eq "/families/home"
     end
   end
+end
 end

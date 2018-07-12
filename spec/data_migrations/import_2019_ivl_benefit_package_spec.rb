@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "import_2019_ivl_benefit_package")
 
 describe Import2019IvlBenefitPackage, :dbclean => :after_each do
@@ -42,4 +43,5 @@ describe Import2019IvlBenefitPackage, :dbclean => :after_each do
       expect(bcp_2019.open_enrollment_end_on).to eq Date.new(2019,1,31)
     end
   end
+end
 end

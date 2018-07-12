@@ -12,6 +12,7 @@ module Factories
 
     def save_clone_enrollment(clone_enrollment)
       if clone_enrollment.save
+        assign_enrollment_to_benefit_package_assignment(clone_enrollment)
         clone_enrollment
       else
         message = "Enrollment: #{enrollment.id}, \n" \
@@ -25,25 +26,28 @@ module Factories
 
     def effective_on_for_cobra(enrollment)
       effective_on_by_terminated = census_employee.coverage_terminated_on.end_of_month + 1.days
-      effective_on_by_benefit_group = enrollment.benefit_group.effective_on_for_cobra(census_employee.hired_on)
+      effective_on_by_benefit_group = enrollment.sponsored_benefit_package.effective_on_for_cobra(census_employee.hired_on)
       [effective_on_by_terminated, effective_on_by_benefit_group].max
     end
 
     def clone_cobra_enrollment
       clone_enrollment = family.active_household.hbx_enrollments.new
 
-      clone_enrollment.benefit_group_assignment_id = enrollment.benefit_group_assignment_id
-      clone_enrollment.benefit_group_id = enrollment.benefit_group_id
+      clone_enrollment.sponsored_benefit_package_id = enrollment.sponsored_benefit_package_id
       clone_enrollment.employee_role_id = enrollment.employee_role_id
-      clone_enrollment.plan_id = enrollment.plan_id
+      clone_enrollment.product_id = enrollment.product_id
       clone_enrollment.coverage_kind = enrollment.coverage_kind
 
       clone_enrollment.kind = 'employer_sponsored_cobra'
       effective_on = effective_on_for_cobra(enrollment)
       clone_enrollment.effective_on = effective_on
       clone_enrollment.external_enrollment = enrollment.external_enrollment
+      clone_enrollment.benefit_sponsorship_id = enrollment.benefit_sponsorship_id
+      clone_enrollment.sponsored_benefit_id = enrollment.sponsored_benefit_id
+      clone_enrollment.rating_area_id = enrollment.rating_area_id
+      clone_enrollment.issuer_profile_id = enrollment.issuer_profile_id
 
-      if enrollment.benefit_group.plan_year.is_renewing?
+      if enrollment.sponsored_benefit_package.benefit_application.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
       else
         clone_enrollment.select_coverage
@@ -68,6 +72,12 @@ module Factories
           is_subscriber: hbx_enrollment_member.is_subscriber
         })
       end
+    end
+
+    def assign_enrollment_to_benefit_package_assignment(enrollment)
+      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+      assignment.update_attributes(hbx_enrollment_id: enrollment.id)
+      enrollment.update_attributes(benefit_group_assignment_id: assignment.id)
     end
   end
 

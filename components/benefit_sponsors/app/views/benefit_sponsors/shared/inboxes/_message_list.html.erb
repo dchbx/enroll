@@ -1,0 +1,79 @@
+<div class="bottom-pd" id='inbox-messages'>
+  <div class="no_margin">
+    <div class="col-xs-12 no-pd">
+      <h3 class="title-inline">Messages</h3>
+    </div>
+  </div>
+  <div class="module inbox col-xs-12">
+    <div class="row">
+      <div class="col-xs-12 inboxes" id="inbox_form">
+        <div class="pull-right">
+          <%= link_to(retrieve_inbox(provider, folder: 'Deleted'), remote: true) do %>
+            <% if @folder == 'Inbox' %>
+              <strong>
+                Inbox
+              </strong>
+            <% else %>
+              Inbox
+            <% end %>
+            <span class="badge message-badge"><%= provider.inbox.unread_messages.size %></span>
+          <% end %>
+          <span class="">
+            &nbsp;|&nbsp;
+          </span>
+          <%- if @sent_box == true %>
+            <%= link_to(retrieve_inbox(provider, folder: 'Sent'), remote: true) do %>
+              <% if @folder == 'Sent' %>
+                <strong>
+                  Sent
+                </strong>
+              <% else %>
+                Sent
+              <% end %>
+            <% end %>
+            <span class="">
+            &nbsp;|&nbsp;
+          </span>
+            <%= link_to(retrieve_inbox(provider, folder: 'Deleted'), remote: true) do %>
+              <% if @folder == 'Deleted' %>
+                <strong>
+                  Deleted
+                </strong>
+              <% else %>
+                Deleted
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <%- @folder = (@folder||'Inbox').capitalize %>
+      <div class="table-responsive" id="message_list_form">
+        <table class="table table-striped table-hover table-sm">
+          <thead class="thead-default">
+          <tr>
+            <th>
+              From
+            </th>
+            <th>
+              Date
+            </th>
+            <th>Subject</th>
+            <%- if @folder != 'Deleted' %>
+              <th></th>
+            <%- end %>
+          </tr>
+          </thead>
+          <tbody>
+          <%- if provider.try(:inbox).try(:messages) %>
+            <% sorted_inbox_messages = find_and_sort_inbox_messages(provider, @folder) %>
+            <%= render partial: "benefit_sponsors/shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: provider} %>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div id="show_message_form"></div>
+    </div>
+  </div>
+</div>

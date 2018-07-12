@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGF
+  key: en.insured.living_outside_the_US_or_in_US_territory
+  value: '"I was living outside the US or in a US territory"'

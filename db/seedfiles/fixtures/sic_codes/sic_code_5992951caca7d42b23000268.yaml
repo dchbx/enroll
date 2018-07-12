@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJo
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '42'
+  major_group_label: Motor Freight Transportation And Warehousing
+  industry_group_code: '423'
+  industry_group_label: Terminal And Joint Terminal Maintenance
+  sic_code: '4231'
+  sic_label: Terminal and Joint Terminal Maintenance Facilities for Motor Freight
+    Transportation

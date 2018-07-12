@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAL1
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '56'
+  major_group_label: Apparel And Accessory Stores
+  industry_group_code: '561'
+  industry_group_label: Men's And Boys' Clothing And Accessory Stores
+  sic_code: '5611'
+  sic_label: Men's and Boys' Clothing and Accessory Stores

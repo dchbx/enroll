@@ -2,14 +2,14 @@ require "rails_helper"
 
 describe ::Importers::ConversionEmployerPlanYearSet, dbclean: :after_each do
   let(:out_stream) { StringIO.new }
-  let(:employer_record) { instance_double("::Importers::ConversionEmployerPlanYear", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
+  let(:employer_record) { instance_double("::Importers::ConversionEmployerPlanYearCreate", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }
   let(:record_warnings) { { } }
   let(:default_plan_year_start) { Date.new(2015, 3, 1) }
 
   subject { ::Importers::ConversionEmployerPlanYearSet.new(file_name, out_stream, default_plan_year_start) }
   before :each do
-    allow(::Importers::ConversionEmployerPlanYear).to receive(:new).with(employer_data).and_return(employer_record)
+    allow(::Importers::ConversionEmployerPlanYearCreate).to receive(:new).with(employer_data).and_return(employer_record)
     subject.import!
     out_stream.rewind
   end
@@ -24,7 +24,7 @@ describe ::Importers::ConversionEmployerPlanYearSet, dbclean: :after_each do
 
 
     let(:base_output_result) do
-      "Action,FEIN,Doing Business As,Legal Name,Physical Address 1,Physical Address 2,City,State,Zip,Mailing Address 1,Mailing Address 2,City,State,Zip,Contact First Name,Contact Last Name,Contact Email,Contact Phone,Enrolled Employee Count,New Hire Coverage Policy,Contact Address 1,Contact Address 2,City,State,Zip,Broker Name,Broker NPN,TPA Name,TPA FEIN,Coverage Start Date,Carrier Selected,Plan Selection Category,Plan Name,Plan HIOS Id,Most Enrollees - Plan Name,Most Enrollees - Plan HIOS Id,Reference Plan - Name,Reference Plan - HIOS Id,Employer Contribution -  Employee,Employer Contribution - Spouse,Employer Contribution - Domestic Partner,Employer Contribution - Child under 26,Employer Contribution - Child over 26,Employer Contribution - Disabled child over 26,Import Status,Import Details\nAdd,931100000,AGA DBA,AGA LEGAL,799 9TH STREET NW,7TH FLR,Washington,DC,20001.0,\"\",\"\",\"\",\"\",\"\",THE,CONTACT,THECONTACT@AGA.COM,2025552675,14.0,Date of Hire equal to Effective Date,799 9TH STREET NW,7TH FLR,Washington,DC,20001.0,THE BROKER   ,8262800  ,\"\",\"\",07/01/2016,United Healtcare,Single Plan from Carrier,Choice Plus Insurance/0/5000,41842DC0010068-01,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
+      "Action,FEIN,Doing Business As,Legal Name,Physical Address 1,Physical Address 2,City,State,Zip,County,Mailing Address 1,Mailing Address 2,City,State,Zip,Contact First Name,Contact Last Name,Contact Email,Contact Phone,Enrolled Employee Count,New Hire Coverage Policy,Contact Address 1,Contact Address 2,City,State,Zip,Broker Name,Broker NPN,TPA Name,TPA FEIN,Coverage Start Date,Carrier Selected,Plan Selection Category,Plan Name,Plan HIOS Id,Most Enrollees - Plan Name,Most Enrollees - Plan HIOS Id,Reference Plan - Name,Reference Plan - HIOS Id,Employer Contribution -  Employee,Employer Contribution - Spouse,Employer Contribution - Domestic Partner,Employer Contribution - Child under 26,Employer Contribution - Child over 26,Employer Contribution - Disabled child over 26,Import Status,Import Details\nAdd,931100000,AGA DBA,AGA LEGAL,799 9TH STREET NW,7TH FLR,Washington,DC,20001.0,County,\"\",\"\",\"\",\"\",\"\",THE,CONTACT,THECONTACT@AGA.COM,2025552675,14.0,Date of Hire equal to Effective Date,799 9TH STREET NW,7TH FLR,Washington,DC,20001.0,THE BROKER   ,8262800  ,\"\",\"\",07/01/2016,United Healtcare,Single Plan from Carrier,Choice Plus Insurance/0/5000,41842DC0010068-01,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
     end
 
     describe "with a valid employer record" do
@@ -62,7 +62,7 @@ describe ::Importers::ConversionEmployerPlanYearSet, dbclean: :after_each do
     end
 
     let(:base_output_result) do
-      "Action,FEIN,Doing Business As,Legal Name,Physical Address 1,Physical Address 2,City,State,Zip,Mailing Address 1,Mailing Address 2,City,State,Zip,Contact First Name,Contact Last Name,Contact Email,Contact Phone,Enrolled Employee Count,New Hire Coverage Policy,Contact Address 1,Contact Address 2,City,State,Zip,Broker Name,Broker NPN,TPA Name,TPA FEIN,Coverage Start Date,Carrier Selected,Plan Selection Category,Plan Name,Plan HIOS Id,Most Enrollees - Plan Name,Most Enrollees - Plan HIOS Id,Reference Plan - Name,Reference Plan - HIOS Id,Employer Contribution -  Employee,Employer Contribution - Spouse,Employer Contribution - Domestic Partner,Employer Contribution - Child under 26,Employer Contribution - Child over 26,Employer Contribution - Disabled child over 26,Import Status,Import Details\nAdd,521782000,MCP DBA,MCP LEGAL,3001 P Street N.W., ,Washington,DC,20007,3001 P Street N.W., ,Washington,DC,20007,The,Contact,thecontact@mcp.com,2025554100,3, ,3001 P Street N.W., ,Washington,DC,20007,The Broker,629000, , ,07/01/2016,CareFirst BlueCross BlueShield,Single Plan from Carrier ,BC HMO Ref  500 Gold Trad Dental Drug,86052DC0480005-01,BC HMO Ref  500 Gold Trad Dental Drug,86052DC0480005-01,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
+      "Action,FEIN,Doing Business As,Legal Name,Physical Address 1,Physical Address 2,City,State,Zip,County,Mailing Address 1,Mailing Address 2,City,State,Zip,Contact First Name,Contact Last Name,Contact Email,Contact Phone,Enrolled Employee Count,New Hire Coverage Policy,Contact Address 1,Contact Address 2,City,State,Zip,Broker Name,Broker NPN,TPA Name,TPA FEIN,Coverage Start Date,Carrier Selected,Plan Selection Category,Plan Name,Plan HIOS Id,Most Enrollees - Plan Name,Most Enrollees - Plan HIOS Id,Reference Plan - Name,Reference Plan - HIOS Id,Employer Contribution -  Employee,Employer Contribution - Spouse,Employer Contribution - Domestic Partner,Employer Contribution - Child under 26,Employer Contribution - Child over 26,Employer Contribution - Disabled child over 26,Import Status,Import Details\nAdd,521782000,MCP DBA,MCP LEGAL,3001 P Street N.W., ,Washington,DC,20007,County,3001 P Street N.W., ,Washington,DC,20007,The,Contact,thecontact@mcp.com,2025554100,3, ,3001 P Street N.W., ,Washington,DC,20007,The Broker,629000, , ,07/01/2016,CareFirst BlueCross BlueShield,Single Plan from Carrier ,BC HMO Ref  500 Gold Trad Dental Drug,86052DC0480005-01,BC HMO Ref  500 Gold Trad Dental Drug,86052DC0480005-01,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
     end
 
     describe "with a valid employer record" do

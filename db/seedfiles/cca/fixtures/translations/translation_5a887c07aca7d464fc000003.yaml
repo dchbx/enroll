@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8B6yn1GT8AAAD
+  key: en.back_to_my_account_title
+  value: '"Back To My Account"'

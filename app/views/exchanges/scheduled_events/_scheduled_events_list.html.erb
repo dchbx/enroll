@@ -1,0 +1,18 @@
+<div class="container content-bottom scheduled-event-list-wrapper">
+  <div class='container'>
+    <div class="row">
+      <h3 class="title-inline">List Of Custom and System Events</h3>
+    </div>
+    <ul>
+      <% scheduled_events.each do |event| %>
+        <% if event.type != 'federal' %>
+          <li>
+            <%= link_to event.event_name.humanize, edit_exchanges_scheduled_event_path(id: event.id), class: 'btn btn-normal', remote: true %>
+           </li>
+        <% end %>
+      <% end %>
+    </ul>
+    <%= link_to 'Back', exchanges_scheduled_events_path, class: "btn btn-default", remote: true %>
+
+  </div>
+</div>

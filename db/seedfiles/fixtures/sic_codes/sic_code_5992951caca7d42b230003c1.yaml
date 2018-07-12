@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPB
+  division_code: I
+  division_label: Services
+  major_group_code: '80'
+  major_group_label: Health Services
+  industry_group_code: '809'
+  industry_group_label: Miscellaneous Health And Allied Services, Not
+  sic_code: '8093'
+  sic_label: Specialty Outpatient Facilities, Not Elsewhere Classified

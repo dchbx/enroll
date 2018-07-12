@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe IdentityVerification::InteractiveVerificationResponse do
   let(:response_data) { File.read(file_path) }
   subject {
@@ -218,4 +219,5 @@ describe IdentityVerification::InteractiveVerificationResponse do
       end
     end
   end
+end
 end

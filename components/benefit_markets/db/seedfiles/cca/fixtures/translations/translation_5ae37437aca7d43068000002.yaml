@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WuN0N6yn1DBoAAAC
+  key: en.insured.start_your_coverage
+  value: '"There are other types of Special Enrollment Periods that may allow you
+    to start your coverage on a different date."'

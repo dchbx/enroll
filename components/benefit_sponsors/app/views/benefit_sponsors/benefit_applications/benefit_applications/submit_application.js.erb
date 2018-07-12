@@ -1,0 +1,4 @@
+<% @benefit_application_form.errors.messages.each_value do |warning| %>
+  $(".application-warnings").append("<li><%= warning %></li>");
+<% end %>
+$("#submitBenefitApplication").modal('show');

@@ -8,6 +8,8 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       And Employee has not signed up as an HBX user
       And Soren White visits the employee portal
       When Soren White creates an HBX account
+      And I select the all security question and give the answer
+      When I have submit the security questions
       When Employee goes to register as an employee
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White
@@ -43,7 +45,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page
       Then Employee should see "employer-sponsored benefits not found" error message
-          
+
   Scenario: New Hire can buy coverage during open enrollment of renewing plan year
     Given Conversion Employer for Soren White exists with active and renewing plan year
       And Employer for Soren White is under open enrollment
@@ -63,6 +65,10 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       And Employee has not signed up as an HBX user
       And Soren White visits the employee portal
       When Soren White creates an HBX account
+      And I select the all security question and give the answer
+      When I have submit the security questions
+      And I select the all security question and give the answer
+      When I have submit the security questions
       When Employee goes to register as an employee
       Then Employee should see the employee search page
       When Employee enters the identifying info of Soren White

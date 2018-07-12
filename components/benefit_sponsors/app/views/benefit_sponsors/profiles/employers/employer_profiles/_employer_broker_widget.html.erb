@@ -1,0 +1,46 @@
+<% broker_and_agency_present = true if @employer_profile.broker_agency_profile.present? && @broker_agency_account.writing_agent.present? %>
+<!-- TODO fix this during pundit implementation-->
+<div class="panel panel-default module employer-broker-widget <%#= pundit_class EmployerProfile, :updateable? %>">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      <strong>
+        <% if broker_and_agency_present %>
+          Your Broker
+        <% else %>
+          Select a Broker
+        <% end %>
+      </strong>
+    </h3>
+  </div>
+  <div class="panel-body">
+    <div class="text-center">
+      <i aria-hidden="true" class="fa fa-user fa-3x"></i>
+      <% if broker_and_agency_present %>
+        <br/>
+        <%= @employer_profile.broker_agency_profile.legal_name.titleize %>
+      <% else %>
+        <br/>
+        No Broker
+      <% end %>
+    </div>
+    <div class="text-left">
+      <% if broker_and_agency_present %>
+        <div class="broker-information">
+          <% active_broker = @broker_agency_account.writing_agent %>
+          <%= active_broker.person.full_name.titleize %>
+          <br/>
+          <a href="tel:1-<%= active_broker.phone %>">1
+            <%= active_broker.phone.to_s if active_broker.phone.present? %></a>
+          <br/>
+          <%= mail_to active_broker.email.address, active_broker.email.address %>
+        </div>
+      <% else %>
+        <%= link_to 'Add Broker', profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'brokers'), "aria-expanded" => "true", class: "btn btn-default center-block" %>
+        <small>
+          <%= link_to "What is a Broker?", '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
+        </small>
+        <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: "What is a broker?", body: "Brokers are licensed professionals with health insurance expertise and long-standing relationships with Small Business owners, Individuals and Families. Brokers help clients identify their options and make choices that are in their best interest and meet their needs and budget. In the District of Columbia, Brokers must have an active DC license in good standing, complete training on DC Health Link, and have contractual relationships with each carrier in DC Health Link for the market in which he/she intends to sell. There is no cost to use an insurance Broker." } %>
+      <% end %>
+    </div>
+  </div>
+</div>

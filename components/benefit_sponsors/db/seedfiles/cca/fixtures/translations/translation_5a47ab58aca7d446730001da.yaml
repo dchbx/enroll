@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHa
+  key: en.insured.group_selection.coverage_household_ineligible_coverage
+  value: '"This dependent is ineligible for employer-sponsored %{coverage_kind} coverage."'

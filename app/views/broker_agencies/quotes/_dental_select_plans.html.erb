@@ -1,8 +1,8 @@
 <div class="container-fluid" style='margin-bottom:0%'>
     <div class='dental_plan_selectors'>
 
-        <div id='dental-carriers' style='width: 200px;'>
-            <b id='dental_carriers_header'>Carriers</b><br/>
+        <div id='dental-carriers' style='width: 148px;'>
+            <b id='dental_carriers_header'><%= l10n("carriers")%></b><br/>
             <%- @dental_selectors[:carriers].each do |carrier| %>
               <div style='width: 200px'>
                  <%- if carrier[0] == 'any' %>

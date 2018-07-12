@@ -31,12 +31,11 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let(:quiet_period_end_on) {
-        Settings.aca.shop_market.initial_application.quiet_period_end_on
+        Settings.aca.shop_market.initial_application.quiet_period.mday
       }
 
       let(:quiet_period_end_date) {
-        prev_month_begin = plan_year.start_on.prev_month
-        Date.new(prev_month_begin.year, prev_month_begin.month, quiet_period_end_on)
+        plan_year.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset).months + (Settings.aca.shop_market.initial_application.quiet_period.mday-1).days
       }
 
       let(:initial_employees) {
@@ -90,9 +89,9 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let!(:enrollment_7) {
-        create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, submitted_at: quiet_period_end_date.end_of_day + 1.hour)
+        create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, submitted_at: quiet_period_end_date.end_of_day - 1.hour)
       }
-   
+
       let(:employee_E) {
         ce = initial_employees[4]
         create_person(ce, initial_employer)
@@ -193,12 +192,11 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let(:quiet_period_end_on) {
-        Settings.aca.shop_market.initial_application.quiet_period_end_on
+        Settings.aca.shop_market.initial_application.quiet_period.mday
       }
 
       let(:quiet_period_end_date) {
-        prev_month_begin = plan_year.start_on.prev_month
-        Date.new(prev_month_begin.year, prev_month_begin.month, quiet_period_end_on)
+        plan_year.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset).months + (Settings.aca.shop_market.initial_application.quiet_period.mday-1).days
       }
 
       let(:initial_employees) {
@@ -245,7 +243,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let!(:enrollment_6) {
-        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: quiet_period_end_date.prev_day, status: 'inactive', parent: enrollment_4) 
+        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: quiet_period_end_date.prev_day, status: 'inactive', parent: enrollment_4)
       }
 
       let!(:enrollment_7) {
@@ -262,7 +260,7 @@ describe "a monthly inital employer quiet period enrollments query" do
 
       let(:term_statuses){ %w(coverage_terminated coverage_canceled coverage_termination_pending) }
 
-   
+
       it "does not include enrollment 1" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, [])
         expect(result).not_to include(enrollment_1.hbx_id)
@@ -312,12 +310,12 @@ describe "a monthly inital employer quiet period enrollments query" do
     describe '.queit_period' do
       let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
 
-      it 'should be in exchange local time' do 
+      it 'should be in exchange local time' do
         qs = Queries::ShopMonthlyEnrollments.new([], effective_on)
 
         expect(qs.quiet_period.begin.in_time_zone(TimeKeeper.exchange_zone).strftime("%H:%M")).to eq ("00:00")
-        expect(qs.quiet_period.end.in_time_zone(TimeKeeper.exchange_zone).strftime("%H:%M")).to eq ("00:00")        
-      end 
+        expect(qs.quiet_period.end.in_time_zone(TimeKeeper.exchange_zone).strftime("%H:%M")).to eq ("00:00")
+      end
     end
   end
 

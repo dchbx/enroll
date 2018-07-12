@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMU
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '59'
+  major_group_label: Miscellaneous Retail
+  industry_group_code: '596'
+  industry_group_label: Nonstore Retailers
+  sic_code: '5962'
+  sic_label: Automatic Merchandising Machine Operators

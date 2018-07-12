@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABG
+  division_code: A
+  division_label: Agriculture, Forestry, And Fishing
+  major_group_code: '07'
+  major_group_label: Agricultural Services
+  industry_group_code: '076'
+  industry_group_label: Farm Labor And Management Services
+  sic_code: '0762'
+  sic_label: Farm Management Services

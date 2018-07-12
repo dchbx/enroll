@@ -1,0 +1,89 @@
+<style>
+  .custom_filter{
+    margin-left: 15em;
+    margin-top: -15px;
+    position: absolute;
+    z-index: 999;
+  }
+  #upload{
+    position: absolute;
+    margin-left: 75em;
+  }
+</style>
+<!-- <div class="container">
+  <div id="upload">
+    <%#= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, '/employers/employer_attestations/new', remote: 'true', class: "btn btn-default ",style: "float: right" %>
+  </div>
+</div> -->
+<%#= render_datatable(@datatable) %>
+<% @documents.each do |doc| %>
+  <%# if doc.employer_profile && doc.employer_profile.employer_attestation && doc.employer_profile.employer_attestation.has_documents? %>
+ <% @document = doc.employer_profile.employer_attestation.employer_attestation_documents.last %>
+
+  <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div style="margin:1em; border: 1px solid;padding: 1em;">
+          <h4>MA DOR FORM-X</h4>
+          <p id="print_<%=doc.id%>">
+            <%begin%>
+              <% reader = PDF::Reader.new(@document.identifier) %>
+              <% reader.pages.each do |page| %>
+                <%= page.text %>
+              <% end %>
+            <%rescue%>
+              <b> Only we supports PDF</b>
+            <%end%>
+          </p>
+          <p style="text-align: right">
+            <a href="<%=download_employer_document_document_path(doc) + "?path=#{@document.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+            <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
+          </p>
+          <hr/>
+          <p class="row">
+            <span class="col-md-6">Employer Name: <%= doc.legal_name %></span>
+            <span class="col-md-6" style="text-align: right">Effective date: <%#= @document.created_at %></span>
+          </p>
+          <%= form_tag employers_employer_attestation_path(doc.employer_profile), :method => :put do |f| %>
+            <input type="hidden" name="attestation_doc_id" value="<%= doc.employer_profile.employer_attestation.employer_attestation_documents.last.id %>" />
+            <div class="row">
+              <div class="col-md-4">
+                <label><input type="radio" name="status" checked="true" value="accepted"> Approve</label><br/>
+                <label><input type="radio" name="status" value="rejected"> Reject</label>
+              </div>
+              <div class="col-md-4">
+                <select class="form-control" name="reason_for_rejection">
+                  <option value="nil">Reason for rejection</option>
+                  <option value="A">Unable To Open Document</option>
+                  <option value="B">Document Not Required DOR-1 Form</option>
+                  <option value="C">DOR-1 Form DoesNot Match Bussiness</option>
+                </select>
+                <div class="form-group">
+                  <input type="text" name="other_reason" placeholder="Other reason for rejection">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-default" type="submit">Submit</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div>
+<%# end %>
+<% end %>
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+  jQuery('.buttons-csv').hide()
+  jQuery('.buttons-excel').hide()
+  function printDoc(id){
+    var window_obj=window.open();
+    window_obj.document.write($('#print_'+id).html());
+    window_obj.print();
+    window_obj.close();
+  }
+</script>

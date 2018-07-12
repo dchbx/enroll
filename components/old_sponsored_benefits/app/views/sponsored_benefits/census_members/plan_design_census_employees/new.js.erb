@@ -1,0 +1,7 @@
+$('#new_employee_form').html("<%= escape_javascript(render 'new') %>");
+
+function cancelCreate(){
+  $('#new_employee_form').html("");
+}
+
+applyJQDatePickers();

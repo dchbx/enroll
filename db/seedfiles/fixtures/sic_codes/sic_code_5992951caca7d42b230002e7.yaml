@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALn
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '54'
+  major_group_label: Food Stores
+  industry_group_code: '542'
+  industry_group_label: Meat And Fish (seafood) Markets, Including
+  sic_code: '5421'
+  sic_label: Meat and Fish (Seafood) Markets, Including Freezer Provisioners

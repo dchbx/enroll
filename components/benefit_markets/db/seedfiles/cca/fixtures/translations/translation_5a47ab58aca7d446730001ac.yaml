@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGs
+  key: en.insured.families.documents_view_important_noticies
+  value: '"The Documents folder is a safe and convenient way for you to view and keep
+    track of important notices and communications you receive from %{site_short_name}.
+    You''ll receive an email notification when there are new documents for you to
+    review."'

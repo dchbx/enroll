@@ -1,0 +1,13 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAJB
+  key: en.insured.plan_shoppings.thankyou.review_your_current_plan_selection
+  value: '"Please review your current plan selection. Select PREVIOUS if you want
+    to change your plan selection. When you''re satisfied with your plan, carefully
+    review and acknowledge the Agreement below along with the Terms and Conditions.
+    You must also provide an electronic signature at the bottom of the page. When
+    you''re finished, select CONFIRM to submit your enrollment to your insurance company.
+    You don''t have to pay today."'

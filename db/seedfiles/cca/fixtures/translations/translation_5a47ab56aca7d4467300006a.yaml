@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerVqyn1EZzAABq
+  key: en.uis.bootstrap3_examples.index.something_else_where
+  value: '"Something else where"'

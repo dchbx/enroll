@@ -3,20 +3,20 @@
   <div class="pull-left">
     <span class="ttu lg twelve">Coverage For:</span>
     &nbsp;
-    <%= plan_shopping_dependent_text(@hbx_enrollment) %>
+    <strong><%= plan_shopping_dependent_text(@hbx_enrollment) %></strong>
     &nbsp;&nbsp;
     <% if @market_kind == 'shop' && @coverage_kind == 'health' %>
     Employer: &nbsp;
-    <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong>
+    <strong><%= @hbx_enrollment.try(:benefit_sponsorship).try(:organization).try(:legal_name) %></strong>
     &nbsp;&nbsp;
     <% end %>
     <span class="ttu lg twelve">Plans:</span>
     &nbsp;
-    <strong id='plans-count'><%= @plans.count %></strong>
+    <strong id='plans-count'><%= @member_groups.count %></strong>
     &nbsp;&nbsp;
     <span class="ttu lg twelve">Effective Date:</span>
     &nbsp;
-    <strong><%= @hbx_enrollment.effective_on %></strong>
+    <strong id='effective_date'><%= @hbx_enrollment.effective_on %></strong>
   </div>
-  <br/> 
+  <br/>
 </div>

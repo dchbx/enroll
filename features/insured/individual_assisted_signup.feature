@@ -1,3 +1,4 @@
+@individiual_enabled
 Feature: Insured Plan Shopping on Individual Assisted market
   Scenario: New insured user purchases on individual market
     # Given Individual has not signed up as an HBX user

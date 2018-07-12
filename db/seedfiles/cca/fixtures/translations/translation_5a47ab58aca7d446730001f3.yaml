@@ -1,0 +1,16 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHz
+  key: en.insured.interactive_identity.failed_validation_html
+  value: '"<h4>To keep your data secure, we are required to verify your identity electronically
+    using the credit reporting agency Experian. Unfortunately, Experian was unable
+    to confirm your identity based on the information you provided. You have two options
+    for completing your application:</h4><br />1. Complete your application at the
+    DC Health Benefit Exchange Authority. Please call (202) 715-7576 to set up an
+    appointment.<br /><br /> 2. Complete a paper application form, scan it, and email
+    it to info@dchealthlink.com. Click here for the paper application form. Be sure
+    to fill out all the required information so that we can process your application
+    as soon as possible.<br />"'

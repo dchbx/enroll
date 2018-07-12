@@ -27,16 +27,16 @@ module Enroll
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-    config.i18n.available_locales = [:en, :es]
+    config.i18n.available_locales = [:am, :en, :es, :ja]
     config.i18n.default_locale = :en
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.active_record.raise_in_transactional_callbacks = true
     config.assets.enabled = true
     config.assets.paths << "#{Rails.root}/app/assets/info"
-    
+
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-    config.i18n.fallbacks = {'es' => 'en'}
+    config.i18n.fallbacks = {'am' => 'en', 'es' => 'en', 'ja' => 'en'}
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
 
@@ -66,6 +66,8 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::EmployeeEnrollmentInvitationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeInitialEnrollmentInvitationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeRenewalInvitationsSubscriber")
+      config.acapi.add_amqp_worker("TransportProfiles::Subscribers::TransportArtifactSubscriber")
+      config.acapi.add_async_subscription("Notifier::NotificationSubscriber")
     end
   end
 end

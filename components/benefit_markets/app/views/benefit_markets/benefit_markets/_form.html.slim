@@ -1,0 +1,132 @@
+fieldset
+  legend Site Information:
+  .form-group
+    label for="inputSite" Site
+    = f.text_field :site_urn, required:'true', class:'form-control mb-1'
+    label for="inputTitle" Title
+    = f.text_field :title, required:'true', class:'form-control mb-1'
+    label for="inputDescription" Description
+    = f.text_field :description, class:'form-control mb-1'
+
+fieldset
+  legend Market Kind:
+  .form-group
+    label for="inputKind" Select Market Kind
+    = f.select :kind, options_for_select({'ACA Individual' => 'aca_individual', 'ACA Shop' => 'aca_shop'}, @benefit_market.kind), {}, data: { target: 'benefit-market--form.select', action: 'change->benefit-market--form#configurationChange' }, class:'form-control mb-1'
+
+fieldset 
+  legend Individual Application:
+  .form-group
+    div data-target="benefit-market--form.aca_individual"
+      = f.fields_for :aca_individual_configuration, @benefit_market.aca_individual_configuration do |configuration_fields|
+        label for="inputEnrollmentDueOn" Monthly Enrollment Due On
+        = configuration_fields.text_field :mm_enr_due_on, id: 'inputEnrollmentDueOn', required:'true', class:'form-control mb-1'
+        label for="inputVerificationOutstanding" Verification Outstanding Window Days
+        = configuration_fields.text_field :vr_os_window, id: 'inputVerificationOutstanding', required:'true', class:'form-control mb-1'
+        label for="inputVerificationDue" Verification Due Days
+        = configuration_fields.text_field :vr_due, id: 'inputVerificationDue', required:'true', class:'form-control mb-1'
+        label for="inputEnrollmentStartOn" Open Enrollment Start On
+        = configuration_fields.date_field :open_enrl_start_on, id: 'inputEnrollmentStartOn', required:'true', class:'form-control mb-1'
+        label for="inputOpenEnrollmentEndOn" Open Enrollment End On
+        = configuration_fields.date_field :open_enrl_end_on, id: 'inputOpenEnrollmentEndOn', required:'true', class:'form-control mb-1'
+        h4 Inital Application
+        = configuration_fields.fields_for :initial_application_configuration, configuration_fields.object.initial_application_configuration do |initial_application_fields|
+          label for="inputPublishDueDayOfMonth" Publish Due Day Of Month
+          = initial_application_fields.text_field :pub_due_dom, id: 'inputPublishDueDayOfMonth', required:'true', class:'form-control mb-1'
+          label for="inputEarliestStartPriorToEffectiveOnMonths" Earliest Start Prior To Effective On Months
+          = initial_application_fields.text_field :erlst_strt_prior_eff_months, id: 'inputEarliestStartPriorToEffectiveOnMonths', required:'true', class:'form-control mb-1'
+          label for="inputAppealPeriodAfterAppDenialDays" Appeal Period After Application Denial Days
+          = initial_application_fields.text_field :appeal_per_aft_app_denial_dys, id: 'inputAppealPeriodAfterAppDenialDays', required:'true', class:'form-control mb-1'
+          label for="inputQuietPeriodEndOn" Quiet Period End On
+          = initial_application_fields.text_field :quiet_per_end, id: 'inputQuietPeriodEndOn', required:'true', class:'form-control mb-1'
+          label for="inputIneligiblePeriodAfterApplicationDenialDays" Ineligible Period After Application Denial Days
+          = initial_application_fields.text_field :inelig_per_aft_app_denial_dys, id: 'inputIneligiblePeriodAfterApplicationDenialDays', required:'true', class:'form-control mb-1'
+
+fieldset
+  legend SHOP Application:
+  .form-group
+      = f.fields_for :aca_shop_configuration, @benefit_market.aca_shop_configuration do |configuration_fields|
+        label for="inputEmployeeCountMax" Employee Count Maximum
+        = configuration_fields.text_field :ee_ct_max, id: 'inputEmployeeCountMax', required:'true', class:'form-control mb-1'
+        label for="inputEEParticipationRatio" Employee Participation Ratio Min
+        = configuration_fields.text_field :ee_ratio_min, id: 'inputEEParticipationRatio', required:'true', class:'form-control mb-1'
+        label for="inputEmployeeNonOwnerCountMin" Employee Non Owner Count Min
+        = configuration_fields.text_field :ee_non_owner_ct_min, id: 'inputEmployeeNonOwnerCountMin', required:'true', class:'form-control mb-1', :style => "width:400px"
+        label for="inputEmployereContribution" Employer Contribution Percentaget Min
+        = configuration_fields.text_field :er_contrib_pct_min, id: 'inputEmployereContribution', required:'true', class:'form-control mb-1'
+        label for="inputBinderPaymentDueDate" Binder Payment Due Day Of Month
+        = configuration_fields.text_field :binder_due_dom, id: 'inputBinderPaymentDueDate', required:'true', class:'form-control mb-1'
+        label for="inputEarliestEnroll" Earliest Enroll Prior Effective On Days
+        = configuration_fields.text_field :erlst_e_prior_eod, id: 'inputEarliestEnroll', required:'true', class:'form-control mb-1'
+        label for="inputLAtestEnroll" Latest Enroll After Effective On Days
+        = configuration_fields.text_field :ltst_e_aft_eod, id: 'inputLAtestEnroll', required:'true', class:'form-control mb-1'
+        label for="inputlatestEnrollEE" Latest Enroll After EE Roster Correction On Days
+        = configuration_fields.text_field :ltst_e_aft_ee_roster_cod, id: 'inputlatestEnrollEE', required:'true', class:'form-control mb-1'
+        label for="inputRetroActiveCoverage" Retroactive Coverage Termination Max Days
+        = configuration_fields.text_field :retroactve_covg_term_max_dys, id: 'inputRetroActiveCoverage', required:'true', class:'form-control mb-1'
+        label for="inputBenefitPeriodMinYear" Benefit Period Min Year
+        = configuration_fields.text_field :ben_per_min_year, id: 'inputBenefitPeriodMinYear', required:'true', class:'form-control mb-1'
+        label for="inputBenefitPeriodManYear" Benefit Period Max Year
+        = configuration_fields.text_field :ben_per_max_year, id: 'inputBenefitPeriodManYear', required:'true', class:'form-control mb-1'
+        label for="inputOpenEnrollmentStartMonthly" Open Enrollment Start On Montly
+        = configuration_fields.text_field :oe_start_month, id: 'inputOpenEnrollmentStartMonthly', required:'true', class:'form-control mb-1'
+        label for="inputOpenEnrollmentEndMonthly" Open Enrollment End On Montly
+        = configuration_fields.text_field :oe_end_month, id:'inputOpenEnrollmentEndMonthly', required:'true', class:'form-control mb-1'
+        label for="inputOpenEnrollmentDaysMin" Open Enrollment Days Min
+        = configuration_fields.text_field :oe_min_dys, id: 'inputOpenEnrollmentDaysMin', required:'true', class:'form-control mb-1'
+        label for="inputOpenEnrollmentGracePeriod" Open Enrollment Grace Period Length Days Min
+        = configuration_fields.text_field :oe_grce_min_dys, id:'inputOpenEnrollmentGracePeriod', required:'true', class:'form-control mb-1'
+        label for="inputOpenEnrollmentAdvDays" Open Enrollment Adv Days Min
+        = configuration_fields.text_field :oe_min_adv_dys, id: 'inputOpenEnrollmentAdvDays', required:'true', class:'form-control mb-1'
+        label for="inputOpenEnrollmentMonthsMAx" Open Enrollment Months Max
+        = configuration_fields.text_field :oe_max_months, id: 'inputOpenEnrollmentMonthsMAx', required:'true', class:'form-control mb-1'
+        label for="inputCobraEnrollments" Cobra Enrollment Period Month
+        = configuration_fields.text_field :cobra_epm, id: 'inputCobraEnrollments', required:'true', class:'form-control mb-1'
+        label for="inputGroupFileNewEnrollment" Group File New Enrollment Transmit on
+        = configuration_fields.text_field :gf_new_enrollment_trans, id: 'inputGroupFileNewEnrollment', required:'true', class:'form-control mb-1'
+        label for="inputUpdateTransmitDay" Group File Update Transmit Day Of Week
+        = configuration_fields.select :gf_update_trans_dow, BenefitMarkets::Configurations::AcaShopConfiguration::TRANSMIT_DAYS, {selected: "Friday"},id: 'inputUpdateTransmitDay', required:'true', class:'form-control mb-1'
+        label for="inputERCalModel" Use Simple Employer calculation Model
+        = configuration_fields.check_box :use_simple_er_cal_model, { class: 'form-control mb-1' }, 'true', 'false'
+        label for="inputOfferingsServiceArea" Offerings Constrained To Service Areas
+        = configuration_fields.check_box :offerings_constrained_to_service_areas, { class: 'form-control mb-1' }, 'true', 'false'
+        label for="inputTransmitERImmediatly" Transmit Employers Immediately
+        = configuration_fields.check_box :trans_er_immed, { class: 'form-control mb-1' }, 'true', 'false'
+        label for="inputTransmitScheduledER" Transmit Scheduled Employers
+        = configuration_fields.check_box :trans_scheduled_er, { class: 'form-control mb-1' }, 'true', 'false'
+        label for="inputERTransmissionDayOfMonth" Employer Transmission Day Of Month
+        = configuration_fields.text_field :er_transmission_dom, id: 'inputERTransmissionDayOfMonth', required:'true', class:'form-control mb-1'
+        label for="inputEnforceEmployerAttestation" Enforce Employer Attestation
+        = configuration_fields.check_box :enforce_er_attest, { class: 'form-control mb-1' }, 'true', 'false'
+        label for="inputSIC" Standard Industrial Classification
+        = configuration_fields.check_box :stan_indus_class, { class: 'form-control mb-1' }, 'true', 'false'
+        label for="inputCarriersFiltersEnabled" Carrier Filters Enabled
+        = configuration_fields.check_box :carrier_filters_enabled, { class: 'form-control mb-1' }, 'true', 'false'
+        label for="inputRatingArea" Rating Areas
+        = configuration_fields.text_field :rating_areas, id: 'RatingArea', required:'true', class:'form-control mb-1'
+        h4 Initial Application
+        = configuration_fields.fields_for :initial_application_configuration, configuration_fields.object.initial_application_configuration do |initial_application_fields|
+          label for="inputPublishDueDayOfMonth" Publish Due Day Of Month
+          = initial_application_fields.text_field :pub_due_dom, id: 'inputPublishDueDayOfMonth', required:'true', class:'form-control mb-1'
+          label for="inputEarliestStartPriorToEffectiveOnMonths" Earliest Start Prior To Effective On Months
+          = initial_application_fields.text_field :erlst_strt_prior_eff_months, id: 'inputEarliestStartPriorToEffectiveOnMonths', required:'true', class:'form-control mb-1'
+          label for="inputAppealPeriodAfterAppDenialDays" Appeal Period After Application Denial Days
+          = initial_application_fields.text_field :appeal_per_aft_app_denial_dys, id: 'inputAppealPeriodAfterAppDenialDays', required:'true', class:'form-control mb-1'
+          label for="inputQuietPeriodEndOn" Quiet Period End On
+          = initial_application_fields.text_field :quiet_per_end, id: 'inputQuietPeriodEndOn', required:'true', class:'form-control mb-1'
+          label for="inputIneligiblePeriodAfterApplicationDenialDays" Ineligible Period After Application Denial Days
+          = initial_application_fields.text_field :inelig_per_aft_app_denial_dys, id: 'inputIneligiblePeriodAfterApplicationDenialDays', required:'true', class:'form-control mb-1'
+        h4 Renewal Application
+        = configuration_fields.fields_for :renewal_application_configuration, configuration_fields.object.renewal_application_configuration do |renewal_application_fields|
+          label for="inputEarliestStartPriorToEffectiveOnMonths" Earliest Start Prior To Effective On Months
+          = renewal_application_fields.text_field :erlst_strt_prior_eff_months, id: 'inputEarliestStartPriorToEffectiveOnMonths', required:'true', class:'form-control mb-1'
+          label for="inputMonthlyOpenEnrollmentEndOn" Monthly Open Enrollment End On
+          = renewal_application_fields.text_field :montly_oe_end, id: 'inputMonthlyOpenEnrollmentEndOn', required:'true', class:'form-control mb-1'
+          label for="inputPublishDueDayOfMonth" Publish Due Day Of Month
+          = renewal_application_fields.text_field :pub_due_dom, id: 'inputPublishDueDayOfMonth', required:'true', class:'form-control mb-1'
+          label for="inputForcePublishDayOfMonth" Force Publish Day Of Month
+          = renewal_application_fields.text_field :force_pub_dom, id: 'inputForcePublishDayOfMonth', required:'true', class:'form-control mb-1'
+          label for="inputOpenEnrollmentDaysMin" Open Enrollment Days Min
+          = renewal_application_fields.text_field :oe_min_dys, id: 'inputOpenEnrollmentDaysMin', required:'true', class:'form-control mb-1'
+          label for="inputQuietPeriodEndOn" Quiet Period End On
+          = renewal_application_fields.text_field :quiet_per_end, id: 'inputQuietPeriodEndOn', required:'true', class:'form-control mb-1'

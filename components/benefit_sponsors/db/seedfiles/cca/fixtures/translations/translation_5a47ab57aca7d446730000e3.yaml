@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADj
+  key: en.insured.consumer_roles.redirect_to_recover_account_msg
+  value: '"An account for this user already exists.  Please visit the account recovery
+    page."'

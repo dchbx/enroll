@@ -51,7 +51,7 @@ class Quote
   index({ broker_role_id: 1, aasm_state: 1 })
   index({"quote_benefit_groups._id" => 1}, { unique: true })
 
-  scope :datatable_search, ->(query) { where(quote_name: Regexp.new(Regexp.escape(query), true)) }
+  scope :datatable_search, ->(query) { where(quote_name: ::Regexp.new(::Regexp.escape(query), true)) }
   scope :by_client_employer_type, -> { where(employer_type: 'client') }
   scope :by_prospect_employer_type, -> { where(employer_type: 'prospect') }
 
@@ -62,7 +62,7 @@ class Quote
   end
 
   def self.search_hash(s_rex)
-    search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+    search_rex = ::Regexp.compile(::Regexp.escape(s_rex), true)
     {
       "$or" => ([
         {"quote_name" => search_rex}

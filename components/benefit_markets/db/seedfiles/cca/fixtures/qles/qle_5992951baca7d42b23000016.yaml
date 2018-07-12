@@ -1,0 +1,23 @@
+--- !ruby/object:QualifyingLifeEventKind
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAAW
+  effective_on_kinds:
+  - first_of_next_month
+  is_active: true
+  title: Started a new job
+  action_kind: add_benefit
+  reason: new_employment
+  edi_code: 28-INITIAL ENROLLMENT
+  market_kind: shop
+  pre_event_sep_in_days: 0
+  post_event_sep_in_days: 30
+  is_self_attested: true
+  date_options_available: false
+  ordinal_position: 10
+  event_kind_label: Date of start a new job
+  tool_tip: Enroll due to becoming newly eligibile
+  updated_at: 2017-08-15 06:30:51.214000000 Z
+  created_at: 2017-08-15 06:30:51.214000000 Z

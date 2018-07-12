@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABn
+  division_code: B
+  division_label: Mining
+  major_group_code: '14'
+  major_group_label: Mining And Quarrying Of Nonmetallic Minerals, Except Fuels
+  industry_group_code: '142'
+  industry_group_label: Crushed And Broken Stone, Including Riprap
+  sic_code: '1429'
+  sic_label: Crushed and Broken Stone, Not Elsewhere Classified

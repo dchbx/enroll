@@ -1,18 +1,28 @@
-
-
 Then(/^Hbx Admin should see the list of primary applicants and an Action button$/) do
-	#expect(page).to have_content('Families')
-  find_button('Actions').visible?
+  within('.effective-datatable') do
+    expect(page).to have_css('.dropdown-toggle', count: 1)
+  end
 end
 
+Then(/^Hbx Admin should see the list of user accounts and an Action button$/) do
+  within('.effective-datatable') do
+    expect(page).to have_css('.dropdown-toggle', count: 2)
+  end
+end
+
+# FIXME: Make this take a 'for' argument, that way we can select which user
 When(/^Hbx Admin clicks on the Action button$/) do
-	find(:xpath, "//*[@id='dropdownMenu1']", :wait => 10).trigger("click")
+  within('.effective-datatable') do
+    find_all('.dropdown-toggle', :wait => 10).last.click
+  end
 end
 
+# FIXME: Make this take a 'for' argument, that way we can select which user
 Then(/^Hbx Admin should see an edit DOB\/SSN link$/) do
   find_link('Edit DOB / SSN').visible?
 end
 
+# FIXME: Make this take a 'for' argument, that way we can select which user
 When(/^Hbx Admin clicks on edit DOB\/SSN link$/) do
   click_link('Edit DOB / SSN')
 end

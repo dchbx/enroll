@@ -1,0 +1,35 @@
+<div class="row">
+  <div id="scroll_container" class="col-xs-12">
+    <div>
+      <label class="plan-offerings">Plan Offerings - <%= render_plan_offerings(benefit_group, 'health') %></label>
+    </div>
+    <div>
+      <% unless benefit_group.sole_source? %>
+        <label>Employer Lowest/Reference/Highest - <%= number_to_currency(@benefit_group_costs[:lowest_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_costs[:highest_plan_employer_cost]) %></label>
+      <% end %>
+    </div>
+    <br />
+    <table class="table table-bg-white table-employee-2">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Dependent Count</th>
+          <% unless benefit_group.single_plan_type? %>
+            <th>Lowest Cost Available Plan</th>
+          <% end %>
+          <th>Reference Plan</th>
+          <% unless benefit_group.single_plan_type? %>
+            <th>Highest Cost Available Plan</th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody id="employee_index_scroll">
+        <% if benefit_group.census_employees.any? %>
+          <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_costs', benefit_group: benefit_group %>
+        <% else %>
+        <tr> <td> No employees enrolled.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

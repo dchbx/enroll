@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"enroll_development.us_counties"},{"v":2,"unique":true,"key":{"county_fips_code":1},"name":"county_fips_code_1","ns":"enroll_development.us_counties"},{"v":2,"key":{"state_postal_code":1},"name":"state_postal_code_1","ns":"enroll_development.us_counties"}],"uuid":"6143ff92747e4c3d8da6c8899974778a"}

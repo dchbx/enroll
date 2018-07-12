@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="tab-content" id="myTabContent">
+    <div class="row">
+      <div id= 'message_form'></div>
+      <div class="top-pd" id="inbox_provider_form">
+        <span class="flash_message"></span>
+      </div>
+      <div class='hide' id='collection_scope'><%= @broker_agency_profile._id %> </div>
+      <div class="row container">
+        <div class="pull-right">
+          <%= link_to "Add Prospect Employer", new_organizations_plan_design_organization_path(broker_agency_id: @broker_agency_profile.id), class:"btn btn-primary prospective-employer"  %>
+        </div>
+      </div>
+      <br>
+      <%= render_datatable(@datatable) %>
+    </div>
+  </div>
+</div>
+<script>
+  initializeDataTables();
+</script>

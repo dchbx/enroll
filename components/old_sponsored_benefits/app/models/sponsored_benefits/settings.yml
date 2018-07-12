@@ -1,0 +1,280 @@
+sponsored_benefits:
+  portals:
+    broker_quoting:
+      enabled: true
+
+    general_agencies:
+      enabled: false
+
+    broker_agencies:
+      enabled: true
+
+  benefit_products:
+    health_care_kinds:
+      key: :sole_source
+      title: "One Plan"
+      key: :single_carrier
+      title: "Single Carrier"
+      key: :metal_level
+      title:  "Metal Level"
+
+  benefit_sponsorship_policies:
+
+    retroactive_termination:
+      maximum:
+        days: 60
+
+    midyear_enrollment:
+      enabled: true
+      frequency: :monthly
+
+    sponsor_attestation:
+      enabled: true
+      documents:
+        url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
+
+    cobra_election:
+      enabled: true
+      due_on:
+        months: 6
+
+  service_period_policies:
+    length:
+      months: 12
+    begin:
+      month: 1
+
+    probation_period:
+      length:
+        days: 30
+
+
+  benefit_product_policies:
+    benefit_products:
+      kinds:
+        health:
+          contributions:
+            benefit_products:
+              benefit_product:
+                kind: :health
+                is_cobra_eligible: true
+                premium_rating_model:
+                  
+
+                premium_ratings:
+
+                  premium_rating:
+                    active_members:
+                      kind: :choice
+                      rating_categories:
+
+                        rating_category:
+                          kind: :employee
+                          title: "Employee"
+                          relationships_to_primary_member: [:self]
+                          eligible_age:
+                            range: [0..0]
+                          is_disabled_eligible: :true
+                          sponsor_contribution:
+                            minimum: 
+                              percent: 50
+
+                        rating_category:
+                          kind: :spouse
+                          title: "Spouse"
+                          relationships_to_primary_member: [:spouse]
+                          eligible_age:
+                            range: [0..0]
+                          is_disabled_eligible: :true
+                          sponsor_contribution:
+                            minimum: 
+                              percent: 0
+
+                        rating_category:
+                          kind: :domestic_partner
+                          title: "Domestic Partner"
+                          relationships_to_primary_member: [:domestic_partner]
+                          eligible_age:
+                            range: [0..0]
+                          is_disabled_eligible: :true
+                          sponsor_contribution:
+                            minimum: 
+                              percent: 0
+
+                        rating_category:
+                          kind: :child_under_age_26
+                          title: "Child Under Age 26"
+                          relationships_to_primary_member: [:child, :foster_child, :step_child]
+                          age_range: [0..26]
+                          disabled_eligible: :true
+                          sponsor_contribution:
+                            minimum: 
+                              percent: 0
+
+                        rating_category:
+                          kind: :disabled_child_over_age_26
+                          title: "Disabled Child Over Age 26"
+                          relationships_to_primary_member: [:child, :foster_child]
+                          age_range: [26..100]
+                          disabled_eligible: :true
+                          sponsor_contribution:
+                            minimum: 
+                              percent: 0
+
+                  cobra_members:
+                    premium_rating:
+                      kind: :choice
+
+
+    categories
+      category
+        id: :family
+        title: "Family"
+        minimum_percent: 33
+        fixed_amount: 
+      category
+        id: :employee_only
+        title: "Employee Only"
+        minimum_percent: 50
+        fixed_amount:
+
+  enrollment_policies:
+
+    initial_enrollments:
+      benefit_application: 
+        period:
+          begin_on:
+            maximum:
+              months: -2
+
+
+        members:
+          maximum:
+           count: 50   # 0 for no maximum
+          minimum:
+            count: 1    # 0 for no minimum
+          non_owner:
+            minimum:
+              count: 1
+        submit_deadline:
+          benefit_sponsor:
+            due_on:
+              day_of_month: 10  # advertised_deadline_of_month: 10
+          grace_period:
+            end_on:
+              day_of_month: 15  # publish_due_day_of_month: 15
+
+        approval_workflow:
+          appeal_period_length:
+            days: 30
+          denial:
+            ineligible_period_length:
+              days: 90
+
+
+
+      open_enrollments:
+        begin: 
+          day_of_month: 1
+        end:
+          day_of_month: 20            
+
+        periods:
+          benefit_sponsor_length:
+            minimum: 
+              days: 10 # adv_days: 10
+          grace_period_length:
+            minimum:
+              days: 5 # days: 5
+
+
+        members:
+          minimum:
+            percent: 75
+        non_owner_member:
+          minimum:
+            count: 1
+
+        binder_payment:
+          required: true
+          due_on:
+            day_of_month: 23
+
+    annual_enrollments:
+
+      benefit_application:
+
+        auto_renewals:
+          draft_application:
+            due_on:
+              pre_effective_date:
+                months: -2
+                day_of_month: 5
+
+        submit_deadlines:
+          benefit_sponsor:
+            due_on:
+              day_of_month: 10
+          grace_period:
+            due_on:
+              day_of_month: 15
+          auto_submit:
+            due_on:
+              day_of_month: 16
+
+        open_enrollments:
+          begin_on:
+            pre_effective_date:
+              months: -1
+              day_of_month: 5
+          end_on:
+            pre_effective_date:
+              months: -1
+              day_of_month: 20            
+
+          periods:
+            benefit_sponsor_length:
+              minimum:
+                days: 10
+            grace_period_length: 
+              minumum:
+                days: 5
+
+        members:
+          minimum:
+            percent: 0
+          non_owner_member:
+            minimum:
+              count: 0
+
+      open_enrollment:
+        members:
+          minimum:
+            percent: 75
+          non_owner_member:
+            minimum:
+              count: 1
+
+    special_enrollments:
+      new_members:
+
+        enrollment:
+          pre_effective_date:
+            days: -30
+          post_effective_date:
+            days: 30
+          post_roster_correction:
+            days: 30
+
+      qualifying_life_events:
+
+  trading_partners:
+    benefit_sponsor_group_file:
+      transmit_on:
+        day_of_month: 16
+
+  administrative_fees:
+
+  notices:
+
+

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAO5
+  division_code: I
+  division_label: Services
+  major_group_code: '80'
+  major_group_label: Health Services
+  industry_group_code: '805'
+  industry_group_label: Nursing And Personal Care Facilities
+  sic_code: '8059'
+  sic_label: Nursing and Personal Care Facilities, Not Elsewhere Classified

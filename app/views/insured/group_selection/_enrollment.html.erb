@@ -64,7 +64,6 @@
             </a>
           </div>
           <div class="col-xs-4">
-
             <% if hbx_enrollment.may_terminate_coverage? && ["individual", 'coverall'].include?(hbx_enrollment.kind) %>
               <%= link_to l10n("terminate_plan"), terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-primary btn-md'} %>
               <% elsif hbx_enrollment.may_terminate_coverage? %>

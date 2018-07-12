@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WpTLn6yn1FBrAAAC
+  key: en.broker_agencies.profiles.commission_statements.no_statements_for_year
+  value: '"You have no commission statements for this year"'

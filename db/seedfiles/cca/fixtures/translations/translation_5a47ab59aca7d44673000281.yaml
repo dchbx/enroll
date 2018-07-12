@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAKB
+  key: en.broker_agencies.profiles.first_time_applications_for_medicaid
+  value: '"First Time Applications for Medicaid"'

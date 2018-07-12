@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
   let(:person) { double(first_name: 'jack', last_name: 'white') }
   let(:hbx_enrollment) do
@@ -26,4 +27,5 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
     expect(rendered).to have_selector("input[value='jack']")
     expect(rendered).to have_selector("input[value='white']")
   end
+end
 end

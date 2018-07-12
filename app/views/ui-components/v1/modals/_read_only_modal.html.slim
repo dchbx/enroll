@@ -1,0 +1,17 @@
+.modal.fade.read-only-modal id="read_only_modal_#{modal_id}" role="dialog"
+  .modal-dialog
+    .modal-content
+      .modal-header
+        .vertically-aligned-row
+          .modal-title
+            = header_icon.html_safe 
+            | &nbsp; 
+            = title
+          button.close aria-label="Close" data-dismiss="modal" type="button"
+            span aria-hidden="true"
+            | &times;
+      .modal-body
+        p = body
+      .modal-footer
+        = link_to 'Close', '', :class => 'btn btn-default', data: { dismiss: "modal"}
+            

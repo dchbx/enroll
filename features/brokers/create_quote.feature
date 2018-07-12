@@ -1,3 +1,4 @@
+@quoting_enabled
 Feature: Create Employee Roster
   In order for Brokers to give a quote to employers
   The Broker should be able to add emloyees
@@ -59,6 +60,7 @@ Feature: Create Employee Roster
     And the broker saves the quote
     And Broker logs out
 
+  @quoting_enabled
   Scenario: Broker should create a quote with health and dental plans
     Given that a broker exists
     And the Plans exist

@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "move_due_date_to_verification_type_level")
 
 describe MoveDueDateToVerificationTypeLevel do
@@ -65,4 +66,4 @@ describe MoveDueDateToVerificationTypeLevel do
     end
   end
 end
-
+end

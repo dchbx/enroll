@@ -1,0 +1,26 @@
+<p class="twenty">Employer Information</p>
+<div class="row no-buffer row-form-wrapper">
+  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :legal_name, class: "floatlabel form-control interaction-field-control-organization-legal-name typeahead_turned_off", required: true, placeholder: 'LEGAL NAME' %>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :dba, class: "floatlabel form-control interaction-field-control-organization-dba", placeholder: 'DBA' %>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
+    <%= f.select(:entity_kind, options_for_select(entity_kinds.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, { :class => 'interaction-choice-control-organization-entity-kind'} ) %>
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top: 10px">
+    <%= f.select(:sic_code, grouped_options_for_select(@grouped_options, f.object.sic_code), { prompt: "Select Industry Code"}, { :class => "chosen-select"} ) %><span class="label label-warning" id="sic_warning"></span>
+  </div>
+  <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd" style="margin-top: 10px; padding-left: 10px;">
+    <a id="sicHelperToggle" href="#" title="I need help finding my SIC Code"><span class="fa fa-question" aria-hidden="true"></span></a>
+  </div>
+</div>
+  <div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
+    <%#= render "sic_help" , sicFieldId: 'organization_sic_code' %>
+  </div>
+<script type="text/javascript">
+  $(".chosen-select").chosen({
+    width: "100%"
+  });
+</script>

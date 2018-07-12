@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person, :min_verification_due_date => TimeKeeper.date_of_record+95.days) }
@@ -200,4 +201,5 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       end
     end
   end
+end
 end

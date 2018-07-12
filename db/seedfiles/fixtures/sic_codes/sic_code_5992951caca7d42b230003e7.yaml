@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPn
+  division_code: I
+  division_label: Services
+  major_group_code: '88'
+  major_group_label: Private Households
+  industry_group_code: '881'
+  industry_group_label: Private Households
+  sic_code: '8811'
+  sic_label: Private Households

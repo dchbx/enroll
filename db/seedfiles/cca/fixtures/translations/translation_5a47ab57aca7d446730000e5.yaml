@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADl
+  key: en.insured.consumer_roles.ridp_agreement.ridp_agreement_alert_msg
+  value: '"Please contact %{site_short_name} at %{contact_center_phone_number} for
+    more info"'

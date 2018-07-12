@@ -1,0 +1,83 @@
+.panel.panel-default#employer-benefit-groups
+  .panel-heading = bg.title.capitalize
+  .panel-body
+    table.table.borderless
+      - if bg.description.present?
+        tr
+          td.benefit-group-heading Description
+          td = bg.description
+      tr
+        td.benefit-group-heading Eligibility
+        td
+          - if bg.effective_on_kind == 'date_of_hire' && bg.effective_on_offset == 0
+            = "#{bg.effective_on_kind.humanize}"
+          - elsif bg.effective_on_kind == 'first_of_month' && bg.effective_on_offset == 0
+            | First of the month following or coinciding with date of hire
+          - elsif bg.effective_on_offset == 1
+            | First of the month following date of hire
+          - else
+            = "#{bg.effective_on_kind.humanize} following #{bg.effective_on_offset} days"
+    - bg.sponsored_benefits.each do |sb|
+      div class="#{sb.product_kind.downcase}"
+        div style="float:right"
+          button#showhidebutton type="button" data-toggle="collapse" data-target="#collapse#{sb.product_kind.downcase}" aria-expanded="false" aria-controls="collapse#{sb.product_kind.downcase}"
+            | View Details
+            a
+              i.fa.fa-chevron-down.fa-lg
+        div
+          h5.title.pl-1 Health
+        table.table.benefit-group.borderless
+          tr
+            th.benefit-group-heading Reference Plan
+            th.benefit-group-heading Carrier
+            th.benefit-group-heading Type
+          tr
+            td = sb.reference_product.name.try(:upcase)
+            td = sb.reference_product.issuer_profile.legal_name
+            td = sb.try(:reference_product).try(:health_plan_kind).try(:upcase)
+          tr
+            td.benefit-group-heading Metal Level
+            td.benefit-group-heading Plans By
+          tr
+            td = sb.reference_product.metal_level.titleize
+            td = sb.product_package_kind.to_s.humanize.capitalize
+            / Health plan collapsible: start
+        .collapse id="collapse#{sb.product_kind.downcase}"
+          = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { sb: sb }
+          .panel.benefitgroup.col-xs-12.referenceplan.home.est
+            .plan-details
+              .col-xs-4
+                .row
+                  span Employer Estimated Maximum Monthly Cost
+                  - estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+                  - estimate = estimator.calculate_estimates_for_home_display(sb)
+                  h2 = number_to_currency(estimate[:estimated_total_cost])
+              .col-xs-8
+                .row
+                  table
+                    tr
+                      th colspan="2"
+                      th Min
+                      th Max
+                    tr
+                      td colspan="2" Total Estimated Monthly Cost for Plan Participants
+                      td= number_to_currency(estimate[:estimated_enrollee_minimum])
+                      td= number_to_currency(estimate[:estimated_enrollee_maximum])
+
+javascript:
+  $('#collapseHealth').on('hide.bs.collapse', function () {
+    $('#showhidebutton').text('Show Details ').append('<i class="fa fa-chevron-down fa-lg"></i>')
+  })
+  
+  $('#collapseDental').on('hide.bs.collapse', function () {
+    $('#showhidebuttonDental').text('Show Details ').append('<i class="fa fa-chevron-down fa-lg"></i>')
+  })
+  
+  $('#collapseHealth').on('show.bs.collapse', function () {
+    $('#showhidebutton').text('Hide Details ').append('<i class="fa fa-chevron-up fa-lg"></i>')
+  })
+  
+  $('#collapseDental').on('show.bs.collapse', function () {
+    $('#showhidebuttonDental').text('Hide Details ').append('<i class="fa fa-chevron-up fa-lg"></i>')
+  })
+            

@@ -5,7 +5,9 @@ class CensusEmployeePolicy < ApplicationPolicy
       true
     else
       can_change = if (@user.has_role?(:employer_staff) && !@user.has_role?(:broker))
-        @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.try(:to_s) rescue false
+        @user.person.employer_staff_roles.any? do |employer_staff_role|
+          employer_staff_role.benefit_sponsor_employer_profile_id == @record.benefit_sponsors_employer_profile_id
+        end
       elsif @user.has_role? :broker
         @record.employer_profile.try(:active_broker) == @user.person
       elsif @user.has_role?(:general_agency_staff)

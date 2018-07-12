@@ -1,0 +1,80 @@
+<% active_broker = @broker %>
+<% broker_agency_profile =  active_broker.broker_agency_profile%>
+
+<div id="broker_show_<%= active_broker.id %>" tabindex="-1" class='hide broker_selection_choice'>
+  <div class="no-buffer" id="active_broker_tab">
+    <div class="col-xs-12">
+      <div class="panel benefits-tab col-xs-12">
+        <div class="col-xs-4">
+          <header class="row">
+            <h5 class="bg-title" style="margin-bottom: 0;"><%= active_broker.person.full_name %></h5><br/>
+            <span class="tt-u"><%= broker_agency_profile.legal_name %><span>
+          </header>
+        </div>
+        <table>
+          <tbody>
+            <tr>
+              <td class='col-xs-4'><br/>
+                <header>
+                  <% if broker_agency_profile.office_locations.any? %>
+                    <%= broker_agency_profile.primary_office_location.address.address_1 %><br/>
+                    <%= broker_agency_profile.primary_office_location.address.city %>,
+                    <%= broker_agency_profile.primary_office_location.address.state %>
+                    <%= broker_agency_profile.primary_office_location.address.zip %>
+                  <% else %>
+                  <%= l10n("broker_agencies.profiles.no_address")%>
+                  <% end %>
+                </header>
+              </td>
+              <td class='col-xs-4'><br/>
+                  <% if active_broker.phone %>
+                  <i class="fa fa-phone"></i>
+                    <%= active_broker.phone.to_s %>
+                    <% else %>
+                    <i class="fa fa-phone"></i>
+                    <%= l10n("broker_agencies.profiles.no_phone_number")%>
+                  <% end %>
+                  <br/>
+                  <i class="fa fa-at"></i>
+                  <a href="mailto:<%= active_broker.email.address %>">
+                    <%= active_broker.email.address %>
+                  </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel benefitgroup col-xs-12">
+        <div class="row">
+          <div class="col-xs-6">
+            <span class="lg ttu twelve">
+              <%= l10n("broker_agencies.profiles.new_clients")%>:
+            </span>
+            <span class="dg">
+              <%= broker_agency_profile.accept_new_clients? ? 'Yes' : 'No' %>
+            </span>
+            <br/>
+            <span class="lg ttu twelve">
+              <%= l10n("broker_agencies.profiles.weekend_evening_hours")%>:
+            </span>
+            <span class="dg">
+              <%= broker_agency_profile.working_hours? ? 'Yes' : 'No' %>
+            </span>
+          </div>
+          <div class="col-xs-6">
+            <span class="lg ttu twelve">
+              <%= l10n("language")%>:
+            </span>
+            <span class="dg">
+              <%= broker_agency_profile.languages %>
+            </span>
+          </div>
+        </div>
+        <br/>
+        <p class="lg"> <b><%= l10n("broker_agencies.profiles.warning_for_existing_broker")%></b></p>
+        <button type="button" class="btn btn-primary btn-small help_button close_broker_select" data-broker='<%=@staff.id%>'><%= l10n("broker_agencies.profiles.select_this_broker")%></button>
+        <button type="button" class="btn btn-default btn-default btn-small close_broker_select"><%= l10n("close")%></button>
+      </div>
+    </div>
+  </div>
+</div>

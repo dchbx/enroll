@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAACt
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '20'
+  major_group_label: Food And Kindred Products
+  industry_group_code: '207'
+  industry_group_label: Fats And Oils
+  sic_code: '2077'
+  sic_label: Animal and Marine Fats and Oils

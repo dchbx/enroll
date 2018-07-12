@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAKh
+  key: en.quote_employer_dental_cost_comparison_results
+  value: '"Quote Employer Dental Cost Comparison Results"'

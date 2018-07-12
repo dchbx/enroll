@@ -1,13 +1,13 @@
 <html>
 <head>
-    <title>DCHealthLink Confirmation</title>
+    <title><%= site_short_name %> Confirmation</title>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
     <meta content="telephone=no" name="format-detection" />
     <style type="text/css">
       /*<![CDATA[*/
-      /* RESET */ 
+      /* RESET */
       #outlook a {
         padding:0
       }
@@ -16,7 +16,7 @@
         font-family: "NimbusTimesRoman";
         font-style: normal;
         font-weight: normal;
-        src: url("<%= asset_data_base64('nimbus-roman-no9/NimbusRomNo9L-Reg.otf') %>") format('opentype'); 
+        src: url("<%= asset_data_base64('nimbus-roman-no9/NimbusRomNo9L-Reg.otf') %>") format('opentype');
       }
 
 
@@ -26,7 +26,7 @@
         margin:0;
         padding:0;
         mso-line-height-rule:exactly
-        font-size:12px;
+        font-size:11px;
         color:rgb(0,0,0);
         font-family: "NimbusTimesRoman", Times, serif;
         padding-left: 15px;
@@ -35,13 +35,13 @@
 
       table td {
         border-collapse:collapse;
-        font-size:12px;
+        font-size:11px;
         font-family: "NimbusTimesRoman", Times, serif;
         border-color: #000;
       }
 
       table th {
-        font-size:12px;
+        font-size:11px;
         border-color: #000;
       }
 
@@ -78,14 +78,14 @@
       .addrs td {
         display:block;
         margin-bottom:2px;
-        font-size:12px;
+        font-size:11px;
       }
       .fssize {
-        font-size:12px;
+        font-size:10px;
         float:left;
       }
       .fssizeuser {
-        font-size:15px;
+        font-size:11px;
         float:left;
       }
       .fssizeuser td {
@@ -95,17 +95,20 @@
         padding-right:20px;
       }
       .mar20 {
-        margin-top:10px;
+        margin-top:11px;
         display:block;
       }
-      .fssize1 {
-        font-size:12px;
+      .fssize1 td {
+        font-size:10px;
       }
       .fssize1 td {
         display:block;
       }
       .total_table {
         width:100%;
+
+        margin-left: 1.5px;
+        margin-top: 2%;
       }
       .list1 {
         margin:20px 0;
@@ -118,13 +121,18 @@
       }
       .wid50 {
         width:100%;
+        font-size: 11px;
       }
       .wid50 td {
         width:50%;
-        font-size:12px;
+        font-size:11px;
       }
       .wid100 td {
         width:100%;
+      }
+
+      .header-notice-font {
+        font-size:14px;
       }
 
       h2 {
@@ -163,7 +171,7 @@
       }
       .para td p {
         margin:0 0 2px 0;
-        font-size:12px;
+        font-size:11px;
       }
 
       .page-break-before {
@@ -172,6 +180,79 @@
         page-break-before: always;
       }
 
+      .break{
+        page-break-after: always;
+      }
+
+      .page-break-after {
+        display: block;
+        clear: both;
+        page-break-after: always;
+      }
+
+      .mpi_indicator {
+        margin-top: 15%;
+        font-size: 11px;
+
+      }
+      .notice_spacing {
+        font-size: 11px;
+        margin-top: -25px;
+
+      }
+
+      .notice_spacing_1 {
+        font-size: 11px;
+        margin-top: -10px;
+
+      }
+      .notice_spacing_2 {
+        font-size: 11px;
+        margin-top: -5px;
+
+      }
+      .notice-font {
+        font-size: 11px;
+      }
+
+      .custom-address {
+        margin-left: 2%;
+      }
+
+      .address-bottom {
+        margin-top: 0.15in;
+      }
+
+      .health-connector-address {
+        padding-left: 30px;
+        padding-top: : 100px;
+        margin-top: 2%;
+        font-size: 10px;
+      }
+
+      .headers-notice {
+        font-size: 14px;
+      }
+
+      .left-align-footer {
+       padding-left: 40px;
+      }
+
+      .header-padding {
+        color:rgb(54,95,145);
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      .notice-font-padding {
+        font-size: 11px;
+        margin-top: -25px;
+      }
+      .notice-font-padding1 {
+        font-size: 11px;
+        margin-top: -5px;
+      }
       .page-break {
         display: block;
         clear: both;

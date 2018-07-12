@@ -1,0 +1,52 @@
+= content_for :navigation do
+    = render "ui-components/v1/navs/employers_navigation", {:active_tab=>params[:tab], organization: @benefit_application_form.service.benefit_sponsorship.profile.organization, profile: @benefit_application_form.service.benefit_sponsorship.profile}
+
+= form_for @benefit_application_form, as: :benefit_application, url: benefit_sponsorship_benefit_application_path, method: :put do |f|
+  = render 'form', f: f
+  = f.submit "Update Plan Year", class:'btn btn-primary btn-lg pull-right', name: "update_multiple"
+
+- @benefit_application_form.benefit_packages.each do |benefit_package_form|
+
+  .col-xs-12
+    = link_to 'Edit Benefit Package', edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, benefit_package_form.service.benefit_application, benefit_package_form.service.benefit_package, :show_benefit_application_tile => false), method: :get, class: 'btn btn-default pull-right mb-1'
+    
+    .panel.benefitgroup.col-xs-12.referenceplan#uicReferencePlan
+      .col-xs-1
+        i.fas.fa-star.fa-3x.mt-3 style="color:#eaeaea"
+      .col-xs-11.health        
+        .row
+          .col-xs-6
+            h3.title.heading-text #{benefit_package_form.service.benefit_package.title}
+            h6 #{benefit_package_form.service.benefit_package.description}
+            
+        table.table
+          tr
+            td
+              header
+                | Coverage Year
+            td #{benefit_package_form.catalog.effective_period}
+          tr
+            td
+              header
+                | ELIGIBILITY
+            td #{benefit_package_form.probation_period_display_name}
+                
+        table.table
+          tr
+            th colspan="2" Reference Plans
+            th colspan="2" Carrier
+            th colspan="2" Type
+            th colspan="2" Metal Level
+            th colspan="2" Plans By
+          tr
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.title}
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.issuer_name}
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.plan_kind}
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.metal_level_kind}
+            td colspan="2" N/A
+
+row
+  = link_to 'Add Benefit Package', new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.benefit_sponsorship_id, @benefit_application_form.id, add_new_benefit_package: true, :tab=>'benefits'), :class => 'btn btn-default pull-left mr-1'
+
+  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_application_form.service.benefit_sponsorship.profile_id, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
+          

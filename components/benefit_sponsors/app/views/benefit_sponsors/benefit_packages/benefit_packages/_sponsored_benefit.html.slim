@@ -1,0 +1,69 @@
+- is_new_package = @benefit_package_form.is_new_package
+.row.health
+  = f.hidden_field :id, value: f.object.id if f.object.id.present?
+
+  br
+  - if is_new_package
+    h1.heading-text Health – Set Up Benefit Package
+  - if !is_new_package
+    h1.heading-text Health - Edit Benefit Package
+  h4 Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
+
+  - if !is_new_package && !is_new_package.nil?
+    .col-xs-3.pull-right
+      .btn.btn-default.pull-right.mt-3 data-toggle="modal" data-target="#eeCostModal" Employee Details Costs
+
+  br
+  .col-md-12.col-sm-12.col-xs-12.top-pd
+    .reference_plan_info style='clear: both;'
+      h4
+      .content
+  #planSelection
+    = render "./ui-components/v1/cards/metal_level_select", f: f
+  br
+  br
+
+- if !is_new_package && !is_new_package.nil?
+  #scEdit
+    = f.fields_for :sponsor_contribution, f.object.sponsor_contribution, errors: {}, fieldset: false do |sc|
+      = render "./ui-components/v1/cards/sponsor_contributions", f: sc
+  br
+  br
+
+- if !is_new_package && !is_new_package.nil?
+
+  #referencePlanEdit
+    = render "./ui-components/v1/cards/reference_plan", f: f
+  i.fas.fa-info-circle.mr-1 
+  | Your final monthly cost is based on final enrollment.
+  br
+  br
+
+
+- if !is_new_package && !is_new_package.nil?
+  javascript:
+    window.onload = function() {
+      document.getElementById('planSelection').classList.add('hidden')
+    }
+
+// Employee Cost Detail Modal
+.modal.fade#eeCostModal tabindex="-1" role="dialog" aria-labelledby="eeCostModal"
+  .modal-dialog.modal-lg role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" &times
+        h3.heading-text.mb-0.mt-0 Employee Costs
+      .modal-body
+        table.table
+					tr
+						td#planOfferingsTitle style="border-top:0" colspan="5"
+					tr
+						td#employerCostTitle style="border-top:0;" colspan="5"
+					tr.eeTableHeader
+						td.text-center Employee
+						td.text-center Dependent Count
+						td.text-center Lowest Cost Available Plan
+						td.text-center Reference Plan
+						td.text-center Highest Cost Available Plan
+					tbody#eeTableBody

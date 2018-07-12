@@ -1,0 +1,3 @@
+<div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero mr-1 ml-1" style="margin-top:-20px">
+  <%= f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, { :class => 'form-control interaction-choice-control-organization-entity-kind'} ) %>
+</div>

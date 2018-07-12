@@ -27,7 +27,9 @@ module MailSpecHelper
     end
 
     def user_mailer_initial_employee_invitation_body(census_employee)
-      ["Dear #{census_employee.full_name}","Good News! #{census_employee.employer_profile.legal_name.titleize}, has chosen to offer health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable.",
+      fname = census_employee.full_name
+      fname.slice! census_employee.last_name
+      ["Dear #{fname.humanize.titleize}","Good News! #{census_employee.employer_profile.legal_name.titleize} has chosen to offer #{Settings.site.short_name} coverage to its employees through The #{Settings.site.short_name} and will contribute to the monthly premium to make the cost of coverage more affordable. Your new open enrollment period begins on #{census_employee.published_benefit_group_assignment.plan_year.open_enrollment_start_on.to_date.to_formatted_s}.",
        "To See Plan Options and Enroll:"]
     end
   end

@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 describe GeneralAgencyStaffRole, dbclean: :after_each do
   let(:address) {FactoryGirl.build(:address)}
   let(:saved_person) {FactoryGirl.create(:person, addresses: [address])}
@@ -134,4 +135,5 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
       expect(staff_role.parent).to eq staff_role.person
     end
   end
+end
 end

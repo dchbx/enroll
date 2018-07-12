@@ -6,13 +6,15 @@ Feature: Employee with future date of hire
   Then New Employee should be able to match Employer
   And Employee should be able to purchase Insurance
 
-  
+
   Scenario: New hire has future enrollment period
     Given Employer for Soren White exists with a published health plan year
     And Employee has future hired on date
     And Employee has not signed up as an HBX user
     And Soren White visits the employee portal
     When Soren White creates an HBX account
+    And I select the all security question and give the answer
+    When I have submit the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Soren White
@@ -47,4 +49,3 @@ Feature: Employee with future date of hire
     Given I reset employee to future enrollment window
     Then Employee tries to complete purchase of another plan
     Then Employee should see "my account" page with enrollment
-

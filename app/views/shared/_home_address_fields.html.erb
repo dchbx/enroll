@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true, :include_id => false do |address| %>
+    <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
       <% kind = address.object.kind %>
 
       <% style = "" %>

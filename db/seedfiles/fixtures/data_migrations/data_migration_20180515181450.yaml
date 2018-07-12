@@ -1,0 +1,7 @@
+--- !ruby/object:DataMigration
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxgBt5+IC4iVk3aN
+  version: '20180515181450'

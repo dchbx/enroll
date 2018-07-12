@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAC/
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '21'
+  major_group_label: Tobacco Products
+  industry_group_code: '214'
+  industry_group_label: Tobacco Stemming And Redrying
+  sic_code: '2141'
+  sic_label: Tobacco Stemming and Redrying

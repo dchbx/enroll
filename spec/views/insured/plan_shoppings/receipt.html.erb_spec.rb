@@ -62,8 +62,9 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   before :each do
     assign :enrollment, enrollment
     @plan = plan_cost_decorator
+    allow(@plan).to receive(:sole_source?).and_return(true)
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true)) 
-    render file: "insured/plan_shoppings/receipt.html.erb"
+    render file: "insured/plan_shoppings/receipt.en.html.erb"
   end
 
   it "should match the data on the confirmation receipt" do

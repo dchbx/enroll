@@ -7,6 +7,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
   let(:family) { Family.new }
   let(:family_member) { family.family_members.new }
   let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
+  let(:individual_market_is_enabled) { true }
 
   context "with consumer_role_id" do
     before :each do
@@ -16,6 +17,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
       allow(person).to receive(:has_active_consumer_role?).and_return true
       assign :person, person
+      allow(view).to receive(:individual_market_is_enabled?).and_return(individual_market_is_enabled)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
@@ -28,18 +30,36 @@ describe "insured/family_members/_dependent_form.html.erb" do
       expect(rendered).not_to have_selector('input[placeholder="SOCIAL SECURITY *"]')
     end
 
-    it "should display the is_applying_coverage field option" do
-      expect(rendered).to match /Is this person applying for coverage?/
+    context "when individual market is enabled" do
+      let(:individual_market_is_enabled) { true }
+      it "should have consumer_fields area" do
+        expect(rendered).to have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
+        expect(rendered).to have_selector("div#consumer_fields")
+        expect(rendered).to match /Are you a US Citizen or US National/
+      end
+
+      it "should have show tribal_container" do
+        expect(rendered).to have_selector('div#tribal_container')
+        expect(rendered).to have_content('Are you a member of an American Indian or Alaskan Native tribe? *')
+      end
+
+      it "should display the is_applying_coverage field option" do
+        expect(rendered).to match /Is this person applying for coverage?/
+      end
     end
 
-    it "should display the affirmative message" do
-      expect(rendered).to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
-    end
+    context "when individual market is disabled" do
+      let(:individual_market_is_enabled) { false }
+      it "should have consumer_fields area" do
+        expect(rendered).to_not have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
+        expect(rendered).to_not have_selector("div#consumer_fields")
+        expect(rendered).to_not match /Are you a US Citizen or US National/
+      end
 
-    it "should have consumer_fields area" do
-      expect(rendered).to have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
-      expect(rendered).to have_selector("div#consumer_fields")
-      expect(rendered).to match /Are you a US Citizen or US National/
+      it "should have show tribal_container" do
+        expect(rendered).to_not have_selector('div#tribal_container')
+        expect(rendered).to_not have_content('Are you a member of an American Indian or Alaskan Native tribe? *')
+      end
     end
 
     it "should have no_ssn input" do
@@ -50,11 +70,6 @@ describe "insured/family_members/_dependent_form.html.erb" do
       #allow(person).to receive(:has_active_consumer_role?).and_return true
       expect(rendered).to have_selector('span.no_ssn')
       expect(rendered).to match /have an SSN/
-    end
-
-    it "should have show tribal_container" do
-      expect(rendered).to have_selector('div#tribal_container')
-      expect(rendered).to have_content('Are you a member of an American Indian or Alaskan Native tribe? *')
     end
 
     it "should have dependent-address area" do

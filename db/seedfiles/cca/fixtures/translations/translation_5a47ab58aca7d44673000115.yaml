@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAEV
+  key: en.insured.families.verification.complete_verification_for_enrollment
+  value: '"Complete Verification for Enrollment"'

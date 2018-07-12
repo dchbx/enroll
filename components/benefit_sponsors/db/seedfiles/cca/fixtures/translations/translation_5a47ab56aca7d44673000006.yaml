@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerVqyn1EZzAAAG
+  key: en.uis.bootstrap3_examples.index.carousels_link
+  value: '"Jump to the carousels section of this page"'

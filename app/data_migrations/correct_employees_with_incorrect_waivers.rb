@@ -18,7 +18,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
           next if enrollments.uniq.size < 2
 
           waiver = enrollments.detect{|e| e.inactive?}
-          active_coverage = enrollments.detect{|e| 
+          active_coverage = enrollments.detect{|e|
             ['coverage_selected', 'coverage_enrolled', 'coverage_expired'].include?(e.aasm_state.to_s)
           }
           if waiver.present? && active_coverage.present?
@@ -94,7 +94,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
     bg_ids = plan_year.benefit_groups.pluck(:id)
 
     {
-      :aasm_state.in => ['inactive', 'coverage_selected', 'coverage_enrolled', 'coverage_expired'], 
+      :aasm_state.in => ['inactive', 'coverage_selected', 'coverage_enrolled', 'coverage_expired'],
       :benefit_group_id.in => bg_ids,
       :coverage_kind => 'health',
       :kind.in => %w(employer_sponsored employer_sponsored_cobra)

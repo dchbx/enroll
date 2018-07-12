@@ -4,7 +4,7 @@
   .row
     .col-lg-7.col-md-7.col-sm-8.col-xs-12
       %h1=l10n("verify_identity")
-      %h4 Please answer the following security questions. When you're finished click SUBMIT.
+      %h4=l10n(".answer_the_following_questions_when_you_finish")
       = form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path, :method => :post) do |f|
         = f.hidden_field :session_id
         = f.hidden_field :transaction_id
