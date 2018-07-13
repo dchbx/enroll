@@ -3,13 +3,12 @@
 <% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
 <% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
 <% if @plan_year.new_record? %>
-  <h1>Select Your Plan Offering</h1>
-  <h4 style="max-width: 660px;">Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.</h4>
-  <br/>
+  <h2>Select Your Plan Offering</h2>
+  <p class="twenty">Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.</p>
 <% else %>
 <div class="edit-offering health">
 
-  <h4 class="currently-offered" style="max-width: 660px; display: inline-block;">
+  <h4 class="currently-offered"  style="display: inline-block;">
   </h4>
     <div class="offered-plan">
     </div>
@@ -19,75 +18,83 @@
   <div class="reference-steps">
     <% if @plan_year.new_record == false %>
     <br/>
-    <h1>Edit Your Plan Offering</h1>
-    <h4 class="currently-offering" style="max-width: 660px; display: inline-block;">
-    </h4>
-
+    <h2>Edit Your Plan Offering</h2>
+    <p class="currently-offering twenty" style="display: inline-block;">
+    </p>
 
     <br/><br/>
     <% end %>
 
   <div class="health">
     <ul class="nav nav-tabs row">
-      <li role="presentation" class="col-xs-4">
-        <%= f.radio_button :plan_option_kind, "single_carrier" %>
-        <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
-        <i class="fa fa-circle-o"></i>
-        <i class="fa fa-dot-circle-o"></i>
-        By carrier
-        <% end %>
-      </li>
-      <li role="presentation" class="col-xs-4 <%= f.object.id %>">
-        <%= f.radio_button :plan_option_kind, "metal_level" %>
-        <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
-        <i class="fa fa-circle-o"></i>
-        <i class="fa fa-dot-circle-o"></i>
-        By metal level
-      </li>
-      <% end %>
-      <li role="presentation" class="col-xs-4">
-        <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-        <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
-        <i class="fa fa-circle-o"></i>
-        <i class="fa fa-dot-circle-o"></i>
-        Single plan
-        <% end %>
-      </li>
-    </ul>
-
-  <div class="col-xs-12 plan-options">
-    <div class="col-xs-12 carriers-tab">
-      <br><br>
-      <h4>Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</h4>
-      <br/><br/>
-      <% @carrier_names.each_pair do |ck, cv| %>
-      <div class="col-xs-3 carriers">
-        <div class="col-xs-12 row">
-          <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier", benefit_group:f.object.id ), remote: true do %>
-          <div class="col-xs-3">
-            <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-            <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+      <% if offers_single_carrier? %>
+  	    <li role="presentation" class="col-xs-4 single-carrier-tab" data-offering-id="<%= f.object.id %>">
+          <%= f.radio_button :plan_option_kind, "single_carrier" %>
+          <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
-            <% end %>
-          </div>
+              <% if check_plan_options_title %>
+                  <%= fetch_plan_title_for_single_carrier %>
+              <% else %>
+                  By carrier
+              <% end %>
           <% end %>
-          <div class="col-xs-9">
-            <div class="panel">
-              <div class="panel-heading">
-                <h3><%= cv %></h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        </li>
       <% end %>
-    </div>
-    <div class="col-xs-12 metals-tab" style="display: none;">
+      <% if offers_metal_level? %>
+        <li role="presentation" class="col-xs-4 <%= f.object.id %> metal-level-tab" data-offering-id="<%= f.object.id %>">
+          <%= f.radio_button :plan_option_kind, "metal_level" %>
+          <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+              <% if check_plan_options_title %>
+                  <%= fetch_plan_title_for_metal_level %>
+              <% else %>
+                  By metal level
+              <% end %>
+          <% end %>
+        </li>
+      <% end %>
+      <% if offer_sole_source? && check_plan_options_title %>
+        <li role="presentation" class="col-xs-4 sole-source-tab" data-offering-id="<%= f.object.id %>" data-offering-kind="sole_source">
+          <%= f.radio_button :plan_option_kind, "sole_source", selected: f.object.plan_option_kind %>
+          <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+              <%= fetch_plan_title_for_sole_source %>
+          <% end %>
+        </li>
+      <% end %>
+      <% if offers_single_plan? %>
+        <li role="presentation" class="col-xs-4 single-plan-tab" data-offering-id="<%= f.object.id %>">
+          <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
+          <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            Single plan
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+  <div class="col-xs-12 plan-options" style="display: none;">
+    <div class="col-xs-12 carriers-tab tab-container" style="display: none;">
       <br><br>
-      <h4>Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.</h4>
+      <p class="twenty">Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</p>
+      <br/><br/>
+      <div id="singleCarrierCarrierList_<%= f.object.id %>" class="carrier-list-container">
+        <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
+      </div>
+    </div>
+    <div class="col-xs-12 metals-tab tab-container" style="display: none;">
+      <br><br>
+      <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explained %></p>
       <br/>
-      <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
+      <% metal_levels = Plan::REFERENCE_PLAN_METAL_LEVELS %>
+      <% if check_plan_options_title %>
+          <% metal_levels = enabled_metal_levels_for_single_carrier %>
+      <% end %>
+      <% metal_levels.each do |kind| %>
       <div class="col-xs-3 metals">
         <div class="col-xs-12 row">
           <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
@@ -104,13 +111,10 @@
           <div class="col-xs-9">
             <div class="panel">
               <div class="panel-heading">
-                <h3><%= kind %></h3>
+                <h3><%= kind.titleize %></h3>
               </div>
             </div>
           </div>
-
-
-
         </div>
       </div>
 
@@ -121,33 +125,21 @@
         <%= f.hidden_field :reference_plan_id, class: "ref-plan hidden-param" %>
       <% end %>
     </div>
-    <div class="col-xs-12 single-plan-tab" style="display: none;">
+    <div class="col-xs-12 single-plan-tab tab-container" style="display: none;">
       <br><br>
-      <h4>Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</h4>
+      <p class="twenty">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</p>
       <br/>
-      <% @carrier_names.each_pair do |ck, cv| %>
-      <div class="col-xs-3 carriers">
-        <div class="col-xs-12 row">
-          <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
-
-          <div class="col-xs-3">
-            <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-            <%= f.label "carrier_for_elected_plan_#{ck}" do %>
-            <i class="fa fa-circle-o"></i>
-            <i class="fa fa-dot-circle-o"></i>
-            <% end %>
-          </div>
-          <% end %>
-          <div class="col-xs-9">
-            <div class="panel">
-              <div class="panel-heading">
-                <h3><%= cv %></h3>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div id="singlePlanCarrierList_<%= f.object.id %>" class="carrier-list-container">
+        <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>
-      <% end %>
+    </div>
+    <div class="col-xs-12 sole-source-plan-tab tab-container" style="display: none;">
+      <br><br>
+      <p class="twenty">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.</p>
+      <br/>
+      <div id="soleSourceCarrierList_<%= f.object.id %>" class="carrier-list-container">
+        <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
+      </div>
     </div>
     <div class="col-xs-12 row plans-tab" style="display: none;">
       <br><br>
@@ -169,7 +161,8 @@ $(function(){
 $('a[data-remote=true]').click( function() {
    var current_href = $(this).attr('href');
    var location_id = $(this).closest('.benefit-group-fields').attr('id');
-   $(this).attr('href', current_href + "&location_id=" + location_id);
+   var object_id = "<%= f.object.id %>";
+   $(this).attr('href', current_href + "&location_id=" + location_id + "&object_id=" + object_id);
 });
 
 })

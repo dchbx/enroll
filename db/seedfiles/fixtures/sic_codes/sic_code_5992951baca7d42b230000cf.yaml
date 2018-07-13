@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAADP
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '22'
+  major_group_label: Textile Mill Products
+  industry_group_code: '228'
+  industry_group_label: Yarn And Thread Mills
+  sic_code: '2281'
+  sic_label: Yarn Spinning Mills

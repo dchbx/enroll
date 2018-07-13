@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALV
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '51'
+  major_group_label: Wholesale Trade-non-durable Goods
+  industry_group_code: '517'
+  industry_group_label: Petroleum And Petroleum Products
+  sic_code: '5172'
+  sic_label: Petroleum and Petroleum Products Wholesalers, Except Bulk Stations and
+    Terminals

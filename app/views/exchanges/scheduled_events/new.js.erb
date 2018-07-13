@@ -1,0 +1,5 @@
+set_tab_content("<%= escape_javascript render 'exchanges/scheduled_events/new' %>");
+
+<% if @flash_message %>
+  $('.hbx_profiles').prepend("<%= escape_javascript render partial: 'layouts/flash', locals: { message: @flash_message, type: @flash_type } %>");
+<% end %>

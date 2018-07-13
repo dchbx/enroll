@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPS
+  division_code: I
+  division_label: Services
+  major_group_code: '84'
+  major_group_label: Museums, Art Galleries, And Botanical And Zoological Gardens
+  industry_group_code: '842'
+  industry_group_label: Arboreta And Botanical Or Zoological Gardens
+  sic_code: '8422'
+  sic_label: Arboreta and Botanical or Zoological Gardens

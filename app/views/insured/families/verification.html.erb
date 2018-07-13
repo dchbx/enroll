@@ -1,12 +1,14 @@
 <% content_for :navigation do %>
-    <%= render 'navigation' %>
+    <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
 <h1 class="darkblue no-buffer"><%= l10n("documents") %></h1>
 <div class="documents-tab">
   <% if @person && @person.consumer_role %>
      <h4 class="starter"><%= l10n("insured.verification_information") %></h4>
 
-      <%= render 'insured/families/verification/verification' %>
+      <% if individual_market_is_enabled? %>
+      	<%= render 'insured/families/verification/verification' %>
+      <% end %>
   <% end %>
 </div>
 &nbsp;

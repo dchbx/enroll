@@ -1,0 +1,118 @@
+#filter-sidebar.col-lg-3.col-md-3.co-sm-3.col-xs-12.pl-0
+  .checkbox-filter-wrapper-uc
+      - if !@hbx_enrollment.is_shop?
+        h4 = link_to l10n('estimate_your_costs'), "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank'
+      - else
+        h4 = find_my_doctor
+  h3.header-title Filter Results
+  - if @market_kind == "shop" || @benefit_group.try(:plan_option_kind) == "single_carrier"
+    .checkbox-filter-wrapper-uc
+      h5 
+        strong Metal Level
+        a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Plans use metal levels as an easy way to help indicate how generous they are in paying expenses. Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan."
+          i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+      ul.list-unstyled
+        - for level in @metal_levels do
+          li
+            checkbox
+              label
+                input id="plan-metal-level-#{level}" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-#{level}" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="#{level}" data-category="planMetalLevel"
+                label for="plan-metal-level-#{level}" class="checkbox-custom-label"
+                  span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_filters_'"#{level}"'_title_info')}"
+                  = l10n("#{level}")
+    .checkbox-filter-wrapper-uc
+      h5
+        strong = l10n(".plan_type")
+        a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.plan_type_title_info")}"
+            i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+      ul.list-unstyled
+        - @plan_types.each_with_index do |type, i|
+          li
+            checkbox
+              label
+                input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)" data-category="planType"
+                label for="checkbox-#{10+i}" class="checkbox-custom-label"
+                  span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.'"#{type}"'_title_info')}"
+                  = l10n("#{type}")
+    - if offers_nationwide_plans?
+      .checkbox-filter-wrapper-uc
+        h5
+          strong = l10n("network")
+          a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.network_title_info")}"
+              i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+        ul.list-unstyled
+          - @networks.each_with_index do |network, i|
+            li
+              checkbox
+                label
+                  input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
+                  label for="checkbox-#{13+i}" class="checkbox-custom-label"
+                    span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
+                    = l10n("#{network}")
+    .checkbox-filter-wrapper-uc
+      h5
+        strong = l10n("carrier")
+        a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("filter_by_the_carrier")}"
+            i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+      ul.list-unstyled
+          li
+            .filter-input-block
+              = select_tag :carrier, options_for_select(@carrier_names), class: "plan-carrier-selection-filter", include_blank: "All", onchange:"filterPlanCarriers(this)"
+    .checkbox-filter-wrapper-uc
+      h5
+        strong = l10n("hsa_eligible")
+        a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.hsa_eligible_title_info")}"
+            i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+      ul.list-unstyled
+        li
+          .filter-input-block
+            = select_tag :hsa_eligibility, options_for_select(["Yes", "No"]), class: "plan-hsa-eligibility-selection-filter", include_blank: "All", onchange:"filterHSAEligibility(this)"
+    .checkbox-filter-wrapper-uc
+      h5
+        strong = l10n("premium_amount")
+        a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.premium_amount_title_info")}"
+            i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+      .filter-input-block
+        input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value='0' onblur="premuimFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
+        small To
+        input.plan-metal-premium-to-selection-filter.form-control.fr type="text" placeholder="$#{@max_total_employee_cost || 2000}" value="#{@max_total_employee_cost || 2000}" onblur="premiumToAmount(this)" maxlength="10" oninput="toCurrency(this)"
+        = hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000)
+      h5
+        strong = l10n("deductible_amount")
+      .filter-input-block
+        input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value='0' onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
+        small To
+        input.plan-metal-deductible-to-selection-filter.form-control type="text" placeholder="$#{@max_deductible || 5000}" onblur="deductibleToAmount(this)" maxlength="10" oninput="toCurrency(this)" value='#{@max_deductible || 5000}'
+    - if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual"
+      .aptc
+        hr
+          .row
+            .col-xs-6
+              p.title = l10n("aptc").to_s.upcase
+              p.title = l10n("available")
+              p
+                span = number_to_currency(@max_aptc, precision: 2)
+            .col-xs-6
+              p.title
+                br
+              p.title = l10n("used")
+              p
+                |
+                  $
+                    input type="text" id='elected_aptc' value="#{number_with_precision(@elected_aptc, precision: 2)}" onchange="setMinMax(this, #{@max_aptc})"
+      = hidden_field_tag :max_aptc, @max_aptc
+      = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
+      form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)"
+      input name='elected_pct' type="range" min='0' max='1' value="0.85" step='0.05'
+        span
+          output name="pct" 85 %
+    .checkbox-filter-wrapper-uc
+      .form-inline.search-apply-wrapper.mt-1
+        a.btn.btn-primary.mz href="javascript:void(0)" onclick="filterResults()"
+          = l10n("apply")
+        a.btn.btn-default onclick="clearAll()"
+          = l10n("reset")
+
+    
+          
+

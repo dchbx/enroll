@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAACH
+  division_code: C
+  division_label: Construction
+  major_group_code: '17'
+  major_group_label: Construction Special Trade Contractors
+  industry_group_code: '179'
+  industry_group_label: Miscellaneous Special Trade Contractors
+  sic_code: '1794'
+  sic_label: Excavation Work

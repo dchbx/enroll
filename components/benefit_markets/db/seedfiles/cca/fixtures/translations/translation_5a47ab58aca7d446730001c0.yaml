@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHA
+  key: en.insured.verification_information
+  value: '"We verify the information you give us using electronic data sources. If
+    the data sources do not match the information you gave us, we need you to provide
+    documents to prove what you told us."'

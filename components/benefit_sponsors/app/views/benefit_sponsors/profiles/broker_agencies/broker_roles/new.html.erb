@@ -1,0 +1,28 @@
+<div class="broker-registration-container mt-4 pt-4 pl-3 pr-3 pb-3">
+  <h1 class="enroll-lead">Broker Registration</h1>
+  
+  <%= form_for @broker_agency, as: :broker_agency, url: {action: "create"}, html: { class: "needs-validation", id:'broker_registration_form', novalidate:true } do |f| %>
+  
+  <%= render 'shared/error_messages', :object => @broker_agency %>
+  
+  <%= render partial: './ui-components/v1/forms/broker_registration/personal_information', locals: {f: f} %>
+          
+  <%= render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f} %>
+
+  <%= render partial: './ui-components/v1/forms/broker_registration/broker_profile_information', locals: {f: f} %>
+      
+  <%= render partial: './ui-components/v1/forms/office_locations/office_locations', locals: {f: f} %>
+  
+  <div class="row">
+    <div class="col">
+      <!-- <button class="float-left btn btn-outline-primary" id="add-broker-location">Add Office Location</button> -->
+      <%= f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right' %>
+    </div>
+  </div>
+      
+  <% end %>
+</div>
+
+<script>
+  validateForm()
+</script>

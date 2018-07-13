@@ -1,4 +1,4 @@
-<% if @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id).include?(plan.id) %>
+<% if @person.primary_family.enrolled_hbx_enrollments.map(&:product).map(&:id).include?(plan.id) %>
   <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i>YOUR CURRENT <%= plan.try(:active_year) %>PLAN </h5>
 <% else %>
   <%= link_to("Select Plan",

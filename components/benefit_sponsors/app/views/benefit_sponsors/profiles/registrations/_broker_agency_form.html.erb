@@ -1,0 +1,69 @@
+<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+<div class="profile-content top-pd">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+      <div id="broker_agency_form" class="container">
+        <div class="row">
+          <%= f.fields_for :staff_roles, @agency.staff_roles, errors: {}, fieldset: false do |f| %>
+            <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/person_info_fields", f: f %>
+          <% end %>
+
+          <%= f.fields_for :organization, @agency.organization, errors: {}, fieldset: false do |f| %>
+            <%= f.hidden_field(:entity_kind, value: f.object.entity_kind) %>
+            <div class="row">
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <h4>Broker Agency Information</h4>
+                <div class="row no-buffer row-form-wrapper">
+                  <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f, readonly: 'readonly' %>
+                </div>
+                <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
+                  <%= f.hidden_field :id, value: f.object.id %>
+                  <div class="row no-buffer row-form-wrapper">
+                    <div class="col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+                      <%= f.text_field :home_page, class: "floatlabel form-control interaction-field-control-broker-home-page", placeholder: "#{l10n('website_url')}" %>
+                    </div>
+                  </div>
+                  <div class="row no-buffer row-form-wrapper">
+                    <%= render "benefit_sponsors/shared/broker_agency_profile_fields", f: f, read_only_dropdown: 'read_only_dropdown' %>
+                  </div><br>
+                  <div class="action-group">
+                    <% if (aca_broker_routing_information && @agency.profile_type == "broker_agency") %>
+                       <%= render "benefit_sponsors/shared/profiles/broker_agency/bank_information", f: f %>
+                       <p class="bank-name-container"></p>
+                    <% end %>
+                  </div><br>
+                  <div class="action-group">
+                    <%#= render "benefit_sponsors/shared/office_locations", f: f %>
+                    <h2> Office Locations </h2>
+                    <div data-controller="office-locations">
+                      <div data-target="office-locations.officeLocations">
+                        <%= f.fields_for :office_locations, f.object.office_locations.each do |office_fields| %>
+                          <%= office_fields.hidden_field :id, value: office_fields.object.id if office_fields.object.id.present? %>
+                          <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
+
+                          <div data-target="<%= 'office-locations.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
+                            <%= office_fields.hidden_field '_destroy', value: false, id: 'delete_location' %>
+                            <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields, profile_type: f.object.profile_type}  %>
+                          </div>
+                        <% end %>
+                      </div>
+                      <a class="btn btn-default pull-left col-12" data-action="click->office-locations#addLocation">Add Office Location</a>
+                    </div>
+                    <br/>
+                    <div class="row no-buffer">
+                      <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency")%></button>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var disableSelectric = true;
+</script>

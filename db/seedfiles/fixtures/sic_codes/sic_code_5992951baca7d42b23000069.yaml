@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABp
+  division_code: B
+  division_label: Mining
+  major_group_code: '14'
+  major_group_label: Mining And Quarrying Of Nonmetallic Minerals, Except Fuels
+  industry_group_code: '144'
+  industry_group_label: Sand And Gravel
+  sic_code: '1446'
+  sic_label: Industrial Sand

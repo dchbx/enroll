@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAACB
+  division_code: C
+  division_label: Construction
+  major_group_code: '17'
+  major_group_label: Construction Special Trade Contractors
+  industry_group_code: '175'
+  industry_group_label: Carpentry And Floor Work
+  sic_code: '1752'
+  sic_label: Floor Laying and Other Floor Work, Not Elsewhere Classified

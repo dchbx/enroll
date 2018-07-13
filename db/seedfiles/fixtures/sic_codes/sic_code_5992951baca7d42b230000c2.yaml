@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAADC
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '22'
+  major_group_label: Textile Mill Products
+  industry_group_code: '223'
+  industry_group_label: Broadwoven Fabric Mills, Wool (including Dyeing and Finishing)
+  sic_code: '2231'
+  sic_label: Broadwoven Fabric Mills, Wool (Including Dyeing and Finishing)

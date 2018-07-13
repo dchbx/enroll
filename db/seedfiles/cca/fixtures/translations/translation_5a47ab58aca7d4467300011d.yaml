@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAEd
+  key: en.insured.families.apply_for_medicaid_widget
+  value: '"Apply, renew, read notices or find out what documents are needed for Medicaid
+    or tax credit assisted coverage"'

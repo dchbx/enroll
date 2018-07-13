@@ -14,8 +14,8 @@ describe ReinstatePlanYear, dbclean: :after_each do
 
   describe "reinstate_plan_year", dbclean: :after_each do
 
-    let!(:employer_profile)  { FactoryGirl.build(:employer_profile) }
-    let!(:organization)  { FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let!(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+    let!(:organization)  { employer_profile.organization }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let!(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile)}
 

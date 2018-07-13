@@ -1,0 +1,113 @@
+<div class="module employer-welcome col-xs-12">
+  <div class="row">
+    <p class='lead'>
+      It's time to set up your Health Benefits Program. You can either get help from a Broker, or set up your Health Benefits Program yourself. Choose the path that's right for you.
+    </p>
+  </div>
+
+  <%if employer_attestation_is_enabled? %>
+    <div class="left-icon-section section">
+      <div class="row">
+        <div class="col-md-offset-1 col-md-11">
+          <h3><%=l10n("employers.employer_profiles.my_account.important_documents_needed")%></h3>
+          <p class="twenty">
+            <%=l10n("employers.employer_profiles.my_account.eligibility_documents_needed")%>
+          </p>
+        </div>
+      </div>
+    </div>
+  <%end%>
+
+  <% unless @employer_profile.broker_agency_profile.present?  %>
+    <div class="left-icon-section section">
+      <div class="row">
+        <div class="col-md-1">
+          <div class="row">
+            <%= image_tag('ui/expertgreen_50.png') %>
+          </div>
+        </div>
+        <div class="col-md-11">
+          <h3> Get Help From a Broker </h3>
+          <p class="twenty">
+            You may want to select a Broker as your personal advocate and trusted adviser, who at no cost to you, can help you set up and administer your Health Benefits Program. If you'd like to select a Broker, we suggest doing so first.
+            <%= link_to '#', class: 'view-more' do %>View More <i class="fa fa-chevron-down"></i> <% end %>
+          </p>
+          <div class="empty-box x-right col-xs-12 dn">
+            <div class="col-xs-12">
+              <div class="row">
+                Select
+                <%= link_to "\"Brokers\"", profiles_employers_employer_profile_path(@employer_profile.id, tab: 'brokers') %>
+                on the blue menu to the left and follow the instructions. Once you've confirmed your selection, you can logout. Your Broker will be in touch shortly and will help you do everything else.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="left-icon-section section">
+    <div class="row">
+      <div class="col-xs-1">
+        <div class="row">
+          <%= image_tag('ui/gearsgreen_50.png') %>
+        </div>
+      </div>
+      <div class="col-xs-11">
+        <h3 class="no-buffer">
+          Set Up Your Health Benefits Program Yourself
+        </h3>
+        <p class="twenty">
+          If you want to set up your Health Benefits Program yourself, we'll walk you through it step-by-step.
+          <%= link_to '#', class: 'view-more' do %> View More <i class="fa fa-chevron-down"></i> <% end %>
+        </p>
+        <div class="empty-box close-right col-xs-12 dn">
+          <div class="col-xs-12">
+            <div class="row">
+              To get started, select '<%= link_to "\"Employees\"", profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'employees') %>' on the blue menu to the left and follow the instructions to add your employee roster. Then we'll help you create your plan(s), assign employees to your plan(s), upload employer attestation documentation, and publish your plan(s) for open enrollment.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-icon-section empty-box important row section">
+    <div class="vertically-aligned-row">
+      <div class="col-xs-1">
+        <i class="fa fa-flag fa-2x"></i>
+      </div>
+
+      <div class="col-xs-9">
+        <span>
+          <strong>Important:
+          </strong>You'll want to enter your employee roster first before selecting your Benefits so that you'll be able to see cost data when you select your Benefits.
+        </span>
+        <% if individual_market_is_enabled? %>
+          <div class="icon-left-download">
+            <%= link_to "https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf", target: '_blank' do %>
+              <i class="fa fa-download">
+              </i>
+              Download Step-by-Step Instructions for New Employers
+            <% end %>
+          </div>
+        <%else%>
+          <div class="icon-left-download">
+            <%= link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do %>
+              <i class="fa fa-download">
+              </i>
+              Download Step-by-Step Instructions for New Employers
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <%if individual_market_is_enabled? %>
+        <div class="col-xs-2 pdf-image full-width">
+          <%= link_to 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank' do %>
+          <%= image_tag('images/guidanceforsmallbusinessowners_214.jpg', class: 'pull-right') %>
+          <% end %>
+        </div>
+      <%end%>
+    </div>
+  </div>
+</div>

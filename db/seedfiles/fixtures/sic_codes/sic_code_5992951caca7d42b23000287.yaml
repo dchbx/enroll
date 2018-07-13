@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKH
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '48'
+  major_group_label: Communications
+  industry_group_code: '483'
+  industry_group_label: Radio And Television Broadcasting Stations
+  sic_code: '4832'
+  sic_label: Radio Broadcasting Stations

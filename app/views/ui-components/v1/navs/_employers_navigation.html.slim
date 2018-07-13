@@ -1,0 +1,32 @@
+nav
+  ul#uic-employers-right-menu
+    li
+      = link_to "My #{Settings.site.short_name}", benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'home'), "aria-expanded" => "true"
+    li 
+      = link_to 'Employees', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'employees'), "aria-expanded" => "true"
+    li
+      = link_to 'Benefits', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'benefits'), "aria-expanded" => "true"
+    li
+      = link_to 'Brokers', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'brokers'), "aria-expanded" => "true"
+    - if benefit_sponsor_display_families_tab(current_user, profile.id)
+      li
+        = link_to 'Families', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'families'), "aria-expanded" => "true"
+    li
+      = link_to 'Documents', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'documents'), "aria-expanded" => "true"
+    li
+      = link_to 'Billing', benefit_sponsors.profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true"
+    li
+      = link_to(benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do
+        | Messages 
+        span.badge.message-unread #{profile.inbox.unread_messages.try(:count) || 0}
+
+  .my-account-widget.panel.panel-default
+    .panel-heading
+      h4 #{organization.legal_name}
+      = link_to 'Update Business Info', benefit_sponsors.edit_profiles_registration_path(profile.id)
+      br
+        = link_to 'View Enrollment Reports', benefit_sponsors.profiles_employers_employer_profile_coverage_reports_path(profile.id)
+    | &nbsp;
+    .panel-body
+      span
+        = link_to "My Employees: #{total_active_census_employees(profile.id)}", benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'employees')

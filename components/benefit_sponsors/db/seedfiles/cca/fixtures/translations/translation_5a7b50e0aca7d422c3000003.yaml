@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WntQ4Kyn1CLDAAAD
+  key: en.employers.plan_years.coinsurance
+  value: '"COINSURANCE"'

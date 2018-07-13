@@ -16,7 +16,7 @@ class SamlController < ApplicationController
     if response.is_valid? && response.name_id.present?
       username = response.name_id.downcase
 
-      oim_user = User.where(oim_id: /^#{Regexp.quote(username)}$/i).first
+      oim_user = User.where(oim_id: /^#{::Regexp.quote(username)}$/i).first
 
       if oim_user.present?
         oim_user.idp_verified = true
@@ -40,7 +40,7 @@ class SamlController < ApplicationController
       else
         new_password = User.generate_valid_password
         new_email = response.attributes['mail'].present? ? response.attributes['mail'] : ""
-        headless = User.where(email: /^#{Regexp.quote(new_email)}$/i).first
+        headless = User.where(email: /^#{::Regexp.quote(new_email)}$/i).first
         headless.destroy if headless.present? && !headless.person.present?
         new_user = User.new(email: new_email, password: new_password, idp_verified: true, oim_id: response.name_id)
         new_user.save!

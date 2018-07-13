@@ -1,0 +1,89 @@
+
+<%= hidden_field_tag 'current_sort', @sort_by  %>
+<%= hidden_field_tag 'plan_ids' %>
+<% single_plan_displayed ||= false %>
+<div class="container-fluid">
+  <% unless single_plan_displayed %><h3>Plan Comparison Chart</h3><% end %>
+  <ul style="padding-left: 18px;">
+    <!-- <li> Plans can be rearranged by dragging the beginning of the company name </li> -->
+    <!-- <li> Use <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> to sort by copay </li> -->
+  </ul>
+  <div class="mygrid-wrapper-div">
+   <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
+        <tr>
+          <th class="row-title">Plans</th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'>
+              <%= hidden_field_tag 'plan_id-#{qhp.plan.id}', qhp.plan.id, class: 'plan_id' %>
+              <%  carrier_name = CarrierProfile.find(qhp.plan.carrier_profile_id).organization.legal_name.gsub(/united health care/i, 'uhic')%>
+              <%=  image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", {width: 80}) if carrier_name.present? %>
+            </th>
+          <% end %>
+        </tr>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.plan.name %></th>
+          <% end %>
+        </tr>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+            <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
+            <%= qhp.plan.plan_type.upcase %>
+            </th>
+          <% end %>
+        </tr>
+        <tr>
+          <th>Provider Network</th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2">
+              <%= render partial: "shared/network_data", locals: {plan: qhp.plan} %>
+            </th>
+          <% end %>
+        </tr>
+
+        <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps}%>
+
+        <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
+          <tr>
+            <th></th>
+            <% qhps.each do |qhp|%>
+              <th colspan="2">
+                <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
+                  <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
+                <% end %>
+              </th>
+            <% end %>
+          </tr>
+        <% end %>
+        <tr>
+          <th>PLAN BENEFITS <br> (In Network)</th>
+          <% qhps.each do |qhp|%>
+            <th colspan="1"> CO-PAY </th>
+            <th colspan="1"> COINSURANCE </th>
+          <% end %>
+        </tr>
+        <%= render partial: "sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/plan_visit_types", locals: {qhps: qhps} %>
+        <tr>
+          <th></th>
+          <% qhps.each do |qhp|%>
+            <th colspan="2">
+              <div class="plan_comparison">
+                <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.plan } %>
+              </div>
+            </th>
+          <% end %>
+        </tr>
+    </table>
+  </div>
+  <br>
+  <% unless single_plan_displayed %>
+    <div class="col-md-offset-5">
+      <%= link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-default", target: "_blank" %>
+      <%= link_to "Export to CSV",  sponsored_benefits.csv_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans]), class: 'btn btn-default', target: "_blank" %>
+      <button class="btn btn-default" id="hide-detail-comparisons">Hide Details</button>
+    </div>
+  <% end %>
+  <br><br>
+</div>

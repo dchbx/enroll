@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Transcripts::PersonTranscript, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
-
   let(:person_template)             { Person.new.attributes.except("_id", "version") }
   let(:consumer_role_template)      { person_template.buiild.attributes.except("_id", "version") }
   let(:family_transcript_template)  { }

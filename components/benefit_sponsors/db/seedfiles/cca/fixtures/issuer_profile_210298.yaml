@@ -1,0 +1,71 @@
+--- !ruby/object:BenefitSponsors::Organizations::ExemptOrganization
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5p+ICzHOaeck
+  _type: BenefitSponsors::Organizations::ExemptOrganization
+  created_at: 2017-11-06 00:28:35.480000000 Z
+  dba: 
+  hbx_id: '210298'
+  legal_name: Harvard Pilgrim Health Care
+  updated_at: 2017-11-06 00:28:35.480000000 Z
+  site_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5J+ICzHOaeVu
+  profiles:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WxWP5p+ICzHOaecl
+    contact_method: :paper_and_electronic
+    _type: BenefitSponsors::Organizations::IssuerProfile
+    issuer_hios_ids:
+    - '36046'
+    issuer_state: MA
+    market_coverage: shop (small group)
+    abbrev: HPHC
+    associated_carrier_profile_id: 
+    created_at: 2017-11-06 00:28:35.468000000 Z
+    dental_only_plan: false
+    hbx_carrier_id: 20008
+    ivl_dental: false
+    ivl_health: false
+    offers_sole_source: false
+    shop_dental: false
+    shop_health: true
+    updated_at: 2017-11-06 00:28:35.468000000 Z
+    is_benefit_sponsorship_eligible: false
+    office_locations:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WxWP5p+ICzHOaecm
+      is_primary: true
+      address: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WxWP5p+ICzHOaecn
+        address_1: address_placeholder
+        address_2: address_2
+        address_3: ''
+        county: ''
+        country_name: ''
+        kind: work
+        city: City
+        state: St
+        zip: '10001'
+        updated_at: 2017-11-06 00:28:35.464000000 Z
+        created_at: 2017-11-06 00:28:35.464000000 Z
+      phone: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WxWP5p+ICzHOaeco
+        kind: main
+        country_code: ''
+        area_code: '111'
+        number: '1111111'
+        extension: ''
+        full_phone_number: '1111111111'
+        updated_at: 2017-11-06 00:28:35.465000000 Z
+        created_at: 2017-11-06 00:28:35.465000000 Z

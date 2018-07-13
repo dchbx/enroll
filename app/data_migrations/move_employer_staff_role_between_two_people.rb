@@ -1,4 +1,3 @@
-
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
@@ -29,6 +28,3 @@ class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
     end
   end
 end
-
-
-

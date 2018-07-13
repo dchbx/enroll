@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHc
+  key: en.insured.group_selection.new.select_who_needs_coverage
+  value: '"Select who needs coverage and the type of coverage needed. When you’re
+    finished, select CONTINUE."'

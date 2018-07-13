@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WntQ4Kyn1CLDAAAB
+  key: en.employers.plan_years.plan_benefits
+  value: '"PLAN BENEFITS"'

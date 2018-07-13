@@ -1,0 +1,31 @@
+<div class="panel panel-default table">
+  <div class="panel-heading">
+    <h3 class="panel-title">Employee Roster</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table table-striped" id="plan_proposal_view_employee_roster">
+      <thead>
+        <tr>
+          <th scope="col">Employee Name</th>
+          <th scope="col">DOB</th>
+          <th scope="col">Hired On</th>
+          <th scope="col">Status</th>
+          <th scope="col">Est. Participation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @census_employees.each do |ce| %>
+        <tr>
+          <td> <%= ce.full_name %> </th>
+          <td> <%= ce.dob %> </td>
+          <td> <%= ce.hired_on %> </td>
+          <td> <%= ce.aasm_state.titleize %> </td>
+          <td> <%= ce.expected_selection.titleize %> </td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>$('#plan_proposal_view_employee_roster').dataTable();</script>

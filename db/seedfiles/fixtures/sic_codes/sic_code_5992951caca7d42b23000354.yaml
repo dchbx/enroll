@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANU
+  division_code: I
+  division_label: Services
+  major_group_code: '70'
+  major_group_label: Hotels, Rooming Houses, Camps, And Other Lodging Places
+  industry_group_code: '702'
+  industry_group_label: Rooming And Boarding Houses
+  sic_code: '7021'
+  sic_label: Rooming and Boarding Houses

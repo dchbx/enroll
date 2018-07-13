@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJa
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '41'
+  major_group_label: Local And Suburban Transit And Interurban Highway Passenger Transportation
+  industry_group_code: '412'
+  industry_group_label: Taxicabs
+  sic_code: '4121'
+  sic_label: Taxicabs

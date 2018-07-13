@@ -1,0 +1,32 @@
+<footer class="footer-wrapper module footer">
+  <div class="container">
+      <div class="col-md-6">
+        <div class="row">
+          <%= copyright_notice %>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <ul class="list-unstyled list-inline pull-right">
+            <li>
+              <!-- <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;(855) 532-5465</a> -->
+            </li>
+            <li>
+              <a class="call-customer-service" href="tel:<%= contact_center_phone_number %>">
+                <span>
+                  <i class="fa fa-phone fa-lg"></i> &nbsp;<%= contact_center_phone_number %>
+                </span>
+              </a>
+            </li>
+            <li>
+              <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i> &nbsp;<%= mail_to contact_center_email_address %>
+            </li>
+            <li>
+              <%= link_to site_faqs_url, target: '_blank' do %>
+                <i class="fa fa-question fa-lg" aria-hidden="true"></i> &nbsp;FAQs
+              <% end %>
+            </li>
+          </ul>
+      </div>
+    </div>
+</footer>

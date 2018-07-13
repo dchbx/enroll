@@ -23,7 +23,12 @@ module ApplicationHelper
   end
 
   def copyright_notice
-    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
+    if TimeKeeper.date_of_record.year.to_s == Settings.site.copyright_period_start.to_s
+      copyright_attribution = "#{Settings.site.copyright_period_start} #{Settings.site.long_name}"
+    else
+      copyright_attribution = "#{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
+    end
+    raw("<span class='copyright'><i class='far fa-copyright fa-lg' aria-hidden='true'></i> #{copyright_attribution}. All Rights Reserved. </span>")
   end
 
   def menu_tab_class(a_tab, current_tab)
@@ -162,7 +167,12 @@ module ApplicationHelper
 
   # Uses a boolean value to return an HTML checked/unchecked glyph
   def boolean_to_glyph(test)
-    test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'") : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
+    test ? content_tag(:span, "", class: "far fa-check-square aria-hidden='true'") : content_tag(:span, "", class: "far fa-square aria-hidden='true'")
+  end
+
+  # Uses a boolean value to return an HTML checked/unchecked glyph with hover text
+  def prepend_glyph_to_text(test)
+    test.event_name ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
@@ -239,6 +249,7 @@ module ApplicationHelper
 
     if f.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
+      new_object.build_composite_tier_contributions
       new_object.build_dental_relationship_benefits
     end
 
@@ -380,20 +391,26 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(plan, options = {:width => 50})
-    return "" if !plan.carrier_profile.extract_value.present?
-    hios_id = plan.hios_id[0..6].extract_value
-    carrier_name = case hios_id
-    when "75753DC"
-      "oci"
-    when "21066DC"
-      "uhcma"
-    when "41842DC"
-      "uhic"
+  def carrier_logo(plan)
+    if plan.extract_value.class.to_s == "Plan"
+      return "" if !plan.carrier_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
     else
-      plan.carrier_profile.legal_name.extract_value
+      return "" if !plan.issuer_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
     end
+  end
+
+  def display_carrier_logo(plan, options = {:width => 50})
+    carrier_name = carrier_logo(plan)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  end
+
+  def display_carrier_pdf_logo(plan, options = {:width => 50})
+    carrier_name = carrier_logo(plan)
+    image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def dob_in_words(age, dob)
@@ -443,10 +460,9 @@ module ApplicationHelper
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
     non_owner = plan_year.non_business_owner_enrolled.count
-    covered = plan_year.covered_count
+    covered = plan_year.progressbar_covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
-
     unless eligible.zero?
       condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
       condition = false if covered == 0 && waived > 0
@@ -464,7 +480,7 @@ module ApplicationHelper
           concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;")
         end
 
-        if eligible > 2
+        if eligible >= 2
           eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
@@ -494,7 +510,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return (@current_plan_year.eligible_to_enroll_count * 2.0 / 3.0).ceil
+      return (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
     end
   end
 
@@ -545,14 +561,9 @@ module ApplicationHelper
     end
   end
 
-  def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
-    begin
-      if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
-        ShopNoticesNotifierJob.perform_later(hbx_enrollment.employer_profile.id.to_s, "notify_employer_when_employee_terminate_coverage", hbx_enrollment: hbx_enrollment.hbx_id.to_s)
-      end
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver employee_terminate_coverage_notice of employee #{hbx_enrollment.census_employee.id.to_s} to #{hbx_enrollment.employer_profile.id.to_s}due to #{e}" }) unless Rails.env.test?
-    end
+  def trigger_notice_observer(recipient, event_object, notice_event, params={})
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: params)
   end
 
   def disable_purchase?(disabled, hbx_enrollment, options = {})
@@ -567,13 +578,19 @@ module ApplicationHelper
   end
 
   def env_bucket_name(bucket_name)
-    aws_env = ENV['AWS_ENV'] || "local"
-    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+    aws_env = ENV['AWS_ENV'] || "qa"
+    "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
-    return plan.metal_level.humanize if plan.coverage_kind == "health"
-    (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
+    if (plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == "Plan"))
+      return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == "health"
+      (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
+    else
+      return plan.metal_level_kind.to_s.titleize if plan.kind == :health
+      # TODO Update this for dental plans
+      (plan.active_year == 2015 ? plan.metal_level_kind : plan.dental_level).try(:to_s).try(:titleize) || ""
+    end
   end
 
   def make_binder_checkbox_disabled(employer)
@@ -612,6 +629,8 @@ module ApplicationHelper
   end
 
   def eligibility_criteria(employer)
+    return unless employer.respond_to?(:show_plan_year)
+
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
@@ -638,6 +657,7 @@ module ApplicationHelper
 
   def participation_rule(employer)
     @participation_count = employer.show_plan_year.additional_required_participants_count
+
     if @participation_count == 0
       "1. 2/3 Rule Met? : Yes"
     else
@@ -646,6 +666,8 @@ module ApplicationHelper
   end
 
   def non_owner_participation_rule(employer)
+    # fix me compare with total enrollments
+    # fix me once new model enrollment and benefit group assignments got fixed
     @non_owner_participation_rule = employer.show_plan_year.assigned_census_employees_without_owner.present?
     if @non_owner_participation_rule == true
       "2. Non-Owner exists on the roster for the employer"
@@ -656,6 +678,10 @@ module ApplicationHelper
 
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
+  end
+
+  def load_captcha_widget?
+    !Rails.env.test?
   end
 
   def previous_year
@@ -672,5 +698,33 @@ module ApplicationHelper
     Settings.checkbook_services.plan_match == "DC"
   end
 
-end
+  def exchange_icon_path(icon)
+    site_key = Settings.site.key
+      "icons/#{site_key}-#{icon}"
+  end
 
+  def benefit_application_summarized_state(benefit_application)
+    return if benefit_application.nil?
+    aasm_map = {
+      :draft => :draft,
+      :enrollment_open => :enrolling,
+      :enrollment_eligible => :enrolled,
+      :approved => :published
+    }
+
+    renewing = benefit_application.predecessor_id.present? && benefit_application.aasm_state != :active ? "Renewing" : ""
+    summary_text = aasm_map[benefit_application.aasm_state] || benefit_application.aasm_state
+    summary_text = "#{renewing} #{summary_text.to_s.humanize.titleize}"
+    return summary_text.strip
+  end
+
+  def json_for_plan_shopping_member_groups(member_groups)
+    member_groups.map do |member_group|
+      member_group_hash = JSON.parse(member_group.group_enrollment.to_json)
+      member_group_hash['product'].merge!(
+        "issuer_name" => member_group.group_enrollment.product.issuer_profile.legal_name
+      )
+      member_group_hash
+    end.to_json
+  end
+end

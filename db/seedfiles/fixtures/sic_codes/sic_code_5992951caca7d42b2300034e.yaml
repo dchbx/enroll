@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANO
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '67'
+  major_group_label: Holding And Other Investment Offices
+  industry_group_code: '673'
+  industry_group_label: Trusts
+  sic_code: '6733'
+  sic_label: Trusts, Except Educational, Religious, and Charitable

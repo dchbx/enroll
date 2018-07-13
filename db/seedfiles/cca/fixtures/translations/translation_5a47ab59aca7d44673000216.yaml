@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIW
+  key: en.insured.plan_shoppings.plan_filters_gold_title_info
+  value: '"Gold means the plan is expected to pay 80% of medical expenses for the
+    average population of consumers. Gold plans typically have higher premiums, but
+    you pay less when you get covered services."'

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANo
+  division_code: I
+  division_label: Services
+  major_group_code: '73'
+  major_group_label: Business Services
+  industry_group_code: '731'
+  industry_group_label: Advertising
+  sic_code: '7312'
+  sic_label: Outdoor Advertising Services

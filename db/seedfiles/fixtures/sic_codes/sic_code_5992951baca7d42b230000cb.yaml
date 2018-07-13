@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAADL
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '22'
+  major_group_label: Textile Mill Products
+  industry_group_code: '226'
+  industry_group_label: Dyeing And Finishing Textiles, Except Wool Fabrics
+  sic_code: '2261'
+  sic_label: Finishers of Broadwoven Fabrics of Cotton

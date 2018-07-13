@@ -1,0 +1,24 @@
+<h3><%= l10n("broker_agencies.profiles.broker_agency_contacts")%></h3>
+
+<div class="table-border">
+  <table class="table">
+    <% if broker_agency_contacts.present? %>
+        <thead>
+          <th><%= l10n("first_name")%></th>
+          <th><%= l10n("last_name")%></th>
+          <th><%= l10n("dob")%></th>
+          <th><%= l10n("broker_agencies.profiles.primary_broker_role_info")%></th>
+        </thead>
+        <% broker_agency_contacts.each do |broker_agency_contact| %>
+          <tbody>
+            <td><%= broker_agency_contact.first_name %></td>
+            <td><%= broker_agency_contact.last_name %></td>
+            <td><%= broker_agency_contact.dob %></td>
+            <td><%= broker_agency_contact.broker_role.present? ? "#{broker_agency_contact.broker_role.npn} / #{broker_agency_contact.broker_role.provider_kind}" : "" %></td>
+          </tbody>
+        <% end %>
+    <% else %>
+      <tr><td><%= l10n("broker_agencies.profiles.no_broker_agency_contacts_found")%></td></tr>
+    <% end %>
+  </table>
+</div>

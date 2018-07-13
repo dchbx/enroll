@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAAD1
+  key: en.insured.employee_roles.enroll_in_individual_benifits
+  value: '"Enroll in Individual Benefits"'

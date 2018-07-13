@@ -1,0 +1,29 @@
+table.table.benefit-group-contribution-table
+  - if sb.pricing_determinations.any?
+    tr
+      th Member Type
+      th.text-center Employer Share
+      th.text-right Employee
+      th.text-right Employer
+      th.text-right Total
+    - pd = sb.latest_pricing_determination
+    - sorted_tiers = pd.pricing_determination_tiers.sort_by { |pdt| pdt.pricing_unit.order }
+    - sorted_tiers.each do |pdt|
+      - pdt_total = pdt.price
+      - pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
+      - pdt_employee = BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
+      tr class="#{pdt.contribution_level.is_offered ? "offered" : "not-offered"}"
+        td = raw(pdt.contribution_level.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{pdt.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{pdt.display_name.try(:humanize)}")
+        td= number_to_percentage((pdt.sponsor_contribution_factor * 100.0), precision: 0)
+        td= number_to_currency(pdt_employee)
+        td= number_to_currency(pdt_employer)
+        td= number_to_currency(pdt.price)
+  - else
+    tr
+      th.benefit-group-heading Offered
+      th.benefit-group-heading Employer Contribution
+    - sb.sponsor_contribution.contribution_levels.each_with_index do |rb, i|
+      tr
+        td = raw(rb.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{rb.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{rb.display_name.try(:humanize)}")
+        td#pct
+          = number_to_percentage rb.contribution_pct.ceil, precision: 0

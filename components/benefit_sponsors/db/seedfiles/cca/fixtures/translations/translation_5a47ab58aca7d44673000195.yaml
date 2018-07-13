@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGV
+  key: en.insured.choose_the_date_you_want_your_plan_start
+  value: '"Choose the date you want your plan to start."'

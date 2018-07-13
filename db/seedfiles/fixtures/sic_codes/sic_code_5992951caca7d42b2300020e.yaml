@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAIO
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '36'
+  major_group_label: Electronic And Other Electrical Equipment And Components, Except
+    Computer Equipment
+  industry_group_code: '364'
+  industry_group_label: Electric Lighting And Wiring Equipment
+  sic_code: '3648'
+  sic_label: Lighting Equipment, Not Elsewhere Classified

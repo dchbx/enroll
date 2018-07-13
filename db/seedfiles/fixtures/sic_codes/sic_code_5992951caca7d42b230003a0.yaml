@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAOg
+  division_code: I
+  division_label: Services
+  major_group_code: '78'
+  major_group_label: Motion Pictures
+  industry_group_code: '782'
+  industry_group_label: Motion Picture Distribution And Allied Services
+  sic_code: '7829'
+  sic_label: Services Allied to Motion Picture Distribution

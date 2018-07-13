@@ -1,0 +1,77 @@
+#addressDetails
+  .row.pl-1
+    h4 Office Location
+  .row
+    .col-md-9.col-sm-6.col-xs-12
+      label for="inputAddress1" Address
+      = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", required: 'true', id:'inputAddress1'
+      .invalid-feedback
+        | Please provide a valid address.
+    .col-md-3.col-sm-6.col-xs-12
+      label for="inputKind" Kind
+      - kinds = f.object.office_kind_options; kinds = kinds.rotate if params[:child_index]
+      = f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, selected: f.object.try(:kind)),{}, class: "form-control", required: true, id:'kindSelect',placeholder: 'KIND', onchange:'checkOLKind(this)'
+      .invalid-feedback
+        | Please select an address kind.
+
+  .row
+    .col-md-12.col-sm-12.col.xs-12
+      label for="inputAddress2" Address 2
+      = f.text_field :address_2, class:"form-control mb-1",  placeholder: "Address 2"
+
+  .row[data-controller='zip-check']
+    .col-md-3.col-sm-12.col-xs-12
+      label for="inputCity" City
+      = f.text_field :city, class: "form-control mb-1", required: true, placeholder: 'CITY'
+      .invalid-feedback
+        | Please provide a valid city.
+    .col-md-3.col-sm-12.col-xs-12
+      label for="inputState" State
+      = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true)
+      .invalid-feedback
+        | Please select a state.
+    .col-md-3.col-sm-12.col-xs-12
+      label for="inputZip" Zip
+      = f.text_field :zip, id:'inputZip', class:'form-control mb-1', minlength:'5', maxlength:'5'
+      .invalid-feedback
+        | Please provide a valid zipcode.
+
+    - if (aca_address_query_county && @agency.profile_type != "broker_agency")
+      .col-md-3.col-sm-12.col-xs-12
+        label for="inputCounty" County
+        = f.select :county, options_for_select([]), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', data: { options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq }
+        .invalid-feedback
+          | Please provide a valid county.
+
+javascript:
+  function checkOLKind(element) {
+    var addressKind = element.value;
+    var row = element.closest(".row").nextSibling.nextSibling;
+    if (addressKind == "primary") {
+      row.querySelector('#inputCounty').setAttribute('required', true);
+      row.querySelector('#inputCounty').setAttribute('disabled', true);
+      row.querySelector('#inputCounty').setAttribute('data-target','zip-check.countySelect');
+      row.querySelector('#inputZip').setAttribute('required', true);
+      row.querySelector('#inputZip').setAttribute('data-action', 'change->zip-check#zipChange');
+    } else {
+      row.querySelector('#inputCounty').removeAttribute('required');
+      row.querySelector('#inputZip').removeAttribute('data-action');
+      row.querySelector('#inputZip').removeAttribute('required');
+      row.querySelector('#inputZip').removeAttribute('data-options');
+      // removes blank option from select options
+      setTimeout(function() {
+        element.options[0].remove()
+      },300)
+    }
+  }
+  
+  function checkKind(element) {
+    checkOLKind(element)
+  }
+  
+  (function() {
+    var element = document.getElementById('kindSelect');
+    var value = element.value;
+    checkKind(element, value)
+  })();
+  

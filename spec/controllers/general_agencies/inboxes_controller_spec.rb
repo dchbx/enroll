@@ -1,11 +1,17 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
   let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
 
+  before :each do
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
+  end
+  
   describe "Get new" do
     before do
       sign_in user
@@ -56,4 +62,5 @@ RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
       expect(response).to have_http_status(:success)
     end
   end
+end
 end

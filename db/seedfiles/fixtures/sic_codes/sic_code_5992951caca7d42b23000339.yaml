@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAM5
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '63'
+  major_group_label: Insurance Carriers
+  industry_group_code: '633'
+  industry_group_label: Fire, Marine, And Casualty Insurance
+  sic_code: '6331'
+  sic_label: Fire, Marine, and Casualty Insurance

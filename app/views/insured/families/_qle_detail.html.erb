@@ -2,7 +2,7 @@
   <div class="hbx-enrollment-panel panel panel-default module">
     <div class="panel-heading">
       <div class="vertically-aligned-row">
-        <h3 class="no-buffer">REPORT LIFE CHANGES</h3>
+        <h3 class="no-buffer"><%= l10n("insured.report_life_changes").to_s.upcase %></h3>
         <div class="text-right">
           <a class="close-popup" href="javascript:void(0);">
             <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
@@ -21,8 +21,8 @@
         <%= form_tag url, method: http_method, class: 'input-no-pd qle-detail-for-existing-kind', id: 'qle_form' do %>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div id='qle-date-chose'>
-            <h3 class="qle-details-title darkblue text-center">I got married</h3>
-            <h5 class='qle-label text-center'>Enter the date of the event.</h5>
+            <h3 class="qle-details-title alternate-header text-center">I got married</h3>
+            <p class='qle-label text-center'>Enter the date of the event.</p>
             <div class="vertically-aligned-row">
               <div class="form-inline text-center">
                 <div class="form-group">
@@ -51,16 +51,16 @@
               <div class="spec_reasons">
               </div>
               <div class="text-center <%= pundit_class Family,:updateable? %>">
-                <%= submit_tag 'Continue', class: 'btn btn-primary' %>
+                <%= submit_tag l10n('.continue'), class: 'btn btn-primary' %>
                 <br/>
                 <br/>
               </div>
             </div>
             <div class="error-info hidden">
-              <h3 class="qle-details-title"><%= l10n("insured.change_tax_credits_or_cost_sharing_reductions") %></h3>
+              <h3 class="qle-details-title darkblue"><%= l10n("insured.change_tax_credits_or_cost_sharing_reductions") %></h3>
               <div class="alert alert-danger" role="alert">
                 <p class="error-text">
-                  <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: Settings.contact_center.phone_number) %>
+                  <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: contact_center_phone_number) %>
                 </p>
               </div>
               <br/>

@@ -1,0 +1,12 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADW
+  key: en.insured.consumer_roles.docs_shared.sevis_id_title
+  value: '"• When entering a SEVIS ID, only include the numbers. Do not enter the
+    ''N'' or any other characters or letters. For example: If your SEVIS ID is ''N1234567891''
+    then please enter ''1234567891''. • The SEVIS ID entered must have 10 digits.   How
+    to find the SEVIS ID: On the DS-2019, the number is on the top right hand side
+    of the page in the box above the barcode."'

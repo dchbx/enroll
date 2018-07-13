@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Exchanges::ResidentsController, :type => :controller do
   let(:user){ FactoryGirl.create(:user, :resident) }
   let(:person){ FactoryGirl.create(:person) }
@@ -116,4 +117,5 @@ RSpec.describe Exchanges::ResidentsController, :type => :controller do
       expect(response).to redirect_to(destroy_user_session_path)
     end
   end
+end
 end

@@ -48,8 +48,9 @@ class Products::QhpController < ApplicationController
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-    @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.plan)
-    @plan = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.plan)
+    # @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.plan)
+    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
+    @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product]).first
 
     respond_to do |format|
       format.html
@@ -76,8 +77,8 @@ class Products::QhpController < ApplicationController
     end
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
     @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.is_shop?) ? "employer_sponsored" : "individual"
-    @coverage_kind = if @hbx_enrollment.plan.present?
-      @hbx_enrollment.plan.coverage_kind
+    @coverage_kind = if @hbx_enrollment.product.present?
+      @hbx_enrollment.product.kind.to_s
     else
       (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
     end

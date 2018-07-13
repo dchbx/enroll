@@ -1,6 +1,7 @@
 <html>
   <head>
-    <title>DCHealthLink Confirmation</title>
+    <title><%= site_short_name %> Confirmation</title>
+
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
@@ -206,15 +207,15 @@
                                           Your coverage start date is <b><%= enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
                                         </p>
                                         <p>
-                                          Thank you for enrolling into employer-sponsored coverage through <%= Settings.site.short_name %>.
+                                          Thank you for enrolling into employer-sponsored coverage through <%= site_short_name %>.
                                         </p>
                                     <span style=
                                       "font-size: 16px; line-height: 130%;">
                                       DC Health
                                       Link<br />
                                       PHONE:
-                                      <%= Settings.contact_center.phone_number %>
-                                      <%= Settings.contact_center.alt_phone_number %><br />
+                                      <%= contact_center_phone_number %>
+                                      <%= contact_center_alt_phone_number %><br />
 
                                       TTY/TDD
                                       711-1-532-5465<br />

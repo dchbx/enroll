@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHk
+  key: en.insured.group_selection.new.coverage_begin_ivl_enrollment_effective_date
+  value: '"If you enroll today, coverage will begin %{ivl_enrollment_effective_date}."'

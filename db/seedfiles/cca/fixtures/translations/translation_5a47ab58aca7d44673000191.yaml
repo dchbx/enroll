@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGR
+  key: en.insured.qle_detail.eligible_to_enroll_limited_time
+  value: '"Based on the information you entered, you may be eligible to enroll now
+    but there is limited time."'

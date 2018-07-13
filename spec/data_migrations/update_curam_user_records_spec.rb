@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "update_curam_user_records")
 
 describe UpdateCuramUserRecords, dbclean: :after_each do
@@ -77,4 +78,5 @@ describe UpdateCuramUserRecords, dbclean: :after_each do
       expect(curam_user.ssn).to eq "456738293"
     end
   end
+end
 end

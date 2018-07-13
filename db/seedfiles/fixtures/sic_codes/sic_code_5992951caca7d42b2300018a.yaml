@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAGK
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '33'
+  major_group_label: Primary Metal Industries
+  industry_group_code: '331'
+  industry_group_label: Steel Works, Blast Furnaces, And Rolling And Finishing Mills
+  sic_code: '3313'
+  sic_label: Electrometallurgical Products, Except Steel

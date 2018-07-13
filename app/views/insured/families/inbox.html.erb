@@ -1,5 +1,5 @@
 <% content_for :navigation do %>
-    <%= render 'navigation' %>
+    <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
 <div class="module">
   <div class="vertically-aligned-row">
@@ -11,9 +11,13 @@
   </div>
   <%= render 'inbox', provider: @person %>
 </div>
-
+<% unless individual_market_is_enabled? %>
+<br/>
+<br/>
+<% else %>
 &nbsp;
 
 <div>
   <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: "If you applied for Medicaid and tax credit savings, view additional messages"} %>
 </div>
+<% end %>

@@ -1,0 +1,73 @@
+<div class="employees-tab">
+<div class="employees-section">
+    <% if @employer_profile.census_employees.empty? %>
+    <div class="row">
+      <div class="col-xs-12">
+       <h1 class="heading-text">Employee Roster</h1>
+
+       <div class="row <%= pundit_class(EmployerProfile, :updateable?) %>">
+        <p class="twenty">You haven't added any employees to your roster. Select 'Add New Employee' to begin, or select 'Upload Employee Roster' if you’d like to download the roster template and/or upload it now or later.</p>
+        <p class="twenty">For each employee you add, you'll need:</p>
+        <ul class="twenty">
+          <li>Name</li>
+          <li>Date of birth</li>
+          <li>Social Security number</li>
+          <li>Date of hire</li>
+        </ul>
+        <p class="twenty">If you plan to make an optional contribution towards employee family coverage and need an accurate cost estimate, you’ll also need the date of birth for all family members because monthly premiums are based on age.</p>
+        <%= link_to 'Add New Employee', main_app.new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-primary btn-lg"  %>
+        <%= link_to "Upload Employee Roster".html_safe, "", data: {toggle: "modal", target: "#upload_roster"}, class: "btn btn-primary btn-lg" %>
+        </div>
+      </div>
+    </div>
+    <% else %>
+    <div class="row">
+      <div class="col-xs-12">
+       <h1 class="heading-text">Employee Roster</h1>
+        <p class="twenty">
+            Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template. If you need to edit information for an employee, or if you're ready to add your employee to a benefit package you created, scroll over the employee's name and select the pencil icon to the right. When you're finished with your roster, select 'Benefits' in the blue menu bar to the left to continue.
+        </p>
+        <%if plan_match_tool_is_enabled? %>
+          <div class="col-xs-12 row">
+            <div class="pull-right">
+              <% if show_oop_pdf_link(@employer_profile.try(:show_plan_year).try(:aasm_state)) %>
+                <%= link_to "Plan Match Tool", "", data: {toggle: "modal", target: "#poc_cal"} %>
+              <% end %>
+            </div>
+          </div>
+        <%end%>
+        <!--  non javascript click when clicked on new employee -->
+        <!-- javascript click when clicked on new employee -->
+
+        <%= pundit_span(EmployerProfile, :updateable?) %>
+          <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add New Employee".html_safe, main_app.new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
+          <%= link_to "<i class='far fa-file' aria-hidden='true'></i> Upload Employee Roster".html_safe, "", data: {toggle: "modal", target: "#upload_roster"}, class: "btn btn-default" %>
+          <%= link_to "<i class='fas fa-download' aria-hidden='true'></i> Download Employee Roster".html_safe, main_app.employers_employer_profile_export_census_employees_path(@employer_profile, format: :csv), class: "btn btn-default" %>
+      </div>
+    </div>
+       <%= render "benefit_sponsors/profiles/employers/employer_profiles/my_account/employees_by_status", status: ( params[:status] || "active" ) %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "upload_employee_roster" %>
+
+<%if plan_match_tool_is_enabled? %>
+  <div class="modal" id="poc_cal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="padding:65px;">
+          <div>
+            <p style="margin-bottom: 30px;"> <p><b>Plan Match:  Help your employees find the right health plan based on their needs and budget!</b></p><p>Plan Match, DC Health Link's health plan comparison tool powered by Consumers'
+            CHECKBOOK, takes your employees through a few simple steps to find the best health plan for them.</br></p><p>With this anonymous tool, your employees can find every plan that you choose to make available to them through DC Health Link, and then compare plans based on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more.  Consumers' CHECKBOOK has over 35 years of experience helping consumers choose the best plans.</br></p><p>To use Plan Match, your employees will need to provide some basic information about your plan offerings and contributions.  Click “Create Employee Plan Match Instructions” and we will generate a custom set of instructions that you can share with your eligible employees to enable them to use Plan Match to find the right health plan for them.</br></p><p>Note:  Generating the custom Plan Match instructions for your employees may take a couple of minutes.  We will notify you in your secure Messages when it is ready.  Then simply download the instructions and share with your eligible employees to allow them to use Plan Match health comparison tool.</br></p>
+            </p> 
+          </div>
+        </div>
+        <div class="modal-footer" style="margin-right: 100px;">
+           <button type="button" class="btn btn-default" data-dismiss="modal">CANCEL</button>
+           <%= link_to "Create Plan Match Instructions", main_app.generate_checkbook_urls_employers_employer_profile_path, class: "btn btn-primary" , method: :post %>
+        </div>
+      </div>
+    </div>
+  </div>
+<%end%>

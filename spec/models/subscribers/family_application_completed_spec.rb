@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe Subscribers::FamilyApplicationCompleted do
   let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
   let(:max_aptc) { parser.households.select do |h|
@@ -198,15 +199,17 @@ describe Subscribers::FamilyApplicationCompleted do
       end
 
       context "with valid broker's npn" do
-        let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+        let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile).broker_agency_profile}
+        let!(:update) {broker_agency_profile.update_attributes(primary_broker_role_id:broker.id)}
+        let(:broker) {FactoryGirl.create(:broker_role,benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id)}
         let(:broker_id) { broker_agency_profile.primary_broker_role.id }
 
         it "should not log any errors and set the broker for the family" do
-          broker_agency_profile.primary_broker_role.update_attributes(npn: "1234567890", broker_agency_profile: broker_agency_profile)
+          broker_agency_profile.primary_broker_role.update_attributes(npn: "1234567890", benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,broker_agency_profile_id: broker_agency_profile.id)
           person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
           expect(subject).not_to receive(:log)
           subject.call(nil, nil, nil, nil, message)
-          expect(family_db.current_broker_agency.broker_agency_profile_id).to eq broker_agency_profile.id
+          expect(family_db.current_broker_agency.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile.id
           expect(family_db.current_broker_agency.writing_agent_id).to eq broker_id
         end
 
@@ -414,7 +417,7 @@ describe Subscribers::FamilyApplicationCompleted do
     let(:user) { FactoryGirl.create(:user) }
 
     context "simulating consumer role controller create action" do
-      let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample.xml"))).first }
+      let!(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample.xml"))).first }
       let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
       let(:dependent) { parser.family_members.last }
       let!(:existing_dep ) { Person.create(
@@ -616,4 +619,5 @@ describe '.search_person' do
       expect(subject.search_person(verified_family_member)).to eq nil
     end
   end
+end
 end

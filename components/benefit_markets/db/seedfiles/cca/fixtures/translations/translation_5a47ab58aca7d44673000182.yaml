@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGC
+  key: en.insured.return_to_index_for_hbx_staff_page
+  value: '"After working on an enrollment return to this page via the person icon
+    in the header"'

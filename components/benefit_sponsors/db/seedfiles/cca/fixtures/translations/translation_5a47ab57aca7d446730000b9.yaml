@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAAC5
+  key: en.welcome.index.assisted_consumer_family_portal
+  value: '"Assisted Consumer/Family Portal"'

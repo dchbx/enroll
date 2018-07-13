@@ -111,12 +111,17 @@ describe Phone, type: :model do
     let(:phone) {Phone.create(**params)}
 
     it "when extension present" do
-      phone.extension = "876" 
+      phone.extension = "876"
       expect(phone.to_s).to eq "(222) 111-3333 x 876"
     end
 
     it "when extension doesn't present" do
-      expect(phone.to_s).to eq "(222) 111-3333" 
-    end 
+      expect(phone.to_s).to eq "(222) 111-3333"
+    end
+
+    it "when extesnion is default" do
+      phone.extension = ""
+      expect(phone.to_s).to eq "(222) 111-3333"
+    end
   end
 end

@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIh
+  key: en.insured.plan_shoppings.PPO_title_info
+  value: '"A PPO (Preferred Provider Organization) plan covers care from in-network
+    and out-of-network providers. You pay less if you use providers that belong to
+    the plan’s network. You can use providers outside of the network for an additional
+    cost."'

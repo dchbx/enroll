@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGY
+  key: en.insured.families.had_income_below_the_federal_poverty_level
+  value: '"I had income below 100% of the Federal Poverty Level and was living in
+    a state that had not expanded Medicaid (tool-tip below)"'

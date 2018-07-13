@@ -1,0 +1,19 @@
+<style>
+  .ui-autocomplete {
+    z-index: 9999;
+  }
+</style>
+
+<div class="employee-upload">
+  <i class="fa fa-times fa-3x pull-right modal-close"></i>
+
+  <div class="upload-preview">
+
+  </div>
+  <%= form_for @document, :url => url_for(:controller => 'employer_attestations', :action => 'create'), method: 'post', :html => { :multipart => true } do |f| %>
+    <%= file_field_tag :file, :accept => 'application/pdf' %>
+    <%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary ' %>
+    <%= f.autocomplete_field :creator, autocomplete_organization_legal_name_documents_path %>
+    <%= f.submit 'Upload', class: 'btn btn-primary ' %>
+  <% end %>
+</div>

@@ -1,0 +1,20 @@
+<div class="profile-content top-pd" id="myTabContent">
+  <div class="tab-row">
+    <div class="tab-content">
+      <div class="container plan-design-proposal">
+        <%= render 'shared/engines/horizontal_status', step:3, links: generate_breadcrumb_links(plan_design_proposal, @plan_design_organization) %>
+      </div>
+    </div>
+    <%= render 'new' %>
+  </div>
+</div>
+
+<script>
+  $('.toggle-text').click(function() {
+    if ($(this).text() == "Hide Details") {
+        $(this).text("Show Details");
+    } else {
+        $(this).text("Hide Details");
+    };
+  });
+</script>

@@ -2,6 +2,7 @@
 <% if level == 1 %>
    <% ancestors=[] %>
    <% data_scope = filters[:top_scope] %>
+
    <div class='custom_filter'>
 <% end %>
 
@@ -32,3 +33,10 @@
      DT.filters()
   </script>
 <% end %>
+
+<style>
+.custom_level_1, .custom_level_2 {
+  padding-left:0 !important;
+  margin-left:-15px;
+}
+</style>

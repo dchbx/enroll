@@ -1,0 +1,14 @@
+h2 Product Package
+dl
+  dt= t("product_package.title", default: "Title")
+  dd= @product_package.title
+  dt= t("product_package.pricing_model", default: "Pricing Model")
+  dd= @product_package.pricing_model.name
+  dt= t("product_package.contribution_model", default: "Contribution Model")
+  dd= @product_package.contribution_model.title
+
+ul
+  - @product_package.products.each do |product|
+    li= product.name
+
+= link_to 'Back to All Product Packages', products_product_packages_path

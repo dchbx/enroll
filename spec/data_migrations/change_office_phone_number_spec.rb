@@ -13,7 +13,7 @@ describe ChangeOfficePhoneNumber do
   end
   describe "changing the phone number of a given organization with country code ", dbclean: :after_each do
     let(:organization) { FactoryGirl.create(:organization) }
-    let(:office_location) {FactoryGril.create(:office_location,:primary, organization:organization)}
+    let(:office_location) {FactoryGirl.create(:office_location,:primary, organization:organization)}
     let(:phone) { FactoryGirl.create(:phone, kind: "work", office_location:office_location) }
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
@@ -53,7 +53,7 @@ describe ChangeOfficePhoneNumber do
   end
   describe "changing the phone number of a given office with no country code ", dbclean: :after_each do
     let(:organization) { FactoryGirl.create(:organization) }
-    let(:office_location) {FactoryGril.create(:office_location,:primary, organization:organization)}
+    let(:office_location) {FactoryGirl.create(:office_location,:primary, organization:organization)}
     let(:phone) { FactoryGirl.create(:phone, kind: "work", office_location:office_location) }
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)

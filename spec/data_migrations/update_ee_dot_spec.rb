@@ -14,8 +14,8 @@ describe UpdateEeDot, dbclean: :after_each do
 
   describe "updating termination date for an Employee" do
 
-    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, coverage_terminated_on:TimeKeeper.date_of_record,employer_profile: employer_profile)}
+    let(:employer_profile) { census_employee.employer_profile}
+    let(:census_employee) { FactoryGirl.create(:census_employee, coverage_terminated_on:TimeKeeper.date_of_record)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)
@@ -38,8 +38,8 @@ describe UpdateEeDot, dbclean: :after_each do
 
   describe "updating coverage termination date for an Employee" do
 
-    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
+    let(:employer_profile) { census_employee.employer_profile }
+    let(:census_employee) { FactoryGirl.create(:census_employee)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)

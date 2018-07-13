@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAOy
+  division_code: I
+  division_label: Services
+  major_group_code: '80'
+  major_group_label: Health Services
+  industry_group_code: '803'
+  industry_group_label: Offices And Clinics Of Doctors Of Osteopathy
+  sic_code: '8031'
+  sic_label: Offices and Clinics of Doctors of Osteopathy

@@ -2,17 +2,27 @@ class EmployerStaffRole
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
-  include Acapi::Notifiers
-  extend Acapi::Notifiers
+  include ::BenefitSponsors::Concerns::Observable
 
-  after_update :notify_contact_changed
+  add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
+  after_create :notify_observers
+  after_update :notify_observers
+
   embedded_in :person
+
   field :is_owner, type: Boolean, default: true
   field :employer_profile_id, type: BSON::ObjectId
   field :bookmark_url, type: String
   field :is_active, type: Boolean, default: true
-  validates_presence_of :employer_profile_id
+  field :benefit_sponsor_employer_profile_id, type: BSON::ObjectId
+
+  validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsor_employer_profile_id.blank? }
+  validates_presence_of :benefit_sponsor_employer_profile_id, :if => Proc.new { |m| m.employer_profile_id.blank? }
+
   field :aasm_state, type: String, default: 'is_active'
+
+  delegate :hbx_id, to: :profile, allow_nil: false
+
   scope :active, ->{ where(aasm_state: :is_active) }
   aasm do
     state :is_applicant    #Person has requested employer staff role with this company
@@ -31,8 +41,7 @@ class EmployerStaffRole
     aasm_state.humanize.titleize
   end
 
-  def notify_contact_changed
-    notify("acapi.info.events.employer.contact_changed", {employer_id: EmployerProfile.find(self.employer_profile_id).hbx_id, event_name: "contact_changed"})
+  def profile
+    BenefitSponsors::Organizations::Profile.find(benefit_sponsor_employer_profile_id)
   end
-
 end

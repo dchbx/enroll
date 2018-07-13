@@ -1,0 +1,31 @@
+<div class='col-md-12' id='families'>
+  <h4> Families </h4>
+  <table class="table table-condensed" style="opacity: 1;">
+    <thead>
+      <tr>
+        <th colspan="6">Primary Applicant</th>
+      </tr>
+      <tr>
+        <th>Employee Name</th>
+        <th>SSN</th>
+        <th>DOB</th>
+        <th>HBX ID</th>
+        <th>Family Ct</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @employees.each do |employee| %>
+        <% person = employee.person %>
+        <% if person.has_active_employee_role? %>
+          <tr>
+            <td> <%= link_to person.full_name, employers_employer_profile_consumer_override_path(:person_id=> person.id, employer_profile_id: @employer_profile.id)%>  </td>
+            <td> <%= number_to_obscured_ssn person.ssn %> </td>
+            <td> <%= format_date person.dob%></td>
+            <td> <%= person.hbx_id %> </td>
+            <td> <%= person.primary_family.present? ? person.primary_family.active_family_members.size : 0 %> </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

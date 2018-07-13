@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHm
+  key: en.insured.group_selection.new.show_residency_alert_msg
+  value: '"Since %{full_name} is not a resident of the %{aca_state_name} she/he is
+    not eligible to purchase a plan through %{ site_short_name}. Other members may
+    still be eligible to enroll. Please call us at %{contact_center_phone_number}
+    to learn about other health insurance options for %{full_name}."'

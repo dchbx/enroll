@@ -1,0 +1,19 @@
+  <div class="col-xs-12">
+  <div class="pull-left">
+  <% if @census_employee.census_dependents.size == 0 %>
+    <h3>Dependents</h3>
+  <% else %>
+    <h3>Dependents (<%= @census_employee.census_dependents.size %>)</h3>
+  <% end %> 
+  </div>
+</div>
+ <div class="col-xs-12">
+  <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
+    <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
+      <%= render 'census_dependent_fields', { f: census_dependent, child_index: census_dependent.index } %>
+      <%= render 'add_dependents', { f: f } if census_dependent.index + 1 == @census_employee.census_dependents.size %>
+    <% end %>
+  <% else %>
+    <%= render 'add_dependents', { f: f } %>
+  <% end %>
+</div>

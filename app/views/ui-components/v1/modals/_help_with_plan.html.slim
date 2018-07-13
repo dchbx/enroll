@@ -1,0 +1,36 @@
+.modal.fade#help_with_plan_shopping role="dialog"
+  .modal-dialog style='min-height: 600px; width: 720px'
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+        span aria-hidden="true"
+        | &times;
+      .modal-body style='height: 650px; overflow-y: scroll'
+        #help_list style='font-size: 140%; margin: 140px 100px 0px'
+          b = l10n("insured.plan_shoppings.help_me_sign_up_options")
+          br
+          br
+          ul
+            li = link_to l10n("insured.plan_shoppings.help_from_a_broker"), benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path, remote: true
+            li = link_to l10n("insured.plan_shoppings.help_from_an_inperson_assister"), assister_index_exchanges_hbx_profiles_path, remote: true
+            li.name_search_only#CSR
+              a = l10n("insured.plan_shoppings.help_from_a_customer_service_representative")
+            li.name_search_only#CAC
+              a = l10n("insured.plan_shoppings.help_from_a_certified_applicant_counselor")
+        #help_search.help_reset
+          h4 = l10n("search_by_name")
+          input#help_first_name type="text"
+          br
+          = l10n("last_name")
+          br
+          input#help_last_name type="text"
+          button.btn.btn-primary#search_for_plan_shopping_help = l10n("search_for_help")
+          br
+          h4#help_status
+          .hide#help_requestor = @person.try(:id)
+          .hide#help_requestor_email = current_user.oim_id
+          .hide#help_type
+        #inbox.help_reset
+          .col-md-10.col-md-12.col-lg-12
+        .col-md-3
+          .col-md-8.btn.btn-default.hide#back_to_help Back

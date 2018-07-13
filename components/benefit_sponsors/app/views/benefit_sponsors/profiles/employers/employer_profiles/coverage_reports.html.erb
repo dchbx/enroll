@@ -1,0 +1,77 @@
+<% content_for :navigation do %>
+  <%= render :partial => 'ui-components/v1/navs/employers_navigation', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
+<% end %>
+<div class="premium-reports-tab">
+  <div class="row no-buffer">
+    <% @plan_year, @billing_date = @employer_profile.billing_plan_year(@billing_date) %>
+    <% if @plan_year.present? && @billing_date.present? %>
+
+      <div class="col-xs-8 col-xs-offset-4">
+        <div class="row">
+          <div class="col-xs-8">
+           <button class="btn btn-lg btn-warning hidden" id="loader">
+            <span id="loader" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+          </button>
+            <span style="float: right; margin-top: 10px;">Select the Coverage Period</span>
+          </div>
+          <div class="col-xs-4">
+            <%= billing_period_dropdown %>
+          </div>
+        </div>
+      </div>
+
+      <%= form_tag profiles_employers_employer_profile_coverage_reports_path(@employer_profile), :remote => true, :method => :get, :id => 'billing_date_form' do %>
+        <%= hidden_field_tag 'billing_date', @billing_date.strftime("%m/%d/%Y") %>
+      <% end %>
+
+    <% end %>
+  </div>
+
+  <div class="premium-reports-table">
+    <div>
+      <div class="enrolled">
+        <% @billing_date ||= TimeKeeper.date_of_record # TODO %>
+        <h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
+        <div class="text-danger">This is not an invoice.</div>
+        <%= button_to 'Download', profiles_employers_employer_profile_coverage_reports_path(@employer_profile, format: :csv), method: :get, params: { billing_date: @billing_date.strftime("%m/%d/%Y")}, class: 'btn btn-default buttons-csv buttons-html5 interaction-click-control-csv' %>
+          </div>
+        </div>
+      </div>
+
+        <% if @datatable.present? %>
+
+        <%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-5'> <'col-sm-5'f> >" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true,buttons: ['csv','excel'],"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]})  %>
+        <% else %>
+          <div class="col-xs-4">No employees enrolled.</div>
+        <% end %>
+      </div>
+      </div>
+
+  </div>
+<br>
+<%#= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-default mz' %>
+<%#= button_to 'Download', employers_premium_statement_path(@employer_profile, format: :csv), method: :get, params: { billing_date: @billing_date.strftime("%m/%d/%Y")}, class: 'btn btn-default' %>
+</div>
+
+<script>
+
+$(function() {
+  $('#billing_date_form').bind({
+    'ajax:before': function () {
+      $('#loader').removeClass('hidden');
+    },
+    'ajax:complete': function () {
+      $('#loader').addClass('hidden');
+    }
+  });
+
+  $('#enrollment_report_dropdown').on('change', function(){
+    $('#billing_date').val($('option:selected', this).val());
+    $("#billing_date_form").submit();
+  });
+});
+
+initializeDataTables();
+$("div.custom_level_1").children('div').hide()
+
+</script>

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAIl
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '37'
+  major_group_label: Transportation Equipment
+  industry_group_code: '371'
+  industry_group_label: Motor Vehicles And Motor Vehicle Equipment
+  sic_code: '3716'
+  sic_label: Motor Homes

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJH
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '39'
+  major_group_label: Miscellaneous Manufacturing Industries
+  industry_group_code: '393'
+  industry_group_label: Musical Instruments
+  sic_code: '3931'
+  sic_label: Musical Instruments

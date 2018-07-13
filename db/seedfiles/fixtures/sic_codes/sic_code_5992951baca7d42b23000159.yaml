@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAFZ
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '30'
+  major_group_label: Rubber And Miscellaneous Plastics Products
+  industry_group_code: '306'
+  industry_group_label: Fabricated Rubber Products, Not Elsewhere
+  sic_code: '3061'
+  sic_label: Molded, Extruded, and Lathe-Cut Mechanical Rubber Goods

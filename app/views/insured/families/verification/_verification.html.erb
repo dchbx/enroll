@@ -4,7 +4,7 @@
       <% if can_show_due_date?(@person) %>
           <%= l10n("document_due_date") %>:&nbsp;&nbsp;
           <% if (@person.primary_family.best_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= @person.primary_family.best_verification_due_date %> (Past Due)</span>
+              <span class="label label-danger"><%= @person.primary_family.best_verification_due_date %> (<%= l10n("past_due") %>)</span>
           <% else %>
               <span class="label label-warning"><%= (@person.primary_family.best_verification_due_date || TimeKeeper.date_of_record + 95.days) %></span>
           <% end %>

@@ -1,8 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/home.html.erb" do
+  let(:current_user) {FactoryGirl.create(:user)} #let(:person) { FactoryGirl.create(:person, :with_family ) }
   let(:person) {FactoryGirl.create(:person, :with_employee_role, :with_family)} #let(:person) { FactoryGirl.create(:person, :with_family ) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:current_user) {FactoryGirl.create(:user,person:person)}
 
   let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month, ) }
   let(:sep){
@@ -22,9 +24,9 @@ RSpec.describe "insured/families/home.html.erb" do
     stub_template "insured/families/_navigation.html.erb" => ''
     stub_template "insured/families/_shop_for_plans_widget.html.erb" => ''
     stub_template "insured/families/_apply_for_medicaid_widget.html.erb" => ''
-    stub_template "insured/plan_shoppings/_help_with_plan.html.erb" => ''
+    stub_template "app/views/ui-components/v1/modals/_help_with_plan.html.slim" => ''
     assign(:person, person)
-
+    sign_in current_user
     assign(:family, family)
     render file: "insured/families/home.html.erb"
   end

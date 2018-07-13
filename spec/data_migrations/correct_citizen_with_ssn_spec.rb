@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "correct_citizen_with_ssn")
 
 shared_examples_for "a determination in the correct states" do |cr_state, ssn_state, lpd_state, cit_result|
@@ -266,4 +267,5 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
       end
     end
   end
+end
 end

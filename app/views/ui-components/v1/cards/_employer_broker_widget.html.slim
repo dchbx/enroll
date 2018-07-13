@@ -1,0 +1,32 @@
+- broker_and_agency_present = true if @employer_profile.broker_agency_profile.present? && @broker_agency_account.writing_agent.present?
+.panel.panel-default class="#{pundit_class EmployerProfile, :updateable?}"
+  .panel-heading style="background:none"
+    - if broker_and_agency_present
+      | Your Broker
+    - else
+      | Select a Broker
+  .panel-body
+    .col-md-4
+      i.fa.fa-user.fa-3x.broker-icon.pl-1 aria-hidden="true"
+      - if broker_and_agency_present
+        br
+        = @employer_profile.broker_agency_profile.legal_name.titleize
+      - else
+        br
+        p.text-center No Broker
+    .col-md-8
+      - if broker_and_agency_present
+        .broker-information
+          - active_broker = @broker_agency_account.writing_agent
+          = active_broker.person.full_name.titleize
+          <br/>
+          a href="tel:1-#{active_broker.phone}"
+            = active_broker.phone.to_s if active_broker.phone.present?
+          br
+          = mail_to active_broker.email.address, active_broker.email.address
+      - else
+        = link_to 'Add Broker', profiles_employers_employer_profile_path(@employer_profile.id, tab: 'brokers'), "aria-expanded" => "true", class: "btn btn-default center-block"
+        small
+          = link_to "What is a Broker?", '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' }
+          = render partial: 'ui-components/v1/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: "What is a broker?", body: "Brokers are licensed professionals with health insurance expertise and long-standing relationships with Small Business owners, Individuals and Families. Brokers help clients identify their options and make choices that are in their best interest and meet their needs and budget. In the Massachusetts, Brokers must have an active license in good standing, complete training on #{site_short_name}, and have contractual relationships with each carrier in #{site_short_name} for the market in which he/she intends to sell. There is no cost to use an insurance Broker." }
+    
