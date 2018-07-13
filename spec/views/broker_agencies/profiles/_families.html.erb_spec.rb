@@ -15,4 +15,8 @@ RSpec.describe "broker_agencies/profiles/_families.html.erb"  do |variable|
   it 'should not reference enrollment' do
     expect(rendered).not_to have_selector('p', text: 'working on an enrollment')
   end
+
+  it 'should not see consumer column' do
+    expect(rendered).not_to have_text("consumer")
+  end
 end

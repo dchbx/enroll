@@ -30,12 +30,12 @@
 
 <%- if @tab == 'home' %>
 <% if @current_plan_year.present? %>
-<aside class="col-xs-4 employer-right-column module">
+<aside class="col-xs-4 employer-right-column">
   <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
-    <%= render partial: 'open_enrollment_ends_panel' %>
+    <%= render partial: 'ui-components/v1/cards/open_enrollment_ends' %>
   <% end %>
-  <%= render partial: 'enrollment_report_widget' %>
-  <%= render partial: 'employer_broker_widget' %>
+  <%= render partial: 'ui-components/v1/cards/employer_enrollment_report' %>
+  <%= render partial: 'ui-components/v1/cards/employer_broker_widget' %>
 </aside>
 <% else %>
 

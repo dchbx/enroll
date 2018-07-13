@@ -1,0 +1,122 @@
+--- !ruby/object:BenefitMarkets::ContributionModels::ContributionModel
+__selected_fields:
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROSZ+IC11vNseQ
+  product_multiplicities:
+  - :multiple
+  - :single
+  sponsor_contribution_kind: "::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution"
+  contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::CcaShopReferencePlanContributionCalculator"
+  title: MA List Bill Shop Contribution Model
+  many_simultaneous_contribution_units: true
+  updated_at: 2018-05-22 17:07:21.437000000 Z
+  created_at: 2018-05-22 17:07:21.437000000 Z
+  contribution_units:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseR
+    _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+    minimum_contribution_factor: 0.5
+    name: employee
+    display_name: Employee
+    order: 0
+    default_contribution_factor: 0.0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNseS
+      operator: :==
+      relationship_name: :employee
+      count: 1
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseT
+    _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+    minimum_contribution_factor: 0.33
+    name: spouse
+    display_name: Spouse
+    order: 1
+    default_contribution_factor: 0.0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNseU
+      operator: :>=
+      relationship_name: :spouse
+      count: 1
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WxF/wZ+ICzQ1Tk5y
+    _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+    minimum_contribution_factor: 0.33
+    name: domestic_partner
+    display_name: Domestic Partner
+    order: 2
+    default_contribution_factor: 0.0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WxF/oZ+ICzQ1Tk5x
+      operator: :>=
+      relationship_name: :domestic_partner
+      count: 1
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseV
+    _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+    minimum_contribution_factor: 0.33
+    name: dependent
+    display_name: Child Under 26
+    order: 3
+    default_contribution_factor: 0.0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNseW
+      operator: :>=
+      relationship_name: :dependent
+      count: 1
+  member_relationships:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseX
+    relationship_name: :employee
+    relationship_kinds:
+    - self
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseY
+    relationship_name: :spouse
+    relationship_kinds:
+    - spouse
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WxF/YZ+ICzQ1Tk5w
+    relationship_name: :domestic_partner
+    relationship_kinds:
+    - life_partner
+    - domestic_partner
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseZ
+    relationship_name: :dependent
+    relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
+    - ward

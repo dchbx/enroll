@@ -1,18 +1,36 @@
-<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-  <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
+<div class="row no-buffer row-form-wrapper">
+
+  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-12 form-group-lg no-pd">
+    <%= f.text_field :dba, class: "floatlabel form-control", placeholder: 'DBA' %>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :disabled => true %>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.select(:entity_kind, options_for_select(Organization::ENTITY_KINDS.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.entity_kind || ""), { prompt: "Select Entity Kind"}, { :class => ''} ) %>
+  </div>
+  <% if display_sic_field_for_employer? %>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top: 10px">
+      <%= f.select(:sic_code, grouped_options_for_select(@grouped_options, f.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "chosen-select"} ) %>
+    </div>
+    <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd" style="margin-top: 10px; padding-left: 10px;">
+      <a id="sicHelperToggle" href="#" title="I need help finding my SIC Code"><span class="fa fa-question" aria-hidden="true"></span></a>
+    </div>
+  <% end %>
 </div>
-<div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
-  <%= f.text_field :dba, class: "floatlabel form-control", placeholder: 'DBA' %>
-</div>
-<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-  <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :disabled => true %>
-</div>
-<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-  <%= f.select(:entity_kind, options_for_select(Organization::ENTITY_KINDS.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.entity_kind || ""), { prompt: "Select Entity Kind"}, { :class => ''} ) %>
-</div>
+
+<% if display_sic_field_for_employer? %>
+  <div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
+    <%= render "sic_help", sicFieldId: 'organization_employer_profile_attributes_sic_code' %>
+  </div>
+<% end %>
 
 <script>
   $(function(){
     Freebies.selectric();
+    $(".chosen-select").chosen({width: "100%"});
   });
 </script>

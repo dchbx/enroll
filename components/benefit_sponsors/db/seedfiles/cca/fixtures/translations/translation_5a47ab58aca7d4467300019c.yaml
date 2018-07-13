@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGc
+  key: en.insured.how_may_effect_your_health_insurance
+  value: '"See how it may affect your health insurance."'

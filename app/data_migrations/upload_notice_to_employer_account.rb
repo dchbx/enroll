@@ -8,7 +8,7 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     raise "Please specify file path" if ENV['file_path'].blank?
 
     notice_path = "#{ENV['file_path']}"
-    notice_subject = ENV['notice_name'].titleize
+    notice_subject = ENV['notice_name']
     notice_title = ENV['notice_name'].titleize.gsub(/\s*/, '')
 
     employer_profile = EmployerProfile.find_by_fein(ENV['fein'])

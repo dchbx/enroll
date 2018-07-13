@@ -73,9 +73,10 @@ module Effective
       end
 
       def hbx_enrollment_ids
-        @billing_date = (attributes[:billing_date].is_a? Date) ? attributes[:billing_date] : Date.strptime(attributes[:billing_date], "%m/%d/%Y")
-        @employer_profile = EmployerProfile.find(attributes[:id])
-        query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
+        @employer_profile = EmployerProfile.find(attributes[:id]) || BenefitSponsors::Organizations::Profile.find(attributes[:id])
+        billing_date = attributes[:billing_date] || billing_period_options.first[1]
+        billing_date = (billing_date.is_a? Date) ? billing_date : Date.strptime(billing_date, "%m/%d/%Y")
+        query = Queries::EmployerPremiumStatement.new(@employer_profile, billing_date)
         @hbx_enrollment_ids ||=  query.execute.nil? ? [] : query.execute.hbx_enrollments.collect{|h| h._id}
       end
 

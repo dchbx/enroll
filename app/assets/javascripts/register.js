@@ -36,7 +36,7 @@ var Register = ( function( window, undefined ) {
     });
 
     /* check password validation */
-    $('#signup #user_password').keyup(function() {
+    $('#signup #user_password, #change-password #user_password').keyup(function() {
       onkeycheckForm();
       checkVal();
     }).focus(function() {
@@ -50,7 +50,7 @@ var Register = ( function( window, undefined ) {
     });
 
     /* check confirm password validation */
-    $('#signup #user_password_confirmation').keyup(function() {
+    $('#signup #user_password_confirmation, #change-password #user_password_confirmation').keyup(function() {
       var pas = $("#user_password");
       var con_pas = $('#user_password_confirmation');
       var pass1 = pas.val();
@@ -154,11 +154,13 @@ var Register = ( function( window, undefined ) {
         status = false;
       }
       //validate not match user id
-      if (user_val.length > 0 && pass1.indexOf(user_val) >= 0) {
-        $('#nm_uid').removeClass('valid').addClass('invalid');
-        status = false;
-      } else {
-        $('#nm_uid').removeClass('invalid').addClass('valid');
+      if (typeof user_val != 'undefined') {
+        if (user_val.length > 0 && pass1.indexOf(user_val) >= 0) {
+          $('#nm_uid').removeClass('valid').addClass('invalid');
+          status = false;
+        } else {
+          $('#nm_uid').removeClass('invalid').addClass('valid');
+        }
       }
 
       //validate repeated no more than 4

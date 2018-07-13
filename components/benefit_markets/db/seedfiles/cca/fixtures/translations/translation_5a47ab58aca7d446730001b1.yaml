@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGx
+  key: en.insured.families.final_sep_experienced_any_events
+  value: '"Have you or anyone in your household recently experienced any of the following
+    events?"'

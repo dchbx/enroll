@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKJ
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '48'
+  major_group_label: Communications
+  industry_group_code: '484'
+  industry_group_label: Cable And Other Pay Television Services
+  sic_code: '4841'
+  sic_label: Cable and Other Pay Television Services

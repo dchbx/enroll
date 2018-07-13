@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAI6
+  key: en.insured.plan_shoppings.show.choose_plan_filter_results_header
+  value: '"Find a quality, affordable health insurance plan that''s right for you,
+    or for you and your family. Use ''Filter Results'', ''Compare'' and ''Details''
+    features to narrow your choices. When you find the plan you want, ''Select Plan''."'

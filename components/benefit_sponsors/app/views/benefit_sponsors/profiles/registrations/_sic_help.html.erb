@@ -1,0 +1,64 @@
+<!-- SIC codes helper -->
+<br />
+<br />
+<div id="sicHelperContent">
+      <div class="header">
+        <h4 class="modal-title mb-2">Search for your matching SIC Code</h4>
+        <p>SIC (Standard Industrial Classifications) codes are used to categorize your business into the appropriate rating group</p>
+        <p>You can use browse or search through all the available codes -- click a SIC code to make a selection</p>
+        <input id="sic_search" type="text" value="" alt="Provide a keyword related to your business"/>
+        <button type="button" class="btn btn-success" id="btn-search">Search</button>
+      </div>
+      <div id="sictree">
+      </div>
+</div>
+<!-- SIC codes helper -->
+
+<script type="text/javascript">
+  $(function() {
+    $.ajax({
+      async: true,
+      type: "GET",
+      url: "/benefit_sponsors/profiles/employers/employer_profiles/generate_sic_tree",
+      dataType: "json",
+      success: function(json) {
+        createJSTrees(json);
+      }
+    });
+  });
+  $(document).on('click', '#sicHelperToggle', displaySicHelper);
+  function displaySicHelper(event) {
+    event.preventDefault();
+    var sicId = "<%= sicFieldId %>";
+    $("#sicHelperWrapper").toggleClass('hidden');
+    $('html, body').animate({
+      scrollTop: $("#" + sicId).offset().top
+    }, 500);
+  }
+  function createJSTrees(jsonData) {
+    var $searchableTree = $("#sictree").treeview({
+                              data: jsonData,
+                              levels: 1,
+                              onNodeSelected: assignSelectionAndCloseModal
+                            });
+    function assignSelectionAndCloseModal(event, data) {
+      $("#sicHelperWrapper").toggleClass('hidden');
+      $('#<%=sicFieldId%>').val(data.sic_code);
+      $('#<%=sicFieldId%>').trigger('chosen:updated');
+    }
+    var search = function(e) {
+      var pattern = $('#sic_search').val();
+      if(pattern.length < 4) { return; }
+      var options = {
+        ignoreCase: true,
+        exactMatch: false,
+        revealResults: true
+      };
+      $searchableTree.treeview('collapseAll', { silent: true });
+      $searchableTree.treeview('clearSearch');
+      $searchableTree.treeview('search', [ pattern, options ]);
+    }
+    $('#sic_search').on('keyup', search);
+    $('#btn-search').on('click', search);
+  }
+</script>

@@ -24,6 +24,7 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
       carrier_profile: carrier_profile,
       metal_level: "bronze",
       coverage_kind: "health",
+      network_information: "This is a plan",
       active_year: 2016,
       nationwide: true
       )
@@ -37,6 +38,7 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
       carrier_profile: carrier_profile,
       metal_level: "high",
       coverage_kind: "dental",
+      network_information: "This is a plan",
       active_year: 2016,
       dental_level: "high",
       nationwide: true
@@ -61,6 +63,12 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
     it "should have health plan summary info" do
       expect(rendered).to match /#{health_plan.plan_type}/i
       expect(rendered).to match /#{health_plan.metal_level}/i
+    end
+
+    it "should have note during plan selection" do
+      expect(rendered).to have_css("span.glyphicon.glyphicon-info-sign")
+      expect(rendered).to have_selector('p', text:"Note: Your final monthly cost is based on")
+      expect(rendered).to match /Note: Your final monthly cost is based on final employee enrollment./
     end
   end
 

@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAK8
+  key: en.here_are_the_costs_for_benefit_group
+  value: '"Here are the costs for Benefit Group"'

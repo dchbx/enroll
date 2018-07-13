@@ -14,14 +14,18 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  BROKER_CARRIER_APPOINTMENTS = {"Aetna Health Inc" => nil,
-    "Aetna Life Insurance Company" => nil,
-     "Carefirst Bluechoice Inc" => nil,
-     "Group Hospitalization and Medical Services Inc" => nil,
-     "Kaiser Foundation" => nil,
-     "Optimum Choice" => nil,
-     "United Health Care Insurance" => nil,
-     "United Health Care Mid Atlantic" => nil}
+  BROKER_CARRIER_APPOINTMENTS = {"Altus" => nil,
+    "Blue Cross Blue Shield MA" => nil,
+     "Boston Medical Center Health Plan" => nil,
+     "Delta" => nil,
+     "FCHP" => nil,
+     "Guardian" => nil,
+     "Health New England" => nil,
+     "Harvard Pilgrim Health Care" => nil,
+     "Minuteman Health" => nil,
+     "Neighborhood Health Plan" => nil,
+     "Tufts Health Plan Direct" => nil,
+     "Tufts Health Plan Premier" => nil}
 
   embedded_in :person
 
@@ -30,6 +34,7 @@ class BrokerRole
   # Broker National Producer Number (unique identifier)
   field :npn, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
   field :reason, type: String
 
@@ -94,22 +99,36 @@ class BrokerRole
 
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency)
-    if new_broker_agency.nil?
-      self.broker_agency_profile_id = nil
+    if new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+      if new_broker_agency.nil?
+        self.benefit_sponsors_broker_agency_profile_id = nil
+      else
+        raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+        self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
+        @broker_agency_profile = new_broker_agency
+      end
     else
-      raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
-      self.broker_agency_profile_id = new_broker_agency._id
-      @broker_agency_profile = new_broker_agency
+      if new_broker_agency.nil?
+        self.broker_agency_profile_id = nil
+      else
+        raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
+        self.broker_agency_profile_id = new_broker_agency._id
+        @broker_agency_profile = new_broker_agency
+      end
     end
   end
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency_profile?
+    if self.benefit_sponsors_broker_agency_profile_id.nil?
+      @broker_agency_profile = BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency_profile?
+    else
+      @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_broker_agency_profile_id).first.broker_agency_profile if has_broker_agency_profile?
+    end
   end
 
   def has_broker_agency_profile?
-    self.broker_agency_profile_id.present?
+    self.benefit_sponsors_broker_agency_profile_id.present? || self.broker_agency_profile_id.present?
   end
 
   def can_update_carrier_appointments?
@@ -173,34 +192,56 @@ class BrokerRole
     end
 
     def find_by_broker_agency_profile(broker_agency_profile)
-      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
-      # list_brokers(Person.where("broker_role.broker_agency_profile_id" => profile._id))
-      people = (Person.where("broker_role.broker_agency_profile_id" => broker_agency_profile.id))
-      people.collect(&:broker_role)
+      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile) || broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+      if broker_agency_profile.is_a?(BrokerAgencyProfile)
+        people = (Person.where("broker_role.broker_agency_profile_id" => broker_agency_profile.id))
+        people.collect(&:broker_role)
+      else
+        people = (Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id))
+        people.collect(&:broker_role)
+      end
     end
 
     def find_candidates_by_broker_agency_profile(broker_agency_profile)
-      people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
-                            .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
-      people.collect(&:broker_role)
+      if broker_agency_profile.is_a? BrokerAgencyProfile
+        people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
+                              .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
+        people.collect(&:broker_role)
+      else
+        people = Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id)\
+                              .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
+        people.collect(&:broker_role)
+      end
     end
 
     def find_active_by_broker_agency_profile(broker_agency_profile)
-      people = Person.and(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id,
-                          :"broker_role.aasm_state"  => "active")
-      people.collect(&:broker_role)
+      if broker_agency_profile.is_a? BrokerAgencyProfile
+        people = Person.and(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id,
+                            :"broker_role.aasm_state"  => "active")
+        people.collect(&:broker_role)
+      else
+        people = Person.and(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id,
+                            :"broker_role.aasm_state"  => "active")
+        people.collect(&:broker_role)
+      end
     end
 
     def find_inactive_by_broker_agency_profile(broker_agency_profile)
-      people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
+      if broker_agency_profile.is_a? BrokerAgencyProfile
+        people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
                             .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
-      people.collect(&:broker_role)
+        people.collect(&:broker_role)
+      else
+        people = Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id)\
+                            .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
+        people.collect(&:broker_role)
+      end
     end
 
     def agency_ids_for_active_brokers
       Person.collection.raw_aggregate([
         {"$match" => {"broker_role.aasm_state" => "active"}},
-        {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+        {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
       ]).map do |record|
         record["_id"]
       end
@@ -212,12 +253,20 @@ class BrokerRole
 
     def agencies_with_matching_broker(search_str)
       broker_role_ids = brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:id)
-
-      Person.collection.raw_aggregate([
-        {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
-        {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
-      ]).map do |record|
-        record["_id"]
+      if brokers_matching_search_criteria(search_str).map(&:broker_role).detect{|b|b.benefit_sponsors_broker_agency_profile_id}.present?
+        Person.collection.raw_aggregate([
+                                            {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
+                                            {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
+                                        ]).map do |record|
+          record["_id"]
+        end
+      else
+        Person.collection.raw_aggregate([
+                                            {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
+                                            {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+                                        ]).map do |record|
+          record["_id"]
+        end
       end
     end
   end
@@ -347,9 +396,10 @@ class BrokerRole
   def current_state
     aasm_state.gsub(/\_/,' ').camelcase
   end
-  
+
   def remove_broker_assignments
-    @orgs = Organization.by_broker_role(id)
+    @orgs = self.benefit_sponsors_broker_agency_profile_id.present? ?
+     (BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_broker_role(id).map(&:organization)) : (Organization.by_broker_role(id))
     @employers = @orgs.map(&:employer_profile)
     # Remove broker from employers
     @employers.each do |e|

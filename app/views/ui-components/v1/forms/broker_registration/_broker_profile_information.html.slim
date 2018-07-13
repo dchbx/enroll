@@ -1,0 +1,21 @@
+.row
+  .col-md-3.mb-2
+    label for="inputPracticeArea" Practice Area *
+    = f.select(:market_kind, options_for_select(BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS_OPTIONS.inject([]) {|options, (k, v)| options << [k, v]}, selected: (f.object.try(:market_kind) || aca_primary_market)), { prompt: "Select Practice Area"}, { :class => 'form-control', required:'true'} )
+    .invalid-feedback
+      |
+        Please select a practice area.
+  
+  .col-md-3.mb-2
+    label for="inputPracticeArea" Select Language(s)
+    = f.select(:languages_spoken, options_from_collection_for_select(LanguageList::COMMON_LANGUAGES.sort_by {|lan| lan.common_name}, "iso_639_1", "common_name", selected:'en'), { }, { id: 'broker_agency_language_select', multiple: "multiple", class: "form-control mb-3" } )
+    small id="emailHelp" class="form-text text-muted" Hold Ctrl or Command (mac) to select multiple
+   
+  .col-md-6
+    .col-12.mb-2.mt-2
+      = f.check_box :working_hours
+      label class="custom-control-label ml-2" for="customCheck1" EVENING/WEEKEND HOURS?
+  
+    .col-12.mb-2.mt-2
+      = f.check_box :accept_new_clients
+      label class="custom-control-label ml-2" for="customCheck2" ACCEPT NEW CLIENTS?

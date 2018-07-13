@@ -2,6 +2,15 @@
 class BrokerAgencies::BrokerRolesController < ApplicationController
   before_action :assign_filter_and_agency_type
 
+  def check_ach_routing
+    begin
+      @ach_record = AchRecord.find_by(routing_number: params[:ach_record][:routing_number])
+      render 'broker_agencies/applicants/check_ach_routing'
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render 'broker_agencies/applicants/invalid_ach'
+    end
+  end
+
   def new_broker
     @broker_candidate = Forms::BrokerCandidate.new
     @organization = Forms::BrokerAgencyProfile.new
@@ -98,15 +107,18 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       :fein, :is_fake_fein, :entity_kind, :home_page, :market_kind, :languages_spoken,
       :working_hours, :accept_new_clients,
       :office_locations_attributes => [
-        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county],
         :phone_attributes => [:kind, :area_code, :number, :extension]
+      ],
+      :ach_record => [
+        :routing_number, :routing_number_confirmation, :account_number
       ]
     )
   end
 
   def applicant_params
     params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id, :broker_applicant_type,
-     :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients, 
-     :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip])
+     :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients,
+     :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county])
   end
 end

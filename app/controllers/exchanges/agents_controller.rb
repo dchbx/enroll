@@ -8,7 +8,7 @@ class Exchanges::AgentsController < ApplicationController
      @person = Person.find(person_id) if person_id.present?
      if @person && !@person.csr_role && !@person.assister_role
        root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + person_id
-       hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
+       hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
        message_params = {
          sender_id: hbx_profile.id,
          parent_message_id: hbx_profile.id,

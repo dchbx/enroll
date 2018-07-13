@@ -119,10 +119,12 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         monthly_min_employee_cost: "monthly_min_employee_cost_1",
         monthly_max_employee_cost: "monthly_max_employee_cost_1",
         id: "9813829831293",
+        is_offering_dental?: false,
         dental_plan_option_kind: "single_plan",
         elected_dental_plan_ids: [],
         elected_dental_plans: [],
         dental_relationship_benefits: [relationship_benefits],
+        sole_source?: false,
         )
     end
 
@@ -143,21 +145,22 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         monthly_min_employee_cost: "monthly_min_employee_cost_2",
         monthly_max_employee_cost: "monthly_max_employee_cost_2",
         id: "9456349532",
+        is_offering_dental?: true,
         dental_plan_option_kind: "single_plan",
         elected_dental_plan_ids: [],
         elected_dental_plans: [],
         dental_relationship_benefits: [relationship_benefits],
-
+        sole_source?: false,
         )
     end
 
     def relationship_benefits
-      random_value = rand(999_999_999)
+      random_value = rand(0..100)
       double(
         "RelationshipBenefit",
-        offered: "offered;#{random_value}",
+        offered: "#{(random_value % 2) == 0}",
         relationship: "relationship;#{random_value}",
-        premium_pct: "premium_pct;#{random_value}"
+        premium_pct: random_value
         )
     end
 
@@ -259,7 +262,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       allow(view).to receive(:pundit_class).and_return(double("EmployerProfilePolicy", updateable?: true))
       allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
       assign :employer_profile, employer_profile
-      render partial: "employers/employer_profiles/my_account/home_tab"
+      render partial: "/employers/employer_profiles/my_account/home_tab.html.slim"
     end
 
     it "should not display employee enrollment information" do
@@ -267,6 +270,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display a link to download employer guidance pdf" do
+      render partial: "employers/employer_profiles/my_account/employer_welcome"
       expect(rendered).to have_selector(".icon-left-download", text: /Download Step-by-Step Instructions/i)
     end
 

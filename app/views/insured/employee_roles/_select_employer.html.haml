@@ -1,4 +1,4 @@
-%h3 Healthcare Marketplace
+%h3= l10n("insured.employee_roles.healthcare_marketplace")
 - if @found_census_employees.size > 1
   %p
     The current selection will continue through the plan selection process for that enrollment, you will have the opportunity to plan shop for additional Employer Plan Year Benefits or Individual Benefits from your Employee account.
@@ -7,16 +7,17 @@
     - @employment_relationships.each_with_index do |er, index|
       = render partial: "insured/employee_roles/employment_relationships", locals: {er: er, index: index}
 
-    .n-radio-row
-      %label.n-radio{ :for=>"individual-benefits" }
-        %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
-        %span.n-radio
-        = l10n("insured.employee_roles.enroll_in_individual_benifits")
+    - if individual_market_is_enabled?
+      .n-radio-row
+        %label.n-radio{ :for=>"individual-benefits" }
+          %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
+          %span.n-radio
+          =l10n("insured.employee_roles.enroll_in_individual_benifits")
     %br
   .row
     .col-md-12.col-sm-12.col-xs-12
       %p
         %br
         If you don't see your employer listed above, click
-        = link_to 'here', 'https://dchealthlink.com/help', class: '', target: '_blank'
+        = link_to 'here', site_help_url, class: '', target: '_blank'
         for help.

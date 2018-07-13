@@ -1,0 +1,113 @@
+h1.heading-text Add Benefit Package
+.row.pl-1
+  h3 When would you like your coverage to start? (In the next 2 months)
+.row#benefitApplicationform
+  .col-md-12.p0
+    - benefit_application_start_dates = f.object.start_on_options.keys
+    - formatted_start_on = f.object.start_on.present? ? Date.strptime(f.object.start_on, "%m/%d/%Y") : nil
+    .row.row-form-wrapper#uic-wrapper
+      .col-md-6.col-sm-12
+        = f.hidden_field :benefit_sponsorship_id
+        = f.select :start_on, benefit_application_start_dates,{:prompt => "SELECT START ON", :selected => formatted_start_on}, class:'floatlabel benefit-application-start-date', onchange:'selectedDate(this)', id:'baStartDate', disabled: f.object.is_renewing?
+      .col-md-6.col-sm-12
+        = f.text_field :end_on, class: "form-control", required: true, placeholder: 'END ON', readonly: true
+.row.pl-1
+  h3 Select your open enrollment dates
+  h4.i.fas.fa-question-circle data-toggle='tooltip' title=plan_shop_tool_tip_helper
+  .col-md-12.col-sm-12.col-xs-12.p0
+    .row.row-form-wrapper#uic-wrapper
+      .col-md-6.col-sm-12
+        = f.text_field :open_enrollment_start_on, class: "form-control interaction-field-control-plan_year-open_enrollment_start_on", required: true, :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "" , placeholder: 'OPEN ENROLLMENT START DATE'
+      .col-md-6.col-sm-12
+        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE'
+.row.pl-1
+  h3 Add the total number of employees in your workforce
+.row
+  .col-md-12.col-sm-12.col-xs-12.p0
+    .row.row-form-wrapper#uic-wrapper
+      .col-md-4.col-sm-12
+        label for="inputFTE" Full Time Employees
+        = f.text_field :fte_count, class: "", required: true, placeholder: 'FULL TIME EMPLOYEES', id:'fteEmployee', onblur:'checkEmployeeCount(this)'
+      .col-md-4.col-sm-12
+        label for="inputPTE" Part Time Employees
+        = f.text_field :pte_count, class: "", required: true, placeholder: 'PART TIME EMPLOYEES', id:'pteEmployee', onblur:'checkEmployeeCount(this)'
+      .col-md-4.col-sm-12
+        label for="inputMSP" Medicare Second Payers
+        = f.text_field :msp_count, class: "", required: true, placeholder: 'MEDICARE SECOND PAYERS', id:'medSecPayers', onblur:'checkEmployeeCount(this)'
+
+#recommend_dates.hidden.mt-1
+  = render "benefit_sponsors/benefit_applications/benefit_applications/recommend_dates"
+      
+javascript:
+
+  var disableSelectric = false;
+  
+  function selectedDate(element) {
+    showHideRecommendDates(element.value)
+  }
+  
+  function setDueDates(id,newvalue) {
+    var s = document.getElementById(id);
+    s.innerHTML = newvalue;
+  }
+  
+  function resetInputOptions() {
+    document.querySelector('input#benefit_application_end_on').value = '';
+    document.querySelector("input#benefit_application_open_enrollment_start_on").value = '';
+    document.querySelector("input#benefit_application_open_enrollment_end_on").value = '';
+  }
+  
+  function showHideRecommendDates(date) {
+    var recommendDates = document.querySelector('#recommend_dates')
+    if (date) {
+      recommendDates.classList.remove('hidden')
+      assignBenefitApplicationDates(date)
+    } else {
+      recommendDates.classList.add('hidden')
+      resetInputOptions()
+    }
+  }
+  
+  var monthName = ["Jan", "Feb", "Mar", "April", "May", "June",
+    "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+  ];
+  
+  function assignBenefitApplicationDates(targetDate) {
+    var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
+    var latest_submitted_on = date[targetDate]["employer_initial_application_latest_submit_on"];
+    var binder_payment_deadline = date[targetDate]["binder_payment_due_date"];
+    var submitByMonth = new Date(latest_submitted_on).getMonth()+1;
+    var deadlineMonth = new Date(binder_payment_deadline).getMonth()+1;
+    document.querySelector('input#benefit_application_end_on').value = getFormattedDate(date[targetDate]["benefit_application_end_on"]);
+    document.querySelector("input#benefit_application_open_enrollment_start_on").value = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
+    document.querySelector("input#benefit_application_open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
+    setDueDates('benefit_application_latest_submitted_on_day', new Date(latest_submitted_on).getDate()+1);
+    setDueDates('benefit_application_latest_submitted_on_month', monthName[submitByMonth-1]);
+    setDueDates('binder_payment_deadline_day', new Date(binder_payment_deadline).getDate()+1);
+    setDueDates('binder_payment_deadline_month', monthName[deadlineMonth-1]);
+  }
+  
+  var employeeCounts = {
+    fte: Number,
+    pte: Number,
+    msp: Number
+  }
+  
+  function checkEmployeeCount(element) {
+    if (element.id == "fteEmployee") {
+      employeeCounts.fte = element.value
+    }
+    if (element.id == "pteEmployee") {
+      employeeCounts.pte = element.value
+    }
+    if (element.id == "medSecPayers") {
+      employeeCounts.msp = element.value
+    }
+    if (employeeCounts.fte >= 1 || employeeCounts.pte >= 1 || employeeCounts.msp >= 1) {
+      document.getElementById('benefitContinueBtn').classList.remove('disabled')
+    } else {
+      document.getElementById('benefitContinueBtn').classList.add('disabled')
+    }
+  }
+  
+  

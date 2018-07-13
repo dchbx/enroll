@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPN
+  division_code: I
+  division_label: Services
+  major_group_code: '83'
+  major_group_label: Social Services
+  industry_group_code: '833'
+  industry_group_label: Job Training And Vocational Rehabilitation
+  sic_code: '8331'
+  sic_label: Job Training and Vocational Rehabilitation Services

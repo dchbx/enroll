@@ -1,0 +1,12 @@
+h2 New Benefit Market
+
+- if @benefit_market.errors.any?
+  = render partial: 'benefit_markets/benefit_markets/error_messages', locals: { object: @benefit_market  } 
+
+= form_for @benefit_market, as: :benefit_market, url: { action: 'create'}, html: { data: { controller: 'benefit-market--form' }, class:'s508', novalidate: true } do |f|
+
+  = render partial: 'form', locals: { f: f }
+  
+  .row.pull-right.mr-1
+    = f.submit 'Submit', class:'btn btn-primary mr-1'
+    = link_to 'Back', site_benefit_markets_path, class:'btn btn-default'

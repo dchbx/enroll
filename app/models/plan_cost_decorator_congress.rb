@@ -11,6 +11,10 @@ class PlanCostDecoratorCongress < SimpleDelegator
     @plan = plan
   end
 
+  def sole_source?
+    false
+  end
+  
   def plan_year_start_on
     benefit_group.plan_year.start_on
   end

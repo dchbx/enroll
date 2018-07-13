@@ -1,0 +1,95 @@
+<% if employer_attestation_is_enabled?  %>
+  <div class="row">
+
+  <div class="col-md-12">
+    <h1 class="heading-text">Verification of Employer Eligibility</h1>
+    <p class="twenty">Before you can complete your application, you will need to submit proof of your eligibility to shop as a small business through the <%= Settings.site.short_name %>. You will need to submit this proof before you are able to finalize your plan year.</p>
+    <p class="twenty"> Please review our list of <%= link_to "documents that can be used as proof", Settings.aca.shop_market.valid_employer_attestation_documents_url %> and ensure that you have the right documentation available.
+    </p>
+  </div>
+
+  <div class="col-xs-12">
+  <div class="pull-right upload-document-location">
+    <%= link_to "<i class='fas fa-cloud-upload-alt' aria-hidden='true'></i> Upload".html_safe, main_app.new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
+  </div>
+  </div>
+  </div>
+
+  <div class="row effectivedatatable">
+    <%= render_datatable(@datatable) %>
+    <% @documents.each do |doc| %>
+      <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog document-modal" role="document">
+          <div class="modal-content">
+            <div class="document-modal-body">
+              <h4>MA DOR FORM-X</h4>
+              <p class='document-modal-buttons'>
+                 <% key, bucket = get_key_and_bucket(doc.identifier) %>
+                 <a href="<%= main_app.document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}" %>" ><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+                <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
+              </p>
+              <p id="print_<%=doc.id%>">
+                <iframe src="<%= main_app.document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id%>"></iframe>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+   <% end if @documents.present? %>
+  </div>
+
+  <script type="text/javascript" charset="utf-8">
+      initializeDataTables();
+      jQuery('.buttons-csv').hide();
+      jQuery('.buttons-excel').hide();
+      function printDoc(id){
+          var window_obj=window.open();
+          window_obj.document.write($('#print_'+id).html());
+          window_obj.print();
+          window_obj.close();
+      }
+      $(".icon_info").tooltip();
+      //There is no css scope mentioned which is affecting the entire a[dat-remote=true] please use the scope like $('.upload-document a[data-remote=true]').
+      $(function(){
+          $('.upload-document-location a[data-remote=true]').click( function() {
+              var current_href = $(this).attr('href').split(/&|\?/)[0]
+              var location_id = $(this).closest('.benefit-group-fields').attr('id');
+              $(this).attr('href', current_href + "?location_id=" + location_id);
+          });
+      })
+  </script>
+<%else%> 
+  <div class="documents-tab">
+    <h1>Documents</h1>
+    <h4 class="starter">
+      The Documents folder is a safe and convenient way for you to view and keep track of important notices and communications you receive from <%= Settings.site.short_name %>. You'll receive an email notification when there are new documents for you to review.
+    </h4>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Document Title</th>
+          <th>Document Type</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <%# unless @employer_profile.has_consumer_role? %>
+          <tr>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+          </tr>
+        <%# else %>
+            <%# @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
+              <tr>
+                <td><%#= doc.title %></td>
+                <td><%#= doc.subject %></td>
+                <td><%#= doc.created_at.try(:to_date) %></td>
+              </tr>
+            <%# end %>
+        <%# end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

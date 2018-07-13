@@ -1,0 +1,12 @@
+<div class="row no-buffer no-border-top">
+  <div class="col-xs-12 form-group form-group-lg">
+    <h5>Please indicate preferred method to receive notices (OPTIONAL)</h5>
+  </div>
+  <div class="phone col-md-12 col-sm-12 col-xs-12 no-pd">
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-6 col-sm-6 no-pd form-group-lg">
+        <%= f.select :contact_method, options_for_select(f.object.contact_method_options, selected: f.object.contact_method), {}, class:'form-control' %>
+      </div>
+    </div>
+  </div>
+</div>

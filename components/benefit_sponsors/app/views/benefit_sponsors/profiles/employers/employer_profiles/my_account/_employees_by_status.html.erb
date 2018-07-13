@@ -1,0 +1,26 @@
+<% if @search || params[:employee_search] %>
+  <% if @census_employees.empty? %>
+    <h4>No results found</h4>
+  <% end %>
+<% end %>
+
+  <div class="effectivedatatable col-md-12">
+    <!-- sDom: "<'row'<'col-sm-4'> <'col-sm-4'f> >" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-7'i> <'col-sm-2'l>>"+ "<'row'<'col-sm-10'p>>" -->
+    <%= raw render_datatable(@datatable,{ })  %>
+  </div>
+
+<script type="text/javascript" charset="utf-8">
+    initializeDataTables();
+    $('.buttons-csv').hide()
+    $('.buttons-excel').hide()
+</script>
+
+<%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
+
+<div class="row">
+  <div class="col-md-9">
+    <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
+        <%= render 'shared/alph_paginate', url: main_app.employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: main_app.employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
+    <% end %>
+  </div>
+</div>

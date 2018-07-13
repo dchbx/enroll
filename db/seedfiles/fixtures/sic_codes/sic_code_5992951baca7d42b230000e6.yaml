@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAADm
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '23'
+  major_group_label: Apparel And Other Finished Products Made From Fabrics And Similar
+    Materials
+  industry_group_code: '236'
+  industry_group_label: Girls', Children's, And Infants' Outerwear
+  sic_code: '2369'
+  sic_label: Girls', Children's, and Infants' Outerwear, Not Elsewhere Classified

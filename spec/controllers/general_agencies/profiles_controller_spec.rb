@@ -1,10 +1,16 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:general_agency_staff) { FactoryGirl.create(:general_agency_staff_role) }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
+
+  before :each do
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
+  end
 
   describe "GET new" do
     it "should redirect without login" do
@@ -355,4 +361,5 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
       expect(response).to render_template("new_agency_staff")
     end
   end
+end
 end

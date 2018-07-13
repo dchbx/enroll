@@ -1,0 +1,6 @@
+h5 Product Package
+
+= form_for @product_package, as: :product_package, url: products_benefit_market_catalog_product_package_path(benefit_market_catalog_id: @product_package.benefit_catalog_id, id: @product_package.id) do |f|
+  = render partial: "form", locals: { f: f }
+
+  = f.submit "Update", class: "btn btn-primary"

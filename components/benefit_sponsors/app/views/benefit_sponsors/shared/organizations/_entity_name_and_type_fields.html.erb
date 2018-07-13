@@ -1,0 +1,11 @@
+<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+  <%= f.text_field :legal_name, class: "floatlabel form-control interaction-field-control-organization-legal-name typeahead_turned_off", required: true, placeholder: 'LEGAL NAME' %>
+</div>
+<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+  <%= f.text_field :dba, class: "floatlabel form-control interaction-field-control-organization-dba", placeholder: 'DBA' %>
+</div>
+
+<div class="col-md-3 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+  <%= f.text_field :fein, class: "floatlabel form-control fien_field interaction-field-control-organization-fein", required: true, placeholder: 'FEIN*' %>
+  <!-- <%= f.text_field :fein, class: "floatlabel form-control fien_field interaction-field-control-organization-fein", required: true, placeholder: 'FEIN*', readonly: defined?(readonly) %> -->
+</div>

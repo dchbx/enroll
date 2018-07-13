@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyAccount, type: :model do
   let(:employer_profile)      { FactoryGirl.create(:employer_profile)}
   let(:general_agency_profile) { FactoryGirl.build(:general_agency_profile) }
@@ -95,4 +96,5 @@ RSpec.describe GeneralAgencyAccount, type: :model do
       expect(GeneralAgencyAccount.find_by_broker_role_id(broker_role1.id)).not_to include gaa2
     end
   end
+end
 end

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANL
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '67'
+  major_group_label: Holding And Other Investment Offices
+  industry_group_code: '672'
+  industry_group_label: Investment Offices
+  sic_code: '6722'
+  sic_label: Management Investment Offices, Open-End

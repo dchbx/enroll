@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAB5
+  division_code: C
+  division_label: Construction
+  major_group_code: '16'
+  major_group_label: Heavy Construction Other Than Building Construction Contractors
+  industry_group_code: '162'
+  industry_group_label: Heavy Construction, Except Highway And Street
+  sic_code: '1629'
+  sic_label: Heavy Construction, Not Elsewhere Classified

@@ -11,7 +11,7 @@ describe "shared/_update_browser_warning.html.erb" do
     let(:person) { FactoryGirl.create(:person)}
 
     it "should display a title" do
-      expect(rendered).to have_selector("h1.darkblue")
+      expect(rendered).to have_selector("h1")
     end
 
     it "should display the browser update mesage" do

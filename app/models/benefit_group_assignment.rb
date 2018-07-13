@@ -8,6 +8,8 @@ class BenefitGroupAssignment
   embedded_in :census_employee
 
   field :benefit_group_id, type: BSON::ObjectId
+  field :benefit_package_id, type: BSON::ObjectId # Engine Benefit Package
+
 
   # Represents the most recent completed enrollment
   field :hbx_enrollment_id, type: BSON::ObjectId
@@ -21,10 +23,18 @@ class BenefitGroupAssignment
 
   embeds_many :workflow_state_transitions, as: :transitional
 
-  validates_presence_of :benefit_group_id, :start_on, :is_active
+  validates_presence_of :start_on, :is_active
+  validates_presence_of :benefit_group_id, :if => Proc.new {|obj| obj.benefit_package_id.blank? }
+  validates_presence_of :benefit_package_id, :if => Proc.new {|obj| obj.benefit_group_id.blank? }
   validate :date_guards, :model_integrity
 
-  scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
+  scope :renewing,       -> { any_in(aasm_state: RENEWING) }
+  scope :active,         -> { where(:is_active => true) }
+  scope :effective_on,   ->(effective_date) { where(:start_on => effective_date) }
+
+  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
+    where(:start_on.lte => effective_on, :end_on.gte => effective_on, :benefit_package_id => benefit_package.id)
+  }
 
   def self.by_benefit_group_id(bg_id)
     census_employees = CensusEmployee.where({
@@ -49,8 +59,18 @@ class BenefitGroupAssignment
     end
   end
 
+  def is_case_old?
+    self.benefit_package_id.blank?
+  end
+
   def plan_year
-    benefit_group.plan_year if benefit_group
+    warn "[Deprecated] Instead use benefit application" unless Rails.env.test?
+    return benefit_group.plan_year if is_case_old?
+    benefit_application
+  end
+
+  def benefit_application
+    benefit_package.benefit_application if benefit_package.present?
   end
 
   def belongs_to_offexchange_planyear?
@@ -59,15 +79,33 @@ class BenefitGroupAssignment
   end
 
   def benefit_group=(new_benefit_group)
-    raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
-    self.benefit_group_id = new_benefit_group._id
-    @benefit_group = new_benefit_group
+    warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
+    if new_benefit_group.is_a?(BenefitGroup)
+      self.benefit_group_id = new_benefit_group._id
+      return @benefit_group = new_benefit_group
+    end
+    self.benefit_package=(new_benefit_group)
   end
 
   def benefit_group
     return @benefit_group if defined? @benefit_group
-    return nil if benefit_group_id.blank?
-    @benefit_group = BenefitGroup.find(self.benefit_group_id)
+    warn "[Deprecated] Instead use benefit_package" unless Rails.env.test?
+    if is_case_old?
+      return @benefit_group = BenefitGroup.find(self.benefit_group_id)
+    end
+    benefit_package
+  end
+
+  def benefit_package=(new_benefit_package)
+    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+    self.benefit_package_id = new_benefit_package._id
+    @benefit_package = new_benefit_package
+  end
+
+  def benefit_package
+    return if benefit_package_id.nil?
+    return @benefit_package if defined? @benefit_package
+    @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(benefit_package_id)
   end
 
   def hbx_enrollment=(new_hbx_enrollment)
@@ -93,6 +131,7 @@ class BenefitGroupAssignment
     end
   end
 
+  # Deprecated
   def latest_hbx_enrollments_for_cobra
     families = Family.where({
       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
@@ -129,28 +168,42 @@ class BenefitGroupAssignment
     end
   end
 
+  def active_enrollments
+    covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.enrolled_and_renewal.select { |enrollment| enrollment.benefit_group_assignment_id == self.id }
+      end
+      enrollments
+    end
+  end
+
+  # def hbx_enrollment # Deprecated
+  #   return @hbx_enrollment if defined? @hbx_enrollment
+
+  #   if hbx_enrollment_id.blank?
+  #     families = Family.where({
+  #       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+  #       })
+
+  #     families.each do |family|
+  #       family.households.each do |household|
+  #         household.hbx_enrollments.show_enrollments_sans_canceled.each do |enrollment|
+  #           if enrollment.benefit_group_assignment_id == self.id
+  #             @hbx_enrollment = enrollment
+  #           end
+  #         end
+  #       end
+  #     end
+
+  #     return @hbx_enrollment
+  #   else
+  #     @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id)
+  #   end
+  # end
+
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
-
-    if hbx_enrollment_id.blank?
-      families = Family.where({
-        "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
-        })
-
-      families.each do |family|
-        family.households.each do |household|
-          household.hbx_enrollments.show_enrollments_sans_canceled.each do |enrollment|
-            if enrollment.benefit_group_assignment_id == self.id
-              @hbx_enrollment = enrollment
-            end
-          end
-        end
-      end
-
-      return @hbx_enrollment
-    else
-      @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id)
-    end
+    @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id) if hbx_enrollment_id.present?
   end
 
   def end_benefit(end_on)
@@ -217,6 +270,10 @@ class BenefitGroupAssignment
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
+  def renew_employee_enrollments
+
+  end
+
   private
 
   def can_be_expired?
@@ -246,7 +303,7 @@ class BenefitGroupAssignment
     end
 
     if hbx_enrollment.present?
-      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
+      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.sponsored_benefit_package_id == benefit_package_id
       # TODO: Re-enable this after enrollment propagation issues resolved.
       #       Right now this is causing issues when linking census employee under Enrollment Factory.
       # self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?

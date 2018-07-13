@@ -2,6 +2,7 @@ module Forms
   class FamilyMember
     include ActiveModel::Model
     include ActiveModel::Validations
+    include Config::AcaModelConcern
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
@@ -39,6 +40,7 @@ module Forms
     end
 
     def consumer_fields_validation
+      return true unless individual_market_is_enabled?
       if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")

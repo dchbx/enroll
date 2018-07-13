@@ -1,0 +1,29 @@
+<div class="col-md-12">
+  <table class="benefit-group-contribution-table">
+    <tr>
+      <th>Member Type</th>
+      <th>Employer Share</th>
+      <th>Employee</th>
+      <th>Employer</th>
+      <th>Total</th>
+    </tr>
+    <% benefit_group.sorted_composite_tier_contributions.each_with_index do |ct, i| %>
+    <tr class="<% if ct.offered %>offered<% else %>not-offered <% end %>">
+      <td><%= ct.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= t("shop.composite_tiers.#{ct.composite_rating_tier}") %></td>
+      <td class="pct">
+        <strong><%= number_to_percentage ct.employer_contribution_percent.ceil, precision: 0 %></strong>
+      </td>
+      <td>
+        <strong><%= number_to_currency(ct.employee_contribution) %></strong>
+      </td>
+      <td>
+         <strong><%= number_to_currency(ct.employer_contribution) %></strong>
+      </td>
+      <td>
+        <strong><%= number_to_currency(ct.display_premium) %></strong>
+      </td>
+    </tr>
+    <% end %>
+    <tr></tr>
+  </table>
+</div>

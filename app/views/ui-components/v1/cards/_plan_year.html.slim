@@ -1,0 +1,20 @@
+.panel.panel-default#employer-plan-year
+  .panel-heading
+    | plan year
+  .panel-body
+    table.table.table-condensed.borderless
+      tr
+        td.plan-year-heading Enrollment Period
+        td
+          = @current_plan_year.open_enrollment_start_on.to_date.to_formatted_s :long_ordinal
+          |  -
+          = @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal
+        td.plan-year-heading Status
+      tr
+        td.plan-year-heading Coverage Year
+        td
+          = @current_plan_year.start_on.to_date.to_formatted_s :long_ordinal
+          |  -
+          = @current_plan_year.end_on.to_date.to_formatted_s :long_ordinal
+        td.plan-year-status
+          = benefit_application_summarized_state(@current_plan_year)

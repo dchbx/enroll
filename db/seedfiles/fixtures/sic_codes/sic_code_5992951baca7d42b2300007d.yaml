@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAB9
+  division_code: C
+  division_label: Construction
+  major_group_code: '17'
+  major_group_label: Construction Special Trade Contractors
+  industry_group_code: '174'
+  industry_group_label: Masonry, Stonework, Tile Setting, And Plastering
+  sic_code: '1741'
+  sic_label: Masonry, Stone Setting, and Other Stone Work

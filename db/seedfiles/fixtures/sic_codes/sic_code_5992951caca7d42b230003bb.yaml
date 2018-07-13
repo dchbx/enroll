@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAO7
+  division_code: I
+  division_label: Services
+  major_group_code: '80'
+  major_group_label: Health Services
+  industry_group_code: '806'
+  industry_group_label: Hospitals
+  sic_code: '8063'
+  sic_label: Psychiatric Hospitals

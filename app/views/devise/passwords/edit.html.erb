@@ -1,4 +1,4 @@
-<div class="container top-pd">
+<div id="change-password" class="container top-pd module">
   <div class="col-md-6 col-md-offset-3 col-sm-8 col-xs-12">
     <h1>Change your password</h1>
 
@@ -10,9 +10,25 @@
         <%= f.label :password, "New Password" %><br />
         <%= f.password_field :password, autofocus: true, class: "form-control" %>
       </div>
+      <div id="pswd_info" class="tooltip_box" style="display: none;">
+        <p>Your password must:</p>
+        <ul>
+          <li id="length" class="valid">Be at least 8 characters</li>
+          <li id="longer" class="invalid">Not be longer than 20 characters</li>
+          <li id="lower" class="valid">Include at least one lowercase letter</li>
+          <li id="upper" class="invalid">Include at least one uppercase letter</li>
+          <li id="number" class="invalid">Include at least one number</li>
+          <li id="spec_char" class="invalid">Include at least one special character ($!@%*&amp;)</li>
+          <li id="mtt" class="invalid">Cannot repeat any character more than 4 times</li>
+          <li id="wh_space" class="valid">Not include blank spaces</li>
+        </ul>
+       </div>
 
       <div class="form-group">
-        <%= f.label :password_confirmation, "Confirm New Password" %><br />
+        <br />
+         <%= f.label :password_confirmation, "Confirm New Password" %>
+            <span class="pull-right con-pass"></span>
+            <br />
         <%= f.password_field :password_confirmation, autofocus: true, class: "form-control" %>
       </div>
 
@@ -24,3 +40,9 @@
     <%= render "devise/shared/links" %>
   </div>
 </div>
+
+<script type="text/javascript">
+  $(document).on('ready page:load', function () {
+    Register.initialize();
+  });
+</script>

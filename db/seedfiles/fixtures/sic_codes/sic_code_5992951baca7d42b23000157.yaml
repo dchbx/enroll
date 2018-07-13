@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAFX
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '30'
+  major_group_label: Rubber And Miscellaneous Plastics Products
+  industry_group_code: '305'
+  industry_group_label: Gaskets, Packing, And Sealing Devices And Rubber
+  sic_code: '3052'
+  sic_label: Rubber and Plastics Hose and Belting

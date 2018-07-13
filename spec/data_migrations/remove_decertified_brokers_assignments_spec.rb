@@ -12,10 +12,12 @@ describe RemoveDecertifiedBrokersAssignments do
   let(:broker_role) { FactoryGirl.create(:broker_role,  broker_agency_profile: broker_agency_profile, aasm_state: 'active')}
   let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile)}
   let(:person) {broker_role.person}
-  
+  let(:fam_broker_agency_account) {BenefitSponsors::Accounts::BrokerAgencyAccount.new(start_on:Date.today,benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,is_active: true, writing_agent_id:broker_role.id)}
   subject { RemoveDecertifiedBrokersAssignments.new(given_task_name, double(:current_scope => nil)) }
   
   it "should get remove decertified/pending brokers from families/general agencies/employers" do
+    family.broker_agency_accounts = [fam_broker_agency_account]
+    family.save
     expect(family.current_broker_agency.is_active).to eq true
     expect(organization.employer_profile.active_broker_agency_account.present?).to eq true
     expect(organization.employer_profile.active_general_agency_account.present?).to eq true

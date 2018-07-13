@@ -13,7 +13,11 @@ class InvitationsController < ApplicationController
   end
 
   def redirect_to_broker_agency_profile(ba_profile)
-    redirect_to broker_agencies_profile_path(ba_profile)
+    # Redirection to new controller
+    redirect_to benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(ba_profile)
+
+    # Redirection to new controller
+    # redirect_to broker_agencies_profile_path(ba_profile)
   end
 
   def redirect_to_general_agency_profile(ga_profile)

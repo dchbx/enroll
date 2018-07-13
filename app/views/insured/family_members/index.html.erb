@@ -14,9 +14,9 @@
           <h3 class="blue-text"><%= @sep.title %> on: <%= @sep.qle_on %></h3>
         <% end %>
 
-        <h1 class="darkblue">Household Info: Family Members</h1>
-        <h4>If you need to get insurance coverage for other members of your household, select 'Add Member'. When you’re finished, select CONTINUE.</h4>
-        <p class='memo'>* = required field</p>
+        <h1><%= l10n("household_info") %>: <%= l10n("family_members") %></h1>
+        <p class="twenty"><%= l10n(".continue_to_get_insurance") %></p>
+        <p class='memo'>* = <%= l10n("required_field") %></p>
 
         <div class="row no-buffer">
           <div class="col-md-12 col-sm-12 col-xs-12 no-pd first">
@@ -57,7 +57,7 @@
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
           <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
             <%= link_to l10n('add_member'), new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
-            <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
+            <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], change_plan_date: @change_plan_date) %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
 
             <% if @change_plan.present? %>

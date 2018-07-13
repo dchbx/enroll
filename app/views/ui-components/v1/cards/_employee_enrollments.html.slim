@@ -1,0 +1,28 @@
+.panel.panel-default#employee-enrollments
+  .panel-heading
+    | Employee Enrollments and Waivers
+    - if @current_plan_year.start_on.to_date.month != 1
+     i.fa.fa-question-circle.pl-1 data-toggle="tooltip" title="At least 75 percent of your eligible employees must enroll or waive coverage during the open enrollment period in order to establish your Health Benefits Program. One of your enrollees must also be a non-owner"
+  .panel-body
+    = render 'employers/employer_profiles/my_account/enrollment_progress_bar'
+    .information
+      strong =  @current_plan_year.total_enrolled_count
+      |  out of 
+      strong = @current_plan_year.eligible_to_enroll_count
+      |  have enrolled or waived coverage 
+      - if @current_plan_year.start_on.to_date.month != 1
+        - if TimeKeeper.date_of_record.to_date <= @current_plan_year.open_enrollment_end_on.to_date
+          strong = @current_plan_year.additional_required_participants_count.to_i
+          |  or more needed by 
+          = @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal 
+          |  to meet minimum requirement
+      - if @current_plan_year.total_enrolled_count != @current_plan_year.eligible_to_enroll_count
+        br
+        br
+        .alert.alert-warning role="alert"
+          i.fa.fa-flag
+          span
+            strong  Important: 
+            | You have until  
+            = @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal 
+            |  for your employees to sign up, or waive coverage.

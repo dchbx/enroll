@@ -1,0 +1,90 @@
+--- !ruby/object:BenefitSponsors::Organizations::GeneralOrganization
+__selected_fields:
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwR5Veq153KWlF2r
+  _type: BenefitSponsors::Organizations::GeneralOrganization
+  created_at: 2018-05-22 18:43:44.592000000 Z
+  dba: 'er2-dba'
+  fein: '222222222'
+  hbx_id: 83f18f1fe48c47f79c993717181eeaa2
+  home_page:
+  legal_name: Er2-Corp
+  updated_at: 2018-05-22 18:43:44.592000000 Z
+  entity_kind: :s_corporation
+  site_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwRnG+q154r9UJIs
+  benefit_sponorships_count: 2
+  profiles:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwR5Veq153KWlF4t
+    contact_method: :electronic_only
+    _type: BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
+    created_at: 2018-05-22 18:43:44.584000000 Z
+    sic_code: '4923'
+    updated_at: 2018-05-22 18:43:44.584000000 Z
+    is_benefit_sponsorship_eligible: true
+    office_locations:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwR5Veq153KWlF4u
+      is_primary: true
+      address: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WwR5Veq153KWlF4v
+        address_1: 823 Cosmic Way, NW
+        address_2: ''
+        address_3: ''
+        county: Hampden
+        country_name: ''
+        kind: work
+        city: Boston
+        state: MA
+        zip: '01001'
+        updated_at: 2018-05-22 18:43:44.591000000 Z
+        created_at: 2018-05-22 18:43:44.591000000 Z
+      phone: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WwR5Veq153KWlF4w
+        kind: main
+        country_code: ''
+        area_code: '802'
+        number: '1231213'
+        extension: ''
+        full_phone_number: '8021231213'
+        updated_at: 2018-05-22 18:43:44.591000000 Z
+        created_at: 2018-05-22 18:43:44.591000000 Z
+    inbox: !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwR5Veq153KWlF4x
+      messages:
+      - !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WwR5Veq153KWlF4g
+        from: DC Health Link
+        to: Employer Mailbox
+        subject: Welcome to HC
+        folder: inbox
+        body: This is your first email
+        sender_id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WwRk3+q154as16P6
+        message_read: false
+        created_at: 2018-05-22 18:43:44.380000000 Z
+    employer_attestation: !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwR/9eq154mjgbDJ
+      aasm_state: unsubmitted
+      updated_by_id:
+      updated_at: 2018-05-22 20:39:21.109000000 Z
+      created_at: 2018-05-22 20:39:21.109000000 Z

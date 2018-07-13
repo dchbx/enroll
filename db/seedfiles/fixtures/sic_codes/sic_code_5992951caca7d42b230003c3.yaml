@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPD
+  division_code: I
+  division_label: Services
+  major_group_code: '81'
+  major_group_label: Legal Services
+  industry_group_code: '811'
+  industry_group_label: Legal Services
+  sic_code: '8111'
+  sic_label: Legal Services

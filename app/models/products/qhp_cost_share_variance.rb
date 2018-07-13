@@ -70,4 +70,9 @@ class Products::QhpCostShareVariance
   end
 
 
+  def product
+    Rails.cache.fetch("qcsv-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hour) do
+      BenefitMarkets::Products::Product.where(hios_id: hios_plan_and_variant_id).select{|a| a.active_year == qhp.active_year}.first
+    end
+  end
 end

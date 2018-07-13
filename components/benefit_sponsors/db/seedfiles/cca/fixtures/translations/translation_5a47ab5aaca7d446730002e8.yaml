@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWqyn1EZzAALo
+  key: en.broker_agencies.quotes.template_upload
+  value: '"If you completed your employee roster offline using our Microsoft Excel
+    template, find the file on your computer and upload it here."'

@@ -1,0 +1,26 @@
+<div class="profile-content top-pd">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+     <div class="container plan_design_proposals">
+      <%= render 'shared/engines/horizontal_status', step:2, links: generate_breadcrumb_links(plan_design_proposal, plan_design_organization) %>
+      <%= form_for plan_design_form, url: {action: "create", controller: '/sponsored_benefits/organizations/plan_design_proposals'} do |f| %>
+        <%= render 'plan_selection_form', f: f %>
+          <div class="col-md-6 col-md-offset-6">
+            <p>To complete your quote, go to Review Quote, and then publish, Once your quote is published, you cannot make any further edits to the quote.  Your client can only claim a quote once it is published.  If you want to save your progress and return later to make edits or Publish, click Save Quote.</p>
+          </div>
+          <div class="col-md-3">
+             <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(plan_design_organization), class:'btn btn-primary' %>
+          </div>
+          <div class="col-md-6 col-md-offset-6 sq-btn-grp plan-selection-button-group">
+            <%= button_tag "Save Quote", id: "submitPlanDesignProposal", class:'btn btn-primary save-action' %>
+            <%= button_tag "Copy Quote", id: "copyPlanDesignProposal", class:'btn btn-primary save-action' %>
+            <%= button_tag "Review Quote", id: "reviewPlanDesignProposal", class:'btn btn-primary save-action' %>
+            <%= button_tag "Publish Quote", id: "publishPlanDesignProposal", class:'btn btn-primary save-action' %>
+            <div class="success-message"></div>
+          </div>
+
+      <% end %>
+    </div>
+    </div>
+  </div>
+</div>

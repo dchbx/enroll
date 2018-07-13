@@ -1,0 +1,24 @@
+--- !ruby/object:QualifyingLifeEventKind
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAAM
+  effective_on_kinds:
+  - first_of_next_month
+  is_active: true
+  title: Entered into a legal domestic partnership
+  tool_tip: Entering a domestic partnership as permitted or recognized by the District
+    of Columbia
+  action_kind: add_benefit
+  reason: domestic_partnership
+  edi_code: 33-ENTERING DOMESTIC PARTNERSHIP
+  market_kind: shop
+  pre_event_sep_in_days: 0
+  post_event_sep_in_days: 30
+  is_self_attested: true
+  date_options_available: false
+  ordinal_position: 20
+  event_kind_label: Date of domestic partnership
+  updated_at: 2017-08-15 06:30:51.199000000 Z
+  created_at: 2017-08-15 06:30:51.199000000 Z

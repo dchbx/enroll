@@ -1,0 +1,535 @@
+@import "./_variables";
+@import url('https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700');
+
+* {
+    font-family: 'Roboto Slab', sans-serif;
+}
+
+a {
+  color: $mhc-href;
+  text-decoration: none;
+  transition: all 0.3s ease 0s;
+  background-color: transparent;
+}
+
+a:visited {
+  text-decoration:none;
+}
+
+a:active {
+  text-decoration:none;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  background-color: $primary-light-gray;
+  padding-bottom: 70px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-weight: 300;
+  line-height: 1.6em;
+}
+
+.heading-text {
+  color: $primary-orange;
+}
+.sub-text {
+  color: $mhc-darker-blue;
+}
+#welcome-nav-options {
+  text-align: center;
+  .btn {
+    margin-right:10px;
+  }
+}
+#header-uic {
+  .fa-phone {
+    color:$mhc-dark-blue;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+  }
+  .navbar {
+    margin-bottom: 0;
+    background-color: $primary-button-text;
+    border-bottom: solid 3px $brand-primary;
+    .navbar-header {
+      .navbar-brand {
+        border-right: solid 1px #d7d7d7;
+        min-height: 70px;
+        img {
+          max-height: 40px;
+        }
+      }
+    }
+    .navbar-collapse {
+      .header-text {
+        color: $primary-gray;
+        font-size: 14px;
+        text-transform: uppercase;
+        font-weight: $primary-bold;
+      }
+      .navbar-nav:first-of-type {
+        a.portal {
+          text-align: center;
+          vertical-align: middle;
+          line-height: 50px;
+          padding: 23px 15px;
+          font-weight: 600;
+          color: $primary-black;
+          &:hover {
+            background-color: $background-hover;
+            text-decoration: none;
+          }
+        }
+      }
+      .navbar-right {
+        li:last-of-type {
+          text-align: right;
+        }
+        a.call-customer-service {
+          span:first-of-type {}
+          span:last-of-type {
+            .fa {
+              color: $brand-primary;
+            }
+            strong {
+              line-height: 0;
+              font-size: 16px;
+              color: $primary-black;
+            }
+          }
+        }
+        .my-portal-links {
+          min-height: 70px;
+          padding: 15px 15px;
+          display: block;
+          border-left: solid 1px #d7d7d7;
+          .users-name {
+            color: $primary-black;
+          }
+        }
+      }
+    }
+  }
+}
+
+#uic-primary-nav {
+  background:$mhc-dark-blue;
+  
+  ul {
+    margin: 20px 0;
+    text-align: left;
+  }
+  
+  ul li {
+ 
+  }
+  
+  ul li a {
+    color:$primary-white;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+  ul li a:hover {
+    text-decoration:none;
+    cursor:pointer;
+    transition: all 0.3s ease 0s;
+    color:$mhc-orange;
+  }
+  
+  a:visited {
+    text-decoration:none;
+  }
+  
+  a:active {
+    text-decoration:none;
+  }
+  .fa-caret-down {
+    color:$primary-white;
+  }
+  
+  ul.dropdown-menu li a {
+    color:$primary-black;
+    padding: 3px 20px;
+    margin-bottom:5px;
+  }
+  
+  ul.dropdown-menu li a:hover {
+    color:$mhc-orange;
+    transition: all 0.3s ease 0s;
+  }
+  
+  .badge {
+    background-color: $primary-orange;
+  }
+}
+
+#uic-families-right-menu, #uic-employers-right-menu {
+  background-color:$mhc-dark-blue;
+  padding: 20px 0;
+  list-style-type: none;
+
+  li {
+    padding: 8px 0;
+    padding-right: 15px;
+  }
+  li a {
+    color: #cbe6ff;
+    text-align: left;
+    padding-left: 15px;
+    font-weight: 600;
+    font-size: 18px;
+    display: inline-block;
+    width: 100%;
+  }
+  li a:hover {
+    background-color: transparent;
+  }
+  .badge {
+    background-color:$primary-orange;
+  }
+  .panel {
+    border-radius: 0;
+    background-image: none;
+    border-bottom: none;
+    padding: 0 20px;
+    font-size: 14px;
+    margin-top:0;
+    padding: 0 10px;
+  }
+}
+
+#footer-uic {
+  font-size: 14px;
+  color: #ffffff;
+  background-color: #005e81;
+  padding: 15px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  
+  a {
+    color:$primary-white;
+  }
+  
+  .fa-envelope {
+    color:$primary-white;
+  }
+}
+
+.btn {
+  margin: 3px 0;
+}
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.btn:hover,
+.btn:focus,
+.btn.focus {
+  color: $primary-white;
+  text-decoration: none;
+}
+.btn:active,
+.btn.active {
+  background-image: none;
+  outline: 0;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+}
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  pointer-events: none;
+  cursor: not-allowed;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  opacity: .65;
+}
+
+.btn-default {
+  color: $secondary-button-text;
+  background-color: $secondary-button-background;
+  border-color: $secondary-button-border;
+  text-transform: $secondary-button-text-casing;
+  font-weight: $primary-bold;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.btn-default:hover,
+.btn-default:focus,
+.btn-default.focus,
+.btn-default:active,
+.btn-default.active,
+.open > .dropdown-toggle.btn-default {
+  color: $secondary-button-text;
+  background-color: $primary-white;
+  border-color: $secondary-button-border;
+}
+.btn-default:active,
+.btn-default.active,
+.open > .dropdown-toggle.btn-default {
+  background-image: none;
+}
+.btn-default.disabled,
+.btn-default[disabled],
+fieldset[disabled] .btn-default,
+.btn-default.disabled:hover,
+.btn-default[disabled]:hover,
+fieldset[disabled] .btn-default:hover,
+.btn-default.disabled:focus,
+.btn-default[disabled]:focus,
+fieldset[disabled] .btn-default:focus,
+.btn-default.disabled.focus,
+.btn-default[disabled].focus,
+fieldset[disabled] .btn-default.focus,
+.btn-default.disabled:active,
+.btn-default[disabled]:active,
+fieldset[disabled] .btn-default:active,
+.btn-default.disabled.active,
+.btn-default[disabled].active,
+fieldset[disabled] .btn-default.active {
+  background-color: $secondary-button-background;
+  border-color: $secondary-button-border;
+}
+.btn-default .badge {
+  color: #337ab7;
+  background-color: $secondary-button-background;
+}
+.fa-trash {
+  color:$mhc-dark-blue;
+}
+.fa-trash:hover {
+  cursor:pointer;
+}
+
+thead {
+  background-color:$mhc-dark-blue;
+  color:$primary-white;
+}
+
+.pdf-image {
+  img {
+    width:45px;
+    height:60px;
+  }
+  
+}
+
+.right-section {
+  h3 {
+    font-weight: 600;
+    color: #414141;
+  }
+  ul.list-right-section {
+      margin-top: 20px;
+  }
+  ul.list-right-section li {
+      float: left;
+      width: 100%;
+      list-style-type: none;
+      padding: 5px 0px;
+  }
+  li a {
+    text-decoration: none;
+    color: #858585;
+    font-weight: 600;
+  }
+  li a img {
+    padding-right: 6px;
+  }
+  ul.progress-wrapper li.complete .vertical-line-progress {
+    background-color: #007bc4;
+  }
+  .vertical-line-progress {
+    background-color: #cacaca;
+    width: 2px;
+    height: 28px;
+    position: absolute;
+    z-index: -1;
+    left: 15px;
+    margin-top: 5px;
+  }
+  ul.progress-wrapper {
+    margin: 25px 0px;
+  }
+  ul.progress-wrapper li {
+    padding: 5px 0px;
+    list-style: none;
+    padding-left: 35px;
+  }
+  ul.progress-wrapper li.complete {
+    padding: 5px 0px;
+    list-style: none;
+    padding-left: 35px;
+    color: #007bc4;
+  }
+  ul.progress-wrapper li.active {
+    padding: 5px 0px;
+    list-style: none;
+    padding-left: 35px;
+    font-weight: bold;
+    color: #007bc4;
+  }
+  ul.progress-wrapper li.complete span.circle-progress {
+    background-color: #007bc4;
+    border: none;
+    width: 14px;
+    left: 9px;
+    height: 14px;
+  }
+  span.circle-progress {
+    border-radius: 50px;
+    background: #fff;
+    border: 2px solid #cacaca;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    left: 10px;
+    margin-top: 3px;
+  }
+  .progress-wrapper {
+    position: relative;
+    margin: 0;
+  }
+  .list-unstyled {
+    padding-left: 0;
+    list-style: none;
+  }
+}
+
+.horizontal-status {
+  padding: 3.75% 0 1.25%;
+  
+  .arrow {
+      padding-top: 1.25%;
+  }
+  .arrow img {
+      width: 100%;
+      max-width: 100%;
+  }
+  img {
+      vertical-align: middle;
+  }
+}
+
+.rp-plan-info {
+  font-size:10px;
+  text-transform: uppercase;
+  font-weight:bold;
+}
+
+#uic-wrapper {
+  width:97%;
+  margin-left:20px;
+  
+  input {
+    height: 48px;
+    border:none;
+  }
+}
+
+.employer-invoices {
+    max-width: 660px;
+    thead th {
+      height: 34px;
+    }
+    tbody {
+      height: 220px;
+      overflow-y: auto;
+      tr {
+        a {
+          color: $primary-black;
+          &:hover {
+            text-decoration: none;
+          }
+        }
+        &:hover {
+          .fa {
+            color: $brand-primary;
+          }
+        }
+        .fa {
+          color: $primary-gray;
+        }
+      }
+    }
+    thead {
+        /* fallback */
+    }
+    tbody td, thead th {
+      width: 50%;
+      float: left;
+    }
+    table {
+      width: 100%;
+    }
+    thead, tbody, tr { display: block; }
+    tr {
+      width: 100%;
+    }
+    tr:after {
+      content: ' ';
+      display: block;
+      visibility: hidden;
+      clear: both;
+    }
+    .sorter {
+      a {
+        color: $primary-white;
+
+      }
+      &:hover {
+        .fa-stack-1x {
+          color: $brand-primary;
+        }
+      }
+      .fa {
+        color: $primary-gray;
+      }
+      .fa-stack {
+        position: relative;
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        line-height: 1em;
+        vertical-align: middle;
+        font-size: 1.15em;
+      }
+      .fa-stack-1x:first-of-type {
+        margin-top: -6px;
+      }
+      .fa-stack-1x:last-of-type {
+        padding-top: 3px;
+      }
+    }
+  }
+
+  .eeTableHeader {
+    font-size: 12px;
+    padding: 8px;
+  }
+ 

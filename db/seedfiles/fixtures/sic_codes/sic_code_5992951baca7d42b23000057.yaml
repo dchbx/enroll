@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABX
+  division_code: B
+  division_label: Mining
+  major_group_code: '10'
+  major_group_label: Metal Mining
+  industry_group_code: '106'
+  industry_group_label: Ferroalloy Ores, Except Vanadium
+  sic_code: '1061'
+  sic_label: Ferroalloy Ores, Except Vanadium

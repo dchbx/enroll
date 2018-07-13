@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABe
+  division_code: B
+  division_label: Mining
+  major_group_code: '12'
+  major_group_label: Coal Mining
+  industry_group_code: '124'
+  industry_group_label: Coal Mining Services
+  sic_code: '1241'
+  sic_label: Coal Mining Services

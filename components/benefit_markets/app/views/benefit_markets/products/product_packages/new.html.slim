@@ -1,0 +1,6 @@
+h5 Product Package
+
+= form_for @product_package, as: :product_package, url: products_product_packages_url, data: { controller: 'product-package--form' } do |f|
+  = render partial: "form", locals: { f: f }
+
+  = f.submit "Create", class: "btn btn-primary"

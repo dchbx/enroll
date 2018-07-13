@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "deactivate_consumer_role")
 describe DeactivateConsumerRole, dbclean: :after_each do
 
@@ -28,4 +29,5 @@ describe DeactivateConsumerRole, dbclean: :after_each do
      expect(person.consumer_role.is_active).to eq false
     end
   end
+end
 end

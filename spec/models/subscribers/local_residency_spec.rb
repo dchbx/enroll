@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe Subscribers::LocalResidency do
 
   it "should subscribe to the correct event" do
@@ -96,4 +97,5 @@ describe Subscribers::LocalResidency do
     end
   end
 
+end
 end

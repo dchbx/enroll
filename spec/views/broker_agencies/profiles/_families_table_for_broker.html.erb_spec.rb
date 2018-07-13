@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "broker_agencies/profiles/_families_table_for_broker.html.erb" do
 
-context "shows families" do
+context "shows families", dbclean: :after_each do
 
     let(:family1) { FactoryGirl.create(:family, :with_primary_family_member)}
 

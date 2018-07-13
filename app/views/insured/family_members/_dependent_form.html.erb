@@ -24,19 +24,19 @@
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *" %>
+              <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *", autocomplete: :off %>
             </div>
           </div>
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase%>
+              <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase, autocomplete: :off%>
             </div>
           </div>
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *" %>
+              <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *", autocomplete: :off %>
               <div class="text-right">
                 <% if !dependent.persisted? %>
                   <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \'Add Member\'. When you\'re finished, select CONTINUE.')" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
@@ -100,7 +100,7 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>            
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>
           </div>
 
 

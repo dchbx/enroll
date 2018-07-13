@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "invoke_hub_response")
 
 describe InvokeHubResponse, dbclean: :after_each do
@@ -48,4 +49,5 @@ describe InvokeHubResponse, dbclean: :after_each do
     end
 
   end
+end
 end

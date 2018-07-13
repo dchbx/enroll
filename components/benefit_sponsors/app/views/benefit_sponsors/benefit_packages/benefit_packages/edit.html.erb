@@ -1,0 +1,11 @@
+<% content_for :navigation do %>
+  <%= render :partial => 'ui-components/v1/navs/employers_navigation', :locals => {:active_tab=>params[:tab], organization: @benefit_package_form.service.employer_profile.organization, profile: @benefit_package_form.service.employer_profile} %>
+<% end %>
+<%= form_for @benefit_package_form, as: :benefit_package, url: benefit_sponsorship_benefit_application_benefit_package_path, method: :put do |f| %>
+  <% if params[:show_benefit_application_tile].to_s == "true" %>
+    <div id="benefitApplicationTile">
+      <%= render 'benefit_application_tile', f: f.object %>
+    </div>
+  <% end %>
+  <%= render 'form', f:f %>
+<% end %>

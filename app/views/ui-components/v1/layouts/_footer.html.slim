@@ -1,0 +1,19 @@
+footer.footer-wrapper#footer-uic
+  .container
+    .col-md-6
+      .row
+        = copyright_notice
+    .col-md-6
+      .row
+        ul.list-unstyled.list-inline.pull-right
+          li 
+            a.call-customer-service href="tel:#{contact_center_phone_number}"
+              span
+                i.fa.fa-phone.fa-lg 
+                | &nbsp; 
+                = contact_center_phone_number
+          li 
+            = link_to site_faqs_url, target: '_blank' do
+              i.fa.fa-question.fa-lg
+              | &nbsp; 
+              | FAQs

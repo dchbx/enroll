@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe Insured::InteractiveIdentityVerificationsController do
 
   describe "GET #new" do
@@ -215,4 +216,5 @@ describe Insured::InteractiveIdentityVerificationsController do
       end
     end
   end
+end
 end

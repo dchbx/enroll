@@ -38,11 +38,13 @@ class QhpRateBuilder
     (20..65).each do |metlife_age|
       @metlife_age = metlife_age
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
+      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
       @results[key] << {
         age: metlife_age,
         start_on: @rate[:effective_date],
         end_on: @rate[:expiration_date],
-        cost: calculate_metlife_cost
+        cost: calculate_metlife_cost,
+        rating_area: rating_area
       }
     end
   end
@@ -60,11 +62,13 @@ class QhpRateBuilder
       calculate_and_build_metlife_premium_tables
     else
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
+      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
       @results[key] << {
         age: assign_age,
         start_on: @rate[:effective_date],
         end_on: @rate[:expiration_date],
-        cost: @rate[:primary_enrollee]
+        cost: @rate[:primary_enrollee],
+        rating_area: rating_area
       }
     end
   end
@@ -107,7 +111,7 @@ class QhpRateBuilder
         @plans.each do |plan|
           pts = plan.premium_tables
           premium_table_hash.each do |value|
-            pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on]).first
+            pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on], rating_area: value[:rating_area]).first
             pt.cost = value[:cost]
             pt.save
           end

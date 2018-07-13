@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAEI
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '25'
+  major_group_label: Furniture And Fixtures
+  industry_group_code: '251'
+  industry_group_label: Household Furniture
+  sic_code: '2512'
+  sic_label: Wood Household Furniture, Upholstered

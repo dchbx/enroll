@@ -1,4 +1,8 @@
   <div class="col-xs-12 module" id='plan_year' data-benefit-group-count="<%= @plan_year.benefit_groups.count %>"> <!--onKeyPress="return disableEnterKey(event)"-->
+    <input type="hidden" id="employerMinEmployeeContribution" data-value="<%= aca_shop_market_employer_contribution_percent_minimum %>" />
+    <input type="hidden" id="employerMinFamilyContribution" data-value="<%= aca_shop_market_employer_family_contribution_percent_minimum %>" />
+    <input type="hidden" id="employerProfileId" data-value="<%= @employer_profile.id %>" />
+    <input type="hidden" id="benefitGroupId" data-value="<%= f.object.id %>" />
       <div class="row">
         <div class="col-xs-12 planyear-add-tab">
           <div id="choose-coverage">
@@ -11,7 +15,7 @@
               <ul>
                 <% @plan_year.errors.delete(:benefit_groups) %>
                 <% @plan_year.errors.full_messages.each do |msg| %>
-                  <li><%= msg %></li>
+                  <li><%= raw msg %></li>
                 <% end %>
 
                 <% @plan_year.benefit_groups.each do |bg| %>
@@ -32,7 +36,7 @@
 
           <%= render "shared/plan_year_fields", f: f %>
 </div>
-          <div style="<%= @plan_year.new_record? ? 'display: none;' : 'display: inline-block;' %>" class="benefits-setup-tab">
+          <div style="<%= @plan_year.new_record? ? 'display: none;' : 'display: inline-block;' %>" class="benefits-setup-tab plan-year-setup">
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>

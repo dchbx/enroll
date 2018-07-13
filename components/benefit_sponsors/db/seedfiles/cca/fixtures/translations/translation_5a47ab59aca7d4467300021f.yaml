@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIf
+  key: en.insured.plan_shoppings.HMO_title_info
+  value: '"An HMO (Health Maintenance Organization) plan usually only covers care
+    from in-network providers. It generally won''t cover out-of-network care except
+    in an emergency, and may require you to live or work in its service area to be
+    eligible for coverage. You may be required to choose a primary care doctor."'

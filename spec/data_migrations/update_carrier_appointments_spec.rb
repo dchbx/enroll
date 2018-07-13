@@ -14,13 +14,30 @@ describe UpdateCarrierAppointments do
 
   describe "migrating old pending broker records" do
     before do
-    @broker_role = FactoryGirl.create(:broker_role, carrier_appointments: { "aetna_health_inc"=>nil, 
-      "aetna_life_insurance_company" =>nil, 
-       "optimum_choice"=>nil, 
-      "united_health_care_insurance"=>nil, "united_health_care_mid_atlantic"=>nil, 
-      "carefirst_bluechoice_inc"=>"true", 
-      "group_hospitalization_and_medical_services_inc"=>"true", "kaiser_foundation"=>"true"}) 
-      @value = {"Aetna Health Inc" => nil, "Aetna Life Insurance Company"=>nil, "Carefirst Bluechoice Inc"=>"true", "Group Hospitalization and Medical Services Inc"=>"true", "Kaiser Foundation"=>"true", "Optimum Choice"=>nil, "United Health Care Insurance"=>nil, "United Health Care Mid Atlantic"=>nil}
+    @broker_role = FactoryGirl.create(:broker_role, carrier_appointments: { "altus" => nil,
+                                                                            "blue_cross_blue_shield_ma" => nil,
+                                                                            "boston_medical_center_health_plan" => nil,
+                                                                            "delta" => nil,
+                                                                            "FCHP" => nil,
+                                                                            "guardian" => nil,
+                                                                            "health_new_england" => nil,
+                                                                            "harvard_pilgrim_health_care" => nil,
+                                                                            "minuteman_health" => nil,
+                                                                            "neighborhood_health_plan" => nil,
+                                                                            "tufts_health_plan_direct" => nil,
+                                                                            "tufts_health_plan_premier" => nil}) 
+      @value = {"Altus" => nil,
+                "Blue Cross Blue Shield MA" => nil,
+                "Boston Medical Center Health Plan" => nil,
+                "Delta" => nil,
+                "FCHP" => nil,
+                "Guardian" => nil,
+                "Health New England" => nil,
+                "Harvard Pilgrim Health Care" => nil,
+                "Minuteman Health" => nil,
+                "Neighborhood Health Plan" => nil,
+                "Tufts Health Plan Direct" => nil,
+                "Tufts Health Plan Premier" => nil}
     end
 
     it "should return new carrier appointments for pending brokers " do

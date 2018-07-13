@@ -1,0 +1,7 @@
+<%= f.fields_for :office_locations, f.object.office_locations, errors: {}, fieldset: false do |office_location| %>
+  <%= render partial: 'benefit_sponsors/shared/office_location_fields', locals: {f: office_location} %>
+<% end %>
+
+<div class="form-inputs" id="office_locations_buttons">
+  <%= link_to('Add Office Location', new_organizations_office_locations_path(:child_index => f.object.office_locations.length, :parent_object => f.object_name), remote: true, class: 'btn btn-default pull-left') %>
+</div>

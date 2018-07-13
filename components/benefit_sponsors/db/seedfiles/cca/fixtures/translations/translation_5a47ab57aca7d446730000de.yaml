@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADe
+  key: en.insured.consumer_roles.no_match_info
+  value: '"Thank you. Next, we need to verify if you or you and your family are eligible
+    to enroll in coverage through %{site_short_name}. Please select CONTINUE."'

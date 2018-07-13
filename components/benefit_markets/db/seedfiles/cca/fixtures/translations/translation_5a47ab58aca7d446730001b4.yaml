@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAG0
+  key: en.insured.families.final_sep_open_enrollment_body
+  value: '"Open enrollment starts on %{next_ivl_open_enrollment_date}. To enroll before
+    open enrollment, you must qualify for a special enrollment period. If none of
+    the circumstances listed apply to you, you will not be able to enroll until %{next_ivl_open_enrollment_period}"'

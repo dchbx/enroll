@@ -1,0 +1,1532 @@
+@import "variables";
+// employer portal
+#home, .plan_design_proposals {
+  nav {
+    ul {
+      background-color: $brand-primary;
+      padding: 20px 0;
+      list-style-type: none;
+      img {
+        width:100%
+      }
+      li {
+        padding: 8px 0;
+        padding-right: 15px;
+
+        &.active {
+          a {
+            color: #ffffff;
+            border-left: solid 4px #cbe6ff;
+          }
+        }
+        a {
+          color: #cbe6ff;
+          text-align: left;
+          padding-left: 15px;
+          font-weight: 600;
+          font-size: 18px;
+          display: inline-block;
+          width: 100%;
+          &:hover {
+            background-color: transparent;
+          }
+        }
+        span {
+          background-color: $primary-notification;
+        }
+      }
+    }
+  }
+  .employees-tab {
+    .col-xs-12 {
+      .button-group-wrapper {
+        margin-bottom: 0;
+      }
+    }
+    #census_employee_search {
+      margin-top: 12px;
+    }
+    #employees-filter {
+      position: relative;
+      i {
+        color: $primary-blue;
+      }
+    }
+    .filter {
+      font-size: 14px;
+      color: $primary-blue;
+      text-align: right;
+      text-transform: uppercase;
+      padding-top: 10px;
+      cursor: pointer;
+
+    }
+    .filter-options {
+      display: none;
+      background-color: #fff;
+      border: solid 1px #b7b7b7;
+      padding: 5px 15px 30px 20px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: #23527c;
+      z-index: 5;
+
+      h4 {
+        text-align: right;
+        text-transform: uppercase;
+        font-size: 14px;
+        color: #333;
+      }
+      input {
+      }
+      label {
+        display: block;
+        text-align: right;
+        color: $primary-blue;
+        font-size: 18px;
+        padding: 0;
+        width: 100%;
+        &.btn {
+          display: block;
+          width: 100%;
+          background-color: transparent;
+          background-image: none;
+          border: none;
+          border-color: none;
+        }
+        &.btn-default {
+          display: block;
+          width: 100%;
+          background-color: transparent;
+          background-image: none;
+          border: none;
+          border-color: none;
+          &:hover, &:active, &:focus, &:active {
+            background-color: transparent;
+            border-color: none;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+          }
+        }
+        &.active {
+          background-color: transparent;
+          background-image: none;
+          border: none;
+          -webkit-box-shadow: none;
+          box-shadow: none;
+
+        }
+        &:hover {
+          color: underline;
+        }
+      }
+
+
+    }
+  }
+  .employees-table, .documents-table{
+      margin-top: 20px;
+      .table-responsive {
+        border: solid 1px #d5d5d5;
+      }
+    table {
+      border: solid 1px #d5d5d5;
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+
+      tr {
+      th {
+        padding: 12px 0;
+        font-weight: normal;
+        text-align: left;
+        text-transform: uppercase;
+        width: 10%;
+        border-bottom: solid 2px #b2b2b2;
+        padding-left: 20px;
+        &:hover {
+          border-bottom: solid 2px $primary-blue;
+
+        }
+
+        }
+        td {
+          background-color: #ffffff;
+          padding: 10px 20px;
+          text-align: left;
+          font-size: 13px;
+          &.confirm-terminate-wrapper {
+            padding: 0;
+
+          }
+          &:first-of-type {
+            font-size: 15px;
+          }
+          &:last-of-type {
+
+          }
+
+          &:hover {
+            color: $primary-blue;
+
+          }
+
+        }
+      }
+    }
+  }
+  .documents-table {
+    table tr th {
+      font-size: 14px;
+      width: auto;
+      padding: 10px 15px;
+    }
+    table tr td {
+      vertical-align: top;
+
+      span {
+        &.name {
+          color: $primary-blue;
+          font-size: 14px;
+        }
+        &.benefit-group {
+          font-size: 14px;
+        }
+        &.coverage-kind {
+          text-transform: uppercase;
+        }
+      }
+      padding: 10px 15px;
+      text-align: left;
+      &:first-of-type {
+        font-size: 13px;
+      }
+      &:hover {
+        color: #333;
+      }
+    }
+
+
+
+  }
+  #add_employee_action {
+    .col-xs-12 {
+      .col-md-6 {
+      }
+    }
+  }
+  .planyear-add-tab, .employer-edit-tab, #add_employee_action {
+    padding-bottom: 45px;
+    h3 {
+      &:first-of-type {
+        display: inline-block;
+        margin-top: 0;
+        &+h4 {
+          display: inline-block;
+        }
+      }
+    }
+    .plan-year-primary {
+      pointer-events: auto;
+    }
+    .fa {
+      cursor: pointer;
+    }
+    .plan-title {
+      border-bottom: none;
+    }
+
+    .recommend {
+      .panel {
+        padding-bottom: 15px;
+        background-color: transparent;
+        &:first-of-type {
+          margin-right: 1.25%;
+          width: 48.75% !important;
+        }
+        &:last-of-type {
+          margin-left: 1.25%;
+          width: 48.75% !important;
+        }
+        .panel-heading {
+          text-transform: uppercase;
+          background-color: transparent;
+
+          h3 {
+            font-weight: bold;
+            color: #333333;
+            font-size: 18px;
+            margin: 0;
+          }
+        }
+        .panel-body {
+          padding: 0px inherit;
+          p {
+            margin: 0;
+          }
+        }
+
+        .col-xs-3 {
+          padding-top: 15px;
+          span {
+            display: inline-block;
+            text-align: center;
+
+            h3.day {
+              padding-top: 15px;
+              display: block;
+              font-weight: 600;
+              font-size: 24px;
+              margin: 0;
+
+            }
+            span.month {
+              text-transform: uppercase;
+              font-size: 10px;
+              display: block;
+              position: relative;
+              top:-5px;
+
+            }
+          }
+        }
+      }
+    }
+    .county-select {
+      display: none;
+    }
+
+    .county-select.primary-office-location {
+      display: inline-block;
+    }
+  }
+  .planyear-add-tab {
+    .row-form-wrapper {
+
+        border-top: 1px solid #ddd;
+
+    }
+  }
+
+  .benefits-tab, .home-tab {
+    .alert-warning {
+      .fa {
+        color: inherit;
+      }
+      span {
+        color: #464646;
+      }
+    }
+    .bg-title {
+      margin-bottom: 10px;
+      display: inline-block;
+      color: #69A30D;
+      font-size: 18px;
+    }
+  }
+
+  #choose-coverage {
+    .selectric {
+      p.label {
+        font-size: 18px !important;
+
+        text-transform: capitalize;
+      }
+    }
+  }
+
+  .benefits-tab, .home-tab {
+
+    .benefit-package {
+      position: relative;
+      .panel {
+        border: none;
+      }
+      .col-xs-1 {
+
+        .make-default {
+          color: #cccccc;
+          position: relative;
+          padding-top: 120%;
+          margin: 0;
+          display: block;
+          &.active {
+            color: #FFD700;
+          }
+          &:hover {
+            cursor: pointer;
+          }
+        }
+
+      }
+      &:hover {
+        .make-default {
+          display: block;
+
+        }
+      }
+    }
+    .plan-details {
+      .col-xs-4 {
+        padding-left: 0;
+      }
+      .col-xs-8 {
+        padding-right: 0;
+        table {
+          table-layout: fixed;
+        }
+      }
+    }
+    .details {
+      cursor: pointer;
+      margin-right:20px;
+    }
+    .benefit-details {
+      cursor: pointer;
+      &:hover {
+        >* {
+          color: #23527c;
+        }
+      }
+    }
+    .package-offering {
+
+      background-color: #ffffff;
+      padding: 10px 0 20px;
+
+    table {
+      padding: 0 2%;
+      margin: auto;
+      table-layout: fixed;
+
+      tr.not-offered {
+        opacity: 0.35;
+      }
+
+      tr:first-of-type {
+        border-top: none;
+        th:first-of-type {
+          width: 28%;
+        }
+        th {
+          font-weight: normal;
+          text-transform: uppercase;
+          padding: 10px 0;
+          color: #9b9b9b;
+        }
+
+      }
+      tr {
+        border-bottom: solid 1px #d5d5d5;
+        td {
+          padding: 15px 0;
+          font-size: 16px;
+          i {
+            margin-left: -15%;
+            color: #69A30D;
+            margin-right: 10px;
+            cursor: default;
+          }
+        }
+        &:last-of-type {
+          border-bottom: none;
+          display: none;
+        }
+      }
+
+    }
+    }
+    .panel.benefitgroup.benefitgroup.referenceplan {
+      border-top: none;
+      border-bottom: solid 1px #b7b7b7;
+      border-left: solid 1px #b7b7b7;
+      border-right: solid 1px #b7b7b7;
+      &>h2 {
+        font-size: 16px;
+      }
+      table {
+        table-layout: fixed;
+        tr {
+          th {
+            font-weight: normal;
+            color: #b7b7b7;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding-right:15px;
+            &:last-of-type {
+              padding-right: 0;
+            }
+
+          }
+          td {
+            color: #333333;
+            font-size: 12px;
+            word-wrap: break-word;
+            vertical-align: top;
+            padding-right:15px;
+            &:last-of-type {
+              padding-left: 0;
+              padding-right:0;
+
+            }
+          }
+        }
+      }
+      .col-xs-4 {
+        text-transform: uppercase;
+        span {
+          color: #b7b7b7;
+          font-size: 12px;
+          text-transform: uppercase;
+          &+h2 {
+            margin: 0;
+            font-size: 36px;
+          }
+
+        }
+      }
+      .col-xs-8 {
+        table {
+          tr {
+            th {
+              padding-bottom: 20px;
+            }
+            td {
+              border-top: solid 1px #d5d5d5;
+              font-size: 12px;
+              padding-top: 10px;
+            }
+
+          }
+        }
+      }
+      .package-offering {
+        border: none;
+        background-color: #ffffff;
+        padding: 10px 0 20px;
+        margin-top: 20px;
+        table {
+          &:first-of-type {
+            th {
+            }
+            tr {
+              td {
+                &:first-of-type {
+                  i {
+                    padding-right: 10px;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      }
+      .est-month {
+        padding: 20px 15px 30px;
+      }
+      &.home {
+        border-bottom: none !important;
+        border-left: none;
+        border-right: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border: none;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        table {
+          border-bottom: 0;
+          tr {
+            vertical-align: top;
+          }
+        }
+        &.est {
+
+            padding: 20px 15px 30px;
+
+        }
+      }
+
+
+    }
+
+  }
+
+  .benefits-setup-tab {
+
+    .selectric-hide-select {
+      display: none;
+    }
+    .remove_fields {
+      display: none;
+    }
+
+    .row-form-wrapper {
+      margin: 0;
+
+      &.active {
+        box-shadow: none;
+      }
+      .form-group-lg .form-control .form-control {
+        input {
+          font-weight: normal !important;
+          height: auto;
+        }
+      }
+
+    }
+    .row-form-wrapper.active::before {
+      border-right: none;
+    }
+    .form-inputs {
+      fieldset {
+        margin-bottom: 40px;
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+      }
+    }
+    .form-group {
+      &.header {
+        padding: 20px 20px;
+        h3 {
+          margin: 0;
+          font-weight: 600;
+          width: 100%;
+          font-size: 20px;
+          .form-functions {
+            float: right;
+          }
+        }
+      }
+      label {
+        margin-top: 5px;
+        font-size: 14px;
+        color: rgba(131, 135, 128, 1);
+        margin-bottom: 0;
+
+      }
+
+      input {
+        font-size: 18px !important;
+        padding: 0 0 !important;
+        color: #444;
+        font-family: 'Open Sans', sans-serif !important;
+        line-height: 28px;
+        &.hidden-param {
+          padding: 5px !important;
+        }
+
+        &:focus {
+          background-color: transparent;
+        }
+      }
+      .selectric {
+        p.label {
+          font-size: 18px !important;
+          margin: 0;
+          text-transform: capitalize;
+        }
+      }
+
+    }
+    .health {
+      .offerings, .composite-offerings {
+        .heading {
+          border-top: solid 1px #d5d5d5;
+        }
+      }
+    }
+
+    .composite-offerings .benefits-fields .row-form-wrapper {
+      padding: 15px 0;
+
+      .slide-label {
+        position: absolute;
+      }
+    }
+
+    .offerings {
+      .benefits-fields {
+        .row-form-wrapper {
+          padding: 15px 0;
+          &:last-of-type {
+            display: none;
+          }
+        }
+      }
+    }
+    .offerings, .composite-offerings {
+      .storage-input {
+        max-width: 100%;
+      }
+      .premium-storage-input {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        width: 100%;
+      }
+      .row-form-wrapper.heading {
+        text-transform: uppercase;
+        font-size: 14px;
+        padding: 10px 0 0 0;
+
+        color: rgb(131, 135, 128);
+        border-bottom: none;
+        border-left: solid 1px #d5d5d5;
+        border-right: solid 1px #d5d5d5;
+
+        &+.benefits-fields {
+          background-color: #ffffff;
+          border-left: solid 1px #d5d5d5;
+          border-right: solid 1px #d5d5d5;
+          border-bottom: solid 1px #d5d5d5;
+          .slider {
+            .slider-selection {
+               background: #9C9C9C;
+            }
+          }
+
+          .row-form-wrapper {
+            border-bottom: solid 1px #d5d5d5;
+            .form-group {
+              .col-xs-9 {
+                padding-right: 0;
+              }
+            }
+            &:last-of-type {
+              border-bottom: none;
+            }
+          }
+
+        }
+        .composite_offering_slider_header div.col-xs-12 {
+          border-bottom: solid 1px #d5d5d5;
+          padding: 15px 0 25px;
+          text-align: center;
+        }
+        .col-xs-6 {
+          border-bottom: solid 1px #d5d5d5;
+          padding: 15px 0 25px;
+          text-align: center;
+        }
+        .row-form-wrapper {
+          border: none;
+          border-left: solid 1px #d5d5d5;
+          border-top: none;
+
+        }
+        &+.row-form-wrapper {
+            border-top: none;
+
+
+        }
+      .benefits-fields {
+        .row-form-wrapper {
+          padding: 15px 0;
+        }
+      }
+      }
+    .row-form-wrapper {
+      border: none;
+    }
+
+    }
+
+    ul.nav.nav-tabs, .plan-options .col-xs-3 a {
+      border-bottom: none;
+      li {
+        a {
+          padding: 0;
+        }
+
+        &.active {
+          label {
+            border: solid 1px #b7b7b7;
+            border-bottom: none;
+            background-color: #ffffff;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            z-index: 100;
+
+            color: #333333;
+            &:hover {
+              background-color: #ffffff;
+            }
+          }
+        }
+
+          label {
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 10px;
+            padding: 10px;
+            background-color: $primary-blue;
+            border-bottom: solid 3px #003260;
+            border-radius: 6px;
+            width: 100%;
+            height: 100%;
+            color: #ffffff;
+            margin-bottom: 0;
+            text-transform: uppercase;
+            &:hover {
+              background-color: #003260;
+              cursor: pointer;
+            }
+            i {
+              padding-right: 15px;
+            }
+
+          }
+
+      }
+      input[type=radio] {
+        display: none;
+      }
+      input[type=radio] + label {
+
+        &>i {
+          font-size: 28px;
+          color: #b7b7b7;
+
+
+
+          &:first-of-type {
+            display: inline-block;
+
+          }
+          &:last-of-type {
+            display: none;
+          }
+        }
+      }
+      input[type=radio]:checked + label {
+
+        &>i {
+          color: #69A30D;
+          &:first-of-type {
+            display: none;
+          }
+          &:last-of-type {
+            display: inline-block;
+          }
+        }
+      }
+    }
+    .elected-plans-continue, .edit-add-dental {
+      padding: 15px 0 20px;
+      background-color: #fff;
+      .di {
+        font-size: 15px;
+      }
+    }
+    .plan-options {
+      background-color: #ffffff;
+      border: solid 1px #b7b7b7;
+      .metals-tab {
+        >.col-xs-3:last-of-type {
+          display: none;
+        }
+      }
+      .elected-plans-tab {
+        border: none;
+        padding: 0;
+        height: 450px;
+        span:first-of-type {
+          text-align: left;
+          font-size: initial;
+          display: inline;
+          padding: 0;
+          margin: 0;
+          max-width: none;
+        }
+      }
+      span:first-of-type {
+        text-align: center;
+        font-size: 16px;
+        display: block;
+        padding: 40px 0;
+        margin: auto;
+        max-width: 660px;
+      }
+      h4 {
+        text-align: center;
+      }
+      .col-xs-3 {
+
+      }
+      .col-xs-9 {
+        padding-right: 0;
+        padding-left: 10px;
+        .panel {
+          border: none;
+          -webkit-box-shadow: none;
+          box-shadow: none;
+          .panel-heading {
+
+            padding: 0;
+            border-bottom: none;
+
+            h3 {
+              font-size: 16px;
+              padding-top: 2px;
+              font-weight: bold;
+              text-transform: capitalize;
+
+
+            }
+
+
+          }
+          .panel-body {
+
+          }
+        }
+      }
+    }
+    .reference-plans, .dental-reference-plans, .elected-plans-tab  {
+      background-color: #ffffff;
+      border: solid 1px #d7d7d7;
+      padding-bottom: 25px;
+      overflow-y: scroll;
+      display: none;
+
+
+      .loading {
+        position: relative;
+        padding-top: 30px;
+        top: 50%;
+        text-align: center;
+      }
+      .reference-plan, .dental-reference-plan {
+        height: 175px;
+        padding: 0;
+        cursor: pointer;
+        padding-top: 20px;
+        border-bottom: solid 1px #d7d7d7;
+
+        &:hover {
+          border-bottom: solid 1px $primary-blue;
+          .col-xs-10 .panel .panel-body .view-summary {
+            display: inline-block;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+        .col-xs-2:first-of-type {
+          padding-left: 0;
+        }
+        .panel {
+          -webkit-box-shadow: none;
+          box-shadow: none;
+          border: none;
+          background-color: transparent;
+          .panel-heading {
+            padding: 0 0 5px 0;
+            color: #333333;
+            background-color: transparent;
+            h3 {
+              font-size: 12px;
+              weight: 700;
+              margin-bottom: 0;
+            }
+          }
+          .panel-body {
+            padding: 0;
+            line-height: 110%;
+            span {
+              font-size: 12px;
+              color: #333333;
+              text-transform: uppercase;
+            }
+            .plan-label {
+              color: #b7b7b7;
+              font-size: 10px;
+
+            }
+            a.view-summary {
+              display: none;
+              margin-top: 3.5%;
+            }
+          }
+        }
+
+        input[type=radio] {
+          display: none;
+        }
+        input[type=radio] + label {
+          position: relative;
+          top: 50%;
+
+          &>i {
+            font-size: 28px;
+            color: #b7b7b7;
+
+
+
+            &:first-of-type {
+              display: inline-block;
+
+            }
+            &:last-of-type {
+              display: none;
+            }
+          }
+        }
+        input[type=radio]:checked + label {
+
+          &>i {
+            color: #69A30D;
+            &:first-of-type {
+              display: none;
+            }
+            &:last-of-type {
+              display: inline-block;
+            }
+          }
+        }
+
+      }
+
+
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+
+    }
+    input[type=radio] {
+      display: inline-block;
+    }
+
+   input[type=checkbox] {
+      display: none;
+      + label > i.fa {
+        color: #69A30D;
+      }
+    }
+    .checkbox {
+      display: block;
+      margin: auto;
+      padding-left: 15%;
+    }
+    .checkbox {
+      &>div {
+        display: inline-block;
+        margin: auto;
+      }
+    }
+    .checkbox label {
+      padding-left: 0;
+    }
+    .checkbox label label {
+      display: inline;
+      padding-left: 0;
+    }
+    .checkbox label label + span {
+      display: inline-block;
+      position: relative;
+      text-transform: capitalize;
+      font-size: 16px;
+      top: -5px;
+      left: 10px;
+    }
+    input[type=checkbox]:disabled + label i {
+      color: #b7b7b7;
+      cursor: not-allowed;
+    }
+    input[type=checkbox] + label i {
+      &:first-of-type {
+        display: none;
+
+      }
+      &:last-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+    }
+    input[type=checkbox]:checked + label i {
+      &:first-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+      &:last-of-type {
+        display: none;
+      }
+    }
+
+  }
+  .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
+  .planyear-add-tab, .employer-tab, .employer-edit-tab,
+   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab {
+    .starter {
+      max-width: 660px;
+    }
+    h1 {
+      margin-top: 0;
+      color: $primary-orange;
+      &+.panel {
+        border-radius: 0;
+        ul {
+          list-style: square;
+          font-size: 14px;
+          li {
+            color: $primary-blue;
+            margin-left: 17px;
+            margin-bottom: 5px;
+            &:last-of-type {
+              margin-bottom: 0;
+            }
+            span {
+              color: #8a6d3b;
+              display: inline-block;
+            }
+            a {
+              color: $primary-blue;
+            }
+          }
+        }
+        &.alert {
+          padding: 0;
+        }
+        &.panel-default {
+          &>.panel-heading {
+            border-radius: 0;
+            background-image: none;
+            background-color: $primary-blue;
+            border-bottom: none;
+            padding: 0 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin: 0;
+            padding: 0 15px;
+          }
+        }
+      }
+    }
+    .panel {
+      border-radius: 0;
+      border: solid 1px #d5d5d5;
+      &.alert {
+        padding: 0;
+      }
+      &.panel-default {
+        &>.panel-heading {
+          border-radius: 0;
+          background-image: none;
+          background-color: #ffffff;
+          h3 {
+            font-size: 18px;
+            margin-top: 0;
+            i {
+              color: $primary-blue;
+            }
+          }
+          .progress, .progress-wrapper {
+            max-width: 90%;
+            height: 16px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            &+.information {
+              padding-bottom: 15px;
+            }
+          }
+        }
+      }
+      &.myplanyear, &.benefitgroup {
+        border-left: solid 1px #b7b7b7;
+        border-right: solid 1px #b7b7b7;
+        background-color: #ffffff;
+        margin-top: 0;
+
+        .reference-plan-details {
+          display: none;
+        }
+
+
+        .panel-heading {
+          padding: 10px 0;
+        }
+        &:first-of-type {
+          border-top: solid 1px #b7b7b7;
+        }
+        &.benefitgroup {
+          margin-top: 0;
+          margin-bottom: 0;
+          section {
+            &:last-of-type {
+              a {
+                margin-top: 20px;
+                float: right;
+                span {
+                  display: inline-block;
+                }
+              }
+            }
+
+          }
+          table {
+            tr {
+              td {
+                padding-bottom: 10px;
+                &:last-of-type {
+                  padding-left: 10px;
+                  td {
+                    margin-bottom: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+        table {
+          width: 100%;
+          margin-top: 10px;
+          tr {
+            width: 100%;
+            &:last-of-type {
+              td {
+                &:last-of-type {
+                  h3 {
+                    color: #69a30d;
+                    font-weight: bold;
+                    font-size: 14px;
+                  }
+                }
+              }
+            }
+            td {
+                header {
+                  text-transform: uppercase;
+                  color: #9b9b9b;
+                  font-size: 12px;
+                }
+              &:last-of-type {
+                padding-right: 15px;
+                h3 {
+                  font-size: 22px;
+                  color: #9b9b9b;
+                  font-weight: semibold;
+                }
+              }
+              * {
+                margin: 0;
+                padding: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .add-new-employees{
+    text-align: right;
+    margin-left: 15%;
+  }
+
+  .document-modal{
+     width: 900px;
+     .document-modal-body{
+         margin:1em;
+         border: 1px solid;
+         padding: 1em;
+     }
+     .document-modal-buttons{
+          text-align: right;
+      }
+     iframe{
+         border: 0;
+     }
+  }
+  .planyear-add-tab {
+    margin-bottom: 50px;
+  }
+  .premium-reports-tab {
+    form {
+      display: inline;
+    }
+    input[type=submit] {
+      -webkit-appearance:none;
+      background-color: transparent;
+      margin-right: 15px;
+      &:hover {
+        background-color: #ffffff;
+      }
+    }
+  }
+
+
+}
+#add_employee_action {
+  table {
+    &.table-striped {
+      table-layout: fixed;
+      overflow-x: hidden;
+      margin: 0;
+      width: 100%;
+      padding: 0;
+      th {
+        padding: 0;
+        text-align: center;
+        font-size: 12px;
+
+        font-weight: bold;
+        text-transform: capitalize;
+        padding-bottom: 5px;
+      }
+      td {
+
+      }
+    }
+  }
+}
+.selected-plan {
+  .col-xs-12 {
+    i {
+      display: block;
+      margin: auto;
+      text-align: center;
+    }
+  }
+  table {
+    table-layout: fixed;
+  }
+
+}
+#modal-wrapper {
+  display: none;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  position: fixed;
+  z-index: 1040;
+  background-color: rgba(256,256,256,.9);
+  .employee-upload {
+      color: #000;
+      position: relative;
+      width: 50%;
+      top: 10%;
+      border: solid 1px #b7b7b7;
+      background-color: rgba(256,256,256,1);
+      margin: auto;
+      text-align: center;
+      padding-bottom: 50px;
+      h2 {
+        color: #003260;
+        font-weight: 300;
+        padding-top: 30px;
+      }
+      h4 {
+        padding: 0 40px;
+        &:last-of-type {
+          color: $primary-blue;
+          margin-bottom: 30px;
+
+        }
+      }
+      input[type=file], input[type=submit] {
+        display: none;
+        margin-top: 30px;
+      }
+      .upload-preview {
+        padding: 10px 5px;
+        border: solid 1px #b7b7b7;
+        display: none;
+        width: 50%;
+        margin: auto;
+        font-size: 16px;
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+    .fa {
+      color: $primary-blue;
+      cursor: pointer;
+      &.pull-right {
+        margin: 6px 10px 0 0;
+        &:last-of-type {
+          margin: 4px 0 0 0;
+          position: absolute;
+          right: 5px;
+
+        }
+
+      }
+
+    }
+}
+
+// plan shopping
+#plans {
+  .current {
+    margin: 0 0 5px 0;
+    .fa {
+      color: $primary-blue;
+      margin: 0 5px 0 0;
+      &.published, &.enrolling {
+        color: #FFD700;
+      }
+    }
+    &.bg-title {
+      font-weight: bold;
+      display: inline-block;
+      color: #69A30D;
+      font-size: 14px;
+
+    }
+  }
+  input[type=checkbox] {
+    display: none;
+    &+span {
+      margin-left: 0;
+    }
+  }
+  table {
+    margin-bottom: 10px;
+  }
+}
+.edit-offering, .reference-steps, .selected-plan {
+  h4.change-dental-reference-plan {
+    font-size: 15px;
+  }
+  h4.dental-view-summary, h4.health-view-summary {
+    display: none;
+  }
+  h4.change-plan, h4.cancel-plan-change, h4.dental-config-reference-selection, h4.change-dental-reference-plan, h4.dental-view-summary, h4.health-view-summary {
+    color: $primary-blue;
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+}
+.benefit-group-fields {
+  padding-bottom: 50px;
+  &:last-of-type {
+    padding-bottom: 0;
+  }
+}
+
+
+#home .select-dental-plan {
+  .fa {
+    &.fa-trash-o {
+      color: #b7b7b7;
+      &:hover {
+        color: #23527c;
+      }
+    }
+  }
+  .premium-storage-input {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+  }
+  .dental-benefits-fields {
+    background-color: #ffffff;
+    border: solid 1px #d5d5d5;
+    .slider {
+      .slider-selection {
+         background: #9C9C9C;
+      }
+    }
+
+    .row-form-wrapper {
+      padding: 15px 0;
+      border-bottom: solid 1px #d5d5d5;
+      .form-group {
+        .col-xs-9 {
+          padding-right: 0;
+        }
+      }
+      &:last-of-type {
+        border-bottom: none;
+        display: none;
+      }
+    }
+
+  }
+  .row-form-wrapper.heading {
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 10px 0 0 0;
+
+    color: rgb(131, 135, 128);
+    border-bottom: none;
+
+
+    .col-xs-6 {
+      border-bottom: solid 1px #d5d5d5;
+      padding: 15px 0 25px;
+      text-align: center;
+
+    }
+    .row-form-wrapper {
+      border: none;
+      border-left: solid 1px #d5d5d5;
+      border-top: none;
+
+    }
+    &+.row-form-wrapper {
+        border-top: none;
+
+
+    }
+  }
+  .benefits-fields {
+    .row-form-wrapper {
+      padding: 15px 0;
+      &:last-of-type {
+        display: none;
+      }
+    }
+  }
+  .row-form-wrapper {
+    border: none;
+  }
+}
+
+
+
+#home #account-detail {
+  .panel.myplanyear h5 {
+    color: #b7b7b7;
+    margin: 0 auto;
+    font-size: 14px;
+  }
+  .panel.myplanyear .panel-heading {
+    margin-bottom: 5px;
+  }
+  .panel.myplanyear table {
+    tr{
+      td:last-of-type {
+        text-align: right;
+        font-weight: bold;
+        color: #69A30D;
+      }
+    }
+  }
+}
+.plan-year {
+  .plan-details {
+    display: none;
+  }
+}
+
+.carrier-list-container .loading {
+  position: relative;
+  padding-top: 30px;
+  top: 50%;
+  text-align: center;
+}

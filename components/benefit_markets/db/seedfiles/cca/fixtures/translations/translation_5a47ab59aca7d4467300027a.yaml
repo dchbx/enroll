@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAJ6
+  key: en.broker_agencies.profiles.manage_employers_for
+  value: '"Manage Employers for"'

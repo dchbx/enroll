@@ -1,0 +1,21 @@
+.home-tab
+  h1 My Health Benefits Program
+  - if @current_plan_year.present?
+  .col-md-8.content-bottom
+    .row
+      - if @current_plan_year.present?
+        = render partial: 'ui-components/v1/cards/employee_enrollments'
+        = render partial: 'ui-components/v1/cards/plan_year'
+        - @current_plan_year.benefit_groups.each do |bg|
+          = render partial: 'ui-components/v1/cards/benefit_groups', locals: { bg: bg }
+      - else
+        = render partial: 'employers/employer_profiles/my_account/employer_welcome'
+  - if !@current_plan_year.present?
+    .row
+      .col-xs-4
+        = render partial: 'ui-components/v1/cards/employer_broker_widget'
+
+javascript:
+  $(document).on('ready page:load', function () {
+    Freebies.manualTooltip();
+  });

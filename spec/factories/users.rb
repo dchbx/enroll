@@ -8,6 +8,16 @@ FactoryGirl.define do
     sequence(:authentication_token) {|n| "j#{n}-#{n}DwiJY4XwSnmywdMW"}
     approved true
     roles ['web_service']
+
+    transient do
+      with_security_questions { true }
+    end
+
+    after(:create) do |user, evaluator|
+      if evaluator.with_security_questions
+        3.times { create(:security_question_response, user: user) }
+      end
+    end
   end
 
   trait :without_email do
