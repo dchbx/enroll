@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPY
+  division_code: I
+  division_label: Services
+  major_group_code: '86'
+  major_group_label: Membership Organizations
+  industry_group_code: '866'
+  industry_group_label: Religious Organizations
+  sic_code: '8661'
+  sic_label: Religious Organizations

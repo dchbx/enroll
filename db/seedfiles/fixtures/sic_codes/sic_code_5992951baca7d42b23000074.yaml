@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAB0
+  division_code: C
+  division_label: Construction
+  major_group_code: '15'
+  major_group_label: Building Construction General Contractors And Operative Builders
+  industry_group_code: '154'
+  industry_group_label: General Building Contractors-nonresidential
+  sic_code: '1541'
+  sic_label: General Contractors-Industrial Buildings and Warehouses

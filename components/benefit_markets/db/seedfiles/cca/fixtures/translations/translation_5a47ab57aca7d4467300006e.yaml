@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAABu
+  key: en.uis.bootstrap3_examples.index.button_group_desc
+  value: '"we can group buttons in 3 different ways"'

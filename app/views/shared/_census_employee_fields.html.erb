@@ -9,26 +9,22 @@
           Is Owner?
         </label>
         <label class="vertically-aligned-row">
-          <%= f.check_box :is_business_owner %>
-          <%= f.label :is_business_owner do %>
-          <i class="fa fa-check-square-o fa-lg"></i>
-          <i class="fa fa-square-o fa-lg"></i>
-          <% end %>
           <span>
+            <%= f.check_box :is_business_owner %>
             Owner?
           </span>
         </label>
       </div>
     </div>
-    <% current_benefit_groups, renewing_benefit_groups = get_benefit_groups_for_census_employee %>
-    <% if renewing_benefit_groups.present? %>
+    <% current_benefit_packages, renewing_benefit_packages = get_benefit_packages_for_census_employee %>
+    <% if renewing_benefit_packages.present? %>
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <div class="selectric-labeled">
         <span>
           <strong>Benefit Package</strong>
         </span>
         <%= f.fields_for :benefit_group_assignments, @census_employee.active_benefit_group_assignment, errors: {}, fieldset: false do |benefit_group_assignment| %>
-        <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_groups, current_option: (@census_employee.active_benefit_group_assignment.try(:benefit_group_id) || @employer_profile.default_benefit_group.try(:id)), prompt: "SELECT BENEFIT PACKAGE"  %>
+        <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_packages, current_option: current_option_for_initial_benefit_package, prompt: "SELECT BENEFIT PACKAGE"  %>
         <% end %>
       </div>
     </div>
@@ -38,7 +34,7 @@
           <strong>Renewal Benefit Package</strong>
         </span>
         <%= f.fields_for :renewal_benefit_group_assignments, @census_employee.renewal_benefit_group_assignment, errors: {}, fieldset: false do |benefit_group_assignment| %>
-        <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: renewing_benefit_groups, current_option: (@census_employee.renewal_benefit_group_assignment.try(:benefit_group_id) || @employer_profile.try(:renewing_plan_year).benefit_groups.first.id), prompt: "SELECT RENEWAL BENEFIT PACKAGE" %>
+        <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: renewing_benefit_packages, current_option: current_option_for_renewal_benefit_package, prompt: "SELECT RENEWAL BENEFIT PACKAGE" %>
         <% end %>
       </div>
     </div>
@@ -48,12 +44,30 @@
         <span>
           <strong>Benefit Package</strong>
         </span>
-            <% @census_employee.benefit_group_assignments << @census_employee.benefit_group_assignments.build if (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.last).blank? %>
-            <%= f.fields_for :benefit_group_assignments, (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.last), errors: {}, fieldset: false do |benefit_group_assignment| %>
-            <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_groups, current_option: (@census_employee.active_benefit_group_assignment.try(:benefit_group_id) || @employer_profile.default_benefit_group.try(:id)), prompt: "SELECT BENEFIT PACKAGE" %>
+            <%= f.fields_for :benefit_group_assignments, (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.build), errors: {}, fieldset: false do |benefit_group_assignment| %>
+            <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_packages, current_option: current_option_for_initial_benefit_package, prompt: "SELECT BENEFIT PACKAGE" %>
             <% end %>
        </div>
     </div>
     <% end %>
   </div>
 </div>
+
+<script>
+  var disableSelectric = false;
+</script>
+  
+<style>
+  .n-radio-group .n-radio-row:first-of-type {
+    border:none !important;
+  }
+  .n-radio-group .n-radio-row {
+    padding:0px !important;
+  }
+  .module.forms .owner.checkbox {
+      margin-left: -5px;
+  }
+  .module.forms .checkbox {
+      margin: auto;
+  }
+</style>

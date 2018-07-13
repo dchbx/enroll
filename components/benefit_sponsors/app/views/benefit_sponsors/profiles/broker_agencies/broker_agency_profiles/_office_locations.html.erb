@@ -1,0 +1,13 @@
+<h2><%= l10n("broker_agencies.profiles.office_locations")%></h3>
+
+<div class="table-border">
+<% if office_locations.present? %>
+  <table class="table">
+    <% office_locations.each do |office_location| %>
+      <tr>
+        <td><%= office_location.address.to_s %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+</div>

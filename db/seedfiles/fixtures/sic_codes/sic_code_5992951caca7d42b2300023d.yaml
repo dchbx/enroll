@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAI9
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '38'
+  major_group_label: Measuring, Analyzing, And Controlling Instruments; Photographic,
+    Medical And Optical Goods; Watches And Clocks
+  industry_group_code: '384'
+  industry_group_label: Surgical, Medical, And Dental Instruments And Supplies
+  sic_code: '3842'
+  sic_label: Orthopedic, Prosthetic, and Surgical Appliances and Supplies

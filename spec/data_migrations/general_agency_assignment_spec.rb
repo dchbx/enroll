@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 require File.join(Rails.root, "app", "data_migrations", "general_agency_assignment")
 
 describe GeneralAgencyAssignment, dbclean: :around_each do
@@ -36,4 +37,5 @@ describe GeneralAgencyAssignment, dbclean: :around_each do
       expect(employer_profile.general_agency_accounts.present?).to eq true
     end
   end
+end
 end

@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8B6yn1GT8AAAI
+  key: en.insured.group_selection.new.effective_date
+  value: '"EFFECTIVE DATE"'

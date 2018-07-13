@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAIV
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '36'
+  major_group_label: Electronic And Other Electrical Equipment And Components, Except
+    Computer Equipment
+  industry_group_code: '367'
+  industry_group_label: Electronic Components And Accessories
+  sic_code: '3672'
+  sic_label: Printed Circuit Boards

@@ -1,0 +1,11 @@
+<% if @roster_upload_form.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@roster_upload_form.errors.count, "error") %> prohibited this csv from being processed:</h2>
+
+      <ul>
+        <% @roster_upload_form.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+<% end %>

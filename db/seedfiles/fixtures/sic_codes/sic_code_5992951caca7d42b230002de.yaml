@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALe
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '52'
+  major_group_label: Building Materials, Hardware, Garden Supply, And Mobile Home
+    Dealers
+  industry_group_code: '521'
+  industry_group_label: Lumber And Other Building Materials Dealers
+  sic_code: '5211'
+  sic_label: Lumber and Other Building Materials Dealers

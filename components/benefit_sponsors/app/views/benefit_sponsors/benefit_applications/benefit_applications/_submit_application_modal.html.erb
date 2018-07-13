@@ -1,0 +1,58 @@
+<div class="modal" id="submitBenefitApplication" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <% if employer_attestation_is_enabled? %>
+          <h4 class="modal-title"><%= benefit_application.no_documents_uploaded? ? "Document Upload Required to Proceed" : "Application may be ineligible!" %></h4>
+        <%else%>
+          <h4 class="modal-title">Confirm Publish Plan Year</h4>
+        <%end%>
+      </div>
+      <% warnings = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application).application_eligibility_warnings %>
+      <% if employer_attestation_is_enabled? %>
+        <div class="modal-body">
+          <% if benefit_application.no_documents_uploaded? %>
+            <p>
+              Before you can complete your application, you will need to submit proof of your eligibility as a <%= aca_state_name %> small business to shop through the <%= site_short_name %>. You will need to submit this proof before you are able to publish your plan year. <%= link_to "View our list of documents that can be submitted as proof.", "#{site_document_verification_checklist_url}" %>
+              <br>
+              <ul>
+                <li>
+                  To upload documentation of your eligibility, go to the Documents option on the left and follow instructions to upload the documentation of your eligibility.
+                </li>
+                <li>
+                  Once you have uploaded your <%= link_to 'Documents', profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'documents') %> you can return to this page and publish your plan year.
+                </li>
+              </ul>
+            </p>
+          <% else %>
+            <p>If you submit this application as is, the small business application may be ineligible for coverage through the <%= Settings.site.short_name %> because it does not meet the eligibility reason(s) identified below: </p>
+            <p><ul class="application-warnings"></ul></p>
+            <p>Click Cancel if you want to go back and review your application information for accuracy. If the information provided on your application is accurate, you may click Publish Anyways to proceed. If you choose to proceed and the application is determined to be ineligible, you will be notified with the reason for the eligibility determination along with what your options are to appeal this determination.</p>
+          <% end %>
+        </div>
+        <div class="modal-footer">
+          <% unless benefit_application.no_documents_uploaded? %>
+            <%= link_to 'Cancel', profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+            <%= link_to 'Publish Anyways', benefit_sponsorship_benefit_application_force_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, :class => 'btn btn-danger' %>
+          <% else %>
+            <%= link_to 'Cancel', profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+          <% end %>
+          <% error_page = warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile.id) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
+        </div>
+      <%else%>
+        <div class="modal-body">
+          <p>
+            As submitted, this application is ineligible for coverage under the <%= Settings.site.short_name %> exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by <%= Settings.site.short_name %> officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
+          </p>
+          <ul class="application-warnings"></ul>
+        </div>
+        <div class="modal-footer">
+          <%= link_to 'Force Publish', benefit_sponsorship_benefit_application_force_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, :class => 'btn btn-danger' %>
+          <% error_page = warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
+          <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
+        </div>
+      <%end%>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'rake'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe 'recurring:ivl_reminder_notices', :dbclean => :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: nil)}
@@ -53,4 +54,5 @@ describe 'recurring:ivl_reminder_notices', :dbclean => :after_each do
       Rake::Task["recurring:ivl_reminder_notices"].invoke
     end
   end
+end
 end

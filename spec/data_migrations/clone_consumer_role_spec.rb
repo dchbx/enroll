@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "clone_consumer_role")
 describe CloneConsumerRole do
   let(:given_task_name) { "clone_consumer_role" }
@@ -46,4 +47,5 @@ describe CloneConsumerRole do
     end
   end
 
+end
 end

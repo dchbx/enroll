@@ -1,0 +1,22 @@
+PAGINATION_EXAMPLE_TRANSLATIONS = {
+  "en.uis.bootstrap3_examples.index.pagination" => "Pagination",
+  "en.uis.bootstrap3_examples.index.default_pagination" => "Default pagination",
+  "en.uis.bootstrap3_examples.index.1" => "1",
+  "en.uis.bootstrap3_examples.index.2" => "2",
+  "en.uis.bootstrap3_examples.index.3" => "3",
+  "en.uis.bootstrap3_examples.index.4" => "4",
+  "en.uis.bootstrap3_examples.index.5" => "5",
+  "en.uis.bootstrap3_examples.index.disabled_and_active_states" => "Disabled and active states",
+  "en.uis.bootstrap3_examples.index.current" => "current",
+  "en.uis.bootstrap3_examples.index.large_sizing" => "Large Sizing",
+  "en.uis.bootstrap3_examples.index.default_sizing" => "Default Sizing",
+  "en.uis.bootstrap3_examples.index.small_sizing" => "Small Sizing",
+  "en.uis.bootstrap3_examples.index.pager" => "Pager",
+  "en.uis.bootstrap3_examples.index.default" => "Default",
+  "en.uis.bootstrap3_examples.index.previous" => "Previous",
+  "en.uis.bootstrap3_examples.index.next" => "Next",
+  "en.uis.bootstrap3_examples.index.aligned_links" => "Aligned links",
+  "en.uis.bootstrap3_examples.index.older" => "Older",
+  "en.uis.bootstrap3_examples.index.newer" => "Newer",
+  "en.uis.bootstrap3_examples.index.optional_disabled_state" => "Optional disabled state"
+}

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMa
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '59'
+  major_group_label: Miscellaneous Retail
+  industry_group_code: '599'
+  industry_group_label: Retail Stores, Not Elsewhere Classified
+  sic_code: '5993'
+  sic_label: Tobacco Stores and Stands

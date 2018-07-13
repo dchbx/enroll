@@ -1,0 +1,56 @@
+<nav>
+  <ul id="uic-employers-right-menu">
+    <li <%= menu_tab_class(active_tab, "home") %>>
+      <%= link_to "My #{Settings.site.short_name}", profiles_employers_employer_profile_path(profile.id, :tab=>'home'), "aria-expanded" => "true" %>
+    </li>
+    <li <%= menu_tab_class(active_tab, "employees") %>>
+      <%= link_to 'Employees', profiles_employers_employer_profile_path(profile.id, :tab=>'employees'), "aria-expanded" => "true" %>
+    </li>
+    <li <%= menu_tab_class(active_tab, "benefits") %>>
+      <%= link_to 'Benefits', profiles_employers_employer_profile_path(profile.id, :tab=>'benefits'), "aria-expanded" => "true" %>
+    </li>
+    <li <%= menu_tab_class(active_tab, "brokers") %>>
+      <%= link_to 'Brokers', profiles_employers_employer_profile_path(profile.id, :tab=>'brokers'), "aria-expanded" => "true" %>
+    </li>
+    <% if benefit_sponsor_display_families_tab(current_user, profile.id) %>
+      <li <%= menu_tab_class(active_tab, "families") %>>
+        <%= link_to 'Families', profiles_employers_employer_profile_path(profile.id, :tab=>'families'), "aria-expanded" => "true" %>
+      </li>
+    <% end %>
+    <li <%= menu_tab_class(active_tab, "documents") %>>
+      <%= link_to 'Documents', profiles_employers_employer_profile_path(profile.id, :tab=>'documents'), "aria-expanded" => "true" %>
+    </li>
+    <li <%= menu_tab_class(active_tab, "billing") %>>
+      <%= link_to 'Billing', profiles_employers_employer_profile_path(profile.id,:tab=>'billing'), "aria-expanded" => "true" %>
+    </li>
+    <%# unless current_user.try(:has_broker_agency_staff_role?)%>
+    <li <%= menu_tab_class(active_tab, "inbox") %>>
+      <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
+        Messages
+        <span class="badge message-unread"><%= profile.inbox.unread_messages.try(:count) || 0 %></span>
+      <% end %>
+      <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do  %>
+      <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+      <small>Messages</small>
+      <% end %>
+    </li>
+    <%# end %>
+  </ul>
+  <div class="module my-account-widget panel panel-default">
+    <div class="panel-heading">
+      <h4><%= organization.legal_name %></h4>
+      <%= link_to 'Update Business Info', edit_profiles_registration_path(profile.id) %>
+      <br/>
+      <!-- TODO fix this when implementing Pundit -->
+      <%#= pundit_span profile, :list_enrollments? %>
+        <%= link_to 'View Enrollment Reports', profiles_employers_employer_profile_premium_statements_path(profile.id) %>
+      </span>
+    </div>
+    <div class="panel-body">
+      <%= link_to profiles_employers_employer_profile_path(profile.id, :tab=>'employees') do %>
+      <!-- TODO fix this when implementing relationship b/w census_employee and employer_profile-->
+      <div>My Employees: <span><%#= profile.census_employees.active.count %></span></div>
+      <% end %>
+    </div>
+  </div>
+</nav>

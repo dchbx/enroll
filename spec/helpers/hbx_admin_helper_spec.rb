@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe HbxAdminHelper, :type => :helper do
   let(:family)    { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:household) { FactoryGirl.create(:household, family: family)}
@@ -47,4 +48,5 @@ RSpec.describe HbxAdminHelper, :type => :helper do
 
   end
 
+end
 end

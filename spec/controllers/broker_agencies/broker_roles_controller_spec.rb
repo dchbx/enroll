@@ -97,7 +97,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         legal_name: 'useragency',
         fein: "223232323",
         entity_kind: "c_corporation",
-        market_kind: "individual",
+        market_kind: "shop",
         working_hours: "0",
         accept_new_clients: "0",
         office_locations_attributes: office_locations
@@ -292,8 +292,8 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     end
   end
 
-  context "search_broker_agency" do
-    before :all do
+  context "search_broker_agency", :dbclean => :after_each do
+    before :each do
       @organization = FactoryGirl.create(:broker_agency)
       @broker_agency_profile = @organization.broker_agency_profile
     end

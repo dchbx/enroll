@@ -1,0 +1,12 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADQ
+  key: en.insured.consumer_roles.docs_shared.i94_number_title
+  value: '"• When entering the I-94 Number, only include numbers.  Do not enter any
+    other characters, letters, or spaces. • You must enter exactly 11 digits into
+    the I-94 Number field.   How to find the I-94 Number:   The I-94 Number is also
+    called an admission number. It is an 11 digit number found printed on Arrival/Departure
+    Records (Form I-94 or Form I-94A). It can also be found on Form I-9."'

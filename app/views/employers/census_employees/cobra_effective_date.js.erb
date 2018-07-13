@@ -1,0 +1,13 @@
+var containing_row = $("#census_employeeid_<%= @census_employee.id %>").closest('TR');
+var $parent_row = containing_row;
+//var $parent_row = $(".table:first > tbody > tr:not(tr.child-row)").eq(<%= @row %>);
+if ( $('tr.child-row:visible').length > 0 ) {
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+}
+if ( $parent_row.next().hasClass('child-row') ) {
+} else {
+    $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render partial: "employers/census_employees/initiate_cobra" %></td></tr>');
+    $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
+    $('.dropdown.pull-right').removeClass('open');
+}

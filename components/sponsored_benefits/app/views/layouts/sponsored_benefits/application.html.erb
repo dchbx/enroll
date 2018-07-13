@@ -1,0 +1,24 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
+  <%= stylesheet_link_tag "application", :media => "all" %>
+  <%= stylesheet_link_tag    "sponsored_benefits/application", media: "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "sponsored_benefits/application" %>
+  <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_pack_tag 'ui_components', 'data-turbolinks-track': 'reload' %>
+  <%= csrf_meta_tags %>
+</head>
+<body class="font">
+    <%= render './ui-components/v1/navs/header' %>
+    <%= render 'shared/engines/broker_menu' %>
+    <%= render_flash %>
+    <div class="content <%= controller_name %>">
+      <%= yield %>
+    </div>
+
+</body>
+</html>
+

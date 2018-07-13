@@ -68,7 +68,7 @@ Then(/^the broker enters the quote effective date$/) do
 end
 
 When(/^the broker selects employer type$/) do
- find('.interaction-choice-control-quote-employer-type').click()
+ #find('.interaction-choice-control-quote-employer-type').click()
  select "Prospect", :from => "quote_employer_type"
  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
@@ -95,7 +95,7 @@ Then(/^the broker clicks on Home button$/) do
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
-  find('#dropdownMenu1').trigger 'click'
+  find('.dropdown-toggle', :text => "Actions").trigger 'click'
 end
 
 When(/^the broker clicks delete$/) do
@@ -136,10 +136,10 @@ Given(/^the Plans exist$/) do
   open_enrollment_end_on = open_enrollment_start_on + 12.days
   start_on = open_enrollment_start_on + 2.months
   end_on = start_on + 1.year - 1.day
-  plan1 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
-  plan2 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
-  plan3 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
-  plan4 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
+  plan1 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
+  plan2 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
+  plan3 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
+  plan4 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
   Caches::PlanDetails.load_record_cache!
 end
 

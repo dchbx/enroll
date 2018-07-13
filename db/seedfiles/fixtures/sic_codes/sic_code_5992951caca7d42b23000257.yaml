@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJX
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '40'
+  major_group_label: Railroad Transportation
+  industry_group_code: '401'
+  industry_group_label: Railroads
+  sic_code: '4013'
+  sic_label: Railroad Switching and Terminal Establishments

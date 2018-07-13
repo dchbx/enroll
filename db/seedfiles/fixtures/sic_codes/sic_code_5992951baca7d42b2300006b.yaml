@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABr
+  division_code: B
+  division_label: Mining
+  major_group_code: '14'
+  major_group_label: Mining And Quarrying Of Nonmetallic Minerals, Except Fuels
+  industry_group_code: '145'
+  industry_group_label: Clay, Ceramic, And Refractory Minerals
+  sic_code: '1459'
+  sic_label: Clay, Ceramic, and Refractory Minerals, Not Elsewhere Classified

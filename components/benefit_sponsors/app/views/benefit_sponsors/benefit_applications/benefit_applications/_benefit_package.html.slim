@@ -1,0 +1,26 @@
+.row
+  #scroll_container.col-xs-12
+    label.plan-offerings Plan Offerings - = render_plan_offerings(@benefit_package, @coverage_type)
+    label Employer Lowest/Reference/Highest -
+      | /
+      = number_to_currency(@benefit_group_costs[:lowest_plan_employer_cost])
+      | /
+      = number_to_currency(@benefit_group_costs[:ref_plan_employer_cost])
+      | /
+      = number_to_currency(@benefit_group_costs[:highest_plan_employer_cost])
+
+table.table.table-bg-white.table-employee-2
+  thead
+    tr scope="col"
+      th Employee
+      th Dependent Count
+      - if !@benefit_package.single_plan_type? || @coverage_type == '.dental'
+        th Lowest Cost Available Plan
+      th Reference Plan
+      - if !@benefit_package.single_plan_type? || @coverage_type == '.dental'
+        th Highest Cost Available Plan
+  tbody#employee_index_scroll
+    - if @employer_profile.census_employees.active.any?
+      = render 'employee_costs'
+    tr
+      td No employees enrolled.

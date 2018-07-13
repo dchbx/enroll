@@ -7,6 +7,13 @@ RSpec.describe "events/employers/updated.haml.erb" do
   let(:entity_kind) { "c_corporation" }
 
   let(:organization) { Organization.new(:legal_name => legal_name, :fein => fein, :is_active => false) }
+  let(:office_location) { double(:address => address) }
+  let(:address) { double }
+
+  before :each do
+    allow(organization).to receive(:primary_office_location).and_return(office_location)
+    allow(RatingArea).to receive(:rating_area_for).with(address).and_return("RATING AREA")
+  end
 
   describe "given a single plan year" do
     include AcapiVocabularySpecHelpers

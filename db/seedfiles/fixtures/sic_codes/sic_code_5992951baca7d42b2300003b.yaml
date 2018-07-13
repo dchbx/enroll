@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAA7
+  division_code: A
+  division_label: Agriculture, Forestry, And Fishing
+  major_group_code: '02'
+  major_group_label: Agriculture production livestock and animal specialties
+  industry_group_code: 029
+  industry_group_label: General Farms, Primarily Livestock And Animal
+  sic_code: 0291
+  sic_label: General Farms, Primarily Livestock and Animal Specialties

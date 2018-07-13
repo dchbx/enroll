@@ -1,0 +1,3 @@
+<%= form_for scheduled_event, as: :scheduled_event, url: exchanges_scheduled_event_path(scheduled_event), remote: true, html: { method: :put } do |f| %>
+  <%= render "event_form", f: f  %>
+<% end %>

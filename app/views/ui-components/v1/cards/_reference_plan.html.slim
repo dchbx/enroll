@@ -1,0 +1,186 @@
+- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
+
+.panel
+  .panel-body
+    .row
+      .col-xs-8
+        h3.heading-text.mt-0 #{f.object.reference_product.title}
+      .col-xs-4
+        a onclick="showPlanSelection()" Change reference Plan?
+    .row
+      table.table
+        tbody
+          tr
+            th Type
+            th Carrier
+            th Metal Level
+            th Network
+          tr
+            td #{f.object.reference_product.plan_kind}
+            td #{f.object.reference_product.issuer_name}
+            td #{f.object.reference_product.metal_level_kind}
+            td Plan Network
+    .row
+      h4.pl-1 Your Estimated Monthly Cost
+    .row
+      .col-xs-4
+        h2.mt-0.heading-text#estimatedERCost= number_to_currency(f.object.employer_estimated_monthly_cost)
+      .col-xs-3
+        | Estimated monthly cost including all roster employees
+      .col-xs-2
+        strong.mb-1 Min
+        br
+        span#estimatedEEMin= number_to_currency(f.object.employer_estimated_min_monthly_cost)
+      .col-xs-2
+        strong.mb-1 Max
+        br
+        span#estimatedEEMax= number_to_currency(f.object.employer_estimated_max_monthly_cost)
+
+- if show_benefit_application_tile == "true"
+  javascript:
+    var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
+    var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
+
+    function setInputValue(element) {
+      document.getElementById(element.dataset.id).value = element.value;
+      contributionAmounts(element)
+    }
+
+    function setSliderValue(element) {
+      document.querySelector("[data-id='"+element.id+"']").value = element.value;
+      contributionAmounts(element)
+    }
+  
+    function showPlanSelection() {
+      document.getElementById('planSelection').classList.remove('hidden');
+      document.getElementById('referencePlanEdit').classList.add('hidden');
+      document.getElementById('scEdit').remove();
+    }
+  
+    function disablePlanYearButton() {
+      var savePlanYearButton = document.getElementById('submitBenefitPackage');
+      savePlanYearButton.classList.add('disabled')
+      disableAddBenefitPackageButton()
+      preventSubmissionOnEnter()
+    }
+  
+    function enablePlanYearButton() {
+      var savePlanYearButton = document.getElementById('submitBenefitPackage');
+      savePlanYearButton.classList.remove('disabled')
+      enableAddBenefitPackageButton()
+    }
+
+    function disableAddBenefitPackageButton() {
+      var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+      addBenefitPackageButton.classList.add('disabled')
+    }
+
+    function enableAddBenefitPackageButton() {
+      var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+      addBenefitPackageButton.classList.remove('disabled')
+    }
+
+    function preventSubmissionOnEnter() {
+      document.getElementById('new_benefit_package').onkeypress = function(e) {
+        var key = e.charCode || e.keyCode || 0;
+        if (key == 13) {
+            e.preventDefault();
+          }
+      }
+    }
+  
+    var eeContribution;
+    var spouse;
+    var domesticPartner;
+    var childUnder26;
+    var employeeOnly;
+    var familyOnly;
+    var contributionInputs;
+    
+    function contributionAmounts(element) {
+      contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
+      contributionHandlers = document.querySelectorAll(".contribution_handler")
+
+      contributionInputs.forEach(function(element) {
+        if (!element.offsetWidth > 0 && !element.offsetHeight > 0) {
+          return
+        }
+        switch (element.dataset.displayname) {
+          case 'Employee':
+            eeContribution = element.value;
+          break;
+          case 'Spouse':
+            spouse = element.value;
+          break;
+          case 'Domestic Partner':
+            domesticPartner = element.value;
+          break;
+          case 'Child Under 26':
+            childUnder26 = element.value;
+          break;
+          case 'Employee Only':
+            employeeOnly = element.value;
+          break;
+          case 'Family':
+            familyOnly = element.value;
+          break;
+        }
+      })
+
+      contributionHandlers.forEach(function(element) {
+        switch (element.dataset.displayname) {
+          case 'Employee':
+            if(!(element.checked)) {
+              eeContribution = 100
+            }
+          break;
+          case 'Spouse':
+            if(!(element.checked)) {
+              spouse = 100
+            }
+          break;
+          case 'Domestic Partner':
+            if(!(element.checked)) {
+              domesticPartner = 100
+            }
+          break;
+          case 'Child Under 26':
+            if(!(element.checked)) {
+              childUnder26 = 100
+            }
+          break;
+          case 'Employee Only':
+            if(!(element.checked)) {
+              employeeOnly = 100
+            }
+          break;
+          case 'Family':
+            if(!(element.checked)) {
+              familyOnly = 100
+            }
+          break;
+        }
+      })
+
+      if (eeContribution < erCL || employeeOnly < erCL) {
+        disablePlanYearButton()
+      } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
+        disablePlanYearButton()
+      } else {
+        enablePlanYearButton()
+      }
+      submitContributionDetailsForSelectedReferencePlan()
+    }
+
+    function submitContributionDetailsForSelectedReferencePlan() {
+      var productOptionKind = "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}";
+      var referencePlanId = "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}";
+      var sponsoredBenefitId = "#{@benefit_package_form.sponsored_benefits.first.id}";
+
+      calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId);
+      calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      contributionAmounts();
+    }, false)

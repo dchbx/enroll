@@ -8,5 +8,5 @@
   %open_enrollment_end= simple_date_for(plan_year.open_enrollment_end_on)
   - if plan_year.benefit_groups.any?
     %benefit_groups
-      = render :partial => "events/v2/employers/health_and_dental_benefit_group", :collection => plan_year.benefit_groups, as: :benefit_group
+      = render :partial => "events/employers/health_and_dental_benefit_group", :collection => plan_year.benefit_groups, as: :benefit_group
   = render :partial => "events/shared/versioned_resource", :object => plan_year

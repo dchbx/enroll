@@ -1,0 +1,21 @@
+h4.mb-2 NOTE: If you are not associated with a broker agency, please enter your personal information. Do not enter a General Agency or Third Party Administrator‘s Information.
+
+.row
+  = f.hidden_field(:entity_kind, :value => "s_corporation")
+  .col-md-6.mb-2
+    label for="inputLegalName" Legal Name *
+    = f.text_field :legal_name, placeholder:'Legal Name', required:'true', id:'validationCustomLegalName', class:'form-control'
+    .invalid-feedback
+      |
+        Please provide a legal name.
+  
+  .col-md-3.mb-2
+    label for="inputDBA" DBA
+    = f.text_field :dba, placeholder:'DBA', id:'validationCustomdba', class:'form-control'
+
+  .col-md-3.mb-2
+    label for="inputFEIN" FEIN *
+    = f.text_field :fein, placeholder:'FEIN', id:'inputFein', class:'form-control', minlength:'9', maxlength:'9', onkeypress:'return isNumberKey(event)', required:'true'
+    .invalid-feedback
+      |
+        Please provide a valid FEIN.

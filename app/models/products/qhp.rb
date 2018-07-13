@@ -102,8 +102,8 @@ class Products::Qhp
   index({"state_postal_code" => 1})
   index({"national_network" => 1})
   index({"tin" => 1}, {sparse: true})
-
   index({"qhp_benefits.benefit_type_code" => 1})
+  index({"standard_component_id" => 1, "active_year" => 1})
 
   def plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
@@ -169,7 +169,7 @@ class Products::Qhp
             qhp.plan.carrier_profile.organization.legal_name,
             qhp.plan.name,
             "$#{qhp[:total_employee_cost].round(2)} / month",
-            qhp.plan.nationwide ? "Nationwide" : "DC-Metro",
+            qhp.plan.nationwide ? "Nationwide" : qhp.plan.service_area_id,
             "Co-Pay"
           ]
           arry2 = [

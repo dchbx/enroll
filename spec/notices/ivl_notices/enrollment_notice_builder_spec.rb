@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
@@ -214,4 +215,5 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
   end
 
+end
 end

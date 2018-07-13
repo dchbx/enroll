@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWqyn1EZzAALz
+  key: en.broker_agencies.quotes.publish_quote.publish_quote_message
+  value: '"You can download a PDF version of your quote via the quote management index
+    page."'

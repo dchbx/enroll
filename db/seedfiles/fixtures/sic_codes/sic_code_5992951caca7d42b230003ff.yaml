@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAP/
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '96'
+  major_group_label: Administration Of Economic Programs
+  industry_group_code: '964'
+  industry_group_label: Regulation Of Agricultural Marketing And
+  sic_code: '9641'
+  sic_label: Regulation of Agricultural Marketing and Commodities

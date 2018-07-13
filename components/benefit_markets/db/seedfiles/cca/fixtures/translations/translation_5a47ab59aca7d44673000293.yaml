@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAKT
+  key: en.broker_agencies.quotes.step_3
+  value: '"Step 3 - Select reference plans for comparison using Roster Cost to Employer"'

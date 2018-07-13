@@ -1,0 +1,78 @@
+// Disables kind for first Address and sets kind to primary
+window.onload = function() {
+  setPrimaryOfficeLocation()
+}
+
+function validateForm() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+}
+
+count = 0;
+
+function addOfficeLocation() {
+  // Makes a new node for existing office location
+  var officeField = document.querySelector('#officeLocations');
+  var newOfficeField = document.importNode(officeField, true)
+  count ++;
+  currentCount = count - 1;
+  officeField.querySelectorAll('input').forEach(function(input) {
+    var name = input.getAttribute('name').replace('['+currentCount+']', '['+count+']')
+    input.setAttribute('name', name);
+  })
+  officeField.querySelectorAll('select').forEach(function(input) {
+    var name = input.getAttribute('name').replace('['+currentCount+']', '['+count+']')
+    input.setAttribute('name', name);
+  })
+  // Appends new office location to empty newOfficeLocation div
+  document.querySelector('#newOfficeLocations').appendChild(newOfficeField).setAttribute("data-id", count)
+  // Unhides trash can icon for new office location fields
+  var doc = document.querySelectorAll('[data-id]')[count-1]
+  doc.children[0].classList.remove("hidden")
+  // Enables select options for kind
+  var selectKindOption = doc.querySelector("#kindSelect")
+  selectKindOption.value = " ";
+  // Removes primary from select as its set by default for first office location
+  selectKindOption.remove(1)
+  // clears inputs from new location
+  newOfficeField.querySelectorAll('input').forEach(function(input) {
+    if (input.value != 'phone main') {
+      input.value = ''
+    }
+  })
+  // clears all selects
+  newOfficeField.querySelectorAll('select#inputCounty').forEach(function(input) {
+    input.value = ''
+    input.closest("div").classList.add("hidden")
+  })
+  // Sets validations if kind is empty for new office location
+  var element = newOfficeField.querySelector('#kindSelect');
+  var defaultValue = newOfficeField.querySelector('#kindSelect').value;
+  checkKind(element, defaultValue)
+}
+
+function removeOfficeLocation() {
+  var doc = document.querySelectorAll('#removeAddress')[count]
+  doc.closest('#officeLocations').remove()
+  count --;
+}
+
+function setPrimaryOfficeLocation() {
+  var selectKindOption = document.querySelector("#kindSelect");
+  if (selectKindOption) {
+    selectKindOption.value = "primary";
+  }
+}

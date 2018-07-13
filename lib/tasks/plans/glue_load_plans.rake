@@ -3,13 +3,13 @@ namespace :seed do
 
     def build_premium_tables(premium_tables)
       results = premium_tables
-      premium_tables.select{|pm| pm[:age] == 14 }.each do |pt|
-        (0..13).each do |age_number|
+      premium_tables.select{|pm| pm[:age] == 20 }.each do |pt|
+        (0..19).each do |age_number|
           results << {age: age_number, rate_start_date: pt[:rate_start_date], rate_end_date: pt[:rate_end_date], amount: pt[:amount]}
         end
       end
-      premium_tables.select{|pm| pm[:age] == 64 }.each do |pt|
-        (65..120).each do |age_number|
+      premium_tables.select{|pm| pm[:age] == 65 }.each do |pt|
+        (66..120).each do |age_number|
           results << {age: age_number, rate_start_date: pt[:rate_start_date], rate_end_date: pt[:rate_end_date], amount: pt[:amount]}
         end
       end
@@ -24,7 +24,8 @@ namespace :seed do
         :csr_variant_id => plan.csr_variant_id,
         :ehb => plan.ehb.nil? ? "0.0" : plan.ehb.to_s,
         :year => plan.active_year,
-        :carrier_id => plan.carrier_profile_id.to_s,
+        # :carrier_id => plan.carrier_profile_id.to_s,
+        :fein => plan.carrier_profile.fein,
         :metal_level => plan.metal_level,
         :coverage_type => plan.coverage_kind,
         :renewal_plan_id => plan.renewal_plan_id,
@@ -36,7 +37,7 @@ namespace :seed do
       premium_tables = []
       # t =  build_premium_tables(plan.premium_tables)
       plan.premium_tables.each do |pt|
-        if (pt.age < 65) && (pt.age > 13)
+        if (pt.age < 67) && (pt.age > 18)
           premium_tables << {
             :age => pt.age,
             :rate_start_date => pt.start_on,
@@ -48,7 +49,7 @@ namespace :seed do
       puts JSON.dump(plan_json.merge({:premium_tables => build_premium_tables(premium_tables).uniq}))
     end
     puts "["
-    Plan.where(active_year: 2018).each do |pln|
+    Plan.where(active_year: args[:year]).each do |pln|
       dump_plan_for_enroll(pln)
       puts(",")
     end

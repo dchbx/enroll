@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHv
+  key: en.insured.group_selection.terminate_confirm.terminate_this_plan_do_you_wish_proceed
+  value: '"Terminating this plan will terminate coverage for all members of your family.
+    Do you wish to proceed? Y/N."'

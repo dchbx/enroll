@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAFI
+  key: en.insured.shop_for_employer_sponsored_coverage
+  value: '"Shop for Employer Sponsored Coverage"'

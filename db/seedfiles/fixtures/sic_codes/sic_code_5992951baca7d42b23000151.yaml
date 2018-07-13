@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAFR
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '29'
+  major_group_label: Petroleum Refining And Related Industries
+  industry_group_code: '295'
+  industry_group_label: Asphalt Paving And Roofing Materials
+  sic_code: '2951'
+  sic_label: Asphalt Paving Mixtures and Blocks

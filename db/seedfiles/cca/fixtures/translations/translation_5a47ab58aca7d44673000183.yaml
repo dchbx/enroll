@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGD
+  key: en.insured.is_your_health_coverage_ending
+  value: '"Is your other health coverage ending because you did not pay your premiums
+    on time?"'

@@ -17,8 +17,7 @@
   <h3 class="header-title">Filter Results</h3>
   <% if @market_kind == "individual" || @benefit_group.try(:plan_option_kind) == "single_carrier" %>
   <div class="checkbox-filter-wrapper">
-    <h5><strong>Metal Level</strong> <a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.
-    Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+    <h5><strong><%= l10n("metal_level") %></strong> <a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_metal_level_title_info') %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
     <ul class="list-unstyled">
       <li>
@@ -102,7 +101,9 @@
           </li>
         </ul>
       </div>
-      <div class="checkbox-filter-wrapper">
+
+      <% if offers_nationwide_plans? %>
+        <div class="checkbox-filter-wrapper">
         <h5><strong><%= l10n("network") %></strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.network_title_info") %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
         <ul class="list-unstyled">
@@ -124,6 +125,8 @@
           </li>
         </ul>
       </div>
+      <% end %>
+
       <div class="checkbox-filter-wrapper">
         <h5><strong><%= l10n("carrier") %></strong> <a href="#" data-toggle="tooltip" data-placement="right" title="<%= l10n('filter_by_the_carrier') %>"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <ul class="list-unstyled">

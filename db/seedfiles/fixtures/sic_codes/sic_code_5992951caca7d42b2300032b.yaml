@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMr
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '61'
+  major_group_label: Non-depository Credit Institutions
+  industry_group_code: '611'
+  industry_group_label: Federal And Federally-sponsored Credit Agencies
+  sic_code: '6111'
+  sic_label: Federal and Federally-Sponsored Credit Agencies

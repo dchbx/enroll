@@ -1,0 +1,5 @@
+<% if @filter_criteria.empty? %>
+$("#broker_agencies_panel").html("<%= escape_javascript render "index" %>");
+<% else %>
+$("#broker_agencies_listing").html("<%= escape_javascript render "broker_agencies_listing" %>");
+<% end %>

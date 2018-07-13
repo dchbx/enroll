@@ -5,6 +5,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
   context "without consumer_role" do
     let(:person) {double(has_active_consumer_role?: false)}
+    let(:offers_nationwide_plans) { true }
     before :each do
       assign(:person, person)
       assign(:carriers, Array.new)
@@ -13,6 +14,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_deductible, 998)
       assign(:hbx_enrollment, hbx_enrollment)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
+      allow(view).to receive(:offers_nationwide_plans?).and_return(offers_nationwide_plans)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
@@ -29,8 +31,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Metal Level title text' do
-      expect(rendered).to match /Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.
-    Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan./i
+      expect(rendered).to match /Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan./i
     end
 
     it 'should have Bronze title text' do
@@ -54,23 +55,27 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Plan Type title text ' do
-      expect(rendered).to match /The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you‘ll pay./i
+      expect(rendered).to match /The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay./i
     end
 
     it 'should have Network title text' do
       expect(rendered).to match /Doctors, specialists, other providers, facilities and suppliers that a health insurance company contracts with to provide health care services to plan members./i
     end
 
+    context "with nationwide disabled" do
+      let(:offers_nationwide_plans) { false }
+
+      it 'should not have Nationwide title text' do
+        expect(rendered).to_not match /The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
+      end
+    end
+
     it 'should have Nationwide title text' do
       expect(rendered).to match /The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
     end
 
-    it 'should have DC-Metro title text' do
-      expect(rendered).to match /The plan has a local network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
-    end
-
     it 'should have HMO title text' do
-      expect(rendered).to match /#{Regexp.escape("An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won‘t cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.")}/i
+      expect(rendered).to match /#{Regexp.escape("An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won't cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.")}/i
     end
 
     it 'should have PPO title text' do
@@ -82,7 +87,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Hsa_eligibilty title text' do
-      expect(rendered).to match(/#{Regexp.escape("Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don‘t spend them.")}/i)
+      expect(rendered).to match(/#{Regexp.escape("Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them.")}/i)
     end
 
     it "should have Premium amount search" do

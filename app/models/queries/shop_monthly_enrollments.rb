@@ -94,10 +94,7 @@ module Queries
     end
 
     def quiet_period
-      prev_month = @effective_on.prev_month
-      quiet_period_begin = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
-      quiet_period_end = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.initial_application.quiet_period_end_on)
-      TimeKeeper.start_of_exchange_day_from_utc(quiet_period_begin)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
+      PlanYear.enrollment_quiet_period(start_on: @effective_on)
     end
 
     def quiet_period_expression

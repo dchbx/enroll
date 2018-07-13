@@ -2,7 +2,7 @@
   <h3> <%= l10n('broker_agencies.profiles.broker_agency_message').to_s.pluralize%> </h3>
     <%= render 'agency_inbox' %>
 
-    <%= link_to l10n('broker_agencies.profiles.send_secure_message', site_short_name: Settings.site.short_name),
+    <%= link_to l10n('broker_agencies.profiles.send_secure_message', site_short_name: site_short_name),
         broker_agencies_inbox_msg_to_portal_path(inbox_id: @broker_agency_profile.id, to: 'HBX_Admin',
         from: @broker_agency_profile.legal_name), class: "btn btn-primary", remote: true %>
 </div>

@@ -4,6 +4,7 @@
     <div class="form-group form-group-lg <%= 'border_bottom_no_zero' if kind.eql?('HOME') %>">
 
       <%= f.hidden_field :kind %>
+      <%= f.hidden_field :_destroy %>
       <%= f.email_field :address, placeholder: "#{kind.capitalize} Email Address", class: "floatlabel form-control" %>
     </div>
   </div>

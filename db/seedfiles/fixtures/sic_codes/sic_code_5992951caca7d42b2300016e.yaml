@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAFu
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '31'
+  major_group_label: Leather And Leather Products
+  industry_group_code: '319'
+  industry_group_label: Leather Goods, Not Elsewhere Classified
+  sic_code: '3199'
+  sic_label: Leather Goods, Not Elsewhere Classified

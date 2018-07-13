@@ -1,11 +1,14 @@
 $('h1:first').text('Choose Plan – Plan Details');
 $('.switch-header').text('Carefully review the details of this plan. If this is the plan you want, choose \'Select Plan\'. If you want to review more plans, select \'Back to Results\'.');
-$("#plan-summary").html("<%= escape_javascript(render partial: "shared/summary", locals: {qhp: @qhp}) %>");
+$("#plan-summary").html("<%= escape_javascript(render partial: "ui-components/v1/cards/summary", locals: {qhp: @qhp}) %>");
 $("#all-plans").hide();
 $("a.all-plans").on('click', function() {
   $('h1:first').text('Choose Plan');
-  $('.switch-header').text('Find a quality, affordable health insurance plan that\'s right for you, or for you and your family. Use \'Filter Results\', \'Compare\' and \'Details\' features to narrow your choices. When you find the plan you want, \'Select Plan\'.');
-
+  $('.switch-header').text('Find a quality, affordable health insurance plan that\'s right for you, or for you and your family. Use \'Filter Results\', \'Compare\' and \'Details\' features to narrow your choices. When you find the plan you want, \'Select Plan\'. ');
+    // TODO: how to find if a benefit package is sole_source in new model
+    <% if check_plan_options_title %>
+    $('.switch-header').append("<b>Please note your final cost may change based on the final enrollment of all employees.</b>");
+    <% end %>
 });
 $("#account-detail").hide();
 $("#plan-summary").show();

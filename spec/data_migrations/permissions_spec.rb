@@ -18,7 +18,7 @@ describe DefinePermissions, dbclean: :after_each do
       expect(Permission.all.map(&:name)).to match_array roles
     end
 
-    describe 'update permissions for hbx staff role' do
+    context 'update permissions for hbx staff role', dbclean: :after_each do
       let(:given_task_name) {':hbx_admin_can_complete_resident_application'}
 
       before do
@@ -95,7 +95,7 @@ describe DefinePermissions, dbclean: :after_each do
     end
   end
 
-  describe 'build test roles' do
+  describe 'build test roles', dbclean: :after_each do
     let(:given_task_name) {':build_test_roles'}
     before do
       User.all.delete

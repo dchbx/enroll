@@ -14,7 +14,7 @@
       end %>
   </ul>
 
-  <h4>Employers can set up different benefit groups, which allow for different plan offerings, reference plan, and contributions. Employees must be assigned to different benefit packages according to legally permissible employment classification (for example, employees located at different worksites, or part-time and full-time employees, etc.)</h4>
+  <h3><%= l10n("click_to_quote")%></h3>
 
   <table class="quote-detail-cost">
     <tr>
@@ -62,5 +62,61 @@
     <% end %>
   </table>
 
-<%= render partial: "employee_cost_breakdown_for_dental_plans", locals: {quote_results: @quote_results}%>
+  <h3><%= l10n("detailed_employer_cost_breakdown_for_selected_plans")%>:</h3>
+  <div class="mygrid-wrapper-div">
+    <table class="quote-detail-cost">
+    <tr>
+      <td colspan="3" class="quote_detail_plan_header">
+
+      </td>
+    <% @quote_results.each do |qr| %>
+      <td colspan="1" class="quote_detail_plan_header">
+        <div style='width: 300px'>
+        <b><%= qr[0] %></b><br>
+        <sm><%= l10n("employee")%>:
+        $<%= qr[1][:total_employee_cost].ceil %>,
+        <%= l10n("employer")%>:
+
+       <span >$<%= qr[1][:total_employer_cost].ceil %></span>
+       <br>
+        </sm>
+   </div>
+      </td>
+    <% end %>
+    </tr>
+
+    <tr style="font-weight: bolder; ">
+      <td class="quote_detail_results_header"><%= l10n("name")%></td>
+      <td class="quote_detail_results_header"><%= l10n("relationship")%> (%)</td>
+      <td class="quote_detail_results_header"><%= l10n("age")%></td>
+      <% @quote_results.keys.each do |de| %>
+
+        <td class="quote_detail_results_header" style='padding-left: 100px'><%= l10n("employer_cost")%></td>
+      <% end %>
+
+    </tr>
+    <% @quote_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
+    <% if index != 0  && @quote_results.first[1][:detail].flatten[index][:family_id] != @quote_results.first[1][:detail].flatten[index-1][:family_id] %>
+      <tr><td>&nbsp;</td></tr>
+    <% end %>
+
+      <tr>
+        <td class="quote_detail_results">
+          <%= qr[:first_name] %>
+        </td>
+        <td class="quote_detail_results">
+          <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i%>)</small>
+        </td>
+        <td class="quote_detail_results">
+          <%= qr[:age] %>
+        </td>
+        <% @quote_results.keys.each do |de| %>
+          <td class="quote_detail_results"  style='padding-left: 100px'>
+            <b><%= @quote_results[de][:detail].flatten[index][:employer_contribution].round(2) %></b></td>
+        <% end %>
+      </tr>
+    <% end %>
+      </table>
+      <div>&nbsp;</div>
+  </div>
 </div>

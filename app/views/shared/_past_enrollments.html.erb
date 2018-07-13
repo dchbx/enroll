@@ -19,7 +19,7 @@
     </thead>
     <tbody>
       <% hbx_enrollments.each do |hbx_enrollment| %>
-      <% plan = hbx_enrollment.plan %>
+      <% plan = hbx_enrollment.product %>
       <tr>
         <td>
           <%= hbx_enrollment.terminated_on %>

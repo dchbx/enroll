@@ -1,0 +1,10 @@
+<% if object.errors.any? %>
+  <div class="alert alert-danger">
+    <h4>The following <%= pluralize(object.errors.size, "error") %> require your attention:</h4>
+    <ul>
+      <% object.errors.full_messages.flatten.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

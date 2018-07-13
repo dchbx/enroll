@@ -1,5 +1,4 @@
 require "rails_helper"
-require 'byebug'
 require 'rake'
 
 require File.join(Rails.root, "app", "data_migrations", "add_primary_family")

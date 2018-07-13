@@ -1,0 +1,375 @@
+- content_for :horizontal_status do
+  = render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 2}
+= render "ui-components/v1/modals/detail_modal"
+#message_form
+.container#plan_shoppings_show_form
+  .select_plan_wrapper
+    .row
+      .col-lg-8.col-md-8.col-sm-8.col-xs-12
+        .ct-1
+          h1.heading-text = l10n("choose_plan")
+          h4.switch-header = l10n(".choose_plan_filter_results_header")
+          h4.swtich-header
+            - if @hbx_enrollment.sponsored_benefit.single_plan_type?
+              strong Please note your final cost may change based on the final enrollment of all employees.
+          - if display_plan_cost_warning(@benefit_group)
+            b = l10n("insured.plan_shoppings.final_cost_change")
+          .row.no-buffer
+            = render "shared/plan_shoppings/more_plan_details"
+          p.pull-right
+            a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}"
+              = l10n("compare_plans").to_s.upcase
+            #plan-summary
+            #all-plans.all-filters-row
+              = render partial: './ui-components/v1/filters/plan_filters'
+              .col-lg-9.col-md-9.co-sm-9.col-xs-12#planContainer style="padding-right: 0"
+                .sort-area style="margin:10px 0"
+                  span.mr-1
+                    strong = l10n("sort_by")
+                  .btn-group#sort_by role="group"
+                    a.btn.btn-default data-sort-by="plan-name" onclick="filterBy(this)" = l10n("plan_name")
+                    a.btn.btn-default data-sort-by='plan-metal-premium' onclick="filterBy(this)" = l10n("premium_amount")
+                    a.btn.btn-default data-sort-by='plan-metal-deductible' onclick="filterBy(this)" = l10n("deductible")
+                    a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
+                #plans
+                 = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
+                #filteredPlans data-enrollments="#{json_for_plan_shopping_member_groups(@member_groups)}"
+
+      .no-buffer
+      p.pull-right
+        a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}" = l10n("compare_plans").to_s.upcase
+      .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-1.col-sm-offset-1.right-section
+        - if @change_plan.blank? && @market_kind == "individual"
+          - if @enrollment_kind.blank? && is_under_open_enrollment?
+            = render partial: 'shared/individual_progress', locals: {step: '4'}
+          - else
+            = render partial: 'shared/sep_progress', locals: {step: '5'}
+        - elsif @change_plan.blank? && @market_kind == "coverall"
+          = render partial: 'shared/resident_progress', locals: {step: '4'}
+        - elsif @change_plan.blank?
+          = render partial: 'shared/signup_progress', locals: {step: '5'}
+        - elsif @change_plan == "change_by_qle"
+          = render partial: 'shared/qle_progress', locals: {step: '2',show_button:'true'}
+        - elsif @change_plan == "change_plan"
+          - if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep'
+            = render partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'}
+          - else
+            = render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true}
+
+.modal.fade#plans-compare-alert
+  .modal-dialog.modal-lg
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" &times;
+        h4.modal-title = l10n("plan_compare_alert")
+      .modal-body
+        p style='color:red;' = l10n(".can_not_select_more_than_n_plans_to_compare", number: 3)
+      .modal-footer
+        button.btn.btn-default type="button" data-dismiss="modal"
+
+= render :partial => "ui-components/v1/modals/waive_confirmation_during_shopping", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.is_shop?
+
+= render :partial => "ui-components/v1/modals/help_with_plan", :locals => {:enrollment => @hbx_enrollment }
+
+javascript:
+
+  var availableEnrollments = [];
+  var availableCarriers = [];
+  var filteredArray = [];
+  var currentPlans = [];
+  var filteredResultsArray = [];
+  var enrollments = document.getElementById('filteredPlans').dataset.enrollments;
+  var carriers = document.getElementById('filteredPlans').dataset.carriers;
+  var filterType = String;
+  var selectedPlans = document.getElementsByClassName("myfilteredPlans");
+
+  // Grabs available products as JSON for filtering onload
+  (function() {
+    document.getElementById('filteredPlans').classList.add('hidden');
+    getEnrollments()
+  })();
+
+  var coverageKind = "#{@hbx_enrollment.coverage_kind}";
+
+  if (coverageKind == "dental") {
+    $(".plan-metal-level-selection-filter").attr("disabled", true);
+  }
+
+  function clearSelections() {
+    Array.from(selectedPlans).forEach(function(plan) {
+      if (plan) {
+        plan.remove()
+      }
+    })
+    document.getElementById('plans').classList.remove('hidden')
+  }
+
+  function filterBy(element) {
+    filterType = element.dataset.sortBy;
+    clearSelections()
+    clearAll()
+    applyFilter()
+    filteredPlans(filterType)
+  }
+
+  function getEnrollments() {
+    enrollments = JSON.parse(enrollments)
+		console.log(enrollments)
+
+    // Formats enrollment to proper JSON format for filters
+    for(enrollment of enrollments) {
+      enrollment = enrollment
+      availableEnrollments.push(enrollment)
+    }
+  }
+
+  function applyFilter() {
+    // Apply's filtered plans to view
+    document.getElementById('plans').classList.add('hidden')
+    document.getElementById('filteredPlans').classList.remove('hidden')
+  }
+
+  function filteredPlans(type) {
+    filteredArray = [];
+
+    if (type == "plan-name") {
+      // Filters by Title
+      availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
+      filteredArray.sort(function(a,b) {
+        var titleA = a.product.title.toLowerCase();
+        var titleB = b.product.title.toLowerCase();
+        if (titleA < titleB) //sort string ascending
+          return -1
+        if (titleA > titleB)
+          return 1
+        return 0 //default return value (no sorting)
+      })
+    }
+
+    if (type == "plan-metal-premium") {
+      // Filter by premium
+      availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
+      filteredArray.sort(function(a,b) {
+        var priceA = parseFloat(a.product_cost_total - a.sponsor_contribution_total).toFixed(2);
+        var priceB = parseFloat(b.product_cost_total - b.sponsor_contribution_total).toFixed(2);
+        if (Number(priceA) < Number(priceB)) //sort string ascending
+          return -1
+        if (Number(priceA) > Number(priceB))
+          return 1
+        return 0 //default return value (no sorting)
+      })
+    }
+
+    if (type == "plan-metal-deductible") {
+      // Filter by deductible
+      availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
+      filteredArray.sort(function(a,b) {
+        var priceA = parseFloat(a.product.deductible).toFixed(0);
+        var priceB = parseFloat(b.product.deductible).toFixed(0);
+        if (Number(priceA) < Number(priceB)) //sort string ascending
+          return -1
+        if (Number(priceA) > Number(priceB))
+          return 1
+        return 0 //default return value (no sorting)
+      })
+    }
+
+    if (type == "plan-carrier") {
+      // Filters by Carrier
+      availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
+      filteredArray.sort(function(a,b) {
+        var nameA = a.product.issuer_name.toLowerCase();
+        var nameB = b.product.issuer_name.toLowerCase();
+        if (nameA < nameB) //sort string ascending
+          return -1
+        if (nameA > nameB)
+          return 1
+        return 0 //default return value (no sorting)
+      })
+    }
+
+    showFilteredResults()
+  }
+
+  function filterResultsSelections(selections) {
+    var resultsArray = [];
+    // Filters based on Metal Level
+    metalLevels = selections.selectedMetalLevels;
+    if (metalLevels) {
+       metalLevels.forEach(function(metalLevel) {
+         availableEnrollments.forEach(function(enrollment) {
+           if (enrollment.product.metal_level_kind.toLowerCase() == metalLevel.toLowerCase()) {
+             resultsArray.push(enrollment);
+           }
+         })
+       })
+    }
+    // Filters based on Plan Type
+    planTypes = selections.selectedPlanTypes;
+    if (planTypes) {
+      planTypes.forEach(function(plan) {
+        availableEnrollments.forEach(function(enrollment) {
+          if (enrollment.product.health_plan_kind.toLowerCase() == plan.toLowerCase()) {
+            resultsArray.push(enrollment);
+          }
+        })
+      })
+    }
+    // Filters based on Premium Amount
+    premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
+    premiumTo = parseFloat(selections.premiumToAmountValue || 0).toFixed(2);
+
+    availableEnrollments.filter(function(enrollment) {
+      premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
+      if (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo)) {
+        resultsArray.push(enrollment);
+      }
+    })
+    // Filters based on Deductible Amount
+    deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
+    deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
+
+    if (selections.deductibleFromAmountValue != ""){
+      availableEnrollments.filter(function(enrollment) {
+        deductible = parseFloat(enrollment.product.deductible.replace(',','').replace('$','')).toFixed(0);
+        if (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo)) {
+          resultsArray.push(enrollment);
+        }
+      })
+    }
+	  // Filters based on Carrier
+	  carrier = selections.selectedCarrier;
+	  if (carrier) {
+	    availableEnrollments.forEach(function(enrollment) {
+	      if (enrollment.product.issuer_name.toLowerCase() == carrier.toLowerCase()) {
+	        resultsArray.push(enrollment);
+	      }
+	    })
+	  }
+
+    if (selections.selectedHSA) {
+      var hsa = Boolean;
+      if (selections.selectedHSA == "Yes") {
+        hsa = true;
+      } else {
+        hsa = false;
+      }
+
+      availableEnrollments.filter(function(enrollment) {
+        if (enrollment.product.hsa_eligibility == hsa) {
+          resultsArray.push(enrollment);
+        }
+      })
+
+    }
+
+
+
+    // Removes duplicates from results array
+    filteredArray = removeDuplicates(resultsArray)
+    // Shows results in the view
+    $("#plans-count").text(filteredArray.length);
+    clearSelections();
+    applyFilter();
+    showFilteredResults()
+  }
+
+  function showFilteredResults() {
+    var element = document.getElementById('filteredPlans');
+    filteredArray.forEach(function(result) {
+      // Used to show deductible for plan
+      if (result.member_enrollments.length > 1) {
+        var deductible = result.product.family_deductible;
+        var deductibeType = "FAMILY DEDUCTIBLE"
+      } else {
+        var deductible = result.product.deductible;
+        var deductibeType = "DEDUCTIBLE"
+      }
+      var div = document.createElement('div')
+      div.setAttribute('class', 'myfilteredPlans')
+      div.innerHTML =
+      `
+      <div class="module plan-row panel panel-default">
+              <div class="panel-body">
+                <div class="row ${result.product.is_standard_plan? '' : 'hidden'}">
+                  <span class="ml-1 text-uppercase" style="color:green"><i class="fas fa-bookmark"></i> Standard Plan</span>
+                </div>
+                <div class="row mt-1">
+                  <div class="col-sm-2 col-md-2">
+                    <img width=80 src="../../assets/logo/carrier/${result.product.issuer_name.toLowerCase().split(' ').join('_')}.jpg" >
+                  </div>
+                  <div class="col-md-7" id="plans">
+                    <h3 class="no-buffer"><a data-remote="true">${result.product.title}</a>
+                      <br>
+                      <small>${result.product.issuer_name}</small>
+                    </h3>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="price-wrapper pull-right">
+                      <h2 class="no-buffer plan-premium">
+                        $${parseFloat(result.product_cost_total - result.sponsor_contribution_total).toFixed(2)}
+                      </h2>
+                      <small style="font-size:12px" class="mt-0">Month</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-md-12">
+                    <table class="table gn-12">
+                      <thead>
+                        <tr>
+                          <th scope="col">TYPE</th>
+                          <th scope="col">LEVEL</th>
+                          <th scope="col">NETWORK</th>
+                          <th scope="col">${deductibeType}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>${result.product.health_plan_kind.toUpperCase()}</td>
+                          <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
+                          <td>
+                            NETWORK NOTES
+                            <a data-container="body" href="#" data-toggle="tooltip" data-placement="right" title='${result.product.network_information}'>
+                              <i aria-hidden="true" class="fas fa-question-circle fa-lg pl-1"></i>
+                            </a>
+                          </td>
+                          <td>${deductible}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-3">
+                    <div class="checkbox no-buffer">
+                      <label>
+                        <input class="checkbox-custom select-plan-for-comparison">
+                        <span class="checkbox-custom-label" for="compare_plan_checkbox" style="font-weight: bold">Compare</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-xs-4">
+                    <a class="sbc_link health vertically-aligned-row interaction-click-control-summary-of-benefits-and-coverage" target="_blank" href="/document/download/${result.product.sbc_document.identifier.split("#")[0].split(":").pop()}/${result.product.sbc_document.identifier.split("#")[1]}?content_type=application/pdf&amp;filename=${result.product.title.replace(/[^0-9a-z]/gi,'')}.pdf&amp;disposition=inline">
+                      Summary of Benefits and Coverage
+                    </a>
+                  </div>
+                  <div class="col-md-5 col-sm-5 col-xs-5 pl-0 pr-0">
+                    <a class="btn btn-default btn-right plan-select select" href="/insured/plan_shoppings/#{@hbx_enrollment.id.to_s}/thankyou?change_plan=&coverage_kind=${result.product.kind}&enrollment_kind=&market_kind=${result.product.benefit_market_kind.replace('aca_','')}&plan_id=${result.product._id}">Select Plan</a>
+                    <a class="btn btn-default ml-1" data-remote="true" href="/products/plans/summary?active_year=${result.coverage_start_on.split('-')[0]}&coverage_kind=${result.product.kind}&enrollment_kind=&hbx_enrollment_id=#{@hbx_enrollment.id.to_s}&market_kind=${result.product.benefit_market_kind.replace('aca_','')}&standard_component_id=${result.product.hios_id}">See Details</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+      `
+      element.append(div)
+    });
+  }
+
+  function removeDuplicates(data) {
+    return data.filter((item, index,arr)=>{
+      var c = arr.map(item=> item.product_cost_total);
+      return  index === c.indexOf(item.product_cost_total)
+    })
+  }

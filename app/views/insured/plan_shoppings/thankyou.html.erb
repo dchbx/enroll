@@ -6,7 +6,6 @@
     <div class="row">
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
-
           <h1 class="darkblue"><%= l10n('confirm_your_plan_selection') %></h1>
           <h4>Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.</h4>
           <% if @enrollment.employee_role.present? %>
@@ -17,7 +16,7 @@
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
-            <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
+            <strong><%= @plan.issuer_profile.legal_name %> <%= @plan.title %></strong><br>
             <%= l10n("benefit") %>: <%= @enrollment.coverage_kind %><br>
             <%= l10n("metal_level") %> : <%= display_dental_metal_level @plan %><br>
             <%= l10n("market") %>: <%= show_market_name_by_enrollment @enrollment %>
@@ -38,7 +37,7 @@
           <% end %>
         </div>
 
-        <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => { :enrollment => @enrollment } if @enrollment.employee_role.present? %>
+        <%= render :partial => "ui-components/v1/modals/waive_confirmation_during_shopping", :locals => { :enrollment => @enrollment } if @enrollment.employee_role.present? %>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
         <% if @change_plan.blank? && @market_kind == "individual" %>

@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAI2
+  key: en.insured.plan_shoppings.you_can_not_waive_confirmation_msg
+  value: '"You cannot waive coverage unless you’re in Open Enrollment or a Special
+    Enrollment Period."'

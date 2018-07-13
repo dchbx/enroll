@@ -1,0 +1,17 @@
+- if object.errors.any?
+  .alert.alert-danger
+    h4 The following #{pluralize(object.errors.size, "error")} require your attention:
+    ul
+      - object.errors.full_messages.each do |msg|
+        li = msg
+      - object.owner_organization.errors.full_messages.each do |msg|
+        li = msg
+      - object.owner_organization.profile.errors.full_messages.each do |msg|
+        li = msg
+      - object.owner_organization.profile.office_locations.each do |office_location|
+        - office_location.errors.full_messages.each do |msg|
+          li = msg
+      - office_location.phone.errors.full_messages.each do |msg|
+        li = msg
+      - office_location.address.errors.full_messages.each do |msg|
+        li = msg

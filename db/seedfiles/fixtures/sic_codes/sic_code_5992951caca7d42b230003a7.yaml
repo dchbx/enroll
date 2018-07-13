@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAOn
+  division_code: I
+  division_label: Services
+  major_group_code: '79'
+  major_group_label: Amusement And Recreation Services
+  industry_group_code: '793'
+  industry_group_label: Bowling Centers
+  sic_code: '7933'
+  sic_label: Bowling Centers

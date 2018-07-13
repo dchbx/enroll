@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAAr
+  division_code: A
+  division_label: Agriculture, Forestry, And Fishing
+  major_group_code: '01'
+  major_group_label: Agricultural Production Crops
+  industry_group_code: 019
+  industry_group_label: General Farms, Primarily Crop
+  sic_code: 0191
+  sic_label: General Farms, Primarily Crop

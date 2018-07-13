@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHl
+  key: en.insured.group_selection.new.need_coverage_earlier_html
+  value: '"Do you need coverage earlier? See if you qualify for a <a href=''#'' id=''find_sep_link''>Special
+    Enrollment Period</a>"'

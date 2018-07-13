@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'csv'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::SecondIvlRenewalNotice, :dbclean => :after_each do
 
   file = "#{Rails.root}/spec/test_data/notices/second_ivl_renewal_notice_test_data.csv"
@@ -110,4 +111,5 @@ RSpec.describe IvlNotices::SecondIvlRenewalNotice, :dbclean => :after_each do
     end
   end
 
+end
 end

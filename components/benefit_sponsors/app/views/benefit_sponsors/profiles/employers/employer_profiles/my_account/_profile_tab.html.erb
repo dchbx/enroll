@@ -1,0 +1,51 @@
+<div class="col-xs-12 employer-tab">
+  <h1>Business Info</h1>
+<div class="row no-buffer">
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <h4><%= @employer_profile.legal_name %> Offices <%= (link_to "Edit Details", edit_profiles_employers_employer_profile_path(@employer_profile.id), class: 'btn pull-right') if current_user.try(:has_employer_staff_role?) %></h4>
+  <% @employer_profile.organization.office_locations.each do |loc| %>
+  <div class="form-border">
+    <%= loc.address.kind.capitalize %>
+    <%= loc.address.to_html %>
+    <%= loc.phone.to_s %>
+  </div>
+  <% end %>
+  </div>
+
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <h4><%= @employer_profile.legal_name %> Info</h4>
+    <div class="form-border">
+      <dl class="dl-horizontal no-buffer">
+        <dt>Registered legal name</dt>
+        <dd><%= @employer_profile.legal_name %></dd>
+        <dt>Doing Business As</dt>
+        <dd><%= @employer_profile.dba %></dd>
+        <dt>Fein</dt>
+        <dd><%= number_to_obscured_ssn @employer_profile.fein %></dd>
+        <% home_page = @employer_profile.organization.try(:home_page) %>
+        <% if home_page.present? %>
+          <dt>Web URL</dt>
+          <dd><%= link_to home_page, home_page %></dd>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="row no-buffer">
+  <% if @employer_profile.staff_roles.try(:present?) %>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <h4>Staff</h4>
+      <div class="form-border">
+        <p><%= @employer_profile.staff_roles.first.full_name %></p>
+        <% @employer_profile.staff_roles.first.phones.each do |phone| %>
+          <p><%= phone.kind %> phone: <%= phone.to_s %></p>
+        <% end %>
+        <% @employer_profile.staff_roles.first.emails.each do |email| %>
+          <p><%= email.kind %> email: <%= email.address %></p>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+</div>

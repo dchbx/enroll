@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Employers::EmployerHelper, :type => :helper do
+RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each do
   describe "#enrollment_state" do
 
     let(:benefit_group)    { plan_year.benefit_groups.first }
@@ -9,23 +9,25 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       bg = FactoryGirl.create(:benefit_group, plan_year: py)
       PlanYear.find(py.id)
     end
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
     let(:benefit_group_assignment) { double }
-    let(:person) {double}
-    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryGirl.create(:person, :with_ssn) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let(:dental_plan) { FactoryGirl.create(:plan, coverage_kind: "dental", dental_level: "high" ) }
     let(:health_plan) { FactoryGirl.create(:plan, coverage_kind: "health") }
     let(:dental_enrollment)   { FactoryGirl.create( :hbx_enrollment,
                                               household: primary_family.latest_household,
                                               employee_role_id: employee_role.id,
                                               coverage_kind: 'dental',
-                                              plan: dental_plan
+                                              plan: dental_plan,
+                                              benefit_group_id: benefit_group.id
                                             )}
     let(:health_enrollment)   { FactoryGirl.create( :hbx_enrollment,
                                               household: primary_family.latest_household,
                                               employee_role_id: employee_role.id,
-                                              plan: health_plan
+                                              plan: health_plan,
+                                              benefit_group_id: benefit_group.id
                                             )}
 
     before do
@@ -122,6 +124,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
       context 'when coverage terminated' do
         before do
+          employee_role.update_attributes!(census_employee_id: census_employee.id)
           health_enrollment.terminate_coverage!
           allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
         end
@@ -213,6 +216,12 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                                   end_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
                                                   aasm_state: 'published') }
 
+      let(:published_plan_year_with_terminated_on)  { FactoryGirl.build(:plan_year,
+                                                  start_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                                                  end_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
+                                                  terminated_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
+                                                  aasm_state: 'published') }
+
       let(:renewing_plan_year)  { FactoryGirl.build(:plan_year,
                                                   start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                   end_on: TimeKeeper.date_of_record.beginning_of_month + 1.year - 1.day,
@@ -230,6 +239,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       let!(:employer_profile)  { FactoryGirl.create(:employer_profile, 
                                                     plan_years: [expired_plan_year, active_plan_year, draft_plan_year]) }
 
+      let!(:employer_profile_1)  { FactoryGirl.create(:employer_profile)}
+
       before do 
         [expired_plan_year, active_plan_year, draft_plan_year, renewing_plan_year, published_plan_year].each do |py|
           bg = py.benefit_groups.build({
@@ -244,6 +255,37 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
           bg.save!
         end
         assign(:employer_profile, employer_profile)
+      end
+
+      context "#show_or_hide_claim_quote_button" do
+        it "should return true if plan year is in draft status" do
+          employer_profile_1.update_attributes(plan_years: [draft_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if plan year is in renewing_draft status" do
+          employer_profile_1.update_attributes(plan_years: [renewing_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return false if plan year is in published status" do
+          employer_profile_1.update_attributes(plan_years: [published_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq false
+        end
+
+        it "should return false if plan year is in published status and with future terminated_on" do
+          employer_profile_1.update_attributes(plan_years: [published_plan_year_with_terminated_on])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if employer does not have any plan years" do
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if employer has both published and draft plan years" do
+          employer_profile_1.update_attributes(plan_years: [draft_plan_year, published_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
       end
 
       context "for employer with plan years" do

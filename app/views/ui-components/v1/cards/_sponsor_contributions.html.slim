@@ -1,0 +1,24 @@
+#sponsorContributions.mt-1
+  .col-xs-12.mb-1
+    .col-xs-6.offered-heading
+      .text-uppercase.text-center 
+        | Offered 
+        i.fas.fa-question-circle
+    .col-xs-6.offered-heading
+      .text-uppercase.text-center 
+        | Employer Contribution 
+        i.fas.fa-question-circle
+  .col-xs-12
+    = f.fields_for :contribution_levels, f.object.contribution_levels, errors: {}, fieldset: false do |f|
+      .row.mb-1
+        .col-xs-4.ml-4.mt-1
+          = f.hidden_field :id, value: f.object.id
+          = f.hidden_field :contribution_unit_id, value: f.object.contribution_unit_id
+          = f.check_box :is_offered, {class: 'contribution_handler', disabled: (f.object.is_employee_cl), "data-displayname" => f.object.display_name, onchange: "contributionAmounts(this)"}, "true", "false"
+          = f.object.display_name
+          = f.hidden_field :display_name, value: f.object.display_name
+        .col-xs-6
+          .col-xs-3
+            = f.number_field :contribution_factor, {value: "#{(f.object.contribution_factor * 100).to_i}", id: "#{f.object.id}", min: 0, max: 100, onblur: "setSliderValue(this)", "data-contribution-input" => 'true', "data-displayname" => f.object.display_name}
+          .col-xs-9
+            input type="range" min="0" max="100" value="#{(f.object.contribution_factor * 100).to_i}" step="5" class="slider" id="#{f.object.id}" onchange="setInputValue(this)" data-id="#{f.object.id}"

@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAId
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '36'
+  major_group_label: Electronic And Other Electrical Equipment And Components, Except
+    Computer Equipment
+  industry_group_code: '369'
+  industry_group_label: Miscellaneous Electrical Machinery, Equipment, and Supplies
+  sic_code: '3692'
+  sic_label: Primary Batteries, Dry and Wet

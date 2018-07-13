@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"enroll_development.history_trackers"},{"v":2,"key":{"scope":1},"name":"scope_1","ns":"enroll_development.history_trackers"},{"v":2,"key":{"association_chain":1},"name":"association_chain_1","ns":"enroll_development.history_trackers"}],"uuid":"3003a488dff7455e8160c54b9870b286"}

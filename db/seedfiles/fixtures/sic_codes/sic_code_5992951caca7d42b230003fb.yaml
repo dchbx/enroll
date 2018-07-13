@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAP7
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '95'
+  major_group_label: Administration Of Environmental Quality And Housing Programs
+  industry_group_code: '953'
+  industry_group_label: Administration Of Housing And Urban
+  sic_code: '9532'
+  sic_label: Administration of Urban Planning and Community and Rural Development

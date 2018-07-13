@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAGC
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '32'
+  major_group_label: Stone, Clay, Glass, And Concrete Products
+  industry_group_code: '328'
+  industry_group_label: Cut Stone And Stone Products
+  sic_code: '3281'
+  sic_label: Cut Stone and Stone Products

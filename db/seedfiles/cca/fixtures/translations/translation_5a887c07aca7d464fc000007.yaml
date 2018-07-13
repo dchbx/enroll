@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8B6yn1GT8AAAH
+  key: en.insured.families.purchase.not_complete_until_purchase
+  value: '"Your enrollment is not complete until you purchase your plan selection
+    below."'

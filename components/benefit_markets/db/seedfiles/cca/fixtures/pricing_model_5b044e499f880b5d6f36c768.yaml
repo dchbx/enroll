@@ -1,0 +1,177 @@
+--- !ruby/object:BenefitMarkets::PricingModels::PricingModel
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROSZ+IC11vNsdo
+  product_multiplicities:
+  - :single
+  price_calculator_kind: "::BenefitSponsors::PricingCalculators::CcaCompositeTieredPriceCalculator"
+  name: MA Composite Price Model
+  updated_at: 2018-05-22 17:07:21.183000000 Z
+  created_at: 2018-05-22 17:07:21.183000000 Z
+  member_relationships:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsdp
+    relationship_name: :employee
+    relationship_kinds:
+    - self
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsdq
+    relationship_name: :spouse
+    relationship_kinds:
+    - spouse
+    - life_partner
+    - domestic_partner
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsdr
+    relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :<
+    relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
+    - ward
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsds
+    relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :>=
+    disability_qualifier: true
+    relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
+    - ward
+  pricing_units:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsdt
+    _type: BenefitMarkets::PricingModels::TieredPricingUnit
+    name: employee_only
+    display_name: Employee Only
+    order: 0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsdu
+      operator: :==
+      relationship_name: :employee
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsdv
+      operator: :==
+      relationship_name: :spouse
+      count: 0
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsdw
+      operator: :==
+      relationship_name: :dependent
+      count: 0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsdx
+    _type: BenefitMarkets::PricingModels::TieredPricingUnit
+    name: employee_and_spouse
+    display_name: Employee and Spouse
+    order: 1
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsdy
+      operator: :==
+      relationship_name: :employee
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsdz
+      operator: :==
+      relationship_name: :spouse
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsd0
+      operator: :==
+      relationship_name: :dependent
+      count: 0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsd1
+    _type: BenefitMarkets::PricingModels::TieredPricingUnit
+    name: employee_and_one_or_more_dependents
+    display_name: Employee and Dependents
+    order: 2
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsd2
+      operator: :==
+      relationship_name: :employee
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsd3
+      operator: :==
+      relationship_name: :spouse
+      count: 0
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsd4
+      operator: :>=
+      relationship_name: :dependent
+      count: 1
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNsd5
+    _type: BenefitMarkets::PricingModels::TieredPricingUnit
+    name: family
+    display_name: Family
+    order: 3
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsd6
+      operator: :==
+      relationship_name: :employee
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsd7
+      operator: :==
+      relationship_name: :spouse
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNsd8
+      operator: :>=
+      relationship_name: :dependent
+      count: 1

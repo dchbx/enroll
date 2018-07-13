@@ -1,0 +1,55 @@
+<div id="address_info" class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="row row-form-wrapper no-buffer">
+
+    <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+      <button class="btn btn-new-address" onclick="return false;">ADDRESS</button>
+    </div>
+
+    <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
+      <div class="form-group form-group-lg">
+        <div class="row" style="margin: 0;">
+          <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+            <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
+              <div class="dropdown">
+                <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                  <label><%= address_kind.humanize%> Address</label>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
+        <%- link_to image_tag('delete.png'), 'javascript:void(0)', class: 'close-2' %>
+      </div>
+    </div>
+    
+  <% flag = false %>
+    <div class="row row-form-wrapper no-buffer address-row">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.hidden_field :kind, value: address_kind %>
+        <%= f.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none", required: required,:readonly => flag %>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control border-bottom-none",:readonly => flag  %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer address-row">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :city, placeholder: "CITY", class: "floatlabel form-control", required: required, :readonly => flag  %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: f.object.state), {include_blank: "SELECT STATE"}, {:disabled => flag})  %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip", required: required, :readonly => flag  %>
+      </div>
+    </div>
+
+
+      </div>
+</div>

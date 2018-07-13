@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAOT
+  division_code: I
+  division_label: Services
+  major_group_code: '75'
+  major_group_label: Automotive Repair, Services, And Parking
+  industry_group_code: '754'
+  industry_group_label: Automotive Services, Except Repair
+  sic_code: '7542'
+  sic_label: Carwashes

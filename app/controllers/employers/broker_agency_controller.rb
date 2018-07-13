@@ -1,12 +1,13 @@
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
+  include ApplicationHelper
+
   before_action :find_employer
-  before_action :find_borker_agency, :except => [:index, :active_broker]
+  before_action :find_broker_agency, :except => [:index, :active_broker]
   before_action :updateable?, only: [:create, :terminate]
 
   def index
     @filter_criteria = params.permit(:q, :working_hours, :languages => [])
-
     if @filter_criteria.empty?
       @orgs = Organization.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
       @page_alphabets = page_alphabets(@orgs, "legal_name")
@@ -52,14 +53,11 @@ class Employers::BrokerAgencyController < ApplicationController
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
         broker_agency_profile.default_general_agency_profile.general_agency_hired_notice(@employer_profile) # broker hired and broker has default GA assigned
       end
-      # send_broker_assigned_msg(@employer_profile, broker_agency_profile)
+      send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
-      #notice to broker
-      @employer_profile.trigger_notices('broker_hired')
-      #notice to broker agency
-      @employer_profile.trigger_notices('broker_agency_hired')
-      #notice to employer
-      @employer_profile.trigger_notices("broker_hired_confirmation_notice")
+      trigger_notice_observer(broker_agency_profile.primary_broker_role, @employer_profile, "broker_hired_notice_to_broker")
+      @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer") 
+      trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
     end
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
@@ -131,9 +129,9 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def send_broker_assigned_msg(employer_profile, broker_agency_profile)
-    broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on DC Health Link"
+    broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on the #{site_short_name}"
     broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.organization.legal_name}<br>Representative: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.staff_roles.first.try(:work_phone).to_s}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
-    employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on DC Health Link."
+    employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on the #{site_short_name} site."
     employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone.to_s}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
     secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
     secure_message(broker_agency_profile, employer_profile, employer_subject, employer_body)
@@ -143,7 +141,7 @@ class Employers::BrokerAgencyController < ApplicationController
     @employer_profile = EmployerProfile.find(params["employer_profile_id"])
   end
 
-  def find_borker_agency
+  def find_broker_agency
     id = params[:id] || params[:broker_agency_id]
     @broker_agency_profile = BrokerAgencyProfile.find(id)
   end

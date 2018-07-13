@@ -27,6 +27,7 @@ class BrokerAgencyAccount
 
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency_profile)
+    pp new_broker_agency_profile if !new_broker_agency_profile.is_a?(BrokerAgencyProfile)
     raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
     self.broker_agency_profile_id = new_broker_agency_profile._id
     @broker_agency_profile = new_broker_agency_profile

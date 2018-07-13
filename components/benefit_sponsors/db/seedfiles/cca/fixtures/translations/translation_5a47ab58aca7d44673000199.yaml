@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGZ
+  key: en.insured.families.tooltip_use_this_calculator_html
+  value: '"Tool-tip: Use this calculator ( %{link} to find out if you meet the qualifications.
+    "'

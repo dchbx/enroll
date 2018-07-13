@@ -29,7 +29,7 @@
           %is_disabled= hbx_enrollment_member.person.is_disabled
   %is_subscriber= hbx_enrollment_member.is_subscriber
   %benefit
-    %premium_amount= (hbx_enrollment.premium_for(hbx_enrollment_member).round(2))
+    %premium_amount= (hbx_enrollment.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == hbx_enrollment_member.id }).product_price.round(2).to_f
     %begin_date= simple_date_for(hbx_enrollment.effective_on)
     - if (HbxEnrollment::TERMINATED_STATUSES + ['coverage_termination_pending']).include?(hbx_enrollment.aasm_state)
       - if !hbx_enrollment.terminated_on.blank?

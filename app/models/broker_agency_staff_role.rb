@@ -8,15 +8,24 @@ class BrokerAgencyStaffRole
   field :aasm_state, type: String, default: "broker_agency_pending"
   field :reason, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
   embeds_many :workflow_state_transitions, as: :transitional
+  # associated_with_one :broker_agency_profile, :broker_agency_profile_id, "BrokerAgencyProfile"  depricated
 
-  associated_with_one :broker_agency_profile, :broker_agency_profile_id, "BrokerAgencyProfile"
+  associated_with_one :broker_agency_profile, :benefit_sponsors_broker_agency_profile_id, "BenefitSponsors::Organizations::BrokerAgencyProfile"
 
-  validates_presence_of :broker_agency_profile_id
+  validates_presence_of :benefit_sponsors_broker_agency_profile_id, :if => Proc.new { |m| m.broker_agency_profile_id.blank? }
+  validates_presence_of :broker_agency_profile_id, :if => Proc.new { |m| m.benefit_sponsors_broker_agency_profile_id.blank? }
 
   accepts_nested_attributes_for :person, :workflow_state_transitions
 
   # after_initialize :initial_transition
+
+  before_create :set_profile_id, :if => Proc.new { |m| m.broker_agency_profile.is_a?(BrokerAgencyProfile) }
+
+  def set_profile_id # adding this for depricated association of broker_agency_profile in main app to fix specs
+    self.broker_agency_profile_id = benefit_sponsors_broker_agency_profile_id if  benefit_sponsors_broker_agency_profile_id.present?
+  end
 
   aasm do
     state :broker_agency_pending, initial: true

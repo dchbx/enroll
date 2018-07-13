@@ -1,0 +1,5 @@
+$("#inbox_form, #message_list_form").hide();
+$('#inbox-messages').show().html("<%= escape_javascript(render "benefit_sponsors/shared/inboxes/message_list", provider: @inbox_provider) %>");
+<% if @inbox_provider != current_user.person%>
+location.reload();
+<% end %>

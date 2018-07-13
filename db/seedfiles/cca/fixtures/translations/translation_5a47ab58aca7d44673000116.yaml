@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAEW
+  key: en.insured.families.verification.complete_verification_for_enrollment_confirm
+  value: '"Click OK if you would like confirm verification for this family."'

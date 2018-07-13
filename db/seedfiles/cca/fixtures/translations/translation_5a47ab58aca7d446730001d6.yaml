@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHW
+  key: en.insured.family_members.index.continue_to_get_insurance
+  value: '"If you need to get insurance coverage for other members of your household,
+    select ''Add Member''. When you’re finished, select CONTINUE."'

@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAG5
+  key: en.insured.families.purchase.terminate_not_present_html
+  value: '"<p>Your current plan selection is displayed below. Click the back button
+    if you want to change your selection. Click Purchase button to complete your enrollment.</p><p>Your
+    enrollment is not complete until you purchase your plan selection below.</p>"'

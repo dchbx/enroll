@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WuN0N6yn1DBoAAAD
+  key: en.insured.open_enrollment_is_over
+  value: '"Open enrollment is over, but you still may be able to enroll now if you
+    qualify for a Special Enrollment Period. We need to ask you some questions to
+    see if you qualify."'

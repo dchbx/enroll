@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANd
+  division_code: I
+  division_label: Services
+  major_group_code: '72'
+  major_group_label: Personal Services
+  industry_group_code: '721'
+  industry_group_label: Laundry, Cleaning, And Garment Services
+  sic_code: '7217'
+  sic_label: Carpet and Upholstery Cleaning

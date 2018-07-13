@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAB2
+  division_code: C
+  division_label: Construction
+  major_group_code: '16'
+  major_group_label: Heavy Construction Other Than Building Construction Contractors
+  industry_group_code: '161'
+  industry_group_label: Highway And Street Construction, Except
+  sic_code: '1611'
+  sic_label: Highway and Street Construction, Except Elevated Highways
