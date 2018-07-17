@@ -843,6 +843,88 @@ RSpec.describe Insured::FamiliesController do
       end
     end
   end
+
+  describe "POST transition_family_members_update" do
+
+    before :each do
+      sign_in(user)
+    end
+
+    context "should transition consumer to resident" do
+      let(:consumer_person) {FactoryGirl.create(:person, :with_consumer_role)}
+      let(:consumer_family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_person) }
+      let(:user){ FactoryGirl.create(:user, person: consumer_person) }
+      let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: consumer_person) }
+      let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "Not eligible for marketplace coverage due to citizenship or immigration status", reason: "eligibility_failed_or_documents_not_received_by_due_date ")}
+
+      let(:consumer_params) {
+        {
+            "transition_effective_date_#{consumer_person.id}" => TimeKeeper.date_of_record.to_s,
+            "transition_user_#{consumer_person.id}" => consumer_person.id,
+            "transition_market_kind_#{consumer_person.id}" => "resident",
+            "transition_reason_#{consumer_person.id}" => "eligibility_failed_or_documents_not_received_by_due_date",
+            "family_actions_id" => "family_actions_#{consumer_family.id}",
+            "family" => consumer_family.id,
+            "qle_id" => qle.id
+        }
+      }
+
+      it "should transition people" do
+        xhr :post, "transition_family_members_update", consumer_params, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should transition people from consumer market to resident market" do
+        expect(consumer_person.is_consumer_role_active?). to be_truthy
+        xhr :post, "transition_family_members_update", consumer_params, format: :js
+        consumer_person.reload
+        expect(consumer_person.is_resident_role_active?). to be_truthy
+        expect(consumer_person.is_consumer_role_active?). to be_falsey
+      end
+    end
+
+    context "should transition resident to consumer" do
+      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role)}
+      let(:resident_family) { FactoryGirl.create(:family, :with_primary_family_member, person: resident_person) }
+      let(:user){ FactoryGirl.create(:user, person: resident_person) }
+      let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :resident, person: resident_person) }
+      let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "Provided documents proving eligibility", reason: "eligibility_documents_provided ")}
+      let(:resident_params) {
+        {
+            "transition_effective_date_#{resident_person.id}" => TimeKeeper.date_of_record.to_s,
+            "transition_user_#{resident_person.id}" => resident_person.id,
+            "transition_market_kind_#{resident_person.id}" => "consumer",
+            "transition_reason_#{resident_person.id}" => "eligibility_documents_provided",
+            "family_actions_id" => "family_actions_#{resident_family.id}",
+            "family" => resident_family.id,
+            "qle_id" => qle.id
+        }
+      }
+
+      it "should transition people" do
+        xhr :post, "transition_family_members_update", resident_params, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should transition people from resident market to consumer market" do
+        expect(resident_person.is_resident_role_active?). to be_truthy
+        xhr :post, "transition_family_members_update", resident_params, format: :js
+        resident_person.reload
+        expect(resident_person.is_consumer_role_active?). to be_truthy
+        expect(resident_person.is_resident_role_active?). to be_falsey
+      end
+
+      it "should trigger_cdc_to_ivl_transition_notice in queue" do
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        xhr :post, "transition_family_members_update", resident_params, format: :js
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|job_info[:job] == IvlNoticesNotifierJobend
+        expect(queued_job[:args]).to eq [resident_person.id.to_s, 'coverall_to_ivl_transition_notice']
+        end
+      end
+    end
+  end
+
 end
 
 RSpec.describe Insured::FamiliesController do

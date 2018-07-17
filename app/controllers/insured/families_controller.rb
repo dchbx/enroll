@@ -280,6 +280,15 @@ class Insured::FamiliesController < FamiliesController
     @row = params_parser.row
     @family_id = params_parser.family_id
     params_parser.transition_family_members
+    @family = Family.find(params[:family])
+
+    @consumer_people = []
+    @resident_people = []
+    @result[:success].each do |person|
+      @resident_people << person if person.individual_market_transitions.order("created_at DESC").first.role_type == "resident"
+      @consumer_people << person if person.individual_market_transitions.order("created_at DESC").first.role_type == "consumer"
+    end
+    trigger_cdc_to_ivl_transition_notice  if @consumer_people.present?
 
     respond_to do |format|
       format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
@@ -287,6 +296,16 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def trigger_cdc_to_ivl_transition_notice
+    person =  @family.primary_applicant.person
+    begin
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "coverall_to_ivl_transition_notice", {family:  @family, result: @consumer_people} )
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
+    end
+  end
+
 
   def updateable?
     authorize Family, :updateable?

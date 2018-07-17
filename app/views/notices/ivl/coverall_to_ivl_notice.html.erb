@@ -1,0 +1,87 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td><h3>YOUR INSURANCE THROUGH COVER ALL DC HAS CHANGED TO DC HEALTH LINK</h3></td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:</td>
+  </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "We're sending you this letter because enrollment for the private insurance you or someone in your household has through Cover All DC will now be moved to DC Health Link. This letter tells you who this impacts, why the change occurred, what's different and what to do next. "} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: ["The people listed below still have the same insurance plan they enrolled in through Cover All DC. The enrollment has moved from Cover All DC to DC Health Link."],
+    heading: "Who's Impacted", sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+
+<% notice.individuals.each do |member| %>
+  <ul>
+    <li><%= member.first_name %> <%= member.last_name %>, Age <%= member.age %></li>
+  </ul>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "If someone else in your household has private insurance through Cover All DC, and their name is not listed above, they're still enrolled through Cover All DC."} %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: ["Based on the documents you submitted to DC Health Link, the people listed are eligible to enroll in a plan through DC Health Link."],
+    heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: [""],
+    heading: "What's Different About Cover All DC Plans", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "The plan you're enrolled in through DC Health Link is the same plan the people listed enrolled in through Cover All DC. It offers the same covered services."} %>
+<%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "Some things are different:",
+    listings: ["<strong>Your premium may be higher.</strong> While the people listed will still have the same plan, we have to re-start the plan. If any of the people listed had a birthday since the start of the plan they enrolled in through Cover All DC, the premium may increase to reflect the age change.", "<strong>You may be eligible for help paying for coverage</strong> The people listed can apply for tax credits and other savings that lower the costs of paying for private health insurance, along with Medicaid at <a href='https://www.dchealthlink.com'>dchealthlink.com</a>.", "<strong> You'll now get a Form 1095-A</strong> at tax time for those listed."]} %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: [""],
+    heading: 'Here’s What You Need to Do Now', sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: " 	If the people listed like the plan they have, they don't need to do anything right now. Just keep paying the monthly premiums on time."} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='https://www.dchealthlink.com'>dchealthlink.com</a> to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}. You may also want to apply for help paying for coverage to see if the people listed are eligible for Medicaid, or tax credits and other savings that lower the costs of paying for private health insurance."} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "Get expert help choosing a new plan (at no cost to you) from a DC Health Link registered Broker. Go to <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a> to search for a Broker near you. You can also call DC Health Link if you have questions or need help."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+    contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
+    heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + 95.days).strftime("%B %d, %Y")}.</strong> Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+    contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+               "Eligibility standards: 45 CFR §155.305",
+               "Eligibility process: 45 CFR §155.310",
+               "Special enrollment periods: 45 CFR §155.420",
+               "Eligibility appeals:  45 C.F.R. §155.500 et. seq."]} %>
