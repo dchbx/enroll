@@ -17,7 +17,7 @@ class EnrollmentEligibilityReason
       case provider.class
       when SpecialEnrollmentPeriod
         SpecialEnrollmentPeriodReasonProvider.new(provider)
-      when EmployerProfile
+      when BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
         EmployerProfileReasonProvider.new(provider)
       when BenefitSponsorship
         BenefitSponsorshipReasonProvider.new(provider)

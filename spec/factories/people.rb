@@ -9,7 +9,9 @@ FactoryGirl.define do
     is_incarcerated false
     is_active true
     gender "male"
-
+    # us_citizen "true"
+    # indian_tribe_member "false"
+    # naturalized_citizen "false"
     #association :employee_role, strategy: :build
 
     after(:create) do |p, evaluator|
@@ -21,6 +23,10 @@ FactoryGirl.define do
 
     trait :with_mailing_address do
       addresses { [FactoryGirl.build(:address, :mailing_kind)]}
+    end
+
+    trait :with_bad_mailing_address do 
+      addresses { [FactoryGirl.build(:address, :mailing_kind, :without_address_1, :without_city, :without_state, :without_zip)] }
     end
 
     trait :with_ssn do

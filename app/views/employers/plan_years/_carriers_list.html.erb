@@ -1,0 +1,23 @@
+<% carrier_names.each_pair do |ck, cv| %>
+  <div class="col-xs-3 carriers">
+    <div class="col-xs-12 row">
+      <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: search_level, benefit_group: benefit_group_id, start_on: start_on, location_id: location_id ), remote: true do %>
+
+      <div class="col-xs-3">
+        <%= radio_button_tag :carrier_for_elected_plan, "#{ck}" %>
+        <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
+          <i class="fa fa-circle-o"></i>
+          <i class="fa fa-dot-circle-o"></i>
+        <% end %>
+      </div>
+      <% end %>
+        <div class="col-xs-9">
+          <div class="panel">
+            <div class="panel-heading">
+              <h3><%= cv %></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<% end %>

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAP2
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '94'
+  major_group_label: Administration Of Human Resource Programs
+  industry_group_code: '944'
+  industry_group_label: Administration Of Social, Human Resource And
+  sic_code: '9441'
+  sic_label: Administration of Social, Human Resource and Income Maintenance Programs

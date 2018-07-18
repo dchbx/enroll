@@ -1,0 +1,34 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADk
+  key: en.insured.consumer_roles.ridp_agreement.ridp_agreement_html
+  value: '"<h1 class=''darkblue''>Authorization and Consent</h1><p>For your security,
+    we need to verify your identity before you can proceed. If you agree, you are
+    providing consent to Experian to access your personal information to conduct identity
+    verification on behalf of the Centers for Medicare and Medicaid Services (CMS)
+    - part of the U.S. Department of Health and Human Services (HHS). Below are a
+    few items to keep in mind.</p><ul><li>Make sure that you entered your legal name,
+    current home address, primary phone number, date of birth and email address correctly.
+    We will only collect personal information to verify your identity with Experian,
+    a third party identity verification provider.</li><li>To verify your identity,
+    Experian uses information from your consumer credit report profile. As a result,
+    you may see an entry called a ''soft inquiry'' on your Experian consumer report.
+    Soft inquiries are only visible to you, are never shared with third parties, and
+    do not affect your credit score. The soft inquiry will be titled “CMS Proofing
+    Services” and will be removed from your Experian consumer report after 25 months.</li><li>You
+    may need to have access to your personal and consumer report information, as the
+    Experian application will pose questions to you based on data in their files.</li></ul><p><br>Please
+    select one of the following options to continue:</p><div class=''disagree_placeholder_text''
+    style=''display: none''>Please contact %{contact_center_name}: %{contact_center_phone_number}
+    for more information</div><div class=''row row-form-wrapper no-buffer'' style=''border-top:
+    solid 1px #b7b7b7;''><div class=''radio skinned-form-controls skinned-form-controls-mac''><input
+    type=''radio'' name=''agreement'' id=''agreement_agree'' value=''agree'' checked=''checked''
+    class=''interaction-choice-control-value-agreement-agree''><label for=''agreement_agree''><span
+    style=''white-space: nowrap;''>I agree</span></label></div></div><div class=''row
+    row-form-wrapper no-buffer''><div class=''radio skinned-form-controls skinned-form-controls-mac''><input
+    type=''radio'' name=''agreement'' id=''agreement_disagree'' value=''disagree''
+    checked=''checked'' class=''interaction-choice-control-value-agreement-disagree''><label
+    for=''agreement_disagree''><span style=''white-space: nowrap;''>I Disagree</span></label></div></div>"'

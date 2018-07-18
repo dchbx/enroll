@@ -1,6 +1,6 @@
-require 'pry'
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe "hbx_admin/_edit_aptc_csr", :dbclean => :after_each do
     let(:person) { FactoryGirl.create(:person, :with_family ) }
     let(:user) { FactoryGirl.create(:user, person: person) }
@@ -109,4 +109,5 @@ RSpec.describe "hbx_admin/_edit_aptc_csr", :dbclean => :after_each do
         expect(rendered).to match(/APTC Amount \/ Percent Ratio/i)
       end
     end
+end
 end

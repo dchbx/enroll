@@ -74,7 +74,7 @@ module Importers
           organization.legal_name = legal_name
           organization.dba = dba
           organization.office_locations = map_office_locations
-          
+
           if broker_npn.present?
             broker_exists_if_specified
             br = BrokerRole.by_npn(broker_npn).first

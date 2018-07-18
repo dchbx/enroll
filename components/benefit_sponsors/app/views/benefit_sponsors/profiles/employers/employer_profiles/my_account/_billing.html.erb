@@ -1,0 +1,46 @@
+<div class="billing-tab">
+  <h1 class="heading-text">Invoices</h1>
+  <%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/employer_invoices_table" %>
+  <br/>
+  <h1 class="no-buffer">Billing</h1>
+  <p class="twenty">
+    <%= site_short_name %>
+    will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of
+    whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
+  </p>
+  <p class="twenty">Your
+    <%= site_short_name %>
+    account number:
+    <strong><%= "#{@employer_profile.hbx_id}".upcase %></strong>
+  </p>
+  <h3><%= site_short_name %>
+    offers multiple payment options including:</h3>
+    <ol class="twenty">
+      <li>
+        <% if invoice_bill_url_helper %>
+          <%= link_to 'Pay Online', invoice_bill_url_helper, target: "_blank"%> -
+        <% else %>
+          Pay Online
+        <% end %>
+        <%= link_to 'How to Pay Online', payment_pdf_helper, target: "_blank"%>
+      </li>
+      <br/>
+      <li>Pay by Phone
+        <div class="row col-md-offset-1">
+          <%= payment_phone_number %>, select "Small Business Employer" then "Make a Payment"</li>
+        <br/>
+        <li>Pay by Mail
+          <div class="row col-md-offset-1">
+            <%= contact_center_mailing_address_name %></div>
+          <div class="row col-md-offset-1">
+            <%= contact_center_address_one %></div>
+          <div class="row col-md-offset-1">
+            <%= contact_center_city %>,&nbsp;<%= contact_center_state %></div>
+          <div class="row col-md-offset-1">
+            <%= contact_center_postal_code %></div>
+        </li>
+    </ol>
+    <p class="twenty">**Please include your account number on your check.</p>
+    <p class="twenty">Check that your mailing address is up to date - click on Update Business Info.</p>
+  </div>
+</div>

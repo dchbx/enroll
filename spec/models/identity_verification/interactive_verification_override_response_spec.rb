@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe IdentityVerification::InteractiveVerificationOverrideResponse do
   let(:response_data) { File.read(file_path) }
   subject {
@@ -43,4 +44,5 @@ describe IdentityVerification::InteractiveVerificationOverrideResponse do
     end
 
   end
+end
 end

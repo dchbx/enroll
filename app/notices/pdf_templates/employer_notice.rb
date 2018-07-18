@@ -32,6 +32,7 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
+    attribute :aasm_state, String
     attribute :employee_email, String
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
     attribute :enrollment, PdfTemplates::Enrollment

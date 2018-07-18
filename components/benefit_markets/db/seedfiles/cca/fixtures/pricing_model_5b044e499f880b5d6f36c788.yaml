@@ -1,0 +1,85 @@
+--- !ruby/object:BenefitMarkets::PricingModels::PricingModel
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROSZ+IC11vNseI
+  product_multiplicities:
+  - :multiple
+  - :single
+  price_calculator_kind: "::BenefitSponsors::PricingCalculators::CcaShopListBillPricingCalculator"
+  name: MA List Bill Shop Pricing Model
+  updated_at: 2018-05-22 17:07:21.431000000 Z
+  created_at: 2018-05-22 17:07:21.431000000 Z
+  member_relationships:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseJ
+    relationship_name: :employee
+    relationship_kinds:
+    - self
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseK
+    relationship_name: :spouse
+    relationship_kinds:
+    - spouse
+    - life_partner
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseL
+    relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :<
+    relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
+    - ward
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseM
+    relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :>=
+    disability_qualifier: true
+    relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
+    - ward
+  pricing_units:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseN
+    _type: BenefitMarkets::PricingModels::RelationshipPricingUnit
+    name: employee
+    display_name: Employee
+    order: 0
+    eligible_for_threshold_discount: false
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseO
+    _type: BenefitMarkets::PricingModels::RelationshipPricingUnit
+    name: spouse
+    display_name: Spouse
+    order: 1
+    eligible_for_threshold_discount: false
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROSZ+IC11vNseP
+    _type: BenefitMarkets::PricingModels::RelationshipPricingUnit
+    name: dependent
+    display_name: Dependents
+    order: 2
+    discounted_above_threshold: 4
+    eligible_for_threshold_discount: true

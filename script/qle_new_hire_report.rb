@@ -50,7 +50,7 @@ end
 
 def get_member_details(enrollment_member, enrollment)
   person = enrollment_member.person
-  relationship = enrollment_member.primary_relationship || 'self' 
+  relationship = enrollment_member.primary_relationship || 'self'
 
   [
     person.hbx_id,
@@ -60,7 +60,7 @@ def get_member_details(enrollment_member, enrollment)
     person.first_name,
     person.middle_name,
     person.last_name,
-    person.mailing_address.try(:zip), 
+    person.mailing_address.try(:zip),
     relationship,
     enrollment.premium_for(enrollment_member)
   ]
@@ -227,5 +227,4 @@ CSV.open("#{Rails.root.to_s}/sep_newhire_enrollment_report.csv", "w") do |csv|
       end
     end
   end
-
 end

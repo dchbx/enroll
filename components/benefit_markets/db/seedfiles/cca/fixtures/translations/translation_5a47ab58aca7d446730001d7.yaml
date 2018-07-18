@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHX
+  key: en.insured.family_members.index.add_member_info_html
+  value: '"<span class=''bold''>Here''s your chance to add family members to your
+    plan.</span><br>Add family members by clicking the ''Add Member'' button. If you
+    don''t need to add more members, or when you are done adding members, click continue."'

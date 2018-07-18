@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe ConsumerRolesHelper, :type => :helper do
   let(:person) {FactoryGirl.build(:person)}
   let(:consumer_role) {FactoryGirl.build(:consumer_role)}
@@ -158,4 +159,5 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       end
     end
   end
+end
 end

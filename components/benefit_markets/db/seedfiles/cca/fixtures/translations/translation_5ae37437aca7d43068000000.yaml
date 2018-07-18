@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WuN0N6yn1DBoAAAA
+  key: en.welcome.index.welcome_to_site_sub_header
+  value: '"The Right Place for the Right Plan"'

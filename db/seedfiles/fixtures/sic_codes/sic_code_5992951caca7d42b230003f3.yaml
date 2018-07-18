@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPz
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '93'
+  major_group_label: Public Finance, Taxation, And Monetary Policy
+  industry_group_code: '931'
+  industry_group_label: Public Finance, Taxation, And Monetary Policy
+  sic_code: '9311'
+  sic_label: Public Finance, Taxation, and Monetary Policy

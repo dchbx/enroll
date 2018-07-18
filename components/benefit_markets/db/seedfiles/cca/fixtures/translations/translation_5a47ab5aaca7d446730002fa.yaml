@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWqyn1EZzAAL6
+  key: en.broker_agencies.profiles.favorite_general_agency_title
+  value: '"favorite General Agency will list on top of other General Agency on assignment
+    page"'

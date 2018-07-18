@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIk
+  key: en.insured.plan_shoppings.network_title_info
+  value: '"Doctors, specialists, other providers, facilities and suppliers that a
+    health insurance company contracts with to provide health care services to plan
+    members."'

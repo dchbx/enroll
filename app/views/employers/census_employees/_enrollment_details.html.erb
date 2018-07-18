@@ -11,21 +11,17 @@
       </tr>
     </thead>
     <tbody>
-      <% @plan = enrollment.decorated_hbx_enrollment %>
+      <% group_enrollment = enrollment.decorated_hbx_enrollment %>
       <% enrollment.hbx_enrollment_members.each do |member| %>
       <tr>
         <td><%= member.person.full_name %></td>
         <td><%= member.primary_relationship %></td>
         <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-        <% if @plan.is_a? OpenStruct %>
-        <td><%= number_to_currency(@plan.total_premium) %></td>
-        <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
-        <td><%= number_to_currency(@plan.total_employee_cost) %></td>
-        <% else %>
-        <td><%= number_to_currency(@plan.premium_for(member)) %></td>
-        <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
-        <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
-        <% end %>
+        <%# TODO %>
+        <% member_enrollment = group_enrollment.member_enrollments.detect {|member_enrollment| member_enrollment.member_id == member.id} %>
+        <td><%= number_to_currency(member_enrollment.product_price.to_f) %></td>
+        <td><%= number_to_currency(member_enrollment.sponsor_contribution.to_f) %></td>
+        <td><%= number_to_currency(member_enrollment.product_price.to_f - member_enrollment.sponsor_contribution.to_f) %></td>
       </tr>
       <% end %>
       <tr class="gray-row">
@@ -35,13 +31,13 @@
         <td></td>
         <td></td>
         <td>
-          <strong><%= number_to_currency(@plan.total_premium) %></strong>
+          <strong><%= number_to_currency(group_enrollment.product_cost_total.to_f) %></strong>
         </td>
         <td>
-          <strong><%= number_to_currency(@plan.total_employer_contribution) %></strong>
+          <strong><%= number_to_currency(group_enrollment.sponsor_contribution_total.to_f) %></strong>
         </td>
         <td>
-          <strong><%= number_to_currency(@plan.total_employee_cost) %></strong>
+          <strong><%= number_to_currency(group_enrollment.product_cost_total.to_f - group_enrollment.sponsor_contribution_total.to_f ) %></strong>
         </td>
       </tr>
     </tbody>

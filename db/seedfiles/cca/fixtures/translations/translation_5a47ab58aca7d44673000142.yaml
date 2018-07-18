@@ -1,0 +1,15 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAFC
+  key: en.insured.answer_for_broker
+  value: '"Brokers are licensed professionals with health insurance expertise and
+    long-s`t`anding relationships with Small Business owners, Individuals and Families.
+    Brokers help clients identify their options and make choices that are in their
+    best interest and meet their needs and budget. In the District of Columbia, Brokers
+    must have an active DC license in good standing, complete training on %{site_short_name},
+    and have contractual relationships with each carrier in %{site_short_name} for
+    the market in which he/she intends to sell. There is no cost to use an insurance
+    Broker."'

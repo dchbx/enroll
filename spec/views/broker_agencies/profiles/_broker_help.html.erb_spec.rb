@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "broker_agencies/profiles/_broker_help_table.html.erb" do
+RSpec.describe "broker_agencies/profiles/_broker_help_table.html.erb", dbclean: :after_each do
   let(:organization) { FactoryGirl.create(:organization) }
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
   let(:broker_role1) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }

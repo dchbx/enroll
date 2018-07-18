@@ -1,0 +1,1080 @@
+
+---------
+2018-07-16 14:37:35 UTC
+5b4cadaf9f880b5c38d0288c
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d028b3
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d028da
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d028da
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d02903
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d02903
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d0292c
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d0292c
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d02957
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d02957
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:37:36 UTC
+5b4cadb09f880b5c38d02982
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:37:37 UTC
+5b4cadb09f880b5c38d029ab
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e93326787
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e933267ae
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e933267d5
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e933267d5
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e933267fe
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e933267fe
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e93326827
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e93326827
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e93326852
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:21 UTC
+5b4cb1d99f880b5e93326852
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 14:55:22 UTC
+5b4cb1da9f880b5e9332687d
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 14:55:22 UTC
+5b4cb1da9f880b5e933268a6
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:39 UTC
+5b4cdd479f880b31752ad041
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:39 UTC
+5b4cdd479f880b31752ad068
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:39 UTC
+5b4cdd479f880b31752ad08f
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:39 UTC
+5b4cdd479f880b31752ad0b8
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:39 UTC
+5b4cdd479f880b31752ad0e1
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:39 UTC
+5b4cdd479f880b31752ad0e1
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:00:40 UTC
+5b4cdd479f880b31752ad10a
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:40 UTC
+5b4cdd479f880b31752ad10a
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:00:40 UTC
+5b4cdd489f880b31752ad133
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:40 UTC
+5b4cdd489f880b31752ad133
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:00:40 UTC
+5b4cdd489f880b31752ad15e
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:00:40 UTC
+5b4cdd489f880b31752ad15e
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:15:07 UTC
+5b4ce0ab9f880b3fd6d4963f
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:15:07 UTC
+5b4ce0ab9f880b3fd6d49666
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ab9f880b3fd6d4968d
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ab9f880b3fd6d4968d
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d496b6
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d496b6
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d496df
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d496df
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d4970a
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d4970a
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d49735
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 18:15:08 UTC
+5b4ce0ac9f880b3fd6d4975e
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cf30
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cf57
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cf7e
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cf7e
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cfa7
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cfa7
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cfd0
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:05 UTC
+5b4cedc99f880b539326cfd0
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:11:06 UTC
+5b4cedca9f880b539326cffb
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:06 UTC
+5b4cedca9f880b539326cffb
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:11:06 UTC
+5b4cedca9f880b539326d026
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:11:06 UTC
+5b4cedca9f880b539326d04f
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:38 UTC
+5b4cf34e9f880b5642a1e86e
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:38 UTC
+5b4cf34e9f880b5642a1e895
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e8bc
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e8bc
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e8e5
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e8e5
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e90e
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e90e
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e939
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e939
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 19:34:39 UTC
+5b4cf34f9f880b5642a1e964
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 19:34:40 UTC
+5b4cf3509f880b5642a1e98d
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:20 UTC
+5b4cfcd89f880b0683cff909
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:20 UTC
+5b4cfcd89f880b0683cff930
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:20 UTC
+5b4cfcd89f880b0683cff957
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:20 UTC
+5b4cfcd89f880b0683cff957
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd89f880b0683cff980
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd89f880b0683cff980
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd99f880b0683cff9a9
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd99f880b0683cff9a9
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd99f880b0683cff9d4
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd99f880b0683cff9d4
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd99f880b0683cff9ff
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 20:15:21 UTC
+5b4cfcd99f880b0683cffa28
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d1bc
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d1e3
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d20a
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d20a
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d233
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d233
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d25c
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d25c
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d287
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:41 UTC
+5b4d0ebd9f880b0af4a5d287
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-16 21:31:42 UTC
+5b4d0ebe9f880b0af4a5d2b2
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-16 21:31:42 UTC
+5b4d0ebe9f880b0af4a5d2db
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:03 UTC
+5b4e01df9f880b5ddd987508
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01df9f880b5ddd98752f
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01e09f880b5ddd987556
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01e09f880b5ddd987556
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01e09f880b5ddd98757f
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01e09f880b5ddd98757f
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01e09f880b5ddd9875a8
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01e09f880b5ddd9875a8
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-17 14:49:04 UTC
+5b4e01e09f880b5ddd9875d3
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:05 UTC
+5b4e01e09f880b5ddd9875d3
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-17 14:49:05 UTC
+5b4e01e19f880b5ddd9875fe
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-17 14:49:05 UTC
+5b4e01e19f880b5ddd987627
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:50 UTC
+5b4f58029f880b9aecfecfb0
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:50 UTC
+5b4f58029f880b9aecfecfd7
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:50 UTC
+5b4f58029f880b9aecfecffe
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:50 UTC
+5b4f58029f880b9aecfecffe
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-18 15:08:50 UTC
+5b4f58029f880b9aecfed027
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:50 UTC
+5b4f58029f880b9aecfed027
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-18 15:08:51 UTC
+5b4f58029f880b9aecfed050
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:51 UTC
+5b4f58029f880b9aecfed050
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-18 15:08:51 UTC
+5b4f58039f880b9aecfed07b
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:51 UTC
+5b4f58039f880b9aecfed07b
+binder_reversed
+initial_enrollment_eligible
+reverse_binder!
+false
+---------
+
+---------
+2018-07-18 15:08:51 UTC
+5b4f58039f880b9aecfed0a6
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------
+
+---------
+2018-07-18 15:08:51 UTC
+5b4f58039f880b9aecfed0cf
+initial_enrollment_eligible
+initial_enrollment_closed
+credit_binder!
+true
+---------

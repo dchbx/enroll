@@ -1,3 +1,4 @@
+@general_agency_enabled
 Feature: update general agency profile
 
   Background: A general agency clicks on edit general agency and updates information

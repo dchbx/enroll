@@ -1,0 +1,37 @@
+.table-border.table-responsive
+  table.table.table-striped
+    thead
+      tr
+        th scope="col" = l10n("name")
+        th scope="col" = l10n("relationship")
+        th scope="col" = l10n("age")
+        th.text-right scope="col" = l10n("premium")
+        th.text-right width="50" scope="col" = l10n("employer_contribution")
+        th.text-right width="50" scope="col" = l10n("you_pay")
+    tbody
+      - @enrollment.hbx_enrollment_members.each do |member|
+        tr
+          td = member.person.full_name
+          td = member.primary_relationship
+          td = dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob)
+          td.text-right = number_to_currency (member_enrollment = @member_group.group_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == member.id }).product_price
+          td.text-right = number_to_currency member_enrollment.sponsor_contribution
+          td.text-right = number_to_currency member_enrollment.employee_cost
+      tr.gray-row
+        td.ext-right.capital colspan="3"
+          strong Totals
+        td.text-right
+          strong = number_to_currency(@member_group.group_enrollment.product_cost_total)
+        td.text-right
+          strong = number_to_currency(@member_group.group_enrollment.sponsor_contribution_total)
+        td.text-right
+          strong = number_to_currency(@member_group.group_enrollment.employee_cost_total)
+      tr
+        td.text-right colspan="5" Your coverage start date :
+        td
+          span.coverage_effective_date = @enrollment.effective_on.strftime("%m/%d/%Y")
+      - if @terminate.present? && @terminate_date.present?
+        tr
+          td.text-right colspan="5" Termination Date:
+          td
+            span.coverage_effective_date = @terminate_date.strftime("%m/%d/%Y")

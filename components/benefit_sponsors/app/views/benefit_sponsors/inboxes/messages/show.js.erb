@@ -1,0 +1,5 @@
+$("#message_list_form").hide();
+$("#inbox_form").show();
+$('#show_message_form').show().html("<%= escape_javascript(render "benefit_sponsors/shared/inboxes/message", message: @message) %>");
+$("#myTab").load(location.href+" #myTab>*", "");
+$("#inbox_form").load(location.href+" #inbox_form>*", "");

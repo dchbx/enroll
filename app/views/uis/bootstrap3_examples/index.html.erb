@@ -1,0 +1,2741 @@
+<% content_for :page_title do %>
+  Bootstrap 3 Example Page
+<% end %>
+
+<% content_for :left_navigation do %>
+  <!-- Sidebar -->
+  <div id="sidebar-wrapper">
+    <nav id="spy">
+      <ul class="sidebar-nav nav">
+        <li class="sidebar-brand">
+          <a href="#home" title="<%= l10n('.typography_link') %>">
+            <span class="fa fa-home solo"><%= l10n('.typography') %></span>
+          </a>
+        </li>
+        <li>
+          <a href="#buttons" data-scroll title="<%= l10n('.buttons_link') %>">
+            <span class="fa fa-anchor solo"><%= l10n('.buttons') %></span>
+          </a>
+        </li>
+        <li>
+          <a href="#panels" data-scroll title="<%= l10n('.panels_link') %>">
+            <span class="fa fa-anchor solo"><%= l10n('.panels') %></span>
+          </a>
+        </li>
+        <li>
+          <a href="#tables" data-scroll title="<%= l10n('.tables_link') %>">
+              <span class="fa fa-anchor solo">Tables</span>
+          </a>
+        </li>
+        <li>
+          <a href="#inputs" data-scroll title="<%= l10n('.inputs_link') %>">
+              <span class="fa fa-anchor solo">Inputs</span>
+          </a>
+        </li>
+        <li>
+          <a href="#pagination" data-scroll title="<%= l10n('.inputs_link') %>">
+              <span class="fa fa-anchor solo"><%= l10n('.pagination') %></span>
+          </a>
+        </li>
+        <li>
+          <a href="#navigation" data-scroll title="<%= l10n('.navigation_link') %>">
+              <span class="fa fa-anchor solo">Navigation</span>
+          </a>
+        </li>
+        <li>
+          <a href="#progressbars" data-scroll title="<%= l10n('.progressbars_link') %>">
+              <span class="fa fa-anchor solo">Progress Bars</span>
+          </a>
+        </li>
+        <li>
+          <a href="#tooltips" data-scroll title="<%= l10n('.tooltips_link') %>">
+              <span class="fa fa-anchor solo">Tooltips / Popovers</span>
+          </a>
+        </li>
+        <li>
+          <a href="#alerts" data-scroll title="<%= l10n('.alerts_link') %>">
+              <span class="fa fa-anchor solo"><%= l10n('.alerts_link') %></span>
+          </a>
+        </li>
+        <li>
+          <a href="#badges" data-scroll title="<%= l10n('.badges_link') %>">
+              <span class="fa fa-anchor solo">Badges</span>
+          </a>
+        </li>
+        <li>
+          <a href="#wells" data-scroll title="<%= l10n('.wells_link') %>">
+              <span class="fa fa-anchor solo">Wells</span>
+          </a>
+        </li>
+        <li>
+          <a href="#carousels" data-scroll title="<%= l10n('.carousels_link') %>">
+              <span class="fa fa-anchor solo">Carouselss</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+<% end %>
+
+<% content_for :main do %>
+
+  <h1 id="home"><%= l10n('.typography') %></h1>
+
+    <%= render 'typography' %>
+
+  <h3 id="buttons"><%= l10n('.buttons') %></h3>
+
+  <%= render 'buttons' %>
+
+  <h3 id="panels"><%= l10n('panels') %></h3>
+
+  <h3><%= l10n('.headings') %></h3>
+
+  <h1><%= l10n('.heading_1') %></h1>
+  <h2><%= l10n('.heading_2') %></h2>
+  <h3><%= l10n('.heading_3') %></h3>
+  <h4><%= l10n('.heading_4') %></h4>
+  <h5><%= l10n('.heading_5') %></h5>
+  <h6><%= l10n('.heading_6') %></h6>
+
+  <h3><%= l10n('.body_copy') %></h3>
+  <p><%= l10n('.body_copy_text') %></p>
+
+  <h3>Lead Body Copy</h3>
+  <p class="lead">
+    Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus.
+  </p>
+
+  <h3>Alignment</h3>
+  <p class="text-left">Left aligned text.</p>
+  <p class="text-center">Center aligned text.</p>
+  <p class="text-right">Right aligned text.</p>
+  <p class="text-justify">Justified text.</p>
+  <p class="text-nowrap">No wrap text.</p>
+
+  <h3>Text Transforms</h3>
+  <p class="text-lowercase">Lowercased text.</p>
+  <p class="text-uppercase">Uppercased text.</p>
+  <p class="text-capitalize">Capitalized text.</p>
+
+  <h3>Addresses</h3>
+  <address>
+    <strong>Twitter, Inc.</strong><br>
+    1355 Market Street, Suite 900<br>
+    San Francisco, CA 94103<br>
+    <abbr title="Phone">P:</abbr> (123) 456-7890
+  </address>
+
+  <address>
+    <strong>Full Name</strong><br>
+    <a href="mailto:#">first.last@example.com</a>
+  </address>
+
+  <h3>Unordered Lists</h3>
+  <ul>
+    <li>First Item</li>
+    <li>Second Item</li>
+    <li>Third Item</li>
+    <li>Fourth Item</li>
+  </ul>
+
+  <h3>Ordered Lists</h3>
+  <ol>
+    <li>First Item</li>
+    <li>Second Item</li>
+    <li>Third Item</li>
+    <li>Fourth Item</li>
+  </ol>
+
+  <h3>Description Lists</h3>
+  <dl>
+    <dt>Description Lists</dt>
+    <dd>A description list is perfect for defining terms</dd>
+    <dt>Term 2</dt>
+    <dd>This is the definition</dd>
+    <dt>This is a very long term to be defined</dt>
+    <dd>This is the definition</dd>
+  </dl>
+
+  <h3>Horizontal Description</h3>
+  <dl class="dl-horizontal">
+    <dt>Description Lists</dt>
+    <dd>A description list is perfect for defining terms</dd>
+    <dt>Term 2</dt>
+    <dd>This is the definition</dd>
+    <dt>This is a very long term to be defined</dt>
+    <dd>This is the definition</dd>
+  </dl>
+
+    <h3 id="buttons"><%= l10n('.button_classes') %></h3>
+
+    <!-- Standard button -->
+    <button type="button" class="btn btn-default"><%= l10n('.default') %></button>
+
+    <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+    <button type="button" class="btn btn-primary"><%= l10n('.primary') %></button>
+
+    <!-- Indicates a successful or positive action -->
+    <button type="button" class="btn btn-success"><%= l10n('.success') %></button>
+
+    <!-- Contextual button for informational alert messages -->
+    <button type="button" class="btn btn-info"><%= l10n('.info') %></button>
+
+    <!-- Indicates caution should be taken with this action -->
+    <button type="button" class="btn btn-warning"><%= l10n('.warning') %></button>
+
+    <!-- Indicates a dangerous or potentially negative action -->
+    <button type="button" class="btn btn-danger"><%= l10n('.danger') %></button>
+
+    <!-- Deemphasize a button by making it look like a link while maintaining button behavior -->
+    <button type="button" class="btn btn-link"><%= l10n('.link') %></button>
+
+    <h3><%= l10n('.button_sizes') %></h3>
+    <p>
+      <button type="button" class="btn btn-primary btn-lg"><%= l10n('.large_button') %></button>
+      <button type="button" class="btn btn-default btn-lg"><%= l10n('.large_button') %></button>
+    </p>
+    <p>
+      <button type="button" class="btn btn-primary"><%= l10n('.default_button') %></button>
+      <button type="button" class="btn btn-default"><%= l10n('.default_button') %></button>
+    </p>
+    <p>
+      <button type="button" class="btn btn-primary btn-sm"><%= l10n('.small_button') %></button>
+      <button type="button" class="btn btn-default btn-sm"><%= l10n('.small_button') %></button>
+    </p>
+    <p>
+      <button type="button" class="btn btn-primary btn-xs"><%= l10n('.extra_small_button') %></button>
+      <button type="button" class="btn btn-default btn-xs"><%= l10n('.extra_small_button') %></button>
+    </p>
+
+    <h3><%= l10n('.block_level_buttons') %></h3>
+    <p>
+      <button type="button" class="btn btn-primary btn-lg btn-block"><%= l10n('.block_level_buttons') %></button>
+      <button type="button" class="btn btn-default btn-lg btn-block"><%= l10n('.block_level_buttons') %></button>
+    </p>
+
+    <h3><%= l10n('.button_states') %></h3>
+      <button type="button" class="btn btn-primary btn-lg active"><%= l10n('.active_primary_button') %></button>
+      <button type="button" class="btn btn-default btn-lg active"><%= l10n('.active_default_button') %></button>
+    </p>
+
+    <p>
+      <button type="button" class="btn btn-lg btn-primary" disabled="disabled"><%= l10n('.disabled_primary_button') %></button>
+      <button type="button" class="btn btn-default btn-lg" disabled="disabled"><%= l10n('.disabled_default_button') %></button>
+    </p>
+
+    <h3 class="demo-panel-title"><%= l10n('.button_variants') %></h3>
+
+    <div class="demo-content">
+      <a href="#fakelink" class="btn btn-primary"><span class="fa fa-twitter"></span> <%= l10n('.its_a') %></a>
+      <a href="#fakelink" class="btn btn-primary "><%= l10n('.primary') %></a>
+      <a href="#fakelink" class="btn btn-primary"><%= l10n('.button') %></a>
+      <a href="#fakelink" class="btn btn-primary "><span class="fa fa-check-circle"></span></a>
+      <a href="#fakelink" class="btn btn-primary btn-embossed mlm"><%= l10n('.embossed') %></a>
+      <a href="#fakelink" class="btn btn-primary btn-block"><%= l10n('.default_fluid_button') %><span class="fa fa-arrow-right pull-right"></span></a>
+    </div>
+
+    <div>
+      <h3><%= l10n('.dropdowns') %></h3>
+
+      <!-- Single button -->
+      <p>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <%= l10n('.default_button') %> <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#"><%= l10n('.action') %></a></li>
+            <li><a href="#"><%= l10n('.another_action') %></a></li>
+            <li><a href="#"><%= l10n('.something_else_where') %></a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#"><%= l10n('.separated_link') %></a></li>
+          </ul>
+        </div>
+
+        <!-- Split button -->
+        <div class="btn-group">
+          <button type="button" class="btn btn-danger">Split Button (btn-danger)</button>
+          <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only"><%= l10n('.toggle_dropdown') %></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#"><%= l10n('.action') %></a></li>
+            <li><a href="#"><%= l10n('.another_action') %></a></li>
+            <li><a href="#"><%= l10n('.something_else_where') %></a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#"><%= l10n('.separated_link') %></a></li>
+          </ul>
+        </div>
+      </p>
+    </div>
+
+    <h3><%= l10n('.button_groups') %></h3>
+    <p> <%= l10n('.button_group_desc') %></p>
+    <h4> <%= l10n('.button_group_type1_desc') %></h4>
+    <div class="btn-group btn-group-lg">
+      <!-- we can specify the button width size here -->
+      <button type="button" class="btn btn-info"> <%= l10n('.elon_musk') %></button>
+      <button type="button" class="btn btn-danger"><%= l10n('.bill_gates') %></button>
+      <button type="button" class="btn btn-warning"><%= l10n('.mark') %></button>
+    </div>
+    <br>
+    <h4> <%= l10n('.second_header') %></h4>
+    <div class="btn-group-vertical btn-group-lg">
+      <!-- we can specify the button width size here -->
+      <button type="button" class="btn btn-info"><p> <%= l10n('.elon_musk') %></p></button>
+      <button type="button" class="btn btn-danger"><p> <%= l10n('.bill_gates') %></p></button>
+      <button type="button" class="btn btn-warning"><p> <%= l10n('.mark') %></p></button>
+    </div>
+    <h4><%= l10n('.third_header') %></h4>
+    <div class="container">
+      <div class="btn-group btn-group-justified">
+        <div class="btn-group">
+          <button type="button" class="btn btn-info"><%= l10n('.elon_musk') %></button>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-info"><%= l10n('.bill_gates') %></button>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-info"><%= l10n('.mark') %></button>
+        </div>
+      </div>
+    </div>
+    <br>
+    <p><%= l10n('.button_group_type_group_desc') %></p>
+    <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+     <div class="input-group">
+       <span class="input-group-addon" id="btnGroupAddon">@</span>
+       <input type="text" class="form-control" placeholder="dc.gov" aria-describedby="btnGroupAddon">
+     </div>
+    </div>
+    <h3><%= l10n('.panels') %></h3>
+    <div class="panel panel-success">  <!-- we can change the panel color with -info, -warning, -primary ... options -->
+      <div class="panel-heading"><%= l10n('.panel_desc') %></div>
+      <div class="panel-body">
+        <p><%= l10n('.panel_body_desc') %></p>
+          <table class="table">
+            <thead>
+            <tr>
+              <th><%= l10n('.hbx_id') %></th>
+              <th><%= l10n('.user_name') %></th>
+              <th><%= l10n('.employee') %></th>
+              <th><%= l10n('.dob') %></th>
+              <th><%= l10n('.ssn') %></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th scope="row"><%= l10n('.elon_id') %></th>
+              <td><%= l10n('.elon_musk') %></td>
+              <td><%= l10n('.tesla') %></td>
+              <td><%= l10n('.elon_dob') %></td>
+              <td><%= l10n('.elon_ssn') %></td>
+            </tr>
+            <tr>
+              <th scope="row"><%= l10n('.gates_id') %></th>
+              <td><%= l10n('.gates') %></td>
+              <td><%= l10n('.microsoft') %></td>
+              <td><%= l10n('.gates_dob') %></td>
+              <td><%= l10n('.gates_ssn') %></td>
+            </tr>
+            <tr>
+              <th scope="row"><%= l10n('.mark_id') %></th>
+              <td><%= l10n('.mark') %></td>
+              <td><%= l10n('.facebook') %></td>
+              <td><%= l10n('.mark_dob') %></td>
+              <td><%= l10n('.mark_ssn') %></td>
+            </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
+    <p><%= l10n('.panel_list_desc') %></p>
+    <div class="panel panel-info">
+    <!-- Default panel contents -->
+    <div class="panel-heading"><%= l10n('.history') %></div>
+    <div class="panel-body">
+      <p><%= l10n('.panel_list_history_desc') %></p>
+    </div>
+    <!-- List group -->
+    <ul class="list-group">
+      <li class="list-group-item"><%= l10n('.bibilography') %></li>
+      <li class="list-group-item"><%= l10n('.qualifications') %></li>
+      <li class="list-group-item"><%= l10n('.education') %></li>
+      <li class="list-group-item"><%= l10n('.references') %></li>
+    </ul>
+  </div>
+
+    <p><%= l10n('.panel_footer_desc') %></p>
+    <div class="panel panel-info">
+      <div class="panel-heading"><%= l10n('.panel_header_desc') %></div>
+      <div class="panel-body">
+        <%= l10n('.panel_body_content') %>
+      </div>
+      <style>
+        .panel-footer.panel-custom {
+          background: deepskyblue;
+          color: white;
+        }
+      </style>
+      <div class="panel-footer panel-custom"> <%= l10n('.panel_footer_content') %></div>
+    </div>
+
+    <h3>Tables</h3>
+    <div class="table-demo-content">
+      <p>
+        For ARIA compatibility, keep in mind what sort of table is being created. For tables with only a header row, each header should be defined with scope="col". For tables with both a header row and a left identifying column, add a scope="row" to each row's first column (see below).
+      </p>
+      <table class="table">
+        <caption>Optional table caption.</caption>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th> <td>Mark</td> <td>Otto</td> <td>@mdo</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th> <td>Jacob</td> <td>Thornton</td> <td>@fat</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th> <td>Larry</td> <td>the Bird</td> <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+      <hr />
+      <p>Effective Datatables example</p>
+      <%= render_datatable(@family_data_table) %>
+    </div>
+
+       <div class="demo-row demo-inputs">
+         <div class="demo-title">
+           <h3 class="demo-panel-title" id="inputs">Inputs</h3>
+         </div>
+         <div class="demo-col">
+           <form>
+             <div class="form-group>">
+               <label class="control-label" for="large-input">Label for large input</label>
+               <input name="large-input" type="text" value="" placeholder="A large height input has class 'input-lg'" class="form-control input-lg">
+             </div>
+             <div class="form-group>">
+               <label class="control-label" for="small-input">Label for small input</label>
+               <input name="small-input" type="text" value="" placeholder="A small height input has class 'input-sm'" class="form-control input-sm">
+             </div>
+             <div class="form-group>">
+               <label class="control-label" for="default-input">Label for default input</label>
+               <input name="default-input" type="text" value="" placeholder="No additional class is necessary" class="form-control">
+             </div>
+             <p>Fields can have a 'has-feedback' class to allow them to provide user cues</p>
+             <div class="form-group has-success has-feedback">
+               <input type="text" value="A success feedback has class 'has-success'" class="form-control">
+               <span class="form-control-feedback fa fa-check-circle"></span>
+             </div>
+             <div class="form-group has-warning has-feedback">
+               <input type="text" value="A warning feedback has class 'has-warning'" class="form-control">
+               <span class="form-control-feedback fa fa-check-circle"></span>
+             </div>
+             <div class="form-group has-error has-feedback">
+               <input type="text" value="An error feedback has class 'has-error'" class="form-control">
+               <span class="form-control-feedback fa fa-check-circle"></span>
+             </div>
+             <hr />
+             <div class="form-group has-feedback">
+               <input type="text" value="An input can also be disabled" disabled="disabled" class="form-control">
+               <span class="form-control-feedback fa fa-lock"></span>
+             </div>
+             <h3>Disabled Inputs</h3>
+             <fieldset disabled>
+               <div class="form-group">
+                 <input type="text" id="disabledTextInput" class="form-control">
+               </div>
+             </fieldset>
+             <h3><%= l10n('.text_area') %></h3>
+             <div class="form-group">
+               <label for="comment"><%= l10n('.comment') %></label>
+               <textarea class="form-control" rows="5" id="textarea"></textarea>
+             </div>
+             <h3><%= l10n('.file_input') %></h3>
+             <label class="custom-file">
+               <input type="file" id="file" class="custom-file-input">
+               <span class="custom-file-control"></span>
+             </label>
+             <h3>Search Boxes</h3>
+             <div class="input-group">
+               <input type="text" class="form-control" id="usr">
+               <div class="input-group-btn">
+                 <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+               </div>
+             </div>
+
+             <div class="input-group">
+               <div class="input-group-btn">
+                 <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+               </div>
+               <input type="text" class="form-control" id="usr">
+             </div>
+           </form>
+           <hr />
+         </div>
+
+         <div class="demo-row">
+           <div class="demo-title">
+             <h3 class="demo-panel-title">Selects</h3>
+           </div>
+
+           <div class="demo-col">
+             <p>Select with Option Groups
+             <div class="mbl">
+               <select class="form-control select select-primary" name="demo-select" data-toggle="select">
+                 <optgroup label="Profile">
+                   <option value="0">My Profile</option>
+                   <option value="1">My Friends</option>
+                 </optgroup>
+                 <optgroup label="System">
+                   <option value="2">Messages</option>
+                   <option value="3">My Settings</option>
+                   <option value="4">Logout</option>
+                 </optgroup>
+               </select>
+             </div>
+             <br />
+             <p>Multiselect</p>
+             <div class="mbl">
+               <select multiple="multiple" class="form-control multiselect multiselect-info" data-toggle="select">
+                 <option value="0">1</option>
+                 <option value="1" selected>2</option>
+                 <option value="2" selected>3</option>
+                 <option value="3" selected>4</option>
+                 <option value="4">5</option>
+               </select>
+             </div>
+
+           </div><!-- ./demo-col -->
+         </div> <!-- /.demo-row -->
+
+          <h3>File Inputs</h3>
+          <label class="custom-file">
+            <input type="file" id="file" class="custom-file-input">
+            <span class="custom-file-control"></span>
+          </label>
+          <h3>Text Area</h3>
+
+           <h3><%= l10n('.check_box') %></h3> 
+
+          <div class="container">
+            <form>
+              <div class="checkbox">
+                <label><input type="checkbox" value=""><%= l10n('.unchecked') %></label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" value="" checked><%= l10n('.checked') %></label>
+              </div>
+              <div class="checkbox disabled">
+                <label><input type="checkbox" value="" disabled><%= l10n('.disabled_unchecked') %></label>
+              </div>
+              <div class="checkbox checked">
+                <label><input type="checkbox" value="" disabled checked ><%= l10n('.disabled_checked') %></label>
+              </div>
+            </form>
+          </div>
+
+          <h3> <%= l10n('.radio_button') %></h3>
+          <div class="container">
+            <form>
+              <div class="radio">
+                <label><input type="radio" name="optradio"><span><%= l10n('.radio_off') %></span></label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="optradio" checked><span><%= l10n('.radio_on') %></span></label>
+              </div>
+              <div class="radio disabled">
+                <label><input type="radio" name="optradio" disabled><span><%= l10n('.disabled_radio_off') %></span></label>
+              </div>
+            </form>
+            <form>
+              <div class="radio disabled">
+                <label><input type="radio" name="optradio" disabled checked><span><%= l10n('.disabled_radio_on') %></span></label>
+              </div>
+            </form>
+          </div>
+
+          <div class="container">
+            <form>
+              <div class="checkbox">
+                <label><input type="checkbox" value=""><%= l10n('.unchecked') %></label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" value="" checked><%= l10n('.checked') %></label>
+              </div>
+              <div class="checkbox disabled">
+                <label><input type="checkbox" value="" disabled><%= l10n('.disabled_unchecked') %></label>
+              </div>
+              <div class="checkbox checked">
+                <label><input type="checkbox" value="" disabled checked ><%= l10n('.disabled_checked') %></label>
+              </div>
+            </form>
+          </div>
+
+          <h3> <%= l10n('.radio_button') %></h3>
+          <div class="container">
+            <form>
+              <div class="radio">
+                <label><input type="radio" name="optradio"><span><%= l10n('.radio_off') %></span></label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="optradio" checked><span><%= l10n('.radio_on') %></span></label>
+              </div>
+              <div class="radio disabled">
+                <label><input type="radio" name="optradio" disabled><span><%= l10n('.disabled_radio_off') %></span></label>
+              </div>
+            </form>
+            <form>
+              <div class="radio disabled">
+                <label><input type="radio" name="optradio" disabled checked><span><%= l10n('.disabled_radio_on') %></span></label>
+              </div>
+            </form>
+          </div>
+
+            <div class="col-lg-6">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  <input type="radio" aria-label="...">
+                </span>
+                <input type="text" class="form-control" aria-label="...">
+              </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+          </div><!-- /.row -->
+       </div>
+
+    <div>
+
+    <h3><%= l10n('.pagination') %></h3>
+      <p><%= l10n('.default_pagination') %></p>
+
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li>
+              <a href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+              <li><a href="#"><%= l10n('.1') %></a></li>
+              <li><a href="#"><%= l10n('.2') %></a></li>
+              <li><a href="#"><%= l10n('.3') %></a></li>
+              <li><a href="#"><%= l10n('.4') %></a></li>
+              <li><a href="#"><%= l10n('.5') %></a></li>
+            <li>
+              <a href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <p><%= l10n('.disabled_and_active_states') %></p>
+         <nav aria-label="Page navigation">
+          <ul class="pagination">
+          <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+          <li class="active"><a href="#"><%= l10n('.1') %><span class="sr-only"><%=l10n('.current')%></span></a></li>
+          <li class="disabled"><a href="#"><%= l10n('.2') %><span class="sr-only"><%=l10n('.current')%></span></a></li>
+          <li class="disabled"><a href="#"><%= l10n('.3') %><span class="sr-only"><%=l10n('.current')%></span></a></li>
+          </ul>
+        </nav>
+
+
+
+        <p><%= l10n('.large_sizing') %></p>
+         <nav aria-label="Page navigation">
+          <ul class="pagination pagination-lg">
+            <li>
+            <a href="#"><%= l10n('.1') %></a>
+            <a href="#"><%= l10n('.2') %></a>
+            <a href="#"><%= l10n('.3') %></a>
+            <a href="#"><%= l10n('.4') %></a>
+            <a href="#"><%= l10n('.5') %></a>
+            </li>
+          </ul>
+        </nav>
+
+      <p><%= l10n('.default_sizing') %></p>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li>
+            <a href="#"><%= l10n('.1') %></a>
+            <a href="#"><%= l10n('.2') %></a>
+            <a href="#"><%= l10n('.3') %></a>
+            <a href="#"><%= l10n('.4') %></a>
+            <a href="#"><%= l10n('.5') %></a>
+            </li>
+          </ul>
+        </nav>
+
+      <p><%= l10n('.small_sizing') %></p>
+        <nav aria-label="Page navigation">
+          <ul class="pagination pagination-sm">
+            <li>
+            <a href="#"><%= l10n('.1') %></a>
+            <a href="#"><%= l10n('.2') %></a>
+            <a href="#"><%= l10n('.3') %></a>
+            <a href="#"><%= l10n('.4') %></a>
+            <a href="#"><%= l10n('.5') %></a>
+            </li>
+          </ul>
+        </nav>
+
+
+     <h3><%= l10n('.pager') %></h3>
+      <p><%= l10n('.default') %></p>
+        <nav aria-label="Page navigation">
+          <ul class="pager">
+            <li><a href="#"><%= l10n('.previous') %></a></li>
+            <li><a href="#"><%= l10n('.next') %></a></li>
+          </ul>
+        </nav>
+
+      <p><%= l10n('.aligned_links') %></p>
+        <nav aria-label="Page navigation">
+          <ul class="pager">
+            <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span><%= l10n('.older') %></a></li>
+            <li class="next"><a href="#"><%= l10n('.newer') %><span aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </nav>
+
+      <p><%= l10n('.optional_disabled_state') %></p>
+        <nav aria-label="Page navigation">
+          <ul class="pager">
+            <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span><%= l10n('.older') %></a></li>
+            <li class="next"><a href="#"><%= l10n('.newer') %><span aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </nav>
+
+    <h3>Navigation</h3>
+    
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+              <img alt="Brand" src="https://mahealthconnector.optum.com/individual/images/logo.png">
+            </a>
+          </div>
+        </div>
+      </nav><br>
+
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">
+              <img alt="Brand" src="https://mahealthconnector.optum.com/individual/images/logo.png">
+            </a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+              <li><a href="#">Link</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">Separated link</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">One more separated link</a></li>
+                </ul>
+              </li>
+            </ul>
+            <form class="navbar-form navbar-left">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search">
+              </div>
+              <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#">Link</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">Separated link</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav><br>
+
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">WebSiteName</a>
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">Link</a></li>
+            <li><a href="#">Link</a></li>
+          </ul>
+          <button class="btn btn-danger navbar-btn">Button</button>
+        </div>
+      </nav><br>
+
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">WebSiteName</a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#">Page 1</a></li>
+              <li><a href="#">Page 2</a></li>
+              <li><a href="#">Page 3</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+              <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div class="demo-row demo-tabs">
+        <div class="demo-title">
+          <h3 class="demo-panel-title"><%= l10n('.tabs') %></h3>
+        </div>
+        <div class="demo-content">
+          <ul class="nav nav-tabs nav-append-content" role="tablist">
+            <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab"><%= l10n('.popular') %></a></li>
+            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><%= l10n('.newest') %></a></li>
+            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><%= l10n('.bestselling') %></a></li>
+            <li role="presentation" class="disabled"><a href="#tab4"><%= l10n('.disabled_tab') %></a></li>
+          </ul> <!-- /tabs -->
+
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="tab1">
+              <p><%= l10n('.section_one') %></p>
+            </div>
+
+            <!-- /tabs -->
+            <div role="tabpanel" class="tab-pane" id="tab2">
+              <p><%= l10n('.section_two') %></p>
+            </div>
+
+            <!-- /tabs -->
+            <div role="tabpanel" class="tab-pane" id="tab3">
+              <p><%= l10n('.section_three') %></p>
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="tab4">
+              <p><%= l10n('.section_disbaled') %></p>
+            </div>
+          </div> <!-- /tab-content -->
+
+          <br>
+          <p> <%= l10n('.tab_dropdown') %> </p>
+          <ul class="nav nav-tabs">
+            <li role="presentation" class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+               <%= l10n('.home') %><span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="#"><%= l10n('.sub_options') %></a></li>
+                <li><a href="#"><%= l10n('.sub_options') %></a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#"><%= l10n('.sub_option_divider') %></a></li>
+              </ul>
+            </li>
+            <li role="presentation"><a href="#"><%= l10n('.profile') %></a></li>
+            <li role="presentation"><a href="#"><%= l10n('.messages') %></a></li>
+          </ul>
+        </div> <!-- /demo-content -->
+      </div> <!-- /row -->
+
+    <h3><%= l10n('.breadcrumbs') %></h3>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active"><%= l10n('.home') %></li>
+      </ol>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><%= l10n('.home') %></a></li>
+        <li class="breadcrumb-item active"><%= l10n('.library') %></li>
+      </ol>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#"><%= l10n('.home') %></a></li>
+        <li class="breadcrumb-item"><a href="#"><%= l10n('.library') %></a></li>
+        <li class="breadcrumb-item active"><%= l10n('.data') %></a></li>
+      </ol>
+
+     <h3><%= l10n('.progress_bar_and_sliders') %></h3>
+<div>
+
+
+
+<h3><%= l10n('.default_progress_bar') %></h3>
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+    <span class="sr-only">60% <%= l10n('.complete') %></span>
+  </div>
+  </div>
+
+<h3>With label</h3>
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+    60%
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
+    0%
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 2%;">
+    2%
+  </div>
+  </div>
+<h3><%= l10n('.contextual_alternatives') %></h3>
+  <div class="progress">
+    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    <span class="sr-only">40% <%= l10n('.complete') %> (<%= l10n('.success') %>)</span>
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+    <span class="sr-only">20% <%= l10n('.complete') %></span>
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
+    <span class="sr-only">60% <%= l10n('.complete') %> (<%= l10n('.warning') %>)</span>
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%">
+    <span class="sr-only">80% <%= l10n('.complete') %> (<%= l10n('.danger') %>)</span>
+  </div>
+  </div>
+<h3>Striped</h3>
+  <div class="progress">
+    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+    <span class="sr-only">40% <%= l10n('.complete') %> (<%= l10n('.success') %>)</span>
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+    <span class="sr-only">20% Complete</span>
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
+    <span class="sr-only">60% <%= l10n('.complete') %> (<%= l10n('.warning') %>)</span>
+  </div>
+  </div>
+  <div class="progress">
+    <div class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%">
+    <span class="sr-only">80% <%= l10n('.complete') %> (<%= l10n('.danger') %>)</span>
+  </div>
+  </div>
+<h3>Animated</h3>
+  <div class="progress">
+    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+    <span class="sr-only">45% <%= l10n('.complete') %></span>
+  </div>
+  </div>
+<h3>Stacked</h3>
+  <div class="progress">
+    <div class="progress-bar progress-bar-success" style="width: 35%">
+    <span class="sr-only">35% <%= l10n('.complete') %> (<%= l10n('.success') %>)</span>
+  </div>
+  <div class="progress-bar progress-bar-warning progress-bar-striped" style="width: 20%">
+    <span class="sr-only">20% <%= l10n('.complete') %> (<%= l10n('.warning') %>)</span>
+  </div>
+  <div class="progress-bar progress-bar-danger" style="width: 10%">
+    <span class="sr-only">10% <%= l10n('.complete') %> (<%= l10n('.danger') %>)</span>
+  </div>
+  </div>
+  </div>
+
+
+
+<h3><%= l10n('.tooltips_and_popovers') %></h3>
+    <div>
+      <h3><%= l10n('.tooltip_four_directions') %></h3>
+        <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="<%= l10n('.tooltip_on_left_link') %>"><%= l10n('.tooltip_on_left') %></button>
+
+        <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="<%= l10n('.tooltip_on_top_link') %>"><%= l10n('.tooltip_on_top') %></button>
+
+        <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="<%= l10n('.tooltip_on_bottom_link') %>"><%= l10n('.tooltip_on_bottom') %></button>
+
+        <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="<%= l10n('.tooltip_on_right_link') %>"><%= l10n('.tooltip_on_right') %></button>
+
+      <h3><%= l10n('.click_to_toggle_Popover') %></h3>
+        <button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="<%= l10n('.click_to_toggle_Popover_link') %>" data-content="<%= l10n('.toggle_Popover_content') %>"><%= l10n('.click_to_toggle_Popover') %></button>
+
+      <h3><%= l10n('.four_directions_popover') %></h3>
+        <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="left" data-content="<%= l10n('.popover_on_left_data') %>">
+          <%= l10n('.popover_on_left') %>
+        </button>
+
+        <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="top" data-content="<%= l10n('.popover_on_top_data') %>">
+          <%= l10n('.popover_on_top') %>
+        </button>
+
+        <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="bottom" data-content="<%= l10n('.popover_on_bottom_data') %>">
+          <%= l10n('.popover_on_bottom') %>
+        </button>
+
+        <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="<%= l10n('.popover_on_right_data') %>">
+          <%= l10n('.popover_on_right') %>
+        </button>
+
+      <h3><%= l10n('.dismissal_popover') %></h3>
+        <a tabindex="0" class="btn btn-lg btn-danger" role="button" data-toggle="popover" data-trigger="focus" title="Dismissible popover" data-content="<%= l10n('.dismissal_popover_content') %>"><%= l10n('.dismissal_popover') %></a>
+    </div>
+
+    <div class="demo-row">
+      <h3 class="demo-title"><%= l10n('.alerts') %></h3>
+      <div class="demo-content">
+        <!-- Alert Success -->
+        <div class="alert alert-success" role="alert"><%= l10n('.div_alert_success') %></div>
+        <div class="alert alert-success">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button><%= l10n('.your_computer') %> <a href="#fakelink"><%= l10n('.because_problem') %></a> <%= l10n('.sorry_for_inconvenience') %></div>
+
+        <div class="alert alert-success">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+          <h4><%= l10n('.disc_space') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-primary btn-wide"><span class="fa fa-check-circle"></span>&nbsp;&nbsp; <%= l10n('.hurray') %></a>
+          <a href="#fakelink" class="btn btn-default btn-info btn-wide"><%= l10n('.share_on_twitter') %></a>
+        </div>
+
+        <!-- Alert Info -->
+        <div class="alert alert-info" role="alert"><%= l10n('.div_alert_info') %></div>
+        <div class="alert alert-info">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+          <%= l10n('.your_computer') %><a href="#fakelink"><%= l10n('.because_problem') %></a><%= l10n('.sorry_for_inconvenience') %>
+        </div>
+
+        <div class="alert alert-info">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+          <h4><%= l10n('.information_label') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-info btn-wide"><%= l10n('.turn_it_off') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.its_ok') %></a>
+        </div>
+
+        <!-- Alert Warning -->
+        <div class="alert alert-warning" role="alert"><%= l10n('.div_alert_warning') %></div>
+        <div class="alert alert-warning">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+          <%= l10n('.your_computer') %><a href="#fakelink"><%= l10n('.because_problem') %></a><%= l10n('.sorry_for_inconvenience') %>
+        </div>
+
+        <div class="alert alert-warning">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+          <h4><%= l10n('.error_the_change') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-warning btn-wide"><%= l10n('.turn_it_off') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.its_ok') %></a>
+        </div>
+
+        <!-- Alert Danger -->
+        <div class="alert alert-danger" role="alert"><%= l10n('.div_alert_danger') %></div>
+        <div class="alert alert-danger">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+          <%= l10n('.your_computer') %><a href="#fakelink"><%= l10n('.because_problem') %></a><%= l10n('.sorry_for_inconvenience') %></div>
+
+        <div class="alert alert-danger">
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
+          <h4><%= l10n('.error_the_change') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-danger btn-wide"><%= l10n('.turn_it_off') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.its_ok') %></a>
+        </div>
+        <p><%= l10n('.dismissible') %>  <%= l10n('.alerts') %></p>
+        <div class="alert alert-warning alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong><%= l10n('.warning') %></strong> <%= l10n('.better_check_yourself') %>
+        </div>
+
+      </div> <!-- /demo-content -->
+    </div> <!-- /row -->
+
+    <h2>Badges</h2>
+    <a href="#">News <span class="badge">5</span></a><br>
+    <a href="#">Comments <span class="badge">10</span></a><br>
+    <a href="#">Updates <span class="badge">2</span></a>
+
+    <h3>Badges on Buttons</h3>
+    <button type="button" class="btn btn-primary">Primary <span class="badge">7</span></button><br>
+    <button type="button" class="btn btn-success">Success <span class="badge">3</span></button><br>
+    <button type="button" class="btn btn-danger">Danger <span class="badge">5</span></button><br>
+
+    <h3>Badges nav-pills</h3>
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="active"><a href="#">Home <span class="badge">42</span></a></li>
+      <li role="presentation"><a href="#">Profile</a></li>
+      <li role="presentation"><a href="#">Messages <span class="badge">3</span></a></li>
+    </ul>
+    <br>
+
+      <h3>Modal</h3>
+      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Large Modal</button>
+      <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+              <p>Some text in the modal.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Small modal</button>
+      <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+              <p>Some text in the modal.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    <h3><%= l10n('.tabs') %></h3>
+
+    <h3><%= l10n('.Wells') %></h3>
+
+      <h3><%= l10n('.default_well') %></h3>
+      <div class="well"> Default well</div>
+
+      <h2><%= l10n('.optional_classes') %></h2>
+
+        <h3><%= l10n('.large_well') %></h3>
+        <div class="well well-lg"> A Large Well</div>
+
+        <h3><%= l10n('.small_well') %></h3>
+        <div class="well well-sm"> A small Well</div>
+
+    <h3><%= l10n('.carousels') %></h3>
+      <h3><%= l10n('.slides_only') %></h3>
+      <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner" role="listbox">
+          <div class="carousel-item item active">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/individual-family.jpg">
+          </div>
+          <div class="carousel-item item">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/small-business.jpg" alt="Second slide">
+          </div>
+          <div class="carousel-item item">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/employee.jpg" alt="Third slide">
+          </div>
+        </div>
+      </div>
+
+      <h3><%= l10n('.with_controls') %></h3>
+      <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner" role="listbox">
+          <div class="carousel-item item active">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/individual-family.jpg" alt="First slide">
+          </div>
+          <div class="carousel-item item">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/small-business.jpg" alt="Second slide">
+          </div>
+          <div class="carousel-item item">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/employee.jpg" alt="Third slide">
+          </div>
+        </div>
+        <a class="left carousel-control carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+          <span class="icon-prev" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+          <span class="icon-next" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+
+      <p> To initialize $("#carouselExampleControls").carousel(); </p>
+
+      <h3><%= l10n('.with_indicators') %></h3>
+      <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+          <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+          <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+          <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner" role="listbox">
+          <div class="carousel-item active carousel-item item ">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/individual-family.jpg" alt="First slide">
+          </div>
+          <div class="carousel-item carousel-item item ">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/small-business.jpg" alt="Second slide">
+          </div>
+          <div class="carousel-item carousel-item item ">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/employee.jpg" alt="Third slide">
+          </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+          <span class="icon-prev carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+          <span class="icon-next carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+
+      <h3><%= l10n('.with_captions') %></h3>
+      <div id="carouselWithCaptions" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner" role="listbox">
+          <div class="carousel-item active carousel-item item ">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/individual-family.jpg" alt="First slide">
+            <div class="carousel-caption">
+              <h3><%= l10n('.picture_one_title') %></h3>
+              <p><%= l10n('.picture_one_caption') %></p>
+             </div>
+          </div>
+          <div class="carousel-item carousel-item item ">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/small-business.jpg" alt="Second slide">
+            <div class="carousel-caption">
+              <h3><%= l10n('.picture_two_title') %></h3>
+              <p><%= l10n('.picture_two_caption') %></p>
+            </div>
+          </div>
+          <div class="carousel-item carousel-item item ">
+            <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/employee.jpg" alt="Third slide">
+            <div class="carousel-caption">
+              <h3><%= l10n('.picture_three_title') %></h3>
+              <p><%= l10n('.picture_three_caption') %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    <div>
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Input Variants</h3>
+      </div>
+      <div class="demo-col">
+        <div class="form-group">
+          <div class="input-group input-group-hg">
+            <input class="form-control" id="appendedInputButton-01" type="search" placeholder="Search">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-lg">
+            <input class="form-control" id="appendedInputButton-02" type="search" placeholder="Search">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <input class="form-control" id="appendedInputButton-03" type="search" placeholder="Search">
+            <div class="input-group-btn">
+              <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+              <button class="btn btn-default" type="button"><span class="fa fa-gear"></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-sm">
+            <input class="form-control" id="appendedInputButton-04" type="search" placeholder="Search">
+            <span class="input-group-btn">
+              <button class="btn" type="button"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-hg">
+            <span class="input-group-addon">@</span>
+            <input class="form-control" id="prependedInput-01" type="text" placeholder="twitter">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-lg">
+            <span class="input-group-addon">@</span>
+            <input class="form-control" id="prependedInput-02" type="text" placeholder="twitter">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon">@</span>
+            <input class="form-control" id="prependedInput-03" type="text" placeholder="twitter">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">@</span>
+            <input class="form-control" id="prependedInput-04" type="text" placeholder="twitter">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button class="btn" type="button"><span class="fa fa-calendar"></span></button>
+            </span>
+            <input type="text" class="form-control" value="14 March, 2013" id="datepicker-01">
+          </div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="spinner-01" placeholder="" value="0" class="form-control spinner">
+        </div>
+      </div>
+
+      <div class="demo-col">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="search" class="form-control" placeholder="Search" id="search-query-1">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-hg input-group-rounded">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+            <input type="search" class="form-control" placeholder="Search" id="search-query-2">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-lg input-group-rounded">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+            <input type="search" class="form-control" placeholder="Search" id="search-query-3">
+          </div>
+        </div>
+        <div class="form-group">
+
+          <div class="input-group input-group-rounded">
+            <input type="search" class="form-control" placeholder="Search" id="search-query-4">
+            <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+          </div>
+
+      <form class="form-inline">
+        <div class="form-group">
+          <label for="exampleInputName2">Name</label>
+          <input type="text" class="form-control" id="exampleInputName2" placeholder="Jane Doe">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail2">Email</label>
+          <input type="email" class="form-control" id="exampleInputEmail2" placeholder="jane.doe@example.com">
+        </div>
+        <button type="submit" class="btn btn-default">Send invitation</button>
+      </form>
+
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-sm input-group-rounded">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+            <input type="search" class="form-control" placeholder="Search" id="search-query-9">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-hg input-group-rounded">
+            <input type="search" class="form-control" placeholder="Search" id="search-query-5">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-lg input-group-rounded">
+            <input type="search" class="form-control" placeholder="Search" id="search-query-6">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-rounded">
+            <input type="search" class="form-control" placeholder="Search" id="search-query-7">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group input-group-sm input-group-rounded">
+            <input type="search" class="form-control" placeholder="Search" id="search-query-8">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /row -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Typeahead</h3>
+      </div>
+      <div class="demo-col">
+        <div class="form-group">
+          <input class="form-control" type="text" id="typeahead-demo-01" />
+        </div>
+      </div>
+    </div><!-- /row -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">File Input</h3>
+      </div>
+      <div class="last-col">
+        <div class="demo-content">
+
+          <div class="form-group">
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <span class="btn btn-primary btn-embossed btn-file">
+                <span class="fileinput-new"><span class="fa fa-upload"></span>&nbsp;&nbsp;Attach File</span>
+                <span class="fileinput-exists"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                <input type="file" name="...">
+              </span>
+              <span class="fileinput-filename"></span>
+              <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <div class="input-group">
+                <div class="form-control uneditable-input" data-trigger="fileinput">
+                  <span class="fa fa-clip fileinput-exists"></span>
+                  <span class="fileinput-filename"></span>
+                </div>
+                <span class="input-group-btn btn-file">
+                  <span class="btn btn-default fileinput-new" data-role="select-file">Select file</span>
+                  <span class="btn btn-default fileinput-exists" data-role="change"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                  <input type="file" name="...">
+                  <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><span class="fa fa-trash"></span>&nbsp;&nbsp;Remove</a>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="demo-col">
+          <div class="form-group">
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+              <div>
+                <span class="btn btn-primary btn-embossed btn-file">
+                  <span class="fileinput-new"><span class="fa fa-image"></span>&nbsp;&nbsp;Select image</span>
+                  <span class="fileinput-exists"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                  <input type="file" name="...">
+                </span>
+                <a href="#" class="btn btn-primary btn-embossed fileinput-exists" data-dismiss="fileinput"><span class="fa fa-trash"></span>&nbsp;&nbsp;Remove</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-col">
+          <div class="form-group">
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                <img data-src="holder.js/100%x100%" alt="...">
+              </div>
+              <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+              <div>
+                <span class="btn btn-primary btn-embossed btn-file">
+                  <span class="fileinput-new"><span class="fa fa-image"></span>&nbsp;&nbsp;Select image</span>
+                  <span class="fileinput-exists"><span class="fa fa-gear"></span>&nbsp;&nbsp;Change</span>
+                  <input type="file" name="...">
+                </span>
+                <a href="#" class="btn btn-primary btn-embossed fileinput-exists" data-dismiss="fileinput"><span class="fa fa-trash"></span>&nbsp;&nbsp;Remove</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /row -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Textarea</h3>
+      </div>
+      <div class="last-col">
+        <div class="demo-col">
+          <textarea class="form-control" rows="3" placeholder="Add comment..."></textarea>
+        </div>
+        <div class="demo-col">
+          <textarea  class="form-control" rows="3">Some text inside small textarea. This is only for paddings and line-height sample.</textarea>
+        </div>
+        <div class="demo-content ptl">
+          <textarea rows="3" placeholder="Add comment..." class="form-control"></textarea>
+        </div>
+      </div><!-- /demo-content -->
+    </div><!-- /row -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Tags Input</h3>
+      </div>
+      <div class="demo-content">
+        <input type="input" name="tagsinput-01" class="tagsinput" data-role="tagsinput" value="Clean, Fresh, Modern, Unique" />
+        <div class="tagsinput-primary">
+          <input type="text" name="tagsinput-02" class="tagsinput" data-role="tagsinput" value="School, Teacher, Colleague" />
+        </div>
+      </div> <!-- /tags -->
+    </div><!-- /row -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Labels</h3>
+      </div>
+      <div class="demo-content">
+        <div class="demo-inline demo-labels">
+          <span class="label label-default">Default</span>
+          <span class="label label-primary">Primary</span>
+          <span class="label label-important">Important</span>
+          <span class="visible-md">
+            <span class="label label-success">Success</span>
+            <span class="label label-warning">Warning</span>
+            <span class="label label-info">Info</span>
+            <span class="label label-inverse">Inverse</span>
+          </span>
+        </div>
+      </div>
+    </div> <!-- /row -->
+
+    <div class="demo-row">
+      <h3 class="demo-title">Checkboxes &<br /> Radio-buttons</h3>
+      <div class="demo-col">
+        <label class="checkbox" for="checkbox1">
+          <input type="checkbox" value="" id="checkbox1" data-toggle="checkbox">
+          Unchecked
+        </label>
+        <label class="checkbox" for="checkbox2">
+          <input type="checkbox" checked="checked" value="" id="checkbox2" data-toggle="checkbox">
+          Checked
+        </label>
+        <label class="checkbox" for="checkbox3">
+          <input type="checkbox" value="" id="checkbox3" data-toggle="checkbox" disabled="">
+          Disabled unchecked
+        </label>
+        <label class="checkbox" for="checkbox4">
+          <input type="checkbox" checked="checked" value="" id="checkbox4" data-toggle="checkbox" disabled="">
+          Disabled checked
+        </label>
+      </div><!-- /.demo-col -->
+      <div class="demo-col">
+        <label class="radio">
+          <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" data-toggle="radio">
+          Radio is off
+        </label>
+        <label class="radio">
+          <input type="radio" name="optionsRadios" id="optionsRadios2" value="option1" data-toggle="radio" checked="">
+          Radio is on
+        </label>
+
+        <label class="radio">
+          <input type="radio" name="optionsRadiosDisabled" id="optionsRadios3" value="option2" data-toggle="radio" disabled="">
+          Disabled radio is off
+        </label>
+        <label class="radio">
+          <input type="radio" name="optionsRadiosDisabled" id="optionsRadios4" value="option2" data-toggle="radio" checked="" disabled="">
+          Disabled radio is on
+        </label>
+      </div><!-- /.demo-col -->
+    </div><!-- /demo-row -->
+
+    <div class="demo-row">
+      <h3 class="demo-title">Custom color</h3>
+      <div class="demo-col">
+        <label class="checkbox primary" for="checkbox5">
+          <input type="checkbox" value="" id="checkbox5" data-toggle="checkbox">
+          Unchecked
+        </label>
+        <label class="checkbox primary" for="checkbox6">
+          <input type="checkbox" checked="checked" value="" id="checkbox6" data-toggle="checkbox">
+          Checked
+        </label>
+        <label class="checkbox primary" for="checkbox7">
+          <input type="checkbox" value="" id="checkbox7" data-toggle="checkbox" disabled="">
+          Disabled unchecked
+        </label>
+        <label class="checkbox primary" for="checkbox8">
+          <input type="checkbox" checked="checked" value="" id="checkbox8" data-toggle="checkbox" disabled="">
+          Disabled checked
+        </label>
+      </div><!-- /.demo-col -->
+      <div class="demo-col">
+        <label class="radio primary">
+          <input type="radio" name="optionsRadios2" id="optionsRadios5" value="option1" data-toggle="radio">
+          Radio is off
+        </label>
+        <label class="radio primary">
+          <input type="radio" name="optionsRadios2" id="optionsRadios6" value="option1" data-toggle="radio" checked="">
+          Radio is on
+        </label>
+
+        <label class="radio primary">
+          <input type="radio" name="optionsRadiosDisabled2" id="optionsRadios7" value="option2" data-toggle="radio" disabled="">
+          Disabled radio is off
+        </label>
+        <label class="radio primary">
+          <input type="radio" name="optionsRadiosDisabled2" id="optionsRadios" value="option2" data-toggle="radio" checked="" disabled="">
+          Disabled radio is on
+        </label>
+      </div><!-- /.demo-col -->
+    </div><!-- /demo-row -->
+
+    <div class="demo-row">
+      <h3 class="demo-title">Switches</h3>
+      <div class="last-col">
+        <div class="demo-col">
+          <input type="checkbox" checked data-toggle="switch" id="custom-switch-01" />
+        </div><!-- /.demo-col -->
+
+        <div class="demo-col">
+          <input type="checkbox" data-toggle="switch" id="custom-switch-02" />
+        </div><!-- /.demo-col -->
+
+        <div class="demo-col ptl">
+          <div class="bootstrap-switch-square">
+            <input type="checkbox" checked data-toggle="switch" id="custom-switch-03" data-on-text="<i class='fa fa-check'></i>" data-off-text="<i class='fa fa-cross'></i>" />
+          </div>
+        </div><!-- /.demo-col -->
+
+        <div class="demo-col ptl">
+          <div class="bootstrap-switch-square">
+            <input type="checkbox" data-toggle="switch" id="custom-switch-04" data-on-text="<i class='fa fa-check'></i>" data-off-text="<i class='fa fa-cross'></i>" />
+          </div>
+        </div><!-- /.demo-col -->
+
+        <div class="demo-col ptl">
+          <input type="checkbox" checked disabled data-toggle="switch" id="custom-switch-05" />
+        </div><!-- /.demo-col -->
+
+        <div class="demo-col ptl">
+          <input type="checkbox" disabled data-toggle="switch" id="custom-switch-06" />
+        </div><!-- /.demo-col -->
+      </div><!-- /.demo-row -->
+    </div>
+
+    <div class="demo-row demo-navigation">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Navigation</h3>
+      </div>
+      <div class="demo-content">
+        <div class="clearfix">
+          <div class="pull-left mrl">
+            <ul class="pager">
+              <li class="previous">
+                <a href="#fakelink">
+                  <span class="fa fa-arrow-left"></span>
+                  <span>All messages</span>
+                </a>
+              </li>
+              <li class="next">
+                <a href="#fakelink">
+                  <span class="fa fa-arrow-right"></span>
+                </a>
+              </li>
+            </ul> <!-- /pager -->
+          </div>
+
+          <div>
+            <div class="btn-toolbar" role="toolbar" aria-label="...">
+              <div class="btn-group" role="group" aria-label="list columned"><span class="fa fa-list-columned"></span></div>
+              <div class="btn-group" role="group" aria-label="list numbered"><span class="fa fa-list-numbered"></div>
+              <div class="btn-group" role="group active" aria-label="list thumbnailed"><span class="fa fa-list-thumbnailed"></span></div>
+              <div class="btn-group" role="group" aria-label="list small thumbnails"><span class="fa fa-list-small-thumbnails"></span></div>
+            </div>
+          </div>
+          <div class="pull-left mll pvl">
+            <div class="btn-toolbar">
+                <a class="btn-group btn-primary" href="#fakelink"><span class="fa fa-list-columned"></span></a>
+                <a class="btn-group btn-primary" href="#fakelink"><span class="fa fa-list-numbered"></span></a>
+                <a class="btn-group btn-primary active" href="#fakelink"><span class="fa fa-list-thumbnailed"></span></a>
+                <a class="btn-group btn-primary" href="#fakelink"><span class="fa fa-list-small-thumbnails"></span></a>
+            </div> <!-- /btn-toolbar -->
+          </div>
+        </div>
+
+        <div class="mbl pbm">
+          <ul class="nav nav-pills">
+            <li class="active"><a href="#fakelink">Popular</a></li>
+            <li><a href="#fakelink">Newest</a></li>
+            <li><a href="#fakelink">Bestselling</a></li>
+            <li role="presentation" class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                Dropdown <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mbl">
+          <nav aria-label="Page navigation">
+            <div>
+              <ul class="pagination">
+                <li class="previous"><a href="#fakelink" class="fa fa-arrow-left"></a></li>
+                <li class="active"><a href="#fakelink">1</a></li>
+                <li><a href="#fakelink">2</a></li>
+                <li><a href="#fakelink">3</a></li>
+                <li><a href="#fakelink">4</a></li>
+                <li><a href="#fakelink">5</a></li>
+                <li><a href="#fakelink">6</a></li>
+                <li><a href="#fakelink">7</a></li>
+                <li><a href="#fakelink">8</a></li>
+                <li><a href="#fakelink">9</a></li>
+                <li><a href="#fakelink">10</a></li>
+                <li class="pagination-dropdown dropdown">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Dropdown<span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                  </ul>
+                </li>
+                <li class="pagination-dropdown dropup">
+                  <a href="#fakelink" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="fa fa-triangle-up"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#fakelink">10&ndash;20</a></li>
+                    <li><a href="#fakelink">20&ndash;30</a></li>
+                    <li><a href="#fakelink">40&ndash;50</a></li>
+                  </ul>
+                </li>
+                <li class="next"><a href="#fakelink" class="fa fa-arrow-right"></a></li>
+              </ul>
+            </div> <!-- /pagination -->
+          </nav>
+
+          <div class="pagination pagination-minimal">
+            <ul>
+              <li class="previous"><a href="#fakelink" class="fa fa-arrow-left"></a></li>
+              <li class="active"><a href="#fakelink">1</a></li>
+              <li><a href="#fakelink">2</a></li>
+              <li><a href="#fakelink">3</a></li>
+              <li><a href="#fakelink">4</a></li>
+              <li><a href="#fakelink">5</a></li>
+              <li><a href="#fakelink">6</a></li>
+              <li><a href="#fakelink">7</a></li>
+              <li><a href="#fakelink">8</a></li>
+              <li><a href="#fakelink">9</a></li>
+              <li><a href="#fakelink">10</a></li>
+              <li><a href="#fakelink">11</a></li>
+              <li><a href="#fakelink">12</a></li>
+              <li class="next"><a href="#fakelink" class="fa fa-arrow-right"></a></li>
+            </ul>
+          </div><!-- /pagination -->
+        </div>
+
+        <div class="mbl">
+          <ul class="pagination-plain">
+            <li class="previous"><a href="#fakelink">&larr; Previous</a></li>
+            <li><a href="#fakelink">1</a></li>
+            <li><a href="#fakelink">2</a></li>
+            <li><a href="#fakelink">3</a></li>
+            <li><a href="#fakelink">4</a></li>
+            <li class="active"><a href="#fakelink">5</a></li>
+            <li><a href="#fakelink">6</a></li>
+            <li><a href="#fakelink">7</a></li>
+            <li><a href="#fakelink">8</a></li>
+            <li><a href="#fakelink">9</a></li>
+            <li><a href="#fakelink">10</a></li>
+            <li class="next"><a href="#fakelink">Newer &rarr;</a></li>
+          </ul>
+        </div>
+
+        <div class="pagination pagination-danger">
+          <a href="#fakelink" class="btn btn-danger previous">
+            <span class="fa fa-arrow-left"></span>
+            OLDER
+          </a>
+          <ul>
+            <li><a href="#fakelink">1</a></li>
+            <li><a href="#fakelink">2</a></li>
+            <li><a href="#fakelink">3</a></li>
+            <li><a href="#fakelink">4</a></li>
+            <li><a href="#fakelink">5</a></li>
+          </ul>
+          <a href="#fakelink" class="btn btn-danger next">
+            NEWER
+            <span class="fa fa-arrow-right"></span>
+          </a>
+        </div><!-- /pagination -->
+
+        <div class="pagination pagination-success">
+          <a href="#fakelink" class="btn btn-success previous">
+            <span class="fa fa-arrow-left"></span>
+            OLDER
+          </a>
+          <ul>
+            <li><a href="#fakelink">1</a></li>
+            <li><a href="#fakelink">2</a></li>
+            <li><a href="#fakelink">3</a></li>
+            <li><a href="#fakelink">4</a></li>
+            <li><a href="#fakelink">5</a></li>
+          </ul>
+          <a href="#fakelink" class="btn btn-success next">
+            NEWER
+            <span class="fa fa-arrow-right"></span>
+          </a>
+        </div><!-- /pagination -->
+
+        <div class="pagination pagination-warning">
+          <a href="#fakelink" class="btn btn-warning previous">
+            <span class="fa fa-arrow-left"></span>
+            OLDER
+          </a>
+          <ul>
+            <li><a href="#fakelink">1</a></li>
+            <li><a href="#fakelink">2</a></li>
+            <li><a href="#fakelink">3</a></li>
+            <li><a href="#fakelink">4</a></li>
+            <li><a href="#fakelink">5</a></li>
+          </ul>
+          <a href="#fakelink" class="btn btn-warning next">
+            NEWER
+            <span class="fa fa-arrow-right"></span>
+          </a>
+        </div><!-- /pagination -->
+
+        <div class="pagination pagination-info">
+          <a href="#fakelink" class="btn btn-info previous">
+            <span class="fa fa-arrow-left"></span>
+            OLDER
+          </a>
+          <ul>
+            <li><a href="#fakelink">1</a></li>
+            <li><a href="#fakelink">2</a></li>
+            <li><a href="#fakelink">3</a></li>
+            <li><a href="#fakelink">4</a></li>
+            <li><a href="#fakelink">5</a></li>
+          </ul>
+          <a href="#fakelink" class="btn btn-info next">
+            NEWER
+            <span class="fa fa-arrow-right"></span>
+          </a>
+        </div><!-- /pagination -->
+
+        <div class="pagination pagination-inverse">
+          <a href="#fakelink" class="btn btn-inverse previous">
+            <span class="fa fa-arrow-left"></span>
+            OLDER
+          </a>
+          <ul>
+            <li><a href="#fakelink">1</a></li>
+            <li><a href="#fakelink">2</a></li>
+            <li><a href="#fakelink">3</a></li>
+            <li><a href="#fakelink">4</a></li>
+            <li><a href="#fakelink">5</a></li>
+          </ul>
+          <a href="#fakelink" class="btn btn-inverse next">
+            NEWER
+            <span class="fa fa-arrow-right"></span>
+          </a>
+        </div> <!-- /pagination -->
+      </div>
+    </div>
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Icon Bars</h3>
+      </div>
+      <div class="demo-content">
+        <div class="iconbar">
+          <ul>
+            <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-success">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li class="active"><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-danger">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li class="active"><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-warning">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li class="active"><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-info">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li class="active">
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-horizontal">
+          <ul>
+            <li class="active"><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-horizontal iconbar-success">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li class="active"><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-horizontal iconbar-danger">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li class="active"><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-horizontal iconbar-warning">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li class="active"><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li>
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+
+        <div class="iconbar iconbar-horizontal iconbar-info">
+          <ul>
+            <li><a href="#fakelink" class="fa fa-user"></a></li>
+            <li><a href="#fakelink" class="fa fa-calendar"></a></li>
+            <li><a href="#fakelink" class="fa fa-chat"></a></li>
+            <li><a href="#fakelink" class="fa fa-mail"></a></li>
+            <li class="active">
+              <a href="#fakelink" class="fa fa-gear">
+                <span class="iconbar-unread">1</span>
+              </a>
+            </li>
+          </ul>
+        </div> <!-- /iconbar -->
+      </div>
+    </div> <!-- /row -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Breadcrumbs</h3>
+      </div>
+      <div class="demo-content">
+        <ul class="breadcrumb">
+          <li><a href="#fakelink">Home</a></li>
+          <li><a href="#fakelink">Directory</a></li>
+          <li class="active"><a href="#">Current Article</a></li>
+        </ul>
+
+        <div class="breadcrumb-text">
+          <h4 class="caption">Shop</h4>
+          <ul>
+            <li><a href="#fakelink" class="text-primary">House</a></li>
+            <li><a href="#fakelink" class="text-info">Bedroom</a></li>
+            <li><a href="#fakelink" class="text-warning">Bed</a></li>
+            <li><a href="#fakelink" class="text-danger">Decor</a></li>
+            <li>A-Z</li>
+          </ul>
+        </div>
+      </div>
+    </div> <!-- /row -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Progress bars &amp; Sliders</h3>
+      </div>
+      <div class="demo-content">
+        <div class="progress">
+          <div class="progress-bar" style="width: 45%;"></div>
+        </div>
+        <br/>
+        <div class="progress">
+          <div class="progress-bar" style="width: 40%;"></div>
+          <div class="progress-bar progress-bar-warning" style="width: 10%;"></div>
+          <div class="progress-bar progress-bar-danger" style="width: 10%;"></div>
+          <div class="progress-bar progress-bar-success" style="width: 10%;"></div>
+          <div class="progress-bar progress-bar-info" style="width: 10%;"></div>
+        </div>
+        <br/>
+        <div id="slider" class="ui-slider"></div>
+        <br/>
+        <div id="slider2" class="ui-slider"></div>
+        <div id="slider3" class="ui-slider">
+          <span class="ui-slider-value first">$500</span>
+          <span class="ui-slider-value last">$1000</span>
+        </div>
+      </div>
+    </div> <!-- /sliders -->
+
+    <div class="demo-row">
+      <div class="demo-title">
+        <h3 class="demo-panel-title">Tooltips &amp; Popovers</h3>
+      </div>
+      <div class="demo-col">
+        <div class="demo-tooltips">
+          <p data-toggle="tooltip" data-placement="bottom" data-tooltip-style="light" title="Hello. I’m the Tooltip."></p>
+        </div>
+        <div class="demo-popovers">
+          <div class="popover right">
+            <div class="arrow"></div>
+            <h3 class="popover-title">Smooth Title</h3>
+            <div class="popover-content">
+              <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-col">
+        <div class="demo-tooltips">
+          <p data-toggle="tooltip" title="Here is a sample of a long dark tooltip. Hell yeah."></p>
+        </div>
+        <div class="demo-popovers">
+          <div class="popover left">
+            <div class="arrow"></div>
+            <h3 class="popover-title">Smooth Title</h3>
+            <div class="popover-content">
+              <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+            </div>
+          </div>
+        </div>
+      </div> <!-- /tooltips -->
+    </div>
+
+    <div class="demo-row demo-social-buttons">
+      <h3 class="demo-title">Social Buttons</h3>
+      <div class="demo-col">
+        <a href="#fakelink" class="btn btn-default btn-sm btn-social-googleplus">
+          <span class="fa fa-googleplus"></span>
+          Connect with Google
+        </a>
+        <a href="#fakelink" class="btn btn-default btn-sm btn-social-facebook">
+          <span class="fa fa-facebook"></span>
+          Connect with Facebook
+        </a>
+        <a href="#fakelink" class="btn btn-default btn-sm btn-social-twitter">
+          <span class="fa fa-twitter"></span>
+          Connect with Twitter
+        </a>
+      </div>
+
+      <div class="demo-col">
+        <a href="#fakelink" class="btn btn-default btn-sm btn-social-pinterest">
+          <span class="fa fa-pinterest"></span>
+          Pin It
+          <span class="btn-tip">100</span>
+        </a>
+        <a href="#fakelink" class="btn btn-default btn-sm btn-social-linkedin">
+          <span class="fa fa-linkedin"></span>
+          Share
+          <span class="btn-tip">91</span>
+        </a>
+        <a href="#fakelink" class="btn btn-default btn-sm btn-social-stumbleupon">
+          <span class="fa fa-stumbleupon"></span>
+          Stumble
+          <span class="btn-tip">45</span>
+        </a>
+      </div>
+    </div> <!-- /row -->
+
+    <div class="demo-row">
+      <h3 class="demo-title">Nav Lists</h3>
+      <div class="demo-col">
+        <ul class="nav nav-list">
+          <li class="nav-header">Subjects</li>
+          <li>
+            <a href="#fakelink">
+              UX Design
+              <span class="badge pull-right">19</span>
+            </a>
+          </li>
+          <li class="active">
+            <a href="#fakelink">
+              Photography
+              <span class="badge pull-right">130</span>
+            </a>
+          </li>
+          <li>
+            <a href="#fakelink">
+              Art
+              <span class="badge pull-right">9</span>
+            </a>
+          </li>
+          <li class="divider"></li>
+          <li class="nav-header">Condition</li>
+          <li>
+            <a href="#fakelink">
+              Brand new
+              <span class="badge pull-right">69</span>
+            </a>
+          </li>
+          <li>
+            <a href="#fakelink">
+              Read-used
+              <span class="badge pull-right">21</span>
+            </a>
+          </li>
+          <li>
+            <a href="#fakelink">
+              Work-used
+              <span class="badge pull-right">40</span>
+            </a>
+          </li>
+        </ul>
+      </div> <!-- /nav-list -->
+
+      <div class="demo-col">
+        <ul class="nav nav-list nav-list-vivid">
+          <li class="nav-header">Europe</li>
+          <li>
+            <a href="#fakelink">
+              London, United Kingdom
+              <span class="badge pull-right">19</span>
+            </a>
+          </li>
+          <li class="active">
+            <a href="#fakelink">
+              Berlin, Germany
+              <span class="badge pull-right">130</span>
+            </a>
+          </li>
+          <li>
+            <a href="#fakelink">
+              Madrid, Spain
+              <span class="badge pull-right">9</span>
+            </a>
+          </li>
+          <li class="divider"></li>
+          <li class="nav-header">Asia</li>
+          <li>
+            <a href="#fakelink">
+              Shanghai, China
+              <span class="badge pull-right">69</span>
+            </a>
+          </li>
+          <li>
+            <a href="#fakelink">
+              Bombay, India
+              <span class="badge pull-right">21</span>
+            </a>
+          </li>
+          <li>
+            <a href="#fakelink">
+              Karachi, Pakistan
+              <span class="badge pull-right">40</span>
+            </a>
+          </li>
+        </ul>
+      </div> <!-- /nav-list -->
+    </div> <!-- /row -->
+
+    <div class="demo-row">
+      <h3 class="demo-title">Modals</h3>
+    </div>
+
+  <div class="static-modal-backdrop">
+    <div class="modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close fa fa-cross" data-dismiss="modal" aria-hidden="true"></button>
+            <h4 class="modal-title">Modal header</h4>
+          </div>
+          <div class="modal-body">
+            <p>An error message is information displayed when an <a href="#">unexpected condition occurs</a>, usually on a computer or other device. </p>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-default btn-wide">It’s ok</a>
+            <a href="#" class="btn btn-wide btn-primary">Turn it off now.</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.static-modal-backdrop -->
+
+    <div class="demo-row">
+      <h3 class="demo-title">Glyphs <small>(70)</small></h3>
+      <div class="demo-content demo-icons">
+        <span class="fa fa-info-circle"></span>
+        <span class="fa fa-alert-circle"></span>
+        <span class="fa fa-question-circle"></span>
+        <span class="fa fa-check-circle"></span>
+        <span class="fa fa-cross-circle"></span>
+        <span class="fa fa-plus-circle"></span>
+        <span class="fa fa-window"></span>
+        <span class="fa fa-windows"></span>
+        <span class="fa fa-upload"></span>
+        <span class="fa fa-arrow-right"></span>
+        <span class="fa fa-arrow-left"></span>
+        <span class="fa fa-loop"></span>
+        <span class="fa fa-cmd"></span>
+        <span class="fa fa-mic"></span>
+        <span class="fa fa-export"></span>
+        <span class="fa fa-heart"></span>
+        <span class="fa fa-location"></span>
+        <span class="fa fa-plus"></span>
+        <span class="fa fa-check"></span>
+        <span class="fa fa-cross"></span>
+        <span class="fa fa-list"></span>
+        <span class="fa fa-new"></span>
+        <span class="fa fa-video"></span>
+        <span class="fa fa-photo"></span>
+        <span class="fa fa-time"></span>
+        <span class="fa fa-eye"></span>
+        <span class="fa fa-chat"></span>
+        <span class="fa fa-home"></span>
+        <span class="fa fa-search"></span>
+        <span class="fa fa-user"></span>
+        <span class="fa fa-mail"></span>
+        <span class="fa fa-lock"></span>
+        <span class="fa fa-power"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-calendar"></span>
+        <span class="fa fa-gear"></span>
+        <span class="fa fa-bookmark"></span>
+        <span class="fa fa-exit"></span>
+        <span class="fa fa-trash"></span>
+        <span class="fa fa-folder"></span>
+        <span class="fa fa-bubble"></span>
+        <span class="fa fa-calendar-solid"></span>
+        <span class="fa fa-star-2"></span>
+        <span class="fa fa-credit-card"></span>
+        <span class="fa fa-clip"></span>
+        <span class="fa fa-link"></span>
+        <span class="fa fa-pause"></span>
+        <span class="fa fa-play"></span>
+        <span class="fa fa-volume"></span>
+        <span class="fa fa-mute"></span>
+        <span class="fa fa-resize"></span>
+        <span class="fa fa-tag"></span>
+        <span class="fa fa-document"></span>
+        <span class="fa fa-image"></span>
+        <span class="fa fa-triangle-up"></span>
+        <span class="fa fa-triangle-up-small"></span>
+        <span class="fa fa-triangle-right-large"></span>
+        <span class="fa fa-triangle-left-large"></span>
+        <span class="fa fa-triangle-down"></span>
+        <span class="fa fa-triangle-down-small"></span>
+        <span class="fa fa-radio-unchecked"></span>
+        <span class="fa fa-radio-checked"></span>
+        <span class="fa fa-checkbox-unchecked"></span>
+        <span class="fa fa-checkbox-checked"></span>
+        <span class="fa fa-list-thumbnailed"></span>
+        <span class="fa fa-list-small-thumbnails"></span>
+        <span class="fa fa-list-numbered"></span>
+        <span class="fa fa-list-large-thumbnails"></span>
+        <span class="fa fa-list-columned"></span>
+        <span class="fa fa-list-bulleted"></span>
+      </div>
+    </div> <!-- /demo-row -->
+
+    <div class="demo-row">
+      <h3 class="demo-title">Social <small>(27)</small></h3>
+      <div class="demo-content demo-icons">
+        <span class="fa fa-facebook"></span>
+        <span class="fa fa-youtube"></span>
+        <span class="fa fa-vimeo"></span>
+        <span class="fa fa-twitter"></span>
+        <span class="fa fa-stumbleupon"></span>
+        <span class="fa fa-spotify"></span>
+        <span class="fa fa-skype"></span>
+        <span class="fa fa-pinterest"></span>
+        <span class="fa fa-path"></span>
+        <span class="fa fa-linkedin"></span>
+        <span class="fa fa-google-plus"></span>
+        <span class="fa fa-dribbble"></span>
+        <span class="fa fa-behance"></span>
+        <span class="fa fa-yelp"></span>
+        <span class="fa fa-wordpress"></span>
+        <span class="fa fa-windows-8"></span>
+        <span class="fa fa-vine"></span>
+        <span class="fa fa-tumblr"></span>
+        <span class="fa fa-paypal"></span>
+        <span class="fa fa-lastfm"></span>
+        <span class="fa fa-instagram"></span>
+        <span class="fa fa-html5"></span>
+        <span class="fa fa-github"></span>
+        <span class="fa fa-foursquare"></span>
+        <span class="fa fa-dropbox"></span>
+        <span class="fa fa-android"></span>
+        <span class="fa fa-apple"></span>
+      </div>
+    </div> <!-- /demo-row -->
+
+    <div class="demo-row">
+      <div class="demo-title pbm">
+        <h3 class="demo-panel-title">Tables</h3>
+      </div>
+      <div class="demo-content-wide ptl">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Year</th>
+              <th>Rating</th>
+              <th>Votes</th>
+              <th>&nbsp;</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>The Shawshank Redemption</td>
+              <td>1994</td>
+              <td>9.2</td>
+              <td>923,629</td>
+              <td class="text-center"><span class="fa fa-check-circle text-primary"></span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>The Godfather</td>
+              <td>1972</td>
+              <td>9.2</td>
+              <td>663,133</td>
+              <td class="text-center"><span class="fa fa-cross-circle text-primary"></span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>The Godfather: Part II</td>
+              <td>1974</td>
+              <td>9.0</td>
+              <td>427,132</td>
+              <td class="text-center"><span class="fa fa-cross-circle text-primary"></span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Pulp Fiction</td>
+              <td>1994</td>
+              <td>8.9</td>
+              <td>719,280</td>
+              <td class="text-center"><span class="fa fa-check-circle text-primary"></span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>The Good, the Bad and the Ugly</td>
+              <td>1966</td>
+              <td>8.9</td>
+              <td>218,887</td>
+              <td class="text-center"><span class="fa fa-check-circle text-primary"></span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-row">
+      <div class="demo-content-wide">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Year</th>
+                <th>Rating</th>
+                <th>Votes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>The Shawshank Redemption</td>
+                <td>1994</td>
+                <td>9.2</td>
+                <td>923,629</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>The Godfather</td>
+                <td>1972</td>
+                <td>9.2</td>
+                <td>663,133</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>The Godfather: Part II</td>
+                <td>1974</td>
+                <td>9.0</td>
+                <td>427,132</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Pulp Fiction</td>
+                <td>1994</td>
+                <td>8.9</td>
+                <td>719,280</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>The Good, the Bad and the Ugly</td>
+                <td>1966</td>
+                <td>8.9</td>
+                <td>218,887</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-row">
+      <div class="demo-content-wide">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="text-center"><label class="checkbox no-label toggle-all" for="checkbox-table-1"><input type="checkbox" value="" id="checkbox-table-1" data-toggle="checkbox"></label></th>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Genre</th>
+                <th>Votes</th>
+                <th>Year</th>
+                <th>Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-center"><label class="checkbox no-label" for="checkbox-table-2"><input type="checkbox" value="" id="checkbox-table-2" data-toggle="checkbox"></label></td>
+                <td>1</td>
+                <td>The Shawshank Redemption</td>
+                <td>Crime, Drama</td>
+                <td>923,629</td>
+                <td>1994</td>
+                <td class="text-center">9.2</td>
+              </tr>
+              <tr class="selected-row">
+                <td class="text-center"><label class="checkbox no-label" for="checkbox-table-3"><input type="checkbox" checked="checked" value="" id="checkbox-table-3" data-toggle="checkbox"></label></td>
+                <td>2</td>
+                <td>The Godfather</td>
+                <td>Crime, Drama</td>
+                <td>663,133</td>
+                <td>1972</td>
+                <td class="text-center">9.2</td>
+              </tr>
+              <tr class="selected-row">
+                <td class="text-center"><label class="checkbox no-label" for="checkbox-table-4"><input type="checkbox" checked="checked" value="" id="checkbox-table-4" data-toggle="checkbox"></label></td>
+                <td>3</td>
+                <td>The Godfather: Part II</td>
+                <td>Crime, Drama</td>
+                <td>427,132</td>
+                <td>1974</td>
+                <td class="text-center">9.0</td>
+              </tr>
+              <tr>
+                <td class="text-center"><label class="checkbox no-label" for="checkbox-table-5"><input type="checkbox" value="" id="checkbox-table-5" data-toggle="checkbox"></label></td>
+                <td>4</td>
+                <td>Pulp Fiction</td>
+                <td>Crime, Drama</td>
+                <td>719,280</td>
+                <td>1994</td>
+                <td class="text-center">8.9</td>
+              </tr>
+              <tr>
+                <td class="text-center"><label class="checkbox no-label" for="checkbox-table-6"><input type="checkbox" value="" id="checkbox-table-6" data-toggle="checkbox"></label></td>
+                <td>5</td>
+                <td>The Good, the Bad and the Ugly</td>
+                <td>Adventure, Western</td>
+                <td>218,887</td>
+                <td>1966</td>
+                <td class="text-center">8.9</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> <!-- /tables -->
+    </div> <!-- /row -->
+
+    <div class="demo-row pbm">
+      <div class="demo-title pbm">
+        <h3 class="demo-panel-title">Navbar</h3>
+      </div>
+      <div class="demo-content-wide ptl">
+
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Flat UI</a>
+          </div>
+          <div class="collapse navbar-collapse" id="navbar-collapse-01">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#fakelink">Products</a></li>
+              <li><a href="#fakelink">Features</a></li>
+              <li><a href="#fakelink">Pricing</a></li>
+              <li><a href="#fakelink">About</a></li>
+             </ul>
+            <form class="navbar-form navbar-right" action="#" role="search">
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control" id="navbarInput-01" type="search" placeholder="Search">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                  </span>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+
+        <nav class="navbar navbar-default navbar-lg" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-02">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Flat UI</a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="navbar-collapse-02">
+            <ul class="nav navbar-nav">
+              <li><a href="#">Messages<span class="navbar-unread">1</span></a></li>
+              <li class="active"><a href="#">About Us</a></li>
+              <li><a href="#">Clients</a></li>
+             </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">MonsterCritic <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Separated link</a></li>
+                </ul>
+              </li>
+              <li><a href="#"><span class="visible-sm visible-xs">Settings<span class="fa fa-gear"></span></span><span class="visible-md visible-lg"><span class="fa fa-gear"></span></span></a></li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+
+        <nav class="navbar navbar-inverse navbar-embossed" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-03">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Flat UI</a>
+          </div>
+          <div class="collapse navbar-collapse" id="navbar-collapse-03">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#fakelink">Products</a></li>
+              <li><a href="#fakelink">Features</a></li>
+              <li><a href="#fakelink">Pricing</a></li>
+              <li><a href="#fakelink">About</a></li>
+             </ul>
+            <form class="navbar-form navbar-right" action="#" role="search">
+              <div class="form-group">
+                <div class="input-group">
+                  <input class="form-control" id="navbarInput-02" type="search" placeholder="Search">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn"><span class="fa fa-search"></span></button>
+                  </span>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+
+        <nav class="navbar navbar-inverse navbar-embossed navbar-lg" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-04">
+              <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">Flat UI</a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="navbar-collapse-04">
+            <ul class="nav navbar-nav">
+              <li><a href="#">Messages<span class="navbar-unread">1</span></a></li>
+              <li class="active"><a href="#">About Us</a></li>
+              <li><a href="#">Clients</a></li>
+             </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle">MonsterCritic <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Separated link</a></li>
+                </ul>
+              </li>
+              <li><a href="#"><span class="visible-sm visible-xs">Settings<span class="fa fa-gear"></span></span><span class="visible-md visible-lg"><span class="fa fa-gear"></span></span></a></li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </nav><!-- /navbar -->
+
+      </div>
+    </div> <!-- /row -->
+
+    <div class="demo-row pbm ptl">
+      <div class="demo-title pbm">
+        <h3 class="demo-panel-title">Dialog</h3>
+      </div>
+    </div><!-- /row -->
+
+  <div class="dialog dialog-success">
+    Activation link was sent to <span class="text-primary">m***@gmail.com</span>
+    <button class="btn btn-primary btn-wide mll">
+      <span class="fa fa-mail"></span>
+      Resend it to me!
+    </button>
+  </div> <!-- /dialog -->
+
+  <div class="dialog dialog-default">
+    <span class="fa fa-mail mrm"></span>
+    Thank you! Your message has been sent.
+  </div> <!-- /dialog -->
+
+  <div class="dialog dialog-default demo-dialog">
+    <form class="form-inline">
+      <div class="form-group">
+        <label class="sr-only" for="dialogExampleInputEmail1">Login/E-mail</label>
+        <input type="email" class="form-control flat" id="dialogExampleInputEmail1" placeholder="Login/E-mail">
+      </div>
+      <div class="form-group">
+        <label class="sr-only" for="dialogExampleInputPass1">Login/E-mail</label>
+        <input type="password" class="form-control flat" id="dialogExampleInputPass1" placeholder="Password">
+        <span class="input-icon fa fa-question"></span>
+      </div>
+      <button class="btn btn-primary btn-wide">Login</button>
+      <button class="btn btn-danger btn-wide">Register</button>
+    </form>
+  </div> <!-- /dialog -->
+
+<% end %>
+
+<% content_for :additional_scripts do %>
+  <% javascript_tag do %>
+    $(document).ready(function(){
+      // start carousels
+      $("#carouselExampleControls").carousel();
+      $("#carouselExampleSlidesOnly").carousel();
+      $("#carouselExampleIndicators").carousel();
+
+      // initialize dropdowns
+      $(".dropdown-toggle").dropdown();
+
+      // initialize nav spy
+      $('body').scrollspy({ target: '#spy', offset:80});
+
+    });
+  <% end %>
+<% end %>

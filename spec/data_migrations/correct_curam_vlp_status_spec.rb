@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "correct_curam_vlp_status")
 
 describe CorrectCuramVlpStatus, dbclean: :after_each do
@@ -152,4 +153,5 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
       expect(user.consumer_role.lawful_presence_determination.vlp_authority).to eq "ssa"
     end
   end
+end
 end

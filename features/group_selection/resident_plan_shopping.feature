@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: IVL plan purchase
 
   Scenario: when Resident purchase plan for self & dependent
@@ -26,7 +27,7 @@ Feature: IVL plan purchase
     When Resident unchecks the primary person
     And Resident clicked on shop for new plan
     Then Resident should only see the dependent name
-    
+
   Scenario: IVL having an ineligible family member & doing plan shop
     Given a Resident exists
     And the Resident is logged in

@@ -12,4 +12,12 @@ RSpec.describe "employers/employer_profiles/_billing.html.erb" do
     expect(rendered).to match employer_profile.hbx_id.upcase
   end
 
+  it "should display a payment link" do 
+    expect(rendered).to match 'Pay Online'
+  end
+
+  it "should display the payment center phone number" do
+    expect(rendered).to match Settings.contact_center.payment_phone_number
+  end
+
 end

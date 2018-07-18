@@ -1,0 +1,26 @@
+<div class="container bottom-pd">
+  <h3><%= l10n("broker_agency")%> : <%= @broker_agency_profile.organization.legal_name %></h3>
+  <% if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role? %>
+    <%= link_to "#{l10n('broker_agencies.profiles.edit_broker_agency_profile')}", edit_profiles_registration_path(@broker_agency_profile.id), class: 'btn btn-primary ' %>
+  <% end %>
+  <p></p>
+  <div class="table-border table-responsive">
+    <table class="table">
+      <thead>
+        <th><%= l10n("legal_name")%></th>
+        <th><%= l10n("dba")%></th>
+        <th><%= l10n("fein").to_s.titleize%></th>
+        <th><%= l10n("market_kind")%></th>
+      </thead>
+      <tbody>
+        <td><%= @broker_agency_profile.organization.legal_name %></td>
+        <td><%= @broker_agency_profile.organization.dba %></td>
+        <td><%= @broker_agency_profile.organization.fein %></td>
+        <td><%= @broker_agency_profile.market_kind.to_s.titleize %></td>
+      </tbody>
+    </table>
+  </div>
+
+  <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
+  <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/office_locations", office_locations: @broker_agency_profile.office_locations %>
+</div>

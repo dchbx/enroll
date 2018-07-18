@@ -8,12 +8,17 @@ module Queries
     def decorate_enrollments_and_calculate_totals(found_enrollments, bg_cache, plan_cache)
       found_enrollments.inject({:hbx_enrollments => found_enrollments, :total_employer_contribution => 0.00, :total_employee_cost => 0.00, :total_premium => 0.00}) do |acc, fe|
         benefit_group = bg_cache[fe.benefit_group_id]
+        plan = plan_cache[fe.plan_id]
         decorator = nil
-        if fe.benefit_group.is_congress?
-          decorator = PlanCostDecoratorCongress.new(plan_cache[fe.plan_id], fe, benefit_group)
+        if benefit_group.is_congress?
+          decorator = PlanCostDecoratorCongress.new(plan, fe, benefit_group)
         else
-          reference_plan = (fe.coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
-          decorator = PlanCostDecorator.new(plan_cache[fe.plan_id], fe, benefit_group, reference_plan)
+          if benefit_group.sole_source? && (!plan.dental?)
+            decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, fe.composite_rating_tier, fe.is_cobra_status?)
+          else
+            reference_plan = (fe.coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
+            decorator = PlanCostDecorator.new(plan_cache[fe.plan_id], fe, benefit_group, reference_plan)
+          end
         end
         acc[:total_employer_contribution] = acc[:total_employer_contribution] + decorator.total_employer_contribution
         acc[:total_employee_cost] = acc[:total_employee_cost] + decorator.total_employee_cost

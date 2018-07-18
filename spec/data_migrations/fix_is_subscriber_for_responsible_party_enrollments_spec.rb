@@ -1,6 +1,6 @@
 require 'rails_helper'
-require 'pry'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "fix_is_subscriber_for_responsible_party_enrollments")
 
 describe FixIsSubscriberForResponsiblePartyEnrollments do
@@ -70,4 +70,5 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
       expect(hbx_enrollment_member_1.is_subscriber).to be(false)
     end
   end
+end
 end

@@ -1,0 +1,605 @@
+.plan-year-heading, .benefit-group-heading {
+  color:$primary-table-heading;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.plan-year-status {
+  color:$primary-green;
+  font-weight: bold;
+  font-size: 14px;
+}
+.borderless td, .borderless th {
+  border: none !important;
+}
+.broker-icon {
+  color:$mhc-dark-blue;
+}
+.offered {
+  color:$primary-green;
+}
+
+.my-account-widget {
+  .panel {
+    border-radius: 0;
+    background-image: none;
+    border-bottom: none;
+    font-size: 14px;
+    margin: 0;
+  }
+  .panel-default {
+    border-color: #ddd;
+  }
+  .panel-heading {
+    background-color: $primary-white;
+    background-image: none;
+    border-bottom: none;
+    padding: 0;
+    font-size: 12px;
+    text-align: center;
+      
+    h4 {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 0;
+      max-width: 155px;
+      color:$mhc-orange;
+    }
+  }
+  .panel-body {
+    font-size: 14px;
+    text-align: center;
+    padding-top:0;
+  }
+  .ttc {
+    text-transform: capitalize;
+  }
+  .ttu {
+      text-transform: uppercase;
+  }
+  .dg {
+    color: #414141;
+  }
+  .lg {
+      color: $primary-dark-gray;
+  }
+}
+
+#shop-for-plans-widget {
+  .image-area {
+    float: left;
+    margin-right: 20px;
+  }
+}
+
+.qles-panel {
+  .panel-heading {
+      background-image: none;
+      padding-bottom: 0;
+      border-bottom: 0;
+      background-color: transparent;
+      color: #333;
+  }
+  img {
+      vertical-align: middle;
+  }
+  h4 {
+      margin: 0;
+      line-height: 1.4em;
+      color: #c56c24;
+      font-size: 18px;
+          font-weight: 600;
+  }
+  #qle-header {
+    .panel-heading small  {
+        padding-top: 5px !important;
+        line-height: 135% !important;
+        display: block !important;
+    }
+  }
+  
+}
+
+#application-dates {
+  margin-left:5px;
+  .panel {
+    padding-bottom: 15px;
+    background-color: transparent;
+  }
+  .panel:first-of-type {
+    margin-right: 1.25%;
+    width: 48.75% !important;
+  }
+  .panel:last-of-type {
+    margin-left: 1.25%;
+    width: 48.75% !important;
+  }
+  .panel-heading {
+    background-color: transparent;
+    
+    h3 {
+      font-weight: bold;
+      color: #333333;
+      font-size: 18px;
+      margin: 0;
+    }
+  }
+  .fa-calendar {
+    color:$primary-green;
+  }
+  #calendar-stack {
+    position: relative;
+    display: inline-block;
+    width: (13em / 14);
+    height: 1em;
+    
+    .fa-calendar,
+    #benefit_application_latest_submitted_on_day, #benefit_application_latest_submitted_on_month, #binder_payment_deadline_day, #binder_payment_deadline_month {
+      position: absolute;
+    }
+    
+    #benefit_application_latest_submitted_on_day, #binder_payment_deadline_day {
+      top:42px;
+      left: (4em / 8);
+      width: (11em / 8);
+      height: (6em / 8);
+      font-family: sans-serif;
+      font-size: (8em / 22);
+      font-weight: 700;
+      line-height: (8em / 14);
+      text-align: center;
+      color:$mhc-orange;
+    }
+    
+    #benefit_application_latest_submitted_on_month, #binder_payment_deadline_month {
+      top:70px;
+      left: (18em / 8);
+      width: (11em / 8);
+      height: (6em / 8);
+      font-family: sans-serif;
+      font-size: (8em / 60);
+      font-weight: 700;
+      line-height: (8em / 14);
+      text-align: center;
+      color:$primary-black;
+    }
+  }
+}
+
+#metal-level-select {
+  .fa-circle {
+    color:$mhc-light-gray;
+  }
+  .fa-dot-circle {
+    color:$primary-green;
+  }
+  #plan, #level, #carrier, #yourPlans, #sponsorContributions {
+    border:1px solid $mhc-light-gray;
+  }
+  .nav-tabs {
+    border-bottom:none;
+  }
+  .nav-tabs > li > a {
+    background-color:$mhc-dark-blue;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px;
+    color:$primary-white;
+    text-transform: uppercase;
+    border:1px solid $mhc-light-gray;
+  }
+  .nav-tabs > li > a  {
+    border:1px solid $mhc-light-gray;
+  }
+  .nav-tabs > li > a:hover {
+    background-color:$mhc-dark-blue;
+    color:$mhc-orange;
+    border-bottom: solid 3px $primary-botton-border-bottom;
+  }
+  .nav-tabs > li > a.active {
+    background-color:$primary-blue;
+  }
+  .tab-pane#carrier {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:370px;
+  }
+  .tab-pane#level {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:370px;
+  }
+  .tab-pane#plan {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:370px;
+  }
+  h5 {
+    font-weight: bold;
+  }
+  #refencePlans {
+   background-color:$primary-white;
+   padding:0px 20px 20px 20px;
+  }
+  p.reference-plan-title {
+    font-size:12px;
+  }
+  .rp-info {
+    min-height:140px;
+  }
+  #yourPlans {
+    padding-top:10px;
+    width:100%;
+    height:310px;
+    background-color:$primary-white;
+    overflow-y: scroll;
+    .col-xs-12 {
+      min-height:170px;
+      border-bottom:1px solid $primary-dark-gray;
+    }
+    .col-xs-12:hover {
+      border-bottom:1px solid $mhc-dark-blue;
+    }
+    .col-xs-12:hover .rp-view-summary {
+      display:block;
+      color:$mhc-blue;
+      font-size:12px;
+      font-weight:bold;
+    }
+    .rp-view-summary {
+      display:none;
+    }
+    
+  }
+}
+
+#sponsorContributions {
+  background-color:$primary-white;
+  height:330px;
+  p {
+    width:190px;
+    font-size: 14px;
+    color:$mhc-heading-gray;
+  }
+  .offered-heading {
+    border-bottom: solid 1px #d5d5d5;
+    padding: 15px 0 25px;
+    font-size: 14px;
+    color:$mhc-heading-gray;
+  }
+  .ac-row {
+    padding: 15px 0;
+  }
+  .fa-check-square {
+    color:$primary-green;
+  }
+  hr {
+    border-top:1px solid $mhc-light-gray;
+    height:2px;
+  }
+  .sc-label {
+    font-size: 16px;
+  }
+  input {
+    &[type=number] {
+      margin-top: 7px !important;
+    }
+    &.contribution_handler {
+      height: 15px;
+    }
+
+    border: 1px solid #b7b7b7;
+    border-radius: 0;
+    box-shadow: none;
+    display: inline-block;
+    font-weight: bold;
+    line-height: normal;
+    width:45px;
+    height:40px;
+    margin-top:10px;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .slidecontainer {
+      width: 100%;
+  }
+
+  .slider {
+      -webkit-appearance: none;
+      -moz-apperance:none;
+      width: 100%;
+      margin-top: 16px;
+      height: 0px;
+      border-radius: 5px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+  }
+
+  .slider:hover {
+      opacity: 1;
+  }
+
+  .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: $mhc-dark-blue;
+      cursor: pointer;
+  }
+
+  .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: $mhc-dark-blue;
+      cursor: pointer;
+  }
+  
+  /* The container */
+  .sc-container {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 22px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+  }
+
+  /* Hide the browser's default checkbox */
+  .sc-container input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+  }
+
+  /* Create a custom checkbox */
+  .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+  }
+
+  /* On mouse-over, add a grey background color */
+  .sc-container:hover input ~ .checkmark {
+      background-color: #ccc;
+  }
+
+  /* When the checkbox is checked, add a blue background */
+  .sc-container input:checked ~ .checkmark {
+      background-color: $mhc-dark-blue;
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+  }
+
+  /* Show the checkmark when checked */
+  .sc-container input:checked ~ .checkmark:after {
+      display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .sc-container .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 6px;
+      height: 15px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+  }
+  
+}
+
+
+
+/* Hides number spinner for chrome */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;}
+
+
+/* Hides number spinner for mozilla */  
+   input[type=number] {-moz-appearance: textfield;}
+   
+   input[type=range] {border:none !important;}
+
+.reference-plans {
+  min-height:200px;
+  .panel-heading {
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    position: relative;
+    padding: 0 0 5px 0;
+    color: #333333;
+    background-color: transparent;
+    
+    h3 {
+      font-size: 12px;
+      margin-bottom: 0;
+      color:$mhc-orange;
+      font-weight: 300;
+      line-height: 1.6em;
+    }
+  }
+  .plan-label {
+    color: #b7b7b7;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight:bold;
+  }
+}
+#employee-enrollments, #employer-plan-year, #employer-benefit-groups {
+  .panel-heading {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size:18px;
+    color:$mhc-orange;
+  }
+}
+
+.employer-broker-widget {
+  .panel-heading {
+    background-color:transparent;
+    font-size: 16px;
+    color:$mhc-dark-blue;
+  }
+}
+
+#yourPlans {
+  /* The container */
+  .container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  /* Hide the browser's default radio button */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* Create a custom radio button */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 50%;
+  }
+
+  /* On mouse-over, add a grey background color */
+  .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+
+  /* When the radio button is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: $mhc-dark-blue;
+  }
+
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the indicator (dot/circle) when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the indicator (dot/circle) */
+  .container .checkmark:after {
+    top: 9px;
+    left: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+}
+
+#plan, #level, #carrier {
+  .col-xs-12 {
+    min-height:80px;
+  }
+  /* The container */
+  .container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color:$mhc-orange;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Hide the browser's default radio button */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* Create a custom radio button */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 50%;
+  }
+
+  /* On mouse-over, add a grey background color */
+  .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+
+  /* When the radio button is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: $mhc-dark-blue;
+  }
+
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the indicator (dot/circle) when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the indicator (dot/circle) */
+  .container .checkmark:after {
+    top: 9px;
+    left: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+}

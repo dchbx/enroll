@@ -1,0 +1,23 @@
+--- !ruby/object:QualifyingLifeEventKind
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAAV
+  effective_on_kinds:
+  - first_of_next_month
+  is_active: true
+  title: Health plan contract violation
+  action_kind: administrative
+  reason: contract_violation
+  edi_code: 33-CONTRACT VIOLATION
+  market_kind: shop
+  pre_event_sep_in_days: 0
+  post_event_sep_in_days: 30
+  is_self_attested: false
+  date_options_available: true
+  ordinal_position: 75
+  event_kind_label: Date of contract violation
+  tool_tip: Enroll due to contract violation
+  updated_at: 2017-08-15 06:30:51.212000000 Z
+  created_at: 2017-08-15 06:30:51.212000000 Z

@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAAB6
+  key: en.uis.bootstrap3_examples.index.employee
+  value: '"Employee"'

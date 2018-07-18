@@ -1,0 +1,156 @@
+<%= flash_messages  %>
+<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+<div class="employer-edit-tab">
+  <h1 class="heading-text">Business Info</h1>
+  <% if @agency.errors.any? %>
+    <div class="alert alert-error">
+      <h4>
+        <%= "#{pluralize(@organization.errors.size, "error")} prohibited this form from being saved:" %>
+      </h4>
+      <ul>
+        <% @agency.errors.full_messages.each do |msg| %>
+          <li>
+            <%= msg %>
+          </li>
+        <% end %>
+        <% office_loc = @agency.office_locations.last %>
+        <% office_loc.phone.errors.full_messages.each do |msg| %>
+          <li>
+            <%= msg %>
+          </li>
+        <% end %>
+        <% office_loc.address.errors.full_messages.each do |msg| %>
+          <li>
+            <%= msg %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if @plan_year.present? %>
+    <div class="alert alert-error">
+      <% @plan_year.application_eligibility_warnings.each do |msg| %>
+        <li>
+          <%= msg[1] %>
+        </li>
+      <% end %>
+    </div>
+  <% end %>
+<!-- TODO refactor pundit related work-->
+  <div class="module employer-staff-table <%#= pundit_class(EmployerProfile, :updateable?) %>">
+    <h4>
+      Point of Contact - Employer Staff
+    </h4>
+    <div class='table-responsive col-12'>
+      <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5'>
+        <thead style='height: 40px;'>
+        <th style='width: 18%; height: 40px; padding: 10px'>First Name</th>
+        <th style='width: 18%'>Last Name</th>
+        <th style='width: 18%'> Email</th>
+        <th style='width: 18%'> Phone</th>
+        <th style='width: 18%'> Status</th>
+        <th style='width: 9%'> Remove Role</th>
+        </thead>
+        <% @agency.staff_roles.each do |staff| %>
+          <tr style='border: 1px solid #d5d5d5; height: 50px; '>
+            <td style='padding: 10px'><%= staff.first_name %></td>
+            <td><%= staff.last_name %></td>
+            <td>
+              <%= staff.email %>
+            </td>
+            <td>
+              <%= staff.phone %>
+            </td>
+            <td>
+              <%= staff.status %>
+              <% if staff.status == "is_applicant" %>
+                  <%=  link_to(approve_profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id)) do %>
+                      approve
+                  <% end %>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to(profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id), method: 'delete', data: {confirm: 'Delete this role?'}) do %>
+                  <i class="far fa-trash-alt fa-2x role-trashcan"></i>
+              <%end%>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+
+    <%= f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f| %>
+      <br>
+      <%= link_to 'Add Employer Staff Role', new_profiles_employers_employer_staff_role_path(profile_id:@agency.profile_id), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>
+      <br/>
+      <div class="mt-3">
+        <h1 class="heading-text"> Employer Information</h1>
+        <div class="row no-buffer row-form-wrapper">
+          <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
+          </div>
+          <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
+            <%= f.text_field :dba, class: "floatlabel form-control", placeholder: 'DBA' %>
+          </div>
+          <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :readonly => true %>
+          </div>
+
+        <br>
+        <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f_profile| %>
+          <%= f_profile.hidden_field :id, value: f_profile.object.id %>
+          <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
+          <% if display_sic_field_for_employer? %>
+            <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-20px">
+              <%= f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} ) %>
+            </div>
+            <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-8px">
+              <a id="sicHelperToggle" href="#" title="I need help finding my SIC Code"><span class="fa fa-question ml-2" aria-hidden="true"></span></a>
+            </div>
+            <div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
+              <%= render "sic_help" , sicFieldId: 'organization_sic_code' %>
+            </div>
+          <% end %>
+          </div>
+          <h2> Office Locations </h2>
+          <div data-controller="office-locations">
+            <div data-target="office-locations.officeLocations">
+              <%= f_profile.fields_for :office_locations, f_profile.object.office_locations.each do |office_fields| %>
+                <%= office_fields.hidden_field :id, value: office_fields.object.id if office_fields.object.id.present? %>
+                <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
+
+                <div data-target="<%= 'office-locations.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
+                  <%= office_fields.hidden_field '_destroy', value: false, id: 'delete_location' %>
+                  <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields, profile_type: f_profile.object.profile_type}  %>
+                </div>
+              <% end %> 
+            </div>
+            <a class="btn btn-default pull-left col-12" data-action="click->office-locations#addLocation">Add Office Location</a>
+          </div>
+          <br/>
+          <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f_profile %><br>
+        <% end %>
+        <br>
+        <div class="form-inputs">
+          <!-- TODO refactor pundit related work and link to add fields-->
+          <%#= pundit_span(EmployerProfile, :updateable?) %>
+          <%#= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
+          </span>
+          <%= link_to "Cancel", profiles_employers_employer_profile_path(id: @agency.profile_id, tab: 'home'), class: 'btn btn-default' %>
+        </div>
+        <div class="top-row no-border">
+          <% button_name = @agency.persisted? ? 'Save' : 'Create' %>
+          <button type="submit" class="btn btn-primary pull-right  mtz sm_full_width">
+            <%= "#{button_name}".html_safe %>
+          </button> &nbsp;&nbsp;
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+
+<script>
+var disableSelectric = true;
+</script>

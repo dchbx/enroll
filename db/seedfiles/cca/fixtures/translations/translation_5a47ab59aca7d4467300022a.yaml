@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIq
+  key: en.insured.plan_shoppings.hsa_eligible_title_info
+  value: '"Plans that are eligible for HSA (Health Savings Accounts) are classified
+    as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred
+    medical savings account at your bank to pay for qualified medical expenses. Funds
+    in an HSA account roll over year to year if you don''t spend them."'

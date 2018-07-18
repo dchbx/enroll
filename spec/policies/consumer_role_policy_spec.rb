@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe ConsumerRolePolicy do
   subject { described_class }
   let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -76,4 +77,5 @@ describe ConsumerRolePolicy do
       end
     end
   end
+end
 end

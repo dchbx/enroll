@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8Bqyn1GT8AAAC
+  key: en.plan_contact_info
+  value: '"Plan Contact Info"'

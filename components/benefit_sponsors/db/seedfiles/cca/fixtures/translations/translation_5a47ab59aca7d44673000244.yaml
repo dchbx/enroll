@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAJE
+  key: en.insured.plan_shoppings.thankyou.additional_administration_msg
+  value: '"* Your employer may charge an additional administration fee for your COBRA/Continuation
+    coverage. If you have any questions, please direct them to the Employer."'

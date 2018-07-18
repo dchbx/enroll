@@ -1,0 +1,49 @@
+<div class="page-break">
+  <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+
+  <% if recipient.shop? %>
+    <%= render partial: 'layouts/notifier/dc_shop_address', :locals => {notice: notice, show_mpi_indicator: false, recipient: recipient, notice_recipient: notice_recipient} %>
+  <% else %>
+    <%= render partial: 'notices/shared/address', :locals => {notice: notice, show_mpi_indicator: false} %>
+  <% end %>
+
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <br></br>
+      </tr>
+      <tr>
+        <td style="text-align: center"><h1><b>THIS IS A COVER PAGE</b></h1>
+        <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 18px; text-align: center;">
+          The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
+        </td>
+      </tr>
+      <tr>
+        <br></br>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="total_table" border="0" style="margin-top: 260px;">
+    <tbody>
+      <tr>
+        <td><%= notice.notice_number %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="page-break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td style="color: #b3b3b3; font-size: 18px; text-align: center; padding-top: 300px;">
+          This page intentionally left blank.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMq
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '60'
+  major_group_label: Depository Institutions
+  industry_group_code: '609'
+  industry_group_label: Functions Related To Depository Banking
+  sic_code: '6099'
+  sic_label: Functions Related to Depository Banking, Not Elsewhere Classified

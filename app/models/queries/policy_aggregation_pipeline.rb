@@ -74,7 +74,7 @@ module Queries
     def filter_to_shopping_completed
       add({
         "$match" => {
-          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "households.hbx_enrollments.product_id" => { "$ne" => nil},
           "households.hbx_enrollments.aasm_state" => { "$nin" => [
             "shopping", "inactive"
           ]}
@@ -88,7 +88,7 @@ module Queries
     def filter_to_active
       add({
         "$match" => {
-          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "households.hbx_enrollments.product_id" => { "$ne" => nil},
           "households.hbx_enrollments.aasm_state" => { "$in" => 
             (HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES)
           }
@@ -217,7 +217,7 @@ module Queries
         }}) +
 =end
         project_property("member_count", {"$size" => "$households.hbx_enrollments.hbx_enrollment_members"}) + 
-        project_property("plan_id", "$households.hbx_enrollments.plan_id") +
+        project_property("product_id", "$households.hbx_enrollments.product_id") +
         project_property("enrollment_kind", "$households.hbx_enrollments.enrollment_kind") +
         project_property("aasm_state", "$households.hbx_enrollments.aasm_state") +
         project_property("hbx_id", "$households.hbx_enrollments.hbx_id") +
@@ -293,7 +293,7 @@ module Queries
           last("policy_purchased_at") +
           last("policy_purchased_on") +
           last("hbx_id") +
-          last("plan_id") +
+          last("product_id") +
           last("aasm_state") +
           last("enrollment_kind") +
           last("coverage_kind") +

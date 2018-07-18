@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMo
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '60'
+  major_group_label: Depository Institutions
+  industry_group_code: '608'
+  industry_group_label: Foreign Banking And Branches And Agencies Of
+  sic_code: '6082'
+  sic_label: Foreign Trade and International Banking Institutions

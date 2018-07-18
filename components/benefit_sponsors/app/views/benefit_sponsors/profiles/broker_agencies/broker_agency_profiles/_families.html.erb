@@ -1,0 +1,76 @@
+<% model_class = Family %>
+<%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
+
+<div class="container">
+  <h3 class="title-inline"><%= l10n("families")%></h3>
+</div>
+
+<div class="container">
+  <div id="families">
+
+    <div class="module">
+      <table class="table table-striped" id="Broker-Family-dataTable">
+        <thead>
+        <tr>
+          <th><%= l10n("name")%></th>
+          <th><%= l10n("ssn")%></th>
+          <th><%= l10n("dob")%></th>
+          <th><%= l10n("hbx_id")%></th>
+          <th><%= l10n("family")%></th>
+          <th><%= l10n("registered?")%></th>
+          <th>Consumer?</th>
+          <th>Employee?</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+      // datatables setup
+      $(document).ready(function() {
+        $('#Broker-Family-dataTable').DataTable( {
+          "processing": true,
+          "serverSide": true,
+          "ordering" : false,
+          "paging": true,
+    "lengthMenu": [ 10, 25, 50, 100],
+    "searchDelay" : 500,
+          "ajax": {
+            url: "<%= family_datatable_profiles_broker_agencies_broker_agency_profile_path(id: @broker_agency_profile.id, :format => :json) %>",
+            type: "POST",
+            data: function ( d ) {
+              console.log("Broker-Family-dataTable datatable")
+            }
+          },
+          "columns": [
+            { data: 'name'},
+            { data: 'ssn' },
+            { data: 'dob' },
+            { data: 'hbx_id'},
+            { data: 'family_count'},
+            { data: 'registered'},
+            { data: 'consumer'},
+            { data: 'employee'}
+      ],
+'dom': "<'row'" +
+          "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
+        ">" +
+        "<'row'" +
+          "<'col-sm-12 col-md-12'>" +
+        ">" +
+        "<'row'" +
+          "<'col-sm-12 col-md-12'tr>"+
+        ">" +
+        "<'row'" +
+          "<'col-sm-11 col-md-11'i><'col-sm-1 col-md-1'l>" +
+        ">" +
+        "<'row'" +
+          "<'col-sm-12 col-md-12'p>" +
+        ">"
+        } );
+      });
+    </script>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAKk
+  key: en.employer_dental_percentage_contributions
+  value: '"The following employer dental percentage contributions were used for calculation
+    of cost.   These percentages are independent of the health plan percentages."'

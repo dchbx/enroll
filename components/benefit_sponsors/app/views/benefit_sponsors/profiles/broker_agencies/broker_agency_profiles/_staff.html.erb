@@ -1,0 +1,30 @@
+<div id= 'message_form'></div>
+<div id="inbox_provider_form">
+
+  <div class="row no-buffer">
+    <div class="pull-right">
+      <div class="input-group search-wp">
+        <%= render 'benefit_sponsors/shared/profiles/broker_agency/search', url: benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path, q: @q, remote: true, placeholder: "#{l10n('last_name')}" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style='width:660px; '>
+    <div class="table-responsive" id='broker_index_view'>
+      <table class="table table-wrapper" style="opacity: 1;">
+        <%= render 'benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/staff_table'%>
+      </table>
+      <div>
+      <%= render 'benefit_sponsors/shared/profiles/broker_agency/alph_paginate_remote', url: benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path, alphs: @page_alphabets %>
+      </div>
+    </div>
+    <h4><div id='help_index_status'></div></h4>
+    <div>
+      <%@staff.each do |staff|
+        @staff = staff
+        @broker = staff.broker_role %>
+        <%= render 'benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/broker_help', locals: {:active_broker => @broker} %>
+      <%end%>
+    </div>
+  </div>
+</div>

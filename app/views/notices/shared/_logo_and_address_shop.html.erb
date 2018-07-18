@@ -7,12 +7,10 @@
         Suite 400<br>
         Washington, DC 20005
       </td>
-      <td colspan="2" align="right"><a href=
-                                    "https://dchealthlink.com/"
-                                    target=
-                                    "_blank">
-                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "100"  %>
-                                  </a></td>
+      <td colspan="2" align="right"><a href= "#{Settings.site.home_url}"
+                                    target= "_blank">
+                                    <%= image_tag "#{Rails.root}/app/assets/images/#{Settings.site.mailer_logo_file_name}", style: "height: auto; vertical-align: top;", width: "100"  %>
+                                    </a></td>
     </tr>
     <tr>
       <td><br></td>

@@ -37,9 +37,7 @@
       <% end %>
 
       <div class="module employer-staff-table <%= pundit_class(EmployerProfile, :updateable?)%>">
-        <h4>
-          Point of Contact - Employer Staff
-        </h4>
+        <h3>Employer Staff Points-of-Contact</h3>
         <div class='table-responsive col-12' >
           <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5'>
             <thead style='height: 40px;'>
@@ -82,65 +80,66 @@
         </div>
 
     <% if @add_staff == 'yes' %>
-        <%= form_for @organization,{as: :organization, url: employers_employer_staff_roles_path(id: @employer_profile.id), method: :post} do |f| %>
-            <div>
-              <h4>Add Employer Staff</h4>
-              <div class="row no-buffer row-form-wrapper">
-                <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                  <%= text_field_tag :first_name, @employer.try(:first_name), class: "floatlabel form-control", required: true, placeholder: 'FIRST NAME *' %>
-                </div>
-                <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-                  <%= text_field_tag :last_name, @employer.try(:last_name), class: "floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
-                </div>
-                <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                  <%= text_field_tag :dob, @employer.try(:dob), class: "date-picker floatlabel form-control", required: true, placeholder: 'DATE OF BIRTH *' %>
-                </div>
-              </div>
+      <%= form_for @organization,{as: :organization, url: employers_employer_staff_roles_path(id: @employer_profile.id), method: :post} do |f| %>
+        <div>
+          <h4>Add Employer Contact</h4>
+          <div class="row no-buffer row-form-wrapper">
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= text_field_tag :first_name, @employer.try(:first_name), class: "floatlabel form-control", required: true, placeholder: 'FIRST NAME *' %>
             </div>
-            <br>
-            <button type="submit" class="btn btn-primary pull-left mtz sm_full_width"> <%= "Save".html_safe %></button>
-            <%= link_to 'Cancel', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'no'), class:'btn btn-default pull-left' %>
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+              <%= text_field_tag :last_name, @employer.try(:last_name), class: "floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= text_field_tag :dob, @employer.try(:dob), class: "date-picker floatlabel form-control", required: true, placeholder: 'DATE OF BIRTH *' %>
+            </div>
+          </div>
+        </div>
 
+        <br/>
+        <button type="submit" class="btn btn-primary"> <%= "Save".html_safe %></button>
+        <%= link_to 'Cancel', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'no'), class:'btn btn-default btn-sm' %>
       <% end %>
 
 
     <% else %>
 
       <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(id: @organization.id), method: :put} do |f| %>
-          <br>
-          <%= link_to 'Add Employer Staff Role', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'yes'), class: 'btn btn-default pull-left col-12' %>
-          <br/><br><br>
-          <div class="">
-            <h4> Employer Information</h4>
-            <div class="row no-buffer row-form-wrapper">
-              <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
-                <%= render "shared/employer_profile_fields", f: emp %><br>
-              <% end %>
-            </div><br>
-            <h2> Office Locations </h2>
-            <% @row = false %>
-            <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location,block| %>
-              <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
-              <% @row = true %>
-            <% end %>
-            <br/>
-            <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |f| %>
-              <%= render "employer_contact_preferences", f: f %><br>
-            <% end %>
-            <br>
-            <div class="form-inputs">
-              <%= pundit_span(EmployerProfile,:updateable?) %>
-                 <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
-              </span>
-              <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-default' %>
-            </div>
-            <div class="top-row no-border">
-              <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
-              <button type="submit" class="btn btn-primary pull-right  mtz sm_full_width">
-                <%= "#{button_name}".html_safe %>
-              </button> &nbsp;&nbsp;
-            </div>
-          </div>
+        <div class="form-group">
+          <%= link_to 'Add Employer Contact', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'yes'), class: 'btn btn-default btn-sm' %>
+        </div>
+
+        <br/>
+        <h3> Employer Information</h3>
+        <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
+          <%= render "shared/employer_profile_fields", f: emp %><br>
+        <% end %>
+
+        <h2> Office Locations </h2>
+        <% @row = false %>
+        <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location,block| %>
+          <%= render partial: 'shared/office_location_fields', locals: {f: office_location, child_index: f.object.office_locations.length - 1} %>
+          <% @row = true %>
+        <% end %>
+        <br>
+        <div class="form-inputs">
+          <%= pundit_span(EmployerProfile,:updateable?) %>
+             <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default btn-sm' %>
+          </span>
+          <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-default btn-sm' %>
+        </div>
+
+        <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |f| %>
+          <%= render "employer_contact_preferences", f: f %><br>
+        <% end %>
+
+        <br/>
+        <p>
+          <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
+          <button type="submit" class="btn btn-primary btn-lg pull-right">
+            <%= "#{button_name}".html_safe %>
+          </button> &nbsp;&nbsp;
+        </p>
       <% end %>
     <% end %>
 

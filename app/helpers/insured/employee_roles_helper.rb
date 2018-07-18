@@ -17,6 +17,18 @@ module Insured::EmployeeRolesHelper
     offered_relationship_benefits.include? relationship
   end
 
+  def composite_relationship_check(offered_relationship_benefits=[], family_member, new_effective_on)
+    return nil if offered_relationship_benefits.blank?
+    direct_realation_to_primary = family_member.primary_relationship
+
+    relationship = CompositeRatedPlanCostDecorator.benefit_relationship(direct_realation_to_primary)
+    if direct_realation_to_primary == "child" && calculate_age_by_dob(family_member.dob) >= 26 && new_effective_on >= family_member.dob+26.years
+      relationship = "child_over_26"
+    end
+
+    offered_relationship_benefits.include? relationship
+  end
+
   def show_market_name_by_enrollment(enrollment)
     return '' if enrollment.blank?
 

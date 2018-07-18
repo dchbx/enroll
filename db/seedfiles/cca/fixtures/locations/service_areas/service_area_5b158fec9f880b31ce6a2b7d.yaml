@@ -1,0 +1,805 @@
+--- !ruby/object:BenefitMarkets::Locations::ServiceArea
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP7J+ICzHOait9
+  active_year: 2017
+  issuer_provided_code: MAS001
+  issuer_profile_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5p+ICzHOaecv
+  issuer_provided_title: HNE Commercial Network
+  county_zip_ids:
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgpm
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglC
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgo8
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmH
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmo
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnr
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgns
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglO
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgps
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgn2
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgol
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjL
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjE
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoK
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjB
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgno
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgi7
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgiz
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgix
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqo
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgl/
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkH
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgpF
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgg4
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggX
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghE
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgi2
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggT
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmf
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoL
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggP
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkQ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgm2
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnx
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggO
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggN
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgiE
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggM
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqY
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghW
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggK
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgh+
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglA
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggI
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggH
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mghs
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkN
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgp+
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggG
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgln
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggd
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqb
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mglz
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggD
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqW
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggC
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgp2
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mglr
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglP
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggs
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgn0
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgg5
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghI
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggc
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmw
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkY
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggr
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglW
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggb
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjl
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgi3
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqm
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggZ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkD
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqD
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggo
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggm
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggk
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggj
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggi
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggh
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgk7
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnb
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgkk
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmM
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnY
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkF
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjb
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqE
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqX
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgna
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgph
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmC
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmT
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgkg
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglL
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnn
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoG
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgm6
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgm5
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgko
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgm3
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgow
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgl7
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoW
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnK
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmp
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgkt
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmm
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmh
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmb
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgoa
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmx
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgpa
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqr
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgk+
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglM
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mglw
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mglx
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoM
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglF
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgj8
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgj5
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgj3
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgj2
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgkf
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjw
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjr
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgpt
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqc
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjD
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqM
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnh
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgj0
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mglj
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgma
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglY
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkK
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglX
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglR
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqt
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnP
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mglk
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoI
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgju
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgle
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnq
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjR
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqh
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgm+
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjG
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmn
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgoi
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgm1
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgi1
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqg
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoQ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgit
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnc
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgpq
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgpL
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggW
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgid
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggR
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgiP
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggQ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnz
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgq9
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgga
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgqd
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnJ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghB
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggL
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmW
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgp/
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggJ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkP
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnt
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggU
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgoz
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgn8
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoE
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggF
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgl0
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmE
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggE
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgin
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggB
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggg
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggf
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggu
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghU
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgg/
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgge
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmI
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggt
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghO
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggq
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MghZ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggp
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggn
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mggl
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MggY
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgok
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmU
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MglI
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgp9
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnS
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnQ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnH
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgq0
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnD
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnA
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqL
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgpR
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgm8
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqF
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgpI
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqH
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgqU
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgoq
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgms
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgnI
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjx
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjC
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmV
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgpJ
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgkp
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkG
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgkC
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgj/
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmL
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgla
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgka
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgj4
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgk8
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgnj
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjy
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgjN
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgn4
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgmv
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgkz
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgpg
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjp
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgmN
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0MgoA
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjo
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjm
+  - !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP4PDRxOS0Mgjk
+  updated_at: 2018-06-04 19:15:56.897000000 Z
+  created_at: 2018-06-04 19:15:56.897000000 Z
+  products_count: 6

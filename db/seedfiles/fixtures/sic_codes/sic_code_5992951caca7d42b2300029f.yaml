@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKf
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '50'
+  major_group_label: Wholesale Trade-durable Goods
+  industry_group_code: '503'
+  industry_group_label: Lumber And Other Construction Materials
+  sic_code: '5031'
+  sic_label: Lumber, Plywood, Millwork, and Wood Panels

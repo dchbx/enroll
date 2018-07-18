@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHb
+  key: en.insured.group_selection.new.choose_coverage_for_your_household
+  value: '"Choose Coverage for your Household"'

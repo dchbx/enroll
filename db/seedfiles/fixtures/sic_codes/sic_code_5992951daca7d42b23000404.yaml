@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHayn1CsjAAQE
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '99'
+  major_group_label: Nonclassifiable Establishments
+  industry_group_code: '999'
+  industry_group_label: Nonclassifiable Establishments
+  sic_code: '9999'
+  sic_label: Nonclassifiable Establishments

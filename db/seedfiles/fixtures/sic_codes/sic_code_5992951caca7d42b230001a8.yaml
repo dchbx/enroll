@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAGo
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '34'
+  major_group_label: Fabricated Metal Products, Except Machinery And Transportation
+    Equipment
+  industry_group_code: '342'
+  industry_group_label: Cutlery, Handtools, And General Hardware
+  sic_code: '3429'
+  sic_label: Hardware, Not Elsewhere Classified

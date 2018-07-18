@@ -1,0 +1,7 @@
+<div class="row">
+<% if current_user.blank? || current_user.person_id.blank? %>
+  <%= render 'shared/person_staff_search', f: f %>
+<% else %>
+<%= f.hidden_field :person_id, value: current_user.person_id %>
+<% end %>
+</div>

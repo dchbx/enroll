@@ -1,0 +1,262 @@
+<%# TODO %>
+<div class="benefits-tab">
+  <div class="row">
+    <div class="col-xs-8">
+      <h1 class="heading-text">Benefits - Coverage You Offer</h1>
+    </div>
+    <div class="col-xs-4">
+      <% if site_broker_claim_quoting_enabled? %>
+        <% if hide_or_show_claim_quote_button(@employer_profile) %>
+          <% claim_warnings, claim_modal_name = benefit_application_claim_quote_warnings(@benefit_applications) %>
+          <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#{claim_modal_name}" }, class: 'btn btn-default btn-block' %>
+
+          <% if claim_warnings.present? %>
+            <%= render "employers/plan_years/claim_quote_warnings", warnings: claim_warnings %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%#= pundit_span EmployerProfile,:updateable? %>
+        <% if @benefit_applications.present? && @benefit_applications.published.blank? && !@employer_profile.draft_benefit_applications.present? %>
+        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
+        <% end %>
+      </span>
+    </div>
+    <% unless @benefit_applications.blank? || @benefit_applications.published.present? %>
+    <% if @employer_profile.renewal_benefit_application.blank? || @employer_profile.active_benefit_application.blank? %>
+    <div class="col-xs-12">
+      <h4>Carefully review the plan information and pricing below. If you haven't added employees to your plan yet, select 'Employees' in the blue menu bar to the left and edit each of your employees to add them to your benefit package. If you want to
+        create more than one benefit package and offer different benefits to different employees, select 'Edit Plan Year' and then select 'Add Benefit Group' at bottom of the page. When you're satisfied with your benefit package(s), select 'Publish Plan Year'.</h4>
+      <h4>
+        <strong>
+          IMPORTANT
+        </strong>
+        – Once you select 'Publish Plan Year', your employees will receive a notification and open enrollment will begin according to the timeline you selected for your plan year.
+      </h4>
+      <br/>
+    </div>
+    <% end %>
+    <% end %>
+  </div>
+  <% if @benefit_applications.present? %>
+
+    <% @benefit_applications.each do |benefit_application| %>
+      <div class="row no-buffer module plan-year">
+        <div class="col-xs-6">
+          <h3 class="no-buffer heading-text">
+            <div class="row">
+              <span data-toggle="tooltip" title="<%= benefit_application.aasm_state.to_s.humanize.titleize %>">
+                <% if benefit_application.draft? %>
+                <i class="fa fa-file"></i>
+                <% elsif benefit_application.enrollment_open? %>
+                <i class="fa fa-star enrolling"></i>
+                <% elsif benefit_application.approved? %>
+                <i class="fa fa-users"></i>
+                <% end %>
+              </span>
+              <%= benefit_application.start_on.to_date.year%>
+              Plan Year (<%= benefit_application_summarized_state(benefit_application) %>)
+            </div>
+          </h3>
+        </div>
+        <div class="row">
+          <%#= pundit_span EmployerProfile, :updateable? %>
+          <% if benefit_application.draft? %>
+              <%# if benefit_application.overlapping_published_benefit_applications.empty? %>
+              <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, benefit_sponsorship_benefit_application_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right" %>
+              <%# end %>
+              <% if benefit_application.benefit_packages.empty? || benefit_application.benefit_packages.count > 1 %>
+                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz mr-1"%>
+              <% else %>
+                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_benefit_package_path(benefit_application.benefit_sponsorship, benefit_application, benefit_application.benefit_packages.first, :show_benefit_application_tile => true), method: :get, class: "btn btn-default pull-right mrz mr-1"%>
+              <% end %>
+          <% end %>
+          <%#= pundit_span(EmployerProfile, :revert_application?) %>
+          <% if current_user.has_hbx_staff_role? && benefit_application.may_revert_application? %>
+            <span class="btn btn-default pull-right" data-target="#revertBenefitApplication_<%= benefit_application.id %>" data-toggle="modal">Revert Application</span>
+            <%#= link_to "Revert Application", benefit_sponsorship_benefit_application_revert_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right"%>
+          <% end %>
+          <span></span>
+        </div>
+
+        <% if benefit_application.draft? && benefit_application.benefit_packages.empty? %>
+          <div class="benefit-group">
+            <div class="panel benefitgroup col-xs-12">
+              <div class="col-xs-11">
+                <table>
+                  <tr>
+                    <td>
+                      <header>Coverage Year</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.start_on.to_date.to_formatted_s :long_ordinal %> - <%= benefit_application.end_on.to_date.to_formatted_s :long_ordinal %>
+                      </p>
+                    </td>
+
+                    <% if benefit_application.terminated_on %>
+                      <td>
+                          <header>Terminated On</header>
+                      </td>
+                      <td>
+                         <p>
+                            <%= benefit_application.terminated_on.to_date.to_formatted_s :long_ordinal %>
+                         </p>
+                      </td>
+                    <%end%>
+
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>Open Enrollment Dates</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.open_enrollment_start_on.to_date.to_formatted_s :long_ordinal %> - <%= benefit_application.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>FTE Count</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.fte_count %>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>PTE Count</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.pte_count %>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>MSP Count</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.msp_count %>
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% benefit_application.benefit_packages.each do |package| %>
+        <div class="benefit-group">
+          <% # next if package.reference_plan_id.blank? %>
+
+          <% if package.is_default %>
+          <% active = 'active' %>
+          <% end %>
+
+          <div class="benefit-package">
+<!--             <a class='make_default_benefit_group_link' data-benefit-group-id="<%= package.id %>" data-href="<%#= employers_employer_profile_plan_year_make_default_benefit_group_path(@employer_profile, benefit_application.id) %>" data-plan-year-id="<%= benefit_application.id %>" href="#"
+              style='display:none;'></a> -->
+            <div class="panel benefitgroup col-xs-12">
+       <!--        <div class="col-xs-1">
+                <i class="make-default <%= active %> fa fa-star fa-3x" data-toggle="tooltip" title="Make this your default benefit group"></i>
+              </div> -->
+              <div class="col-xs-12">
+                <section class="col-xs-10">
+                  <header class="row">
+                    <h3 class="title heading-text">
+                      <%= package.title %>
+                    </h3>
+                    <% if package.description.present? %>
+                    <h5 class="description no-buffer"><%= package.description %></h5>
+                    <% end %>
+                  </header>
+                </section>
+                <div class="col-xs-2 mt-1">
+                  <button class="nav-toggle row view" id="showhidebutton" onclick="EmployerProfile.viewDetails($(this))">View Details
+                    <i class="fa fa-chevron-down fa-lg"></i>
+                  </button>
+                </div>
+                <table>
+                  <tr>
+                    <td>
+                      <header>Coverage Year</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.start_on.to_date.to_formatted_s :long_ordinal %> - <%= benefit_application.end_on.to_date.to_formatted_s :long_ordinal %>
+                      </p>
+                    </td>
+                    <% if benefit_application.terminated_on %>
+                      <td>
+                          <header>Terminated On</header>
+                      </td>
+                      <td>
+                         <p>
+                            <%= benefit_application.terminated_on.to_date.to_formatted_s :long_ordinal %>
+                         </p>
+                      </td>
+                    <%end%>
+                  </tr>
+                  <tr>
+                    <td>
+                      <header>Eligibility</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= package.probation_period_display_name %>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <% package.sponsored_benefits.each do |sponsored_benefit| %>
+              <%= render 'sponsored_benefit', sponsored_benefit: sponsored_benefit %>
+            <% end %>
+
+
+            <br class="clear"/>
+          </div>
+            <%= pundit_span EmployerProfile, :updateable? %>
+                <div class="below clear">
+                  <%= link_to "Delete Benefit Package <i class='fas fa-trash-alt' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{package.id.to_s}" }, class: 'btn btn-default' if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
+                  <%= render partial: "benefit_sponsors/profiles/employers/benefit_packages/delete_benefit_package_modal", locals: { benefit_application: benefit_application, package: package } if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
+                </div>
+            </span>
+          <% end %>
+        </div>
+        <br/>
+        <br/>
+
+        <div class="col-xs-12"></div>
+
+        <%= render "benefit_sponsors/benefit_applications/benefit_applications/submit_application_modal", benefit_application: benefit_application %>
+        <%= render "benefit_sponsors/benefit_applications/benefit_applications/revert_application_modal", benefit_application: benefit_application %>
+
+    <% end %>
+  <% else %>
+      <h4>
+        It's time to create a benefits package. Select 'Add Plan Year' to create your first one. Most employers only create one benefits package but you'll have the opportunity to create more than one if you want to offer different benefits to different
+        groups of employees.
+      </h4>
+      <br/>
+      <%=pundit_span EmployerProfile, :updateable?%>
+        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
+      </span>
+  <% end %>
+  </div>
+</div>
+
+<%= render "benefit_sponsors/profiles/employers/benefit_applications/claim_quote_modal" %>

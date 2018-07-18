@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "broker_agencies/profiles/_assign_history.html.erb" do
+RSpec.describe "broker_agencies/profiles/_assign_history.html.erb", dbclean: :after_each do
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
 
   before :each do

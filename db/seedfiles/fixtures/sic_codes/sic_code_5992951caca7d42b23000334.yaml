@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAM0
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '62'
+  major_group_label: Security And Commodity Brokers, Dealers, Exchanges, And Services
+  industry_group_code: '628'
+  industry_group_label: Services Allied With The Exchange Of Securities
+  sic_code: '6282'
+  sic_label: Investment Advice

@@ -1,0 +1,23 @@
+h2.mt-3 Benefit Markets
+
+table.table.table-striped
+  thead.thead-dark
+    tr
+      th scope="col" Site URN
+      th scope="col" Kind
+      th scope="col" Title
+      th scope="col" Description
+      th
+      th
+  tbody
+    - @benefit_markets.each do |bm|
+      tr
+        td = bm.site_urn
+        td = bm.kind
+        td = bm.title
+        td = bm.description
+        td = link_to "Edit",edit_benefit_market_path(bm)
+        td = link_to 'Delete', benefit_market_path(id: bm.id,site_id: params[:site_id]),method: :delete
+
+= link_to "Create new benefit market", new_site_benefit_market_path(site_id: @site_id), class:'btn btn-primary'
+      

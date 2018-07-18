@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALg
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '52'
+  major_group_label: Building Materials, Hardware, Garden Supply, And Mobile Home
+    Dealers
+  industry_group_code: '525'
+  industry_group_label: Hardware Stores
+  sic_code: '5251'
+  sic_label: Hardware Stores

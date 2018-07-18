@@ -1,0 +1,12 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADp
+  key: en.insured.employee_roles.not_your_employer_modal_body
+  value: '"Unable to match your identifying information with an active employer.  First,
+    verify the information that you provided here is correct.  If so, contact your
+    employer to confirm that your name, date of birth, social security number, gender
+    and date-of-hire information, as entered on %{site_short_name}, is accurate and
+    complete."'

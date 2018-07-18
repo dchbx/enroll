@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJj
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '42'
+  major_group_label: Motor Freight Transportation And Warehousing
+  industry_group_code: '421'
+  industry_group_label: Trucking And Courier Services, Except Air
+  sic_code: '4215'
+  sic_label: Courier Services, Except by Air

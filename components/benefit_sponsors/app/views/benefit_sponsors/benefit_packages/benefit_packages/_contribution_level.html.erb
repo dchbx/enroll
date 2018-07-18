@@ -1,0 +1,41 @@
+<div class="row row-form-wrapper no-buffer">
+  <%= f.hidden_field :id, value: f.object.id if f.object.id.present? %>
+  <%= f.hidden_field :contribution_unit_id %>
+  <% f.object.is_offered = false if f.object.display_name == 'child_26_and_over' %>
+  <fieldset style="<%= 'display: none;' if f.object.display_name == 'child_26_and_over' %>">
+    <div class="col-xs-6 form-group form-group-lg">
+      <div class="checkbox">
+        <label>
+          <%= f.check_box :is_offered, {class: "contribution_handler"}, "true", "false" %>
+          <%= f.label :is_offered do %>
+
+          <i class="fas fa-check-square fa-2x"></i>
+          <i class="fas fa-square-o fa-2x"></i>
+
+          <% end %>
+
+          <span>
+            <%= f.hidden_field :display_name, value: f.object.display_name %>
+            <p><%= f.object.display_name.try(:humanize) %></p>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="col-xs-6 form-group form-group-lg">
+      <div class="col-xs-12 row">
+        <div class="col-xs-3">
+          <%= f.number_field :contribution_factor, class: "hidden-param contribution_handler premium-storage-input", value: (f.object.contribution_factor * 100) %>
+
+        </div>
+        <div class="col-xs-9" style="padding-top: 10px;">
+          <input class="contribution_slide_handler slider premium-storage-input" data-slider-max="100" data-slider-min="0" data-slider-step="5" data-slider-value="0" type="number" value="<%= (f.object.contribution_factor * 100) %>"/>
+          &nbsp;&nbsp;&nbsp;
+          <span class="slide-label pull-right">0%</span>
+          <!--<i class="far fa-question-circle fa-lg"></i>-->
+        </div>
+
+      </div>
+    </div>
+  </fieldset>
+</div>

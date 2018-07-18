@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADm
+  key: en.insured.consumer_roles.search.enter_personal_info_msg
+  value: '"First, we need to verify whether you''re new to %{site_short_name} or affiliated
+    with another account. Please enter your personal information. When you''re finished,
+    select CONTINUE."'

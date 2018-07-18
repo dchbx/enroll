@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAGs
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '34'
+  major_group_label: Fabricated Metal Products, Except Machinery And Transportation
+    Equipment
+  industry_group_code: '344'
+  industry_group_label: Fabricated Structural Metal Products
+  sic_code: '3441'
+  sic_label: Fabricated Structural Metal

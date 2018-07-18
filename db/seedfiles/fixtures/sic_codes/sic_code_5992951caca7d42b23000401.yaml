@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAQB
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '96'
+  major_group_label: Administration Of Economic Programs
+  industry_group_code: '966'
+  industry_group_label: Space Research And Technology
+  sic_code: '9661'
+  sic_label: Space and Research and Technology

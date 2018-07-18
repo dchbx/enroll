@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAP9
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '96'
+  major_group_label: Administration Of Economic Programs
+  industry_group_code: '962'
+  industry_group_label: Regulation And Administration Of Transportation
+  sic_code: '9621'
+  sic_label: Regulation and Administration of Transportation Programs

@@ -1,0 +1,38 @@
+fieldset
+  legend Personal Information
+
+  .row
+    .col-md-4.mb-2
+        label for="inputFirstname"  First name *
+        = f.text_field :first_name, placeholder:'First Name', required:'true', id:'inputFirstname', class:'form-control'
+        .invalid-feedback
+          |
+            Please provide a first name.
+
+    .col-md-4.mb-2
+        label for="inputLastname"  Last name *
+        = f.text_field :last_name, placeholder:'Last Name', required:'true', id:'inputLastname', class:'form-control'
+        .invalid-feedback
+          |
+            Please provide a last name.
+
+    .col-md-4.mb-2
+        label for="inputDOB"  Date of Birth *
+        = f.text_field :dob, placeholder:'MM/DD/YYYY', required:'true', id:'inputDOB', class:'form-control'
+        .invalid-feedback
+          |
+            Please provide a date of birth.
+
+    .col-md-4.mb-2
+        label for="inputEmail"  Email *
+        = f.email_field :email, placeholder:'Email', required:'true', id:'inputEmail', class:'form-control'
+        .invalid-feedback
+          |
+            Please provide a email address.
+
+    .col-md-4.mb-2
+        label for="inputNPN"  NPN *
+        = f.text_field :npn, placeholder:'NPN', required:'true', id:'inputNPN', class:'form-control', maxlength:'10', onkeypress:'return isNumberKey(event)'
+        .invalid-feedback
+          |
+            Please provide a NPN.

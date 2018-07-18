@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALw
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '55'
+  major_group_label: Automotive Dealers And Gasoline Service Stations
+  industry_group_code: '554'
+  industry_group_label: Gasoline Service Stations
+  sic_code: '5541'
+  sic_label: Gasoline Service Stations

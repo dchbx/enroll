@@ -6,7 +6,7 @@ module Events
       reply_to = properties.reply_to
       headers = (properties.headers || {}).stringify_keys
       employer_id = headers["employer_id"]
-      employer_org = Organization.employer_by_hbx_id(employer_id).first
+      employer_org = BenefitSponsors::Organizations::Organization.employer_by_hbx_id(employer_id).first
       manual_gen = headers["manual_gen"].present? && (headers["manual_gen"] == "true" || headers["manual_gen"] == true) ? true : false
       if !employer_org.nil?
         employer = employer_org.employer_profile
@@ -21,7 +21,7 @@ module Events
                 :employer_id => employer_id
               }
             }
-          ) 
+          )
         end
       else
         with_response_exchange(connection) do |ex|
@@ -34,7 +34,7 @@ module Events
                 :employer_id => employer_id
               }
             }
-          ) 
+          )
         end
       end
     end

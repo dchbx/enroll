@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADr
+  key: en.insured.employee_roles.enroll_as_an_employee
+  value: '"Enroll as an employee of %{employer_name}"'

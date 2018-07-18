@@ -45,12 +45,12 @@
       <small>
         <%= link_to l10n("insured.what_is_an_assister?"), '', data: { target: '#read_only_modal_what_is_an_assister', toggle: 'modal' } %>
       </small>
-      <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_an_assister', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_an_assister?"), body: l10n("insured.answer_for_assister", site_short_name: Settings.site.short_name ) } %>
+      <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_an_assister', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_an_assister?"), body: l10n("insured.answer_for_assister", site_short_name: site_short_name ) } %>
       <br/>
       <small>
         <%= link_to l10n("insured.what_is_a_broker?"), '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
       </small>
-      <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_a_broker?"), body: l10n("insured.answer_for_broker", site_short_name: Settings.site.short_name ) } %>
+      <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_a_broker?"), body: l10n("insured.answer_for_broker", site_short_name: site_short_name ) } %>
       <% end %>
       <% if broker_and_agency_present %>
       <small>

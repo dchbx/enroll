@@ -1,0 +1,10 @@
+fieldset
+  legend Personal Information:
+  .col-md-4
+    .form-group
+      label for="First Name" First Name 
+      = f.text_field :first_name, class: "form-control", required: true, placeholder: 'FIRST NAME *'
+  .col-md-4
+    .form-group
+      label for="Last Name" Last Name
+      = f.text_field :last_name, class: "form-control", required: true, placeholder: 'LAST NAME *'

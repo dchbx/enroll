@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAB6
+  division_code: C
+  division_label: Construction
+  major_group_code: '17'
+  major_group_label: Construction Special Trade Contractors
+  industry_group_code: '171'
+  industry_group_label: Plumbing, Heating And Air-conditioning
+  sic_code: '1711'
+  sic_label: Plumbing, Heating and Air-Conditioning

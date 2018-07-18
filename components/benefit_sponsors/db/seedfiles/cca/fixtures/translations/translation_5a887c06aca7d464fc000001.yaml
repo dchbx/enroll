@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8Bqyn1GT8AAAB
+  key: en.enroll_in_health_or_dental_dc
+  value: '"Enroll in health or dental coverage on the District of Columbia''s individual
+    market"'

@@ -1,0 +1,19 @@
+<div class="employee-upload">
+  <i class="fa fa-times fa-3x pull-right modal-close"></i>
+  <h2>Upload Employee Roster</h2>
+  <h4>If you completed your employee roster offline using our Microsoft Excel template, find the file on your computer and upload it here.</h4>
+  <%= link_to(main_app.document_download_path(env_bucket_name("templates"), s3_template_bucket_key) + "?contenttype=application/vnd.ms-excel&filename=Health Connector - Employee Census Template.xlsx", class: "download") do %>
+  <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
+        Download it now.
+    <% end %>
+        </h4>
+  <div class="upload-preview">
+
+  </div>
+<%= form_for @plan_design_proposal, url: bulk_employee_upload_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal), method: 'post', :html => { :multipart => true } do |f| %>
+<%= file_field_tag :file %>
+<%#=pundit_span EmployerProfile, :updateable? %>
+<%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary ' %>
+<%= f.submit 'Upload', class: 'btn btn-primary ' %>
+<% end %>
+</div>

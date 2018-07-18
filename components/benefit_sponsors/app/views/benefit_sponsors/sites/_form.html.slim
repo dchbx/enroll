@@ -1,0 +1,59 @@
+= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload'
+
+fieldset
+  legend Site Information:
+  .form-group
+    label for="inputSiteKey" Site Key
+    = f.text_field :site_key, required:'true', id:'inputSiteKey', class:'form-control'
+    label for="inputLongName" Long Name
+    = f.text_field :long_name, required:'true', id:'inputLongName', class:'form-control'
+    label for="inputShortName" Short Name
+    = f.text_field :short_name, required:'true', id:'inputShortName', class:'form-control'
+    label for="inputByLine" By Line
+    = f.text_field :byline, required:'true', id:'inputShByLine', class:'form-control'
+    label for="inputDomainName" Domain Name
+    = f.text_field :domain_name, required:'true', id:'inputDomainName', class:'form-control'
+    
+    = f.fields_for :owner_organization, @site.owner_organization do |organization_fields|
+      .form-group
+        label for="inputLegalName" Organization Legal Name
+        = organization_fields.text_field :legal_name, id: 'inputLegalName', class: 'form-control'
+        
+      h4 Office Location
+      
+      = organization_fields.fields_for :profile, organization_fields.object.profile do |profile_fields|
+        div data-controller="office-locations"
+          div data-target="office-locations.officeLocations"
+            = profile_fields.fields_for :office_locations, profile_fields.object.office_locations do |office_fields|
+              = office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary?
+              .js-remove.row
+                label Primary Address
+              - if office_fields.object.is_primary?
+                .js-office-location data-target="office-locations.officeLocation"
+              - else
+                .js-office-location
+              .row.row-form-wrapper.no-buffer.js-non-primary
+                .col-md-2.col-sm-2.col-xs-12.form-group.form-group-lg.no-pd
+                .col-md-8.col-sm-8.col-xs-12.form-group.form-group-lg.no-pd.address
+                  .form-group.form-group-lg
+                    .row style="margin: 0"
+                      .col-md-3.col-sm-3.col-xs-0.floatlabel
+                      .col-md-3.col-sm-3.col-xs-0.floatlabel
+                .col-md-2.col-sm-2.col-xs-12.form-group.form-group.no-pd
+                  a.btn.btn-sm.btn-outline-primary data-action="click->office-locations#removeLocation"
+                    i.far.fa-trash-alt.fa-2x.role-trashcan
+
+              = office_fields.fields_for :address, office_fields.object.address do |address_fields|
+                = address_fields.hidden_field :kind, value: 'primary'
+                = render partial: 'benefit_sponsors/locations/address', locals: { f: address_fields }
+              .js-remove.row
+                label Main Phone
+              = office_fields.fields_for :phone, office_fields.object.phone do |phone_fields|
+                = phone_fields.hidden_field :kind, value: 'main'
+                = render partial: 'benefit_sponsors/locations/phone', locals: { f: phone_fields }
+
+          a.btn.btn-default.btn-outline-primary data-action="click->office-locations#addLocation" Add another location
+                      
+      
+      
+        

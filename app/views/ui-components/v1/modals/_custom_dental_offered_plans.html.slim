@@ -1,0 +1,25 @@
+id="electedDentalPlans_#{bg.id}" class="modal fade" role="dialog"
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" &times;
+        h4.modal-title Offered Plans - 
+        = bg.title 
+        | (Dental)
+      .modal-body
+        .module.custom-dental-offered-plans
+          .table-responsive
+            table.table.table-striped.table-hover.table-sm
+              thead.thead-default
+                tr
+                  th Carrier
+                  th Plan
+              tbody
+              - bg.elected_dental_plans.each do |p|
+                tr
+                  td = p.carrier_profile.legal_name
+                  td = p.name
+        ul.application-warnings
+      .modal-footer
+        = link_to 'Close', '', :class => 'btn btn-default', data: { dismiss: "modal"}

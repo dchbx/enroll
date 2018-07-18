@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJF
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '39'
+  major_group_label: Miscellaneous Manufacturing Industries
+  industry_group_code: '391'
+  industry_group_label: Jewelry, Silverware, And Plated Ware
+  sic_code: '3914'
+  sic_label: Silverware, Plated Ware, and Stainless Steel Ware

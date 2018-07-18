@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAM9
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '63'
+  major_group_label: Insurance Carriers
+  industry_group_code: '639'
+  industry_group_label: Insurance Carriers, Not Elsewhere Classified
+  sic_code: '6399'
+  sic_label: Insurance Carriers, Not Elsewhere Classified

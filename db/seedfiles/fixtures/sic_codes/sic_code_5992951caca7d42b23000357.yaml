@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANX
+  division_code: I
+  division_label: Services
+  major_group_code: '70'
+  major_group_label: Hotels, Rooming Houses, Camps, And Other Lodging Places
+  industry_group_code: '704'
+  industry_group_label: Organization Hotels And Lodging Houses, On
+  sic_code: '7041'
+  sic_label: Organization Hotels and Lodging Houses, on Membership Basis

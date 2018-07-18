@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "assign_attested_residency_state")
 
 describe AssignAttestedResidency, :dbclean => :after_each do
@@ -37,4 +38,5 @@ describe AssignAttestedResidency, :dbclean => :after_each do
   (HbxEnrollment::TERMINATED_STATUSES - ["unverified"]).each do |status|
     it_behaves_like "attested residency", status, "individual", nil
   end
+end
 end

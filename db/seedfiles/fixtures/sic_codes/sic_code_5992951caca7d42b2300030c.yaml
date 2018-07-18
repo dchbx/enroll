@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMM
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '59'
+  major_group_label: Miscellaneous Retail
+  industry_group_code: '594'
+  industry_group_label: Miscellaneous Shopping Goods Stores
+  sic_code: '5943'
+  sic_label: Stationery Stores

@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "fix_unverified_people")
 
 describe FixUnverifiedPeople, :dbclean => :after_each do
@@ -186,4 +187,5 @@ describe FixUnverifiedPeople, :dbclean => :after_each do
       end
     end
   end
+end
 end

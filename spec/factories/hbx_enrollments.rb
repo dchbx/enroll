@@ -23,12 +23,12 @@ FactoryGirl.define do
       active_year TimeKeeper.date_of_record.year
     end
 
-    plan { create(:plan, :with_premium_tables, active_year: active_year) }
+    plan { create(:plan, :with_rating_factors, :with_premium_tables, active_year: active_year) }
 
     trait :with_enrollment_members do
       hbx_enrollment_members { enrollment_members.map{|member| FactoryGirl.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on) }}
     end
-    
+
     trait :with_dental_coverage_kind do
       association :plan, factory: [:plan, :with_dental_coverage]
       coverage_kind "dental"
@@ -96,11 +96,11 @@ FactoryGirl.define do
       termination_submitted_on TimeKeeper.date_of_record
     end
 
-    trait :older_effective_date do 
+    trait :older_effective_date do
       effective_on {Date.new(active_year,4,1)}
     end
 
-    trait :newer_effective_date do 
+    trait :newer_effective_date do
       effective_on {Date.new(active_year,5,1)}
     end
 
