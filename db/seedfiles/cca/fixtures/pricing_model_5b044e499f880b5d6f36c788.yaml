@@ -27,6 +27,7 @@ attributes: !ruby/hash:BSON::Document
     relationship_kinds:
     - spouse
     - life_partner
+    - domestic_partner
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-

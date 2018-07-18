@@ -10,7 +10,11 @@ class GenerateBenefitMarketCatalogs < Mongoid::Migration
   end
 
   def self.down
-    BenefitMarkets::BenefitMarketCatalog.all.delete
-    BenefitMarkets::Products::ProductPackage.all.delete
+    if Settings.site.key.to_s == "cca"
+      BenefitMarkets::BenefitMarketCatalog.all.delete
+      BenefitMarkets::Products::ProductPackage.all.delete
+    else
+      say("Skipping migration for non-MHC site")
+    end
   end
 end

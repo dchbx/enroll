@@ -91,6 +91,10 @@ class MigrateMaServiceAreas < Mongoid::Migration
   end
 
   def self.down
-    ::BenefitMarkets::Locations::ServiceArea.where.delete
+    if Settings.site.key.to_s == "cca"
+      ::BenefitMarkets::Locations::ServiceArea.where.delete
+    else
+      say("Skipping migration for non-MHC site")
+    end
   end
 end

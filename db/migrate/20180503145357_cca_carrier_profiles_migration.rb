@@ -31,6 +31,7 @@ class CcaCarrierProfilesMigration < Mongoid::Migration
   end
 
   def self.down
+    raise "Can not be reversed!"
   end
 
   private

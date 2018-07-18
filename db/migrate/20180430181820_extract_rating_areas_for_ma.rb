@@ -1,5 +1,6 @@
 class ExtractRatingAreasForMa < Mongoid::Migration
   def self.up
+    if Settings.site.key.to_s == "cca"
     rating_areas = connection["rating_areas"]
     if rating_areas
       say_with_time("Build rating areas linking them with county_zips") do
@@ -34,9 +35,16 @@ class ExtractRatingAreasForMa < Mongoid::Migration
         end
       end
     end
+    else
+      say "Skipping for non-CCA site"
+    end
   end
 
   def self.down
-    ::BenefitMarkets::Locations::RatingArea.where.delete
+    if Settings.site.key.to_s == "cca"
+      ::BenefitMarkets::Locations::RatingArea.where.delete
+    else
+      say "Skipping for non-CCA site"
+    end
   end
 end

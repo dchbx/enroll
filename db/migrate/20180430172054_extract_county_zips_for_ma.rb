@@ -37,6 +37,8 @@ class ExtractCountyZipsForMa < Mongoid::Migration
   end
 
   def self.down
-    ::BenefitMarkets::Locations::CountyZip.all.delete
+    if Settings.site.key.to_s == "cca"
+      ::BenefitMarkets::Locations::CountyZip.all.delete
+    end
   end
 end
