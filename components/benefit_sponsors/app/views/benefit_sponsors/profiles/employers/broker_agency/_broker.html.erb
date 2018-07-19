@@ -1,0 +1,30 @@
+<td> <%= broker.person.full_name if broker %></td>
+<td> <%= broker.npn if broker %></td>
+
+<td>
+  <%= pundit_span @employer_profile, :updateable?%>
+  <%= link_to 'Select Broker', '#', data: {toggle: "modal", target: "#broker_confirm_#{broker.id}"}, class: 'btn btn-default btn-default' %>
+  </span>
+  <div class="modal fade" id="broker_confirm_<%= broker.id %>" tabindex="-1" role="dialog" aria-labelledby="brokerConfirm" role="document">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Broker Selection Confirmation</h4>
+        </div>
+
+        <%= form_for broker_agency, {url: profiles_employers_employer_profile_broker_agency_index_path(@employer_profile.id) , method: :post} do |f| %>
+          <div class="modal-body">
+            <%= hidden_field_tag(:broker_agency_id, broker_agency.id) %>
+            <%= hidden_field_tag(:broker_role_id, broker.id) %>
+            <p>Select 'Confirm' to hire the selected Broker. Warning: if you already have an existing Broker, they will be terminated effective immediately.</p>
+          </div>
+          <div class="modal-footer">
+            <%= submit_tag "Confirm", class: 'btn btn-primary  mtz' %>
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</td>

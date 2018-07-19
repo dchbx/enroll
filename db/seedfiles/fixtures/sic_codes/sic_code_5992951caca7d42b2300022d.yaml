@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAIt
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '37'
+  major_group_label: Transportation Equipment
+  industry_group_code: '376'
+  industry_group_label: Guided Missiles And Space Vehicles And Parts
+  sic_code: '3761'
+  sic_label: Guided Missiles and Space Vehicles

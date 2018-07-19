@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :hbx_profile do
     organization            { FactoryGirl.build(:organization) }
-    us_state_abbreviation   "DC"
+    us_state_abbreviation   Settings.aca.state_abbreviation
     cms_id   "DC0"
     benefit_sponsorship { FactoryGirl.build(:benefit_sponsorship) }
 

@@ -1,0 +1,16 @@
+<div class="col-xs-12">
+  <table class="benefit-group-contribution-table">
+    <tr>
+      <th>Offered</th>
+      <th>Employer Health Contribution</th>
+    </tr>
+    <% @benefit_group.relationship_benefits.each_with_index do |rb, i| %>
+    <tr class="<% if rb.offered %>offered<% else %>not-offered <% end %>">
+      <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+      <td id="pct">
+        <strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong>
+      </td>
+    </tr>
+    <% end %>
+  </table>
+</div>

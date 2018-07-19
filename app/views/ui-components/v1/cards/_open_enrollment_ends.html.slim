@@ -1,0 +1,17 @@
+.panel.panel-default.module.open-enrollment-ends-on
+  .panel-body
+    .text-center
+      figure
+        span.icon-calendar-large.icon-calendar-large-dims role="img" aria-label="tooltip"
+          figcaption
+            h2.no-buffer 
+              strong
+                - if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0
+                  = (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i
+                - else
+                  0
+            span Days
+    .text-left
+      h3.no-buffer
+        strong Until Open Enrollment Ends
+      span = @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal

@@ -1,0 +1,187 @@
+<a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
+<a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
+<a href="#" data-href="<%= calc_offered_plan_contributions_employers_employer_profile_plan_years_path %>" id='calc_offered_plan_contributions_link' style='display:none;'></a>
+<a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
+<% i = f.index %>
+<div class="reference-summary">
+</div>
+<%= render "employers/plan_years/employee_costs_modal" %>
+<fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields' data-benefit-group="<%= f.object.id.to_s %>" data-benefit-group-index="<% if i < 50 %><%= i %><% end %>">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <h1>
+        Benefit Package - Set Up
+      </h1>
+      <div class="module benefit-properties">
+        <div class="row row-form-wrapper no-buffer plan-title">
+          <div class="col-xs-12 form-group form-group-lg">
+            <!-- Offset :  -->
+            <label class="title">NAME YOUR BENEFIT PACKAGE</label>
+            <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
+            <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper no-buffer description">
+          <div class="col-xs-12 form-group form-group-lg">
+            <label class="title">DESCRIPTION</label>
+            <%= f.text_field :description, class: "form-control", style: "font-weight: normal !important;" %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-xs-12 form-group form-group-lg">
+            <!-- Offset :  -->
+            <label class="title">WHEN SHOULD NEWLY HIRED EMPLOYEES START THEIR COVERAGE? <!--<i class="fa fa-chevron-down"></i>--></label>
+            <%= f.select(:effective_on_offset, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.effective_on_offset), { :class => ''}) %>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <br/>
+    </div>
+  </div>
+
+  <div class="row health">
+    <div class="col-xs-12"
+    <span class="starter" style="display: inline-block;">
+      <h1><%= @benefit_application.new_record? ? 'Health – Set Up Benefit Package' : 'Health - Edit Benefit Package' %></h1>
+      <div class="col-xs-9" style="padding-left:0px !important">
+      <h4>Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.</h4>
+      </div>
+    </span>
+    <% if @benefit_application.new_record? == false %>
+    <div class="col-xs-3">
+    <span class="pull-right">
+      <div id="edit_employer_cost_info_btn" style="padding-top:12px">
+        <div class="btn btn-default">
+          Employee Detail Costs
+        </div>
+        <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
+      </div>
+    </span>
+  </div>
+    </div>
+      <% end %>
+    <br class="clear"/>
+    <br/>
+    <div class="col-xs-12 offerings">
+      <div class="row row-form-wrapper no-buffer heading">
+        <div class="col-xs-12" id="offering_slider_header">
+          <div class="col-xs-6">Offered <i class="fa fa-question-circle" data-toggle="tooltip" title="You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees’ families."></i></div>
+          <div class="col-xs-6">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>
+        </div>
+      </div>
+      <div class="col-xs-12 benefits-fields">
+        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+        <%= render "shared/relationship_benefit_fields", f: rb %>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-md-12 col-sm-12 col-xs-12 top-pd">
+      <div class="reference_plan_info" style='clear: both;'>
+        <h4></h4>
+        <div class="content"></div>
+      </div>
+    </div>
+  </div>
+  <%= render "shared/reference_plans_list", f: f, p: p %>
+  <div class="col-xs-12">
+    <div class="health selected-plan row" style="display: none;">
+    </div>
+    <% i = f.index %>
+    <span class="dent plan-count" style="display: none;"><% if i < 50 %><% if @benefit_application.benefit_groups[i].elected_dental_plan_ids.count == 13 %>All<% else %><%= @benefit_application.benefit_groups[i].elected_dental_plan_ids.count %><% end %><% end %></span>
+      <br/>
+      <br/>
+      <div class="row">
+        <div class="col-xs-12 edit-add-dental b bt-n vertically-aligned-row" style="<% if (@benefit_application.new_record? == false && @benefit_application.benefit_groups[i].try(:dental_reference_plan_id).present?) || @benefit_application.new_record == true %>display: none;<% else %>display: block;<% end %>">
+          <div class="col-xs-9 text-center">
+              <h4 class="di">Click "Add Dental Plans" to add one or more dental plans to this benefit package</h4>
+          </div>
+          <div class="col-xs-3 text-center">
+            <span class="btn btn-default">Add Dental Plans</span>
+          </div>
+        </div>
+      </div>
+    <div class="select-dental-plan dental row" style="display: none;">
+      <br/>
+      <br/>
+      <br/>
+      <div class="row">
+        <div class="col-xs-12">
+          <h1>
+            <%= @benefit_application.new_record? ? 'Dental - Set Up Benefit Package' : 'Dental - Edit Benefit Package' %>
+            <i class="fa fa-trash-o pull-right" style="margin-top: 10px;" data-toggle="tooltip" title="Remove"></i>
+          </h1>
+          <div class="col-xs-9" style="padding-left:0px !important;">
+            <span class="starter" style="display: inline-block;">
+              Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
+            </span>
+          </div>
+          <div class="col-xs-3">
+            <span class="pull-right">
+              <div id="edit_employer_cost_info_btn" style="padding-top: 10px;">
+                <div class="btn btn-default btn-right pull-right" style="margin-right: 0; margin-bottom: 15px;">
+                  Employee Detail Costs
+                </div>
+                <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div class="dental-benefits-fields">
+        <div class="row row-form-wrapper no-buffer heading">
+          <div class="col-xs-6">
+            Offered
+            <i class="fa fa-question-circle" data-toggle="tooltip" title="You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees’ families.">
+            </i>
+          </div>
+          <div class="col-xs-6">
+            Employer Contribution
+            <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute.">
+            </i>
+          </div>
+        </div>
+        <%= f.fields_for :dental_relationship_benefits, errors: {}, fieldset: false do |f|  %>
+          <%= render "shared/relationship_benefit_fields", f: f %>
+        <% end %>
+      </div>
+      <%= render "shared/dental_reference_plans_list", f: f, p: p %>
+
+      <span class="clear"></span>
+      <div class="dental-reference-plans">
+      </div>
+      <div class="col-xs-12">
+        <div class="dental selected-plan row" style="display: none;">
+        </div>
+      </div>
+    </div>
+  </div>
+</fieldset>
+
+<% if i < 50 %>
+  <script>
+  $(document).on('page:update', function() {
+    //validate plan year create for title, referencce plan, and premium Percentage
+    if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+        $('.interaction-click-control-save-plan-year').removeClass('disabled');
+        EmployerProfile.validateEditPlanYear();
+        //validate plan year create for title, referencce plan, and premium Percentage
+        $(document).on('change', '.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+            EmployerProfile.validateEditPlanYear();
+        });
+        $(document).on('change', '.reference-plan input', function() {
+            EmployerProfile.validateEditPlanYear();
+        });
+    } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
+        EmployerProfile.validatePlanYear();
+        $(document).on('change', '.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+            EmployerProfile.validatePlanYear();
+        });
+        $(document).on('change', '.reference-plan input', function() {
+            EmployerProfile.validatePlanYear();
+        });
+    } else {}
+  });
+  </script>
+<% end %>

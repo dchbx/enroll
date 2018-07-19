@@ -14,7 +14,7 @@ module Effective
           #row.legal_name
           #(link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>") + truncate(row.id.to_s, length: 8, omission: '' )
           #link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile)
-          link_to row.legal_name, broker_agencies_profile_path(row.broker_agency_profile)
+          link_to row.legal_name, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(row.broker_agency_profile)
           }, :sortable => false, :filter => false
 
         table_column :dba, :proc => Proc.new { |row|
@@ -22,15 +22,19 @@ module Effective
         }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
 
-        table_column :entity_kind, :proc => Proc.new { |row| row.broker_agency_profile.entity_kind.titleize }, :sortable => false, :filter => false
-        table_column :market_kind, :proc => Proc.new { |row| row.broker_agency_profile.market_kind.titleize }, :sortable => false, :filter => false
+        table_column :entity_kind, :proc => Proc.new { |row| row.entity_kind.to_s.titleize }, :sortable => false, :filter => false
+        table_column :market_kind, :proc => Proc.new { |row| row.broker_agency_profile.market_kind.to_s.titleize }, :sortable => false, :filter => false
 
       end
 
       def collection
         return @broker_agency_profiles_collection if defined? @broker_agency_profiles_collection
 
-        @broker_agency_profiles_collection = Organization.exists(broker_agency_profile: true).order_by([:legal_name])
+        # Query From New Model
+        @broker_agency_profiles_collection = BenefitSponsors::Organizations::Organization.broker_agency_profiles.order_by([:legal_name])
+
+        # Query from Old Model
+        #@broker_agency_profiles_collection = Organization.exists(broker_agency_profile: true).order_by([:legal_name])
 
       end
 

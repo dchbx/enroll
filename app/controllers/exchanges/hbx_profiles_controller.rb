@@ -1,8 +1,9 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  include DataTablesAdapter
-  include DataTablesSearch
-  include Pundit
-  include SepAll
+  include ::DataTablesAdapter
+  include ::DataTablesSearch
+  include ::Pundit
+  include ::SepAll
+  include ::Config::AcaHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -23,7 +24,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def binder_paid
     if params[:ids]
       begin
-        EmployerProfile.update_status_to_binder_paid(params[:ids])
+        ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.set_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
       rescue => e
@@ -61,12 +62,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
-
-    @organizations= Organization.where(:id.in => params[:ids]).all
-
-    @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+    @organizations = @benfit_sponsorships.map(&:organization)
+    @employer_profiles = @organizations.flat_map(&:employer_profile)
+    @employer_profiles.each do |employer_profile|
+      employer_profile.trigger_model_event(:generate_initial_employer_invoice)
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
@@ -83,14 +83,19 @@ class Exchanges::HbxProfilesController < ApplicationController
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
 
-
-    @datatable = Effective::Datatables::EmployerDatatable.new
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
 
     respond_to do |format|
       format.js
     end
   end
 
+  def employer_datatable
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
+    respond_to do |format|
+      format.js
+    end
+  end
 
 def employer_poc
 
@@ -202,11 +207,14 @@ def employer_poc
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
+  def user_account_index
+    @datatable = Effective::Datatables::UserAccountDatatable.new
+  end
+
   def outstanding_verification_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])
   end
-
 
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
@@ -230,7 +238,11 @@ def employer_poc
     else
       @employer_actions = true
       @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
-      @organization = Organization.find(@element_to_replace_id.split("_").last)
+      @organization = if params.key?(:employers_action_id)
+        EmployerProfile.find(@element_to_replace_id.split("_").last).organization
+      else
+        Organization.find(@element_to_replace_id.split("_").last)
+      end
     end
   end
 
@@ -331,6 +343,17 @@ def employer_poc
 
     respond_to do |format|
       format.html { render "issuer_index" }
+      format.js {}
+    end
+  end
+
+  def verification_index
+    #@families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
+    # @datatable = Effective::Datatables::DocumentDatatable.new
+    @documents = [] # Organization.all_employer_profiles.employer_profiles_with_attestation_document
+
+    respond_to do |format|
+      format.html { render partial: "index_verification" }
       format.js {}
     end
   end
@@ -581,7 +604,7 @@ private
       body =  "Please contact #{first_name} #{last_name}. <br>" +
         "Plan shopping help has been requested by #{insured_email}<br>"
     end
-    hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
+    hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {
       sender_id: hbx_profile.id,
       parent_message_id: hbx_profile.id,

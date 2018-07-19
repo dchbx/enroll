@@ -1,7 +1,6 @@
 require 'rails_helper'
-include ApplicationHelper
 
-describe Services::CheckbookServices::PlanComparision do
+describe ::Services::CheckbookServices::PlanComparision do
 
   let(:census_employee) { FactoryGirl.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
@@ -10,7 +9,7 @@ describe Services::CheckbookServices::PlanComparision do
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id)}
 
   describe "when employee is not congress" do
-    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
+    subject { ::Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
     let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => "http://checkbook_url"})}
 
     it "should generate non-congressional link" do
@@ -25,7 +24,7 @@ describe Services::CheckbookServices::PlanComparision do
   end
 
   describe "when employee is congress member" do
-    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
+    subject { ::Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
 
     it "should generate congressional url" do
      if plan_match_dc

@@ -1,10 +1,14 @@
 %elected_plan
   %id
     %id= elected_plan.hios_id
-  %name= elected_plan.name
+    - if elected_plan.issuer_assigned_id.present?
+      %alias_ids
+        %alias_id
+          %id= "urn:MA:terms:v1:plan:super_group_id#" + elected_plan.issuer_assigned_id
+  %name= elected_plan.title
   %active_year= elected_plan.active_year
-  %is_dental_only= elected_plan.is_dental_only?
-  = render :partial=> "events/v2/shared/carrier", :object=> elected_plan.carrier_profile, as: :carrier
-  %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{elected_plan.metal_level}"
-  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{elected_plan.coverage_kind}"
+  %is_dental_only= elected_plan.kind == :dental ? true :false
+  = render :partial=> "events/v2/shared/carrier", :object=> elected_plan.issuer_profile, as: :carrier
+  %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{elected_plan.metal_level_kind}"
+  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{elected_plan.kind}"
   %ehb_percent= elected_plan.ehb*100

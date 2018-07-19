@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "All Brokers"
     task :brokers => :environment do
+      include Config::AcaHelper
 
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
       brokers = Person.exists(broker_role: true).broker_role_having_agency
@@ -31,48 +32,61 @@ namespace :reports do
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/brokers_list_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
+      file_name = fetch_file_format('brokers_list', 'BROKERSLIST')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        brokers.each do |broker|  
+        brokers.each do |broker|
+          begin
+            role = broker.broker_role
+            profile = role.broker_agency_profile
+            primary_location = profile.primary_office_location
+            approved_wfst = role.workflow_state_transitions.detect{ |t| t.to_state == "active"}
+            approval_date = approved_wfst.transition_at.strftime("%Y-%m-%d") if approved_wfst
             csv << [
-            broker.broker_role.npn,
-            broker.broker_role.broker_agency_profile.try(:legal_name),
-            broker.first_name,
-            broker.last_name, 
-            broker.broker_role.email_address, 
-            broker.broker_role.phone,
-            broker.broker_role.broker_agency_profile.try(:market_kind),
-            broker.broker_role.broker_agency_profile.try(:languages_spoken),
-            broker.broker_role.broker_agency_profile.try(:working_hours),
-            broker.broker_role.broker_agency_profile.try(:accept_new_clients)] +
+              role.npn,
+              profile.legal_name,
+              broker.first_name,
+              broker.last_name,
+              role.email_address,
+              role.phone,
+              profile.market_kind,
+              profile.languages_spoken,
+              profile.working_hours,
+              profile.accept_new_clients] +
 
-            organization_info(broker) +
+              office_location_info(primary_location) +
 
-            [
-              broker.broker_role.created_at.try(:strftime,'%Y-%m-%d'),
-              broker.broker_role.aasm_state,
-              broker.broker_role.updated_at.try(:strftime,'%Y-%m-%d'),
-              broker.broker_role.workflow_state_transitions.detect{ |t| t.to_state == "active"}.try(:transition_at).try(:strftime,'%Y-%m-%d'),
-
-            ]
-           processed_count += 1
+              [
+                role.created_at.try(:strftime,'%Y-%m-%d'),
+                role.aasm_state,
+                role.updated_at.try(:strftime,'%Y-%m-%d'),
+                approval_date
+              ]
+            rescue Exception => e
+              "Exception on #{broker.hbx_id}: #{e}"
+            end
+          processed_count += 1
         end
+      end
+
+      if Rails.env.production?
+        pubber = Publishers::Legacy::ShopBrokersReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
       end
 
       puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} Brokers to output file: #{file_name}"
     end
 
-    def organization_info(broker)
-      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil? or broker.broker_role.broker_agency_profile.organization.primary_office_location.nil?
+    def office_location_info(location)
+      return ["","","","",""] if location.blank? || location.address.blank?
       [
-        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_1,
-        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_2,
-        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.city,
-        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.state,
-        broker.broker_role.broker_agency_profile.organization.primary_office_location.address.zip
+        location.address.address_1,
+        location.address.address_2,
+        location.address.city,
+        location.address.state,
+        location.address.zip
       ]
     end
   end

@@ -1,0 +1,21 @@
+.modal.fade#waive_confirm tabindex="-1" role="dialog" aria-labelledby="waiveConfirm"
+  .modal-dialog
+    .modal-content
+      - if enrollment.is_shop?
+        = form_tag(waive_insured_plan_shopping_path(enrollment.id), method: :get) do
+          .modal-header
+            button.close type="button" data-dismiss="modal" aria-label="Close"
+              | &times;
+            h4.modal-title = l10n("select_waive_reason")
+          .modal-body
+            = select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: l10n("please_select_waive_reason"), id: "waiver_reason_selection_dropdown"
+          .modal-footer class="#{pundit_class Family, :updateable?}"
+            button.btn.btn-default type="button" data-dismiss="modal" = l10n("close")
+            = submit_tag l10n("submit"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true
+      - else
+        .modal-header
+          button.close type="button" data-dismiss="modal" aria-label="Close"
+            | &times;
+          h4.modal-title = l10n("unable_to_waive_coverage")
+        .modal-body
+          = l10n("insured.plan_shoppings.you_can_not_waive_confirmation_msg")

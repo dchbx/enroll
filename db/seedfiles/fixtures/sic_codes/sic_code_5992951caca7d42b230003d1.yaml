@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPR
+  division_code: I
+  division_label: Services
+  major_group_code: '84'
+  major_group_label: Museums, Art Galleries, And Botanical And Zoological Gardens
+  industry_group_code: '841'
+  industry_group_label: Museums And Art Galleries
+  sic_code: '8412'
+  sic_label: Museums and Art Galleries

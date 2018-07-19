@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAQA
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '96'
+  major_group_label: Administration Of Economic Programs
+  industry_group_code: '965'
+  industry_group_label: Regulation, Licensing, And Inspection Of
+  sic_code: '9651'
+  sic_label: Regulation, Licensing, and Inspection of Miscellaneous Commercial Sectors

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAGJ
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '33'
+  major_group_label: Primary Metal Industries
+  industry_group_code: '331'
+  industry_group_label: Steel Works, Blast Furnaces, And Rolling And Finishing Mills
+  sic_code: '3312'
+  sic_label: Steel Works, Blast Furnaces (Including Coke Ovens), and Rolling Mills

@@ -1,0 +1,12 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WuN0OKyn1DBoAAAH
+  key: en.employers.employer_profiles.my_account.eligibility_documents_needed
+  value: '"After you complete your application, you will need to submit proof of your
+    eligibility to shop as a small business through the Health Connector. You will
+    need to submit this proof before you are able to shop for a plan. Please review
+    our list of documents that can be used as proof and make sure that you have the
+    right documentation available."'

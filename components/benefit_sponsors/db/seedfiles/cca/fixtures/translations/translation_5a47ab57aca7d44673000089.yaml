@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAACJ
+  key: en.uis.bootstrap3_examples.index.panel_list_desc
+  value: '"We can put the list of groups in panel while displaying them using JS and
+    we can use Hover as well while moving the cursor to different panels"'

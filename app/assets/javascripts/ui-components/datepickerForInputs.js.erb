@@ -1,0 +1,7 @@
+$(function() {
+// Adds datepicker to New Employee form
+initDatepicker('eeDOB',new Date('<%= Date.today.beginning_of_month-100.years %>'),new Date('<%= Date.today.beginning_of_month-16.years %>'))
+  
+initDatepicker('hiredDate',new Date('<%= Date.today.beginning_of_month-2.weeks %>'),new Date('<%= Date.today.beginning_of_month+1.week %>'))
+  
+});

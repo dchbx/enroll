@@ -17,7 +17,7 @@ class NoticeTrigger
   def publish(target_object, new_event)
     rule = EventForNoticeTriggerRule.new(self, new_event)
     if rule.satisfied?
-      notice_builder.camelize.constantize.new(target_object, {template: notice_template, subject: application_event_kind.title, mpi_indicator: mpi_indicator}.merge(notice_trigger_element_group.notice_peferences)).deliver
+      notice_builder.camelize.constantize.new(target_object, {template: notice_template, subject: application_event_kind.title, event_name: application_event_kind.event_name, mpi_indicator: mpi_indicator}.merge(notice_trigger_element_group.notice_peferences)).deliver
     else
       # log error
     end

@@ -1,0 +1,15 @@
+- profile_type = @agency.profile_type
+- if is_broker_profile?(profile_type)
+  
+  = render 'shared/error_messages', :object => @agency
+  = render "benefit_sponsors/shared/profiles/broker_agency/menu", {:broker_profile_id => @agency.profile_id, :active_tab => "home-tab"}
+  
+  = form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f|
+    = render "benefit_sponsors/profiles/registrations/broker_agency_form", f: f
+
+- elsif is_sponsor_profile?(profile_type)
+  = content_for :navigation do
+    = render "ui-components/v1/navs/employers_navigation", {:active_tab=>params[:tab], organization: @agency.organization, profile: @agency.organization.profile}
+    
+  = form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f|
+    = render "benefit_sponsors/profiles/employers/employer_profiles/employer_form", f: f

@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+
 RSpec.describe Admin::Aptc, :type => :model do
   let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
@@ -118,7 +120,7 @@ RSpec.describe Admin::Aptc, :type => :model do
     end
   end
 
-  context "years_with_tax_household" do
+  context "years_with_tax_household", dbclean: :after_each do
     let(:past_date) { Date.new(oe_start_year, 10, 10) }
     let(:future_date) { Date.new(oe_start_year + 1 , 10, 10) }
     let!(:family10) { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -154,4 +156,6 @@ RSpec.describe Admin::Aptc, :type => :model do
       end
     end
   end
+end
+
 end

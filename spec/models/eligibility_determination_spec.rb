@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :determined_on }
   it { should validate_presence_of :max_aptc }
@@ -87,4 +88,5 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       end
     end
   end
+end
 end

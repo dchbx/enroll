@@ -1,0 +1,4 @@
+setTabContent("<%= escape_javascript render 'new' %>");
+set_active_ontab("#employers-tab");
+pageInit();
+window.history.pushState("", "Select a Plan", "<%=  sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.id) %>");

@@ -1,0 +1,27 @@
+<tr class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show(provider, message) %>');">
+  <td style="font-weight:bold">
+    <%= message.try(:from) if @folder == 'Inbox' %>
+    <%= message.try(:to)   if @folder == 'Sent'%>
+  </td>
+  <td>
+    <%=message.created_at.strftime("%m/%d/%Y") %>
+  <td>
+    <%= message.try(:subject) %>
+  </td>
+  <%- if @folder != 'Deleted' %>
+      <td class="  <%#=pundit_class(Family, :updateable?)%>">
+      <span onclick='event.stopPropagation();deleteMessage("<%=retrieve_show(provider, message) %>&url=<%=retrieve_inbox(provider)%>");' class='pull-right'>
+        <i aria-hidden="true" class="fa fa-trash-o fa-lg <%#=pundit_class Family, :updateable?%>" title="Delete" data-toggle="tooltip"></i>
+      </span>
+      </td>
+  <% end %>
+  </td>
+</tr>
+<script>
+    function showMessage(url) {
+        $.ajax({type: "GET", url: url, dataType: 'script'});
+    }
+    function deleteMessage(url, e) {
+        $.ajax({type: "DELETE", url: url, dataType: 'script'});
+    }
+</script>

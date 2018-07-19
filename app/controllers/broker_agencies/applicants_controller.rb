@@ -33,7 +33,6 @@ class BrokerAgencies::ApplicantsController < ApplicationController
   def update
     role = @broker_applicant.broker_role
     role = @broker_applicant.broker_agency_staff_roles[0] unless role
-
     # if params[:person] && params[:person][:broker_role_attributes] && params[:person][:broker_role_attributes][:reason]
     #   broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
     # end

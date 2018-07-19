@@ -1,5 +1,7 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+
 describe "A new consumer role with an individual market enrollment", :dbclean => :around_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:family) { FactoryGirl.create(:individual_market_family, primary_person: person) }
@@ -51,4 +53,6 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       end
     end
   end
+end
+
 end

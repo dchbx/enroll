@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAKL
+  key: en.broker_agencies.quotes.panels.dental_features_and_cost_criteria
+  value: '"Dental Features and cost criteria"'

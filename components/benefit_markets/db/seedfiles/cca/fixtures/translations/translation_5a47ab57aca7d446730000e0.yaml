@@ -1,0 +1,32 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADg
+  key: en.insured.consumer_roles.privacy.privacy_info_html
+  value: '"<p class=''starter''>We will keep your information private and will not
+    share it with anyone unless you allow it or it is required by law. Your answers
+    will only be used to decide whether you are eligible for health insurance. Information
+    about your health will not be used to deny you insurance or determine how much
+    you pay.<br/><br/>You can complete an application for health insurance for your
+    children or other family members even if you do not qualify yourself. If you are
+    applying for benefits for other members of your family, you will need to give
+    us information about where you live, but you are not required to answer any questions
+    about your citizenship or immigration status and you will not have to give us
+    a Social Security Number.<br/><br/>As part of the application process, we will
+    be checking the information you give us with information from other government
+    agencies like the Social Security Administration, and the Department of Homeland
+    Security. If the information you provide does not match the information we get
+    from these agencies, we may ask you to send us proof. Remember, if you are not
+    applying for benefits for yourself, we will not ask you about your citizenship
+    or immigration status and will not check your information with the Department
+    of Homeland Security.<br/><br/><a href=''https://www.dchealthlink.com/privacy''
+    target=''_blank''>Learn more about how we will use your information.</a><br><a
+    href=''https://www.dchealthlink.com/privacy-act-statement'' target=''_blank''>View
+    Privacy Act Statement</a><br/><br/>By clicking Continue, you are saying that you
+    understand that information in this application, and the information we get from
+    data sources will be used to decide the eligibility of the people who are applying
+    for health insurance. You are also indicating that you have permission from all
+    of the people listed on the application for their information to be retrieved
+    and used from data sources.</p>"'

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPv
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '92'
+  major_group_label: Justice, Public Order, And Safety
+  industry_group_code: '922'
+  industry_group_label: Public Order And Safety
+  sic_code: '9222'
+  sic_label: Legal Counsel and Prosecution

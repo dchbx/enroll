@@ -1,0 +1,48 @@
+<div class="" id="inbox_provider_form">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <h3 class="title-inline"><%= l10n("broker_agencies.profiles.broker_agencies")%></h3>
+      <div class="form-inline button-group-wrapper">
+        <div class="col-xs-12 input-group search-wp">
+          <!--TODO: Need to verify the implementation around DataTables -->
+          <%#= render 'shared/search', url: main_app.broker_agency_index_exchanges_hbx_profiles_path, q: @q, placeholder: "#{l10n('name')}", remote: true %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="table-border table-responsive">
+        <table class="table">
+          <% if @broker_agency_profiles.present? %>
+            <thead>
+              <th><%= l10n("legal_name")%></th>
+              <th><%= l10n("dba")%></th>
+              <th><%= l10n("fein")%></th>
+              <th><%= l10n("entity_kind")%></th>
+              <th><%= l10n("market_kind")%></th>
+              <th></th>
+            </thead>
+
+            <% @broker_agency_profiles.each do |broker_agency_profile| %>
+              <tbody>
+                <td><%= link_to broker_agency_profile.legal_name, profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile) %></td>
+                <td><%= broker_agency_profile.dba %></td>
+                <td><%= broker_agency_profile.fein %></td>
+                <td><%= broker_agency_profile.entity_kind.try(:to_s).try(:titleize) %></td>
+                <td><%= broker_agency_profile.market_kind.try(:to_s).try(:titleize) %></td>
+                <td>
+                  <!--TODO: Fix link when Inbox/Messages are implemented -->
+                  <%#= link_to ("#{l10n('send_secure_message')}"),
+                new_broker_agencies_inbox_path(id: broker_agency_profile.id, profile_id: @profile._id), class: "btn btn-default" + pundit_class(HbxProfile, :modify_admin_tabs?), remote: true %>
+                </td>
+              </tbody>
+              <% end %>
+              <% else %>
+                <tr><td><%= l10n("broker_agencies.profiles.no_broker_agency_profiles_found")%></td></tr>
+              <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

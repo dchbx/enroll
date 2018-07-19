@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAL9
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '57'
+  major_group_label: Home Furniture, Furnishings, And Equipment Stores
+  industry_group_code: '571'
+  industry_group_label: Home Furniture And Furnishings Stores
+  sic_code: '5713'
+  sic_label: Floor Covering Stores

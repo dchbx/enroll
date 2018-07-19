@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAP8
+  division_code: J
+  division_label: 'Public Administration '
+  major_group_code: '96'
+  major_group_label: Administration Of Economic Programs
+  industry_group_code: '961'
+  industry_group_label: Administration Of General Economic Programs
+  sic_code: '9611'
+  sic_label: Administration of General Economic Programs

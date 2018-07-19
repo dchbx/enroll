@@ -1,0 +1,96 @@
+<fieldset class="pl-0">
+  <h4>ACH Routing Information</h4>
+    <div id="routing_info" class="">
+      <div class="row">
+        <div class="col-md-4">
+          <label for="inputAccountNumber">Account Number</label>
+          <%= f.text_field :ach_account_number, value: f.object.ach_account_number, class: "form-control", required: true, placeholder: 'Account #' %>
+          <div class="invalid-feedback">
+            Please provide an account number.
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label for="inputRoutingNumber">Routing Number</label>
+          <%= f.text_field :ach_routing_number, value: f.object.ach_routing_number, class: "form-control", required: true, placeholder: '9 digit ACH Routing #', maxlength: 9, onblur:'checkRoutingNumber(this.value)' %>
+          <div class="invalid-feedback">
+            Please provide a routing number.
+          </div>
+          <div class="routing-error hidden" id="routing-error" style="color:#dc3545;font-size: 80%;    margin-top: .25rem">
+            Routing numbers dont match
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label for="inputRoutingNumberConfirmation">Routing Number Confirmation</label>
+          <%= f.text_field :ach_routing_number_confirmation, value: f.object.ach_routing_number, class: "form-control", required: true, placeholder: 'Confirm Routing #', maxlength: 9, onblur:'checkRoutingNumberConfirmation(this.value)' %>
+          <div class="invalid-feedback">
+            Please provide routing number confirmation.
+          </div>
+          <div class="routing-error hidden" id="routing-c-error" style="color:#dc3545;font-size: 80%;    margin-top: .25rem">
+            Routing numbers dont match
+          </div>
+        </div>
+      </div>
+    </div>
+</fieldset>
+
+<script>
+  var routingNumber;
+  var routingNumberConfirmation;
+  function checkRoutingNumber(value) {
+    routingNumber = value;
+    checkMatch()
+  }
+  function checkRoutingNumberConfirmation(value) {
+    routingNumberConfirmation = value;
+    checkMatch()
+  }
+  function checkMatch() {
+    if (routingNumber && routingNumberConfirmation) {
+      if (routingNumber != routingNumberConfirmation) {
+        document.getElementById('broker-btn').classList.add('disabled')
+        document.getElementById('routing-error').classList.remove('hidden')
+        document.getElementById('routing-c-error').classList.remove('hidden')
+      } else {
+        document.getElementById('broker-btn').classList.remove('disabled')
+        document.getElementById('routing-error').classList.add('hidden')
+        document.getElementById('routing-c-error').classList.add('hidden')
+      }
+    }
+  }
+</script>
+
+<!-- <script>
+  var loadAchRecord = function(routing_number) {
+    $.ajax({
+      url: "<%= main_app.check_ach_routing_number_path %>",
+      data: { f: { 'routing_number': routing_number } }
+    });
+  }
+  $(document).ready(function(){
+    $('body').on('keyup', 'input.interaction-field-control-organization-ach-record-routing-number', function(){
+      var valueOfConfirm = $('input.interaction-field-control-organization-ach-record-routing-number-confirmation').val();
+      var originalVal = $(this).val();
+      if (originalVal.length === 9) {
+        loadAchRecord(originalVal);
+      }
+      if (originalVal !== valueOfConfirm) {
+        $('button.interaction-click-control-create-broker-agency').attr('disabled',true)
+        $('button.interaction-click-control-create-broker-agency.valid').attr('data-original-title', 'ACH Routing # mismatch').tooltip('show');
+      } else {
+        $('button.interaction-click-control-create-broker-agency.valid').attr('disabled',false)
+        $('button.interaction-click-control-create-broker-agency.valid').tooltip('hide');
+      }
+    });
+
+    $('body').on('keyup', 'input.interaction-field-control-organization-ach-record-routing-number-confirmation', function(){
+      var valueOfRoutingNum = $('input.interaction-field-control-organization-ach-record-routing-number').val();
+      if (valueOfRoutingNum !== $(this).val()) {
+        $('button.interaction-click-control-create-broker-agency').attr('disabled',true)
+        $('button.interaction-click-control-create-broker-agency.valid').attr('data-original-title', 'ACH Routing # mismatch').tooltip('show');
+      } else {
+        $('button.interaction-click-control-create-broker-agency.valid').tooltip('hide');
+        $('button.interaction-click-control-create-broker-agency.valid').attr('disabled',false)
+      }
+    });
+  });
+</script> -->

@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: Create Employer
   In order for Employers to create and manage an account on the HBX for their organization
   In order for Employees to purchase insurance
@@ -9,9 +10,10 @@ Feature: Create Employer
   Employee should be able to create an account, match to their employer and roster family
   Employee should be able to  purchase insurance
 
-    
+
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
+      Given vertical and horizontal plan choices are offered
       When I visit the Employer portal
       Then John Doe creates an HBX account
       Then I should see a successful sign up message
@@ -28,6 +30,16 @@ Feature: Create Employer
       And Employer should see employer census family created success message
       When Employer goes to the benefits tab
       Then Employer should see the plan year
+      When Employer clicks on publish plan year
+      Then Employer should see Action Needed under document
+      When the employer goes to the documents tab
+      Then the employer should see upload button
+      When the employer clicks upload button
+      Then the employer should see model box with file upload
+      And the employer fill the document form
+      Then the employer clicks the upload button in popup
+      Then the employer should see the document list
+      When Employer goes to the benefits tab
       When Employer clicks on publish plan year
       Then Employer should see Publish Plan Year Modal with address warnings
       When Employer clicks on the Cancel button

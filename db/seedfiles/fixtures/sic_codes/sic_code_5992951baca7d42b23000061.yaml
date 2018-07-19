@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABh
+  division_code: B
+  division_label: Mining
+  major_group_code: '13'
+  major_group_label: Oil And Gas Extraction
+  industry_group_code: '138'
+  industry_group_label: Oil And Gas Field Services
+  sic_code: '1381'
+  sic_label: Drilling Oil and Gas Wells

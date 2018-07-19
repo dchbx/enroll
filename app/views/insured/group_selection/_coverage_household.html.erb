@@ -7,13 +7,13 @@
 
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
 
-        <% if can_shop_shop?(@person) %>
+        <% if @adapter.can_shop_shop?(@person) %>
 
-          <% is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role)) %>
+          <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), @effective_on_date || @new_effective_on) %>
 
         <% end %>
 
-        <% if (can_shop_individual?(@person) || can_shop_resident?(@person)) %>
+        <% if (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)) %>
         <%
             #Handle When Implementing - People with Both Consumer Role & Resident Role
             role = (family_member.person.consumer_role || family_member.person.resident_role)
@@ -28,7 +28,7 @@
         <% is_checked = is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
 
 
-        <tr class='<%= class_for_ineligible_row(family_member, is_ivl_coverage) %>'>
+        <tr class='<%= @adapter.class_for_ineligible_row(family_member, is_ivl_coverage, (@effective_on_date || @new_effective_on)) %>'>
           <td width="20">
             <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
           </td>
@@ -36,7 +36,7 @@
 
           <% @person.active_employee_roles.each do |employee_role| %>
 
-            <% is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role) %>
+            <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, employee_role, (@effective_on_date || @new_effective_on)) %>
 
             <td class='<%= "health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></td>
             <td class='<%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_dental_coverage && !is_dental_coverage.nil? %></td>

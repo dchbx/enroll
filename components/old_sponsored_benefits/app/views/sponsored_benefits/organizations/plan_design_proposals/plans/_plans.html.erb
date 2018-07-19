@@ -1,0 +1,40 @@
+<% @plans.each do |plan| %>
+<div class="col-xs-4">
+  <div class="col-xs-12 reference-plan"
+    data-plan-type="<%= plan.plan_type %>"
+    data-plan-hsa="<%= plan.plan_hsa %>"
+    data-metal-level="<%= plan.metal_level %>"
+    data-plan-deductible="<%= plan.plan_deductible %>"
+    data-family-deductible="<%= plan.family_deductible %>"
+  >
+    <div class="col-xs-2">
+
+      <%= radio_button "#{@location_id}", :reference_plan_id, plan.id %>
+      <%= label_tag "#{@location_id}_reference_plan_id" do %>
+      <i class="fa fa-circle-o"></i>
+      <i class="fa fa-dot-circle-o"></i>
+      <% end %>
+    </div>
+
+    <div class="col-xs-10">
+      <div class="panel row reference-plan-info">
+        <div class="panel-heading">
+          <h3><b><%= plan.name %></b></h3>
+        </div>
+        <div class="panel-body">
+          <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
+          <span class="plan-label">Carrier: </span><span><%= carriers_cache[plan.carrier_profile_id] %></span><br>
+          <span class="plan-label">Level: </span><span><%= plan.metal_level.titleize %></span><br>
+          <span>
+            <%= render partial: "shared/network_data", locals: {plan: plan} %>
+          </span>
+          <br />
+          <span><%= check_box_tag "#{@location_id}", plan.id, false, id:'plan-comparison' %> </span><span>Include in comparison</span>
+          <br/>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<% end %>

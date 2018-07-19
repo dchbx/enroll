@@ -1,0 +1,14 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAFA
+  key: en.insured.answer_for_assister
+  value: '"Assisters help Individuals, Families and Small Businesses in the District
+    find quality, affordable health insurance through %{site_short_name}. Assisters
+    are trained experts with deep roots and trusted relationships in the District
+    and its communities. They include consumer and patient advocates, civic and faith-based
+    organizations, business leaders and others. Assisters must complete more than
+    30 hours of rigorous training and pass criminal background checks prior to service.
+    There is no cost to use an Assister."'

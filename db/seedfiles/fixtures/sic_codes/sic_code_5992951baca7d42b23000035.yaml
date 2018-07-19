@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAA1
+  division_code: A
+  division_label: Agriculture, Forestry, And Fishing
+  major_group_code: '02'
+  major_group_label: Agriculture production livestock and animal specialties
+  industry_group_code: '025'
+  industry_group_label: Poultry And Eggs
+  sic_code: '0254'
+  sic_label: Poultry Hatcheries

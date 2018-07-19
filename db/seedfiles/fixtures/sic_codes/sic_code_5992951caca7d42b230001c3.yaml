@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAHD
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '34'
+  major_group_label: Fabricated Metal Products, Except Machinery And Transportation
+    Equipment
+  industry_group_code: '349'
+  industry_group_label: Miscellaneous Fabricated Metal Products
+  sic_code: '3494'
+  sic_label: Valves and Pipe Fittings, Not Elsewhere Classified

@@ -1,0 +1,197 @@
+<div class="no-buffer module" id="active_broker_tab">
+  <div class="col-xs-12">
+    <div class="row">
+      <% if @employer_profile.broker_agency_profile.present? && @broker_agency_account.writing_agent.present? %>
+        <div class="vertically-aligned-row">
+          <h1 class="darkblue no-buffer">Brokers</h1>
+          <div class="text-right">
+            <% if current_user.can_change_broker? %>
+              <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, profiles_employers_employer_profile_broker_agency_index_path(@employer_profile.id), remote: true, class: "btn btn-primary", id: 'browse_brokers_link',
+                onclick: '$("#brokers-empty").hide(); $("#active_broker_tab").hide(); $("#browse_brokers_link").hide()' %>
+            <% else %>
+              <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary disabled" %>
+            <% end %>
+          </div>
+        </div>
+        <% active_broker = @broker_agency_account.writing_agent %>
+        <div class="panel panel-default module broker employer-broker">
+          <div class="panel-heading vertically-aligned-row">
+            <div>
+              <h3 class="panel-title">
+                Active Broker
+              </h3>
+            </div>
+            <div class="text-right">
+              <% if (defined?(direct_terminate) ? direct_terminate : false) %>
+                <% if @broker_agency_account.start_on == TimeKeeper.date_of_record %>
+                  <% date = TimeKeeper.date_of_record %>
+                <% else %>
+                  <% date = TimeKeeper.date_of_record - 1.day %>
+                <% end %>
+                <% if current_user.can_change_broker? %>
+                  <%= link_to "Change Broker &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>".html_safe, ('javascript:;'), class: "btn btn-default", data: {toggle: "modal", target: "#terminate_broker"} %>
+                <% else %>
+                  <%= link_to "Change Broker &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>".html_safe, ('javascript:;'), class: "btn btn-default disabled" %>
+                <% end %>
+              <% else %>
+                <% if current_user.can_change_broker? %>
+                  <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-default", id: "show_confirm_#{@employer_profile.broker_agency_profile.id}" %>
+                <% else %>
+                  <%= link_to 'Change Broker'.html_safe, ('javascript:;'), class: "btn btn-default disabled" %>
+                <% end %>
+                <table class="table table-wrapper" style="opacity: 1;">
+                  <tbody>
+                    <tr class="unbrd remove_<%= @employer_profile.broker_agency_profile.id %>">
+                      <td class="confirm-terminate-wrapper show_confirm_<%= @employer_profile.broker_agency_profile.id %>" colspan="7" id="enter-date">
+                        <div class="confirm-terminate">
+                          <input class="text-center date-picker" placeholder="e.g. 5/1/2015" type="text"><br/>
+                          <a class="delete_confirm" data-link="<%= employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id) %>" href="javascript:;" id="remove_<%= @employer_profile.broker_agency_profile.id %>">
+                            <strong>Submit</strong>
+                          </a>
+                        </div>
+                        <%= image_tag "enter_date_termination.png", width: "300", height: "" %>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              <% end %>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="vertically-aligned-row">
+              <div>
+                <strong>
+                  Broker Name:
+                </strong>
+                <span>
+                  <%= active_broker.person.full_name.titleize %>
+                </span>
+              </div>
+              <div>
+                <strong>
+                  Phone:
+                </strong>
+                <span>
+                  <% if active_broker.phone %>
+                  <%= active_broker.phone.to_s %>
+                  <% else %>
+                  <% end %>
+                </span>
+              </div>
+            </div>
+            <div class="vertically-aligned-row">
+              <div>
+                <strong>
+                  Broker Agency:
+                </strong>
+                <span>
+                  <%= @employer_profile.broker_agency_profile.legal_name.titleize %>
+                </span>
+              </div>
+              <div>
+                <strong>
+                  Email:
+                </strong>
+                <span>
+                  <a href="mailto:<%= active_broker.email.address %>">
+                    <%= active_broker.email.address %>
+                  </a>
+                </span>
+              </div>
+            </div>
+            <div class="vertically-aligned-row">
+              <div>
+                <strong>
+                  Address:
+                </strong>
+                <span>
+                  <% if @employer_profile.broker_agency_profile.office_locations.any? %>
+                    <%= @employer_profile.broker_agency_profile.primary_office_location.address.full_address %>
+                  <% else %>
+                  <% end %>
+                </span>
+              </div>
+              <div></div>
+            </div>
+            <br/>
+            <div class="vertically-aligned-row">
+              <div>
+                <strong>
+                  Accepting New Clients:
+                </strong>
+                <span>
+                  <%= @employer_profile.broker_agency_profile.accept_new_clients? ? 'Yes' : 'No' %>
+                </span>
+              </div>
+              <div>
+                <strong>
+                  Language:
+                </strong>
+                <span>
+                  <%= @employer_profile.broker_agency_profile.languages %>
+                </span>
+              </div>
+            </div>
+            <div class="vertically-aligned-row">
+              <div>
+                <strong>
+                  Weekend/Evening Hours:
+                </strong>
+                <span>
+                  <%= @employer_profile.broker_agency_profile.working_hours? ? 'Yes' : 'No' %>
+                </span>
+              </div>
+              <div>
+                <strong>
+                  Assignment Date:
+                </strong>
+                <span>
+                  <%= format_date(assignment_date(@employer_profile)) %>
+                </span>
+              </div>
+            </div>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if (defined?(direct_terminate) ? direct_terminate : false) %>
+    <div class="modal fade" id="terminate_broker" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" data-dismiss="modal" type="button">&times;</button>
+            <h4 class="modal-title">Broker Termination Confirmation</h4>
+          </div>
+          <div class="modal-body">
+            <p>Select 'Terminate' to unhire the selected Broker. They will be terminated effective immediately.</p>
+          </div>
+          <div class="modal-footer">
+            <%= link_to 'Terminate Broker'.html_safe, profiles_employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id, termination_date: date, direct_terminate: true), class: "btn btn-primary  mtz" %>
+            <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <% if !@employer_profile.broker_agency_profile.present? %>
+    <div class="col-xs-12 col-sm-4 col-md-4">
+      <div class="row">
+        <% if current_user.can_change_broker? %>
+          <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, profiles_employers_employer_profile_broker_agency_index_path(@employer_profile.id), remote: true, class: "btn btn-primary btn-block btn-block btn-lg", id: 'browse_brokers_link',
+        onclick: '$("#brokers-empty").hide(); $("#active_broker_tab").hide(); $("#browse_brokers_link").hide()' %>
+        <% else %>
+          <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-primary disabled btn-block btn-lg" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  <div class="row no-buffer">
+    <div class="">
+      <div id="show_broker_agency"></div>
+      <div id="broker_agencies_panel"></div>
+    </div>
+  </div>

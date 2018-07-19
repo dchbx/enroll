@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANG
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '65'
+  major_group_label: Real Estate
+  industry_group_code: '654'
+  industry_group_label: Title Abstract Offices
+  sic_code: '6541'
+  sic_label: Title Abstract Offices

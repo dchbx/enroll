@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "update_verification_types")
 
 describe "UpdateVerificationTypes data migration", dbclean: :after_each do
@@ -37,4 +38,4 @@ describe "UpdateVerificationTypes data migration", dbclean: :after_each do
     it_behaves_like "update residency type for verified people", "unverified", nil, "local_residency_validation", nil
   end
 end
-
+end

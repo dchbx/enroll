@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8B6yn1GT8AAAG
+  key: en.insured.families.purchase.current_plan_selection_displayed_below
+  value: '"Your current plan selection is displayed below. Click the back button if
+    you want to change your selection. Click Purchase button to complete your enrollment."'

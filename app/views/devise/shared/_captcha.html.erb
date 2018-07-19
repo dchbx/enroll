@@ -1,0 +1,7 @@
+<% if load_captcha_widget? %>
+  <script type="text/javascript">
+    site_key = '<%= ENV['RECAPTCHA_SITE_KEY'] %>'
+    setCaptchaSiteKey(site_key);
+  </script>
+  <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=loadCaptchaWidget&render=explicit"></script>
+<% end %>

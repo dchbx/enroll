@@ -39,33 +39,33 @@ module Queries
     end
 
     def filter_to_employers_hbx_ids(hbx_id_list)
-      orgs = Organization.where(:hbx_id => {"$in" => hbx_id_list})
-      benefit_group_ids = orgs.map(&:employer_profile).flat_map(&:plan_years).flat_map(&:benefit_groups).map(&:id)
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
+      benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.benefit_group_id" => { "$in" => benefit_group_ids }
+                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
                   }
       })
       self
     end
 
     def exclude_employers_by_hbx_ids(hbx_id_list)
-      orgs = Organization.where(:hbx_id => {"$in" => hbx_id_list})
-      benefit_group_ids = orgs.map(&:employer_profile).flat_map(&:plan_years).flat_map(&:benefit_groups).map(&:_id)
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
+      benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.benefit_group_id" => { "$nin" => benefit_group_ids }
+                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$nin" => benefit_group_ids }
           }
       })
       self
     end
 
     def filter_to_employers_feins(fein_list)
-      orgs = Organization.where(:fein => {"$in" => fein_list})
-      benefit_group_ids = orgs.map(&:employer_profile).flat_map(&:plan_years).flat_map(&:benefit_groups).map(&:id)
+      orgs = BenefitSponsors::Organizations::Organization.where(:fein => {"$in" => fein_list}) 
+      benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.benefit_group_id" => { "$in" => benefit_group_ids }
+                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
                   }
       })
       self
@@ -74,7 +74,7 @@ module Queries
     def filter_to_shopping_completed
       add({
         "$match" => {
-          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "households.hbx_enrollments.product_id" => { "$ne" => nil},
           "households.hbx_enrollments.aasm_state" => { "$nin" => [
             "shopping", "inactive"
           ]}
@@ -88,7 +88,7 @@ module Queries
     def filter_to_active
       add({
         "$match" => {
-          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "households.hbx_enrollments.product_id" => { "$ne" => nil},
           "households.hbx_enrollments.aasm_state" => { "$in" => 
             (HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES)
           }
@@ -217,7 +217,7 @@ module Queries
         }}) +
 =end
         project_property("member_count", {"$size" => "$households.hbx_enrollments.hbx_enrollment_members"}) + 
-        project_property("plan_id", "$households.hbx_enrollments.plan_id") +
+        project_property("product_id", "$households.hbx_enrollments.product_id") +
         project_property("enrollment_kind", "$households.hbx_enrollments.enrollment_kind") +
         project_property("aasm_state", "$households.hbx_enrollments.aasm_state") +
         project_property("hbx_id", "$households.hbx_enrollments.hbx_id") +
@@ -276,7 +276,7 @@ module Queries
         project_property("_id", "$households.hbx_enrollments._id")  +
         project_property("hbx_id", "$households.hbx_enrollments.hbx_id")  +
         project_property("consumer_role_id", "$households.hbx_enrollments.consumer_role_id") +
-        project_property("benefit_group_id", "$households.hbx_enrollments.benefit_group_id") +
+        project_property("benefit_group_id", "$households.hbx_enrollments.sponsored_benefit_package_id") +
         project_property("benefit_group_assignment_id", "$households.hbx_enrollments.benefit_group_assignment_id")
     end
 
@@ -293,7 +293,7 @@ module Queries
           last("policy_purchased_at") +
           last("policy_purchased_on") +
           last("hbx_id") +
-          last("plan_id") +
+          last("product_id") +
           last("aasm_state") +
           last("enrollment_kind") +
           last("coverage_kind") +

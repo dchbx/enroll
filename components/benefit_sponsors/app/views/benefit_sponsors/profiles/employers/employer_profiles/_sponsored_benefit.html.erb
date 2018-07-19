@@ -1,0 +1,165 @@
+<div class="panel benefitgroup col-xs-12 referenceplan">
+  <div class="col-xs-1">
+    &nbsp;
+  </div>
+  <!-- Health Plan Summary: start -->
+  <div class="col-xs-12 health">
+    <div class="row">
+      <div class="col-xs-6">
+        <h5 class="title no-buffer"><%= sponsored_benefit.product_kind.to_s.humanize %></h5>
+      </div>
+    </div>
+
+    <table>
+      <tr>
+        <th colspan="2">
+          <header>Reference Plan</header>
+        </th>
+        <th>
+          <header>Carrier</header>
+        </th>
+        <th>
+          <header>Type</header>
+        </th>
+        <th>
+          <header>Metal Level</header>
+        </th>
+        <th>
+          <header>Plans By</header>
+        </th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <p>
+            <%= sponsored_benefit.reference_product.title.upcase %>
+          </p>
+        </td>
+        <td>
+          <p>
+            <%= sponsored_benefit.reference_product.issuer_profile.legal_name %>
+          </p>
+        </td>
+        <td>
+          <p>
+            <%= sponsored_benefit.reference_product.health_plan_kind.to_s.upcase %>
+          </p>
+        </td>
+        <td>
+          <p>
+            <%= sponsored_benefit.reference_product.metal_level_kind.to_s.humanize %>
+          </p>
+        </td>
+        <td>
+          <p>
+            <% if sponsored_benefit.product_package_kind == :single_issuer %>
+              One Carrier
+            <% elsif sponsored_benefit.product_package_kind == :metal_level %>
+              One Level
+            <% elsif sponsored_benefit.product_package_kind == :single_product %>
+              A Single Plan
+            <% end %>
+          </p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Health Plan Summary: end -->
+
+  <!--Health plan collapsible: starts -->
+  <div class="health-offering" style="display:none">
+    <div class="col-xs-1">
+      &nbsp;
+    </div>
+
+    <!--Health plan contribution: start-->
+    <div class="col-xs-12">
+      <div class="col-xs-12">
+        <table>
+          <% if sponsored_benefit.pricing_determinations.any? %>
+          <tr>
+            <th>Member Type</th>
+            <th>Employer Share</th>
+            <th>Employee</th>
+            <th>Employer</th>
+            <th>Total</th>
+            </tr>
+            <% pd = sponsored_benefit.latest_pricing_determination %>
+            <% sorted_tiers = pd.pricing_determination_tiers.sort_by { |pdt| pdt.pricing_unit.order } %>
+            <% sorted_tiers.each do |pdt| %>
+            <% pdt_total = pdt.price %>
+            <% pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2) %>
+            <% pdt_employee = BigDecimal.new((pdt_total - pdt_employer).to_s).round(2) %>
+            <tr>
+              <td>
+                <%= raw(pdt.contribution_level.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{pdt.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{pdt.display_name.try(:humanize)}") %>
+              </td>
+              <td id="pct">
+                <%= number_to_percentage((pdt.sponsor_contribution_factor * 100.0), precision: 0) %>
+              </td>
+              <td><%= number_to_currency(pdt_employee) %></td>
+              <td><%= number_to_currency(pdt_employer) %></td>
+              <td><%= number_to_currency(pdt.price) %></td>
+            </tr>
+            <% end %>
+            <% else %>
+            <tr>
+              <th>Offered</th>
+              <th>Employer Contribution</th>
+              <% sponsored_benefit.sponsor_contribution.contribution_levels.each_with_index do |rb, i| %>
+              <tr>
+                <td><%= raw(rb.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{rb.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{rb.display_name.try(:humanize)}") %></td>
+                <td><%= number_to_percentage rb.contribution_pct.ceil, precision: 0 %></td>
+              </tr>
+              <% end %>
+            <% end %>
+          </table>
+        </div>
+    </div>
+    <!--Health plan contribution: end -->
+
+    <!--Health plan Estimated Cost: start-->
+    <div class="col-xs-12">
+      <div class="col-xs-1">
+        &nbsp;
+      </div>
+      <div class="est-month col-xs-11">
+        <%# if package.census_employees.present? %>
+        <div class="row">
+          <div class="col-xs-4">
+            <div class="row">
+              <span>Employer Estimated Maximum Monthly Cost</span>
+              <% estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new %>
+	            <% estimate = estimator.calculate_estimates_for_benefit_display(sponsored_benefit) %>
+              <h2><%= number_to_currency(estimate[:estimated_total_cost]) %></h2>
+            </div>
+          </div>
+          <div class="col-xs-8">
+            <div class="row">
+              <table>
+                <tr>
+                  <th colspan="2"></th>
+                  <th>Min</th>
+                  <th>Max</th>
+                </tr>
+                <tr>
+                  <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                    <td><%= number_to_currency(estimate[:estimated_enrollee_minimum]) %></td>
+                    <td><%= number_to_currency(estimate[:estimated_enrollee_maximum]) %></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<style>
+  .fa-check-square {
+    color:#69A30D;
+  }
+</style>

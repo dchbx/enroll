@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABC
+  division_code: A
+  division_label: Agriculture, Forestry, And Fishing
+  major_group_code: '07'
+  major_group_label: Agricultural Services
+  industry_group_code: '074'
+  industry_group_label: Veterinary Services
+  sic_code: '0742'
+  sic_label: Veterinary Services for Animal Specialties

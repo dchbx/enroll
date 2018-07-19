@@ -1,6 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_consumer_role")
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe RemoveConsumerRole do
 
   let(:given_task_name) { "remove_consumer_role" }
@@ -48,4 +49,5 @@ describe RemoveConsumerRole do
     end
 
   end
+end
 end

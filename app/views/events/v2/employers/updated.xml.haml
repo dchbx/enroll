@@ -9,18 +9,18 @@
   -#%abbreviation= " " filed doesn't exists
   %fein= employer.fein.strip
   %office_locations
-    = render :partial => "events/v2/organizations/office_location", :collection => employer.organization.office_locations
+    = render :partial => "events/v2/organizations/office_location", :collection => employer.office_locations
   - if !employer.organization.home_page.blank?
     %website= employer.organization.home_page
   - if employer.staff_roles.any?
     %contacts
       = render :partial => "events/v2/employers/owner_contact", :collection => employer.staff_roles.uniq
-  %is_active= (employer.is_active.blank? ? true : employer.is_active)
+  %is_active= true
   - broker_agency_profile = employer.broker_agency_profile
-  = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if broker_agency_profile && broker_agency_profile.brokers.present?
+  = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if broker_agency_profile && broker_agency_profile.active_broker_roles.present?
   %employer_profile
-    %business_entity_kind= "urn:openhbx:terms:v1:employers##{employer.entity_kind}"
-    - if !employer.sic_code.blank?
+    %business_entity_kind= "urn:openhbx:terms:v1:employers##{employer.organization.entity_kind}"
+    - if employer.sic_code.present?
       %sic_code= employer.sic_code
     - if employer.broker_agency_accounts.unscoped.present?
       %brokers
@@ -32,7 +32,7 @@
     - elsif employer_plan_years(employer).present?
       %plan_years
         = render :partial => "events/v2/employers/plan_year", :collection => employer_plan_years(employer)
-    - if employer.is_conversion?
+    - if employer.active_benefit_sponsorship.is_conversion?
       %shop_transfer
         %hbx_active_on= employer.created_at.strftime("%Y-%m-%d")
   = render :partial => "events/v2/shared/versioned_resource", :object => employer

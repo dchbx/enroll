@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJn
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '42'
+  major_group_label: Motor Freight Transportation And Warehousing
+  industry_group_code: '422'
+  industry_group_label: Public Warehousing And Storage
+  sic_code: '4226'
+  sic_label: Special Warehousing and Storage, Not Elsewhere Classified

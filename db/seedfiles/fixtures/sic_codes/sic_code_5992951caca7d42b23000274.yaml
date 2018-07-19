@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJ0
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '44'
+  major_group_label: Water Transportation
+  industry_group_code: '449'
+  industry_group_label: Services Incidental To Water Transportation
+  sic_code: '4499'
+  sic_label: Water Transportation Services, Not Elsewhere Classified

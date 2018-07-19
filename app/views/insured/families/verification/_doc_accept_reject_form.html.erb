@@ -1,0 +1,20 @@
+
+<% if current_user.has_hbx_staff_role? && vlp_doc.status != ('verified' || 'rejected') %>
+      <%= link_to l10n("accept"), document_path(vlp_doc, :person_id => person.id, :status => "verified"), method: :put, class: "btn btn-success btn-xs  pull-right "  , remote: true%>
+      <%= link_to "#comment-#{vlp_doc.id}", { 'data-toggle' => 'collapse', 'aria-expanded' => false, 'aria-controls' => "comment-#{vlp_doc.id}" } do %>
+          <%= button_tag l10n("reject"), class:"btn btn-danger btn-xs  pull-right" %>
+      <% end %>
+      <!-- Admin comment form -->
+      <div class="collapse" id="comment-<%=vlp_doc.id%>">
+        <%= form_for person, :url => document_path(vlp_doc), remote: true do |f| %>
+            <% f.fields_for vlp_doc do |c| %>
+                <%= hidden_field_tag 'comment', 'comment' %>
+                <%= hidden_field_tag 'status', 'rejected' %>
+                <%= hidden_field_tag 'person_id', person.id %>
+                <%= c.text_area  :comment, placeholder: 'comment...', size: "30x4" %>
+                <%= c.button :submit %>
+            <% end %>
+        <% end %>
+      </div>
+      <!-- >>>>>> admin comment form -->
+<% end %>

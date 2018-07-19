@@ -1,0 +1,25 @@
+<div class="row focus_effect personal-info-row">
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :address_1, class: "floatlabel form-control",  placeholder: "ADDRESS 1", required: 'true'%>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :address_2, class: "floatlabel form-control", placeholder: "ADDRESS 2" %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", placeholder: "CITY", required: 'true' %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }), {include_blank: "SELECT STATE"}, class:'form-control', id:'inputState', required: true)%>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", placeholder: "ZIP", required: 'true', maxlength: '5'%>
+      </div>
+    </div>
+  </div>
+  <div class="row"></div>
+</div>

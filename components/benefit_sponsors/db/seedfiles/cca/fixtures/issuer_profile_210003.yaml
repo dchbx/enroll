@@ -1,0 +1,71 @@
+--- !ruby/object:BenefitSponsors::Organizations::ExemptOrganization
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5p+ICzHOaec9
+  _type: BenefitSponsors::Organizations::ExemptOrganization
+  created_at: 2017-08-15 06:30:51.155000000 Z
+  dba: 
+  hbx_id: '210003'
+  legal_name: Fallon Health
+  updated_at: 2017-08-15 06:30:51.155000000 Z
+  site_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5J+ICzHOaeVu
+  profiles:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WxWP5p+ICzHOaec+
+    contact_method: :paper_and_electronic
+    _type: BenefitSponsors::Organizations::IssuerProfile
+    issuer_hios_ids:
+    - '88806'
+    issuer_state: MA
+    market_coverage: shop (small group)
+    abbrev: FCHP
+    associated_carrier_profile_id: 
+    created_at: 2017-08-15 06:30:51.137000000 Z
+    dental_only_plan: false
+    hbx_carrier_id: 20005
+    ivl_dental: false
+    ivl_health: false
+    offers_sole_source: true
+    shop_dental: true
+    shop_health: true
+    updated_at: 2017-08-15 06:30:51.137000000 Z
+    is_benefit_sponsorship_eligible: false
+    office_locations:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WxWP5p+ICzHOaec/
+      is_primary: true
+      address: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WxWP5p+ICzHOaedA
+        address_1: address_placeholder
+        address_2: address_2
+        address_3: ''
+        county: ''
+        country_name: ''
+        kind: work
+        city: City
+        state: St
+        zip: '10001'
+        updated_at: 2017-08-15 06:30:51.130000000 Z
+        created_at: 2017-08-15 06:30:51.130000000 Z
+      phone: !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            WxWP5p+ICzHOaedB
+        kind: main
+        country_code: ''
+        area_code: '111'
+        number: '1111111'
+        extension: ''
+        full_phone_number: '1111111111'
+        updated_at: 2017-08-15 06:30:51.130000000 Z
+        created_at: 2017-08-15 06:30:51.130000000 Z

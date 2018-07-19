@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8B6yn1GT8AAAE
+  key: en.insured.families.purchase.click_terminate_plan_button
+  value: '"Click Terminate Plan button to complete your termination from coverage."'

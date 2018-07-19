@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKa
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '50'
+  major_group_label: Wholesale Trade-durable Goods
+  industry_group_code: '501'
+  industry_group_label: Motor Vehicles And Motor Vehicle Parts And Supplies
+  sic_code: '5013'
+  sic_label: Motor Vehicle Supplies and New Parts

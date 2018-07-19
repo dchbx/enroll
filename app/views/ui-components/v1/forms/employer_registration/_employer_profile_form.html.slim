@@ -1,0 +1,64 @@
+.row.mt-2
+  .alert.alert-info
+    h4 Thank you for logging into your #{Settings.site.short_name} employer account.
+  
+    p.starter
+      |
+        Before we get started, we need to confirm the primary point of contact for your business. Please confirm that the name and email address listed below are correct, update the information or provide the name and email address for your primary point of contact. When you're finished, select 'Confirm'.
+        If the organization already has a staff role you will will be placed in applicant status for an additional staff role.
+fieldset.mt-2
+  = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
+    = render partial: './ui-components/v1/forms/employer_registration/staff_role_information', locals: {f: f}
+
+fieldset.mt-2
+  legend Employer Information
+  
+  = f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f|
+    .row
+      .col-md-4.mb-2
+        label for="inputLegalName"  Legal Name *
+        = f.text_field :legal_name, class: "form-control", required: true, placeholder: 'LEGAL NAME'
+        .invalid-feedback
+          |
+            Please provide a legal name.
+      .col-md-4.mb-2
+        label for="inputDBA"  DBA
+        = f.text_field :dba, class: "form-control", placeholder: 'DBA'
+      .col-md-4.mb-2
+        label for="inputFEIN"  FEIN *
+        = f.text_field :fein, class: "form-control", placeholder: 'FEIN', minlength:'9', maxlength:'9', onkeypress:'return isNumberKey(event)', required:'true'
+        .invalid-feedback
+          |
+            Please provide a fein.
+            
+    = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f_profile|
+      .col-md-4.pl-0
+        label for="inputEntityKind"  Kind *
+        = f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, {:required => true, :class => 'form-control mb-1'} )
+        .invalid-feedback
+          |
+            Please select a entity kind.
+      - if display_sic_field_for_employer?
+        .col-md-4.pl-0
+          label for="inputSIC"  SIC Code *
+          = f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} )
+          .invalid-feedback
+            |
+              Please provide a SIC code.
+        .col-md-1.pl-0
+          a#sicHelperToggle
+            i.fas.fa-question.mt-3.fa-lg style="padding-top:5px"
+      #sicHelperWrapper.hidden.row.row-form-wrapper.no-buffer style="margin-top:90px"
+        = render "benefit_sponsors/profiles/registrations/sic_help" , sicFieldId: 'organization_sic_code'
+        
+      br
+      br
+      br
+      br
+      = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
+      h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
+      = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
+      = f.submit "Submit", class: "btn btn-primary pull-right mt-2"
+      
+      input type="hidden" name="employer_id" id="employer_id"
+

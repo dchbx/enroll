@@ -1,0 +1,63 @@
+- if current_user.blank? || current_user.person_id.blank?
+
+  legend Personal Information
+  .row
+    .col-md-4
+      = f.hidden_field :person_id, value: f.object.person_id
+      label for="inputFirstName"  First Name *
+      = f.text_field :first_name, class: "form-control", required: true, placeholder: 'John'
+      .invalid-feedback
+        |
+          Please provide a first name.
+    .col-md-4
+      label for="inputLastName"  Last Name *
+      = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'Doe'
+      .invalid-feedback
+        |
+          Please provide a last name.
+    .col-md-4
+      label for="inputDob"  Date of Birth *
+      = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', required: true, readonly: defined?(readonly), maxlength:10, minlength:10}
+      .invalid-feedback
+        |
+          Please provide a date of birth.
+  .row.mt-1
+    .col-md-3
+      label for="inputEmail"  Email *
+      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'john@example.com'
+      .invalid-feedback
+        |
+          Please provide a email address.
+
+    .col-md-3
+      label for="inputAreaCode"  Area code *
+      = f.text_field :area_code, class: "form-control", minlength: '3', maxlength:'3', onkeypress:'return isNumberKey(event)', placeholder: '508', required: true
+      .invalid-feedback
+        |
+              Please provide a valid area code.
+    .col-md-3.col-sm-3
+      label for="inputNumber"  Number *
+      = f.text_field :number, placeholder:'1112222', required:'true', id:'inputNumber', class:'form-control', minlength: '7',maxlength:'7', onkeypress:'return isNumberKey(event)'
+      .invalid-feedback
+        |
+              Please provide a valid number.
+    .col-md-3
+      label for="inputExtension"  Extension
+      = f.text_field :extension, id:'inputExtension', class:'form-control', maxlength:'10'
+- else
+  = f.hidden_field :person_id, value: current_user.person_id
+
+javascript:
+	(function() {
+	if (window.location.pathname == "/benefit_sponsors/profiles/registrations/new") {
+		// Hides extension field on page load
+		document.getElementsByTagName('label')[6].remove()
+		document.getElementById('inputExtension').remove()
+	}
+	})();
+	
+	var cleave = new Cleave('#inputDOB', {
+	    date: true,
+	    datePattern: ['m', 'd', 'Y']
+	});
+

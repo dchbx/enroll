@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKt
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '50'
+  major_group_label: Wholesale Trade-durable Goods
+  industry_group_code: '506'
+  industry_group_label: Electrical Goods
+  sic_code: '5064'
+  sic_label: Electrical Appliances, Television and Radio Sets

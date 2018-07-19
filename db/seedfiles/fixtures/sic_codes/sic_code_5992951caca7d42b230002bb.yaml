@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAK7
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '50'
+  major_group_label: Wholesale Trade-durable Goods
+  industry_group_code: '509'
+  industry_group_label: Miscellaneous Durable Goods
+  sic_code: '5093'
+  sic_label: Scrap and Waste Materials

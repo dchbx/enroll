@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMF
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '58'
+  major_group_label: Eating And Drinking Places
+  industry_group_code: '581'
+  industry_group_label: Eating And Drinking Places
+  sic_code: '5812'
+  sic_label: Eating Places

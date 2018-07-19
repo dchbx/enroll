@@ -1,0 +1,15 @@
+.modal#publishPlanYear role="dialog"
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true"
+          | &times;
+        h4.modal-title Confirm Publish Plan Year
+      .modal-body
+        p As submitted, this application is ineligible for coverage under the "#{Settings.site.short_name}"  exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by "#{Settings.site.short_name}" officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
+        ul.application-warnings
+      .modal-footer
+        = link_to 'Force Publish', employers_employer_profile_plan_year_force_publish_path(@employer_profile,benefit_application), method: :post, :class => 'btn btn-danger'
+        - error_page = benefit_application.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile.organization, benefit_application_id: benefit_application.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,benefit_application, publish: true)
+        = link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default'

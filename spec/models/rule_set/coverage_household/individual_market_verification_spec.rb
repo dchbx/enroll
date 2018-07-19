@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe RuleSet::CoverageHousehold::IndividualMarketVerification do
   subject { RuleSet::CoverageHousehold::IndividualMarketVerification.new(coverage_household) }
   let(:coverage_household) { instance_double(CoverageHousehold, :active_individual_enrollments => active_individual_policies) }
@@ -76,4 +77,5 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
     end
   end
 
+end
 end

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJp
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '43'
+  major_group_label: United States Postal Service
+  industry_group_code: '431'
+  industry_group_label: United States Postal Service
+  sic_code: '4311'
+  sic_label: United States Postal Service

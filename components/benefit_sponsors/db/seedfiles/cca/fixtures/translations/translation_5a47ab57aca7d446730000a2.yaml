@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAACi
+  key: en.users.orphans.index.enroll_app_error_list
+  value: '"An Enroll App error prevents the customer from proceeding"'

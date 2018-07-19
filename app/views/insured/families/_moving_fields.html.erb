@@ -1,5 +1,5 @@
 <div class="special_qle_reasons hidden">
-  <h4><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </h4> <br/> 
+  <h4><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </h4> <br/>
   <div class = 'moving_radio_btn'>
     <div class="n-radio-group">
       <div class="n-radio-row">
@@ -15,26 +15,26 @@
           <span class="n-radio"></span>
           <span><%= l10n("insured.living_outside_the_US_or_in_US_territory") %></span>
         </label>
-      </div>      
+      </div>
       <div class="n-radio-row">
         <label class="n-radio vertically-aligned-row" for="reason_accept2">
           <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio"%>
           <span class="n-radio"></span>
-          <span>
-            <%= l10n(".moving_fields_had_incomd_below_of_the_federal_poverty_level") %> <%= link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank) %>
+          <span data-placement="top" data-toggle="popover" data-html="true" data-content="<a href='http://www.healthcare.gov/lower-costs', target='_blank'>Use Calculator">
+            <%= l10n(".moving_fields_had_incomd_below_of_the_federal_poverty_level") %> <%= link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank) if individual_market_is_enabled? %>
           </span>
         </label>
-      </div>      
+      </div>
       <div class="n-radio-row">
         <label class="n-radio" for="reason_reject">
           <%= radio_button_tag :reason, "None of the Above", false, id:'reason_reject', class: "n-radio" %>
           <span class="n-radio"></span>
           <span><%= l10n("none_of_the_above") %></span>
         </label>
-      </div>                        
+      </div>
       <div class="center">
         <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit_reason' %>
-      </div>  
+      </div>
     </div>
   </div>
 </div>

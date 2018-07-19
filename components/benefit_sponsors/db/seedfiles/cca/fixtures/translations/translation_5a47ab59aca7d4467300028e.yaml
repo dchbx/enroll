@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAKO
+  key: en.broker_agencies.quotes.panels.quote_benefit_group_selection
+  value: '"Quote Benefit Group Selection"'

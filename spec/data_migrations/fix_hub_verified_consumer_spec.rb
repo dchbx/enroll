@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "fix_hub_verified_consumer")
 
 describe FixHubVerifiedConsumer, :dbclean => :after_each do
@@ -258,4 +259,5 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
       end
     end
   end
+end
 end

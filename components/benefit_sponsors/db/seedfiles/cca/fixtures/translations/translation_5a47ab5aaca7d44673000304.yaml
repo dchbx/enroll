@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWqyn1EZzAAME
+  key: en.devise.shared.links.sign_in_with_provider
+  value: '"Sign in with %{provider}"'

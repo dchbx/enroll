@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model do
 
   context "Given a database of Families" do
@@ -144,4 +145,5 @@ RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model 
   end
 
 
+end
 end

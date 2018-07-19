@@ -1,0 +1,12 @@
+<div class="profile-content top-pd" id="myTabContent">
+  <div class="tab-row">
+    <div class="tab-content">
+     <div class="container plan-design-proposal">
+       <%= render 'shared/engines/horizontal_status', step:1, links: generate_breadcrumb_links(@plan_design_proposal.proposal, @plan_design_organization) %>
+      <%= form_for @plan_design_proposal, url: {action: "create"} do |f| %>
+      <%= render 'form', f: f %>
+      <% end %>
+    </div>
+    </div>
+</div>
+</div>

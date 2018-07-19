@@ -1,0 +1,47 @@
+<div class="table-responsive">
+  <table class="table table-wrapper" style="opacity: 1;">
+    <thead>
+      <tr>
+        <th>Agency Name</th>
+        <th>Evening/Weekend Hours</th>
+        <th>Language(s) spoken</th>
+        <th>Broker Name</th>
+        <th>NPN</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @broker_agency_profiles.each do |broker_agency| %>
+        <% broker_roles = broker_agency.active_broker_roles %>
+        <% broker_roles = (broker_roles & @filtered_broker_roles) if @filtered_broker_roles.present? %>
+        <% next if broker_roles.empty? %>
+        <tr>
+           <td <%= "rowspan=#{broker_roles.size}" %>>
+           <% @broker_roles=broker_roles %>
+            <%= render 'benefit_sponsors/profiles/employers/broker_agency/active_broker_modal', locals: {broker_roles: broker_roles} %>
+          </td>
+          <td <%= "rowspan=#{broker_roles.size}" %>>
+            <%= broker_agency.working_hours ? "Yes" : "No" %>
+          </td>
+          <td <%= "rowspan=#{broker_roles.size}" %>>
+            <%= broker_agency.languages %>
+          </td>
+          <% primary_broker =  broker_roles.delete(broker_agency.primary_broker_role) %>
+          <% primary_broker =  broker_roles.delete_at(0) if primary_broker.blank? %>
+          <%= render "benefit_sponsors/profiles/employers/broker_agency/broker", broker: primary_broker, broker_agency: broker_agency %>
+          <% broker_roles.each do |broker_role| %>
+          <tr><%= render "benefit_sponsors/profiles/employers/broker_agency/broker", broker: broker_role, broker_agency: broker_agency %></tr>
+        <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<div class="row container">
+  <div class="col-md-12" id="paginator">
+    <%= paginate @broker_agency_profiles, :remote => true, :param_name => "organization_page", :params => {:page => @page_alphabet || "A"} %>
+  </div>
+</div>
+<% if @page_alphabets.present? %>
+  <%= render '/benefit_sponsors/shared/alph_paginate', url: "/benefit_sponsors/profiles/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
+<% end %>

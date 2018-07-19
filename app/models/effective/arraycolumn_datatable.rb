@@ -12,7 +12,7 @@ module Effective
     end
 
     def active_record_collection?
-      @active_record_collection ||= true
+      @active_record_collection ||= false
     end
   end
 end

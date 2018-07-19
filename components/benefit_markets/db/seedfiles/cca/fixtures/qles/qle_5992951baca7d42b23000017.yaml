@@ -1,0 +1,23 @@
+--- !ruby/object:QualifyingLifeEventKind
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAAX
+  effective_on_kinds:
+  - exact_date
+  is_active: true
+  title: Court order to provide coverage for someone
+  tool_tip: ''
+  action_kind: add_member
+  market_kind: shop
+  event_kind_label: Date that court orders that coverage starts
+  ordinal_position: 100
+  reason: court_order
+  edi_code: " "
+  pre_event_sep_in_days: 0
+  post_event_sep_in_days: 60
+  is_self_attested: false
+  date_options_available: false
+  updated_at: 2017-08-15 06:30:51.215000000 Z
+  created_at: 2017-08-15 06:30:51.215000000 Z

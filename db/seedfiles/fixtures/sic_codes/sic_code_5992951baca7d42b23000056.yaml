@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABW
+  division_code: B
+  division_label: Mining
+  major_group_code: '10'
+  major_group_label: Metal Mining
+  industry_group_code: '104'
+  industry_group_label: Gold And Silver Ores
+  sic_code: '1044'
+  sic_label: Silver Ores

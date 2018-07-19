@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAD8
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '24'
+  major_group_label: Lumber And Wood Products, Except Furniture
+  industry_group_code: '243'
+  industry_group_label: Millwork, Veneer, Plywood, And Structural Wood
+  sic_code: '2435'
+  sic_label: Hardwood Veneer and Plywood

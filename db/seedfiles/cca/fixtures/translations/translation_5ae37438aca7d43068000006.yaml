@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WuN0OKyn1DBoAAAG
+  key: en.employers.employer_profiles.my_account.important_documents_needed
+  value: '"Important Documents Needed"'

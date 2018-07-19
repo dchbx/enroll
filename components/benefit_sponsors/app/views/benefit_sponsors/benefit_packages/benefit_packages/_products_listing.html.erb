@@ -1,0 +1,35 @@
+<% if @single_plan.present? %>
+<br><br>
+<h4>Let your plan participants choose any plan they would like.<br/>It will not cost you more to let them choose.</h4>
+<br/><br/>
+<% end %>
+<% @benefit_package_form.catalog.plan_options.each do |plan| %>
+<div class="col-xs-4">
+  <div class="col-xs-12 reference-plan">
+    <div class="col-xs-2">
+
+      <%= radio_button "#{@location_id}", :reference_plan_id, plan.id %>
+      <%= label_tag "#{@location_id}_reference_plan_id" do %>
+      <i class="far fa-circle-o"></i>
+      <i class="far fa-dot-circle-o"></i>
+      <% end %>
+    </div>
+
+    <div class="col-xs-10">
+      <div class="panel row">
+        <div class="panel-heading">
+          <h3><%= plan.title %></h3>
+        </div>
+        <div class="panel-body">
+          <!-- <span class="plan-label">Type: </span><span><%#= plan.health_plan_kind %></span><br> -->
+          <span class="plan-label">Carrier: </span><span><%= plan.carrier_name %></span><br>
+          <span class="plan-label">Level: </span><span><%= plan.metal_level_kind %></span><br>
+          <span class="plan-label">Network: </span><span><%= plan ? 'Nationwide' : 'DC Metro' %></span><br/>
+          <%#= link_to 'View Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<% end %>

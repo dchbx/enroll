@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABL
+  division_code: A
+  division_label: Agriculture, Forestry, And Fishing
+  major_group_code: 08
+  major_group_label: Forestry
+  industry_group_code: 083
+  industry_group_label: Forest Nurseries And Gathering Of Forest
+  sic_code: 0831
+  sic_label: Forest Nurseries and Gathering of Forest Products

@@ -1,0 +1,30 @@
+<div class="col-md-3 col-xs-12 form-group-lg form-group no-pd broker-agency-info <%=defined?(read_only_dropdown) && read_only_dropdown%>">
+  <%= f.select(:market_kind, options_for_select(f.object.market_kind_options.inject([]) {|options, (k, v)| options << [k, v]}, selected: f.object.try(:market_kind)), { prompt: "Select Practice Area"}, { :class => 'interaction-choice-control-broker-agency-practice-area'} ) %>
+</div>
+<div class="col-md-3  col-xs-12 form-group-lg form-group no-pd broker-agency-info">
+  <div class="language_multi_select">
+    <%= f.select(:languages_spoken, options_from_collection_for_select(f.object.language_options.sort_by {|lan| lan.common_name}, "iso_639_1", "common_name", f.object.try(:languages_spoken)), { }, { id: 'broker_agency_language_select', multiple: "multiple", class: "floatlabel form-control interaction-field-control-broker-agency-languages-spoken" } ) %>
+  </div>
+
+</div>
+
+<div class=" form-group form-group-lg no-pd broker-agency-info weekend-hour">
+  <div class="checkbox col-md-3  col-xs-12 interaction-choice-control-broker-agency-evening-weekend-hours">
+    <label>
+      <%= f.check_box :working_hours %> EVENING/WEEKEND HOURS?
+    </label>
+  </div>
+</div>
+<div class=" form-group form-group-lg form-group no-pd broker-agency-info">
+  <div class="checkbox col-md-3  col-xs-12 interaction-choice-control-broker-agency-accept-new-clients">
+    <label>
+      <%= f.check_box :accept_new_clients %> ACCEPT NEW CLIENTS?
+    </label>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    applyMultiLanguageSelect();
+  });
+</script>

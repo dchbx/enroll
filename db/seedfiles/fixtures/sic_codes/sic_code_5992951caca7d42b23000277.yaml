@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJ3
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '45'
+  major_group_label: Transportation By Air
+  industry_group_code: '452'
+  industry_group_label: Air Transportation, Nonscheduled
+  sic_code: '4522'
+  sic_label: Air Transportation, Nonscheduled

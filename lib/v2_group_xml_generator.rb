@@ -16,8 +16,9 @@ class V2GroupXmlGenerator
   XML_NS = "http://openhbx.org/api/terms/1.0"
 
   CARRIER_ABBREVIATIONS = {
-      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "UnitedHealthcare": "UHIC", "Delta Dental": "DDPA",
-      "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
+      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "UnitedHealthCare": "UHIC", "Delta Dental": "DDPA",
+      "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META", "Health New England, Inc.": "HNE", "Boston Medical Center HealthNet Plan": "BMCHP", "Fallon Community Health Plan, Inc.": "FCHP",
+      "Minuteman Health, Inc.": "MHI"}
 
   # Inputs
   # 1 Array of FEINS
@@ -26,9 +27,6 @@ class V2GroupXmlGenerator
   def initialize(feins, plan_year_start, plan_year_end)
     @feins = feins
     Dir.mkdir("employer_xmls.v2") unless File.exists?("employer_xmls.v2") #Output directory
-
-
-
     @plan_year = {"start_date": plan_year_start, "end_date": plan_year_end}
   end
 
@@ -36,6 +34,7 @@ class V2GroupXmlGenerator
     views = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
     views_helper = ActionView::Base.new views
     views_helper.class.send(:include, EventsHelper)
+    views_helper.class.send(:include, Config::AcaHelper)
 
     organizations_hash = {} # key is carrier name, value is the return object of remove_other_carrier_nodes()
 
@@ -48,19 +47,15 @@ class V2GroupXmlGenerator
     @feins.uniq.each do |fein|
 
       begin
-        employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
+        employer_profile = BenefitSponsors::Organizations::Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
+        benefit_application = find_benefit_application(employer_profile)
 
-        benefit_groups = employer_profile.plan_years.select(&:eligible_for_export?).select do |py|
-          py.start_on == Date.parse(@plan_year[:start_date])
-        end.flat_map(&:benefit_groups)
-
-        carrier_profiles = []
-        benefit_groups.each do |benefit_group|
-          carrier_profiles << benefit_group.elected_plans.map(&:carrier_profile).uniq
-          carrier_profiles << benefit_group.elected_dental_plans.map(&:carrier_profile).uniq if benefit_group.is_offering_dental?
+        unless benefit_application.present?
+          puts "benefit_application not found"
+          return
         end
 
-        carrier_profiles = carrier_profiles.flatten.uniq
+        carrier_profiles = benefit_application_carriers(benefit_application).flatten.uniq
         next if carrier_profiles.length == 0
 
         cv_xml = nil
@@ -70,17 +65,15 @@ class V2GroupXmlGenerator
           organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
 
           organizations_hash[carrier.legal_name] << remove_other_carrier_nodes(cv_xml, carrier.legal_name,
-                                                                               employer_profile,
-                                                                               @plan_year[:start_date])
+                                                                               employer_profile, benefit_application)
         end
 
         # carrier switch scenario
-        switched_carriers(employer_profile, @plan_year).uniq.each do |switched_carrier|
+        switched_carriers(employer_profile, benefit_application).uniq.each do |switched_carrier|
           organizations_hash[switched_carrier.legal_name] = [] if organizations_hash[switched_carrier.legal_name].nil?
-
           organizations_hash[switched_carrier.legal_name] << remove_other_carrier_nodes(cv_xml, switched_carrier.legal_name,
                                                                                         employer_profile,
-                                                                                        previous_plan_year(employer_profile).start_on.strftime("%Y%m%d"),
+                                                                                        predecessor_application(benefit_application).effective_period.min.strftime("%Y%m%d"),
                                                                                         {event: "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"})
         end
       rescue => e
@@ -103,7 +96,7 @@ class V2GroupXmlGenerator
     end
   end
 
-  def remove_other_carrier_nodes(xml, trading_partner, employer_profile, pys, options = {})
+  def remove_other_carrier_nodes(xml, trading_partner, employer_profile, benefit_application, options = {})
     doc = Nokogiri::XML(xml)
     doc.xpath("//cv:elected_plans/cv:elected_plan", {:cv => XML_NS}).each do |node|
       carrier_name = node.at_xpath("cv:carrier/cv:name", {:cv => XML_NS}).content
@@ -129,14 +122,13 @@ class V2GroupXmlGenerator
     has_this_year = false
     event = "urn:openhbx:events:v1:employer#other"
 
-    previous_plan_year_value = previous_plan_year(employer_profile)
-    #previous_plan_year_end_date = previous_plan_year_value.present? ? previous_plan_year_value.end_on.strftime("%Y%m%d") : "19700101"
+    previous_plan_year_value = predecessor_application(benefit_application)
 
     if previous_plan_year_value.present?
       has_last_year = true
     end
 
-    if doc.xpath("//cv:plan_year/cv:plan_year_start[contains(text(), '#{pys}')]", {:cv => XML_NS}).any?
+    if doc.xpath("//cv:plan_year/cv:plan_year_start[contains(text(), '#{@plan_year[:start_date]}')]", {:cv => XML_NS}).any?
       has_this_year = true
     end
 
@@ -146,23 +138,21 @@ class V2GroupXmlGenerator
       return [options[:event], employer_id, doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)]
     end
 
-    if has_last_year
-      if has_this_year
-        if employer_profile.eligible? || employer_profile.enrolled? || employer_profile.binder_paid?
-          event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_application_eligible"
-        elsif employer_profile.suspended?
-          event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"
-        elsif employer_profile.ineligible?
-          event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"
-        end
-      else
-        event = "urn:openhbx:events:v1:employer#benefit_coverage_period_expired"
+    if has_last_year && has_this_year
+      if employer_profile.active_benefit_sponsorship.is_eligible?
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_renewal_application_eligible"
+      elsif employer_profile.active_benefit_sponsorship.terminated? && employer_profile.active_benefit_sponsorship.termination_kind == :voluntary
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_voluntary"
+      elsif employer_profile.active_benefit_sponsorship.terminated? && employer_profile.active_benefit_sponsorship.termination_kind == :involuntary
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_nonpayment"
       end
-    else
-      if has_this_year
-        if employer_profile.eligible? || employer_profile.enrolled? || employer_profile.binder_paid? || employer_profile.registered?
-          event = "urn:openhbx:events:v1:employer#benefit_coverage_initial_application_eligible"
-        end
+    elsif has_this_year
+      if employer_profile.active_benefit_sponsorship.is_eligible?
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_initial_application_eligible"
+      elsif employer_profile.active_benefit_sponsorship.terminated? && employer_profile.active_benefit_sponsorship.termination_kind == :voluntary
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_voluntary"
+      elsif employer_profile.active_benefit_sponsorship.terminated? && employer_profile.active_benefit_sponsorship.termination_kind == :involuntary
+        event = "urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_nonpayment"
       end
     end
 
@@ -170,50 +160,33 @@ class V2GroupXmlGenerator
   end
 
 # return previous active plan year
-  def previous_plan_year(employer_profile)
-    #sort by increasing plan year start_on and return the previous active plan year at index -2
-    employer_profile.plan_years.select(&:eligible_for_export?).sort_by do |plan_year|
-      plan_year.start_on
-    end[-2]
+  def predecessor_application(benefit_application)
+    benefit_application.predecessor
   end
 
-  def plan_year_carriers(plan_year)
+  def benefit_application_carriers(benefit_application)
     carrier_profiles = []
-    plan_year.benefit_groups.each do |benefit_group|
-      carrier_profiles << benefit_group.elected_plans.map(&:carrier_profile)
-      carrier_profiles << benefit_group.elected_dental_plans.map(&:carrier_profile) if benefit_group.is_offering_dental?
+    benefit_application.benefit_packages.each do |benefit_package|
+      carrier_profiles << benefit_package.health_sponsored_benefit.products(benefit_package.effective_period.min).map(&:issuer_profile).uniq
+      carrier_profiles << benefit_package.dental_sponsored_benefit.products(benefit_package.effective_period.min).map(&:issuer_profile).uniq if benefit_package.dental_sponsored_benefit.present?
     end
     carrier_profiles
   end
 
 #returns an array of carriers which were switched from and need to be informed
-  def switched_carriers(employer_profile, plan_year)
-    previous_plan_year_value = previous_plan_year(employer_profile)
+  def switched_carriers(employer_profile, benefit_application)
+    previous_plan_year_value = predecessor_application(benefit_application)
     return [] if previous_plan_year_value.nil? #no previous plan year
-
-    this_plan_year = employer_profile.plan_years.select(&:eligible_for_export?).find do |py|
-      py.start_on == Date.parse(plan_year[:start_date])
-    end
-
-    this_plan_year_carrier_profiles = plan_year_carriers(this_plan_year).flatten.uniq
-    previous_plan_year_carrier_profiles = plan_year_carriers(previous_plan_year(employer_profile)).flatten.uniq
-
+    this_plan_year = find_benefit_application(employer_profile)
+    this_plan_year_carrier_profiles = benefit_application_carriers(this_plan_year).flatten.uniq
+    previous_plan_year_carrier_profiles =  benefit_application_carriers(previous_plan_year_value).flatten.uniq
     previous_plan_year_carrier_profiles - this_plan_year_carrier_profiles
   end
 
-#returns a list of carriers to be informed about carrier_switch
-  def switched_from_carriers(employer_profile, plan_year)
-
-    this_plan_year = employer_profile.plan_years.select(&:eligible_for_export?).find do |py|
-      py.start_on == Date.parse(plan_year[:start_date])
-    end
-
-    this_plan_year_carrier_profiles = plan_year_carriers(this_plan_year)
-    previous_plan_year_carrier_profiles = plan_year_carriers(previous_plan_year(employer_profile))
-
-    (previous_plan_year_carrier_profiles - this_plan_year_carrier_profiles).flatten.uniq
+  def find_benefit_application(employer_profile)
+    benefit_application = employer_profile.benefit_applications.select {|benefit_application|  benefit_application.effective_period.min == Date.parse(@plan_year[:start_date]) && (benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?)}
+    benefit_application.present? ? benefit_application.first : nil
   end
-
 end
 
 

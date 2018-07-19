@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAMe
+  division_code: H
+  division_label: 'Finance, Insurance, And Real Estate '
+  major_group_code: '60'
+  major_group_label: Depository Institutions
+  industry_group_code: '601'
+  industry_group_label: Central Reserve Depository Institutions
+  sic_code: '6011'
+  sic_label: Federal Reserve Banks

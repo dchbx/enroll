@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WnE8AnxpukFCAAAB
+  key: en.shared.my_portal_links.my_employer_portal
+  value: '"My Employer Portal"'

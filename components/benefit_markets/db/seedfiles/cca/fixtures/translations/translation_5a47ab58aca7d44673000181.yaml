@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGB
+  key: en.insured.switch_to_aptc_or_csr_families
+  value: '"Switch to APTC / CSR Families"'

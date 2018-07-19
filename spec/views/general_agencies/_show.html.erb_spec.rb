@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_show.html.erb", dbclean: :after_each do
   let(:general_agency_profile) {FactoryGirl.create(:general_agency_profile)}
   let(:user) {FactoryGirl.create(:user, :general_agency_staff)}
@@ -9,6 +10,8 @@ RSpec.describe "general_agencies/profiles/_show.html.erb", dbclean: :after_each 
     assign(:general_agency_profile, general_agency_profile)
     user.person = person
     user.save
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/_show.html.erb"
   end
 
@@ -19,4 +22,5 @@ RSpec.describe "general_agencies/profiles/_show.html.erb", dbclean: :after_each 
   it "should have status bar" do
     expect(rendered).to have_content('Edit General Agency')
   end
+end
 end

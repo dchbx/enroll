@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALo
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '54'
+  major_group_label: Food Stores
+  industry_group_code: '543'
+  industry_group_label: Fruit And Vegetable Markets
+  sic_code: '5431'
+  sic_label: Fruit and Vegetable Markets

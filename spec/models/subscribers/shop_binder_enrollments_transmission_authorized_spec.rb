@@ -32,7 +32,7 @@ describe Subscribers::ShopBinderEnrollmentsTransmissionAuthorized, "given an emp
 
   before :each do
     allow(Date).to receive(:strptime).with(effective_on, "%Y-%m-%d").and_return(effective_date)
-    allow(Organization).to receive(:employer_by_hbx_id).with(employer_id).and_return(found_organizations)
+    allow(::BenefitSponsors::Organizations::Organization).to receive(:employer_by_hbx_id).with(employer_id).and_return(found_organizations)
   end
 
   describe "which doesn't exist" do
@@ -58,7 +58,7 @@ describe Subscribers::ShopBinderEnrollmentsTransmissionAuthorized, "given an emp
     let(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
     before(:each) do
-      allow(Queries::NamedPolicyQueries).to receive(:shop_monthly_enrollments).with([employer_fein], effective_date).and_return(enrollment_ids)
+      allow(Queries::NamedEnrollmentQueries).to receive(:shop_initial_enrollments).with(employer_org, effective_date).and_return(enrollment_ids)
     end
 
     it "transmits the new enrollments for the employer" do
@@ -80,7 +80,7 @@ describe Subscribers::ShopBinderEnrollmentsTransmissionAuthorized, "given an emp
 
   before :each do
     allow(Date).to receive(:strptime).with(effective_on, "%Y-%m-%d").and_return(effective_date)
-    allow(Organization).to receive(:where).with({:fein => employer_fein}).and_return(found_organizations)
+    allow(::BenefitSponsors::Organizations::Organization).to receive(:employer_by_fein).with(employer_fein).and_return(found_organizations)
   end
 
   describe "which doesn't exist" do
@@ -106,7 +106,7 @@ describe Subscribers::ShopBinderEnrollmentsTransmissionAuthorized, "given an emp
     let(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
     before(:each) do
-      allow(Queries::NamedPolicyQueries).to receive(:shop_monthly_enrollments).with([employer_fein], effective_date).and_return(enrollment_ids)
+      allow(Queries::NamedEnrollmentQueries).to receive(:shop_initial_enrollments).with(employer_org, effective_date).and_return(enrollment_ids)
     end
 
     it "transmits the new enrollments for the employer" do

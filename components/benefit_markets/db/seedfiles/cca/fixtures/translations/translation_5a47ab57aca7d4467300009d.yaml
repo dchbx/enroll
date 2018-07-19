@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAACd
+  key: en.users.orphans.index.unlinked_person_record_contents
+  value: '"Occasionally, accounts are created, but not linked, with a corresponding
+    Person record. This may result from a number of scenarios. For example:"'

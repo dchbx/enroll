@@ -188,12 +188,20 @@ function setDentalBenefits(dental_benefits){
   }
 }
 
+$(document).on('change', '#waiver_reason_selection_dropdown', function() {
+	if($(this).val() == undefined || $(this).val() == ""){
+		$('#waiver_reason_submit').attr("disabled",true);
+	}else{
+		$('#waiver_reason_submit').attr("disabled",false);
+	}
+});
+
 $(function(){
-  if ( $("#find_sep_link").length ) {
-    $("#find_sep_link").click(function() {
-      $(this).closest('form').attr('action', '/insured/families/find_sep');
-      $(this).closest('form').attr('method', 'get');
-      $(this).closest('form').submit();
-    });
-  }
+	if ( $("#find_sep_link").length ) {
+		$("#find_sep_link").click(function() {
+			$(this).closest('form').attr('action', '/insured/families/find_sep');
+			$(this).closest('form').attr('method', 'get');
+			$(this).closest('form').submit();
+		});
+	}
 })

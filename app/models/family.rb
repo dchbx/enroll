@@ -48,7 +48,8 @@ class Family
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
-  embeds_many :broker_agency_accounts
+  # embeds_many :broker_agency_accounts #depricated
+  embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount"
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
 
@@ -94,6 +95,17 @@ class Family
          "households.hbx_enrollments.effective_on" => 1
          },
          {name: "kind_and_state_and_coverage_kind_effective_date"})
+
+  index({
+    "households.hbx_enrollments.sponsored_benefit_package_id" => 1,
+    "households.hbx_enrollments.sponsored_benefit_id" => 1,
+    "households.hbx_enrollments.effective_on" => 1,
+    "households.hbx_enrollments.submitted_at" => 1,
+    "households.hbx_enrollments.terminated_on" => 1,
+    "households.hbx_enrollments.employee_role_id" => 1,
+    "households.hbx_enrollments.aasm_state" => 1,
+    "households.hbx_enrollments.kind" => 1
+  }, {name: "hbx_enrollment_sb_package_lookup"})
 
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
@@ -147,7 +159,7 @@ class Family
   scope :all_tax_households,                ->{ exists(:"households.tax_households" => true) }
 
   scope :by_writing_agent_id,               ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
-  scope :by_broker_agency_profile_id,       ->(broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
+  scope :by_broker_agency_profile_id,       ->(broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {is_active: true, "$or": [{benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id}, {broker_agency_profile_id: broker_agency_profile_id}]}})}
   scope :by_general_agency_profile_id,      ->(general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
 
   scope :all_assistance_applying,           ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
@@ -182,6 +194,7 @@ class Family
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
+  scope :all_enrollments_by_benefit_sponsorship_id,   ->(benefit_sponsorship_id){where(:"households.hbx_enrollments.benefit_sponsorship_id" => benefit_sponsorship_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
   scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_enrollment_renewing,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
@@ -200,6 +213,22 @@ class Family
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
   scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
+  scope :enrolled_through_benefit_package,      ->(benefit_package) { unscoped.where(
+                                                    :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),
+                                                    :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
+                                                  ) }
+
+  scope :all_enrollments_by_benefit_sponsorship_id,   ->(benefit_sponsorship_id){where(:"households.hbx_enrollments.benefit_sponsorship_id" => benefit_sponsorship_id) }
+  scope :enrolled_under_benefit_application,    ->(benefit_application) { unscoped.where(
+                                                    :"households.hbx_enrollments" => {
+                                                      :$elemMatch => {
+                                                        :sponsored_benefit_package_id => {"$in" => benefit_application.benefit_packages.pluck(:_id) },
+                                                        :aasm_state => {"$nin" => %w(coverage_canceled shopping) },
+                                                        :coverage_kind => "health"
+                                                      }
+                                                  })}
+
+
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -245,7 +274,7 @@ class Family
 
   def enrollments
     return [] if  latest_household.blank?
-    latest_household.hbx_enrollments.show_enrollments
+    latest_household.hbx_enrollments.show_enrollments_sans_canceled
   end
 
   # The {FamilyMember} who is head and 'owner' of this family instance.
@@ -682,10 +711,11 @@ class Family
   def hire_broker_agency(broker_role_id)
     return unless broker_role_id
     existing_agency = current_broker_agency
-    broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
+    broker_role = BrokerRole.find(broker_role_id)
+    broker_agency_profile_id = broker_role.benefit_sponsors_broker_agency_profile_id.present? ? broker_role.benefit_sponsors_broker_agency_profile_id : broker_role.broker_agency_profile_id
     terminate_broker_agency if existing_agency
     start_on = Time.now
-    broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
+    broker_agency_account =  BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
     broker_agency_accounts.push(broker_agency_account)
     self.save
   end

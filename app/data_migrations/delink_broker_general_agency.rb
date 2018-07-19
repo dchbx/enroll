@@ -21,10 +21,9 @@ class DelinkBrokerGeneralAgency < MongoidMigrationTask
     office_location = OfficeLocation.new(is_primary: true, address: address, phone: phone)
 
     organization = Organization.new(:legal_name => "Alvin Frager", :fein => "521376450", :dba => "Alvin Frager Insurance", office_locations: [office_location])
+    broker_agency_profile = BrokerAgencyProfile.new(:id => BSON::ObjectId('57961bf1f1244e3ece000064'), :organization => organization,entity_kind: "s_corporation", market_kind: "shop", corporate_npn: nil, primary_broker_role_id: BSON::ObjectId('57961bf1f1244e3ece000062'), default_general_agency_profile_id: BSON::ObjectId('57589d8bf1244e54170000ab'), languages_spoken: ["", "en"], working_hours: true, accept_new_clients: true, aasm_state: "is_approved")
 
-    broker_agency_profile = BrokerAgencyProfile.new(:id => BSON::ObjectId('57961bf1f1244e3ece000064'), :organization => organization,entity_kind: "s_corporation", market_kind: "both", corporate_npn: nil, primary_broker_role_id: BSON::ObjectId('57961bf1f1244e3ece000062'), default_general_agency_profile_id: BSON::ObjectId('57589d8bf1244e54170000ab'), languages_spoken: ["", "en"], working_hours: true, accept_new_clients: true, aasm_state: "is_approved")
     puts "created new broker agency profile and delinked GA & BA." unless Rails.env.test?
-    organization.save!
+    organization.save
   end
 end
-

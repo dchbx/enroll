@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPL
+  division_code: I
+  division_label: Services
+  major_group_code: '82'
+  major_group_label: Educational Services
+  industry_group_code: '829'
+  industry_group_label: Schools And Educational Services, Not Elsewhere
+  sic_code: '8299'
+  sic_label: Schools and Educational Services, Not Elsewhere Classified

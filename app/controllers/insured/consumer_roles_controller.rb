@@ -5,6 +5,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
+  before_action :individual_market_is_enabled?
   #before_action :authorize_for, except: [:edit, :update]
 
   def ssn_taken
@@ -259,9 +260,9 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
-      { :phones_attributes => [:kind, :full_phone_number] },
-      { :emails_attributes => [:kind, :address] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+      { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
+      { :emails_attributes => [:kind, :address, :id, :_destroy] },
       { :consumer_role_attributes => [:contact_method, :language_preference]},
       :first_name,
       :last_name,

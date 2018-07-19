@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAJA
+  key: en.insured.plan_shoppings.show.can_not_select_more_than_n_plans_to_compare
+  value: '"Can not select more than %{number} plans to compare."'

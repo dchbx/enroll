@@ -1,10 +1,14 @@
 %plan
   %id
-    %id= hbx_enrollment.plan.hios_id
-  %name= hbx_enrollment.plan.name
-  %active_year= hbx_enrollment.plan.active_year
-  %is_dental_only= hbx_enrollment.plan.is_dental_only?
-  = render :partial=> "events/shared/carrier", :object=> hbx_enrollment.plan.carrier_profile, as: :carrier
-  %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{hbx_enrollment.plan.metal_level}"
-  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{hbx_enrollment.plan.coverage_kind}"
-  %ehb_percent= hbx_enrollment.plan.ehb*100
+    %id= hbx_enrollment.product.hios_id
+    - if hbx_enrollment.product.issuer_assigned_id.present?
+      %alias_ids
+        %alias_id
+          %id= "urn:MA:terms:v1:plan:super_group_id#" + hbx_enrollment.product.issuer_assigned_id
+  %name= hbx_enrollment.product.title
+  %active_year= hbx_enrollment.product.active_year
+  %is_dental_only= hbx_enrollment.product.kind == :dental ? true :false
+  = render :partial=> "events/shared/carrier", :object=> hbx_enrollment.product.issuer_profile, as: :carrier
+  %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{hbx_enrollment.product.metal_level_kind}"
+  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{hbx_enrollment.product.kind}"
+  %ehb_percent= hbx_enrollment.product.ehb*100

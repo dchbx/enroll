@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGS
+  key: en.insured.qle_detail.error_text
+  value: '"Based on the information you entered, you may be eligible for a special
+    enrollment period. Please call us at %{contact_center_phone_number} to give us
+    more information so we can see if you qualify."'

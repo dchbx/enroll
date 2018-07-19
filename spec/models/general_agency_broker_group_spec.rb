@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyAccount, type: :model do
   let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
 
@@ -36,4 +37,5 @@ RSpec.describe GeneralAgencyAccount, type: :model do
       end
     end
   end
+end
 end

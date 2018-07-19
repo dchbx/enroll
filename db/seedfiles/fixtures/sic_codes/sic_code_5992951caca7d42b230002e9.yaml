@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALp
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '54'
+  major_group_label: Food Stores
+  industry_group_code: '544'
+  industry_group_label: Candy, Nut, And Confectionery Stores
+  sic_code: '5441'
+  sic_label: Candy, Nut, and Confectionery Stores

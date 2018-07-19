@@ -1,0 +1,7 @@
+= fields_for(@parent_object, @slug_owner, :fieldset => false) do |f|
+  = f.fields_for("office_locations", @office_location, child_index: @child_index) do |builder|
+    = render("/sponsored_benefits/organizations/office_locations/office_location_fields", {f: builder, child_index: @child_index.to_i})
+
+.form-inputs#office_locations_buttons
+  = link_to(new_organizations_office_locations_path(:child_index => @child_index.to_i + 1, :parent_object => @parent_object), remote: true, class: 'btn btn-default pull-left') do
+    Add Office Location

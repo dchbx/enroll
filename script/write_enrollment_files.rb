@@ -15,6 +15,7 @@ ConnectionSlug = Struct.new(:policy_id) do
   end
 
   def publish(payload, properties)
+    Dir.mkdir("policy_cvs") unless File.exists?("policy_cvs")
     if properties[:headers][:return_status] == "200"
       File.open(File.join("policy_cvs", "#{policy_id}.xml"), 'w') do |f|
         f.puts payload
@@ -40,8 +41,8 @@ hbx_ids.each do |pid|
   if pol.nil?
     raise "NO SUCH POLICY #{pid}"
   end
-  if pol.plan.blank?
-    puts "No plan for policy ID #{pid}: plan ID #{pol.plan_id}"
+  if pol.product.blank?
+    puts "No product for policy ID #{pid}: plan ID #{pol.plan_id}"
     #  elsif pol.subscriber.nil?
     #    puts "No subscriber for Policy ID #{pid}"
   else
