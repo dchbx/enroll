@@ -116,6 +116,7 @@ class Insured::FamiliesController < FamiliesController
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
     @provider = @person
+    @family_members = @family.active_family_members
   end
 
   def verification

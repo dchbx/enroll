@@ -406,6 +406,7 @@ RSpec.describe Insured::FamiliesController do
 
   describe "GET inbox" do
     before :each do
+      allow(family).to receive(:active_family_members).and_return(family_members)
       get :inbox
     end
 
