@@ -1,6 +1,8 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-before_filter :configure_sign_up_params, only: [:create]
-# before_filter :configure_account_update_params, only: [:update]
+  include RecaptchaConcern
+  
+  before_filter :configure_sign_up_params, only: [:create]
+  # before_filter :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
   # def new
@@ -16,9 +18,15 @@ before_filter :configure_sign_up_params, only: [:create]
       render :new and return
     end
 
-    if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present? 
+    if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
       flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
       render :new and return
+    end
+
+    headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
+
+    if headless.present? && !headless.person.present?
+      headless.destroy
     end
 
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
@@ -33,7 +41,7 @@ before_filter :configure_sign_up_params, only: [:create]
       #              can't accept a password with a standard hash.
       session["stashed_password"] = sign_up_params["password"]
       if resource.active_for_authentication?
-        set_flash_message :notice, :signed_up if is_flashing_format?
+        set_flash_message :notice, :signed_up, site_name: Settings.site.short_name if is_flashing_format?
         sign_up(resource_name, resource)
         location = after_sign_in_path_for(resource)
         flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
@@ -98,4 +106,5 @@ before_filter :configure_sign_up_params, only: [:create]
   # def after_inactive_sign_up_path_for(resource)
   #   super(resource)
   # end
+
 end

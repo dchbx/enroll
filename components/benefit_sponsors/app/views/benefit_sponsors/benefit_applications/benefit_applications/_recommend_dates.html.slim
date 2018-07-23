@@ -1,0 +1,45 @@
+.col-xs-12#application-dates
+  .row
+    .col-xs-6.panel
+      .col-xs-9
+        .panel-heading.row
+          h3.text-uppercase Your Application Deadline
+        .panel-body.row
+          p Based on the dates you entered, the latest you can submit this application is:
+      .col-xs-3.p0#calendar-stack
+        i.far.fa-calendar.fa-7x.mt-2
+          span.day#benefit_application_latest_submitted_on_day
+          span.month#benefit_application_latest_submitted_on_month
+    .col-xs-6.panel
+      .col-xs-9
+        .panel-heading.row
+          h3.text-uppercase Payment Deadline
+        .panel-body.row
+          p Your first payment to #{site_short_name} is due no later than:
+      .col-xs-3.p0#calendar-stack
+        i.far.fa-calendar.fa-7x.mt-2
+          span.day#binder_payment_deadline_day
+          span.month#binder_payment_deadline_month
+
+.table-responsive style="display: none"
+  table.table.table-border
+    tr
+      td Employer initial application earliest start on
+      td 
+        | :
+      td#benefit_application_earliest_start_on
+    tr
+      td Employer initial application earliest submit on
+      td 
+        | :
+      td#benefit_application_earlies_submit_on
+    tr
+      td Employer initial application latest submit on
+      td 
+        | :
+      td#benefit_application_latest_submitted_on
+    tr
+      td Binder payment due date
+      td 
+        | :
+      td#binder_payment_due_date

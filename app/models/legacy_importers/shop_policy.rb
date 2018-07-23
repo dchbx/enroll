@@ -113,7 +113,7 @@ module LegacyImporters
 
     def find_employer(data)
       @employer_fein = data["employer_fein"]
-      org = Organization.where(fein: @employer_fein).first
+      org = BenefitSponsors::Organizations::Organization.where(fein: @employer_fein).first
       throw :missing_object, "No organization with fein: #{@employer_fein}" if org.nil?
       org.employer_profile.tap do |ep|
         throw :missing_object, "No employer_profile for organization with fein: #{@employer_fein}" if ep.nil?

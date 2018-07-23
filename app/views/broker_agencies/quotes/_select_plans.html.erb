@@ -62,4 +62,18 @@
             <% end %>
         </div>
     </div>
+
+
+      <div class='left'>
+      <b><%= l10n("broker_agencies.quotes.limit_maximum")%></b>
+        <div class='row'>
+          <div class='col-sm-1'>
+            <%= number_field_tag 'ex1_input', '6000', {  class: "slider_input hidden-param", style: 'margin-top:3%;min-width:75px;' } %>
+          </div>
+          <div class='col-sm-4' style='margin-top:1%;'>
+            <input id="ex1" data-slider-id='ex1Slider' class='slider' type="text" data-slider-min="0" data-slider-max="6000" data-slider-step="1" data-slider-value="6000" style='width:350px;'/>
+          </div>
+            <div style='margin-top:1%;'><span id='ex1_label' class="slide-label" style='margin-left:2%;'>$6000</span></div>
+        </div>
+      </div>
 </div>

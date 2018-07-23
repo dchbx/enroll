@@ -4,30 +4,41 @@ module Importers
     include ActiveModel::Model
     include ::Etl::ValueParsers
 
+    # CARRIER_MAPPING = {
+    #   "aetna" => "AHI",
+    #   "carefirst bluecross blueshield" => "GHMSI",
+    #   "kaiser permanente" => "KFMASI",
+    #   "united healthcare" => "UHIC",
+    #   "united health care" => "UHIC",
+    #   "unitedhealthcare" => "UHIC"
+    # }
+
     attr_converter :fein, :as => :optimistic_ssn
     attr_converter :tpa_fein, :as => :optimistic_ssn
 
     attr_reader :broker_npn, :primary_location_zip, :mailing_location_zip
 
     attr_accessor :action,
-      :dba,
-      :legal_name,
-      :primary_location_address_1,
-      :primary_location_address_2,
-      :primary_location_city,
-      :primary_location_state,
-      :mailing_location_address_1,
-      :mailing_location_address_2,
-      :mailing_location_city,
-      :mailing_location_state,
-      :contact_email,
-      :contact_phone,
-      :enrolled_employee_count,
-      :new_hire_count,
-      :broker_name,
-      :contact_first_name,
-      :contact_last_name,
-      :registered_on
+                  :dba,
+                  :legal_name,
+                  :primary_location_address_1,
+                  :primary_location_address_2,
+                  :primary_location_city,
+                  :primary_location_state,
+                  :primary_location_county,
+                  :mailing_location_address_1,
+                  :mailing_location_address_2,
+                  :mailing_location_city,
+                  :mailing_location_state,
+                  :contact_email,
+                  :contact_phone,
+                  :contact_phone_extension,
+                  :enrolled_employee_count,
+                  :new_hire_count,
+                  :broker_name,
+                  :contact_first_name,
+                  :contact_last_name,
+                  :registered_on
 
     include Validations::Email
 
@@ -43,7 +54,7 @@ module Importers
 
     attr_reader :warnings
 
-    include ::Importers::ConversionEmployerCarrierValue
+    # include ::Importers::ConversionEmployerCarrierValue
 
     def initialize(opts = {})
       super(opts)
@@ -81,16 +92,20 @@ module Importers
     def find_ga
       return nil if tpa_fein.blank?
       org = Organization.where({
-        :fein => tpa_fein,
-        :general_agency_profile => {"$exists" => true}
-      }).first
+                                   :fein => tpa_fein,
+                                   :general_agency_profile => {"$exists" => true}
+                               }).first
       return nil unless org
       org.general_agency_profile
     end
 
+    def fein=(val)
+      @fein = prepend_zeros(val.to_s.gsub('-', '').strip, 9)
+    end
+
     def validate_new_fein
       return true if fein.blank?
-      found_org = Organization.where(:fein => fein).first
+      found_org = BenefitSponsors::Organizations::Organization.where(fein: fein).first
       if found_org
         if found_org.employer_profile
           errors.add(:fein, "is already taken")
@@ -107,39 +122,48 @@ module Importers
       end
     end
 
+    def build_primary_address
+      Address.new(
+          :kind => "primary",
+          :address_1 => primary_location_address_1,
+          :address_2 => primary_location_address_2,
+          :city => primary_location_city,
+          :state => primary_location_state,
+          :county => primary_location_county,
+          :zip => primary_location_zip
+      )
+    end
+
+    def build_mailing_address
+      Address.new(
+          :kind => "mailing",
+          :address_1 => mailing_location_address_1,
+          :address_2 => mailing_location_address_2,
+          :city => mailing_location_city,
+          :state => mailing_location_state,
+          :zip => mailing_location_zip
+      )
+    end
+
     def map_office_locations
       locations = []
-      main_address = Address.new(
-        :kind => "work",
-        :address_1 => primary_location_address_1,
-        :address_2 => primary_location_address_2,
-        :city =>  primary_location_city,
-        :state => primary_location_state,
-        :zip => primary_location_zip
-      )
-      mailing_address = Address.new(
-        :kind => "mailing",
-        :address_1 => mailing_location_address_1,
-        :address_2 => mailing_location_address_2,
-        :city =>  mailing_location_city,
-        :state => mailing_location_state,
-        :zip => mailing_location_zip
-      )
+      main_address = build_primary_address
+      mailing_address = build_mailing_address
       main_location = OfficeLocation.new({
-        :address => main_address,
-        :phone => Phone.new({
-          :kind => "work",
-          :full_phone_number => contact_phone
-        }),
-        :is_primary => true
-      })
+                                             :address => main_address,
+                                             :phone => Phone.new({
+                                                                     :kind => "work",
+                                                                     :full_phone_number => contact_phone
+                                                                 }),
+                                             :is_primary => true
+                                         })
       locations << main_location
       if !mailing_address.blank?
         if !mailing_address.same_address?(main_address)
           locations << OfficeLocation.new({
-            :is_primary => false,
-            :address => mailing_address
-          })
+                                              :is_primary => false,
+                                              :address => mailing_address
+                                          })
         end
       end
       locations
@@ -168,32 +192,36 @@ module Importers
         br = BrokerRole.by_npn(broker_npn).first
         if !br.nil?
           broker_agency_accounts << BrokerAgencyAccount.new({
-            start_on: Time.now,
-            writing_agent_id: br.id,
-            broker_agency_profile_id: br.broker_agency_profile_id
-          })
+                                                                start_on: Time.now,
+                                                                writing_agent_id: br.id,
+                                                                broker_agency_profile_id: br.broker_agency_profile_id
+                                                            })
         end
       end
       broker_agency_accounts
     end
 
+    def employer_attestation_attributes
+      EmployerAttestation.new(aasm_state: "approved")
+    end
+
     def map_poc(emp)
       person_attrs = {
-        :first_name => contact_first_name,
-        :last_name => contact_last_name,
-        :employer_staff_roles => [
-          EmployerStaffRole.new(employer_profile_id: emp.id, is_owner: false)
-        ],
-        :phones => [
-          Phone.new({
-            :kind => "work",
-            :full_phone_number => contact_phone
-          })
-        ]
+          :first_name => contact_first_name,
+          :last_name => contact_last_name,
+          :employer_staff_roles => [
+              EmployerStaffRole.new(employer_profile_id: emp.id, benefit_sponsor_employer_profile_id: emp.id, is_owner: false)
+          ],
+          :phones => [
+              Phone.new({
+                            :kind => "work",
+                            :full_phone_number => contact_phone
+                        })
+          ]
       }
       if !contact_email.blank?
         emails = contact_email.strip.split(',')
-        person_attrs[:emails] = emails.map{|email| Email.new(:kind => "work", :address => email.gsub(/\s/, '')) }
+        person_attrs[:emails] = emails.map {|email| Email.new(:kind => "work", :address => email.gsub(/\s/, ''))}
       end
       Person.create!(person_attrs)
     end
@@ -201,27 +229,27 @@ module Importers
     def update_poc(emp)
       return true if contact_first_name.blank? || contact_last_name.blank?
 
-      matching_staff_role = emp.staff_roles.detect{|staff|
+      matching_staff_role = emp.staff_roles.detect {|staff|
         staff.first_name.match(/#{contact_first_name}/i) && staff.last_name.match(/#{contact_last_name}/i)
       }
 
       if emp.staff_roles.present? && matching_staff_role.blank?
         emp.staff_roles.each do |person|
-          person.employer_staff_roles.where(employer_profile_id: emp.id).each{|role| role.close_role!}
+          person.employer_staff_roles.where(employer_profile_id: emp.id).each {|role| role.close_role!}
         end
       end
 
       if matching_staff_role.present?
         matching_staff_role.phones = [
-          Phone.new({
-            :kind => "work",
-            :full_phone_number => contact_phone
-          })
+            Phone.new({
+                          :kind => "work",
+                          :full_phone_number => contact_phone
+                      })
         ]
 
         if contact_email.present?
           matching_staff_role.emails = [
-            Email.new(:kind => "work", :address => contact_email)
+              Email.new(:kind => "work", :address => contact_email)
           ]
         end
 
@@ -242,11 +270,11 @@ module Importers
       general_agency_accounts = []
       if broker
         if general_agency
-           general_agency_accounts << GeneralAgencyAccount.new(
-             :start_on => Time.now,
-             :general_agency_profile_id => general_agency.id,
-             :broker_role_id => broker.id
-           )
+          general_agency_accounts << GeneralAgencyAccount.new(
+              :start_on => Time.now,
+              :general_agency_profile_id => general_agency.id,
+              :broker_role_id => broker.id
+          )
         end
       end
       return general_agency_accounts
@@ -261,6 +289,11 @@ module Importers
           errors.add("office_location_#{idx}_" + attr.to_s, err)
         end
       end
+    end
+
+    def prepend_zeros(number, n)
+      (n - number.to_s.size).times {number.prepend('0')}
+      number
     end
   end
 end

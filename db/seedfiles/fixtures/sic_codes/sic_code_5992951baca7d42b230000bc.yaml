@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAC8
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '21'
+  major_group_label: Tobacco Products
+  industry_group_code: '211'
+  industry_group_label: Cigarettes
+  sic_code: '2111'
+  sic_label: Cigarettes

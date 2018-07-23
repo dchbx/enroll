@@ -1,0 +1,41 @@
+#referencePlanShell
+  .row
+    .col-xs-12.col-md-6
+      h1.heading-text Your Reference Plan
+    .col-xs-12.col-md-6
+      .btn.btn-default.pull-right.mt-3 data-toggle="modal" data-target="#eeCostModal" Employee Details Costs
+
+
+.panel.panel-default
+  .panel-body
+    h5.heading-text
+      strong#referencePlanTitle
+    table.table
+      tbody
+        tr
+          th
+            strong Type
+          th
+            strong Carrier
+          th
+            strong Metal Level
+          th
+            strong Network
+        tr
+          td.text-capitalize#rpType
+          td.text-capitalize#rpCarrier
+          td.text-capitalize#rpMetalLevel
+          td.text-capitalize#rpNetwork
+    .row
+      strong.pl-2 Your Estimated Monthly Cost
+    .row
+      .col-xs-4
+        h2.heading-text.mt-0#rpEstimatedMonthlyCost
+      .col-xs-2
+        strong.mb-1 Min
+        br
+        #rpMin
+      .col-xs-2
+        strong.mb-1 Max
+        br
+        #rpMax

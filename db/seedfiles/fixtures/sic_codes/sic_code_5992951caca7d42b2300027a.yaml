@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJ6
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '46'
+  major_group_label: Pipelines, Except Natural Gas
+  industry_group_code: '461'
+  industry_group_label: Pipelines, Except Natural Gas
+  sic_code: '4613'
+  sic_label: Refined Petroleum Pipelines

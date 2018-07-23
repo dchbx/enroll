@@ -1,0 +1,43 @@
+- if @profile_type == "broker_agency"
+  .broker-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3
+
+    h1.heading-text Broker Registration
+    
+    - flash.each do |key, value|
+			div class="alert alert-#{key} alert-dismissible" role="alert"
+				button.close type="button" data-dismiss="alert" aria-label="Close"
+					span aria-hidden="true" &times
+				= value
+
+    = form_for @agency, as: :agency, url: {action: "create"}, html: { class: "needs-validation s508", id:'broker_registration_form', novalidate:true } do |f|
+    
+      = f.hidden_field :profile_type, value: params[:profile_type]
+      
+      = render 'shared/error_messages', :object => @agency
+      = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
+        = render partial: './ui-components/v1/forms/broker_registration/personal_information', locals: {f: f}
+      
+      = f.fields_for :organization, f.object.organization, errors: {}, field_set: false do |f|
+        fieldset
+          legend Broker Agency Information
+          = render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f}
+          = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
+            = render partial: './ui-components/v1/forms/broker_registration/broker_profile_information', locals: {f: f}
+            - if (aca_broker_routing_information && @agency.profile_type == "broker_agency")
+              = render partial: "benefit_sponsors/shared/profiles/broker_agency/bank_information", locals: {f: f}
+            = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f}
+            - if (aca_broker_routing_information && @agency.profile_type == "broker_agency")
+              h5.heading-text
+                = l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path)
+
+        = f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right', id:'broker-btn'
+- else
+  = form_for @agency, as: :agency, url: {action: "create"},  html: { class: "needs-validation s508", novalidate:true } do |f|
+    = f.hidden_field :profile_type, value: params[:profile_type]
+    = render 'benefit_sponsors/shared/error_messages', :object => @agency
+    = render './ui-components/v1/forms/employer_registration/employer_profile_form', f: f
+    
+javascript:
+  validateForm()
+
+

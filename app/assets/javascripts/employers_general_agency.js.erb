@@ -1,0 +1,43 @@
+$(document).on('page:update', function() {
+  Freebies.tooltip();
+
+  $('#employers_general_agency_id').on('change', function() {
+    employers_check_allow_assign(this);
+  });
+
+  $('input[data-role="bulk-actions-resource"]').on('change', function() {
+    employers_check_allow_assign(this);
+  });
+});
+
+function employers_check_allow_assign(element) {
+
+  var allow_assign = ($('#employers_general_agency_id').val() != undefined && $('#employers_general_agency_id').val() != "") && $('input[data-role="bulk-actions-resource"]').is(':checked');
+  var allow_unassign = false;
+  $('input[data-role="bulk-actions-resource"]').each(function (){
+    if($(this).is(':checked') && $(this).parent().parent().find("td.col-general_agency a").length > 0){
+      allow_unassign =true;
+      return false;
+    }
+  });
+
+  if (allow_assign){
+    $('#assign_general_agency').removeAttr("disabled");
+  }else{
+    $('#assign_general_agency').attr("disabled","disabled");
+  }
+  if (allow_unassign){
+    $('#unassign_general_agency').removeAttr("disabled");
+  }else{
+    $('#unassign_general_agency').attr("disabled","disabled");
+  }
+}
+
+$(document).on('click', 'input#datatable_filter_bulk_actions', function(){
+  if($(this).is(':checked')){
+    $('input[data-role="bulk-actions-resource"]').prop('checked', true);
+  }else{
+    $('input[data-role="bulk-actions-resource"]').removeProp('checked');
+  }
+  employers_check_allow_assign(this);
+});

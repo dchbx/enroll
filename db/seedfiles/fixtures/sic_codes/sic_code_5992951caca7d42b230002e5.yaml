@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALl
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '53'
+  major_group_label: General Merchandise Stores
+  industry_group_code: '539'
+  industry_group_label: Miscellaneous General Merchandise Stores
+  sic_code: '5399'
+  sic_label: Miscellaneous General Merchandise Stores

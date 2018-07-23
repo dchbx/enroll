@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKS
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '49'
+  major_group_label: Electric, Gas, And Sanitary Services
+  industry_group_code: '493'
+  industry_group_label: Combination Electric And Gas, And Other Utility
+  sic_code: '4939'
+  sic_label: Combination Utilities, Not Elsewhere Classified

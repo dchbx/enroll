@@ -1,0 +1,78 @@
+@import "variables";
+@import "bootstrap";
+@import "dragtable";
+
+.plan_design_proposals {
+  h3 {
+    color:$mhc-orange;
+    font-weight: 300;
+    line-height: 1.6em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  .col-md-3 {
+    display:none;
+  }
+  .toggle-text {
+    display:none;
+  }
+  .compare-table tr th:first-of-type.row-title {
+      font-size: 24px;
+      color: #414141;
+      font-weight: 600;
+  }
+  .compare-table tr th:first-of-type {
+      background-color: #E8E8E8;
+      border: none;
+      text-align: left;
+      vertical-align: center;
+      font-size: 12px;
+  }
+  .compare-table .row-title {
+      font-size: 24px;
+      color: #414141;
+      font-weight: 600;
+  }
+  .sq-btn-grp {
+    display:none;
+  }
+  table.benefit-group-contribution-table {
+      padding: 0 2%;
+      margin: auto;
+      table-layout: auto;
+  }
+  table.benefit-group-contribution-table tr td {
+      padding: 15px 0;
+      font-size: 16px;
+  }
+  table {
+      background-color: transparent;
+  }
+  table {
+      border-spacing: 0;
+      border-collapse: collapse;
+  }
+}
+
+.plan-details-export {
+  h1 {
+    color:$mhc-orange;
+    font-weight: 300;
+    line-height: 1.6em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  .emp-cost {
+    color:$mhc-orange;
+  }
+  .monthly-cost {
+    margin-top:80px;
+    margin-left:0px;
+  }
+  .monthly-cost tr {
+    border-top:none;
+  }
+  .col-md-offset-5 {
+    display:none;
+  }
+}

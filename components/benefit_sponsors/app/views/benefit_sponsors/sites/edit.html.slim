@@ -1,0 +1,12 @@
+h2 Edit Site
+
+- if @site.errors.any?
+  = render partial: 'benefit_markets/benefit_markets/error_messages', locals: { object: @site }
+  
+= form_for @site, url: site_path, html: { data: { controller: "site" }, class: "needs-validation s508", id:'broker_registration_form', novalidate:true } do |f|
+
+  = render partial: 'form', locals: { f: f }
+  
+  .row.pull-right.mr-1
+    = f.submit 'Update', class:'btn btn-primary mr-1'
+    = link_to 'Back', sites_path, class:'btn btn-default'

@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAALW
+  key: en.employer_estimated_maximum_monthly_cost
+  value: '"Employer Estimated Maximum Monthly Cost"'

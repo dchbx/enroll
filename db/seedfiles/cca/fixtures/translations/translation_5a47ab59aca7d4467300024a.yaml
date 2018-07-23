@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAJK
+  key: en.broker_agencies.broker_roles.new_broker_agency_form.create_broker_agency
+  value: '"Create Broker Agency"'

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAOR
+  division_code: I
+  division_label: Services
+  major_group_code: '75'
+  major_group_label: Automotive Repair, Services, And Parking
+  industry_group_code: '753'
+  industry_group_label: Automotive Repair Shops
+  sic_code: '7538'
+  sic_label: General Automotive Repair Shops

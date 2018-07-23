@@ -1,0 +1,25 @@
+<div class="modal" id="revertBenefitApplication_<%= benefit_application.id %>" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Confirm Revert Plan Year</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to revert this plan year to draft?
+          <br/><br/>
+          <strong>
+            Warning:
+          </strong>
+          Plan years should not be reverted after employees have already enrolled or renewed in a benefit package from this plan year.
+        </p>
+        <ul class="application-warnings"></ul>
+      </div>
+      <div class="modal-footer">
+        <%= link_to "Revert Plan Year", benefit_sponsorship_benefit_application_revert_path(benefit_application.benefit_sponsorship, benefit_application ), method: :post, remote: true, class: "btn btn-primary mtz  btn-small"%>
+        <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+      </div>
+    </div>
+  </div>
+</div>

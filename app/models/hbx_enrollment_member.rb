@@ -22,12 +22,13 @@ class HbxEnrollmentMember
   validate :check_primary_applicant_selected_during_enrollment
 
   validate :end_date_gt_start_date
-  delegate :ivl_coverage_selected, to: :family_member
+
+  delegate :ivl_coverage_selected, :is_disabled, to: :family_member
 
   def family
     hbx_enrollment.family if hbx_enrollment.present?
   end
-
+  
   def covered?
     (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
   end

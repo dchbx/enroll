@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'csv'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::IvlBacklogVerificationNoticeUqhp, :dbclean => :after_each do
 
   file = "#{Rails.root}/spec/test_data/notices/ivl_backlog_notice.csv"
@@ -88,4 +89,5 @@ RSpec.describe IvlNotices::IvlBacklogVerificationNoticeUqhp, :dbclean => :after_
     end
   end
 
+end
 end

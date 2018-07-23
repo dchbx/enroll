@@ -4,9 +4,8 @@ module Effective
 
     # This will respond to both a GET and a POST
     def show
-      attributes = (params[:attributes].presence || {}).merge(referer: request.referer).merge(params.try(:[], :custom_attributes) || {})
-      scopes = (params[:scopes].presence || {})
-
+      attributes = (params[:attributes].presence || {}).merge(referer: request.referer).merge(custom_attributes: params.try(:custom_attributes, []))
+      scopes = (params[:scopes].presence || params[:custom_attributes].presence || {})
       @datatable = find_datatable(params[:id]).try(:new, attributes.merge(scopes))
       @datatable.view = view_context if !@datatable.nil?
 

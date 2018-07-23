@@ -1,0 +1,382 @@
+<% selected_kind_carrier = f.object.product_option_choice == 'single_issuer' %>
+<% selected_kind_metal_level = f.object.product_option_choice == 'metal_level' %>
+<% selected_kind_plan = f.object.product_option_choice == 'single_product' %>
+
+<% if @benefit_package_form.new_record? %>
+  <h1 class="heading-text">Select Your Plan Offering</h1>
+  <h4 style="max-width: 660px;">Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.</h4>
+  <br/>
+<% else %>
+<div class="edit-offering health">
+
+  <h4 class="currently-offered" style="max-width: 660px; display: inline-block;">
+  </h4>
+    <div class="offered-plan">
+    </div>
+</div>
+<% end %>
+
+  <div class="reference-steps">
+    <% unless @benefit_package_form.new_record? %>
+    <br/>
+    <h1>Edit Your Plan Offering</h1>
+    <h4 class="currently-offering" style="max-width: 660px; display: inline-block;">
+    </h4>
+    <br/><br/>
+    <% end %>
+
+    <div class="health">
+      <div class="product-options-tab">
+        <ul class="nav nav-tabs row">
+          <li role="presentation" class="col-xs-4">
+            <%= f.radio_button :product_package_kind, "single_issuer", class: 'product_package_kind' %>
+            <%= f.label :product_package_kind_single_issuer, class: "elected_plan" do %>
+            <i class="far fa-circle"></i>
+            <i class="far fa-dot-circle"></i>
+            By carrier
+            <% end %>
+          </li>
+          <li role="presentation" class="col-xs-4">
+            <%= f.radio_button :product_package_kind, "metal_level", class: 'product_package_kind' %>
+            <%= f.label :product_package_kind_metal_level, class: "elected_plan" do %>
+            <i class="far fa-circle"></i>
+            <i class="far fa-dot-circle"></i>
+            By metal level
+          </li>
+          <% end %>
+          <li role="presentation" class="col-xs-4">
+            <%= f.radio_button :product_package_kind, "single_product", class: 'product_package_kind'%>
+            <%= f.label :product_package_kind_single_product, class: "elected_plan" do %>
+            <i class="far fa-circle"></i>
+            <i class="far fa-dot-circle"></i>
+            Single plan
+            <% end %>
+          </li>
+        </ul>
+      </div>
+
+      <div class="col-xs-12 plan-options">
+
+        <%= f.hidden_field :kind, value: "health" %>
+        <div class="col-xs-12 carriers-tab" style="display: none;">
+          <br><br>
+          <h4>Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</h4>
+          <br/><br/>
+          <% @benefit_package_form.catalog.single_issuer_options.each do |issuer_name, issuer_id| %>
+          <div class="col-xs-3 carriers">
+            <div class="col-xs-12 row">
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, product_option_choice: "#{cv}", carrier_id: "#{ck}", product_option_choice: "single_issuer", benefit_group:f.object.id ), remote: true do %>
+              <div class="col-xs-3">
+                <%= f.radio_button :product_option_choice, "#{issuer_id}", class: 'product_option_choice' %>
+                <%= f.label "product_option_choice_#{issuer_id}" do %>
+                <i class="far fa-circle"></i>
+                <i class="far fa-dot-circle"></i>
+                <% end %>
+              </div>
+              <%# end %>
+              <div class="col-xs-9">
+                <div class="panel">
+                  <div class="panel-heading">
+                    <h3><%= issuer_name %></h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% end %>
+        </div>
+        <div class="col-xs-12 metals-tab" style="display: none;">
+          <br><br>
+          <h4>Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.</h4>
+          <br/>
+          <% @benefit_package_form.catalog.metal_levels.each do |kind| %>
+          <div class="col-xs-3 metals">
+            <div class="col-xs-12 row">
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, product_option_choice: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
+
+              <div class="col-xs-3">
+                <%= f.radio_button :product_option_choice, kind, class: 'product_option_choice' %>
+                <%= f.label "product_option_choice_#{kind}" do %>
+                <i class="far fa-circle"></i>
+                <i class="far fa-dot-circle"></i>
+                <% end %>
+              </div>
+              <%# end %>
+
+              <div class="col-xs-9">
+                <div class="panel">
+                  <div class="panel-heading">
+                    <h3><%= kind %></h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <% end %>
+          <%# if @plan_year.new_record? %>
+            <%#= f.hidden_field :reference_plan_id, value: "", class: "ref-plan hidden-param" %>
+          <%# else %>
+            <%#= f.hidden_field :reference_plan_id, class: "ref-plan hidden-param" %>
+          <%# end %>
+        </div>
+        <div class="col-xs-12 single-plan-tab" style="display: none;">
+          <br><br>
+          <h4>Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</h4>
+          <br/>
+
+          <% @benefit_package_form.catalog.single_product_options.each do |issuer_name, issuer_id| %>
+          <div class="col-xs-3 carriers">
+            <div class="col-xs-12 row">
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, product_option_choice: "#{cv}", carrier_id: "#{ck}", product_option_choice: "single_product", benefit_group:f.object.id ), remote: true do %>
+
+              <div class="col-xs-3">
+                <%= f.radio_button :product_option_choice, "#{issuer_id}", class: 'product_option_choice' %>
+                <%= f.label "product_option_choice_#{issuer_id}" do %>
+                <i class="far fa-circle"></i>
+                <i class="far fa-dot-circle"></i>
+                <% end %>
+              </div>
+              <%# end %>
+              <div class="col-xs-9">
+                <div class="panel">
+                  <div class="panel-heading">
+                    <h3><%= issuer_name %></h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% end %>
+        </div>
+        <div class="col-xs-12 row plans-tab" style="display: none;">
+          <br><br>
+        </div>
+      </div>
+
+      <div class="reference-plans row" style="display: none;">
+        <div class="col-xs-12 loading">
+          <i class='fa fa-spinner fa-spin fa-2x'></i>
+          <span></span>
+        </div>
+      </div>
+
+      <div class="sponsor_contributions row" style="display: none;">
+
+      </div>
+    </div>
+  </div>
+<script>
+
+  $(function(){
+
+    $('a[data-remote=true]').click( function() {
+       var current_href = $(this).attr('href');
+       var location_id = $(this).closest('.benefit-group-fields').attr('id');
+       $(this).attr('href', current_href + "&location_id=" + location_id);
+    });
+
+    $(document).on('click', '.plan-options input[type=radio].product_option_choice', function(event)  {
+
+      var product_option_kind = $('.product-options-tab input[type=radio]:checked').val();
+      var selected_radio = event.target.value;
+      var location_id = $(this).closest('.benefit-group-fields').attr('id');
+
+      var plan_options = <%= @benefit_package_form.catalog.plan_options.to_json.html_safe %>;
+      var filtered_products = plan_options[product_option_kind][selected_radio];
+
+      initPlanOptions(filtered_products, location_id);
+
+      var sponsor_contributions = <%= @benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe %>;
+      var sponsor_contribution = sponsor_contributions[product_option_kind];
+
+      initSponsorContributions(sponsor_contribution, location_id);
+
+      $(document).on('click', ".reference-plan input[type='radio']", function(event){
+        var reference_plan_id = $(this).val()
+        initReferencePlanDetails(filtered_products, reference_plan_id);
+      })
+
+    });
+  })
+
+  function initReferencePlanDetails(plan_options, reference_plan_id) {
+    var reference_plan
+    $.each(plan_options, function(index, product){
+      if(product["id"] == reference_plan_id){
+        reference_plan = product
+        return false;
+      }
+    })
+
+    $(".reference_plan_info").hide();
+    var referencePlanHtml = '<div class="row row-form-wrapper no-buffer reference_plan_info">\
+      <div class="col-xs-5">\
+        <h1>Your Reference Plan</h1>\
+      </div>\
+      <div>\
+        <section class="col-xs-7">\
+          <header class="row">\
+            <h5"><strong>'+ reference_plan["title"] +' </strong></h5>\
+          </header>\
+        </section>\
+        <h2></h2>\
+        <table>\
+          <tr>\
+            <th><header>Type</header></th>\
+            <th><header>Carrier</header></th>\
+            <th><header>Metal Level</header></th>\
+            <th><header>Network</header></th>\
+          </tr>\
+          <tr>\
+            <td><p>'+ reference_plan["title"] +'</p></td>\
+            <td><p>'+ reference_plan["carrier_name"] +'</p></td>\
+            <td><p>'+ reference_plan["metal_level_kind"] +'</p></td>\
+            <td></td>\
+          </tr>\
+        </table>\
+        <div class="col-xs-12">\
+          <div class="col-xs-4 row">\
+            <span>Your Estimated Monthly Cost</span>\
+            <h2 class="employer-monthly-cost"></h2>\
+          </div>\
+          <div class="col-xs-8">\
+            <table>\
+              <tr>\
+                <th></th>\
+                <th>Min</th>\
+                <th>Max</th>\
+              </tr>\
+              <tr>\
+                <td>Estimated monthly cost including all roster employees</td>\
+                <td class="employee-monthly-cost-min"></td>\
+                <td class="employee-monthly-cost-max" style="padding-left: 0;"></td>\
+              </tr>\
+            </table>\
+          </div>\
+        </div>\
+      </div>'
+
+    $(".reference-steps").append(referencePlanHtml)
+  }
+
+  function initPlanOptions(plan_options, location_id) {
+    
+    $('.reference-plans').html("<div class='col-xs-12 health select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong>" + plan_options.length + "Plans</strong> </span></h4><br/></div>");
+
+    $.each(plan_options, function (index, product) {
+
+      var productHtml = '<div class="col-xs-4">\
+        <div class="col-xs-12 reference-plan">\
+          <div class="col-xs-2">\
+            <input type="radio" value="' + product["id"] + '" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]">\
+            <label for="' + location_id + '_reference_plan_id">\
+              <i class="far fa-circle-o"></i>\
+              <i class="far fa-dot-circle-o"></i>\
+            </label>\
+          </div>\
+          <div class="col-xs-10">\
+            <div class="panel row">\
+              <div class="panel-heading">\
+                <h3>' + product["title"] + '</h3>\
+              </div>\
+              <div class="panel-body">\
+                <span class="plan-label">Type: </span><span>' + product["health_plan_kind"] + '</span><br>\
+                <span class="plan-label">Carrier: </span><span>' + product["carrier_name"] + '</span><br>\
+                <span class="plan-label">Level: </span><span>' + product["metal_level_kind"] + '</span><br>\
+              </div>\
+            </div>\
+          </div>\
+        </div>\
+      </div>'
+
+      $('.reference-plans').append(productHtml);
+    });
+  
+    $('.reference-plans').css({ "height": "450px", "y-overflow": "scroll" });
+    $('.reference-plans').show();
+  };
+
+  function initSponsorContributions(sponsor_contribution, location_id) {
+
+    $('.sponsor_contributions').html('<div class="col-xs-12 offerings">\
+      <div class="row row-form-wrapper no-buffer heading">\
+      <div class="col-xs-12" id="offering_slider_header">\
+      <div class="col-xs-6">Offered <i class="fa fa-question-circle" data-toggle="tooltip" title="You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees’ families."></i></div>\
+      <div class="col-xs-6">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>\
+      </div>\
+      </div></div>');
+
+
+  $.each(sponsor_contribution['contribution_levels'], function (index, contribution_level) {
+
+      var attr_prefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
+
+      var contributionHtml = '<div class="col-xs-12"><div class="row row-form-wrapper no-buffer">\
+  <input id="' + attr_prefix + '[id]" name="' + attr_prefix + '[id]" type="hidden" value="' + contribution_level['id'] + '" />\
+  <input id="' + attr_prefix + '[contribution_level_id]" name="' + attr_prefix + '[contribution_level_id]" type="hidden" value="' + contribution_level['contribution_level_id'] + '" />\
+  <input type="radio" value="' + contribution_level["id"] + '" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]">\
+  <fieldset>\
+    <div class="col-xs-6 form-group form-group-lg">\
+      <div class="checkbox">\
+        <label>\
+        <input checked="checked" id="' + attr_prefix + '[is_offered]" class="contribution_handler" name="' + attr_prefix +'[is_offered]" type="checkbox" value="' + contribution_level["is_offered"] +'" />\
+          <label for="is_offered">\
+            <i class="far fa-check-square-o fa-2x"></i>\
+            <i class="far fa-square-o fa-2x"></i>\
+          </label>\
+          <span>\
+            <input id="' + attr_prefix + '[display_name]" name="' + attr_prefix + '[display_name]" type="hidden" value="' + contribution_level["display_name"] + '" />\
+            <p>' + contribution_level["display_name"] + '</p>\
+          </span>\
+        </label>\
+      </div>\
+    </div>\
+    <div class="col-xs-6 form-group form-group-lg">\
+      <div class="col-xs-12 row">\
+        <div class="col-xs-3">\
+          <input class="hidden-param contribution_handler premium-storage-input" id="'+ attr_prefix +'[contribution_factor]" name="'+ attr_prefix +'[contribution_factor]" type="number" value="' + (contribution_level["contribution_factor"] * 100) + '" />\
+        </div>\
+        <div class="col-xs-9" style="padding-top: 10px;">\
+          <input class="contribution_slide_handler slider premium-storage-input" data-slider-max="100" data-slider-min="0" data-slider-step="5" data-slider-value="0" type="number" value="' + (contribution_level["contribution_factor"] * 100) + '"/>\
+          &nbsp;&nbsp;&nbsp;\
+          <span class="slide-label pull-right">0%</span>\
+        </div>\
+      </div>\
+    </div>\
+  </fieldset>\
+  </br>\
+</div></div>';
+
+      $('.sponsor_contributions').append(contributionHtml);
+  });
+
+  $('.sponsor_contributions').show();
+  };
+
+
+  $(document).on("change", ".reference-steps input[type=radio].product_package_kind", function(event) {
+
+    $('.sponsor_contributions').html('');
+    $('.reference-plans').html('');
+
+    switch($('.product-options-tab input[type=radio]:checked').val()){
+      case "single_issuer":
+        $("div.carriers-tab").show();
+        $("div.metals-tab").hide();
+        $("div.single-plan-tab").hide();
+        break;
+      case "metal_level":
+        $("div.metals-tab").show();
+        $("div.single-plan-tab").hide();
+        $("div.carriers-tab").hide();
+        break;
+      case "single_product":
+        $("div.single-plan-tab").show();
+        $("div.metals-tab").hide();
+        $("div.carriers-tab").hide();
+        break;
+    };
+  });
+
+</script>

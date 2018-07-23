@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAO9
+  division_code: I
+  division_label: Services
+  major_group_code: '80'
+  major_group_label: Health Services
+  industry_group_code: '807'
+  industry_group_label: Medical And Dental Laboratories
+  sic_code: '8071'
+  sic_label: Medical Laboratories

@@ -11,7 +11,7 @@ class BrokerAgencies::InboxesController < InboxesController
   def msg_to_portal
     @broker_agency_provider = BrokerAgencyProfile.find(params["inbox_id"])
     @inbox_provider = @broker_agency_provider
-    @inbox_provider_name = @inbox_provider.try(:legal_name) 
+    @inbox_provider_name = @inbox_provider.try(:legal_name)
     @inbox_to_name = "HBX Admin"
     log("#3969 and #3985 params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
     @new_message = @inbox_provider.inbox.messages.build
@@ -46,20 +46,18 @@ class BrokerAgencies::InboxesController < InboxesController
     super
   end
 
- def find_inbox_provider
+  def find_inbox_provider
     id = params["id"]||params['profile_id']
-    if Person.find(params["id"]).id.to_s == id
+    if Person.where(:id => params["id"]).present?
       @inbox_provider = Person.find(params["id"])
     else
-      @broker_agency_provider = BrokerAgencyProfile.where(:_id => params["id"]||params['profile_id'])
+      @broker_agency_provider = BrokerAgencyProfile.find(id)
       if @broker_agency_provider.present?
         @inbox_provider = @broker_agency_provider
       else
-        @inbox_provider = Person.where(:_id => id).first
+         @inbox_provider = Person.where(:id => id).first
       end
-
     end
-
   end
 
   def successful_save_path

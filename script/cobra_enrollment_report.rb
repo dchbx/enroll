@@ -6,10 +6,10 @@ require 'csv'
 @start_date = Date.strptime(ARGV[0], "%m/%d/%Y").beginning_of_day
 @end_date  = Date.strptime(ARGV[1], "%m/%d/%Y").end_of_day
 
-@carriers = CarrierProfile.all.inject({}){|data, c| data[c.id.to_s] = c.legal_name; data }
+@issuer_profile = BenefitSponsors::Organizations::Organization.issuer_profiles.all.inject({}){|data, c| data[c.id.to_s] = c.legal_name; data }
 
 def get_plan_details(enrollment, employer)
-  plan = enrollment.plan
+  product = enrollment.product
   data = [
     employer.legal_name,
     employer.fein,
@@ -20,11 +20,11 @@ def get_plan_details(enrollment, employer)
     enrollment.aasm_state.titleize,
     enrollment.total_premium,
     enrollment.total_employer_contribution,
-    plan.name,
-    plan.hios_id,
-    @carriers[plan.carrier_profile_id.to_s],
-    plan.plan_type,
-    plan.metal_level
+    product.name,
+    product.hios_id,
+    @issuer_profile[product.issuer_profile_id.to_s],
+    product.health_plan_kind,
+    product.metal_level
   ]
 end
 
@@ -42,7 +42,7 @@ def get_member_details(enrollment_member, enrollment)
     person.last_name,
     person.mailing_address.try(:zip), 
     relationship,
-    enrollment.premium_for(enrollment_member)
+    enrollment.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == enrollment_member.id }.product_price.round(2).to_f
   ]
 end
 
@@ -57,8 +57,8 @@ def header_rows
     "Enrollment Status",
     "Total Premium",
     "Employer Contribution",
-    "Plan HIOS ID",
     "Plan Name",
+    "Plan HIOS ID",
     "Carrier Name",
     "Plan Type (HMS/PPO/etc.)",
     "Plan metal level",
@@ -124,7 +124,7 @@ CSV.open("#{Rails.root.to_s}/cobra_enrollment_report.csv", "w") do |csv|
 
     
     active_enrollments.each do |enrollment|
-      employer = enrollment.benefit_group.plan_year.employer_profile
+      employer = enrollment.benefit_sponsor
 
       begin
         data = get_plan_details(enrollment, employer)

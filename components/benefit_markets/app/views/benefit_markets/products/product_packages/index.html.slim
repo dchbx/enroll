@@ -1,0 +1,20 @@
+h1 Product Packages
+
+- BenefitMarkets::BenefitMarketCatalog.all.each do |benefit_catalog|
+  .row
+    .col-md-3
+      dl
+        dt= t("benefit_market_catalog.title", default: "Benefit Market Catalog")
+        dd= benefit_catalog.title
+    .col-md-5
+      dl
+        dt= t("benefit_market_catalog.product_packages", default: "Product Packages")
+        - benefit_catalog.product_packages.each do |product_package|
+          dd
+            .row
+              .col-md-8
+                = link_to product_package.title, products_benefit_market_catalog_product_package_path(benefit_catalog, product_package)
+              .col-md-2
+                = link_to 'Edit', edit_products_benefit_market_catalog_product_package_path(benefit_catalog, product_package)
+              .col-md-2
+                = link_to 'Delete', products_benefit_market_catalog_product_package_path(benefit_catalog, product_package), method: :delete, data: { confirm: 'Are you sure?' }

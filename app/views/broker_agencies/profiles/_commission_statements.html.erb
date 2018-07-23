@@ -1,0 +1,66 @@
+<div class="bottom-pd" id='commissions'>
+  <div class="no_margin">
+    <div class="col-xs-12 no-pd">
+      <h3 class="title-inline"><%= l10n("broker_agencies.profiles.commission_statements")%></h3>
+      <table class="table" id="commissions-table">
+        <thead>
+          <tr>
+            <th><%= l10n("year")%></th>
+            <th><%= l10n("statement_date")%></th>
+            <th><%= l10n("coverage_period")%></th>
+            <th><%= l10n("download")%></th>
+            <th><%= l10n("view")%></th>
+          </tr>
+        </thead>
+        <tbody class="commissions">
+          <% @statement_years.each do |statement_year| %>
+            <tr data-toggle="collapse" data-target="#collapse2" id="<%= statement_year %>" class="statement_years">
+              <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> <%= statement_year %></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <% statements_2 = get_commission_statements_for_year(@statements, statement_year) %>
+              <% if statements_2.empty? %>
+                <tr class="statements <%= statement_year %>">
+                  <td></td>
+                  <td><%= l10n("broker_agencies.profiles.commission_statements.no_statements_for_year")%></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              <% else %>
+                <% statements_2.each do |statement| %>
+                  <tr class="statements <%= statement_year %>">
+                    <td></td>
+                    <td><%= commission_statement_formatted_date(statement.date) %></td>
+                    <td><%= commission_statement_coverage_period(statement.date) %></td>
+                    <td><%= link_to "<i class='fa fa-cloud-download' aria-hidden='false' title='Download' data-toggle='tooltip'></i>".html_safe, download_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
+                    <td><%= link_to "<i class='fa fa-file-pdf-o' aria-hidden='true' data-toggle='tooltip'></i>".html_safe,  show_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank" %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('td i').click(function() {
+    $(this).toggleClass("glyphicon glyphicon-plus glyphicon glyphicon-minus");
+  });
+
+  $(document).ready(function() {
+    $('tr.statements').hide();
+
+    $('.statement_years').each(function() {
+      $(this).click(function() {
+        $('tr.' + $(this).attr('id')).toggle();
+      })
+    });
+
+  });
+</script>

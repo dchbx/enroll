@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAN0
+  division_code: I
+  division_label: Services
+  major_group_code: '73'
+  major_group_label: Business Services
+  industry_group_code: '735'
+  industry_group_label: Miscellaneous Equipment Rental And Leasing
+  sic_code: '7352'
+  sic_label: Medical Equipment Rental and Leasing

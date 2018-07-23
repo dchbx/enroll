@@ -2,11 +2,13 @@ FactoryGirl.define do
   factory :plan_year do
     employer_profile
 
+    recorded_rating_area { Settings.aca.rating_areas.first }
+    recorded_sic_code { employer_profile.sic_code }
     start_on { (TimeKeeper.date_of_record).beginning_of_month }
 
     end_on { start_on + 1.year - 1.day }
     open_enrollment_start_on { (start_on - 30).beginning_of_month }
-    open_enrollment_end_on { open_enrollment_start_on + 1.weeks }
+    open_enrollment_end_on { (open_enrollment_start_on + Settings.aca.shop_market.open_enrollment.monthly_end_on.days) - 1.day }
     fte_count { 5 }
   end
 
@@ -33,7 +35,7 @@ FactoryGirl.define do
     employer_profile
     start_on { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
     end_on { start_on + 1.year - 1.day }
-    open_enrollment_start_on { (start_on - 32).beginning_of_month }
+    open_enrollment_start_on { (start_on - 32).beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days}
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
     aasm_state "enrolling"
     fte_count { 5 }
@@ -43,7 +45,7 @@ FactoryGirl.define do
     employer_profile
     start_on { (TimeKeeper.date_of_record).next_month.beginning_of_month }
     end_on { start_on + 1.year - 1.day }
-    open_enrollment_start_on { (start_on - 32).beginning_of_month }
+    open_enrollment_start_on { (start_on - 32).beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days}
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
     aasm_state "renewing_enrolling"
     fte_count { 5 }
@@ -51,7 +53,7 @@ FactoryGirl.define do
 
   factory :plan_year_not_started, class: PlanYear do
     employer_profile
-    start_on { (TimeKeeper.date_of_record + 3.months).beginning_of_month }
+    start_on { (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month }
     end_on { start_on + 1.year - 1.day }
     open_enrollment_start_on { (start_on - 1.month).beginning_of_month }
     open_enrollment_end_on { open_enrollment_start_on + 1.weeks }
@@ -64,19 +66,21 @@ FactoryGirl.define do
     transient do
       renewing false
       with_dental false
-      reference_plan {FactoryGirl.create(:plan, :with_premium_tables)._id}
+      reference_plan {FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables)._id}
       dental_reference_plan nil
     end
 
     employer_profile
     start_on TimeKeeper.date_of_record.beginning_of_month
     end_on { start_on + 1.year - 1.day }
-    open_enrollment_start_on { start_on - 1.month }
+    open_enrollment_start_on { start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days }
     imported_plan_year true
+    fte_count { 5 }
 
     open_enrollment_end_on do
       end_date = renewing ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on : Settings.aca.shop_market.open_enrollment.monthly_end_on
-      Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, end_date)
+      previous_month = start_on.prev_month
+      Date.new(previous_month.year, previous_month.month, end_date)
     end
 
     after(:create) do |custom_plan_year, evaluator|

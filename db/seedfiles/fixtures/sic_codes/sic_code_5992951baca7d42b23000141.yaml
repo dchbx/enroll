@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAFB
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '28'
+  major_group_label: Chemicals And Allied Products
+  industry_group_code: '284'
+  industry_group_label: Soap, Detergents, And Cleaning Preparations; Perfumes, Cosmetics,
+    and Other Toilet Preparations
+  sic_code: '2843'
+  sic_label: Surface Active Agents, Finishing Agents, Sulfonated Oils, and Assistants

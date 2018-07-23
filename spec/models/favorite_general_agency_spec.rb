@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe FavoriteGeneralAgency, type: :model do
   let(:general_agency_profile) { FactoryGirl.build(:general_agency_profile) }
   let(:broker_role) { FactoryGirl.build(:broker_role) }
@@ -37,4 +38,5 @@ RSpec.describe FavoriteGeneralAgency, type: :model do
       end
     end
   end
+end
 end

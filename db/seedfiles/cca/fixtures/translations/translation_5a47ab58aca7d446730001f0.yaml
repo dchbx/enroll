@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAHw
+  key: en.insured.group_selection.terminate_confirm.terminate_confirm_note_html
+  value: '"<strong>Note:</strong>Federal law allows your plan(s) to require that you
+    make your request for termination no less than 14 days before the date you want
+    your coverage to end. This requirement was included in the notice that you received
+    from %{site_short_name} after you enrolled in your plan."'

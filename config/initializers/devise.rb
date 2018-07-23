@@ -160,7 +160,7 @@ Devise.setup do |config|
   # time the user will be asked for credentials again. Default is 30 minutes.
 
   config.timeout_in = 15.minutes
-  config.timeout_in = 6000.minutes if Rails.env.development? && (ENV['timeout'] != 'true')
+  config.timeout_in = 480.minutes if Rails.env.development? && (ENV['timeout'] != 'true')
 
   # If true, expires auth token on session timeout.
   # config.expire_auth_token_on_timeout = false

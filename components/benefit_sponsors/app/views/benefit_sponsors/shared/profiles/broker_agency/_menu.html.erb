@@ -1,0 +1,97 @@
+<% content_for :horizontal_menu do %>
+  <div class="mainmenu">
+    <div class="container">
+      <ul role="tablist" class="list-unstyled list-inline" id="myTab">
+        <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>>
+          <%= link_to(profiles_broker_agencies_broker_agency_profile_path(broker_profile_id), "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+            <span class="hidden-xs"><%= l10n("home")%></span>
+            <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
+          <% end %>
+        </li>
+        <li role="presentation" id="employers-tab" <%= menu_tab_class(active_tab, "employers-tab") %>>
+          <%= link_to(sponsored_benefits.employers_organizations_broker_agency_profile_path(broker_profile_id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
+            <span class="hidden-xs"><%= l10n("employers")%></span>
+            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
+          <% end %>
+        </li>
+        <li role="presentation" id="families-tab" <%= menu_tab_class(active_tab, "families-tab") %>>
+          <%= link_to(family_index_profiles_broker_agencies_broker_agency_profiles_path(id: broker_profile_id ), "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
+            <span class="hidden-xs"><%= l10n("families")%></span>
+            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
+          <% end %>
+        </li>
+        <% if @staff_role %>
+          <% if site_broker_claim_quoting_enabled? && !individual_market_is_enabled? %>
+            <li role="presentation" id="brokers-tab" <%= menu_tab_class(active_tab, "brokers-tab").present? || "class=hide" %>>
+              <%= link_to(main_app.broker_agencies_profile_applicants_path(broker_profile_id), :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
+                <span class="hidden-xs">Brokers</span>
+                <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Brokers"></span>
+              <% end %>
+            </li>
+          <% end %>
+          <!-- Hidden due to request in 18558
+          <li role="presentation" id="inbox-tab" <%#= menu_tab_class(active_tab, "inbox-tab") %>>
+            <%#= link_to(agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+              <span class="badge message-unread"><%#=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
+              <%#= l10n("broker_agencies.profiles.agency_mail")%>
+            <%# end %>
+          </li>
+          -->
+        <% end %>
+        <% if general_agency_enabled? %>
+          <li role="presentation" id="general-agency-tab" <%= menu_tab_class(active_tab, "general-agency-tab") %>>
+            <!--TODO: Enable Link when GA is moved to the Engine-->
+            <%#= link_to(general_agency_index_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "general-agency", "role" => "tab" ) do  %>
+              <span class="hidden-xs">General Agencies</span>
+              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="General Agencies"></span>
+            <%# end %>
+          </li>
+        <% end %>
+        <% if site_broker_quoting_enabled? && individual_market_is_enabled? %>
+          <li role="presentation" id="assign-tab" <%= menu_tab_class(active_tab, "assign-tab") %>>
+            <%#= link_to(assign_profiles_broker_agencies_broker_agency_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
+              <span class="hidden-xs">Assign</span>
+              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Assign"></span>
+            <%# end %>
+          </li>
+          <!--TODO: Fix link when Quotes Controller is implemented in the Engine -->
+          <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
+           <%= link_to main_app.my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
+              <span class="hidden-xs">Quoting Tool</span>
+              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Quoting Tool"></span>
+            <% end %>
+          </li>
+        <% end %>
+
+        <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
+          <%= link_to(messages_profiles_broker_agencies_broker_agency_profiles_path(id: broker_profile_id), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+            <span class="badge message-unread"><%= total_messages(broker_profile_id) %></span>
+            <%= l10n("broker_mail")%>
+          <% end %>
+        </li>
+
+        <% if aca_broker_routing_information %>
+          <li role="presentation" id="commissions-tab" <%= menu_tab_class(active_tab, "commissions-tab") %>>
+            <%= link_to(commission_statements_profiles_broker_agencies_broker_agency_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+              <span class="hidden-xs">Commissions</span>
+              <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
+            <% end %>
+          </li>
+        <% end %>
+
+        <% if current_user.has_hbx_staff_role? %>
+        <% else %>
+          <% if individual_market_is_enabled? %>
+            <li role="presentation" class="multi-line">
+              <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
+                First Time Applications for Medicaid
+                <br/>
+                and Premium Tax Credits
+              <% end %>
+            </li>
+          <% end %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>

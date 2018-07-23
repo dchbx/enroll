@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WuN0OKyn1DBoAAAF
+  key: en.broker_agencies.broker_roles.broker_registration_text
+  value: '"By submitting this application to become a certified broker on the %{site_short_name}
+    for Business, I agree to the terms and conditions described in the %{site_brokers_agreement_path}."'

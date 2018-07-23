@@ -1,0 +1,25 @@
+h2.mt-3 Available Sites
+
+table.table.table-striped
+  thead.thead-dark
+    tr
+      th scope="col" Site Key
+      th scope="col" Long Name
+      th scope="col" Short Name
+      th scope="col" By Line
+      th scope="col" Domain Name
+      th
+      th
+  tbody
+    - @sites.each do |site|
+        tr
+          td = link_to site.site_key, "/benefit_markets/sites/#{site.id.to_s}/benefit_markets"
+          td = site.long_name
+          td = site.short_name
+          td = site.byline
+          td = site.domain_name
+          td = link_to 'Edit', edit_site_path(site)
+          td = link_to 'Destroy', site_path(site), method: :delete, data: { confirm: 'Are you sure?' }
+
+= link_to 'New Site', new_site_path, class:'btn btn-primary'
+      

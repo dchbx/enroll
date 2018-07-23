@@ -1,0 +1,15 @@
+<% opts = opts || {} %>
+<%= form_tag url, { method: :get, remote: (defined?(remote) ? remote : false), class: "form form-inline input-no-pd", role: "search", style: "margin: 0;"} do %>
+  <div class="input-group">
+      <%= label_tag :q, "Search term", {class: "sr-only"} %>
+      <%= text_field_tag :q, q, {placeholder: placeholder, class: "form-control"} %>
+      <% opts.each do |k,v|%>
+        <%= hidden_field_tag k, v %>
+      <% end %>
+      <span class="input-group-btn">
+          <button class="btn btn-default" type="submit">
+              <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+          </button>
+      </span>
+  </div>
+<% end %>

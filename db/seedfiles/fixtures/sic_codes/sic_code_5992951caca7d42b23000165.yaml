@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAFl
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '31'
+  major_group_label: Leather And Leather Products
+  industry_group_code: '313'
+  industry_group_label: Boot And Shoe Cut Stock And Findings
+  sic_code: '3131'
+  sic_label: Boot and Shoe Cut Stock and Findings

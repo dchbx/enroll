@@ -54,6 +54,8 @@ __MACOSX
 tags
 
 spec/vocabularies
+components/**/spec/dummy/tmp
+components/**/spec/examples.txt
 plan_xmls.zip
 
 # Ignore byebug history
@@ -61,3 +63,18 @@ plan_xmls.zip
 
 # Ignore .idea
 .idea
+.yardoc
+*.log
+
+# Ignore rspec state files
+**/spec/examples.txt
+
+# Ignore .orig files
+*.orig
+
+/public/packs
+/public/packs-test
+/node_modules
+yarn-debug.log*
+.yarn-integrity
+

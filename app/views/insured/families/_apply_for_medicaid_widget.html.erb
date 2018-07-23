@@ -1,28 +1,28 @@
 <div class="module shop-for-plans-widget">
   <div class="panel panel-default" id='shop-for-plans-widget'>
-  <% if @person.consumer_role.blank? %>
-    <div class="panel-body">
+    <% if @person.consumer_role.blank? %>
+      <div class="panel-body">
         <div class="row flex">
-        <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-          <strong><%= l10n('enroll_in_health_or_dental_dc') %></strong>
-        </div>
-        <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-          <div class='image-area'></div>
-          <%= link_to l10n('enroll'), build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+          <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+            <strong><%= l10n('enroll_in_health_or_dental_dc') %></strong>
+          </div>
+          <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+            <div class='image-area'></div>
+            <%= link_to l10n('enroll'), build_insured_consumer_role_index_path, method: :post, class: "btn btn-default pull-right" %>
+          </div>
         </div>
       </div>
-    </div>
     <% end %>
     <div class="panel-body">
       <div class="row flex">
-      <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-        <strong><%= l10n('insured.families.apply_for_medicaid_widget') %></strong>
-      </div>
-      <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-        <div class='image-area'></div>
+        <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+          <strong><%= l10n('insured.families.apply_for_medicaid_widget')%></strong>
+        </div>
+        <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+          <div class='image-area'></div>
           <%= link_to l10n("insured.families.medicaid_and_tax_credits"), navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </div>

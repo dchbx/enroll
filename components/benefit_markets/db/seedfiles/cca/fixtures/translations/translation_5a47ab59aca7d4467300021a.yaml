@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIa
+  key: en.insured.plan_shoppings.plan_filters_bronze_title_info
+  value: '"Bronze means the plan is expected to pay 60% of medical expenses for the
+    average population of consumers. Bronze plans generally have low premiums, but
+    you pay more when you get covered services."'

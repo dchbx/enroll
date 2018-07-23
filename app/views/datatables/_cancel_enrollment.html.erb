@@ -27,7 +27,7 @@
         <% @hbxs.each do |hbx| %>
         <tr>
           <td><%= hbx.hbx_id %></td>
-          <td><%= hbx.plan.name %></td>
+          <td><%= hbx.product.title %></td>
           <td><%= hbx.effective_on %></td>
           <td><%= hbx.effective_on %></td>
           <td><%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %></td>

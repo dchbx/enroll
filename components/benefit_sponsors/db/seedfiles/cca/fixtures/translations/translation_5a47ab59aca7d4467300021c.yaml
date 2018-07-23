@@ -1,0 +1,12 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIc
+  key: en.insured.plan_shoppings.plan_filters_catastrophic_title_info
+  value: '"While not a metal level plan, catastrophic plans are another group of plans
+    that have low monthly premiums and high annual deductibles. The plans are designed
+    to protect consumers from worst case situations like a serious illness or an accident.
+    Catastrophic plans are only available to people under 30 or people with a hardship
+    exemption."'

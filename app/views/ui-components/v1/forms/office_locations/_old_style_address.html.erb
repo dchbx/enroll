@@ -1,0 +1,91 @@
+<fieldset>
+  <% primary_office_location = office_fields.object.is_primary %>
+  <h3 class="ol_title"> <% if primary_office_location %> Primary <% end %> Office Location </h3>
+
+  <div id="address_info" class="row no-buffer focus_effect personal-info-row">
+    <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+      <%= office_fields.fields_for :address, office_fields.object.address, errors: {}, fieldset: false do |f| %>
+        <%= f.hidden_field :id, value: f.object.id if f.object.id.present? %>
+        <%
+          # address_kind = ''
+          # if params.has_key?(:organization)
+          #   office_address = params[:organization][:office_locations_attributes].first
+          #   address_kind = office_address[1][:address_attributes][:kind]
+          # end
+        %>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+            <button class="btn btn-new-address" onclick="return false;">ADDRESS</button>
+          </div>
+
+          <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
+            <div class="form-group form-group-lg">
+              <div class="row" style="margin: 0;">
+                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                  <div class="col-md-6 col-sm-6 col-xs-12 no-pd office_kind_select">
+                    <% kinds = Address::OFFICE_KINDS; kinds = kinds.rotate if params[:child_index] %>
+                    <%= f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, selected: f.object.try(:kind)),{}, class: "form-control", required: true, id:'kindSelect',placeholder: 'KIND' %>
+                  </div>
+                  <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
+              <%#= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'remove_fields close-2' %>
+              <a class="remove_fields close-2" data-action="click->office-locations#removeLocation"><i class="far fa-trash-alt fa-2x role-trashcan"></i></a>
+            </div>
+          </div>
+
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+              <%= f.text_field :address_1, class: "floatlabel form-control interaction-field-control-office-location-address-address-1", required: true, placeholder: 'ADDRESS LINE 1' %>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+              <%= f.text_field :address_2, class: "floatlabel form-control interaction-field-control-office-location-address-address-2", placeholder: 'ADDRESS LINE 2' %>
+            </div>
+          </div>
+          <div class="row row-form-wrapper no-buffer" data-controller="zip-check">
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                <%= f.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
+              </div>
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                <%= f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true) %>
+              </div>
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                 <%= f.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: primary_office_location ? 'change->zip-check#zipChange' : '', 'child-index': "#{f.index.to_s}" } %>
+              </div>
+              <div class="invalid-feedback">Please provide a valid zipcode.</div>
+
+              <% if aca_address_query_county && profile_type == "benefit_sponsor" && primary_office_location %>
+                <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd <%= 'primary-office-location' if primary_office_location %>">
+                   <% @counties = BenefitMarkets::Locations::CountyZip.where(zip: f.object.try(:zip)).pluck(:county_name).uniq %>
+                   <% @empty_message = f.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
+                   <% @counties = [@empty_message] if @counties.empty? %>
+                   <%= f.select(:county, options_for_select(@counties, selected: (f.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq })%>
+                </div>
+              <% end %>
+          </div>
+        <% end %>
+      </div>
+      <div class="col-md-2 key col-sm-3 col-xs-12"></div>
+    </div><br>
+    <%# MPYC missing phone fields. we should always have persisted phone record while editing business info %>
+    <%= office_fields.fields_for :phone, office_fields.object.phone || BenefitSponsors::Organizations::OrganizationForms::PhoneForm.new, errors: {}, fieldset: false do |phone| %>
+    <%= phone.hidden_field :id, value: phone.object.id if phone.object.id.present? %>
+    <div id="phone_info" class="row no-buffer row-form-wrapper">
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code area-code", required: true, placeholder: 'AREA CODE', oninvalid:"checkAreaCode(this);", oninput:"checkAreaCode(this);" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= phone.text_field :number, class: "floatlabel form-control phone_number7 interaction-field-control-office-location-phone-number", required: true, placeholder: 'NUMBER', oninvalid:"checkPhone(this);", oninput:"checkPhone(this);" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
+        <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION' %>
+      </div>
+    </div><br>
+  <% end %>
+</fieldset>

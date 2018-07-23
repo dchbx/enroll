@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "add_new_eligibility_determination")
 describe AddNewEligibilityDetermination, dbclean: :after_each do
   let(:given_task_name) { "add_new_eligibility_determination" }
@@ -52,4 +53,5 @@ describe AddNewEligibilityDetermination, dbclean: :after_each do
       end
     end
   end
+end
 end

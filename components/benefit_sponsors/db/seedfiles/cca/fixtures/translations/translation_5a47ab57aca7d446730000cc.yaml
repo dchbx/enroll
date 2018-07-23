@@ -1,0 +1,14 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADM
+  key: en.insured.consumer_roles.docs_shared.citizenship_number_title
+  value: '"• When entering a Citizenship Certification Number, include all numbers
+    and letters. Do not enter any other characters or spaces. • The Certification
+    number entered must have between 6 and 12 characters.   How to find Citizenship
+    Certification Number: The Certificate of Citizenship certification number is most
+    often in the upper right hand corner of the Certificate.   The Certificate of
+    Citizenship certification number is printed in red on all US Certificates of Citizenship
+    issued since September 27, 1906."'

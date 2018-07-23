@@ -1,10 +1,10 @@
 -# this partial will separate out health and dental elected plans
 - if benefit_group.elected_plans.present?
-  = render :partial => "events/v2/employers/benefit_group", :locals => {benefit_group:benefit_group,
+  = render :partial => "events/employers/benefit_group", :locals => {benefit_group:benefit_group,
             elected_plans: benefit_group.elected_plans, reference_plan: benefit_group.reference_plan,
             relationship_benefits: benefit_group.relationship_benefits}
 
 - if benefit_group.is_offering_dental?
-  = render :partial => "events/v2/employers/benefit_group", :locals => {benefit_group:benefit_group,
+  = render :partial => "events/employers/benefit_group", :locals => {benefit_group:benefit_group,
             elected_plans: benefit_group.elected_dental_plans, reference_plan: benefit_group.dental_reference_plan,
             relationship_benefits: benefit_group.dental_relationship_benefits}

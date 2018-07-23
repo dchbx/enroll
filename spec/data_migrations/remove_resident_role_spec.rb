@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "remove_resident_role")
 
 describe RemoveResidentRole do
@@ -131,4 +132,5 @@ describe RemoveResidentRole do
       expect(person1.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to eq(person1.consumer_role.id)
     end
   end
+end
 end

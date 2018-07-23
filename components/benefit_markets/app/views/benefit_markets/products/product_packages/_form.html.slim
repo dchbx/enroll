@@ -1,0 +1,53 @@
+- if @product_package.errors.any?
+  ul
+    - @product_package.errors.full_messages.each do |msg|
+      li= msg
+
+.row
+  = f.label :title, class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.text_field :title, class: "form-control", required: true
+
+.row
+  = f.label :product_kind, 'Product Kind', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :product_kind, options_for_select([["Please select the kind of product", nil]] + @product_package.available_product_kinds, selected: @product_package.product_kind), {}, class: "form-control", data: { action: "product-package--form#kindChange" }
+
+.row.js-package-kind class=(@product_package.product_kind == 'health' ? '' : 'hidden') data-target='product-package--form.healthPackageKind'
+  = f.label :health_package_kind, 'Package Kind', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :health_package_kind, options_for_select([["Please select the kind of health package", nil]] + @product_package.available_health_package_kinds, selected: @product_package.package_kind), {}, class: 'form-control'
+
+.row.js-package-kind class=(@product_package.product_kind == 'dental' ? '' : 'hidden') data-target='product-package--form.dentalPackageKind'
+  = f.label :dental_package_kind, 'Package Kind', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :dental_package_kind, options_for_select([["Please select the kind of dental package", nil]] + @product_package.available_dental_package_kinds, selected: @product_package.package_kind), {}, class: 'form-control'
+
+.row.js-package-kind class=(['health', 'dental'].include?(@product_package.product_kind) ? 'hidden' : '') data-target='product-package--form.defaultPackageKind'
+  = f.label :package_kind, 'Package Kind', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :package_kind, options_for_select([["Please select the kind of package", nil]] + @product_package.available_default_package_kinds, selected: @product_package.package_kind), {}, class: 'form-control'
+
+.row
+  = f.label :benefit_kind, 'Benefit Kind', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :benefit_kind, options_for_select([["Please select the kind of benefit", nil]] + @product_package.available_benefit_kinds, selected: @product_package.benefit_kind), {}, class: "form-control"
+
+.row
+  = f.label :pricing_model_id, 'Pricing Model', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :pricing_model_id, options_for_select([["Please select a pricing model", nil]] + @product_package.available_pricing_models, selected: @product_package.pricing_model_id), {}, class: "form-control"
+
+.row
+  = f.label :contribution_model_id, 'Contribution Model', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :contribution_model_id, options_for_select([["Please select a contribution model", nil]] + @product_package.available_contribution_models, selected: @product_package.contribution_model_id), {}, class: "form-control"
+
+.row
+  = f.label :benefit_catalog_id, 'Benefit Catalog', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :benefit_catalog_id, options_for_select([["Please select a benefit catalog", nil]] + @product_package.available_benefit_catalogs, selected: @product_package.benefit_catalog_id), {}, class: "form-control"
+
+
+- if @product_package.has_additional_attributes?
+  = render partial: "benefit_markets/products/product_packages/#{@product_package.additional_form_fields_partial}", :locals => { :form => f }

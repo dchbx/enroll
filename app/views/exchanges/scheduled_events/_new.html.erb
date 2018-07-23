@@ -1,0 +1,12 @@
+<div id="create_event">
+  <div class="container top-pd">
+    <div class="tab-wrapper">
+      <h3 class="title-inline">Create Scheduled Events</h3>
+    </div>
+  </div>
+  <div id="schedules_event_form">
+    <%= form_for scheduled_event, as: :scheduled_event, url: {action: "create"}, remote: true do |f| %>
+      <%= render "event_form", f: f %>
+    <% end %>
+  </div>
+</div>

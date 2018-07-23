@@ -1,0 +1,43 @@
+- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
+
+.col-md-12.col-xs-12
+  .row
+    h1.heading-text.mt-0 
+		| Benefit Application Details
+    span.blocking
+      .row.row-form-wrapper.col-md-12.ml-1
+        .col-md-6.col-sm-12.p0.form-group.form-group-lg
+          .floatlabel-wrapper style="position:relative"
+            label.label-floatlabel.mb-1 for="startOn" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;" COVERAGE START ON
+            input.form-control type="text" value="#{f.parent.start_on}"
+        .col-md-6.col-sm-12.p0.form-group.form-group-lg
+          .floatlabel-wrapper style="position:relative"
+            label.label-floatlabel.mb-1 for="startOn" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;" COVERAGE END ON
+            input.form-control type="text" value="#{f.parent.end_on}"
+      .row.row-form-wrapper.col-md-12.ml-1.mt-2
+        .col-md-6.col-sm-12.p0.form-group.form-group-lg
+          .floatlabel-wrapper style="position:relative"
+            label.label-floatlabel.mb-1 for="startOn" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;" OPEN ENROLLMENT START ON
+            input.form-control type="text" value="#{f.parent.open_enrollment_start_on}"
+        .col-md-6.col-sm-12.p0.form-group.form-group-lg
+          .floatlabel-wrapper style="position:relative"
+            label.label-floatlabel.mb-1 for="startOn" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;" OPEN ENROLLMENT END ON
+            input.form-control type="text" value="#{f.parent.open_enrollment_end_on}"
+      .row.row-form-wrapper.col-md-12.ml-1.mt-2
+        .col-md-4.col-sm-12.p0.form-group.form-group-lg
+          .floatlabel-wrapper style="position:relative"
+            label.label-floatlabel.mb-1 for="startOn" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;" FULL TIME EMPLOYEES
+            input.form-control type="text" value="#{f.parent.fte_count}"
+        .col-md-4.col-sm-12.p0.form-group.form-group-lg
+          .floatlabel-wrapper style="position:relative"
+            label.label-floatlabel.mb-1 for="startOn" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;" PART TIME EMPLOYEES
+            input.form-control type="text" value="#{f.parent.pte_count}"
+        .col-md-4.col-sm-12.p0.form-group.form-group-lg
+          .floatlabel-wrapper style="position:relative"
+            label.label-floatlabel.mb-1 for="startOn" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;" MEDICARE SECOND PAYERS
+            input.form-control type="text" value="#{f.parent.msp_count}"
+
+.pull-right
+  = link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(f.parent.service.benefit_sponsorship, f.service.benefit_application), remote: true, class: "btn btn-default pull-right mrz mr-1", id:'editPlanYearButton'
+
+        

@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAACj
+  key: en.users.orphans.index.invalid_accounts_contents
+  value: '"However, not all unlinked accounts are invalid.  For example, a customer
+    may return later (via SSO) and complete the screeing process."'

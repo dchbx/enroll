@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANm
+  division_code: I
+  division_label: Services
+  major_group_code: '72'
+  major_group_label: Personal Services
+  industry_group_code: '729'
+  industry_group_label: Miscellaneous Personal Services
+  sic_code: '7299'
+  sic_label: Miscellaneous Personal Services, Not Elsewhere Classified

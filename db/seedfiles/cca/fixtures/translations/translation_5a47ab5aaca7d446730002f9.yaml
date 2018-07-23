@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWqyn1EZzAAL5
+  key: en.broker_agencies.profiles.no_default_general_agency_profile
+  value: '"You do not have default GA, to select your default GA click ''Select Default
+    GA'' under your desired agency."'

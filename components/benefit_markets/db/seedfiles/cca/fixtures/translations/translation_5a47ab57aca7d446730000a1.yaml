@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAACh
+  key: en.users.orphans.index.without_screen_process_list
+  value: '"Test accounts are created without completing screening process"'

@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAABv
+  division_code: B
+  division_label: Mining
+  major_group_code: '14'
+  major_group_label: Mining And Quarrying Of Nonmetallic Minerals, Except Fuels
+  industry_group_code: '148'
+  industry_group_label: Nonmetallic Minerals Services, Except Fuels
+  sic_code: '1481'
+  sic_label: Nonmetallic Minerals Services, Except Fuels

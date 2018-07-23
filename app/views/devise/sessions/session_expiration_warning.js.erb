@@ -21,22 +21,22 @@ function session_countdown (){
 // reset user clock
 $('#stay-logged-in').on('click', function() {
     $.ajax({
-      url: '<%= reset_user_clock_path(:format => :js) %>',
+      url: "<%= reset_user_clock_path(format: :js) %>",
       method: 'GET',
-      dataType: "script",
+      dataType: 'script',
       success: function(response){
         $('#sessionExpirationWarningModal').remove();
-	clearInterval(countdown_timer);
+        clearInterval(countdown_timer);
         clearTimeout(logout_check_timer);
         logout_check_timer = setTimeout(check_time_until_logout, <%= (Devise.timeout_in - 30) * 1000 %>);
       },
       error: function(response){
-        window.location.replace('<%= SamlInformation.iam_login_url %>');
+        window.location.replace('<%= site_redirect_on_timeout_route %>');
       }
     });
 
 });
 <% else %>
-clearTimeout(logout_check_timer);
-logout_check_timer = setTimeout(check_time_until_logout, <%= (@time_left - 30) * 1000 %>);
+  clearTimeout(logout_check_timer);
+  logout_check_timer = setTimeout(check_time_until_logout, <%= (@time_left - 30) * 1000 %>);
 <% end %>

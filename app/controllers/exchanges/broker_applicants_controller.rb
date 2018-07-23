@@ -52,16 +52,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.recertify!
       flash[:notice] = "Broker applicant is now approved."
     elsif params['pending']
-      all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
-      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+      broker_carrier_appointments
       broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else
-      all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
-      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+      broker_carrier_appointments
       broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
       broker_role.approve!
       broker_role.reload
@@ -82,6 +78,17 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   private
+
+  def broker_carrier_appointments
+    all_carrier_appointment = BrokerRole::BROKER_CARRIER_APPOINTMENTS.stringify_keys
+    broker_carrier_appointments_enabled = Settings.aca.broker_carrier_appointments_enabled
+    unless broker_carrier_appointments_enabled
+      all_carrier_appointment.merge!(params[:person][:broker_role_attributes][:carrier_appointments]) if params[:person][:broker_role_attributes][:carrier_appointments]
+      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+    else
+      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment.each{ |key,str| all_carrier_appointment[key] = "true" }
+    end
+  end
 
   def send_secure_message_to_broker_agency(broker_role)
     hbx_admin = HbxProfile.all.first

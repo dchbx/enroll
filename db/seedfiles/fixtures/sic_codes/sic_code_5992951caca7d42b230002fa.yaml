@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAL6
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '56'
+  major_group_label: Apparel And Accessory Stores
+  industry_group_code: '566'
+  industry_group_label: Shoe Stores
+  sic_code: '5661'
+  sic_label: Shoe Stores

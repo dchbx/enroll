@@ -1,0 +1,12 @@
+div#officeLocations.mb-1
+  div.pull-right.hidden#removeAddress
+    i.fas.fa-trash.fa-lg.mt-1 onclick="removeOfficeLocation()"
+  = f.fields_for :office_locations, f.object.office_locations do |office_fields|
+    = office_fields.fields_for :address, office_fields.object.address do |address_fields|
+      = render partial: './ui-components/v1/forms/office_locations/address', locals: {f: address_fields}
+      = office_fields.fields_for :phone, office_fields.object.phone do |phone_fields|
+        = render partial: './ui-components/v1/forms/office_locations/phone', locals: {f: phone_fields}
+
+div#newOfficeLocations
+
+a.btn.btn-default#addOfficeLocation type="button" onclick="addOfficeLocation()" Add Office Location

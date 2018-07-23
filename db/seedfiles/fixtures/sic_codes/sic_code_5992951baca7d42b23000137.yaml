@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAE3
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '28'
+  major_group_label: Chemicals And Allied Products
+  industry_group_code: '282'
+  industry_group_label: Plastics Materials And Synthetic Resins, Synthetic
+  sic_code: '2821'
+  sic_label: Plastics Materials, Synthetic Resins, and Nonvulcanizable Elastomers

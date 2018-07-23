@@ -1,0 +1,20 @@
+<thead>
+  <tr class='row'>
+    <th class='col-sm-4'><%= l10n("broker_name")%></th>
+    <th class='col-sm-3'><%= l10n("agency_name")%></th>
+    <th class='col-sm-3'><%= l10n("market_kind")%></th>
+    <th class='col-sm-2'></th>
+  </tr>
+</thead>
+
+<tbody>
+  <% @staff.each do |staff| %>
+    <tr class='row'>
+      <td class='col-sm-4'><%= staff.first_name + ' ' + staff.last_name %></td>
+      <td class='col-sm-3'><%= BenefitSponsors::Organizations::Organization.where(:"profiles._id" => staff.broker_role.benefit_sponsors_broker_agency_profile_id).first.legal_name %></td>
+      <td class='col-sm-3'><% market_kind = staff.broker_role.market_kind %>
+        <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %><%= l10n("market")%></td>
+      <td class='col-sm-2'><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'><%= l10n("select")%></a></td>
+   </tr>
+  <% end %>
+</tbody>

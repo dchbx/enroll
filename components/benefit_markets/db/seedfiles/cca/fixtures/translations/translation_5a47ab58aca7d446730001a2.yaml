@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGi
+  key: en.insured.enroll_in_the_individual_market_msg
+  value: '"If you wish to purchase insurance, please enroll in the Individual Market."'

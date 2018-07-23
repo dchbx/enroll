@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJs
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '44'
+  major_group_label: Water Transportation
+  industry_group_code: '443'
+  industry_group_label: Freight Transportation On The Great Lakes-st.
+  sic_code: '4432'
+  sic_label: Freight Transportation on the Great Lakes-St. Lawrence Seaway

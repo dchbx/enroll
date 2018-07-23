@@ -1,0 +1,81 @@
+.employer-welcome.col-xs-12
+  .row
+    p.lead It's time to set up your Health Benefits Program. You can either get help from a Broker, or set up your Health Benefits Program yourself. Choose the path that's right for you.
+
+  - if employer_attestation_is_enabled?
+    .left-icon-section.section
+      .row
+        .col-md-offset-1.col-md-11
+          h3 =l10n("employers.employer_profiles.my_account.important_documents_needed")
+          p.twenty =l10n("employers.employer_profiles.my_account.eligibility_documents_needed")
+
+  - unless @employer_profile.broker_agency_profile.present?
+    .left-icon-section.section
+      .row
+        .col-md-1
+          .row
+            = image_tag('ui/expertgreen_50.png')
+        .col-md-11
+          h3 Get Help From a Broker
+          p.twenty You may want to select a Broker as your personal advocate and trusted adviser, who at no cost to you, can help you set up and administer your Health Benefits Program. If you'd like to select a Broker, we suggest doing so first.
+          = link_to '#', '', class: 'view-more'
+          | View More 
+          i.fa.fa-chevron-down
+
+          .empty-box.x-right.col-xs-12.dn
+            .col-xs-12
+              .row
+                | Select
+                = link_to "\"Brokers\"", employers_employer_profile_path(@employer_profile, tab: 'brokers') 
+                | on the blue menu to the left and follow the instructions. Once you've confirmed your selection, you can logout. Your Broker will be in touch shortly and will help you do everything else.
+
+  .left-icon-section.section
+    .row
+      .col-xs-1
+        .row
+          = image_tag('ui/gearsgreen_50.png')
+      .col-xs-11
+        h3.no-buffer Set Up Your Health Benefits Program Yourself
+        p.twenty If you want to set up your Health Benefits Program yourself, we'll walk you through it step-by-step. 
+        a#showMoreBenefits role="button" data-toggle="collapse" href="#collapseMore" aria-expanded="false" aria-controls="collapseMore" View More
+        br
+        br
+        .collapse#collapseMore
+          .col-xs-12
+            .row
+              | To get started, select '#{ link_to "Employees", employers_employer_profile_path(@employer_profile, tab: 'employees')}' on the blue menu to the left and follow the instructions to add your employee roster. Then we'll help you create your plan(s), assign employees to your plan(s), upload employer attestation documentation, and publish your plan(s) for open enrollment.
+  br
+  .left-icon-section.empty-box.important.row.section
+    .vertically-aligned-row
+      .col-xs-1
+        i.fa.fa-flag.fa-2x
+      .col-xs-9
+        span
+          strong Important:
+          | You'll want to enter your employee roster first before selecting your Benefits so that you'll be able to see cost data when you select your Benefits.
+          br
+          br
+        - if individual_market_is_enabled?
+          .icon-left-download
+            = link_to "https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf", target: '_blank' do
+              i.fa.fa-download 
+              |  Download Step-by-Step Instructions for New Employers
+        - else
+          .icon-left-download 
+            = link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do
+              i.fa.fa-download 
+              |  Download Step-by-Step Instructions for New Employers
+      - if individual_market_is_enabled?
+        .col-xs-2.pdf-image.full-width
+          = link_to 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank' do
+          = image_tag('images/guidanceforsmallbusinessowners_214.jpg', class: 'pull-right')
+
+javascript:
+  $('#collapseMore').on('hide.bs.collapse', function () {
+    $('#showMoreBenefits').text('View More ').append('<i class="fa fa-chevron-down fa-lg"></i>')
+  })
+  
+  $('#collapseMore').on('show.bs.collapse', function () {
+    $('#showMoreBenefits').text('View Less ').append('<i class="fa fa-chevron-up fa-lg"></i>')
+  })
+

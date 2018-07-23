@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+
 RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model do
 
   let(:current_date) { Date.new(calender_year, 11, 1) }
@@ -206,4 +208,5 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
       end 
     end
   end
+end
 end

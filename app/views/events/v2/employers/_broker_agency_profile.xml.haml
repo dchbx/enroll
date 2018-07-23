@@ -19,7 +19,7 @@
           = render partial: "events/v2/phones/phone", collection: broker_agency_profile.primary_broker_role.person.phones
     %npn=broker_agency_profile.primary_broker_role.npn
   %brokers
-    - broker_agency_profile.brokers.each do |broker|
+    - broker_agency_profile.active_broker_roles.each do |broker|
       %broker
         %id
           %id= broker.id

@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAACk
+  key: en.users.orphans.index.disable_customer_access_contents
+  value: '"Incorrect usage of this feature can <strong>disable a customer''s access
+    to the HBX</strong> and should be done only by a knowledgable adminstrator and
+    in conjunction with any necessary action on the Enterprise SSO record."'

@@ -1,0 +1,58 @@
+// This is a manifest file that'll be compiled into application.js, which will include all the files
+// listed below.
+//
+// Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
+// or any plugin's vendor/assets/javascripts directory can be referenced here using a relative path.
+//
+// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
+// compiled file.
+//
+// Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
+// about supported directives.
+//
+//= require ui-components/components
+//= require_tree .
+
+// Initalize Datepickers for elements
+$(function() {
+  // Pass element ID, minDate, maxDate for datepicker options
+  initDatepicker('inputDOB',new Date('<%= Date.today.beginning_of_month-90.years %>'),new Date('<%= Date.today.end_of_month-18.years %>'));
+});
+
+
+$(document).on('change', "input#jq_datepicker_ignore_benefit_application_open_enrollment_start_on", function() {
+  var date = $(this).val();
+  if(check_dateformat(date) != true) {
+    $('.recommend #notice').html("<div class='alert-benefit-application alert-error'><h4>Open Enrollment Start Date: Invalid date format!</h4></div>");
+  } else {
+    $('.recommend #notice').html("");
+  }
+});
+
+$(document).on('change', "input#jq_datepicker_ignore_benefit_application_open_enrollment_end_on", function() {
+  var date = $(this).val();
+  if(check_dateformat(date) != true) {
+    $('.recommend #notice').html("<div class='alert-benefit-application alert-error'><h4>Open Enrollment End Date: Invalid date format!</h4></div>");
+  } else {
+    $('.recommend #notice').html("");
+  }
+});
+
+
+
+$(document).on('change', "#benefit_application_start_on", function() {
+  if ($('.recommend #notice h4').text() == "Loading Suggested Dates...") {
+    return false;
+  }
+
+  var start_on_date = $(this).val();
+  if(start_on_date != "") {
+    $('.recommend #notice').html("<h4>Loading Suggested Dates...<h4>");
+    var target_url = $("a#generate_recommend_dates").data("href");
+    $.ajax({
+      type: "GET",
+      data:{start_on: start_on_date},
+      url: target_url
+    });
+  };
+});

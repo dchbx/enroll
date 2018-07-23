@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALS
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '51'
+  major_group_label: Wholesale Trade-non-durable Goods
+  industry_group_code: '516'
+  industry_group_label: Chemicals And Allied Products
+  sic_code: '5162'
+  sic_label: Plastics Materials and Basic Forms and Shapes

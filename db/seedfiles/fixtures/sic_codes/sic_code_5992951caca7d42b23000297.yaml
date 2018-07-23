@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKX
+  division_code: E
+  division_label: 'Transportation, Communications, Electric, Gas, And Sanitary Services '
+  major_group_code: '49'
+  major_group_label: Electric, Gas, And Sanitary Services
+  industry_group_code: '496'
+  industry_group_label: Steam And Air-conditioning Supply
+  sic_code: '4961'
+  sic_label: Steam and Air-Conditioning Supply

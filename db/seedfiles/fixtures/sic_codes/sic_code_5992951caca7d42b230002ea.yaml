@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALq
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '54'
+  major_group_label: Food Stores
+  industry_group_code: '545'
+  industry_group_label: Dairy Products Stores
+  sic_code: '5451'
+  sic_label: Dairy Products Stores

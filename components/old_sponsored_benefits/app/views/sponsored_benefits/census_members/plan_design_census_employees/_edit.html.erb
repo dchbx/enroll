@@ -1,0 +1,26 @@
+<div class="col-xs-1">
+</div>
+<div class="col-xs-10">
+<%= form_for @census_employee, url: plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal, @census_employee) do |f| %>
+  <%= render 'form', f: f %>
+<% end %>
+</div>
+
+<script>
+$(function(){
+$( "form.edit_census_members_plan_design_census_employee" ).submit(function( event ) {
+  event.preventDefault();
+
+  $.ajax({
+    type: "PUT",
+    url: $(this).attr('action'),
+    data: $(this).serialize(),
+    dataType: "script",
+    success: function(data) {
+    }
+  });
+});
+
+})
+
+</script>

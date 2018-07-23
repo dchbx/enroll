@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALu
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '55'
+  major_group_label: Automotive Dealers And Gasoline Service Stations
+  industry_group_code: '552'
+  industry_group_label: Motor Vehicle Dealers (used Only)
+  sic_code: '5521'
+  sic_label: Motor Vehicle Dealers (Used Only)

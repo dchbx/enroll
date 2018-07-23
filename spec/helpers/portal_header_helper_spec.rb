@@ -21,17 +21,17 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
       end
 
         it "should have I'm an Employee link when user has active employee_staff_role" do
-         
+
           allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
-          expect(portal_display_name('')).to eq  "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-individual.png\" alt=\"Icon individual\" /> &nbsp; I'm an Employee</a>"
+          expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/mhc-icon-individual.png\" alt=\"Mhc icon individual\" /> &nbsp; I'm an Employee</a>"
         end
 
       it "should have Welcome prompt when user has no active role" do
         allow(current_user).to receive(:has_employer_staff_role?).and_return(false)
-        expect(portal_display_name(controller)).to eq "<a class='portal'>Welcome to the District's Health Insurance Marketplace</a>"
+        expect(portal_display_name(controller)).to eq "<a class='portal'>#{Settings.site.byline}</a>"
       end
 
-     
+
     end
 
     context "has_consumer_role?" do

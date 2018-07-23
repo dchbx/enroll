@@ -1,0 +1,44 @@
+<% plan_export_default_class ||= "plan-not-saved" %>
+
+<div class="col-md-8">
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th>Benefit Model Selection</th>
+        <td><%= Settings.plan_option_titles.send(@benefit_group.plan_option_kind.to_sym) %></td>
+      </tr>
+      <tr>
+        <th>Plan Name</th>
+        <td><%= @plan.name %></td>
+      </tr>
+      <tr>
+        <th>Plan Coverage Level</th>
+        <td><%= display_dental_metal_level @plan %></td>
+      </tr>
+      <tr>
+        <th>Plan Carrier</th>
+        <td><%= @plan.carrier_profile.legal_name %></td>
+      </tr>
+      <tr>
+        <th>Deductible - Medical</th>
+        <td><%= @plan.deductible %> / <%= @plan.family_deductible %></td>
+      </tr>
+<!--       <tr>
+        <th>Maximum Out of Pocket Costs</th>
+        <td><%#= @plan.deductible %> / <%#= @plan.family_deductible %></td>
+      </tr> -->
+      <tr>
+        <th>Summary of Benefits and Coverage (SBC)</th>
+        <td><%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="col-md-4">
+  <h2 class="text-center employer-cost-text">Estimated Maximum Monthly Employer Cost</h2>
+  <h2 class="employer-monthly-cost text-center"></h2>
+  <div class="text-center">
+    <a class="btn btn-default <%= plan_export_default_class %>" id="downloadReferencePlanDetailsButton" onmouseenter="setSBC('<%= sponsored_benefits.new_organizations_plan_design_proposal_plan_export_path(@plan_design_proposal) %>')">Download PDF</a>
+    <label class="sbc-download-label" for="sbc-checkbox"><%= check_box_tag "include_sbc", true, true, class: "sbc-download-checkbox" %> Include SBC</label>
+  </div>
+</div>

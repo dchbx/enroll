@@ -15,7 +15,7 @@ describe Events::BrokersController do
     before :each do
       allow(Person).to receive(:by_broker_role_npn).with(broker_id).and_return(found_brokers)
       allow(controller).to receive(:render_to_string).with(
-        "events/individuals/created", {:formats => ["xml"], :locals => {
+        "events/brokers/created", {:formats => ["xml"], :locals => {
          :individual => broker
         }}).and_return(rendered_template)
     end

@@ -1,5 +1,6 @@
 class CarrierProfile
   include Mongoid::Document
+  include Config::AcaModelConcern
   include SetCurrentUser
   include Mongoid::Timestamps
 
@@ -15,9 +16,10 @@ class CarrierProfile
   field :ivl_dental, type: Boolean
   field :shop_health, type: Boolean
   field :shop_dental, type: Boolean
+  field :offers_sole_source, type: Boolean, default: false
 
-  field :issuer_hios_id, type: String
-  field :issuer_state, type: String, default: "DC"
+  field :issuer_hios_ids, type: Array, default: []
+  field :issuer_state, type: String, default: aca_state_abbreviation
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
 
@@ -29,6 +31,9 @@ class CarrierProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  def self.for_issuer_hios_id(issuer_id)
+    Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
+  end
 
   def associated_carrier_profile=(new_associated_carrier_profile)
     if new_associated_carrier_profile.present?
@@ -59,6 +64,26 @@ class CarrierProfile
     def all
       list_embedded Organization.exists(carrier_profile: true).order_by([:legal_name]).to_a
     end
+
+    def carriers_for(employer_profile)
+      servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.issuer_hios_id }.uniq
+      self.all.reject { |cp| (cp.issuer_hios_ids & servicing_hios_ids).empty? }
+    end
+
+    def carrier_profile_service_area_pairs_for(employer_profile, start_on)
+     hios_carrier_id_mapping = Organization.where("carrier_profile" => {"$exists" => true}).inject({}) do |acc, org|
+
+       cp = org.carrier_profile
+
+       cp.issuer_hios_ids.each do |ihid|
+         acc[ihid] = cp.id
+       end
+       acc
+     end
+     employer_profile.service_areas_available_on(DateTime.new(start_on.to_i)).map do |service_area|
+       [hios_carrier_id_mapping[service_area.issuer_hios_id], service_area.service_area_id]
+     end.uniq
+   end
 
     def first
       all.first

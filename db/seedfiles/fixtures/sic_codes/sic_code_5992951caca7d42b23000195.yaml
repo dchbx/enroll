@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAGV
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '33'
+  major_group_label: Primary Metal Industries
+  industry_group_code: '334'
+  industry_group_label: Secondary Smelting And Refining Of Nonferrous
+  sic_code: '3341'
+  sic_label: Secondary Smelting and Refining of Nonferrous Metals

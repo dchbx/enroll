@@ -1,0 +1,34 @@
+- add_new_package = (params["add_new_benefit_package"] == "true")
+.reference-summary
+
+= f.hidden_field :benefit_application_id
+
+h1.heading-text Benefit Package - Set Up
+
+.benefit-properties
+  .plan-title#uic-wrapper
+    .row.row-form-wrapper
+      - title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits"
+      = f.text_field :title, class: "form-control", placeholder:'My Benefit Package', required: true
+    .row.row-form-wrapper
+      = f.text_field :description, class: "form-control", placeholder:'My Description'
+    .row.row-form-wrapper
+      = f.select :probation_period_kind, options_for_select(@benefit_package_form.catalog.probation_period_kinds, selected: f.object.probation_period_kind), {}, :class => 'form-control'
+    = f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|
+      = render "sponsored_benefit", f: sb
+
+  button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
+  button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Create Plan Year
+  
+
+  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
+      
+javascript:
+  var disableSelectric = false;
+
+- if add_new_package
+  javascript:
+    window.onload = function(){
+      document.getElementById("addBenefitPackage").classList.add("hidden")
+    }
+

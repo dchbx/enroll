@@ -89,6 +89,6 @@ class Phone
 
 private
   def filter_non_numeric(str)
-    str.to_s.gsub(/\D/,'') if str.present? 
+    str.present? ? str.to_s.gsub(/\D/,'') : ""
   end
 end

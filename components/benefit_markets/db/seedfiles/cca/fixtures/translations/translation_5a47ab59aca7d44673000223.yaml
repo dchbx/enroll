@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIj
+  key: en.insured.plan_shoppings.POS_title_info
+  value: '"A POS (Point-of-Service) plan is a combination of an HMO and a PPO. Typically
+    it has a network that functions like an HMO – you pick a primary care doctor,
+    who manages and coordinates your care within the network. Similar to a PPO, POS
+    plans usually also allow you to use a provider who is not in the network."'

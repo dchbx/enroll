@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAKu
+  key: en.detailed_employer_cost_breakdown_for_selected_plans
+  value: '"Detailed Employer cost breakdown for selected plans"'

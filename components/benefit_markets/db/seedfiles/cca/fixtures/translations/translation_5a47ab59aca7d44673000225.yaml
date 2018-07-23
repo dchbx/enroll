@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIl
+  key: en.insured.plan_shoppings.nationwide_title_info
+  value: '"The plan has a national network of doctors, specialists, other providers,
+    facilities and suppliers that plan members can access."'

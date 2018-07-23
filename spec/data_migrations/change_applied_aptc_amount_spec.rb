@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "change_applied_aptc_amount")
 
 describe ChangeAppliedAptcAmount, dbclean: :after_each do
@@ -30,4 +31,5 @@ describe ChangeAppliedAptcAmount, dbclean: :after_each do
       expect(hbx_enrollment.applied_aptc_amount.to_f).to eq 450.0
     end
   end
+end
 end

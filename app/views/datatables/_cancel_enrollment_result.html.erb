@@ -12,7 +12,7 @@
     <% @result[:success].each do |hbx| %>
       <tr>
         <td><%= hbx.hbx_id %></td>
-        <td><%= hbx.plan.name %></td>
+        <td><%= hbx.product.title %></td>
         <td><%= hbx.effective_on %></td>
         <td><%= hbx.effective_on %></td>
         <td><i class="fa fa-check" aria-hidden="true"></i></td>
@@ -20,7 +20,7 @@
     <% end %>
 
   <%elsif @result[:failure].present? %>
-    
+
     <tr>
       <th>HBX ID</th>
       <th>Plan</th>
@@ -32,7 +32,7 @@
     <% @result[:failure].each do |hbx| %>
       <tr>
         <td><%= hbx.hbx_id %></td>
-        <td><%= hbx.plan.name %></td>
+        <td><%= hbx.product.title %></td>
         <td><%= hbx.effective_on %></td>
         <td><%= hbx.effective_on %></td>
       </tr>

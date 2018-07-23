@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::FinalCatastrophicPlanNotice, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_mailing_address)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -103,4 +104,5 @@ RSpec.describe IvlNotices::FinalCatastrophicPlanNotice, dbclean: :after_each do
       expect(File.exist?(file.path)).to be true
     end
   end
+end
 end

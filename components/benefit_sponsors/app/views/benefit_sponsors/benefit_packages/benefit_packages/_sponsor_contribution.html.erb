@@ -1,0 +1,14 @@
+<div class="col-xs-12 offerings">
+  <div class="row row-form-wrapper no-buffer heading">
+    <div class="col-xs-12" id="offering_slider_header">
+      <div class="col-xs-6">Offered <i class="fa fa-question-circle" data-toggle="tooltip" title="You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees’ families."></i></div>
+      <div class="col-xs-6">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 benefits-fields">
+    <%= f.fields_for :contribution_levels, errors: {}, fieldset: false do |cl|  %>
+      <%= render "contribution_level", f: cl %>
+    <% end %>
+  </div>
+</div>

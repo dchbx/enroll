@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPo
+  division_code: I
+  division_label: Services
+  major_group_code: '89'
+  major_group_label: Miscellaneous Services
+  industry_group_code: '899'
+  industry_group_label: 'Miscellaneous Services '
+  sic_code: '8999'
+  sic_label: Services, Not Elsewhere Classified

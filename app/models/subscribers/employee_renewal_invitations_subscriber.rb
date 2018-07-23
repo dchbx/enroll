@@ -14,9 +14,9 @@ module Subscribers
     def process_response(payload)
       begin
         stringified_payload = payload.stringify_keys
-        plan_year_id = stringified_payload["plan_year_id"]
-        plan_year = PlanYear.find(plan_year_id)
-        plan_year.send_employee_renewal_invites
+        benefit_application_id = stringified_payload["benefit_application_id"]
+        benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.find(benefit_application_id)
+        benefit_application.send_employee_renewal_invites
       rescue => e
         notify("acapi.error.application.enroll.remote_listener.employee_renewal_invitations_subscriber", {
           :body => JSON.dump({

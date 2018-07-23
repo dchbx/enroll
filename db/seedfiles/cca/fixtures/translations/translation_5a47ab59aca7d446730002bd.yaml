@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAK9
+  key: en.employer_percentage_contributions
+  value: '"The following employer percentage contributions were used for calculation
+    of cost"'

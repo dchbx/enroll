@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe RuleSet::HbxEnrollment::IndividualMarketVerification do
   subject { RuleSet::HbxEnrollment::IndividualMarketVerification.new(enrollment) }
 
@@ -121,4 +122,5 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       end
     end
   end
+end
 end

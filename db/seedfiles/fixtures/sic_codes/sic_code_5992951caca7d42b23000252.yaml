@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJS
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '39'
+  major_group_label: Miscellaneous Manufacturing Industries
+  industry_group_code: '399'
+  industry_group_label: Miscellaneous Manufacturing Industries
+  sic_code: '3993'
+  sic_label: Signs and Advertising Specialties

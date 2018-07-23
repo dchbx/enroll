@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: IVL plan purchase
 
   Scenario: when IVL purchase plan for self & dependent
@@ -26,7 +27,7 @@ Feature: IVL plan purchase
     When consumer unchecks the primary person
     And consumer clicked on shop for new plan
     Then consumer should only see the dependent name
-    
+
   Scenario: IVL having an ineligible family member & doing plan shop
     Given a consumer exists
     And the consumer is logged in

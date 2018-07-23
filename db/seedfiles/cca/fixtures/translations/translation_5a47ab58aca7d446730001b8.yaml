@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAG4
+  key: en.insured.families.purchase.terminate_present_html
+  value: '"<p>Click Terminate Plan button to complete your termination from coverage.</p><p>You
+    will remain enrolled in coverage until you terminate your plan selection below.</p>"'
