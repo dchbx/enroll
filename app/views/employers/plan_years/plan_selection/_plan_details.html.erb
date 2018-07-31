@@ -22,7 +22,7 @@
   </section>
   <section class="col-xs-6">
     <h4 class="change-dental-reference-plan pull-right" style="display: none;">Change Reference Plan?</h4>
-    <% render partial: "employers/plan_years/dental_reference_plans_options_modal" %>
+      <% render partial: "employers/plan_years/dental_reference_plans_options_modal" %>
   </section>
   <h2></h2>
   <table>
@@ -54,7 +54,7 @@
       </td>
       <td style="padding-left: 0;">
         <p style="text-transform: capitalize;">
-          <%= @plan.nationwide ? 'Nationwide' : 'DC Metro' %></span>
+          <%= render partial: "shared/network_data", locals: {plan: @plan} %>
         </p>
       </td>
 
@@ -82,12 +82,18 @@
     </div>
   </div>
 </div>
+<% if check_plan_options_title %>
+    <div class="col-xs-12">
+      <div class="row">
+        <p class="text-info"><span class="glyphicon glyphicon-info-sign"></span>Note: Your final monthly cost is based on final employee enrollment.</p>
+      </div>
+    </div>
+<% end %>
+
+
 <div class="dental-config-links" style="display: none;">
   <br class="clear"/>
   <br/>
-  <h4 class="dental-config-reference-selection">
-    Configure which plans you're offering your employees
-  </h4>
   <% if @is_edit == 'true' && calc_offered == true %>
   <h4 class="dental-view-summary">
     <%= link_to 'View Plan Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: @plan.id, hios_id: @plan.hios_id, coverage_kind: @plan.coverage_kind), remote: true %>

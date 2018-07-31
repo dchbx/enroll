@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAJD
+  key: en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll
+  value: '"You must complete these steps to enroll."'

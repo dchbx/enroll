@@ -1,0 +1,66 @@
+- content_for :horizontal_menu do
+  #uic-primary-nav
+    .container
+      ul#myTab.list-unstyled.list-inline role="tablist"
+        li.pl-0 role="presentation"
+          a
+            = link_to(main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do
+              i.fas.fa-home.fa-lg aria-hidden="true"
+        - if individual_market_is_enabled?
+          li.dropdown role="presentation"
+            a Families
+          li role="presentation"
+            a Employers
+        - else
+          li role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'families', link_path: main_app.family_index_dt_exchanges_hbx_profiles_path, display_name: 'Families', active_tab: "families" }
+          li role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers" }
+        - if aca_user_accounts_enabled
+          li role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'user-account', link_path: main_app.user_account_index_exchanges_hbx_profiles_path, display_name: 'User Accounts',active_tab: "user-account" }
+          li role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'issuers', link_path: main_app.issuer_index_exchanges_hbx_profiles_path, display_name: 'Issuers', active_tab: "issuers" }
+          li role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'products', link_path: main_app.product_index_exchanges_hbx_profiles_path, display_name: 'Products', active_tab: "products" }
+          li.dropdown.pl-1 role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" Brokers 
+            i.fas.fa-caret-down
+            ul.dropdown-menu aria-labelledby="dropdownMenu1"
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'brokers', link_path: main_app.exchanges_broker_applicants_path, display_name: 'Broker Applications', active_tab: "brokers" }
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'broker-agencies', link_path: main_app.broker_agency_index_exchanges_hbx_profiles_path, display_name: 'Broker Agencies', active_tab: "broker-agencies" }
+              - if general_agency_enabled?
+                li
+                  = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'general-agencies', link_path: main_app.general_agency_index_exchanges_hbx_profiles_path, display_name: 'General Agencies', active_tab: 'general-agencies'}
+          li.dropdown.pl-1 role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" Admin 
+            i.fas.fa-caret-down
+            ul.dropdown-menu aria-labelledby="dropdownMenu1"
+              - if calendar_is_enabled?
+                li
+                  = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'calendar', link_path: main_app.exchanges_scheduled_events_path, display_name: 'Calendar', active_tab: 'calendar' }
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'configuration', link_path: main_app.configuration_exchanges_hbx_profiles_path, display_name: 'Config', active_tab: 'config' }
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'staff', link_path: main_app.staff_index_exchanges_hbx_profiles_path, display_name: 'Staff', active_tab: 'staff' }
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'users-orphans', link_path: main_app.users_orphans_path, display_name: 'Orphan Accounts', active_tab: 'users-orphans' }
+          li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
+            = link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do
+              | Inbox
+              span.badge.ml-half = @unread_messages
+          li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
+            = link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do
+              | Notices
+
+              
+
+                
+              

@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      Woh8B6yn1GT8AAAF
+  key: en.insured.families.purchase.remain_in_plan_until_terminate
+  value: '"You will remain enrolled in coverage until you terminate your plan selection
+    below."'

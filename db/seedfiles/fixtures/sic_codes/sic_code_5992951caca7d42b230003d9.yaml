@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPZ
+  division_code: I
+  division_label: Services
+  major_group_code: '86'
+  major_group_label: Membership Organizations
+  industry_group_code: '869'
+  industry_group_label: Membership Organizations, Not Elsewhere
+  sic_code: '8699'
+  sic_label: Membership Organizations, Not Elsewhere Classified

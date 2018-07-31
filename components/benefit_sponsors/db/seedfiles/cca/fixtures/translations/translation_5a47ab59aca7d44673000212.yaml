@@ -1,0 +1,11 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIS
+  key: en.insured.plan_shoppings.plan_filters_metal_level_title_info
+  value: '"Plans use metal levels as an easy way to help indicate how generous they
+    are in paying expenses.Metal levels only focus on what the plan is expected to
+    pay, and do NOT reflect the quality of health care or service providers available
+    through the health insurance plan."'

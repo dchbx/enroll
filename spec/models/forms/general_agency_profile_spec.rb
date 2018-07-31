@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 describe Forms::GeneralAgencyProfile, "given nothing" do
   subject { Forms::GeneralAgencyProfile.new }
 
@@ -27,8 +28,9 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     npn: "8422323232",
     legal_name: 'useragency',
     fein: "223232323",
+    sic_code: '1111',
     entity_kind: "c_corporation",
-    market_kind: "individual",
+    market_kind: Settings.aca.market_kinds.include?("individual") ? "individual" : "shop",
     working_hours: "0",
     accept_new_clients: "0",
     office_locations_attributes: office_locations
@@ -47,8 +49,9 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       kind: "primary",
       address_1: "99 N ST",
       city: "washignton",
-      state: "dc",
-      zip: "20006"
+      state: Settings.aca.state_abbreviation,
+      zip: "20006",
+      county: "County"
     }
   }
 
@@ -298,4 +301,5 @@ describe Forms::GeneralAgencyProfile, ".find", dbclean: :after_each do
   it "should have correct npn" do
     expect(@form.npn).to eq general_agency_profile.primary_staff.npn
   end
+end
 end

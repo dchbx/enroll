@@ -1,4 +1,4 @@
-<div class="modal claimQuoteModal" id="claimQUoteModal" tabindex="-1" role="dialog" role="document">
+<div class="modal claimQuoteModal" id="claimQuoteModal" tabindex="-1" role="dialog" role="document">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -10,7 +10,7 @@
           Please enter your claim code to create a Plan Year and Benefit Package based on the quote provided by your broker.
         </p>
         <!-- form_for @employer_profile, url: {action: "link_from_quote"}, method: "get", class: "form-inline" do |f|  -->
-        <%= form_for :employer_profile, url: employers_employer_profile_link_from_quote_path(@employer_profile), method: "get", class: "form-inline" do |f| %>
+        <%= form_for :employer_profile, url: sponsored_benefits.organizations_plan_design_proposal_claim_path(@employer_profile), method: "get", class: "form-inline" do |f| %>
         <label><%= text_field_tag :claim_code, nil, placeholder: 'X X X X - X X X X', maxlength: 9 %></label>
       </br></br>
       <!--   <p><label><%= check_box_tag "import_roster", "yes", false %> Import roster</label></p>

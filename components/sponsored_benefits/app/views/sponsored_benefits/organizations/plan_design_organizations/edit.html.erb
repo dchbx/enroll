@@ -1,0 +1,14 @@
+<div class="container content-bottom">
+  <div class="row">
+    <div class="tab-content" id="myTabContent">
+      <h3>
+        <div>Edit Employer Information</div>
+      </h3>
+      <br />
+      <%= form_for @organization, as: :organization, url: {action: "update"}, method: :patch do |f| %>
+        <%= render 'shared/error_messages', :object => @organization %>
+        <%= render 'form', f: f %>
+      <% end %>
+    </div>
+  </div>
+</div>

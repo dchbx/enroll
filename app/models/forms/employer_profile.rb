@@ -28,7 +28,7 @@ module Forms
         pending = false
       else
         pending = existing_company && Person.staff_for_employer(employer_profile).detect{|person|person.user_id}
-        role_state = pending ? 'is_applicant' : 'is_active' 
+        role_state = pending ? 'is_applicant' : 'is_active'
         person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: role_state)
       end
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
@@ -71,7 +71,9 @@ module Forms
         :dba => dba,
         :employer_profile => ::EmployerProfile.new({
           :entity_kind => entity_kind,
-          :contact_method => contact_method
+          :contact_method => contact_method,
+          :sic_code => sic_code,
+          :employer_attestation => ::EmployerAttestation.new(),
         }),
         :office_locations => office_locations
       )
@@ -79,7 +81,7 @@ module Forms
 
     def update_organization(org)
       if !org.employer_profile.present?
-        org.create_employer_profile({:entity_kind => entity_kind})
+        org.create_employer_profile({:entity_kind => entity_kind, :sic_code => sic_code})
         org.save!
       end
     end

@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADU
+  key: en.insured.passport_number.title
+  value: '"When entering a Passport Number, include all numbers and letters. Do not
+    enter any other characters or spaces. • The Passport Number that you enter must
+    have between 6 and 12 numbers and letters."'

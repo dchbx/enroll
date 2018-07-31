@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "update_aptc_dental_enr")
 
 
@@ -48,4 +49,5 @@ describe UpdateAptcDentalEnr, dbclean: :after_each do
       expect(hbx_enrollment.applied_aptc_amount.to_f).not_to eq 0.00
     end
   end
+end
 end

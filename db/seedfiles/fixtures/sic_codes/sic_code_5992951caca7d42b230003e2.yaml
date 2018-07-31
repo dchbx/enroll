@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPi
+  division_code: I
+  division_label: Services
+  major_group_code: '87'
+  major_group_label: Engineering, Accounting, Research, Management, And Related Services
+  industry_group_code: '874'
+  industry_group_label: Management And Public Relations Services
+  sic_code: '8741'
+  sic_label: Management Services

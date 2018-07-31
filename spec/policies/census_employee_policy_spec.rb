@@ -133,12 +133,12 @@ describe CensusEmployeePolicy do
         end
 
         context "when employee is staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employer_profile.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
             allow(user).to receive(:person).and_return person
-            allow(employee).to receive(:employer_profile).and_return employer_profile
+            allow(employee).to receive(:benefit_sponsors_employer_profile_id).and_return employer_profile.id
           end
 
           it "grants access when change dob" do
@@ -153,12 +153,12 @@ describe CensusEmployeePolicy do
         end
 
         context "when employee is not staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
             allow(user).to receive(:person).and_return person
-            allow(employee).to receive(:employer_profile).and_return employer_profile
+            allow(employee).to receive(:benefit_sponsors_employer_profile_id).and_return employer_profile.id
           end
 
           it "denies access when change dob" do
@@ -179,12 +179,12 @@ describe CensusEmployeePolicy do
         end
 
         context "when employee is staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employer_profile.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
             allow(user).to receive(:person).and_return person
-            allow(employee).to receive(:employer_profile).and_return employer_profile
+            allow(employee).to receive(:benefit_sponsors_employer_profile_id).and_return employer_profile.id
           end
 
           it "grants access when change dob" do
@@ -199,12 +199,12 @@ describe CensusEmployeePolicy do
         end
 
         context "when employee is not staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
             allow(user).to receive(:person).and_return person
-            allow(employee).to receive(:employer_profile).and_return employer_profile
+            allow(employee).to receive(:benefit_sponsors_employer_profile_id).and_return employer_profile.id
           end
 
           it "denies access when change dob" do

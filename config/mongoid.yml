@@ -2,10 +2,10 @@ development:
   # Configure available database sessions. (required)
   clients:
     # Defines the default session. (required)
-    default:
+    default: &default_development
       # Defines the name of the default database that Mongoid can connect to.
       # (required).
-      database: enroll_development
+      database: mhc_enroll_development
       # Provides the hosts the default session can connect to. Must be an array
       # of host:port pairs. (required)
       hosts:
@@ -27,6 +27,12 @@ development:
         # The time in seconds that Moped should wait before retrying an
         # operation on failure. (default: 0.25)
         # retry_interval: 0.25
+
+    rocketjob:
+      <<: *default_development
+    rocketjob_slices:
+      <<: *default_development
+
   # Configure Mongoid specific options. (optional)
   options:
     # Includes the root model name in json serialization. (default: false)
@@ -58,7 +64,7 @@ development:
 test:
   clients:
     default:
-      database: enroll_test<%= ENV['TEST_ENV_NUMBER'] %>
+      database: mhc_enroll_test<%= ENV['TEST_ENV_NUMBER'] %>
       hosts:
         - localhost:27017
       options:
@@ -69,7 +75,7 @@ test:
 production:
   clients:
     default:
-      database: enroll_production
+      database: mhc_enroll_production
       hosts:
         - localhost:27017
       options:

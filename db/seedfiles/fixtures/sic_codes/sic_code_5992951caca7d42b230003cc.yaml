@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAPM
+  division_code: I
+  division_label: Services
+  major_group_code: '83'
+  major_group_label: Social Services
+  industry_group_code: '832'
+  industry_group_label: Individual And Family Social Services
+  sic_code: '8322'
+  sic_label: Individual and Family Social Services

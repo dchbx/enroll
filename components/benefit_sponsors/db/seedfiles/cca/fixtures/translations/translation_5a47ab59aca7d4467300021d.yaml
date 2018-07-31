@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAId
+  key: en.insured.plan_shoppings.plan_type_title_info
+  value: '"The plan type you choose impacts which doctors you can see, whether or
+    not you can use out-of-network providers, and how much you''ll pay."'

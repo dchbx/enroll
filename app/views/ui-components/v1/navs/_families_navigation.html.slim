@@ -1,0 +1,40 @@
+nav
+  ul#uic-families-right-menu
+    li
+      = link_to l10n("my_site_short_name", site_short_name: site_short_name), family_account_path(tab: 'home')
+    - if ( @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present?) || ( @person.has_active_consumer_role? &&  @person.primary_family.current_broker_agency.present? )
+      li 
+        = link_to l10n("my_broker"), brokers_insured_families_path(tab: 'broker')
+    - if @person.has_consumer_role?
+      li
+        = link_to verification_insured_families_path(tab: 'verification') do
+          = l10n("documents")
+          - if enrollment_group_unverified?(@person) && verification_needed?(@person) && !documents_uploaded
+            span.badge.message-unread = l10n("action_needed")
+    - if current_user.has_hbx_staff_role? && @person.has_resident_role?
+      li
+        = link_to upload_application_insured_families_path(tab: 'verification') do
+          = l10n("upload_paper_application")
+    li
+      = link_to(inbox_insured_families_path(tab: 'messages')) do
+        = l10n("messages") 
+        span.badge.message-unread.ml-half
+          = @person.inbox.unread_messages.size
+  .my-account-widget.panel.panel-default
+    .panel-heading
+      h4 = l10n("my_account")
+    .panel-body
+      span.dg.ttc #{@person.first_name.try(:humanize)} #{@person.last_name.try(:humanize)}
+      - family_member_count = @family_members.nil? ? 0 : @family_members.count
+      - if family_member_count > 1
+        br
+        br
+        span.lg.ttu Your Household of #{@family_members.count}
+        br
+        - @family_members.each do |f|
+          span.twelve.ttc #{f.first_name} #{f.last_name}
+          br
+      = link_to l10n("manage_family"), manage_family_insured_families_path(tab: 'family'), class: 'btn btn-default btn-block mt-1'
+          
+
+      

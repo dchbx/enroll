@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANy
+  division_code: I
+  division_label: Services
+  major_group_code: '73'
+  major_group_label: Business Services
+  industry_group_code: '734'
+  industry_group_label: Services To Dwellings And Other Buildings
+  sic_code: '7342'
+  sic_label: Disinfecting and Pest Control Services

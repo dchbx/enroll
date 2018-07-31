@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAANV
+  division_code: I
+  division_label: Services
+  major_group_code: '70'
+  major_group_label: Hotels, Rooming Houses, Camps, And Other Lodging Places
+  industry_group_code: '703'
+  industry_group_label: Camps And Recreational Vehicle Parks
+  sic_code: '7032'
+  sic_label: Sporting and Recreational Camps

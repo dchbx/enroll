@@ -1,5 +1,7 @@
 <fieldset>
-  <h4> Office Location </h4>
+  <% primary_office_location = (!@row && !params[:child_index]) %>
+  <h3> <% if primary_office_location %> Primary <% end %> Office Location </h3>
+
   <div id="address_info" class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
       <%= f.fields_for :address, errors: {}, fieldset: false do |address| %>
@@ -44,15 +46,23 @@
           </div>
 
           <div class="row row-form-wrapper no-buffer">
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
               </div>
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
               </div>
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', oninvalid:"checkZip(this);", oninput:"checkZip(this);" %>
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                 <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP',oninvalid:"checkZip(this);", oninput:"checkZip(this);", data: { 'child-index': "#{f.index.to_s}" } %>
               </div>
+              <% if controller_name == 'employer_profiles' && aca_address_query_county %>
+                <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd <%= 'primary-office-location' if primary_office_location %>">
+                   <% @counties = RatingArea.find_counties_for(zip_code: address.object.try(:zip)) %>
+                   <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
+                   <% @counties = [@empty_message] if @counties.empty? %>
+                 <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{}, required: true, onchange: 'validateCounty(this)')%>
+                </div>
+              <% end %>
           </div>
         <% end %>
       </div>

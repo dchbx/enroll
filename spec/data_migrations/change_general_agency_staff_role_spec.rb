@@ -1,5 +1,5 @@
 require "rails_helper"
-require 'byebug'
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 require File.join(Rails.root, "app", "data_migrations", "change_general_agency_staff_role")
 
 describe ChangeGeneralAgencyStaffRole, dbclean: :after_each do
@@ -30,4 +30,5 @@ describe ChangeGeneralAgencyStaffRole, dbclean: :after_each do
           expect(incorrect_person.general_agency_staff_roles.present?).to eq false
       end
   end
+end
 end

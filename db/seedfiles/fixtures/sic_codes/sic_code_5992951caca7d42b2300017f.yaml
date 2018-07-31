@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAF/
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '32'
+  major_group_label: Stone, Clay, Glass, And Concrete Products
+  industry_group_code: '327'
+  industry_group_label: Concrete, Gypsum, And Plaster Products
+  sic_code: '3273'
+  sic_label: Ready-Mixed Concrete

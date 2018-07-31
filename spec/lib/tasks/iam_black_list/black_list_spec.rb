@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require "tasks/iam_black_list/black_list"
 
 def persisted(object)
@@ -154,4 +155,5 @@ describe BlackList, :dbclean => :after_each do
     end
 
   end
+end
 end

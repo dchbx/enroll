@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAF4
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '32'
+  major_group_label: Stone, Clay, Glass, And Concrete Products
+  industry_group_code: '326'
+  industry_group_label: Pottery And Related Products
+  sic_code: '3261'
+  sic_label: Vitreous China Plumbing Fixtures and China and Earthenware Fittings and
+    Bathroom Accessories

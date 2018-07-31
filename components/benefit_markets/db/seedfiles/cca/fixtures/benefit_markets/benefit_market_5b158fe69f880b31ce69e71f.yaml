@@ -1,0 +1,69 @@
+--- !ruby/object:BenefitMarkets::BenefitMarket
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5p+ICzHOaecf
+  title: ACA SHOP
+  description: CCA ACA Shop Market
+  kind: :aca_shop
+  site_urn: cca
+  site_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5J+ICzHOaeVu
+  updated_at: 2018-06-04 19:15:50.730000000 Z
+  created_at: 2018-06-04 19:15:50.730000000 Z
+  configuration: !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WxWP5p+ICzHOaecg
+    _type: BenefitMarkets::Configurations::AcaShopConfiguration
+    ee_ct_max: 50
+    ee_ratio_min: 0.666
+    ee_non_owner_ct_min: 1
+    er_contrib_pct_min: 75
+    erlst_e_prior_eod: -30
+    ltst_e_aft_eod: 30
+    ltst_e_aft_ee_roster_cod: 30
+    retroactve_covg_term_max_dys: -60
+    ben_per_min_year: 1
+    ben_per_max_year: 1
+    oe_start_month: 1
+    oe_end_month: 10
+    oe_min_dys: 5
+    oe_grce_min_dys: 5
+    oe_min_adv_dys: 5
+    oe_max_months: 2
+    cobra_epm: 6
+    gf_new_enrollment_trans: 16
+    gf_update_trans_dow: friday
+    use_simple_er_cal_model: true
+    trans_scheduled_er: true
+    er_transmission_dom: 16
+    enforce_er_attest: true
+    binder_due_dom: 15
+    offerings_constrained_to_service_areas: false
+    trans_er_immed: false
+    stan_indus_class: false
+    carrier_filters_enabled: false
+    initial_application_configuration: !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WxWP5p+ICzHOaech
+      pub_due_dom: 15
+      adv_pub_due_dom: 10
+      erlst_strt_prior_eff_months: -3
+      appeal_per_aft_app_denial_dys: 30
+      quiet_per_end: 28
+      inelig_per_aft_app_denial_dys: 90
+    renewal_application_configuration: !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WxWP5p+ICzHOaeci
+      erlst_strt_prior_eff_months: -3
+      montly_oe_end: 13
+      pub_due_dom: 15
+      adv_pub_due_dom: 10
+      force_pub_dom: 11
+      oe_min_dys: 3
+      quiet_per_end: 15

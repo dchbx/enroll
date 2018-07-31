@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAAo
+  division_code: A
+  division_label: Agriculture, Forestry, And Fishing
+  major_group_code: '01'
+  major_group_label: Agricultural Production Crops
+  industry_group_code: '017'
+  industry_group_label: Fruits And Tree Nuts
+  sic_code: 0179
+  sic_label: Fruits and Tree Nuts, Not Elsewhere Classified

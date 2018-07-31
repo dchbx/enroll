@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAGn
+  key: en.insured.waived_coverage_for_year
+  value: '"You have selected to waive your employer %{coverage_kind} coverage for
+    %{year}"'

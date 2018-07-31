@@ -22,7 +22,7 @@ class Household
   embeds_many :coverage_households, cascade_callbacks: true
 
   accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
-
+  
   before_validation :set_effective_starting_on
   before_validation :set_effective_ending_on #, :if => lambda {|household| household.effective_ending_on.blank? } # set_effective_starting_on should be done before this
   before_validation :reset_is_active_for_previous

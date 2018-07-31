@@ -1,0 +1,20 @@
+<div class="col-md-9 col-sm-9 col-xs-12">
+  <h4>Personal Information</h4>
+  <div class="row no-buffer row-form-wrapper">
+    <%= f.hidden_field :person_id, value: f.object.person_id %>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+      <%= f.text_field :first_name, class: "floatlabel form-control interaction-field-control-person-first-name", required: true, placeholder: 'FIRST NAME *' %>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+      <%= f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *' %>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+      <%= f.date_field :dob, {:class => "floatlabel form-control interaction-field-control-person-dob", :placeholder => "DATE OF BIRTH *", :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yyyy', required: true, readonly: defined?(readonly)} %>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $(function() {
+    applyJQDatePickers();
+  });
+</script>

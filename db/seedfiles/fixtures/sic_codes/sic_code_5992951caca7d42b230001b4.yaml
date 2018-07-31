@@ -1,0 +1,16 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAG0
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '34'
+  major_group_label: Fabricated Metal Products, Except Machinery And Transportation
+    Equipment
+  industry_group_code: '345'
+  industry_group_label: Screw Machine Products, And Bolts, Nuts, Screws, Rivets, And
+    Washers
+  sic_code: '3452'
+  sic_label: Bolts, Nuts, Screws, Rivets, and Washers

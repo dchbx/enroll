@@ -1,0 +1,12 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAAD6
+  key: en.insured.employee_roles.privacy.privacy_info_html
+  value: '"<p><strong>Please read the information below and click the ''CONTINUE''
+    button to show you agree before proceeding.</strong></p><p>Your answers on this
+    application will only be used to determine if you qualify for employer-sponsored
+    health insurance through %{site_short_name} and to help you enroll. We will keep
+    your information private as required by law.</p>"'

@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "fix_citizen_for_hub_responses")
 
 ACCEPTABLE_STATES = %w(us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident indian_tribe_member not_lawfully_present_in_us)
@@ -47,4 +48,5 @@ describe UpdateCitizenStatus, dbclean: :after_each do
       it_behaves_like "fixing citizen status for consumer", "us_citizen", status, "us_citizen", "curam"
     end
   end
+end
 end

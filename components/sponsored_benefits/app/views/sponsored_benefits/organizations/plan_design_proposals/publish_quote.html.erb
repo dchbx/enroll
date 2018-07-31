@@ -1,0 +1,12 @@
+<!-- FIXME: Please verify the css class names and the wording for this page. -->
+<div class="module container broker_quote_tool">
+  <div class="row">
+    <div class="col-md-12">
+      <h3>
+        Your quote has been published. The Claim Code is <%= @plan_design_proposal.claim_code %>
+      </h3>
+      <p>You can download a PDF version of your quote via the quote management index page.</p>
+      <%= link_to "Back to Quotes", organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization.id), class: 'btn btn-primary', data: { no_turbolink: true } %>
+    </div>
+  </div>
+</div>

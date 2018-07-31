@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAADY
+  key: en.insured.consumer_roles.docs_shared.visa_number_title
+  value: '"Please enter the Visa Number exactly as it appears on the document. You
+    must enter exactly eight letters and numbers. You may not enter any special characters."'

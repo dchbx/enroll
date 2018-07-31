@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAL3
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '56'
+  major_group_label: Apparel And Accessory Stores
+  industry_group_code: '563'
+  industry_group_label: Women's Accessory And Specialty Stores
+  sic_code: '5632'
+  sic_label: Women's Accessory and Specialty Stores

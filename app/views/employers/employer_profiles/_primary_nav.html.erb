@@ -1,7 +1,7 @@
 <nav>
   <ul>
     <li <%= menu_tab_class(active_tab, "home") %>>
-      <%= link_to "My #{Settings.site.short_name}", employers_employer_profile_path(@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>
+      <%= link_to "My #{site_short_name}", employers_employer_profile_path(@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>
     </li>
     <li <%= menu_tab_class(active_tab, "employees") %>>
       <%= link_to 'Employees', employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), "aria-expanded" => "true" %>

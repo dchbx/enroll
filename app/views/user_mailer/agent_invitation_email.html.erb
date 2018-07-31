@@ -2,7 +2,7 @@
 <body>
 Congratulations <%= person_name %>,
 <br />
-<div>You have been invited to join <%= Settings.site.short_name %> as <%=invitation.role %>.</div>
-<div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation.id) %> to get started.</div>
+<div>You have been invited to join <%= site_short_name %> as <%=invitation.role %>.</div>
+<div>Please visit <%= link_to "#{site_short_name}", claim_invitation_url(invitation.id) %> to get started.</div>
 </body>
 </html>

@@ -14,7 +14,7 @@
   "<%= json_escape employer_invoice.employer_profile.aasm_state.humanize %>",
   "<%= json_escape employer_invoice.employer_profile.published_plan_year.try(:effective_date) %>",
   <% conversion_info = capture do %>
-    <%= '<i class="fa fa-check-square-o" aria-hidden="true"></i>'.html_safe if employer_invoice.employer_profile.is_conversion? %>
+    <%= '<i class="far fa-check-square" aria-hidden="true"></i>'.html_safe if employer_invoice.employer_profile.is_conversion? %>
   <% end %>
   <%= raw conversion_info.to_json %>,
   "<%= json_escape enrolled_ee %>",

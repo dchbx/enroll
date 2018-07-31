@@ -1,11 +1,9 @@
-$('#<%= @location_id %> .reference-plans').html("<div class='col-xs-12 health select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @plans.count %> Plans</strong> </span></h4><br/></div>")
+$('#<%= @location_id %> .reference-plans').html("<div class='col-xs-12 health select-reference'><br><br><h2 class='row'>Select Your Reference Plan</h2><p style='position: relative;' class='row twenty'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @plans.count %> Plans</strong> </span></p><br/></div>")
 $('#<%= @location_id %> .reference-plans').append("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/single_carriers", locals: { :plans => @plans, :benefit_group => @benefit_group  })).html_safe %>")
 $('#<%= @location_id %> .reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('#<%= @location_id %> .reference-plans').show();
 
-
 $('#<%= @location_id %> .health .reference-plan .col-xs-2').on('click', function() {
-
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
       $(this).find('input[type=radio]').prop('checked', true );
@@ -15,14 +13,14 @@ $('#<%= @location_id %> .health .reference-plan .col-xs-2').on('click', function
 
 });
 $('.controls').show();
-var reference_plan_count = $('#<%= @location_id %> .reference-plan').length
+var reference_plan_count = $('#<%= @location_id %> .reference-plan').length;
 var reference_plan_remainder = reference_plan_count % 3;
 if (reference_plan_remainder > 0 ) {
   $('#<%= @location_id %> .reference-plan').slice(-reference_plan_remainder).css({"border-bottom":"none" });
 } else {
 
 }
-var dental_reference_plan_count = $('#<%= @location_id %> .dental-reference-plan').length
+var dental_reference_plan_count = $('#<%= @location_id %> .dental-reference-plan').length;
 var dental_reference_plan_remainder = dental_reference_plan_count % 4;
 if (dental_reference_plan_remainder > 0 ) {
   $('#<%= @location_id %> .dental-reference-plan').slice(-dental_reference_plan_remainder).css({"border-bottom":"none" });

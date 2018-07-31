@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe Subscribers::SsaVerification do
 
   it "should subscribe to the correct event" do
@@ -95,4 +96,5 @@ describe Subscribers::SsaVerification do
     end
 
   end
+end
 end

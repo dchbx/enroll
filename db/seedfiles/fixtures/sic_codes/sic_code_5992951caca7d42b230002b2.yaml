@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAKy
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '50'
+  major_group_label: Wholesale Trade-durable Goods
+  industry_group_code: '507'
+  industry_group_label: Hardware, And Plumbing And Heating Equipment
+  sic_code: '5078'
+  sic_label: Refrigeration Equipment and Supplies

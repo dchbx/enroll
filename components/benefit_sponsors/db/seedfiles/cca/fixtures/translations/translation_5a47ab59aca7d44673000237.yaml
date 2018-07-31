@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAI3
+  key: en.insured.plan_shoppings.print_waiver.print_waiver_html
+  value: '"<h3>Waiver confirmation</h3><p>You have successfully waived the coverage
+    at %{updated_at}. </p><p>Waiver Reason : %{waiver_reason}. </p><p>Please print
+    this page for your records. </p>"'

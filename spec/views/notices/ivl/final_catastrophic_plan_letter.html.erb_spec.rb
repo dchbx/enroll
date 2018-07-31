@@ -1,6 +1,7 @@
 require "rails_helper"
 include ActionView::Context
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
 
   let!(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_mailing_address)}
@@ -46,4 +47,5 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
     render partial: 'notices/shared/paragraph', :locals => {content: "The #{Settings.site.short_name} Team"}
     render partial: 'notices/shared/reference_paragraph', :locals => {contents: [""]}
   end
+end
 end

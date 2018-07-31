@@ -2,7 +2,7 @@
   <h3> General Agency Messages </h3>
     <%= render 'agency_inbox' %>
 
-    <%#= link_to "Send Secure Message to #{Settings.site.short_name}".html_safe, 
+    <%#= link_to "Send Secure Message to #{site_short_name}".html_safe, 
         broker_agencies_inbox_msg_to_portal_path(inbox_id: @broker_agency_profile.id, to: 'HBX_Admin',
         from: @broker_agency_profile.legal_name), class: "btn btn-primary", remote: true %>
 </div>

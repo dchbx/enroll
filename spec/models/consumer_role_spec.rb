@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'aasm/rspec'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe ConsumerRole, dbclean: :after_each do
   it { should delegate_method(:hbx_id).to :person }
   it { should delegate_method(:ssn).to :person }
@@ -955,4 +956,5 @@ describe "Verification Tracker" do
       expect(person.consumer_role.history_action_trackers.last.tracking_record).to be_a(HistoryTracker)
     end
   end
+end
 end

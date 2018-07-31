@@ -1,0 +1,43 @@
+<% content_for :navigation do %>
+<%= render :partial => 'ui-components/v1/navs/employers_navigation', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
+<% end %>
+
+<%- if @tab == 'home' %>
+<%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/my_account/home_tab' %>
+<%- elsif @tab == 'profile' %>
+<%= render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/profile_tab' %>
+<%- elsif @tab == 'employees' %>
+
+<%= render :partial => "benefit_sponsors/profiles/employers/employer_profiles/my_account/census_employees" %>
+
+<%- elsif @tab == 'benefits' %>
+<%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits" %>
+<%- elsif @tab == 'brokers' %>
+<%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/broker_agency" %>
+<%- elsif @tab == 'inbox' %>
+  <h1 class="darkblue no-buffer">Messages</h1>
+<%= render :partial => 'benefit_sponsors/shared/inboxes/messages_list' %>
+<%- elsif @tab == 'documents' %>
+
+<%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/documents" %>
+
+<%- elsif @tab == 'billing' %>
+  <%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/billing" %>
+
+<%- elsif @tab == 'families' %>
+<%= render partial:  "benefit_sponsors/profiles/employers/employer_profiles/my_account/families" %>
+<%- end %>
+
+<%- if @tab == 'home' %>
+<% if @current_plan_year.present? %>
+<aside class="col-xs-4 employer-right-column module">
+  <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
+    <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/open_enrollment_ends_panel' %>
+  <% end %>
+  <%#= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/enrollment_report_widget' %>
+  <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/employer_broker_widget' %>
+</aside>
+<% else %>
+
+<% end %>
+<% end %>

@@ -1,0 +1,10 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAAIY
+  key: en.insured.plan_shoppings.plan_filters_silver_title_info
+  value: '"Silver means the plan is expected to pay 70% of medical expenses for the
+    average population of consumers. Silver plans generally have lower premiums, but
+    you pay more when you get covered services."'

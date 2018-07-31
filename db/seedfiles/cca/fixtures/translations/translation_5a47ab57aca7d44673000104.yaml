@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerV6yn1EZzAAEE
+  key: en.insured.families.add_or_remove_family_html
+  value: '"You have added/removed a family member to your profile. <br>You may qualify
+    for a special enrollment period."'

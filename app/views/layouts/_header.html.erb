@@ -10,7 +10,7 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="#">
-          <%= image_tag 'logo.png' %>
+          <%= image_tag Settings.site.logo_file_name %>
         </a>
       </div>
 
@@ -21,7 +21,7 @@
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
-          <li><a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
+          <li><a class="call-customer-service" href="tel:<%= contact_center_phone_number %>">
             <span class="header-text">
               <%= l10n(".call_customer_service") %>
             </span>
@@ -29,7 +29,7 @@
             <span>
               <i class="fa fa-phone fa-lg"></i>
               <strong>
-                <%= Settings.contact_center.phone_number %>
+                <%= contact_center_phone_number %>
               </strong>
             </span>
           </a>
@@ -39,11 +39,11 @@
               <span class="my-portal-links">
                 <%= render partial: "shared/my_portal_links"%>
                 <span>
-                  <a href="https://dchealthlink.com/help" target="_blank" class="header-text">Help</a>
+                  <%= link_to l10n(".help"), site_help_url, target: '_blank', class: 'header-text' %>
                 </span>
                 <span> | </span>
                 <span>
-                  <%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %>
+                  <%= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "header-text" %>
                 </span>
                 <br/>
                 <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
@@ -65,9 +65,9 @@
     // check time until logout
     function check_time_until_logout(){
       $.ajax({
-        url: '<%= check_time_until_logout_path(:format => :js) %>',
-	dataType: "script",
+        url: "<%= main_app.check_time_until_logout_path(format: :js) %>",
         method: 'GET',
+        dataType: 'script',
         success: function(response){
         },
         error: function(response){

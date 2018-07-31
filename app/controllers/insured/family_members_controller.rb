@@ -1,5 +1,6 @@
 class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
+  include ApplicationHelper
 
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]

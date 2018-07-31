@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyNotices::GeneralAgencyTerminatedNotice, dbclean: :after_each do
 	let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ FactoryGirl.create :employer_profile}
@@ -77,4 +78,5 @@ RSpec.describe GeneralAgencyNotices::GeneralAgencyTerminatedNotice, dbclean: :af
       expect(File.exist?(file.path)).to be true
     end
   end
+end
 end

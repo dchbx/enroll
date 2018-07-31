@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAHN
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '35'
+  major_group_label: Industrial And Commercial Machinery And Computer Equipment
+  industry_group_code: '353'
+  industry_group_label: Construction, Mining, And Materials Handling
+  sic_code: '3531'
+  sic_label: Construction Machinery and Equipment

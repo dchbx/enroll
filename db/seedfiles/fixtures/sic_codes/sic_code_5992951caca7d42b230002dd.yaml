@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALd
+  division_code: F
+  division_label: Wholesale Trade
+  major_group_code: '51'
+  major_group_label: Wholesale Trade-non-durable Goods
+  industry_group_code: '519'
+  industry_group_label: Miscellaneous Non-durable Goods
+  sic_code: '5199'
+  sic_label: Nondurable Goods, Not Elsewhere Classified

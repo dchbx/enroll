@@ -1,0 +1,11 @@
+= content_for :navigation do
+    = render "ui-components/v1/navs/employers_navigation", {:active_tab=>params[:tab], organization: @benefit_application_form.service.benefit_sponsorship.profile.organization, profile: @benefit_application_form.service.benefit_sponsorship.profile}
+
+= form_for @benefit_application_form, as: :benefit_application, url: benefit_sponsorship_benefit_applications_path, method: :post, html: {novalidate: true} do |f|
+  = render 'form', f: f
+  = f.submit "Continue", class:'btn btn-primary btn-lg pull-right disabled', onclick:'showProgress()', id:'benefitContinueBtn'
+
+javascript:
+  function showProgress() {
+    swal({title: "Please Hold!", text: "Retrieving Plan Options !", icon:"success", buttons:false, closeOnClickOutside:false});
+  }

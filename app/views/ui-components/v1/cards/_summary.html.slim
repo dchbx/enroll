@@ -1,0 +1,122 @@
+- member_enrollment = @member_group.group_enrollment
+- @plan = member_enrollment.product
+- if @hbx_enrollment.shopping?
+- else
+  = link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans'
+  br/
+  br/
+- if qhp.present?
+  .row.plan.module style=("margin-top: 0;")
+    .col-xs-12
+      .col-xs-6
+        span.pull-left
+          = display_carrier_logo(Maybe.new(@plan), {width: 180})
+      .col-xs-6
+        span.pull-right
+          span style=("font-size: 24px;")
+            = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
+          br/
+          span.lg per month
+      .col-xs-12
+        h3.text-blue= @plan.title
+      div
+        - if @plan.try(:is_standard_plan)
+          .col-md-12
+            i.fa.fa-bookmark
+              | STANDARD PLAN
+      .col-xs-12
+        .row
+          .col-xs-7
+            table style=("width: 100%; table-layout:fixed;")
+              tr
+                td
+                  span.ttu.lg.twelve
+                    | Type
+                  br/
+                  span.ttu.dg.fourteen
+                    = @plan.health_plan_kind ? @plan.health_plan_kind.upcase : ""
+                td
+                  span.ttu.lg.twelve style=("margin-left: -10px")
+                    | Metal Level
+                  br/
+                  span.ttu.dg.fourteen style=("margin-left: -10px")
+                    = display_dental_metal_level @plan
+                td
+                  span.ttu.lg.twelve style=("margin-left: -10px")
+                    | Network
+                  br/
+                  span.ttu.dg.fourteen style=("margin-left: -10px")
+                    - if offers_nationwide_plans?
+                      = @plan.nationwide ? "Nationwide" : "DC-Metro"
+                    - else
+                      - if @plan.network_information.present?
+                        | Network Notes
+                        i.fa.fa-question-circle data-toggle="tooltip" title="#{@plan.network_information}"
+                td
+                  span.ttu.lg.twelve style=("margin-left: -10px")
+                    - if @hbx_enrollment.hbx_enrollment_members.count > 1
+                      | Family Deductible
+                    - else
+                      | Deductible
+                  br/
+                  span.ttu.dg.fourteen style=("margin-left: -10px")
+                    = deductible_display(@hbx_enrollment, @plan)
+          .col-xs-5
+            .pull-right
+              - if @hbx_enrollment.shopping?
+                = render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan }
+        .col-xs-12
+          .row
+            hr/
+            .col-xs-4
+              = render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan }
+            .col-xs-4
+              - if @plan.kind == "health" && @plan.rx_formulary_url.present?
+                = link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank"
+            .col-xs-4
+              - if offers_nationwide_plans?
+                - if @plan.nationwide
+                  = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank"
+              - else
+                = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank"
+  .col-md-6.col-sm-6.col-xs-12 style=("display: none;")
+    .row
+      - if @market_kind == "employer_sponsored" && @coverage_kind == 'health'
+        .col-md-4.col-sm-4.col-xs-12
+          h3= number_to_currency(member_enrollment.product_cost_total)
+          small Premium
+        .col-md-4.col-sm-4.col-xs-12
+          h3= number_to_currency(member_enrollment.sponsor_contribution_total)
+          small Employer
+    br/
+    br/
+    .row
+      .col-md-12.col-sm-12.col-xs-12
+  - if @coverage_kind == "health"
+    .details
+      table.table.table-bordered
+        thead
+          tr
+            th width="30%"  SERVICES YOU MAY NEED
+            th width="40%"
+              | YOUR COST AT PARTICIPATING PROVIDER
+            th width="30%"  (IN-NETWORK)
+          tr
+            th  
+            th CO-PAY
+            th COINSURANCE
+        tbody
+          = render partial: "shared/service_visit_details", locals: { qhp: qhp }
+          tr
+            td
+            td.text-center colspan="3"
+              - if @hbx_enrollment.shopping?
+                = render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan }
+              - else
+                = link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans'
+  - if @hbx_enrollment.shopping?
+    = link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-default all-plans'
+    br/
+    br/
+- else
+  | No Plan found

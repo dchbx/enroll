@@ -1,11 +1,11 @@
 %plan_year
-  %plan_year_start= simple_date_for(plan_year.start_on)
+  %plan_year_start= simple_date_for(plan_year.effective_period.min)
   - unless plan_year.end_on.blank?
-    %plan_year_end= simple_date_for(plan_year.end_on)
+    %plan_year_end= simple_date_for(plan_year.effective_period.max)
   %fte_count= plan_year.fte_count
   %pte_count= plan_year.pte_count
-  %open_enrollment_start= simple_date_for(plan_year.open_enrollment_start_on)
-  %open_enrollment_end= simple_date_for(plan_year.open_enrollment_end_on)
+  %open_enrollment_start= simple_date_for(plan_year.open_enrollment_period.min)
+  %open_enrollment_end= simple_date_for(plan_year.open_enrollment_period.max)
   %benefit_groups
-    = render :partial => "events/v2/employers/health_and_dental_benefit_group", :collection => plan_year.benefit_groups, as: :benefit_group
+    = render :partial => "events/v2/employers/health_and_dental_benefit_group", :collection => plan_year.benefit_packages, as: :benefit_group
   = render :partial => "events/v2/shared/versioned_resource", :object => plan_year

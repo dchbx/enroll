@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAEy
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '27'
+  major_group_label: Printing, Publishing, And Allied Industries
+  industry_group_code: '279'
+  industry_group_label: Service Industries For The Printing Trade
+  sic_code: '2796'
+  sic_label: Platemaking and Related Services

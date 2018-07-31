@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAAJQ
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '39'
+  major_group_label: Miscellaneous Manufacturing Industries
+  industry_group_code: '396'
+  industry_group_label: Costume Jewelry, Costume Novelties, Buttons, And Miscellaneous
+    Notions, Ecept Precious Metal
+  sic_code: '3965'
+  sic_label: Fasteners, Buttons, Needles, and Pins

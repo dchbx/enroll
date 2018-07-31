@@ -32,7 +32,7 @@ class DelinkBroker < MongoidMigrationTask
       #update fields
       person.broker_role.update_attributes!(broker_agency_profile_id: broker_agency_profile.id)
       person.broker_role.save
-      #move organizations under to newly created borker agency profile 
+      #move organizations under to newly created broker agency profile 
       if organization_ids_to_move.present?
         organization_ids_to_move.each do |organization_id|
           org_er = Organization.find(organization_id)

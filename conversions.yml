@@ -1,5 +1,10 @@
 conversions:
-  plan_year_date: 2016-05-01
-  employer_profile_date: 2017-02-01
-  employee_date: 2017-02-01
-  employee_policies_date: 2017-02-01
+  plan_year_date: 2018-04-01
+  employer_profile_date: 2018-01-01
+  employee_date: 2018-01-01
+  employee_policies_date: 2018-04-01
+  employee_policy_year: 2017
+  number_of_dependents: 6
+  mid_year_conversion: true
+  orginal_plan_year_begin_date: 2017-09-01
+  plan_year_end_date: 2018-08-31

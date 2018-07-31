@@ -1,2 +1,0 @@
-    class HbxEnrollError < StandardError
-    end

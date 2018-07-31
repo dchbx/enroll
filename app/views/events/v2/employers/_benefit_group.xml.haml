@@ -1,7 +1,24 @@
 %benefit_group
+  %id
+    %id= benefit_group.id
   %name= benefit_group.title
+  - unless benefit_group.benefit_market.configuration.use_simple_employer_calculation_model
+    - if sponsored_benefit.present? && sponsored_benefit.latest_pricing_determination.present?
+      %group_size= sponsored_benefit.latest_pricing_determination.group_size
+      %participation_rate= sponsored_benefit.latest_pricing_determination.participation_rate
+  - if benefit_group.rating_area.present?
+    %rating_area= benefit_group.rating_area.exchange_provided_code
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
   -#%federal_contributions= " " field not available in benefit group modal
-  %relationship_benefits
-    = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits
+  - if sponsored_benefit.single_plan_type?
+    %composite_rating_tiers
+      - pricing_deter = sponsored_benefit.latest_pricing_determination
+      - pricing_deter.pricing_determination_tiers.each do |deter_tier|
+        %composite_rating_tier
+          %tier_name= "urn:openhbx:terms:v1:composite_rating_tier#" + deter_tier.pricing_unit.name
+          %premium= deter_tier.price
+          %contribution_percent= deter_tier.sponsor_contribution_factor * 100
+  - else
+    %relationship_benefits
+      = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits

@@ -3,12 +3,12 @@
 <h4>Let your plan participants choose any plan they would like.<br/>It will not cost you more to let them choose.</h4>
 <br/><br/>
 <% end %>
-<% @plans.each do |p| %>
+<% @plans.each do |plan| %>
 <div class="col-xs-4">
   <div class="col-xs-12 reference-plan">
     <div class="col-xs-2">
 
-      <%= radio_button "#{@location_id}", :reference_plan_id, p.id %>
+      <%= radio_button "#{@location_id}", :reference_plan_id, plan.id %>
       <%= label_tag "#{@location_id}_reference_plan_id" do %>
       <i class="fa fa-circle-o"></i>
       <i class="fa fa-dot-circle-o"></i>
@@ -18,14 +18,18 @@
     <div class="col-xs-10">
       <div class="panel row">
         <div class="panel-heading">
-          <h3><%= p.name %></h3>
+          <h3><%= plan.name %></h3>
         </div>
         <div class="panel-body">
-          <span class="plan-label">Type: </span><span><%= p.plan_type %></span><br>
-          <span class="plan-label">Carrier: </span><span><%= @carriers_cache[p.carrier_profile_id] %></span><br>
-          <span class="plan-label">Level: </span><span><%= p.metal_level %></span><br>
-          <span class="plan-label">Network: </span><span><%= p.nationwide ? 'Nationwide' : 'DC Metro' %></span><br/>
-          <%= link_to 'View Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: p.id, hios_id: p.hios_id, coverage_kind: p.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
+          <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
+          <span class="plan-label">Carrier: </span><span><%= @carriers_cache[plan.carrier_profile_id] %></span><br>
+          <span class="plan-label">Level: </span><span><%= plan.metal_level.titleize %></span><br>
+          <span class="plan-label">Network: </span>
+          <span>
+            <%= render partial: "shared/network_data", locals: {plan: plan} %>
+          </span>
+          <br/>
+          <%= link_to 'View Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
         </div>
       </div>
 

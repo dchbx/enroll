@@ -9,3 +9,10 @@ es:
     paragraph3: "¿Listo? Haga clic en el botón para continuar."
     notice: "Al utilizar este sitio, usted reconoce que ha leído y acepto la política de privacidad y condiciones de uso se encuentra aquí:"
     link: "DCHBX política de privacidad & Condiciones de uso."
+
+  shop:
+    composite_tiers:
+      employee_only: "Empleado Solo"
+      employee_and_spouse: "Empleado y Esposo"
+      employee_and_one_or_more_dependents: "Empleado y los hijos"
+      family: "Familia"

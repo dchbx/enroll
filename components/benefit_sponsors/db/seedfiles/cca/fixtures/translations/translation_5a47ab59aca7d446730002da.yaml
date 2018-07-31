@@ -1,0 +1,9 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWayn1EZzAALa
+  key: en.emplyer_dental_plan_offering
+  value: '"Below is your Employer‘s Dental Plan offering Spectrum. Your offerings
+    are based on"'

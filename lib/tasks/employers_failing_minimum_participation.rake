@@ -4,54 +4,65 @@ namespace :reports do
 
     desc "Report of Initial/Renewal/Conversion ERs that Failed Minimum Participation or Non-Owner Rule"
     task :employers_failing_minimum_participation => :environment do
-      window_date = Date.today
-      valid_states = PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::PUBLISHED
-      employers = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
-        :open_enrollment_start_on => {"$lte" => window_date},
-        :open_enrollment_end_on => {"$gte" => window_date},
-        :aasm_state.in => valid_states}})
+      include Config::AcaHelper
 
-      file_name = "#{Rails.root}/public/employers_failing_minimum_participation.csv"
+      window_date = Date.today
+      valid_states = (BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES - [:enrollment_closed])
+      benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"benefit_applications.aasm_state".in => valid_states)
+
+      employer_profiles = benefit_sponsorships.flat_map(&:benefit_applications).inject([]) do |array, benefit_application|
+        array << benefit_application if benefit_application.open_enrollment_period.include?(window_date)
+        array.flatten
+      end.map(&:sponsor_profile).uniq
+
+      file_name = fetch_file_format('employers_failing_minimum_participation', 'EMPLOYERSFAILINGMINIMUMPARTICIPATION')
+
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 
       CSV.open(file_name, "w") do |csv|
         csv << field_names
 
-        employers.each do |employer|
-          employer_profile = employer.employer_profile
-          plan_year = employer_profile.plan_years.detect do |py|
-             (py.open_enrollment_start_on <= window_date) &&
-               (py.open_enrollment_end_on >= window_date) &&
-               valid_states.include?(py.aasm_state)
+        employer_profiles.each do |employer_profile|
+          benefit_application = employer_profile.benefit_applications.detect do |benefit_application|
+            (benefit_application.open_enrollment_period.include?(window_date)) && (valid_states.include?(benefit_application.aasm_state))
           end
 
-          enrollment_errors = plan_year.enrollment_errors
-          
-          if enrollment_errors.any?
-            csv << [
-              employer.fein,
-              employer.legal_name,
-              employer.dba,
-              plan_year.start_on,
-              plan_year.open_enrollment_end_on,
-              clean_JSON_dump(JSON.dump(enrollment_errors)),
-              (PlanYear::RENEWING_PUBLISHED_STATE.include?(plan_year.aasm_state) ? "renewing" : "initial"),
-              employer_profile.is_conversion?
-            ]
-          end
+          if benefit_application.present?
+            enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+            policy = enrollment_policy.business_policies_for(benefit_application, :passes_open_enrollment_period_policy)
+            if policy.present?
+              policy.is_satisfied?(benefit_application)
+              enrollment_errors = policy.fail_results
 
+              if enrollment_errors.any?
+                csv << [
+                  employer_profile.fein,
+                  employer_profile.legal_name,
+                  employer_profile.dba,
+                  benefit_application.start_on.to_date.to_s,
+                  benefit_application.open_enrollment_end_on.to_date.to_s,
+                  clean_JSON_dump(JSON.dump(enrollment_errors)),
+                  (benefit_application.is_renewing? ? "renewing" : "initial"),
+                  employer_profile.is_conversion?
+                ]
+              end
+            end
+          end
         end
+      end
 
+      if Rails.env.production?
+        pubber = Publishers::Legacy::EmployersFailingParticipationReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
       end
     end
 
     def clean_JSON_dump(json_errors)
       errors = Array.new
-      errors << "Mimimum Participation" if json_errors["enrollment_ratio"].present?
+      errors << "Mimimum Participation" if json_errors["minimum_participation_rule"].present?
       errors << "Non-Owner" if json_errors["non_business_owner_enrollment_count"].present?
-      errors << "At least one Employee" if json_errors["eligible_to_enroll_count"].present?
+      errors << "At least one Employee" if json_errors["minimum_eligible_member_count"].present?
       return errors.join(" & ")
-    end  
-
+    end
   end
 end

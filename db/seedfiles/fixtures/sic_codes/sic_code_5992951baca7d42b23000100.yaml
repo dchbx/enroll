@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAEA
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '24'
+  major_group_label: Lumber And Wood Products, Except Furniture
+  industry_group_code: '244'
+  industry_group_label: Wood Containers
+  sic_code: '2448'
+  sic_label: Wood Pallets and Skids

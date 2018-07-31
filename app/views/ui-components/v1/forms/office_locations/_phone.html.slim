@@ -1,0 +1,19 @@
+.row.pl-1
+  h4 Phone
+.row
+  = f.hidden_field :kind, value:'phone main'
+  .col-md-2.mb-1
+    label for="inputAreacode" Area Code *
+    = f.text_field :area_code, placeholder:'508', required:'true', id:'inputAreacode', class:'form-control', minlength:'3', maxlength:'3', onkeypress:'return isNumberKey(event)'
+    .invalid-feedback
+      |
+        Please provide a valid area code.
+  .col-md-2.mb-1
+    label for="inputNumber" Number *
+    = f.text_field :number, placeholder:'1112222', required:'true', id:'inputNumber', class:'form-control', minlength:'7', maxlength:'7', onkeypress:'return isNumberKey(event)'
+    .invalid-feedback
+      |
+        Please provide a valid number.
+  .col-md-2.mb-3
+    label for="inputExtension" Extension
+    = f.text_field :extension, id:'inputExtension', class:'form-control', maxlength:'10'

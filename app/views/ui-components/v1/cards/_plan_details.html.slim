@@ -1,0 +1,78 @@
+- # plan_carrier = Caches::MongoidCache.lookup(CarrierProfile, plan.carrier_profile_id) { plan.carrier_profile }
+- member_enrollment = plan.group_enrollment
+- plan = plan.group_enrollment.product
+- plan_carrier = ::Caches::CustomCache.lookup(::BenefitSponsors::Organizations::Organization, :plan_shopping, plan.issuer_profile_id) { plan.issuer_profile }
+
+.module.plan-row.panel.panel-default
+  .panel-body
+    .row
+      - if plan.try(:is_standard_plan)
+        .col-md-12
+          span style="color:green"
+            i.fas.fa-bookmark.mr-1 data-toggle="tooltip" data-placement="top" data-container="body" title="#{l10n('insured.plan_shoppings.standard_plan_title_info')}"
+            = l10n("standard_plan").to_s.upcase
+    .row.mt-1
+      - if @enrolled_hbx_enrollment_plan_ids.include?(plan.id)
+        h5.col-md-12.current.bg-title
+          i.fa.fa-star.fa-lg.enrolling = l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase
+    .row
+      .col-md-2.col-sm-2 = display_carrier_logo(Maybe.new(plan), {width: 80})
+      .col-md-7
+        h3.no-buffer
+          = link_to summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, active_year: plan.try(:active_year), market_kind: @market_kind, coverage_kind: @coverage_kind}), {:remote => true} do 
+            - if false # plan.is_csr?
+              i.fa.fa-check-square-o title="Eligible for Cost Sharing Reduction" data-toggle="tooltip"
+            = plan.title
+          br
+          small = plan_carrier.legal_name
+      .col-md-3
+        .price-wrapper.pull-right
+          h2.no-buffer.plan-premium = number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total)
+          small 
+            = l10n("month")
+    br
+    .row
+      .col-md-12
+        table.table.gn-10
+          thead
+            tr
+              th scope="col" TYPE
+              th scope="col" LEVEL
+              th scope="col" NETWORK
+              th scope="col"
+                - if @hbx_enrollment.hbx_enrollment_members.size > 1
+                  | FAMILY DEDUCTIBLE
+                - else
+                  | DEDUCTIBLE
+          tbody
+            tr
+              td = plan.health_plan_kind ? plan.health_plan_kind.upcase : ""
+              td 
+                - plan_level = plan.metal_level_kind.to_s.humanize
+                span class="#{plan_level.downcase}-icon"
+                  = plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize
+              td
+                - if offers_nationwide_plans?
+                  - if plan.network_information.present?
+                    | NETWORK NOTES
+                    a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="#{plan.network_information}"
+                      i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+
+              td 
+                - if @hbx_enrollment.hbx_enrollment_members.size > 1
+                  = plan.family_deductible
+                - else
+                  = plan.deductible
+    .row
+      .col-xs-3
+        .checkbox.no-buffer
+          label
+            input#compare_plan_checkbox.checkbox-custom.select-plan-for-comparison type="checkbox" data-hbx-id="#{@hbx_enrollment.id}" data-hios-id="#{plan.hios_id}" data-plan-year="#{plan.active_year}" data-plan-enrollment-kind="#{@enrollment_kind}" data-plan-change-plan="#{@change_plan}"
+            span.checkbox-custom-label for="compare_plan_checkbox" style="font-weight: bold" Compare
+      .col-xs-4
+        = render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan }
+      .col-md-5.col-sm-5.col-xs-5.text-right style="padding-left: 0"
+        = link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: 'btn btn-default btn-right plan-select select')
+        = link_to "See Details", summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default ml-1", :remote => true}
+            
+          

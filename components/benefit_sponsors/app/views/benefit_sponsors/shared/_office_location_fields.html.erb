@@ -1,0 +1,77 @@
+<fieldset>
+  <h4> Office Location </h4>
+  <div id="address_info" class="row no-buffer focus_effect personal-info-row">
+    <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+      <%= f.hidden_field :id, value: f.object.id if f.object.id %>
+      <%= f.fields_for :address, f.object.address, errors: {}, fieldset: false do |address| %>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+            <button class="btn btn-new-address" onclick="return false;">ADDRESS</button>
+          </div>
+
+          <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
+            <div class="form-group form-group-lg">
+              <div class="row" style="margin: 0;">
+                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                  <div class="col-md-6 col-sm-6 col-xs-12 no-pd office_kind_select">
+                    <% kinds = address.object.office_kind_options; kinds = kinds.rotate if params[:child_index] %>
+                    <%= address.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, address.object.kind ),class: "floatlabel form-control interaction-choice-control-office-location-address-kind", required: true, placeholder: 'KIND' %>
+                  </div>
+                  <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
+              <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'remove_fields close-2' %>
+            </div>
+          </div>
+
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :address_1, class: "floatlabel form-control interaction-field-control-office-location-address-address-1", required: true, placeholder: 'ADDRESS LINE 1' %>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :address_2, class: "floatlabel form-control interaction-field-control-office-location-address-address-2", placeholder: 'ADDRESS LINE 2' %>
+            </div>
+          </div>
+
+          <div class="row row-form-wrapper no-buffer" controller="zip-check">
+              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
+              </div>
+              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                <%= address.select(:state, options_for_select(address.object.state_options.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
+              </div>
+              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: 'change=>zip-check.zipChange' } %>
+              </div>
+              <% if (aca_address_query_county && @agency.profile_type != "broker_agency") %>
+                <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                  <%= address.select(:county, options_for_select(BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq, selected: address.object.county), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', required: true) %>
+                </div>
+              <% end %>
+          </div>
+          <%= address.hidden_field :id, value: address.object.id if address.object.id %>
+        <% end %>
+      </div>
+      <div class="col-md-2 key col-sm-3 col-xs-12"></div>
+    </div><br>
+    <%= f.fields_for :phone, f.object.phone, errors: {}, fieldset: false do |phone| %>
+    <div id="phone_info" class="row no-buffer row-form-wrapper">
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= phone.select :kind, options_for_select(phone.object.office_kind_options.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code area-code", required: true, placeholder: 'AREA CODE', oninvalid:"checkAreaCode(this);", oninput:"checkAreaCode(this);" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= phone.text_field :number, class: "floatlabel form-control phone_number7 interaction-field-control-office-location-phone-number", required: true, placeholder: 'NUMBER', oninvalid:"checkPhone(this);", oninput:"checkPhone(this);" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
+        <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION' %>
+      </div>
+      <%= phone.hidden_field :id, value: phone.object.id if phone.object.id %>
+    </div><br>
+  <% end %>
+</fieldset>

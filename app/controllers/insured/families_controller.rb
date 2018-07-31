@@ -1,7 +1,7 @@
 class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
-  include ApplicationHelper
+  include ::ApplicationHelper
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -25,10 +25,10 @@ class Insured::FamiliesController < FamiliesController
     valid_display_enrollments = Array.new
     @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
 
-    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.plan.blank?}
+    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
     update_changing_hbxs(@hbx_enrollments)
 
-    @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
+    # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
     @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
@@ -127,14 +127,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
+    today = TimeKeeper.date_of_record
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
-    start_date = TimeKeeper.date_of_record - 30.days
-    end_date = TimeKeeper.date_of_record + 30.days
+    start_date = today - 30.days
+    end_date = today + 30.days
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
-      end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+      start_date = today - @qle.post_event_sep_in_days.try(:days)
+      end_date = today + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
@@ -142,17 +143,17 @@ class Insured::FamiliesController < FamiliesController
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-      @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+      @future_qualified_date = (@qle_date > today) ? true : false
     end
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date)
-      sep_request_denial_notice
-    elsif is_ee_sep_request_accepted?
-      ee_sep_request_accepted_notice
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
+      benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
+      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+      trigger_notice_observer(@person.active_employee_roles.first, benefit_application, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
     end
   end
 
@@ -240,29 +241,6 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def sep_request_denial_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.id}")
-    end
-  end
-
-  def is_ee_sep_request_accepted?
-    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
-  end
-
-  def ee_sep_request_accepted_notice
-    employee_role = @person.active_employee_roles.first
-    if employee_role.present? && employee_role.census_employee.present?
-      begin
-        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
-      rescue Exception => e
-        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
-      end
-    end
-  end
-
   private
 
   def updateable?
@@ -317,10 +295,18 @@ class Insured::FamiliesController < FamiliesController
       end
     else
       if @person.active_employee_roles.present?
-        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
-      else @person.consumer_role.present?
-      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
-      end
+         if current_user.has_hbx_staff_role?
+           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
+         else
+           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
+         end
+       else @person.consumer_role.present?
+         if current_user.has_hbx_staff_role?
+           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+         else
+           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+         end
+       end
     end
   end
 
@@ -365,7 +351,7 @@ class Insured::FamiliesController < FamiliesController
   def notice_upload_email
     if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
       (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
-      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
+      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from #{site_short_name}", @person.work_email_or_best).deliver_now
     end
   end
 
@@ -373,7 +359,7 @@ class Insured::FamiliesController < FamiliesController
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
-    @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
+    @person.inbox.messages << Message.new(subject: subject, body: body, from: site_short_name)
     @person.save!
   end
 
@@ -383,7 +369,7 @@ class Insured::FamiliesController < FamiliesController
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
-    @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
+    @qle_date_calc = @qle_date - aca_qle_period.days
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id

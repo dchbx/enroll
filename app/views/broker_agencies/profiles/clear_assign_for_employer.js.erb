@@ -1,3 +1,4 @@
 <% if @employer_profile.present? %>
-$('#Broker-Employer-dataTable').DataTable().draw()
+setTabContent("<%= escape_javascript render "employers" %>");
+set_active_ontab("#employers-tab");
 <% end %>

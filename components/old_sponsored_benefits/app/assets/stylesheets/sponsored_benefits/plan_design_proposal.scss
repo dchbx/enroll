@@ -1,0 +1,557 @@
+$mhc-dark-blue: #005e81;
+$mhc-blue: #247dc5;
+$mhc-dark-gray: #706f6d;
+$mhc-gray: #6d6e70;
+$mhc-light-gray:#9b9b9b;
+$mhc-orange: #c56c24;
+$mhc-red: #812200;
+
+$primary-orange: $mhc-orange;
+$primary-red: #d9534f;
+$primary-button-disabled: #c9302c;
+$primary-button-borer-disabled: #ac2925;
+$primary-button-border: #b7191b;
+$primary-blue: $mhc-blue;
+$primary-white: #ffffff;
+$primary-button-text: #ffffff;
+$primary-green: #69A30D;
+$primary-black: #5C5C5C;
+$primay-active-button-text-color: #ffffff;
+$primary-bold: 600;
+$primary-light: 300;
+$primary-gray: $mhc-gray;
+$primary-light-gray: #f2f2f2;
+$primary-dark-gray: #7b7b7b;
+$primary-button-text-casing: uppercase;
+$primary-border-radius: .5rem;
+$primary-input-border: solid 1px #b7b7b7;
+
+$float-labels-text-size: 10px;
+$float-labels-weight: bold;
+$float-labels-color: rgb(131, 135, 128);
+$float-labels-casing: uppercase;
+
+$secondary-button-text: $primary-blue;
+$secondary-button-background: transparent;
+$secondary-button-border: $primary-blue;
+$secondary-button-text-casing: capitalize;
+
+$background-hover: #eeeeee;
+
+$font-family-base: 'arial';
+$headings-font-family: 'Roboto Slab';
+$headings-color: $primary-orange;
+$gray: #4b7c2b;
+$brand-success: #5cb85c;
+$brand_info: #006494;
+$brand-warning: #f0ad4e;
+$brand-danger: #d9534f;
+$brand-primary: $mhc-dark-blue;
+
+
+.plan_design_proposals {
+
+  .plan-type-filters {
+    ul {
+      list-style: none;
+      padding-left: 10%;
+    }
+    input.plan-filter-checkbox[type=checkbox] {
+      display: inline-block;
+    }
+    label {
+      display: block;
+    }
+  }
+  .success-message {
+    color: green;
+  }
+  .custom-heading {
+    background-color:#fff !important;
+  }
+  .custom-heading h3 {
+    color:$primary-orange;
+  }
+  table.borderless td, table.borderless th {
+       border: none !important;
+  }
+  .border-bottom {
+    border-bottom:1px solid $mhc-light-gray;
+  }
+  .th-gray {
+    color:$mhc-light-gray;
+  }
+  .pr-close {
+    margin-top:-17px;
+    color:$mhc-light-gray;
+  }
+  .pr-close-button {
+    margin-left:10px;
+  }
+  .pr-pdf {
+    margin-top:10px;
+    padding-right:10px;
+  }
+  .pr-star {
+    margin-top:65px;
+    color:$mhc-orange;
+  }
+  .toggle-text {
+    margin-top:-30px;
+  }
+  table.benefit-group-contribution-table {
+    padding: 0 2%;
+    margin: auto;
+    table-layout: fixed;
+
+    tr.not-offered {
+      opacity: 0.35;
+    }
+
+    tr:first-of-type {
+      border-top: none;
+      th:first-of-type {
+        width: 22%;
+      }
+      th {
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 10px 0;
+        color: #9b9b9b;
+      }
+
+    }
+    tr {
+      border-bottom: solid 1px #d5d5d5;
+
+      td {
+        padding: 15px 0;
+        font-size: 16px;
+        i {
+          margin-left: -17%;
+          color: #69A30D;
+          margin-right: 10px;
+          cursor: default;
+        }
+      }
+      &:last-of-type {
+        border-bottom: none;
+        display: none;
+      }
+    }
+  }
+  .employer-cost-text {
+    color:$primary-black;
+  }
+  .reference-plans {
+    max-height:400px;
+    overflow-y: scroll;
+  }
+  /* Style Benefit Model Selection of BQT */
+  ul.nav.nav-tabs, .plan-options .col-xs-3 a {
+    border-bottom: none;
+    li {
+      a {
+        padding: 0;
+      }
+
+      &.active {
+        label {
+          border: solid 1px #b7b7b7;
+          border-bottom: none;
+          background-color: #ffffff;
+          border-bottom-left-radius: 0px;
+          border-bottom-right-radius: 0px;
+          z-index: 100;
+
+          color: #333333;
+          &:hover {
+            background-color: #ffffff;
+          }
+        }
+      }
+
+        label {
+          font-weight: bold;
+          font-size: 18px;
+          margin-right: 10px;
+          padding: 10px;
+          background-color: $primary-blue;
+          border-bottom: solid 3px #003260;
+          border-radius: 6px;
+          width: 100%;
+          height: 100%;
+          color: #ffffff;
+          margin-bottom: 0;
+          text-transform: uppercase;
+          &:hover {
+            background-color: #003260;
+            cursor: pointer;
+          }
+          i {
+            padding-right: 15px;
+          }
+
+        }
+
+    }
+    input[type=radio] {
+      display: none;
+    }
+    input[type=radio] + label {
+
+      &>i {
+        font-size: 28px;
+        color: #b7b7b7;
+
+
+
+        &:first-of-type {
+          display: inline-block;
+
+        }
+        &:last-of-type {
+          display: none;
+        }
+      }
+    }
+    input[type=radio]:checked + label {
+
+      &>i {
+        color: #69A30D;
+        &:first-of-type {
+          display: none;
+        }
+        &:last-of-type {
+          display: inline-block;
+        }
+      }
+    }
+  }
+  .benefits-setup-tab ul.nav.nav-tabs li label {
+    font-size:12px;
+    padding-bottom:15px;
+  }
+  .pdp_carrier_title {
+    width:auto;
+    margin-top:-25px;
+    margin-left:35px;
+    font-size:13px;
+  }
+  .plan_heading_text {
+    font-size:14px;
+  }
+  .benefits-setup-tab .plan-options .col-xs-9 h3 {
+    font-size:12px;
+    min-height:90px;
+    font-weight:bold;
+    margin-top:-1px;
+  }
+  /* Styles Benefit Package Selection of BQT */
+  .offerings-slider {
+    .row-form-wrapper, input.premium-storage-input {
+      border:none;
+    }
+  }
+  .reference-plans, .dental-reference-plans, .elected-plans-tab  {
+    background-color: #ffffff;
+    border: solid 1px #d7d7d7;
+    padding-bottom: 25px;
+    overflow-y: scroll;
+    display: none;
+
+    .loading {
+      position: relative;
+      padding-top: 30px;
+      top: 50%;
+      text-align: center;
+    }
+    .reference-plan-info {
+      margin-top:-12px;
+    }
+    .reference-plan, .dental-reference-plan {
+      height: 193px;
+      padding: 0;
+      cursor: pointer;
+      padding-top: 20px;
+      border-bottom: solid 1px #d7d7d7;
+
+      &:hover {
+        border-bottom: solid 1px $primary-blue;
+        .col-xs-10 .panel .panel-body .view-summary {
+          display: inline-block;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+      .col-xs-2:first-of-type {
+        padding-left: 0;
+      }
+      .panel {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        border: none;
+        background-color: transparent;
+        .panel-heading {
+          padding: 0 0 5px 0;
+          color: #333333;
+          background-color: transparent;
+          h3 {
+            font-size: 12px;
+            weight: 700;
+            margin-bottom: 0;
+          }
+        }
+        .panel-body {
+          padding: 0;
+          line-height: 110%;
+          span {
+            font-size: 12px;
+            color: #333333;
+            text-transform: uppercase;
+          }
+          .plan-label {
+            color: #b7b7b7;
+            font-size: 10px;
+
+          }
+          a.view-summary {
+            display: none;
+            margin-top: 3.5%;
+          }
+        }
+      }
+
+      input[type=radio] {
+        display: none;
+      }
+      input[type=radio] + label {
+        position: relative;
+        top: 50%;
+
+        &>i {
+          font-size: 28px;
+          color: #b7b7b7;
+
+
+
+          &:first-of-type {
+            display: inline-block;
+
+          }
+          &:last-of-type {
+            display: none;
+          }
+        }
+      }
+      input[type=radio]:checked + label {
+
+        &>i {
+          color: #69A30D;
+          &:first-of-type {
+            display: none;
+          }
+          &:last-of-type {
+            display: inline-block;
+          }
+        }
+      }
+
+    }
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+
+  }
+  input[type=radio] {
+    display: inline-block;
+  }
+  label.sbc-download-label {
+    display: block;
+  }
+ input.sbc-download-checkbox[type=checkbox] {
+   display: inline;
+ }
+
+ .benefits-fields input[type=checkbox] {
+    display: none;
+    + label > i.fa {
+      color: #69A30D;
+    }
+  }
+  table input[type=checkbox] {
+    display: inline-block;
+  }
+  .checkbox {
+    display: block;
+    margin: auto;
+    padding-left: 15%;
+  }
+  .checkbox {
+    &>div {
+      display: inline-block;
+      margin: auto;
+    }
+  }
+  .checkbox label {
+    padding-left: 0;
+  }
+  .checkbox label label {
+    display: inline;
+    padding-left: 0;
+  }
+  .checkbox label label + span {
+    display: inline-block;
+    position: relative;
+    text-transform: capitalize;
+    font-size: 16px;
+    top: -5px;
+    left: 10px;
+  }
+  input[type=checkbox]:disabled + label i {
+    color: #b7b7b7;
+    cursor: not-allowed;
+  }
+  input[type=checkbox] + label i {
+    &:first-of-type {
+      display: none;
+
+    }
+    &:last-of-type {
+      display: inline-block;
+      width: 30px;
+    }
+  }
+  input[type=checkbox]:checked + label i {
+    &:first-of-type {
+      display: inline-block;
+      width: 30px;
+    }
+    &:last-of-type {
+      display: none;
+    }
+  }
+
+  #pdp-bms {
+    input[type=radio] {
+      display: none;
+    }
+    input[type=radio] + label {
+
+      &>i {
+        font-size: 28px;
+        color: #b7b7b7;
+
+
+
+        &:first-of-type {
+          display: inline-block;
+
+        }
+        &:last-of-type {
+          display: none;
+        }
+      }
+    }
+    input[type=radio]:checked + label {
+
+      &>i {
+        color: #69A30D;
+        &:first-of-type {
+          display: none;
+        }
+        &:last-of-type {
+          display: inline-block;
+        }
+      }
+    }
+  }
+  .reference-plan {
+    input[type=checkbox] {
+      display:inline;
+      width:15px;
+      height:15px;
+      margin-top:15px;
+    }
+  }
+  #clear-comparison {
+    float:left;
+    margin-left:10px;
+  }
+  #view-comparison {
+    float:left;
+  }
+
+  .glyphicon-refresh-animate {
+      -animation: spin .7s infinite linear;
+      -webkit-animation: spin2 .7s infinite linear;
+  }
+
+  @-webkit-keyframes spin2 {
+      from { -webkit-transform: rotate(0deg);}
+      to { -webkit-transform: rotate(360deg);}
+  }
+
+  @keyframes spin {
+      from { transform: scale(1) rotate(0deg);}
+      to { transform: scale(1) rotate(360deg);}
+  }
+  .sq-btn-grp {
+    margin-top:-40px;
+  }
+  .benefits-adjustmets {
+    margin-left:-30px;
+  }
+}
+
+.plan-details-export {
+  background-color: white;
+  table.benefit-group-contribution-table {
+    padding: 0 2%;
+    margin: auto;
+    table-layout: fixed;
+
+    tr.not-offered {
+      opacity: 0.35;
+    }
+
+    tr:first-of-type {
+      border-top: none;
+      th:first-of-type {
+        width: 28%;
+      }
+      th {
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 10px 0;
+        color: #9b9b9b;
+      }
+
+    }
+    tr {
+      border-bottom: solid 1px #d5d5d5;
+
+      td {
+        padding: 15px 0;
+        font-size: 16px;
+        i {
+          margin-left: -17%;
+          color: #69A30D;
+          margin-right: 10px;
+          cursor: default;
+        }
+      }
+      &:last-of-type {
+        border-bottom: none;
+        display: none;
+      }
+    }
+  }
+}

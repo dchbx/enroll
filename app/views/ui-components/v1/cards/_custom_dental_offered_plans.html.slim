@@ -1,0 +1,141 @@
+.panel.panel-default#employer-benefit-groups
+  .panel-heading = bg.title.capitalize
+  .panel-body
+    table.table.borderless
+      - if bg.description.present?
+        tr
+          td.benefit-group-heading Description
+          td = bg.description
+      tr
+        td.benefit-group-heading Eligibility
+        td
+          - if bg.effective_on_kind == 'date_of_hire' && bg.effective_on_offset == 0
+            = "#{bg.effective_on_kind.humanize}"
+          - elsif bg.effective_on_kind == 'first_of_month' && bg.effective_on_offset == 0
+            | First of the month following or coinciding with date of hire
+          - elsif bg.effective_on_offset == 1
+            | First of the month following date of hire
+          - else
+            = "#{bg.effective_on_kind.humanize} following #{bg.effective_on_offset} days"
+    .health
+      div style="float:right"
+        button#showhidebutton type="button" data-toggle="collapse" data-target="#collapseHealth" aria-expanded="false" aria-controls="collapseHealth"
+          | View Details
+          a
+            i.fa.fa-chevron-down.fa-lg
+      div
+        h5.title.pl-1 Health
+      table.table.benefit-group.borderless
+        tr
+          th.benefit-group-heading Reference Plan
+          th.benefit-group-heading Carrier
+          th.benefit-group-heading Type
+        tr
+          td = bg.reference_plan.name.try(:upcase)
+          td = bg.reference_plan.carrier_profile.legal_name
+          td = bg.try(:reference_plan).try(:plan_type).try(:upcase)
+        tr
+          td.benefit-group-heading Metal Level
+          td.benefit-group-heading Plans By
+        tr
+          td = bg.reference_plan.metal_level.titleize
+          td = selected_benefit_plan(bg.plan_option_kind)
+          / Health plan collapsible: start
+      .collapse#collapseHealth
+        = render :partial => 'ui-components/v1/tables/benefit_group_summary', locals: { bg: bg }
+        .panel.benefitgroup.col-xs-12.referenceplan.home.est
+          .plan-details
+            .col-xs-4
+              .row
+                span Employer Estimated Maximum Monthly Cost
+                h2 = number_to_currency(bg.monthly_employer_contribution_amount)
+            .col-xs-8
+              .row
+                table
+                  tr
+                    th colspan="2"
+                    th Min
+                    th Max
+                  tr
+                    td colspan="2" Total Estimated Monthly Cost for Plan Participants
+                    td = number_to_currency(bg.monthly_min_employee_cost)
+                    td = number_to_currency(bg.monthly_max_employee_cost)
+    / Dental plan start
+  - if bg.dental_reference_plan_id.present?
+    .dental
+      div style="float:right"
+        button#showhidebuttonDental type="button" data-toggle="collapse" data-target="#collapseDental" aria-expanded="false" aria-controls="collapseDental"
+          | View Details
+          a
+            i.fa.fa-chevron-down.fa-lg
+      div
+        h5.title.pl-1 Dental
+      table.table.benefit-group.borderless
+        tr
+          th.benefit-group-heading Reference Plan
+          th.benefit-group-heading Carrier
+          th.benefit-group-heading Type
+        tr
+          td = bg.dental_reference_plan.name
+          td = bg.dental_reference_plan.carrier_profile.legal_name
+          td = bg.dental_reference_plan.plan_type.to_s.upcase
+        tr
+          td.benefit-group-heading Metal Level
+          td.benefit-group-heading Plans By
+        tr
+          td = display_dental_metal_level bg.dental_reference_plan
+          td
+            - if bg.dental_plan_option_kind == "single_carrier"
+              | All Plans From A 
+              = fetch_plan_title_for_single_carrier
+            - elsif bg.dental_plan_option_kind == "single_plan"
+              - if bg.elected_dental_plan_ids.count < 13
+                | Custom 
+                = bg.elected_dental_plans.count 
+                | Plans
+                br
+                = link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"}
+              - else
+                | All Plans
+      / Dental Plan collapsible: start
+      .collapse#collapseDental
+        .col-xs-12.package-offering
+          table
+            tr
+              th Offered
+              th Employer Dental Contribution
+          - bg.relationship_benefits.each_with_index do |rb, i|
+            tr
+              td = raw(bg.dental_relationship_benefits[i].offered ? "<i class='far fa-check-square fa-lg'></i>" : "<i class='far fa-square fa-lg'></i>"  " #{bg.dental_relationship_benefits[i].relationship.try(:humanize)}")
+              td
+                strong = number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0
+        .panel.benefitgroup.col-xs-12.referenceplan.home.est
+          .plan-details
+            .col-xs-4
+              .row
+                span Employer Estimated Maximum Monthly Cost
+                h2 = number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan))
+            .col-xs-8
+              .row
+                table
+                  tr
+                    th colspan="2"
+                    th Min
+                    th Max
+                  tr
+                    td colspan="2" Total Estimated Monthly Cost for Plan Participants
+                    td = number_to_currency(bg.monthly_min_employee_cost('dental'))
+                    td = number_to_currency(bg.monthly_max_employee_cost('dental'))
+      - if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1
+        = render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg }
+        
+
+javascript:
+  $('#collapseHealth').on('hide.bs.collapse', function () {
+    $('#showhidebutton').text('Show Details ').append('<i class="fa fa-chevron-down fa-lg"></i>')
+  })
+  
+  $('#collapseHealth').on('show.bs.collapse', function () {
+    $('#showhidebutton').text('Hide Details ').append('<i class="fa fa-chevron-up fa-lg"></i>')
+  })
+            

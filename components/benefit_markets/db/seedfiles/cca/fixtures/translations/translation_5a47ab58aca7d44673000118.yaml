@@ -1,0 +1,8 @@
+--- !ruby/object:Translation
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WkerWKyn1EZzAAEY
+  key: en.insured.families.verification.send_documents_for_review_confirm
+  value: '"Click OK if you would like to send all your documents for review."'

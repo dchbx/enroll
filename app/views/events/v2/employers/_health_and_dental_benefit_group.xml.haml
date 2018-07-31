@@ -1,10 +1,12 @@
 -# this partial will separate out health and dental elected plans
-- if benefit_group.elected_plans.present?
+- if benefit_group.health_sponsored_benefit.present?
   = render :partial => "events/v2/employers/benefit_group", :locals => {benefit_group:benefit_group,
-            elected_plans: benefit_group.elected_plans, reference_plan: benefit_group.reference_plan,
-            relationship_benefits: benefit_group.relationship_benefits}
+            elected_plans: benefit_group.health_sponsored_benefit.products(benefit_group.effective_period.min), reference_plan: benefit_group.health_sponsored_benefit.reference_product ,
+            relationship_benefits: benefit_group.health_sponsored_benefit.sponsor_contribution.contribution_levels,
+            sponsored_benefit:benefit_group.health_sponsored_benefit}
 
-- if benefit_group.is_offering_dental?
+- if benefit_group.dental_sponsored_benefit.present?
   = render :partial => "events/v2/employers/benefit_group", :locals => {benefit_group:benefit_group,
-            elected_plans: benefit_group.elected_dental_plans, reference_plan: benefit_group.dental_reference_plan,
-            relationship_benefits: benefit_group.dental_relationship_benefits}
+            elected_plans: benefit_group.dental_sponsored_benefit.products(benefit_group.effective_period.min), reference_plan: benefit_group.dental_sponsored_benefit.reference_product,
+            relationship_benefits: benefit_group.dental_sponsored_benefit.sponsor_contribution.contribution_levels,
+            sponsored_benefit:benefit_group.dental_sponsored_benefit}

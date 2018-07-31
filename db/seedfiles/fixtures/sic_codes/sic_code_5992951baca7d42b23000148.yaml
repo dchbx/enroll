@@ -1,0 +1,14 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVG6yn1CsjAAFI
+  division_code: D
+  division_label: Manufacturing
+  major_group_code: '28'
+  major_group_label: Chemicals And Allied Products
+  industry_group_code: '287'
+  industry_group_label: Agricultural Chemicals
+  sic_code: '2874'
+  sic_label: Phosphatic Fertilizers

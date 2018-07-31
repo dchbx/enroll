@@ -1,0 +1,15 @@
+--- !ruby/object:SicCode
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WZKVHKyn1CsjAALf
+  division_code: G
+  division_label: Retail Trade
+  major_group_code: '52'
+  major_group_label: Building Materials, Hardware, Garden Supply, And Mobile Home
+    Dealers
+  industry_group_code: '523'
+  industry_group_label: Paint, Glass And Wallpaper Stores
+  sic_code: '5231'
+  sic_label: Paint, Glass, and Wallpaper Stores

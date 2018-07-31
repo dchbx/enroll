@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe ShopGeneralAgencyNotices::GeneralAgencyHiredNotice, :dbclean => :after_each do
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, organization: organization) }
   let!(:person) { FactoryGirl.create(:person, :with_work_email, :with_hbx_staff_role) }
@@ -92,4 +93,5 @@ RSpec.describe ShopGeneralAgencyNotices::GeneralAgencyHiredNotice, :dbclean => :
       expect(@general_agency_notice.template).to eq "notices/shop_general_agency_notices/general_agency_hired_notice"
     end
   end
+end
 end

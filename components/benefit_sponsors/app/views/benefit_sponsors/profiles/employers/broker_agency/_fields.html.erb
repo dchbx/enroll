@@ -1,0 +1,21 @@
+<div class="table-responsive">
+  <table class="table">
+    <tr>
+      <th>Agency</th>
+      <th>Broker</th>
+      <th>Broker NPN</th>
+      <th>Contact Phone</th>
+      <th>Email</th>
+    </tr>
+
+    <tr>
+      <td><%= broker_agency_profile.legal_name %></td>
+      <% if broker_agency_profile.primary_broker_role.present? %>
+        <td><%= broker_agency_profile.primary_broker_role.person.full_name %></td>
+        <td><%= broker_agency_profile.primary_broker_role.npn %></td>
+        <td><%= broker_agency_profile.primary_broker_role.person.phones.map(&:to_s).join('/') %></td>
+        <td><a href="mailto:<%= broker_agency_profile.primary_broker_role.person.emails.first.address %>"><%= broker_agency_profile.primary_broker_role.person.emails.first.address %></a></td>
+      <% end %>
+    </tr>
+  </table>
+</div>
