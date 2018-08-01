@@ -63,10 +63,27 @@ RSpec.configure do |config|
   config.include Devise::TestHelpers, :type => :view
   config.extend ControllerMacros, :type => :controller #real logins for integration testing
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
+  config.include Devise::TestHelpers, :type => :helper
   config.include FactoryGirl::Syntax::Methods
+  config.example_status_persistence_file_path = "rspec_failures.txt"
 
   config.infer_spec_type_from_file_location!
 
   config.include Capybara::DSL
 
+end
+
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new("spec:start") do |t|
+    t.rspec_opts = "--format documentation"
+    t.verbose = false
+    t.fail_on_error = false # don't stop the whole suite
+  end
+  
+  RSpec::Core::RakeTask.new("spec:retry") do |t|
+    t.rspec_opts = "--only-failures"
+    t.verbose = false
+ end
+rescue LoadError
 end
