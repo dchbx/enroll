@@ -3,7 +3,7 @@ require 'csv'
 namespace :reports do
   desc "Verified verifications created monthly report"
   task :verified_verification_report => :environment do
-    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME CURRENT_STATUS VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON)
+    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME CURRENT_STATUS VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON IVL_ENROLLMENT SHOP_ENROLLMENT)
 
     CITIZEN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid","pass_dhs!", "pass_dhs"]
 
@@ -27,13 +27,44 @@ namespace :reports do
       if @person.primary_family
         @person.hbx_id
       else
-        @person.families.to_a.each do |family|
-          @family_array = []
-          @family_array <<  family  if family.active_family_members.map(&:person).map(&:hbx_id).include? @person.hbx_id
-        end
-        @family_array.map(&:primary_family_member).map(&:hbx_id).join(',')
+        @person.families.map(&:primary_family_member).select{|member| member.person.consumer_role.present?}.first.hbx_id || @person.hbx_id
       end
     end
+
+    def ivl_enrollment(person)
+      if person.primary_family
+        if person.primary_family.active_household.hbx_enrollments.individual_market.present?
+          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        else
+          "nil"
+        end
+      else
+        families = person.families.select{|family| family.active_household.hbx_enrollments.individual_market.present?}
+        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| !(["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
+        active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state)}
+        return "nil" unless all_enrollments.any?
+        active_enrollments.any? ? "YES" : "NO"
+      end
+    end
+
+    def shop_enrollment(person)
+      if person.primary_family
+        if person.primary_family.active_household.hbx_enrollments.shop_market.present?
+          person.primary_family.active_household.hbx_enrollments.shop_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        else
+          "nil"
+        end
+      else
+        families = person.families.select{|family| family.active_household.hbx_enrollments.shop_market.present?}
+        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| (["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
+        active_enrollments = enrollments.select{|enrollment| enrollment.currently_active?}
+        return "nil" unless all_enrollments.any?
+        active_enrollments.any? ? "YES" : "NO"
+      end
+    end
+
 
     def start_date
       Date.parse(date)
@@ -43,8 +74,8 @@ namespace :reports do
       Date.parse(date).next_month
     end
 
-    def verified_history_elements_with_date_range
-      @person.consumer_role.verification_type_history_elements.
+    def type_history_elements_with_date_range(v_type)
+      v_type.type_history_elements.
       where(created_at:{
         :"$gte" => start_date,
         :"$lt" => end_date},
@@ -52,11 +83,11 @@ namespace :reports do
           {:"action" => "verify"},
           {:"modifier" => "external Hub"}
         ]
-      ).uniq{|element| [element.modifier,element.created_at.to_date,element.verification_type]}
+      ).uniq{|element| [element.modifier,element.created_at.to_date]}
     end
   
     def verified_people
-      Person.where(:"consumer_role.verification_type_history_elements" => { :"$elemMatch" => {
+      Person.where(:"verification_types.type_history_elements" => { :"$elemMatch" => {
         :"created_at" => {
           :"$gte" => start_date,
           :"$lt" => end_date
@@ -68,9 +99,9 @@ namespace :reports do
       }})
     end
 
-    def hub_response_wfst
+    def hub_response_wfst(verification_type)
       hub_response_on = @history_element.created_at.to_date
-      v_type = @history_element.verification_type
+      v_type = verification_type.type_name
       @person.consumer_role.workflow_state_transitions.where(:"created_at" => {
         :"$gt" => hub_response_on - 1.day,
         :"$lt" => hub_response_on + 1.day
@@ -92,12 +123,11 @@ namespace :reports do
         else
           ALL_EVENTS
       end
-
     end
     
-   def is_not_eligible_transaction?
+   def is_not_eligible_transaction?(v_type)
       return false if @history_element.modifier != "external Hub"
-      hub_response_wfst.blank?
+      hub_response_wfst(v_type).blank?
     end
 
 
@@ -110,20 +140,22 @@ namespace :reports do
       verified_people.each do |person|
         begin
           @person = person
-          verified_history_elements_with_date_range.each do |history_element|
+          person.verification_types.each do |v_type|
+            type_history_elements_with_date_range(v_type).each do |history_element|
             @history_element = history_element
-
-            next if is_not_eligible_transaction?
-          
+            next if is_not_eligible_transaction?(v_type)
             csv << [  subscriber_id,
                       person.hbx_id,
                       person.first_name,
-                      person.last_name,  
-                      person.consumer_role.verification_type_status(history_element.verification_type,person),
-                      history_element.verification_type,
+                      person.last_name,
+                      v_type.validation_status,
+                      v_type.type_name,
                       history_element.created_at,
-                      history_element.update_reason
-                    ]
+                      history_element.update_reason,
+                      ivl_enrollment(person),
+                      shop_enrollment(person)
+            ]
+            end
           end
         rescue => e
          puts "Invalid Person with HBX_ID: #{person.hbx_id}"
@@ -135,4 +167,3 @@ namespace :reports do
 
   end
 end
-
