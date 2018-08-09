@@ -805,8 +805,9 @@ class ConsumerRole
 
   def move_types_to_pending(*args)
     verification_types.each do |type|
-      type.pending_type unless type.type_name == "DC Residency"
+      type.pending_type unless (type.type_name == "DC Residency") || (type.type_name == "American Indian Status")
     end
+    fail_native
   end
 
   def pass_lawful_presence(*args)
@@ -833,6 +834,10 @@ class ConsumerRole
 
   def revert_native
     verification_types.by_name("American Indian Status").first.pending_type if verification_types.by_name("American Indian Status").first
+  end
+
+  def fail_native
+    verification_types.by_name("American Indian Status").first.fail_type if verification_types.by_name("American Indian Status").first
   end
 
   def revert_lawful_presence(*args)
