@@ -17,8 +17,10 @@ describe CreatingPersonRecord, dbclean: :after_each do
     end
     it "should create person record" do
       expect(Person.all.to_a.size).to eq 0 # before migration
+      expect(Person.all.map(&:addresses).count).to eq 0
       subject.migrate
       expect(Person.all.to_a.size).to eq 1 # after migration
+      expect(Person.all.map(&:addresses).count).to eq 1
     end
   end
 end
