@@ -398,13 +398,14 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
-  def first_name_last_name_and_suffix
-    [first_name, last_name, name_sfx].compact.join(" ")
+  def first_name_last_name_and_suffix(seperator=nil)
+    seperator = seperator.present? ? seperator : " "
+    [first_name, last_name, name_sfx].compact.join(seperator)
     case name_sfx
       when "ii" ||"iii" || "iv" || "v"
-        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(seperator)
       else
-        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(seperator)
       end
   end
 

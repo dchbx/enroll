@@ -5,7 +5,7 @@ class PaymentTransaction
   belongs_to :family
 
   field :payment_transaction_id, type: String
-  field :carrier_id, type: Integer
+  field :carrier_id, type: BSON::ObjectId
   field :enrollment_effective_date, type: Date
   field :enrollment_id, type: BSON::ObjectId
   field :status, type: String
@@ -20,5 +20,19 @@ class PaymentTransaction
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
+  end
+
+  def update_enrollment_details(enrollment)
+    self.enrollment_id = enrollment.id
+    self.carrier_id =  enrollment.plan.carrier_profile_id
+    self.enrollment_effective_date = enrollment.effective_on
+    self.save!
+  end
+
+  def self.build_payment_instance(enrollment)
+    payment = enrollment.family.payment_transactions.build
+    payment.update_enrollment_details(enrollment)
+    payment.family.save!
+    payment
   end
 end

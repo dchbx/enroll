@@ -23,6 +23,8 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
+
   namespace :exchanges do
 
     resources :inboxes, only: [:show, :destroy]
