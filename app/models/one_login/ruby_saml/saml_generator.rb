@@ -1,23 +1,18 @@
-require "onelogin/ruby-saml/logging"
+require 'onelogin/ruby-saml/logging'
 
-require "onelogin/ruby-saml/saml_message"
-require "onelogin/ruby-saml/utils"
+require 'onelogin/ruby-saml/saml_message'
+require 'onelogin/ruby-saml/utils'
 
 require 'securerandom'
 
-require "onelogin/ruby-saml/error_handling"
+require 'onelogin/ruby-saml/error_handling'
 
-require "xml_security/document"
+require 'xml_security/document'
 
 # Only supports SAML 2.0
 module OneLogin
   module RubySaml
-
-
-
     class SamlGenerator < SamlMessage
-
-
       REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount', 'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Partner Assigned Consumer ID','Street Name 1', 'City Name', 'State', 'Zip Code','Additional Information']
       ASSERTION = 'urn:oasis:names:tc:SAML:2.0:assertion'
       PROTOCOL = 'urn:oasis:names:tc:SAML:2.0:protocol'
@@ -48,48 +43,48 @@ module OneLogin
 
         response_doc = XMLSecurity::Document.new
 
-        root = response_doc.add_element 'samlp:Response', { 'xmlns:samlp' => PROTOCOL}
+        root = response_doc.add_element 'samlp:Response', { 'xmlns:samlp' => PROTOCOL }
         root.attributes['ID'] = "_#{generate_uuid}"
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'
 
-        #add success message
+        # add success message
         status = root.add_element 'samlp:Status'
 
-        #success status code
+        # success status code
         status_code = status.add_element 'samlp:StatusCode'
         status_code.attributes['Value'] = SUCCESS
 
-        #assertion
-        assertion = root.add_element 'saml:Assertion', { 'xmlns:saml' =>  ASSERTION}
+        # assertion
+        assertion = root.add_element 'saml:Assertion', {'xmlns:saml' =>  ASSERTION }
         assertion.attributes['ID'] =  "_#{generate_uuid}"
         assertion.attributes['IssueInstant'] =  time
         assertion.attributes['Version'] = '2.0'
 
-        issuer = assertion.add_element 'saml:Issuer', {'Format' => NAME_ID_FORMAT}
+        issuer = assertion.add_element 'saml:Issuer', { 'Format' => NAME_ID_FORMAT }
         issuer.text = SamlInformation.issuer
 
-        #sign the assertion
+        # sign the assertion
         response_doc.sign_document(@private_key, @cert, signature_method, digest_method)
 
-        #subject
+        # subject
         subject = assertion.add_element 'saml:Subject'
-        name_id = subject.add_element 'saml:NameID', {'Format' => NAME_ID_FORMAT }
+        name_id = subject.add_element 'saml:NameID', { 'Format' => NAME_ID_FORMAT }
         name_id.text = 'FFM'
 
-        #subject confirmation
+        # subject confirmation
         subject.add_element 'saml:SubjectConfirmation', { 'Method' => SENDER_VOUCHES }
 
-        #conditions
-        assertion.add_element 'saml:Conditions', {'NotBefore' => "#{not_before}",  'NotOnOrAfter' => "#{not_on_or_after_condition}"}
+        # conditions
+        assertion.add_element 'saml:Conditions', { 'NotBefore' => "#{not_before}",  'NotOnOrAfter' => "#{not_on_or_after_condition}" }
 
-        #auth statements
-        auth_statement = assertion.add_element 'saml:AuthnStatement', {'AuthnInstant' => "#{now_iso}",  'SessionIndex' => "_#{generate_uuid}", 'SessionNotOnOrAfter' => "#{not_on_or_after_condition}"}
+        # auth statements
+        auth_statement = assertion.add_element 'saml:AuthnStatement', { 'AuthnInstant' => "#{now_iso}",  'SessionIndex' => "_#{generate_uuid}", 'SessionNotOnOrAfter' => "#{not_on_or_after_condition}" }
         auth_context = auth_statement.add_element 'saml:AuthnContext'
         auth_class_reference = auth_context.add_element 'saml:AuthnContextClassRef'
         auth_class_reference.text = PASSWORD
 
-        #attributes
+        # attributes
         attribute_statement = assertion.add_element 'saml:AttributeStatement'
 
         REQUIRED_ATTRIBUTES.each do |attr_name|
@@ -100,7 +95,6 @@ module OneLogin
         end
         response_doc
       end
-
 
       def set_attribute_values(attr_name, hbx_enrollment)
         case attr_name
@@ -140,10 +134,8 @@ module OneLogin
       def encode_saml_response(response_doc)
         response = ''
         response_doc.write(response)
-        base64_response = encode(response)
-        base64_response
+        encode(response)
       end
-
 
       private
 
@@ -170,7 +162,6 @@ module OneLogin
       def generate_uuid
         SecureRandom.uuid
       end
-
     end
   end
 end

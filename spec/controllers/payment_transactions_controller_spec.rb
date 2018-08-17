@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe PaymentTransactionsController, :type => :controller do
   let(:user){ FactoryGirl.create(:user, :consumer) }
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "shopping") }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: 'shopping') }
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
 
