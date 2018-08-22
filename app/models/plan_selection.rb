@@ -28,6 +28,7 @@ class PlanSelection
   end
 
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
+
     hbx_enrollment.update_current(plan_id: plan.id)
     # hbx_enrollment.inactive_related_hbxs
     # hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
@@ -42,15 +43,20 @@ class PlanSelection
     hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
     if enrollment_members_verification_status(market_kind)
       hbx_enrollment.move_to_contingent!
+
+      #To ensure consumer state transition
+      hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).each(&:coverage_purchased!)
     else
       hbx_enrollment.select_coverage!(qle: qle)
     end
   end
-
+  
   def enrollment_members_verification_status(market_kind)
     members = hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role)
-    if market_kind == "individual"
-      return  (members.compact.present? && (members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)))
+    if market_kind == "individual" 
+      return  members.compact.present? && members.any?{ |member|
+        member.verification_outstanding? || member.verification_period_ended? || member.native_outstanding?
+      }
     else
       return false
     end
