@@ -37,7 +37,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   def new_plan
     double(
       "Plan",
-      name: "My Silly Plan"
+      name: "My Silly Plan",
+      carrier_profile: carrier_profile,
     )
   end
 
@@ -58,11 +59,12 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   end
 
   let(:members) { [new_member, new_member] }
+  let(:carrier_profile){ double("CarrierProfile", legal_name: "my legal name") }
 
   before :each do
     assign :enrollment, enrollment
     @plan = plan_cost_decorator
-    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true)) 
+    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
     render file: "insured/plan_shoppings/receipt.html.erb"
   end
 
@@ -99,4 +101,40 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should not have cobra msg" do
     expect(rendered).not_to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
   end
+  
+  
+  context "doesn't have a Pay Now option and messaging" do
+    before do
+      allow(view).to receive(:show_pay_now?).and_return false
+    end
+    it "doesn't have a Pay now button" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to_not have_selector('btn-btn-default', text: /Pay Now/)
+    end
+
+    it "doesn't have Pay Now messaging" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment online/)
+      expect(rendered).to_not have_content(/You only have the option to PAY NOW while you’re on this page/)
+      expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment directly to Kaiser Permanente/)
+    end
+  end
+  context "have Pay Now options and messaging" do
+    before do
+      allow(view).to receive(:show_pay_now?).and_return true
+    end
+    it "should have a Pay now button" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to have_selector('button', text: /Pay Now/)
+    end
+
+    it "have Pay Now messaging" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to have_selector('strong', text: /You only have the option to PAY NOW while you’re on this page./)
+      expect(rendered).to have_text(/If you leave this page without selecting PAY NOW,/)
+      expect(rendered).to have_text(/You only have the option to PAY NOW while you’re on this page/)
+    end
+  end
+
+    
 end

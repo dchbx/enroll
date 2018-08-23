@@ -22,6 +22,16 @@ describe Family, "given a primary applicant and a dependent" do
     subject.remove_family_member(dependent)
   end
 
+  context "payment_transactions" do
+    it "should match with has_many association" do
+      expect(Family.reflect_on_association(:payment_transactions).macro).to eq :has_many
+    end
+
+    it "should not match with has_many association" do
+      expect(Family.reflect_on_association(:payment_transactions).macro).not_to eq :embeds_many
+    end
+  end
+
   context "with enrolled hbx enrollments" do
     let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
     before do
