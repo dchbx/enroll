@@ -38,6 +38,7 @@ describe DefinePermissions, dbclean: :after_each do
 
     describe 'update permissions for hbx staff role to be able to view username and email' do
       let(:given_task_name) {':hbx_admin_can_add_view_username_and_email'}
+      let(:given_task_name) {':hbx_admin_can_access_pay_now'}
 
       before do
         User.all.delete
@@ -53,6 +54,15 @@ describe DefinePermissions, dbclean: :after_each do
         hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
         hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
         subject.hbx_admin_can_view_username_and_email
+      end
+
+      it "updates can_access_pay_now to true" do
+        subject.hbx_admin_can_access_pay_now
+        expect(Person.all.count).to eq(5)
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_access_pay_now).to be true
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_pay_now).to be true
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_pay_now).to be true
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_pay_now).to be true
       end
 
       it "updates can_view_username_and_email to true" do

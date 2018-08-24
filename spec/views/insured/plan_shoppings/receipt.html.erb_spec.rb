@@ -120,7 +120,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     end
   end
   context "have Pay Now options and messaging" do
+    let!(:user){FactoryGirl.create(:user)}
+    let!(:person){FactoryGirl.create(:person, user: user)}
     before do
+      sign_in(user)
       allow(view).to receive(:show_pay_now?).and_return true
     end
     it "should have a Pay now button" do

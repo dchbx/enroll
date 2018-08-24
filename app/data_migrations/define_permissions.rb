@@ -67,4 +67,11 @@ class DefinePermissions < MigrationTask
     Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
   end
+
+  def hbx_admin_can_access_pay_now
+    Permission.hbx_staff.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_csr_supervisor.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_csr_tier1.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_csr_tier2.update_attributes!(can_access_pay_now: true)
+  end
 end

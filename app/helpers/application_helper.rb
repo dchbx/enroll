@@ -672,5 +672,10 @@ module ApplicationHelper
     Settings.checkbook_services.plan_match == "DC"
   end
 
+  def can_access_pay_now_button
+    hbx_staff_role = current_user.person.hbx_staff_role
+    return true unless hbx_staff_role.present?
+    hbx_staff_role.permission.can_access_pay_now
+  end
 end
 
