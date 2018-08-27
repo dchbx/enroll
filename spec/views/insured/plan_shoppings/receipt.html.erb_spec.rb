@@ -37,7 +37,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   def new_plan
     double(
       "Plan",
-      name: "My Silly Plan"
+      name: "My Silly Plan",
+      carrier_profile: carrier_profile,
     )
   end
 
@@ -58,6 +59,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   end
 
   let(:members) { [new_member, new_member] }
+  let(:carrier_profile){ double("CarrierProfile", legal_name: "my legal name") }
 
   before :each do
     assign :enrollment, enrollment
@@ -99,4 +101,61 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should not have cobra msg" do
     expect(rendered).not_to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
   end
+  
+  
+  context "will not a Pay Now options for plans other than Kaiser" do
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:dob) { Date.new(1985, 4, 10) }
+    let(:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, dob: dob) }
+    let(:family) { person.primary_family }
+    let(:household) { family.active_household }
+    let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
+    let(:plan) { individual_plans.first }
+    let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
+
+    let!(:hbx_enrollment) {
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
+    }
+
+    it "should not have a Pay now button" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to_not have_selector('btn-btn-default', text: /Pay Now/)
+    end
+    
+    it "should not have Pay Now messaging" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment online/)
+      expect(rendered).to_not have_content(/You only have the option to PAY NOW while you’re on this page/)
+      expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment directly to Kaiser Permanente/)
+    end
+  end
+  
+  context "will have Pay Now options and messaging for Kaiser plans" do
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:dob) { Date.new(1985, 4, 10) }
+    let(:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, dob: dob) }
+    let(:family) { person.primary_family }
+    let(:household) { family.active_household }
+    let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
+    let(:carrier_profile) { FactoryGirl.create(:carrier_profile, legal_name:'Kaiser') }
+    let(:plan) { FactoryGirl.create(:plan, carrier_profile:carrier_profile) }
+
+    let!(:hbx_enrollment) {
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
+    }
+
+    it "should have a Pay now button" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to have_selector('button', text: /Pay Now/)
+    end
+    
+    it "should have Pay Now messaging" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to have_selector('strong', text: /You only have the option to PAY NOW while you’re on this page/)
+      expect(rendered).to have_text(/Select PAY NOW to make your first premium payment directly to Kaiser Permanente/)
+      expect(rendered).to have_text(/You only have the option to PAY NOW while you’re on this page/)
+    end
+  end
+
+    
 end
