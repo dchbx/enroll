@@ -6,6 +6,7 @@ module Factories
     def clone_for_cobra
       raise ArgumentError if !defined?(family) || !defined?(census_employee)
       clone_enrollment = clone_cobra_enrollment
+      clone_enrollment
       clone_enrollment.decorated_hbx_enrollment
       save_clone_enrollment(clone_enrollment)
     end
@@ -37,11 +38,11 @@ module Factories
       clone_enrollment.employee_role_id = enrollment.employee_role_id
       clone_enrollment.plan_id = enrollment.plan_id
       clone_enrollment.coverage_kind = enrollment.coverage_kind
-
       clone_enrollment.kind = 'employer_sponsored_cobra'
       effective_on = effective_on_for_cobra(enrollment)
       clone_enrollment.effective_on = effective_on
       clone_enrollment.external_enrollment = enrollment.external_enrollment
+      clone_enrollment.hbx_enrollment_members = clone_enrollment_members
 
       if enrollment.benefit_group.plan_year.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
@@ -53,7 +54,6 @@ module Factories
       end
 
       clone_enrollment.generate_hbx_signature
-      clone_enrollment.hbx_enrollment_members = clone_enrollment_members
       clone_enrollment
     end
 
