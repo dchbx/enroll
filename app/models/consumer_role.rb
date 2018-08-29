@@ -573,7 +573,6 @@ class ConsumerRole
   end
 
   def handle_native_no_snn_or_indian_transition
-    binding.pry
     if tribal_no_ssn?
       fail_lawful_presence (verification_attr)
       fail_indian_tribe
@@ -587,7 +586,7 @@ class ConsumerRole
   end
 
   def is_tribe_member?
-    !tribal_id.empty?
+    !tribal_id.nil? || !tribal_id.empty?
   end
 
   def tribal_no_ssn?
@@ -853,7 +852,6 @@ class ConsumerRole
   end
 
   def fail_lawful_presence(*args)
-    binding.pry
     lawful_presence_determination.deny!(*args)
     verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type }
   end

@@ -573,8 +573,7 @@ class HbxEnrollment
     is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
   end
 
-  def handle_coverage_selection
-    binding.pry
+  def handle_coverage_selection    
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
   end
