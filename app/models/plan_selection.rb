@@ -43,11 +43,6 @@ class PlanSelection
     hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
     if enrollment_members_verification_status(market_kind)
       hbx_enrollment.move_to_contingent!
-
-      #To ensure consumer state transition if unverified 
-      hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).each{ |consumer| 
-        consumer.coverage_purchased! if consumer.unverified?
-      }
     else
       hbx_enrollment.select_coverage!(qle: qle)
     end

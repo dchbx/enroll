@@ -1321,7 +1321,7 @@ class HbxEnrollment
     end
 
     event :move_to_contingent, :after => :record_transition do
-      transitions from: :shopping, to: :enrolled_contingent
+      transitions from: :shopping, to: :enrolled_contingent, after: :propagate_selection
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
