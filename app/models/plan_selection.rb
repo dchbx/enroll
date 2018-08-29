@@ -50,10 +50,8 @@ class PlanSelection
   
   def enrollment_members_verification_status(market_kind)
     members = hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role)
-    if market_kind == "individual" 
-      return  members.compact.present? && members.any?{ |member|
-        member.verification_outstanding? || member.verification_period_ended? || member.native_outstanding?
-      }
+    if market_kind == "individual"
+      return  (members.compact.present? && (members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)))
     else
       return false
     end

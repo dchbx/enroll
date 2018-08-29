@@ -567,13 +567,15 @@ class HbxEnrollment
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
-
-    callback_context = { :hbx_enrollment => self }
-    HandleCoverageSelected.call(callback_context)
   end
 
   def is_applicable_for_renewal?
     is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
+  end
+
+  def handle_coverage_selection
+    callback_context = { :hbx_enrollment => self }
+    HandleCoverageSelected.call(callback_context)
   end
 
   def update_renewal_coverage
@@ -1179,7 +1181,7 @@ class HbxEnrollment
 
   aasm do
     state :shopping, initial: true
-    state :coverage_selected, :after_enter => :update_renewal_coverage
+    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection]
     state :transmitted_to_carrier
     state :coverage_enrolled
 
