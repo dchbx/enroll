@@ -586,7 +586,8 @@ class ConsumerRole
   end
 
   def is_tribe_member?
-    !tribal_id.nil? || !tribal_id.empty?
+    return false if tribal_id.nil?
+    !tribal_id.empty?
   end
 
   def tribal_no_ssn?

@@ -239,11 +239,12 @@ context "Verification process and notices" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
-    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
+    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event, tribal_id = ""|
       before do
         person.ssn = ssn
         consumer.citizen_status = citizen
         consumer.is_state_resident = residency
+        consumer.tribal_id = tribal_id
       end
       it "moves from #{from_state} to #{to_state} on #{event}" do
         expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
@@ -298,11 +299,34 @@ context "Verification process and notices" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, :unverified, :dhs_pending, "coverage_purchased!"
       end
 
+      describe "indian tribe member with ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+      end
+
+      describe "indian tribe member with NO ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+      end
+
       describe "pending verification type updates" do
         it "updates validation status to pending for unverified consumers" do
           consumer.coverage_purchased!
           expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending"])
         end
+
+        it "updates indian tribe validition status to outstanding and to pending for the rest" do
+          consumer.tribal_id = "345543345"
+          consumer.coverage_purchased!
+          consumer.verification_types.each { |verif| 
+            if verif.type_name == "American Indian Status"
+              expect(verif.validation_status). to eq("outstanding")
+            else
+              expect(verif.validation_status).to eq("pending")
+            end
+          }
+        end
+
       end
     end
 
