@@ -444,12 +444,14 @@ class ConsumerRole
 
     event :coverage_purchased, :after => [:record_transition ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_lawful_presence]
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_with_ssn?, :after => [:invoke_verification!, :move_types_to_pending]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!, :move_types_to_pending]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!, :move_types_to_pending]
     end
 
     event :coverage_purchased_no_residency, :after => [:record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_lawful_presence]
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_with_ssn?, :after => [:invoke_verification!, :move_types_to_pending]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
     end
@@ -676,6 +678,10 @@ class ConsumerRole
   end
 
   def native_no_ssn?
+    is_native? && no_ssn?
+  end
+
+  def native_with_ssn?
     is_native? && no_ssn?
   end
 
