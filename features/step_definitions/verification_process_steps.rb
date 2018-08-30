@@ -75,7 +75,6 @@ end
 
 Given(/^consumer has outstanding verification and unverified enrollments$/) do
   family = user.person.primary_family
-  user.person.verification_types.first.fail_type
   enr = FactoryGirl.create(:hbx_enrollment,
                            household: family.active_household,
                            coverage_kind: "health",
@@ -88,12 +87,11 @@ Given(/^consumer has outstanding verification and unverified enrollments$/) do
                                                         eligibility_date: TimeKeeper.date_of_record - 2.months,
                                                         coverage_start_on: TimeKeeper.date_of_record - 2.months)
   enr.save!
-  family.enrollments.first.move_to_contingent!
-  family.active_family_members.first.person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+  user.person.consumer_role.fail_residency!
 end
 
 Then(/^consumer should see Verification Due date label$/) do
-  expect(page).to have_content('Document Due Date:')
+  expect(page).to have_content('Due Date')
 end
 
 Then(/^consumer should see Documents FAQ link$/) do

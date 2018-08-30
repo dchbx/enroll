@@ -456,18 +456,19 @@ class ConsumerRole
 
 
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
-      transitions from: :ssa_pending, to: :verification_outstanding
+      transitions from: [:ssa_pending, :verification_outstanding], to: :verification_outstanding
     end
 
     event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change, :fail_lawful_presence] do
-      transitions from: :ssa_pending, to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
-      transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
+      transitions from: [:ssa_pending, :verification_outstanding], to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
+      transitions from: [:ssa_pending, :verification_outstanding], to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
     end
 
     event :ssn_valid_citizenship_valid, :guard => :call_ssa?, :after => [:pass_ssn, :pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_denied?
       transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :sci_verified, :guard => :residency_pending?
-      transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified?
+      transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_verified_and_tribe_member?
+      transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified_and_not_tribe_member?
     end
 
     event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -478,13 +479,15 @@ class ConsumerRole
     event :pass_dhs, :guard => :is_non_native?, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_denied?
       transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :sci_verified, :guard => :residency_pending?
-      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_verified_and_tribe_member?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified_and_not_tribe_member?
     end
 
     event :pass_residency, :after => [:mark_residency_authorized, :record_transition] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :ssa_pending
       transitions from: :dhs_pending, to: :dhs_pending
+      transitions from: :sci_verified, to: :verification_outstanding, :guards => [:is_tribe_member?]
       transitions from: :sci_verified, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified, :guards => [:ssn_verified?, :lawful_presence_verified?]
       transitions from: :verification_outstanding, to: :verification_outstanding
@@ -574,14 +577,14 @@ class ConsumerRole
 
   def handle_native_no_snn_or_indian_transition
     if tribal_no_ssn?
-      fail_lawful_presence (verification_attr)
+      fail_lawful_presence(verification_attr)
       fail_indian_tribe
     elsif tribal_with_ssn?
-      invoke_verification! (verification_attr)
+      invoke_verification!(verification_attr)
       move_types_to_pending
       fail_indian_tribe
     elsif native_no_ssn?
-      fail_lawful_presence (verification_attr)
+      fail_lawful_presence(verification_attr)
     end
   end
 
@@ -788,6 +791,14 @@ class ConsumerRole
 
   def lawful_presence_authorized?
     lawful_presence_determination.verification_successful?
+  end
+
+  def residency_verified_and_not_tribe_member?
+    residency_verified? && !is_tribe_member?
+  end
+
+  def residency_verified_and_tribe_member?
+    residency_verified? && is_tribe_member?
   end
 
   def residency_pending?
