@@ -11,5 +11,14 @@ module Exchanges
       person_roles << "General Agency Staff Role" if person.general_agency_staff_roles.present?
       person_roles
     end
+
+    def can_cancel_employer_plan_year?(employer_profile)
+      if employer_profile.active_plan_year.present?
+        ['published', 'enrolling', 'enrolled', 'active'].include?(employer_profile.active_plan_year.aasm_state)
+      else
+        false
+      end
+    end
+
   end
 end

@@ -2,8 +2,10 @@
 module Effective
   module Datatables
     class EmployerDatatable < Effective::MongoidDatatable
-      datatable do
+      include EventsHelper
+      include Exchanges::HbxProfilesHelper
 
+      datatable do
 
         bulk_actions_column do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
@@ -49,6 +51,7 @@ module Effective
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'static'],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)],
+           ['Cancel Initial Plan Year', cancel_initial_plan_year_form_exchanges_hbx_profiles_path(id: row), cancel_initial_plan_year_link_type(row)],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
@@ -159,6 +162,11 @@ module Effective
         top_scope: :employers
         }
 
+      end
+
+      def cancel_initial_plan_year_link_type(row)
+        employer_profile= row.employer_profile
+        is_initial_or_conversion_employer?(employer_profile) && can_cancel_employer_plan_year?(employer_profile) ? 'post_ajax' : 'disabled'
       end
     end
   end

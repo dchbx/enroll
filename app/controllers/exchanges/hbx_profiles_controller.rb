@@ -3,6 +3,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesSearch
   include Pundit
   include SepAll
+  include EventsHelper
+  include Exchanges::HbxProfilesHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -547,6 +549,34 @@ def employer_poc
 
   end
 
+  def cancel_initial_plan_year_form
+    @employer_profile= Organization.where(:id => params[:id]).first.employer_profile
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def cancel_initial_plan_year
+    begin
+      employer_profile = EmployerProfile.find(params[:id])
+      hbx_enrollments = employer_profile.published_plan_year.hbx_enrollments
+      plan_year = employer_profile.published_plan_year
+
+      if is_initial_or_conversion_employer?(employer_profile) && can_cancel_employer_plan_year?(employer_profile)
+        process_cancel_initial_plan_year(hbx_enrollments, employer_profile)
+        post_cancel_conditions(employer_profile, plan_year)
+        flash["notice"] = "Initial plan year cancelled for employer: #{employer_profile.legal_name}"
+      else
+        raise("Internal error.")
+      end
+    rescue Exception => e
+      return_status = 500
+      flash["error"] = "Could not cancel initial plan year for employer: #{employer_profile.legal_name}. #{e.message}"
+    end
+
+    render :js => "window.location = '#{exchanges_hbx_profiles_root_path}'", status: return_status
+  end
+
 private
 
    def modify_admin_tabs?
@@ -633,5 +663,27 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
+  end
+
+  def process_cancel_initial_plan_year(hbx_enrollments, employer_profile)
+    hbx_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    end
+    employer_profile.published_plan_year.cancel!
+  end
+
+  def post_cancel_conditions(employer_profile, plan_year)
+    employer_profile.census_employees.each do |census_employee|
+      assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
+      assignments.each do |assignment|
+        if assignment.may_delink_coverage?
+          assignment.delink_coverage!
+          assignment.update_attribute(:is_active, false)
+        end
+      end
+    end
+
+    employer_profile.aasm_state = 'applicant' unless employer_profile.applicant?
+    employer_profile.save!
   end
 end
