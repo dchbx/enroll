@@ -649,6 +649,7 @@ describe "Indian tribe member" do
 
     it 'aasm state should be in verification outstanding if dc response is valid and consumer is tribe member' do
       person.update_attributes!(tribal_id: "12345")
+      consumer_role.coverage_purchased!(verification_attr)
       consumer_role.pass_residency!
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
       expect(consumer_role.aasm_state). to eq 'verification_outstanding'
@@ -689,6 +690,19 @@ describe "Indian tribe member" do
       american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
       expect(american_indian_status.validation_status). to eq 'outstanding'
       expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+    end
+  end
+
+  context 'admin verifies american indian status' do
+    it 'consumer aasm state should be in fully_verified if all verification types are verified' do
+      person.update_attributes!(tribal_id: "12345")
+      consumer_role.coverage_purchased!(verification_attr)
+      consumer_role.pass_residency!
+      consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+      american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
+      consumer_role.update_verification_type(american_indian_status, "admin verified")
+      expect(consumer_role.aasm_state). to eq 'fully_verified'
+      expect(american_indian_status.validation_status). to eq 'verified'
     end
   end
 
