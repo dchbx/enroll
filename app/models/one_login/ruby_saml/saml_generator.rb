@@ -34,6 +34,13 @@ module OneLogin
           @private_key = OpenSSL::PKey::RSA.new(File.read(PRIVATE_KEY_LOCATION))
           @cert = OpenSSL::X509::Certificate.new(File.read(X509_CERT_LOCATION))
         end
+
+        # only for local TEST
+        # DELETE before PRODUCTION Release!!!
+        if Rails.env.development?
+          @private_key = OpenSSL::PKey::RSA.new(File.read("#{Rails.root.join("spec", "test_data")}" + "/test_wfpk.pem"))
+          @cert = OpenSSL::X509::Certificate.new(File.read("#{Rails.root.join("spec", "test_data")}" + "/test_x509.pem"))
+        end
       end
 
       def build_saml_response

@@ -91,6 +91,11 @@ class SamlController < ApplicationController
     redirect_to SamlInformation.saml_logout_url
   end
 
+  def redirection_test
+    response = OneLogin::RubySaml::Response.new(params[:SAMLResponse])
+    render json: {"SAMLresponse": response.response}
+  end
+
   private
 
   def saml_settings

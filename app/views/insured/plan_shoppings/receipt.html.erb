@@ -52,7 +52,7 @@
         <% end %>
         <% if show_pay_now? %>
           <% if can_access_pay_now_button %>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal">Pay Now</button>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal" id="kp-pay-now" data-enrollment="<%= @enrollment.hbx_id %>">Pay Now</button>
           <% else %>
             <button class="btn btn-primary disabled">Pay Now</button>
           <% end %>
@@ -295,9 +295,18 @@
         </p>
       </div>
       <div class="modal-footer">
-        <%= link_to "LEAVE DC HEALTH LINK", "http://localhost:3000", {type: "button", class: "btn btn-default pull-left", id: "payment-redirect-kp", target: "_blank"} %>
+        <%= link_to "LEAVE DC HEALTH LINK", "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org", {type: "button", class: "btn btn-default pull-left", id: "payment-redirect-kp", target: "_blank"} %>
         <button type="button" class="btn btn-default" data-dismiss="modal">GO BACK</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- function to only represents the payment redirection data for TEST -->
+<!-- DELETE before PRODUCTION Release!!! -->
+<div class="container" id="payment-payload-container">
+  <div id="payment-redirection-test-payload" class="col-md-12" style="overflow: scroll;">
+
+  </div>
+</div>
+<!-- ^^^^ DELETE before PRODUCTION Release!!! ^^^^ -->
