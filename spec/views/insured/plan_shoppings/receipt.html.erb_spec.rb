@@ -20,6 +20,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       plan: new_plan,
       is_cobra_status?: false,
       coverage_kind: 'health',
+      hbx_id: "3939393",
       is_shop?: true,
       employee_role: double("EmployeeRole")
     )
