@@ -47,6 +47,8 @@ class GenerateCcaSite < Mongoid::Migration
       else
         puts @benefit_market.configuration.errors.full_messages.inspect
       end
+    else
+      say "Skipping for non-CCA site"
     end
   end
 
