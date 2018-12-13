@@ -33,6 +33,8 @@ class ExtractCountyZipsForMa < Mongoid::Migration
           end
         end
       end
+    else
+      say "Skipping for non-CCA site"
     end
   end
 
