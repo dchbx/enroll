@@ -2,7 +2,7 @@ class ExtractRatingAreasForDc < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
       say_with_time("Build rating areas linking them with county_zips") do
-        [2015,2016,2017,2018,2019].each do |year|
+        [2014, 2015,2016,2017,2018,2019].each do |year|
           ::BenefitMarkets::Locations::RatingArea.create!({
                                                             active_year: year,
                                                             exchange_provided_code: 'R-DC001',
