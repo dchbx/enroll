@@ -6,8 +6,9 @@ class GenerateDcSite < Mongoid::Migration
             site_key: :dc,
             byline: "DC's Online Health Insurance Marketplace",
             short_name: "DC Health Link",
-            domain_name: "",
-            long_name: "")
+            domain_name: "hbxshop.org",
+            long_name: "DC Health Exchange Benefit")
+        # TODO check on domain_name & long_name
 
         @old_org = Organization.unscoped.exists(hbx_profile: true).first
         @old_profile = @old_org.hbx_profile
