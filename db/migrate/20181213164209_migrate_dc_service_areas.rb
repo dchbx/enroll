@@ -9,7 +9,7 @@ class MigrateDcServiceAreas < Mongoid::Migration
             if self.carrier_exists_in_the_year(issuer_profile, year)
               ::BenefitMarkets::Locations::ServiceArea.create!({
                                                                    active_year: year,
-                                                                   issuer_provided_code: issuer_profile.hbx_id,
+                                                                   issuer_provided_code: "DCS001",
                                                                    covered_states: ["DC"],
                                                                    issuer_profile_id: issuer_profile.id,
                                                                    issuer_provided_title: issuer_profile.legal_name
