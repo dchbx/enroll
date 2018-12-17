@@ -76,7 +76,7 @@ class QhpRateBuilder
       calculate_and_build_metlife_premium_tables
     else
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
-      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
+      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : "R-DC001"
       @results[key] << {
         age: assign_age,
         start_on: @rate[:effective_date],
