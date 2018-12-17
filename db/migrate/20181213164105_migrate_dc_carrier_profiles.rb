@@ -1,6 +1,25 @@
 class MigrateDcCarrierProfiles < Mongoid::Migration
   def self.up
 
+    # fix carrier profile issuer_hios_ids ids.
+    carrier_info = {
+      "53e67210eb899a4603000010" => ["81334"],
+      "53e67210eb899a4603000013" => ["96156"],
+      "53e67210eb899a4603000016" => ["92479"],
+      "53e67210eb899a460300001a" => ["95051"],
+      "53e67210eb899a460300001d" => ["43849"],
+      "53e67210eb899a460300000d" => ["94506"],
+      "53e67210eb899a4603000007" => ["77422", "73987"], #aetna
+      "53e67210eb899a4603000004" => ["86052", "78079"], # carefirst
+      "53e67210eb899a460300000a" => ["21066", "41842", "75753"] #uhc
+    }
+
+    carrier_info.each do |key,value|
+      cp = CarrierProfile.find(key)
+      cp.issuer_hios_ids = value
+      cp.save
+    end
+
     if Settings.site.key.to_s == "dc"
       site_key = "dc"
 

@@ -23,10 +23,10 @@ org = Organization.new(office_locations: [hbx_office], fein: "060000000", legal_
 cp = org.create_carrier_profile(id: "53e67210eb899a460300001d", abbrev: "META", hbx_carrier_id: nil, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: false, issuer_hios_ids: ['43849'])
 
 org = Organization.new(office_locations: [hbx_office], fein: "070000000", legal_name: "CareFirst")
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000004", abbrev: "GHMSI", hbx_carrier_id: "116036", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['86052'])
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000004", abbrev: "GHMSI", hbx_carrier_id: "116036", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ["86052", "78079"])
 
 org = Organization.new(office_locations: [hbx_office], fein: "080000000", legal_name: "Aetna")
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000007", abbrev: "AHI", hbx_carrier_id: "116163", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['77422'])
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000007", abbrev: "AHI", hbx_carrier_id: "116163", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ["77422", "73987"])
 
 org = Organization.new(office_locations: [hbx_office], fein: "090000000", legal_name: "UnitedHealthcare")
 cp = org.create_carrier_profile(id: "53e67210eb899a460300000a", abbrev: "UHIC", hbx_carrier_id: "116034", ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['21066'])

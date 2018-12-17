@@ -3,19 +3,6 @@ class MigrateDcProducts < Mongoid::Migration
     if Settings.site.key.to_s.downcase == "dc"
       say_with_time("Migrating plans for CCA") do
 
-        # fix carrier profile issuer_hios_ids ids.
-        carrier_info = {
-          "53e67210eb899a4603000007" => ["77422", "73987"], #aetna
-          "53e67210eb899a4603000004" => ["86052", "78079"], # carefirst
-          "53e67210eb899a460300000a" => ["21066", "41842", "75753"] #uhc
-        }
-
-        carrier_info.each do |key,value|
-          cp = CarrierProfile.find(key)
-          cp.issuer_hios_ids = value
-          cp.save
-        end
-
         old_carrier_profile_map = {}
         CarrierProfile.all.each do |cpo|
           old_carrier_profile_map[cpo.id] = cpo.hbx_id
@@ -40,7 +27,7 @@ class MigrateDcProducts < Mongoid::Migration
         end
 
         say_with_time("Migrate primary plan data") do
-          Plan.where(active_year: 2019).each do |plan|
+          Plan.all.each do |plan|
             premium_table_cache = Hash.new do |h, k|
               h[k] = Hash.new
             end
@@ -157,6 +144,16 @@ class MigrateDcProducts < Mongoid::Migration
           # Now that all the plans moved over, cross-map the catastropic, age-off,
           # and renewal plans from the original data
         end
+
+        # for congress products, change the metal_level_kind below as needed.
+        # say_with_time("Create DC congress products") do
+        #   products = BenefitMarkets::Products::Product.where(:metal_level_kind.in => ["gold"])
+        #   products.each do |product|
+        #     congress_product = product.dup
+        #     congress_product.benefit_market_kind = "fehb".to_sym
+        #     congress_product.save
+        #   end
+        # end
 
       end
     else
