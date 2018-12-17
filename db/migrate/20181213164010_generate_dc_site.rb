@@ -32,12 +32,18 @@ class GenerateDcSite < Mongoid::Migration
                                                             title: 'ACA SHOP',
                                                             description: 'DC ACA Shop Market',
                                                             configuration: configuration
+
+        # TODO Need to verify whether to create new configuartion for congress (or) use shop configuration
+        @congress_benefit_market = BenefitMarkets::BenefitMarket.new kind: :fehb,
+                                                            site_urn: 'dc',
+                                                            title: 'ACA SHOP',
+                                                            description: 'DC ACA Shop Market',
+                                                            configuration: configuration
       end
 
-      @site.benefit_markets << @benefit_market
+      @site.benefit_markets = [@benefit_market, @congress_benefit_market]
 
       # TODO ivl benefit_market
-      # TODO congress benefit_market
 
       if @site.valid?
         @site.save!
@@ -50,6 +56,13 @@ class GenerateDcSite < Mongoid::Migration
         @benefit_market.save!
       else
         puts @benefit_market.configuration.errors.full_messages.inspect
+      end
+
+      if @congress_benefit_market.valid?
+        @congress_benefit_market.site = @site
+        @congress_benefit_market.save!
+      else
+        puts @congress_benefit_market.configuration.errors.full_messages.inspect
       end
     else
       say "Skipping for non-DC site"
