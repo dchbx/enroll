@@ -1,7 +1,7 @@
 class MigrateDcProducts < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s.downcase == "dc"
-      say_with_time("Migrating plans for CCA") do
+      say_with_time("Migrating plans for DC") do
 
         old_carrier_profile_map = {}
         CarrierProfile.all.each do |cpo|
@@ -77,6 +77,8 @@ class MigrateDcProducts < Mongoid::Migration
               premium_tables: premium_tables,
               issuer_assigned_id: plan.carrier_special_plan_identifier
             }
+            # TODO check product_package_kinds for DC plans
+
             if product_kind.to_s.downcase == "health"
               product_package_kinds = []
               if plan.is_horizontal?
@@ -104,8 +106,9 @@ class MigrateDcProducts < Mongoid::Migration
                 raise "Health Product not saved #{hp.hios_id}."
               end
             else
+              # TODO check on product_package_kinds dental products
               dp = BenefitMarkets::Products::DentalProducts::DentalProduct.new({
-                dental_plan_kind: plan.plan_type.downcase,
+                dental_plan_kind: plan.plan_type.try(:downcase),  # TODO plan type nil
                 metal_level_kind: :dental,
                 dental_level: plan.dental_level,
                 product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
@@ -145,15 +148,23 @@ class MigrateDcProducts < Mongoid::Migration
           # and renewal plans from the original data
         end
 
-        # for congress products, change the metal_level_kind below as needed.
-        # say_with_time("Create DC congress products") do
-        #   products = BenefitMarkets::Products::Product.where(:metal_level_kind.in => ["gold"])
-        #   products.each do |product|
-        #     congress_product = product.dup
-        #     congress_product.benefit_market_kind = "fehb".to_sym
-        #     congress_product.save
-        #   end
-        # end
+        # TODO for congress products, change the metal_level_kind below as needed.
+        say_with_time("Create DC congress products") do
+          products = BenefitMarkets::Products::Product.where(:metal_level_kind.in => ["gold"])
+          products.each do |product|
+            congress_product = product.dup
+            congress_product.benefit_market_kind = "fehb".to_sym
+            product.premium_tables.map {|pt| pt._id = BSON::ObjectId.new}
+            product.premium_tables.each do |pt|
+              pt.premium_tuples.map {|p_tuples| p_tuples._id = BSON::ObjectId.new}
+            end
+            if congress_product.valid?
+              congress_product.save
+            else
+              raise "Congress Product not saved #{dp.hios_id}."
+            end
+          end
+        end
 
       end
     else
