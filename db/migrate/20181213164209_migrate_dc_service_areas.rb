@@ -30,7 +30,7 @@ class MigrateDcServiceAreas < Mongoid::Migration
 
   def self.down
     if Settings.site.key.to_s == "dc"
-      ::BenefitMarkets::Locations::ServiceArea.where.delete
+      ::BenefitMarkets::Locations::ServiceArea.all.delete_all
     else
       say("Skipping migration for non-DC site")
     end

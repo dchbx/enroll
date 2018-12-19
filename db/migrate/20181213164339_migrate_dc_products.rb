@@ -91,7 +91,7 @@ class MigrateDcProducts < Mongoid::Migration
                 product_package_kinds << :single_product
               end
               hp = BenefitMarkets::Products::HealthProducts::HealthProduct.new({
-                health_plan_kind: plan.plan_type.downcase,
+                health_plan_kind:  plan.plan_type? ? plan.plan_type.downcase : "hmo", # TODO 2014 plan issues, fix plan_type
                 metal_level_kind: plan.metal_level,
                 product_package_kinds: product_package_kinds,
                 ehb: plan.ehb,
@@ -108,7 +108,7 @@ class MigrateDcProducts < Mongoid::Migration
             else
               # TODO check on product_package_kinds dental products
               dp = BenefitMarkets::Products::DentalProducts::DentalProduct.new({
-                dental_plan_kind: plan.plan_type.try(:downcase),  # TODO plan type nil
+                dental_plan_kind: plan.try(:plan_type).try(:downcase),  # TODO 2014 plan issues, fix plan_type
                 metal_level_kind: :dental,
                 dental_level: plan.dental_level,
                 product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
@@ -126,42 +126,45 @@ class MigrateDcProducts < Mongoid::Migration
           products = BenefitMarkets::Products::Product.all
           products.each do |product|
             year = product.application_period.first.year
-            if year == 2017 # because we dont have any mappings from 2018 to 2019
-              plan = Plan.where(active_year: year, hios_id: product.hios_id).first
+            plan = Plan.where(active_year: year, hios_id: product.hios_id).first
 
-              renewal_plan_hios_id = plan.renewal_plan.hios_id
-              catastrophic_plan_hios_id = plan.cat_age_off_renewal_plan_id.present? ? plan.cat_age_off_renewal_plan.hios_id : nil
+            renewal_plan_hios_id = plan.renewal_plan_id.present? ? plan.renewal_plan.hios_id : nil
+            catastrophic_plan_hios_id = plan.cat_age_off_renewal_plan_id.present? ? plan.cat_age_off_renewal_plan.hios_id : nil
 
-              renewal_product_2018 = BenefitMarkets::Products::Product.where(hios_id: renewal_plan_hios_id).sort_by{|a| a.application_period.first.year}.last
-
-              catastrophic_product_2018 = if catastrophic_plan_hios_id.present?
-                BenefitMarkets::Products::Product.where(hios_id: catastrophic_plan_hios_id).sort_by{|a| a.application_period.first.year}.last
-              else
-                nil
-              end
-              product.renewal_product = renewal_product_2018
-              product.catastrophic_age_off_product = catastrophic_product_2018
-              product.save
+            renewal_product = if renewal_plan_hios_id.present?
+              BenefitMarkets::Products::Product.where(hios_id: renewal_plan_hios_id).select{|product| product.application_period.first.year == plan.renewal_plan.active_year}.last
+            else
+              nil
             end
+
+            catastrophic_product = if catastrophic_plan_hios_id.present?
+              BenefitMarkets::Products::Product.where(hios_id: catastrophic_plan_hios_id).select{|product| product.application_period.first.year == plan.cat_age_off_renewal_plan.active_year}.last
+            else
+              nil
+            end
+            product.renewal_product = renewal_product
+            product.catastrophic_age_off_product = catastrophic_product unless plan.coverage_kind == "dental"
+            product.save
           end
           # Now that all the plans moved over, cross-map the catastropic, age-off,
           # and renewal plans from the original data
         end
 
-        # TODO for congress products, change the metal_level_kind below as needed.
         say_with_time("Create DC congress products") do
-          products = BenefitMarkets::Products::Product.where(:metal_level_kind.in => ["gold"])
+          products = BenefitMarkets::Products::Product.where(metal_level_kind: :gold, :benefit_market_kind => :aca_shop)
           products.each do |product|
             congress_product = product.dup
             congress_product.benefit_market_kind = "fehb".to_sym
-            product.premium_tables.map {|pt| pt._id = BSON::ObjectId.new}
-            product.premium_tables.each do |pt|
+            congress_product._id = BSON::ObjectId.new
+            congress_product.sbc_document._id = BSON::ObjectId.new if product.sbc_document.present?
+            congress_product.premium_tables.map {|pt| pt._id = BSON::ObjectId.new}
+            congress_product.premium_tables.each do |pt|
               pt.premium_tuples.map {|p_tuples| p_tuples._id = BSON::ObjectId.new}
             end
             if congress_product.valid?
               congress_product.save
             else
-              raise "Congress Product not saved #{dp.hios_id}."
+              raise "congress product not saved #{congress_product.hios_id}."
             end
           end
         end

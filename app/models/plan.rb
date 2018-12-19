@@ -433,6 +433,7 @@ class Plan
 
   def hsa_eligibility
     qhp = Products::Qhp.where(standard_component_id: hios_base_id, active_year: active_year).last
+    return false unless qhp
     case qhp.hsa_eligibility.downcase
     when "" # dental always has empty data for hsa_eligibility in serff templates.
       return false
