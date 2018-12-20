@@ -2,7 +2,7 @@ module BenefitMarkets
   module Products
     class DentalProducts::DentalProduct < BenefitMarkets::Products::Product
 
-      PRODUCT_PACKAGE_KINDS = [:single_product, :multi_product]
+      PRODUCT_PACKAGE_KINDS = [:single_product, :multi_product, :single_issuer]
       METAL_LEVEL_KINDS     = [:dental]
 
       field :hios_id,                     type: String
