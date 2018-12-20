@@ -77,19 +77,10 @@ class MigrateDcProducts < Mongoid::Migration
               premium_tables: premium_tables,
               issuer_assigned_id: plan.carrier_special_plan_identifier
             }
-            # TODO check product_package_kinds for DC plans
+            # TODO Fix product_package_kinds for IVL products
 
             if product_kind.to_s.downcase == "health"
-              product_package_kinds = []
-              if plan.is_horizontal?
-                product_package_kinds << :metal_level
-              end
-              if plan.is_vertical?
-                product_package_kinds << :single_issuer
-              end
-              if plan.is_sole_source?
-                product_package_kinds << :single_product
-              end
+              product_package_kinds = [:metal_level, :single_issuer, :single_product]
               hp = BenefitMarkets::Products::HealthProducts::HealthProduct.new({
                 health_plan_kind:  plan.plan_type? ? plan.plan_type.downcase : "hmo", # TODO 2014 plan issues, fix plan_type
                 metal_level_kind: plan.metal_level,
@@ -106,12 +97,12 @@ class MigrateDcProducts < Mongoid::Migration
                 raise "Health Product not saved #{hp.hios_id}."
               end
             else
-              # TODO check on product_package_kinds dental products
+              # TODO Fix product_package_kinds for IVL dentals if any
               dp = BenefitMarkets::Products::DentalProducts::DentalProduct.new({
                 dental_plan_kind: plan.try(:plan_type).try(:downcase),  # TODO 2014 plan issues, fix plan_type
                 metal_level_kind: :dental,
                 dental_level: plan.dental_level,
-                product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
+                product_package_kinds: [:multi_product, :single_issuer]
               }.merge(shared_attributes))
               if dp.valid?
                 dp.save
