@@ -168,5 +168,10 @@ class MigrateDcProducts < Mongoid::Migration
   end
 
   def self.down
+    if Settings.site.key.to_s == "dc"
+      BenefitMarkets::Products::Product.all.delete_all
+    else
+      say("Skipping migration for non-DC site")
+    end
   end
 end

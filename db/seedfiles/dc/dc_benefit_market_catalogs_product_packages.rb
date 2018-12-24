@@ -14,11 +14,8 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
                                                                                   probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS
                                                                               })
 
-      composite_contribution_model = BenefitMarkets::ContributionModels::ContributionModel.where(title: "MA Composite Contribution Model").first.create_copy_for_embedding
-      composite_pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "MA Composite Price Model").first.create_copy_for_embedding
-
-      list_bill_contribution_model = BenefitMarkets::ContributionModels::ContributionModel.where(title: "MA List Bill Shop Contribution Model").first.create_copy_for_embedding
-      list_bill_pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "MA List Bill Shop Pricing Model").first.create_copy_for_embedding
+      list_bill_contribution_model = BenefitMarkets::ContributionModels::ContributionModel.where(title: "DC Shop Simple List Bill Contribution Model").first.create_copy_for_embedding
+      list_bill_pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "DC Shop Simple List Bill Pricing Model").first.create_copy_for_embedding
 
 
       def products_for(product_package, calender_year)
@@ -58,8 +55,8 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
                                                                           benefit_kind: kind, product_kind: product_kind, title: 'Single Product',
                                                                           package_kind: :single_product,
                                                                           application_period: benefit_market_catalog.application_period,
-                                                                          contribution_model: composite_contribution_model,
-                                                                          pricing_model: composite_pricing_model
+                                                                          contribution_model: list_bill_contribution_model,
+                                                                          pricing_model: list_bill_pricing_model
                                                                       })
 
         product_package.products = products_for(product_package, calender_year)
