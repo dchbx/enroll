@@ -49,7 +49,11 @@ class MigrateDcCarrierProfiles < Mongoid::Migration
   end
 
   def self.down
-    raise "Can not be reversed!"
+    if Settings.site.key.to_s == "dc"
+      :BenefitSponsors::Organizations::Organization.issuer_profiles.delete_all
+    else
+      say "Skipping for non-DC site"
+    end
   end
 
   private
@@ -71,7 +75,7 @@ class MigrateDcCarrierProfiles < Mongoid::Migration
     failed = 0
     limit_count = 1000
 
-    say_with_time("Time taken to migrate organizations") do
+    say_with_time("Time taken to migrate issuer profile organization") do
       old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
         begin
           existing_new_organizations = find_new_organization(old_org)

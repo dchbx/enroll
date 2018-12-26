@@ -70,7 +70,12 @@ class GenerateDcSite < Mongoid::Migration
   end
 
   def self.down
-    raise "Migration is not reversable."
+    if Settings.site.key.to_s == "dc"
+      ::BenefitSponsors::Site.where(site_key: :dc).delete_all
+      ::BenefitMarkets::BenefitMarket.all.delete_all
+    else
+      say "Skipping for non-DC site"
+    end
   end
 
   def self.sanitize_hbx_params
