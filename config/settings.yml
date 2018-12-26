@@ -137,6 +137,7 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   market_kinds: ["shop", "individual"]
+
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: true
   general_agency_enabled: true
