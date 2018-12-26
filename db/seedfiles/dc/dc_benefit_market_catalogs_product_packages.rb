@@ -6,7 +6,7 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
 
     [2014, 2015, 2016, 2017, 2018, 2019].each do |calender_year|
 
-      puts "Creating Benefit Market Catalog for #{calender_year}"
+      puts "Creating #{kind.to_s} Benefit Market Catalog for #{calender_year}"
       benefit_market_catalog = benefit_market.benefit_market_catalogs.create!({
                                                                                   title: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} SHOP Benefit Catalog",
                                                                                   application_interval_kind: :monthly,
@@ -20,13 +20,13 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
 
       def products_for(product_package, calender_year)
         product_class = product_package.product_kind.to_s== "health" ? BenefitMarkets::Products::HealthProducts::HealthProduct : BenefitMarkets::Products::DentalProducts::DentalProduct
-        puts "Found #{product_class.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind.to_s}"
+        puts "Found #{product_class.by_product_package(product_package).count} #{product_package.product_kind.to_s} products for #{calender_year} #{product_package.package_kind.to_s}"
         product_class.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
       end
 
       [:health, :dental].each do |product_kind|
 
-        puts "Creating Product Packages..."
+        puts "Creating #{product_kind.to_s} Product Packages..."
         product_package = benefit_market_catalog.product_packages.new({
                                                                           benefit_kind: kind, product_kind: product_kind, title: 'Single Issuer',
                                                                           package_kind: :single_issuer,
@@ -49,18 +49,31 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
 
           product_package.products = products_for(product_package, calender_year)
           product_package.save! if product_package.valid?
+
+          product_package = benefit_market_catalog.product_packages.new({
+                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Single Product',
+                                                                            package_kind: :single_product,
+                                                                            application_period: benefit_market_catalog.application_period,
+                                                                            contribution_model: list_bill_contribution_model,
+                                                                            pricing_model: list_bill_pricing_model
+                                                                        })
+
+          product_package.products = products_for(product_package, calender_year)
+          product_package.save! if product_package.valid?
         end
 
-        product_package = benefit_market_catalog.product_packages.new({
-                                                                          benefit_kind: kind, product_kind: product_kind, title: 'Single Product',
-                                                                          package_kind: :single_product,
-                                                                          application_period: benefit_market_catalog.application_period,
-                                                                          contribution_model: list_bill_contribution_model,
-                                                                          pricing_model: list_bill_pricing_model
-                                                                      })
+        if product_kind.to_s == "dental"
+          product_package = benefit_market_catalog.product_packages.new({
+                                                                            benefit_kind: kind, product_kind: product_kind, title: 'Multi Product',
+                                                                            package_kind: :multi_product,
+                                                                            application_period: benefit_market_catalog.application_period,
+                                                                            contribution_model: list_bill_contribution_model,
+                                                                            pricing_model: list_bill_pricing_model
+                                                                        })
 
-        product_package.products = products_for(product_package, calender_year)
-        product_package.save! if product_package.valid?
+          product_package.products = products_for(product_package, calender_year)
+          product_package.save! if product_package.valid?
+        end
       end
     end
   end
