@@ -1,5 +1,5 @@
 site:
-  key: :cca
+  key: :dc
   subdomain: "mhc"
   domain_name: "hbxshop.org"
   site_title: "Massachusetts Health Connector for Business"
@@ -18,7 +18,7 @@ site:
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Health Connector"
+  short_name: "DC Health Link"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
   copyright_period_start: "2017"
@@ -132,7 +132,7 @@ invoices:
 
 aca:
   state_name: "Massachusetts"
-  state_abbreviation: "MA"
+  state_abbreviation: "DC"
   market_kinds: ["shop"]
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: false
