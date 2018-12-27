@@ -50,7 +50,7 @@ class MigrateDcCarrierProfiles < Mongoid::Migration
 
   def self.down
     if Settings.site.key.to_s == "dc"
-      :BenefitSponsors::Organizations::Organization.issuer_profiles.delete_all
+      ::BenefitSponsors::Organizations::Organization.issuer_profiles.delete_all
     else
       say "Skipping for non-DC site"
     end
