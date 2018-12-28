@@ -1,0 +1,138 @@
+--- !ruby/object:BenefitMarkets::ContributionModels::ContributionModel
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      XCUvxredUFFw07gZ
+  product_multiplicities:
+  - single
+  - multiple
+  sponsor_contribution_kind: "::BenefitSponsors::SponsoredBenefits::FixedPercentWithCapSponsorContribution"
+  contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::TieredPercentWithCapContributionCalculator"
+  title: DC Congress Contribution Model
+  many_simultaneous_contribution_units: false
+  updated_at: 2018-12-27 00:00:00.000000000 Z
+  created_at: 2018-12-27 00:00:00.000000000 Z
+  contribution_units:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XCUvxredUFFw07gM
+    _type: BenefitMarkets::ContributionModels::PercentWithCapContributionUnit
+    minimum_contribution_factor: 0.5
+    name: employee_only
+    display_name: Employee Only
+    order: 0
+    default_contribution_factor: 0.0
+    default_contribution_cap: 0.0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          XCUvxredUFFw07gN
+      operator: :==
+      relationship_name: :employee
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          XCUvxredUFFw07gO
+      operator: :==
+      relationship_name: :dependent
+      count: 0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XCUvxredUFFw07gP
+    _type: BenefitMarkets::ContributionModels::PercentWithCapContributionUnit
+    minimum_contribution_factor: 0.5
+    name: employee_plus_one
+    display_name: Employee + 1
+    order: 0
+    default_contribution_factor: 0.0
+    default_contribution_cap: 0.0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          XCUvxredUFFw07gQ
+      operator: :==
+      relationship_name: :employee
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          XCUvxredUFFw07gR
+      operator: :==
+      relationship_name: :dependent
+      count: 1
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XCUvxredUFFw07gS
+    _type: BenefitMarkets::ContributionModels::PercentWithCapContributionUnit
+    minimum_contribution_factor: 0.33
+    name: family
+    display_name: Family
+    order: 1
+    default_contribution_factor: 0.0
+    default_contribution_cap: 0.0
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          XCUvxredUFFw07gT
+      operator: :==
+      relationship_name: :employee
+      count: 1
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          XCUvxredUFFw07gU
+      operator: :>
+      relationship_name: :dependent
+      count: 1
+  member_relationships:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XCUvxredUFFw07gV
+    relationship_name: :employee
+    relationship_kinds:
+    - self
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XCUvxredUFFw07gW
+    relationship_name: :dependent
+    relationship_kinds:
+    - spouse
+    - life_partner
+    - domestic_partner
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XCUvxredUFFw07gX
+    relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :<
+    relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
+    - ward
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        XCUvxredUFFw07gY
+    relationship_name: :dependent
+    age_threshold: 26
+    age_comparison: :>=
+    disability_qualifier: true
+    relationship_kinds:
+    - child
+    - adopted_child
+    - foster_child
+    - stepchild
+    - ward
