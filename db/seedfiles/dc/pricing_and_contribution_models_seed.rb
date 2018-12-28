@@ -19,6 +19,7 @@ def load_dc_shop_contribution_models_seed
   Dir.glob(cm_pattern).each do |f_name|
     loaded_class_1 = ::BenefitMarkets::ContributionModels::ContributionModel
     loaded_class_2 = ::BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+    loaded_class_3 = ::BenefitMarkets::ContributionModels::PercentWithCapContributionUnit
     yaml_str = File.read(f_name)
     data = YAML.load(yaml_str)
     data.new_record = true
