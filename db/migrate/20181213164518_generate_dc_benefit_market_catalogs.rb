@@ -1,6 +1,5 @@
 class GenerateDcBenefitMarketCatalogs < Mongoid::Migration
   def self.up
-    # TODO update pricing and contribution for fehb & shop market.
     if Settings.site.key.to_s == "dc"
       say_with_time("Loading DC benefit market catalog") do
         require File.join(Rails.root, "db/seedfiles/dc/dc_benefit_market_catalogs_product_packages")
