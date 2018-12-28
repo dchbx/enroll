@@ -1,6 +1,5 @@
 class CreateDcPricingAndContributionModels < Mongoid::Migration
   def self.up
-    # TODO Need to create Pricing & Contribution model for congress check with trey
     if Settings.site.key.to_s == "dc"
       require File.expand_path(File.join(Rails.root, "db/seedfiles/dc/pricing_and_contribution_models_seed"))
       say_with_time("Load DC Pricing Models") do
