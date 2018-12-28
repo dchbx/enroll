@@ -13,9 +13,10 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
                                                                                   application_period: Date.new(calender_year,1,1)..Date.new(calender_year,12,31),
                                                                                   probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS
                                                                               })
-
-      list_bill_contribution_model = BenefitMarkets::ContributionModels::ContributionModel.where(title: "DC Shop Simple List Bill Contribution Model").first.create_copy_for_embedding
-      list_bill_pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "DC Shop Simple List Bill Pricing Model").first.create_copy_for_embedding
+      congress_contribution_model = BenefitMarkets::ContributionModels::ContributionModel.where(title: "DC Congress Contribution Model").first.create_copy_for_embedding
+      shop_contribution_model = BenefitMarkets::ContributionModels::ContributionModel.where(title: "DC Shop Simple List Bill Contribution Model").first.create_copy_for_embedding
+      contribution_model = kind.to_s == "aca_shop" ? shop_contribution_model : congress_contribution_model
+      pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "DC Shop Simple List Bill Pricing Model").first.create_copy_for_embedding
 
 
       def products_for(product_package, calender_year)
@@ -31,8 +32,8 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
                                                                           benefit_kind: kind, product_kind: product_kind, title: 'Single Issuer',
                                                                           package_kind: :single_issuer,
                                                                           application_period: benefit_market_catalog.application_period,
-                                                                          contribution_model: list_bill_contribution_model,
-                                                                          pricing_model: list_bill_pricing_model
+                                                                          contribution_model: contribution_model,
+                                                                          pricing_model: pricing_model
                                                                       })
 
         product_package.products = products_for(product_package, calender_year)
@@ -43,8 +44,8 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
                                                                             benefit_kind: kind, product_kind: product_kind, title: 'Metal Level',
                                                                             package_kind: :metal_level,
                                                                             application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: list_bill_contribution_model,
-                                                                            pricing_model: list_bill_pricing_model
+                                                                            contribution_model: contribution_model,
+                                                                            pricing_model: pricing_model
                                                                         })
 
           product_package.products = products_for(product_package, calender_year)
@@ -54,8 +55,8 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
                                                                             benefit_kind: kind, product_kind: product_kind, title: 'Single Product',
                                                                             package_kind: :single_product,
                                                                             application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: list_bill_contribution_model,
-                                                                            pricing_model: list_bill_pricing_model
+                                                                            contribution_model: contribution_model,
+                                                                            pricing_model: pricing_model
                                                                         })
 
           product_package.products = products_for(product_package, calender_year)
@@ -67,8 +68,8 @@ Mongoid::Migration.say_with_time("Load DC Benefit Market Catalogs") do
                                                                             benefit_kind: kind, product_kind: product_kind, title: 'Multi Product',
                                                                             package_kind: :multi_product,
                                                                             application_period: benefit_market_catalog.application_period,
-                                                                            contribution_model: list_bill_contribution_model,
-                                                                            pricing_model: list_bill_pricing_model
+                                                                            contribution_model: contribution_model,
+                                                                            pricing_model: pricing_model
                                                                         })
 
           product_package.products = products_for(product_package, calender_year)
