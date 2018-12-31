@@ -71,6 +71,7 @@ class GenerateDcSite < Mongoid::Migration
 
   def self.down
     if Settings.site.key.to_s == "dc"
+      ::BenefitSponsors::Organizations::Organization.hbx_profiles.delete_all
       ::BenefitSponsors::Site.where(site_key: :dc).delete_all
       ::BenefitMarkets::BenefitMarket.all.delete_all
     else
