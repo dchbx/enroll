@@ -119,7 +119,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.initialize_new_profile(old_org, old_profile_params)
-    new_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(old_profile_params)
+    new_profile = BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(old_profile_params)
 
     if @old_profile.contact_method == "Only Electronic communications"
       new_profile.contact_method = :electronic_only
@@ -167,14 +167,14 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     @old_profile.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
-      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save, :notify_on_create)
+      BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create)
       doc.save!
     end
 
     old_org.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
-      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save, :notify_on_create)
+      BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create)
       doc.save!
     end
   end
