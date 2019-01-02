@@ -29,12 +29,15 @@ class PlanSelection
 
   # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
-    hbx_enrollment.update_current(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
+    if market_kind == 'shop'
+      hbx_enrollment.update_current(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
+    else
+      hbx_enrollment.update_current(plan_id: plan.id)
+    end
 
     qle = hbx_enrollment.is_special_enrollment?
     if qle
-      sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id
-      : hbx_enrollment.family.earliest_effective_ivl_sep.id
+      sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id : hbx_enrollment.family.earliest_effective_ivl_sep.id
 
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
@@ -61,8 +64,13 @@ class PlanSelection
   end
 
   def self.for_enrollment_id_and_plan_id(enrollment_id, plan_id)
-    plan = BenefitMarkets::Products::Product.find(plan_id)
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
+    if hbx_enrollment.kind == "individual"
+      plan = Plan.find(plan_id)
+    else
+      plan = BenefitMarkets::Products::Product.find(plan_id)
+    end
+
     self.new(hbx_enrollment, plan)
   end
 

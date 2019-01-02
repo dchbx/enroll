@@ -16,9 +16,10 @@
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
-            <strong><%= @plan.issuer_profile.legal_name %> <%= @plan.title %></strong><br>
+            <%#=TODO for shop%>
+            <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
             <%= l10n("benefit") %>: <%= @enrollment.coverage_kind %><br>
-            <%= l10n("metal_level") %> : <%= display_dental_metal_level @plan %><br>
+            <%= l10n("metal_level") %> : <%#= display_dental_metal_level @plan %><br>
             <%= l10n("market") %>: <%= show_market_name_by_enrollment @enrollment %>
 
           </p>
