@@ -13,18 +13,12 @@
             %p If you are able to resolve the issue with Experian, select CONTINUE APPLICATION.
             %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_transaction_id), :method => :put, :class => "btn btn-primary  btn-small interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))
             = render partial: 'insured/interactive_identity_verifications/options_to_verify_identity'
-            .btn.btn-default.hidden{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
+          .btn.btn-default.hidden{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
             =l10n("help_me_sign_up")
-          - else
-             %h4= t('insured.interactive_identity_verifications.failed_validation.contact_information', :ref_number => @verification_response.transaction_id)
-             .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
-             =l10n("help_me_sign_up")
-        %br
-          = render partial: 'insured/plan_shoppings/help_with_plan'
-          = render partial: 'shared/application_types_list'
-        - if individual_market_is_enabled?
-        .outstanding-ridp-documents
-          = render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents'
-      - if individual_market_is_enabled?
+          %br
+            = render partial: 'ui-components/v1/modals/help_with_plan'
+            = render partial: 'shared/application_types_list'
+          .outstanding-ridp-documents
+            = render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents'
       .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
         = render  partial: 'shared/individual_progress', locals: {ridp:true, step: '2', next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : insured_family_members_path(consumer_role_id: @person.consumer_role.id), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?}
