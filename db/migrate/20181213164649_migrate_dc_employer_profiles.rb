@@ -1,29 +1,25 @@
 class MigrateDcEmployerProfiles < Mongoid::Migration
   def self.up
+    # TODO do we need to set rating and service area on benefit_sponsorship
+    # TODO check registerd on date feild
+    # TODO check congress Organization & employer profiles
+    # TODO foreign_embassy_or_consulate entity kind organization
 
     if Settings.site.key.to_s == "dc"
       site_key = "dc"
 
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/employer_profiles_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( organization_hbx_id legal_name benefit_sponsor_organization_id status)
-
       logger = Logger.new("#{Rails.root}/log/employer_profiles_migration_data.log") unless Rails.env.test?
       logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
-      CSV.open(file_name, 'w') do |csv|
-        csv << field_names
+      #build and create GeneralOrganization and its profiles
+      status = create_profile(site_key, logger)
 
-        #build and create GeneralOrganization and its profiles
-        status = create_profile(site_key, csv, logger)
-
-        if status
-          puts "" unless Rails.env.test?
-          puts "Check employer_profiles_migration_data logs & employer_profiles_migration_status csv for additional information." unless Rails.env.test?
-        else
-          puts "" unless Rails.env.test?
-          puts "Script execution failed" unless Rails.env.test?
-        end
+      if status
+        puts "" unless Rails.env.test?
+        puts "Check employer_profiles_migration_data logs & employer_profiles_migration_status csv for additional information." unless Rails.env.test?
+      else
+        puts "" unless Rails.env.test?
+        puts "Script execution failed" unless Rails.env.test?
       end
       logger.info "End of the script" unless Rails.env.test?
     else
@@ -36,15 +32,14 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   private
 
-  def self.create_profile(site_key, csv, logger)
+  def self.create_profile(site_key, logger)
 
-    #find or build site
     sites = find_site(site_key)
     return false unless sites.present?
     site = sites.first
 
     #get main app organizations for migration
-    old_organizations = Organization.unscoped.exists(:employer_profile => true)
+    old_organizations = Organization.where(:employer_profile.exists => true, :'employer_profile.entity_kind' => {"$nin" => ["foreign_embassy_or_consulate", "governmental_employer"]}, :hbx_id => {"$nin" => ["100101", "100102", "118510"]})
 
     #counters
     total_organizations = old_organizations.count
@@ -54,19 +49,20 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     limit_count = 1000
 
     say_with_time("Time taken to migrate organizations") do
-      old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
+      old_organizations.batch_size(limit_count).no_timeout.each do |old_org|
         begin
           existing_new_organizations = find_new_organization(old_org)
           if existing_new_organizations.count == 0
             @old_profile = old_org.employer_profile
 
+            # TODO check enable_ssn_date & disable_ssn_date, workflow_state_transitions
             json_data = @old_profile.to_json(:except => [:_id,:no_ssn, :sic_code, :enable_ssn_date, :disable_ssn_date, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
             new_organization = initialize_new_organization(old_org, site)
 
-            @benefit_sponsorship = @new_profile.add_benefit_sponsorship
+            @benefit_sponsorship = new_organization.benefit_sponsorships.build(profile: @new_profile, benefit_market: benefit_market)
             @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
 
             raise Exception unless @benefit_sponsorship.valid?
@@ -91,13 +87,11 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             link_existing_census_employees_to_new_profile(census_employees_with_old_id)
 
             print '.' unless Rails.env.test?
-            csv << [old_org.hbx_id, old_org.legal_name, new_organization.id, "Migration Success"]
             success = success + 1
           end
         rescue Exception => e
           failed = failed + 1
           print 'F' unless Rails.env.test?
-          csv << [old_org.hbx_id, old_org.legal_name, "0", "Migration Failed"]
           logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
           validation_errors:
           organization - #{new_organization.errors.messages}
@@ -129,38 +123,12 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
       new_profile.contact_method = :paper_only
     end
 
-    build_employer_attestation(new_profile) if @old_profile.employer_attestation.present?
-    build_documents(old_org, new_profile)
-    build_inbox_messages(new_profile)
+    # build_documents(old_org, new_profile)
+    # build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
     return new_profile
   end
 
-
-  def self.build_employer_attestation(obj)
-
-    old_attestation_params = @old_profile.employer_attestation.attributes.except("_id", "employer_profile", "employer_attestation_documents", "workflow_state_transitions")
-
-    new_employer_attestation  = obj.build_employer_attestation(old_attestation_params)
-
-    old_workflow_state_trans = @old_profile.employer_attestation.workflow_state_transitions
-    build_workflow_state_transition(old_workflow_state_trans ,new_employer_attestation)
-
-    @old_profile.employer_attestation.employer_attestation_documents.each do |employer_attestation_document|
-      old_attestation_doc_params = employer_attestation_document.attributes.except("_id", "workflow_state_transitions")
-      new_emp_attest_doc = new_employer_attestation.employer_attestation_documents.new(old_attestation_doc_params)
-
-      old_workflow_state_trans = employer_attestation_document.workflow_state_transitions
-      build_workflow_state_transition(old_workflow_state_trans, new_emp_attest_doc)
-    end
-  end
-
-  def self.build_workflow_state_transition(old_workflow_state_trans, new_obj)
-    old_workflow_state_trans.each do |old_workflow_state_tran|
-      old_attestation_doc_params = old_workflow_state_tran.attributes.except("_id", "transitional")
-      new_obj.workflow_state_transitions.new(old_attestation_doc_params)
-    end
-  end
 
   def self.build_documents(old_org, new_profile)
 
@@ -250,6 +218,12 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.find_site(site_key)
-    BenefitSponsors::Site.all.where(site_key: site_key.to_sym)
+    return @site if defined? @site
+    @site =  BenefitSponsors::Site.all.where(site_key: site_key.to_sym)
+  end
+
+  def self.benefit_market
+    return @benefit_market if defined? @benefit_market
+    @benefit_market  = find_site('dc').first.benefit_market_for(:aca_shop)
   end
 end
