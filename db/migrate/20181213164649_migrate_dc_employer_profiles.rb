@@ -11,7 +11,6 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
       logger = Logger.new("#{Rails.root}/log/employer_profiles_migration_data.log") unless Rails.env.test?
       logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
-      #build and create GeneralOrganization and its profiles
       status = create_profile(site_key, logger)
 
       if status
@@ -38,8 +37,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     return false unless sites.present?
     site = sites.first
 
-    #get main app organizations for migration
-    old_organizations = Organization.where(:employer_profile.exists => true, :'employer_profile.entity_kind' => {"$nin" => ["foreign_embassy_or_consulate", "governmental_employer"]}, :hbx_id => {"$nin" => ["100101", "100102", "118510"]})
+    old_organizations = Organization.unscoped.exists(:employer_profile => true)
 
     #counters
     total_organizations = old_organizations.count
@@ -56,7 +54,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             @old_profile = old_org.employer_profile
 
             # TODO check enable_ssn_date & disable_ssn_date, workflow_state_transitions
-            json_data = @old_profile.to_json(:except => [:_id,:no_ssn, :sic_code, :enable_ssn_date, :disable_ssn_date, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:no_ssn, :sic_code, :enable_ssn_date, :disable_ssn_date, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
@@ -113,7 +111,8 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.initialize_new_profile(old_org, old_profile_params)
-    new_profile = BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(old_profile_params)
+    profile_class = is_congress?(old_org) ? BenefitSponsors::Organizations::FehbEmployerProfile : BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+    new_profile = profile_class.new(old_profile_params)
 
     if @old_profile.contact_method == "Only Electronic communications"
       new_profile.contact_method = :electronic_only
@@ -123,48 +122,8 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
       new_profile.contact_method = :paper_only
     end
 
-    # build_documents(old_org, new_profile)
-    # build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
     return new_profile
-  end
-
-
-  def self.build_documents(old_org, new_profile)
-
-    @old_profile.documents.each do |document|
-      doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
-      doc.identifier = document.identifier if document.identifier.present?
-      BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create)
-      doc.save!
-    end
-
-    old_org.documents.each do |document|
-      doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
-      doc.identifier = document.identifier if document.identifier.present?
-      BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create)
-      doc.save!
-    end
-  end
-
-  def self.build_inbox_messages(new_profile)
-    @old_profile.inbox.messages.each do |message|
-      msg = new_profile.inbox.messages.new(message.attributes.except("_id"))
-      msg.body.gsub!("EmployerProfile", "AcaShopDcEmployerProfile")
-      msg.body.gsub!(@old_profile.id.to_s, new_profile.id.to_s)
-
-      new_profile.documents.where(subject: "notice").each do |doc|
-        old_emp_docs = @old_profile.documents.where(identifier: doc.identifier)
-        old_org_docs = @old_profile.organization.documents.where(identifier: doc.identifier)
-        old_document_id = if old_emp_docs.present?
-                            old_emp_docs.first.id.to_s
-                          elsif old_org_docs.present?
-                            old_org_docs.first.id.to_s
-                          end
-        msg.body.gsub!(old_document_id, doc.id.to_s) if (doc.id.to_s.present? && old_document_id.present?)
-      end
-
-    end
   end
 
   def self.build_office_locations(old_org, new_profile)
@@ -181,7 +140,8 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   def self.initialize_new_organization(organization, site)
     json_data = organization.to_json(:except => [:_id, :updated_by_id, :issuer_assigned_id, :version, :versions, :employer_profile, :broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
-    general_organization = BenefitSponsors::Organizations::GeneralOrganization.new(old_org_params)
+    org_class = is_congress?(organization) || is_exempt_org?(organization) ? BenefitSponsors::Organizations::ExemptOrganization : BenefitSponsors::Organizations::GeneralOrganization
+    general_organization = org_class.new(old_org_params)
     general_organization.entity_kind = @old_profile.entity_kind.to_sym
     general_organization.site = site
     general_organization.profiles << [@new_profile]
@@ -215,6 +175,14 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   def self.link_existing_census_employees_to_new_profile(census_employees_with_old_id)
     census_employees_with_old_id.update_all(benefit_sponsors_employer_profile_id: @new_profile.id, benefit_sponsorship_id: @benefit_sponsorship.id)
+  end
+
+  def self.is_congress?(organization)
+    organization.employer_profile.plan_years.any?{|p| p.benefit_groups.any?{|bg| bg.is_congress?}}
+  end
+
+  def self.is_exempt_org?(organization)
+    ['governmental_employer','foreign_embassy_or_consulate'].include?(organization.employer_profile.entity_kind)
   end
 
   def self.find_site(site_key)
