@@ -36,7 +36,7 @@
     </table>
 <% end %>
 
-<% if notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
+<% if notice.aqhp_individuals.present? && notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
     <table class="total_table" border="0">
       <tbody>
       <tr>
@@ -52,7 +52,7 @@
       </tr>
       </tbody>
     </table>
-<% elsif notice.renewal_health_enrollments.present?  %>
+<% elsif notice.aqhp_individuals.present? && notice.renewal_health_enrollments.present?  %>
     <table class="total_table" border="0">
       <tbody>
       <tr>

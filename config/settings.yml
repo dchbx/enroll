@@ -1,5 +1,5 @@
 site:
-  key: :cca
+  key: :dc
   subdomain: "mhc"
   domain_name: "hbxshop.org"
   site_title: "Massachusetts Health Connector for Business"
@@ -33,7 +33,7 @@ site:
   broker_claim_quoting_enabled: true
   guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
   use_default_devise_path: true
-  plan_options_title_for_ma: true
+  plan_options_title_for_ma: false
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
@@ -96,10 +96,10 @@ contact_center:
     complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
 plan_option_titles:
-  sole_source: 'One Plan'
-  metal_level: 'One Level'
-  single_carrier: 'One Carrier'
-  single_plan: 'One Plan'
+  sole_source: 'Single Plan'
+  metal_level: 'By Metal Level'
+  single_carrier: 'By Carrier'
+  single_plan: 'Single Plan'
   plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
 plan_option_descriptions:
@@ -143,16 +143,16 @@ aca:
   dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
-  address_query_county: true
-  broker_routing_information: true
+  address_query_county: false
+  broker_routing_information: false
   recaptcha_enabled: false
   security_questions: true
   user_accounts_enabled: true
   admin_actions_available: ["reset_password", "unlock_or_lock_account", "view_login_history"]
-  plan_options_available: ["sole_source", "single_carrier", "metal_level"]
-  dental_plan_options_available: ["single_plan"]
+  plan_options_available: ["single_plan", "single_carrier", "metal_level"]
+  dental_plan_options_available: ["single_carrier", "custom"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
-  enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
+  enabled_metal_levels_for_single_carrier: ["silver", "gold", "bronze", "platinum", "dental"]
   carrier_hios_logo_variant:
     '': ""
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
@@ -166,7 +166,7 @@ aca:
     with_in_sixty_days: 60
 #
   individual_market:
-    monthly_enrollment_due_on: 15
+    monthly_enrollment_due_on: 18
     verification_outstanding_window:
       days: 0
     verification_due:
@@ -264,23 +264,17 @@ aca:
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 27
   transmit_employers_immediately: false
-  employer_has_sic_field: true
-  validate_county: true
+  employer_has_sic_field: false
+  validate_county: false
 
-  use_simple_employer_calculation_model: false
+  use_simple_employer_calculation_model: true
   carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
-  offerings_constrained_to_service_areas: true
+  offerings_constrained_to_service_areas: false
   employer_attestation: true
   enforce_employer_attestation: true
   plan_match_tool: false
   rating_areas:
-    - R-MA001
-    - R-MA002
-    - R-MA003
-    - R-MA004
-    - R-MA005
-    - R-MA006
-    - R-MA007
+  - nil
 
 notices:
   individual_market:

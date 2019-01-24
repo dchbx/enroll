@@ -105,7 +105,6 @@ unless event_kind.present?
 end
 
 #need to exlude this list from UQHP_FEL data set.
-
 # if event == "final_eligibility_notice_uqhp"
 #   @excluded_list = []
 #   CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|

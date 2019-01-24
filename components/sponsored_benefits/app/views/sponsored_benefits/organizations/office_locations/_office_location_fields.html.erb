@@ -54,6 +54,8 @@
               <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                  <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: 'change->zip-check#zipChange', 'child-index': "#{f.index.to_s}" } %>
               </div>
+              <%# Use better config settings %>
+              <% if aca_address_query_county %>
               <div class="invalid-feedback">Please provide a valid zipcode.</div>
 	            <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
 	               <% @counties = RatingArea.find_counties_for(zip_code: address.object.try(:zip)) %>
@@ -61,6 +63,7 @@
 	               <% @counties = [@empty_message] if @counties.empty? %>
  	               <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq })%>
 	            </div>
+              <% end %>
           </div>
         <% end %>
       </div>

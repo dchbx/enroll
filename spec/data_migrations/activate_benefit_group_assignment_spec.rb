@@ -2,7 +2,9 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "activate_benefit_group_assignment")
 
 describe ActivateBenefitGroupAssignment do
-
+  before(:each) do
+    DatabaseCleaner.clean
+  end
   let(:given_task_name) { "activate_benefit_group_assignment" }
   subject { ActivateBenefitGroupAssignment.new(given_task_name, double(:current_scope => nil)) }
 
@@ -23,8 +25,10 @@ describe ActivateBenefitGroupAssignment do
     let!(:benefit_group_assignment1)  { FactoryGirl.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
     let!(:benefit_group_assignment2)  { FactoryGirl.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
     before(:each) do
-      allow(ENV).to receive(:[]).with("ce_ssn").and_return(census_employee.ssn)
-      allow(ENV).to receive(:[]).with("bga_id").and_return(benefit_group_assignment1.id)
+      ENV["ce_ssn"] = census_employee.ssn
+      #allow(ENV).to receive(:[]).with("ce_ssn").and_return(census_employee.ssn)
+      ENV["bga_id"] = benefit_group_assignment1.id
+      #allow(ENV).to receive(:[]).with("bga_id").and_return(benefit_group_assignment1.id)
     end
 
     context "activate_benefit_group_assignment", dbclean: :after_each do

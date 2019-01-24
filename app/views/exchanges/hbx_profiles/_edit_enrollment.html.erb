@@ -20,7 +20,8 @@
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               New SSN
               <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required mask-ssn input_txt", :value => params[:new_ssn].present? ? params[:new_ssn] : @person.ssn, required: params[:new_ssn].present? ? true : false, :input_html => {:maxlength => 15, :size => 40, :width => '100%'} 
-              %>  
+              %>
+              <%= f.hidden_field :dob, :value => params[:new_dob].present? ? Date.strptime(params[:new_dob], '%m/%d/%Y').to_formatted_s(:db) : @person.dob.to_formatted_s(:db) %>
               <%= f.hidden_field :pid, :value => @person.id  %>
               <%= f.hidden_field :family_actions_id, :value => "family_actions_#{@person.primary_family.id.to_s}" %>
             </div>

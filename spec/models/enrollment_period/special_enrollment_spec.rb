@@ -380,4 +380,20 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
       end
     end
   end
+
+  context "for validating next_poss_effective_date_within_range" do
+    let!(:person100) { FactoryGirl.create(:person, :with_employee_role) }
+    let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+    let!(:shop_sep) { FactoryGirl.create :special_enrollment_period, family: family100, qualifying_life_event_kind_id: shop_qle.id, next_poss_effective_date: (TimeKeeper.date_of_record - 1.year), market_kind: "shop"}
+
+    it "should return true" do
+      allow(person100).to receive(:has_active_employee_role?).and_return false
+      expect(shop_sep.valid?).to be_truthy
+    end
+
+    it "should not return true" do
+      allow(person100).to receive(:active_employee_roles).and_return person100.employee_roles
+      expect(shop_sep.send(:next_poss_effective_date_within_range)).to eq ["No active plan years present"]
+    end
+  end
 end

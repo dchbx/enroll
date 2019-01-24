@@ -252,6 +252,8 @@ class Organization
   def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil, kind: nil })
     # toDo
     if filters[:kind] == "dental"
+      return self.valid_dental_carrier_names unless constrain_service_areas?
+
       office_location = filters[:primary_office_location]
       dental_carrier_ids = Plan.shop_dental_by_active_year(filters[:active_year]).map(&:carrier_profile_id).uniq
 

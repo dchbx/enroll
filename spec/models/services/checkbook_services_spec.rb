@@ -106,7 +106,7 @@ describe ::Services::CheckbookServices::PlanComparision do
     it "should generate congressional url" do
      if ApplicationHelperModStubber.plan_match_dc
        allow(subject).to receive(:construct_body_shop).and_return({})
-       expect(subject.generate_url).to eq("https://checkbook_url/congress/#{hbx_enrollment.effective_on.year}/")
+       expect(subject.generate_url).to eq("https://checkbook_url/congress/2019/")
       end
     end
   end

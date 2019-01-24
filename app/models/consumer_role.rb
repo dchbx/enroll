@@ -839,14 +839,6 @@ class ConsumerRole
     person.verification_types.active.where(applied_roles: "consumer_role") if person
   end
 
-  #class methods
-  class << self
-    #this method will be used to check 90 days verification period for outstanding verification
-    def advance_day(check_date)
-      #handle all outstanding consumer who is unverified more than 90 days
-    end
-  end
-
   private
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)

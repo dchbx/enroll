@@ -68,7 +68,7 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
-  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range
+  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 
   validates :csl_num,
     length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
@@ -153,19 +153,27 @@ class SpecialEnrollmentPeriod
 private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
-    return true unless is_shop?
-    min_date = sep_optional_date family, 'min', self.market_kind
-    max_date = sep_optional_date family, 'max', self.market_kind
-    errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
+    return true unless (is_shop? && family.has_primary_active_employee?)
+    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
+    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+    if !(min_date || max_date)
+      errors.add(:next_poss_effective_date, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+    elsif !next_poss_effective_date.between?(min_date, max_date)
+      errors.add(:next_poss_effective_date, "out of range.")
+    end
   end
 
   def optional_effective_on_dates_within_range
-    return true unless is_shop?
+    return true unless (is_shop? && family.has_primary_active_employee?)
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
-      min_date = sep_optional_date family, 'min', self.market_kind
-      max_date = sep_optional_date family, 'max', self.market_kind
-      errors.add(:optional_effective_on, "Date #{index+1} option out of range.") if not date_option.between?(min_date, max_date)
+      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
+      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+      if !(min_date || max_date)
+        errors.add(:optional_effective_on, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+      elsif !date_option.between?(min_date, max_date)
+        errors.add(:optional_effective_on, "Date #{index+1} option out of range.")
+      end
     end
   end
 

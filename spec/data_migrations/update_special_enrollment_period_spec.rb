@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_special_enrollment_period.rb")
 
-describe FixSpecialEnrollmentPeriod do
+describe UpdateSpecialEnrollmentPeriod do
   let(:given_task_name) { "update_special_enrollment_period" }
   subject { UpdateSpecialEnrollmentPeriod.new(given_task_name, double(:current_scope => nil)) }
 

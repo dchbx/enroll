@@ -441,6 +441,5 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         end
       end
     end
-
   end
 end

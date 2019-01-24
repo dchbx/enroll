@@ -112,8 +112,10 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         let(:renewal_factory) {
           Factories::PlanYearRenewalFactory.new
         }
-        let(:start_on) {Date.new(2018,1,1)}
-        let(:end_on) {Date.new(2018,12,31)}
+        let(:start_on) { Date.new(2018,1,1) }
+        let(:end_on)   { Date.new(2018,12,31) }
+        let(:renewing_plan_year_start) { renewing_employer.active_plan_year.start_on.next_year }
+        let(:notice_end_date)         { Date.new(2019,1,1) }
 
         before :each do
           renewal_factory.employer_profile = renewing_employer

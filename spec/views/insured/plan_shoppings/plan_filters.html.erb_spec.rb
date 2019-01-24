@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "insured/_plan_filters.html.erb" do
   let(:benefit_group){ double("BenefitGroup") }
-  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
+  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month) }
   context "without consumer_role" do
     let(:person) {double(is_consumer_role_active?: false)}
     let(:offers_nationwide_plans) { true }
@@ -168,6 +168,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_aptc, 330)
       assign(:market_kind, 'individual')
       assign(:tax_household, true)
+      assign(:coverage_kind, "health")
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
       assign(:elected_aptc, 280.50)
@@ -198,6 +199,14 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     it "should have selected aptc pct amount" do
       expect(rendered).to match /85/
       expect(rendered).to have_selector("input#elected_aptc[value='280.50']")
+    end
+
+    it 'should display find your doctor link for health enrollments only' do
+      expect(rendered).to have_selector('a', text: /Find Your Doctor/i)
+    end
+
+     it 'should display estimate your cost link' do
+      expect(rendered).to have_selector('a', text: /estimate your cost/i)
     end
   end
 

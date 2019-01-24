@@ -79,16 +79,6 @@ module Employers::EmployerHelper
     end
   end
 
-  def render_plan_offerings(benefit_group)
-
-    assignment_mapping.each do |bgsm_state, enrollment_statuses|
-      if enrollment_statuses.include?(enrollment_status.to_s)
-        return bgsm_state
-      end
-    end
-  end
-
-
   def invoice_formated_date(date)
     date.strftime("%m/%d/%Y")
   end
@@ -114,13 +104,7 @@ module Employers::EmployerHelper
   end
 
   def render_plan_offerings(benefit_group, coverage_type)
-    start_on = benefit_group.plan_year.start_on.year
     reference_plan = benefit_group.reference_plan
-    carrier_profile = reference_plan.carrier_profile
-    employer_profile = benefit_group.employer_profile
-    profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on)
-    query = profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile.id }
-
     if coverage_type == "dental" && benefit_group.dental_plan_option_kind == "single_plan"
       plan_count = benefit_group.elected_dental_plan_ids.count
       "#{plan_count} Plans"
@@ -130,13 +114,33 @@ module Employers::EmployerHelper
     else
       return "1 Plan Only" if benefit_group.single_plan_type?
       return "Sole Source Plan" if benefit_group.plan_option_kind == 'sole_source'
-      if benefit_group.plan_option_kind == "single_carrier"
+      return health_plan_offerings_count(benefit_group, reference_plan)
+    end
+  end
+
+  def health_plan_offerings_count(benefit_group, reference_plan)
+    start_on = benefit_group.plan_year.start_on.year
+    if offerings_constrained_to_service_areas?
+      carrier_profile = reference_plan.carrier_profile
+      employer_profile = benefit_group.employer_profile
+      profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on)
+      query = profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile.id }
+    end
+
+    if benefit_group.plan_option_kind == "single_carrier"
+      if offerings_constrained_to_service_areas?
         plan_count = Plan.for_service_areas_and_carriers(query, start_on).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/).count
-        "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
       else
-        plan_count = Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).count
-        "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
+        plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
       end
+      "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
+    else
+      if offerings_constrained_to_service_areas?
+        plan_count = Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).count
+      else
+        plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level]).count
+      end
+      "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
     end
   end
 
@@ -280,4 +284,8 @@ module Employers::EmployerHelper
   def display_sic_field_for_employer?
     Settings.aca.employer_has_sic_field
   end
+
+    def offerings_constrained_to_service_areas?
+      (Settings.aca.offerings_constrained_to_service_areas.to_s.downcase == "true")
+    end
 end

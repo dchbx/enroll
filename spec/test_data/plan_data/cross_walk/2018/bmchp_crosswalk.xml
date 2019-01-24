@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<plan_crosswalk_2018>
+  <version>
+    <name>Plan Service Area Crosswalk Template</name>
+    <number>2.3.3</number>
+  </version>
+  <issuer_information>
+    <hios_issuer_id>42690</hios_issuer_id>
+    <issuer_state>MA</issuer_state>
+    <market_coverage>SHOP (Small Group)</market_coverage>
+    <multistate_plan>No</multistate_plan>
+    <dental_only_plan>No</dental_only_plan>
+  </issuer_information>
+  <crosswalks>
+    <crosswalk>
+      <plan_id_2017_hios>42690MA1234502</plan_id_2017_hios>
+      <crosswalk_level>Crosswalking to same Plan ID</crosswalk_level>
+      <reason_for_crosswalk>Renewing exact same product/plan combination (Same 2017 Plan ID)</reason_for_crosswalk>
+      <plan_id_2018_hios>42690MA1234502</plan_id_2018_hios>
+      <is_this_plan_catastrophic_or_child_only_plan>No</is_this_plan_catastrophic_or_child_only_plan>
+    </crosswalk>
+    <crosswalk>
+      <plan_id_2017_hios>42690MA1234503</plan_id_2017_hios>
+      <crosswalk_level>Crosswalking to same Plan ID</crosswalk_level>
+      <reason_for_crosswalk>Discontined</reason_for_crosswalk>
+      <plan_id_2018_hios></plan_id_2018_hios>
+      <is_this_plan_catastrophic_or_child_only_plan>No</is_this_plan_catastrophic_or_child_only_plan>
+    </crosswalk>
+  </crosswalks>
+</plan_crosswalk_2018>

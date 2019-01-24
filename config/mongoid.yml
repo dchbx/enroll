@@ -5,7 +5,7 @@ development:
     default: &default_development
       # Defines the name of the default database that Mongoid can connect to.
       # (required).
-      database: mhc_enroll_development
+      database: enroll_development
       # Provides the hosts the default session can connect to. Must be an array
       # of host:port pairs. (required)
       hosts:

@@ -245,6 +245,8 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         org
       }
 
+      let(:active_plan_year) { organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (TimeKeeper.date_of_record)).first }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -273,6 +275,24 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         expiring_enrollments.each do |enrollment|
           enrollment.reload
           expect(enrollment.aasm_state).to eq 'coverage_expired'
+        end
+      end
+
+      context ".expire_plan_year_enrollments_and_bgas" do
+        before :each do
+          active_plan_year.hbx_enrollments.map(&:benefit_group_assignment).each { |bga| bga.update_attributes!(aasm_state: 'coverage_selected')}
+          emp_enr_factory_instance = ::Factories::EmployerEnrollFactory.new
+          emp_enr_factory_instance.send(:expire_plan_year_enrollments_and_bgas, active_plan_year)
+        end
+
+        it 'should expire plan_year hbx_enrollments and bgas' do
+          active_plan_year.hbx_enrollments.each do |enr|
+            enr.reload
+            enr.benefit_group_assignment.reload
+            expect(enr.aasm_state).to eq 'coverage_expired'
+            expect(enr.benefit_group_assignment.aasm_state).to eq 'coverage_expired'
+          end
+          expect(active_plan_year.aasm_state).to eq 'expired'
         end
       end
     end

@@ -31,11 +31,11 @@ module BenefitSponsors
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
       validates_presence_of :market_kind, if: :is_broker_profile?
-      validates_presence_of :ach_routing_number, if: :is_broker_profile?
+      validates_presence_of :ach_routing_number, if: :is_cca_broker_profile?
       validates_presence_of :referred_by, if: :is_cca_profile?
 
       validate :validate_profile_office_locations
-      validate :validate_routing_information, if: :is_broker_profile?
+      validate :validate_routing_information, if: :is_cca_broker_profile?
       validates_presence_of :referred_reason, if: :is_referred_by_other?
 
       def persisted?
@@ -44,6 +44,10 @@ module BenefitSponsors
 
       def office_locations_attributes=(locations_params)
         self.office_locations=(locations_params.values)
+      end
+
+      def is_cca_broker_profile?
+        is_broker_profile? && is_site_cca?
       end
 
       def is_broker_profile?

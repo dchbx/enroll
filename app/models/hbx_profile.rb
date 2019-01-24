@@ -131,7 +131,7 @@ class HbxProfile
   CallCenterPhoneNumber = contact_center_phone_number
   ShortName = site_short_name
 
-  IndividualEnrollmentDueDayOfMonth = 15
+  IndividualEnrollmentDueDayOfMonth = Settings.aca.individual_market.monthly_enrollment_due_on
 
   #New Rule There is no 14 days rule for termination
   # IndividualEnrollmentTerminationMinimum = 14.days

@@ -473,5 +473,96 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         end
       end
     end
+
+    describe "render_plan_offerings" do
+      context "constrained service area rule present" do
+        let(:query) { double("Mongoid::Criteria") }
+
+        context "dental sponsored benefit" do
+          let(:carrier_profile) { double("BenefitSponsors::Organizations::IssuerProfile", id: "rspec_mock", legal_name: "Blue cross Blue Shield")}
+          let(:reference_plan) {double("BenefitMarkets::Products::Product", active_year: 2019, carrier_profile: carrier_profile)}
+
+          it "should return plans count when single_plan" do
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, dental_plan_option_kind: "single_plan", elected_dental_plan_ids: ["1", "2", "3"])
+            expect(helper.render_plan_offerings(benefit_group, "dental")).to eq "3 Plans"
+          end
+
+          it "should return plan count when single_carrier" do
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, dental_plan_option_kind: "single_carrier", elected_dental_plan_ids: ["1", "2", "3"])
+            allow(Plan).to receive(:shop_dental_by_active_year).with(2019).and_return(query)
+            allow(query).to receive(:by_carrier_profile).with(carrier_profile).and_return(["rspec_legal_name_mock", "rspec_carrier_profile_mock"])
+            expect(helper.render_plan_offerings(benefit_group, "dental")).to eq "All Blue cross Blue Shield Plans (2)"
+          end
+        end
+
+        context "health sponsored benefit" do
+          let(:filtred_service_areas) { [["rspec_mock"]]}
+          let(:carrier_profile) { double("BenefitSponsors::Organizations::IssuerProfile", id: "rspec_mock", legal_name: "Blue cross Blue Shield")}
+          let(:reference_plan) {double("BenefitMarkets::Products::Product", active_year: 2019, carrier_profile: carrier_profile, metal_level: "metal_level")}
+
+          it "should return plan offerings count when plan option kind is :sole_source" do
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, single_plan_type?: false, plan_option_kind: 'sole_source')
+            expect(helper.render_plan_offerings(benefit_group, "health")).to eq "Sole Source Plan"
+          end
+
+          it "should return plan offerings count when plan option kind is :single_carrier" do
+            employer_profile = double("SponsoredBenefits::Organizations::PlanDesignOrganization")
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, single_plan_type?: false, plan_option_kind: 'single_carrier', employer_profile: employer_profile)
+            allow(benefit_group).to receive_message_chain("plan_year.start_on.year").and_return 2019
+            allow(helper).to receive(:offerings_constrained_to_service_areas?).and_return true
+            allow(CarrierProfile).to receive(:carrier_profile_service_area_pairs_for).with(employer_profile, 2019).and_return(filtred_service_areas)
+            allow(Plan).to receive(:for_service_areas_and_carriers).with(filtred_service_areas, 2019).and_return(query)
+            allow(query).to receive_message_chain("shop_market.check_plan_offerings_for_single_carrier.health_coverage").and_return(query)
+            allow(query).to receive(:and).and_return(["Plan_instance_1", "Plan_instance_2"])
+            expect(helper.render_plan_offerings(benefit_group, "health")).to eq "All Blue cross Blue Shield Plans (2)"
+          end
+
+          it "should return plan offerings count when plan option kind is :metal_level" do
+            employer_profile = double("SponsoredBenefits::Organizations::PlanDesignOrganization")
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, single_plan_type?: false, plan_option_kind: 'metal_level', employer_profile: employer_profile)
+            allow(benefit_group).to receive_message_chain("plan_year.start_on.year").and_return 2019
+            allow(helper).to receive(:offerings_constrained_to_service_areas?).and_return true
+            allow(CarrierProfile).to receive(:carrier_profile_service_area_pairs_for).with(employer_profile, 2019).and_return(filtred_service_areas)
+            allow(Plan).to receive(:for_service_areas_and_carriers).with(filtred_service_areas, 2019).and_return(query)
+            allow(query).to receive_message_chain("shop_market.check_plan_offerings_for_metal_level.health_coverage").and_return(query)
+            allow(query).to receive(:by_metal_level).with("metal_level").and_return(query)
+            allow(query).to receive(:and).and_return(["Plan_instance_1", "Plan_instance_1"])
+            expect(helper.render_plan_offerings(benefit_group, "health")).to eq "Metal Level Plans (2)"
+          end
+        end
+      end
+
+      context "constrained service area rule not present" do
+        context "health sponsored benefit" do
+          let(:query) { double("Mongoid::Criteria") }
+          let(:carrier_profile) { double("BenefitSponsors::Organizations::IssuerProfile", id: "rspec_mock", legal_name: "Blue cross Blue Shield")}
+          let(:reference_plan) {double("BenefitMarkets::Products::Product", active_year: 2019, carrier_profile: carrier_profile, metal_level: "metal_level")}
+          it "should return plan offerings count when plan option kind is :single_plan" do
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, single_plan_type?: true)
+            expect(helper.render_plan_offerings(benefit_group, "health")).to eq "1 Plan Only"
+          end
+
+          it "should return plan offerings count when plan option kind is :metal_level" do
+            employer_profile = double("SponsoredBenefits::Organizations::PlanDesignOrganization")
+            allow(helper).to receive(:offerings_constrained_to_service_areas?).and_return false
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, single_plan_type?: false, plan_option_kind: 'metal_level', employer_profile: employer_profile)
+            allow(benefit_group).to receive_message_chain("plan_year.start_on.year").and_return 2019
+            allow(Plan).to receive(:shop_health_by_active_year).with(2019).and_return(query)
+            allow(query).to receive(:by_health_metal_levels).with(["metal_level"]).and_return ["Plan_instance_1"]
+            expect(helper.render_plan_offerings(benefit_group, "health")).to eq "Metal Level Plans (1)"
+          end
+
+          it "should return plan offerings count when plan option kind is :single_carrier" do
+            employer_profile = double("SponsoredBenefits::Organizations::PlanDesignOrganization")
+            allow(helper).to receive(:offerings_constrained_to_service_areas?).and_return false
+            benefit_group = double("BenefitGroup", reference_plan: reference_plan, single_plan_type?: false, plan_option_kind: 'single_carrier', employer_profile: employer_profile)
+            allow(benefit_group).to receive_message_chain("plan_year.start_on.year").and_return 2019
+            allow(Plan).to receive(:shop_health_by_active_year).with(2019).and_return(query)
+            allow(query).to receive(:by_carrier_profile).with(carrier_profile).and_return ["Plan_instance_1"]
+            expect(helper.render_plan_offerings(benefit_group, "health")).to eq "All Blue cross Blue Shield Plans (1)"
+          end
+        end
+      end
+    end
   end
 end

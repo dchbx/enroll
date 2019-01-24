@@ -21,6 +21,7 @@ describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
         organization.employer_profile.renewing_plan_year.update_attribute(:open_enrollment_end_on, Date.new(2016,11,13))
         allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.renewing_plan_year.start_on)
         allow(ENV).to receive(:[]).with("new_oe_end_date").and_return(organization.employer_profile.renewing_plan_year.open_enrollment_end_on + 2.days)
+        allow(ENV).to receive(:[]).with("feins").and_return("")
       end
 
       it "should change the open_enrollment_end_on date of conversion ER" do
@@ -40,6 +41,24 @@ describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
       end
     end
 
+    context "for renewal employer when feins provided" do
+      let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+
+      before(:each) do
+        organization.employer_profile.renewing_plan_year.update_attribute(:open_enrollment_end_on, Date.new(2016,11,13))
+        allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.renewing_plan_year.start_on)
+        allow(ENV).to receive(:[]).with("new_oe_end_date").and_return(organization.employer_profile.renewing_plan_year.open_enrollment_end_on + 2.days)
+        allow(ENV).to receive(:[]).with("feins").and_return(organization.fein.to_s)
+      end
+
+      it "should change the open_enrollment_end_on date of ER" do
+        end_date = organization.employer_profile.renewing_plan_year.open_enrollment_end_on
+        subject.migrate
+        organization.employer_profile.reload
+        expect(organization.employer_profile.renewing_plan_year.open_enrollment_end_on).to eq  (end_date + 2.days)
+      end
+    end
+
     context "for initial employer" do
       let(:organization) { employer_profile.organization }
       let(:employer_profile) { plan_year.employer_profile }
@@ -48,6 +67,7 @@ describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
       before(:each) do
         allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.plan_years.first.start_on)
         allow(ENV).to receive(:[]).with("new_oe_end_date").and_return(organization.employer_profile.plan_years.first.open_enrollment_end_on + 2.days)
+        allow(ENV).to receive(:[]).with("feins").and_return("")
       end
 
       it "should not change the open_enrollment_end_on date for inital employer" do
