@@ -22,7 +22,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
 
   describe "when lawful presence fails verification" do
     let(:denial_information) do
-      Struct.new(:determined_at, :vlp_authority).new(Time.now, "ssa")
+      OpenStruct.new({ :determined_at => Time.now, :authority => 'ssa' })
     end
 
     before :each do

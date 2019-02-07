@@ -119,5 +119,40 @@ describe LawfulPresenceDetermination do
       end
     end
   end
+
+  context 'qualified non citizenship code' do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    subject { person.consumer_role.lawful_presence_determination }
+
+    context 'store qnc result if present' do
+      let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => 'hbx' , :qualified_non_citizenship_result => 'valid person'})}
+
+      it 'should store QNC result on authorize' do
+        subject.authorize!(verification_attr)
+        expect(subject.qualified_non_citizenship_result).to eq('valid person')
+      end
+
+      it 'should store QNC result on deny' do
+        verification_attr.qualified_non_citizenship_result = 'not a valid person'
+        subject.deny!(verification_attr)
+        expect(subject.qualified_non_citizenship_result).to eq('not a valid person')
+      end
+    end
+
+    context 'do not store qnc result if not present' do
+      let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => 'hbx' })}
+
+      it 'should not store QNC result on authorize' do
+        subject.authorize!(verification_attr)
+        expect(subject.qualified_non_citizenship_result).to eq(nil)
+      end
+
+      it 'should not store QNC result on deny' do
+        subject.deny!(verification_attr)
+        expect(subject.qualified_non_citizenship_result).to eq(nil)
+      end
+    end
+
+  end
 end
 end
