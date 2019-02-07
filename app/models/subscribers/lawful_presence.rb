@@ -59,18 +59,16 @@ module Subscribers
 
     def update_consumer_role(consumer_role, xml_hash)
       args = OpenStruct.new
+      args.determined_at = Time.now
+      args.vlp_authority = 'dhs'
       if xml_hash[:lawful_presence_indeterminate].present?
-        args.determined_at = Time.now
-        args.vlp_authority = 'dhs'
         consumer_role.fail_dhs!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("lawfully_present")
-        args.determined_at = Time.now
-        args.vlp_authority = 'dhs'
+        args.qualified_non_citizenship_result = xml_hash[:lawful_presence_determination][:qualified_non_citizen_code] if xml_hash[:lawful_presence_determination][:qualified_non_citizen_code]
         args.citizenship_result = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
         consumer_role.pass_dhs!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("not_lawfully_present")
-        args.determined_at = Time.now
-        args.vlp_authority = 'dhs'
+        args.qualified_non_citizenship_result = xml_hash[:lawful_presence_determination][:qualified_non_citizen_code] if xml_hash[:lawful_presence_determination][:qualified_non_citizen_code]
         args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.fail_dhs!(args)
       end

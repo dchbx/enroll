@@ -20,6 +20,7 @@ class LawfulPresenceDetermination
   field :vlp_document_id, type: String
   field :citizen_status, type: String
   field :citizenship_result, type: String
+  field :qualified_non_citizenship_result, type:  String
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -85,6 +86,8 @@ class LawfulPresenceDetermination
     approval_information = args.first
     self.update_attributes!(vlp_verified_at: approval_information.determined_at,
                             vlp_authority: approval_information.vlp_authority)
+
+    self.qualified_non_citizenship_result = approval_information.qualified_non_citizenship_result if approval_information.qualified_non_citizenship_result
     if approval_information.citizenship_result
       self.citizenship_result = approval_information.citizenship_result
     else
@@ -104,8 +107,10 @@ class LawfulPresenceDetermination
 
   def record_denial_information(*args)
     denial_information = args.first
+    qnc_result = denial_information.qualified_non_citizenship_result.present? ? denial_information.qualified_non_citizenship_result : nil
     self.update_attributes!(vlp_verified_at: denial_information.determined_at,
                             vlp_authority: denial_information.vlp_authority,
+                            qualified_non_citizenship_result: qnc_result,
                             citizenship_result: ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS)
   end
 

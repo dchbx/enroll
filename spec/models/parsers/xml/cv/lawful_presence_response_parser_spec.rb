@@ -23,7 +23,7 @@ describe Parsers::Xml::Cv::LawfulPresenceResponseParser do
       subject.parse(xml)
       expect(subject.to_hash).to include(:case_number, :lawful_presence_determination)
       expect(subject.to_hash[:lawful_presence_determination][:document_results]).to include(:document_foreign_passport, :document_cert_of_naturalization)
-
+      expect(subject.to_hash[:lawful_presence_determination]).to include(:qualified_non_citizen_code)
     end
   end
 
