@@ -4,6 +4,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     # TODO check registerd on date feild
     # TODO check congress Organization & employer profiles
     # TODO foreign_embassy_or_consulate entity kind organization
+    # TODO do we need to set fein for exempt organization
 
     if Settings.site.key.to_s == "dc"
       site_key = "dc"
