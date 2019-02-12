@@ -125,17 +125,17 @@ describe LawfulPresenceDetermination do
     subject { person.consumer_role.lawful_presence_determination }
 
     context 'store qnc result if present' do
-      let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => 'hbx' , :qualified_non_citizenship_result => 'valid person'})}
+      let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => 'hbx' , :qualified_non_citizenship_result => 'Y'})}
 
       it 'should store QNC result on authorize' do
         subject.authorize!(verification_attr)
-        expect(subject.qualified_non_citizenship_result).to eq('valid person')
+        expect(subject.qualified_non_citizenship_result).to eq('Y')
       end
 
       it 'should store QNC result on deny' do
-        verification_attr.qualified_non_citizenship_result = 'not a valid person'
+        verification_attr.qualified_non_citizenship_result = 'N'
         subject.deny!(verification_attr)
-        expect(subject.qualified_non_citizenship_result).to eq('not a valid person')
+        expect(subject.qualified_non_citizenship_result).to eq('N')
       end
     end
 
