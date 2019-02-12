@@ -20,13 +20,13 @@ describe Subscribers::LawfulPresence do
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response.xml")) }
     let(:xml2) { File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response2.xml")) }
     let(:xml_hash) { {:case_number => "12121", :lawful_presence_determination => {
-        :response_code => "lawfully_present", :legal_status => "lawful_permanent_resident", :qualified_non_citizen_code => 'valid citizen'}} }
+        :response_code => "lawfully_present", :legal_status => "lawful_permanent_resident", :qualified_non_citizen_code => 'Y'}} }
     let(:xml_hash2) { {:case_number => "12121", :lawful_presence_indeterminate => {:response_code => "invalid_information",
                                                                                    :response_text => "Complete information."}} }
     let(:xml_hash3) { {:case_number => "12121", :lawful_presence_determination => {
         :response_code => "not_lawfully_present", :legal_status => "other"}} }
     let(:xml_hash4) { {:case_number => "12121", :lawful_presence_determination => {
-        :response_code => "not_lawfully_present", :legal_status => "other", :qualified_non_citizen_code => 'not a valid citizen'}} }
+        :response_code => "not_lawfully_present", :legal_status => "other", :qualified_non_citizen_code => 'N'}} }
 
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:consumer_role) { person.consumer_role }
@@ -73,7 +73,7 @@ describe Subscribers::LawfulPresence do
           subject.call(nil, nil, nil, nil, payload)
           expect(person.consumer_role.aasm_state).to eq('fully_verified')
           expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
-          expect(person.consumer_role.lawful_presence_determination.qualified_non_citizenship_result).to eq('valid citizen')
+          expect(person.consumer_role.lawful_presence_determination.qualified_non_citizenship_result).to eq('Y')
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
         end
@@ -95,7 +95,7 @@ describe Subscribers::LawfulPresence do
           allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash4)
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
-          expect(person.consumer_role.lawful_presence_determination.qualified_non_citizenship_result).to eq('not a valid citizen')
+          expect(person.consumer_role.lawful_presence_determination.qualified_non_citizenship_result).to eq('N')
         end
       end
     end
