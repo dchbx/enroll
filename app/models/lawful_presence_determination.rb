@@ -75,10 +75,18 @@ class LawfulPresenceDetermination
 
   def start_vlp_process(requested_start_date)
     notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
+    mock_dummy_data
   end
 
   def assign_citizen_status(new_status)
     update_attributes(citizen_status: new_status)
+  end
+
+  def mock_dummy_data
+    xml = [File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response2.xml")), File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response3.xml"))].sample
+    payload = {:individual_id => ivl_role.person.hbx_id, :body => xml}
+    lawful_subscriber = ::Subscribers::LawfulPresence.new
+    lawful_subscriber.call(nil, nil, nil, nil, payload)
   end
 
   private
