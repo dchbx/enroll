@@ -344,10 +344,12 @@ describe Person do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}
         let(:census_employee) { double }
+        let(:benefit_group) { double }
 
         before do
           allow(employee_roles).to receive(:census_employee).and_return(census_employee)
           allow(census_employee).to receive(:is_active?).and_return(true)
+          allow(employee_roles).to receive(:benefit_group).and_return(benefit_group)
         end
 
         it "should return true" do
@@ -1162,6 +1164,7 @@ describe Person do
     let(:person) { FactoryGirl.create(:person) }
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:census_employee2) { FactoryGirl.create(:census_employee) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     context "person has no active employee roles" do
       it "should return false" do
@@ -1173,9 +1176,11 @@ describe Person do
     context "person has active employee roles" do
       before(:each) do
         person.employee_roles.create!(FactoryGirl.create(:employee_role, person: person,
-                                                                       census_employee_id: census_employee.id).attributes)
+                                                                       census_employee_id: census_employee.id,
+                                                                       benefit_group_id: benefit_group.id).attributes)
         person.employee_roles.pluck(:census_employee).each { |census_employee| census_employee.update_attribute(:aasm_state, 'eligible') }
-      end
+        allow(person.employee_roles.first).to receive(:benefit_group).and_return(benefit_group)
+      end 
 
       it "should return true if person has active employee role for given census_employee" do
         expect(person.active_employee_roles).to be_present
