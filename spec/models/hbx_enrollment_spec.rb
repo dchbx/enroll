@@ -847,7 +847,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     context "ivl consumer role with unverified state purchased a plan" do
-      xit "should return enrollment status as unverified" do
+      it "should return enrollment status as unverified" do
         person.consumer_role.update_attribute("aasm_state","unverified")
         enrollment.select_coverage!
         enrollment.reload

@@ -714,7 +714,7 @@ describe "it should check the residency status" do
   let!(:hbx_enrollment_member) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
   let!(:enrollment) {consumer.person.primary_family.active_household.hbx_enrollments.first}
   context "consumer role should check for eligibility" do
-    xit "should move the enrollment to unverified" do
+    it "should move the enrollment to unverified" do
       consumer.coverage_purchased!
       expect(consumer.aasm_state).to eq("ssa_pending")
       enrollment.reload
