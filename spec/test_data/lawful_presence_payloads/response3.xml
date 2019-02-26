@@ -1,0 +1,30 @@
+<ridp:lawful_presence xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                      xmlns:ridp='http://openhbx.org/api/terms/1.0'
+                      xsi:schemaLocation='http://openhbx.org/api/terms/1.0 file:/Users/tevans/proj/cv_example_builder/verification_services.xsd'>
+  <ridp:case_number>12121</ridp:case_number>
+  <ridp:lawful_presence_determination>
+    <ridp:response_code>urn:openhbx:terms:v1:lawful_presence:determination#not_lawfully_present</ridp:response_code>
+    <ridp:response_text>Not Lawfully Present</ridp:response_text>
+    <ridp:legal_status>urn:openhbx:terms:v1:lawful_presence:presence_status#lawful_permanent_resident
+    </ridp:legal_status>
+    <ridp:employment_authorized>urn:openhbx:terms:v1:lawful_presence:employment_authorization#authorized
+    </ridp:employment_authorized>
+    <ridp:document_results>
+      <ridp:document_cert_of_naturalization>
+        <ridp:case_number>2113123</ridp:case_number>
+        <ridp:response_code>022</ridp:response_code>
+        <ridp:response_description_text>Good</ridp:response_description_text>
+        <ridp:elig_statement_code>011</ridp:elig_statement_code>
+        <ridp:elig_statement_txt>ok</ridp:elig_statement_txt>
+      </ridp:document_cert_of_naturalization>
+      <ridp:document_foreign_passport>
+        <ridp:case_number>12123123</ridp:case_number>
+        <ridp:response_code>011</ridp:response_code>
+        <ridp:response_description_text>Valid Passport</ridp:response_description_text>
+        <ridp:elig_statement_code>01</ridp:elig_statement_code>
+        <ridp:elig_statement_txt>1.1</ridp:elig_statement_txt>
+      </ridp:document_foreign_passport>
+    </ridp:document_results>
+    <ridp:qualified_non_citizen_code>Y</ridp:qualified_non_citizen_code>
+  </ridp:lawful_presence_determination>
+</ridp:lawful_presence>
