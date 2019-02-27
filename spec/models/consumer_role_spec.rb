@@ -377,6 +377,17 @@ context "Verification process and notices" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
       it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, "valid", :unverified, :dhs_pending, "coverage_purchased!"
+
+        context "not_lawfully_present_in_us" do
+          it "should store QNC result" do
+            allow(person).to receive(:ssn).and_return nil
+            allow(consumer).to receive(:citizen_status).and_return "not_lawfully_present_in_us"
+            consumer.lawful_presence_determination.update_attributes!(citizen_status: "not_lawfully_present_in_us")
+            consumer.coverage_purchased! verification_attr
+            consumer.reload
+            expect(consumer.lawful_presence_determination.qualified_non_citizenship_result).not_to be nil
+          end
+        end
       end
 
       describe "indian tribe member with ssn" do
