@@ -58,7 +58,7 @@
   </ridp:individual>
   <ridp:response_code>ss</ridp:response_code>
   <ridp:ssn_verified>true</ridp:ssn_verified>
-  <ridp:citizenship_verified>true</ridp:citizenship_verified>
+  <ridp:citizenship_verified>false</ridp:citizenship_verified>
   <ridp:incarcerated>false</ridp:incarcerated>
   <ridp:response_text>Failed</ridp:response_text>
 </ridp:ssa_verification_result>

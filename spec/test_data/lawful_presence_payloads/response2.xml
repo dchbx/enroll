@@ -25,6 +25,6 @@
         <ridp:elig_statement_txt>1.1</ridp:elig_statement_txt>
       </ridp:document_foreign_passport>
     </ridp:document_results>
-    <ridp:qualified_non_citizen_code>Y</ridp:qualified_non_citizen_code>
+    <ridp:qualified_non_citizen_code>N</ridp:qualified_non_citizen_code>
   </ridp:lawful_presence_determination>
 </ridp:lawful_presence>
