@@ -486,13 +486,13 @@ class ConsumerRole
     end
 
 
-    event :coverage_purchased, :after => [:record_transition, :notify_of_eligibility_change, :invoke_residency_verification!, :invoke_pending_verification!]  do
+    event :coverage_purchased, :after => [:invoke_pending_verification!, :record_transition, :notify_of_eligibility_change, :invoke_residency_verification!]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:move_types_to_pending]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:move_types_to_pending]
     end
 
-    event :coverage_purchased_no_residency, :after => [:record_transition, :move_types_to_pending, :notify_of_eligibility_change, :invoke_pending_verification!]  do
+    event :coverage_purchased_no_residency, :after => [:invoke_pending_verification!, :record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?]
