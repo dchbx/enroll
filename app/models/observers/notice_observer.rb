@@ -7,6 +7,17 @@ module Observers
       @notifier = Services::NoticeService.new
     end
 
+    def financial_assistance_application_date_change; end
+
+    def financial_assistance_application_update(new_model_event)
+      application = new_model_event.klass_instance
+      if new_model_event.event_key == :ineligibility_notice
+        deliver(recipient: application, event_object: application, notice_event: "ineligibility_notice")
+      else
+        deliver(recipient: application, event_object: application, notice_event: "eligibility_notice")
+      end
+    end
+
     def plan_year_update(new_model_event)
       current_date = TimeKeeper.date_of_record
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
@@ -97,7 +108,7 @@ module Observers
 
         if new_model_event.event_key == :application_denied
           errors = plan_year.enrollment_errors
-          
+
           if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               if ce.employee_role.present?

@@ -7,10 +7,14 @@ module Notifier
 
     EVENT_MAP = {
       employer: {
-        binder_paid: :benefit_coverage_initial_binder_paid,        
+        binder_paid: :benefit_coverage_initial_binder_paid
       },
       consumer_role: {
         projected_eligibility_notice_2: :projected_eligibility_notice_2
+      },
+      "FinancialAssistance::Application": {
+        ineligibility_notice: :ineligibility_notice,
+        eligibility_notice: :eligibility_notice
       }
     }
 
@@ -18,6 +22,7 @@ module Notifier
       "EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
       "BrokerAgencyProfile" => Resource.new(:broker_agency, :id, :broker_agency_id, :find),
       "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find),
+      "FaaApplication" => Resource.new(:"FinancialAssistance::Application", :id, :hbx_id, :find),
       "CensusEmployee" => Resource.new(:census_employee, :id, :census_employee_id, :find),
       "BrokerRole" => Resource.new(:broker, :id, :broker_role_id, :find),
       "EmployeeRole" => Resource.new(:employee, :id, :employee_role_id, :find),

@@ -4,6 +4,8 @@ class FinancialAssistance::Application
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::FaaApplication
   require 'securerandom'
 
   belongs_to :family, class_name: "::Family"
@@ -107,6 +109,7 @@ class FinancialAssistance::Application
                                 message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                               }
 
+  after_save :notify_on_save
 
   scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
   scope :determined, ->{ any_in(aasm_state: "determined") }
