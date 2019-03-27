@@ -314,7 +314,7 @@ module Notifier
     end
 
     def sub_resource?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole) || resource.is_a?(ConsumerRole))
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole) || resource.is_a?(ConsumerRole) || resource.is_a?(FinancialAssistance::Application))
     end
 
     def envelope

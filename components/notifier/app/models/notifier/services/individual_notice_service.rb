@@ -5,7 +5,7 @@ module Notifier
       def recipients
         {
           "Consumer" => "Notifier::MergeDataModels::ConsumerRole",
-          "FinancialAssistance::Application" => "Notifier::MergeDataModels::FaaApplication"
+          "FaaApplication" => "Notifier::MergeDataModels::FaaApplication"
         }
       end
 

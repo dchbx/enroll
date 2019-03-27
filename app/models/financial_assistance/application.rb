@@ -566,6 +566,10 @@ class FinancialAssistance::Application
     end
   end
 
+  def person
+    primary_applicant.person
+  end
+
 private
 
   def clean_params(model_params)

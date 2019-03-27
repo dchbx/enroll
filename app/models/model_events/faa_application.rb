@@ -8,7 +8,7 @@ module ModelEvents
     def notify_on_save
       return unless aasm_state_changed?
 
-      if aasm_state_was? == "submitted" && aasm_state == "determined"
+      if aasm_state_was == "submitted" && aasm_state == "determined"
         if is_family_totally_ineligibile
           is_ineligibility_notice = true
         else

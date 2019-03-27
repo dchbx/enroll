@@ -13,6 +13,7 @@ module Notifier
       "Employee" => "Notifier::MergeDataModels::EmployeeProfile",
       "Broker" => "Notifier::MergeDataModels::BrokerProfile",
       "Broker Agency" => "Notifier::MergeDataModels::BrokerAgencyProfile",
+      "FaaApplication" => "Notifier::MergeDataModels::FaaApplication",
       "GeneralAgency" => "Notifier::MergeDataModels::GeneralAgency"
     }
 

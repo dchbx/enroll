@@ -22,7 +22,7 @@ module Notifier
       "EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
       "BrokerAgencyProfile" => Resource.new(:broker_agency, :id, :broker_agency_id, :find),
       "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find),
-      "FaaApplication" => Resource.new(:"FinancialAssistance::Application", :id, :hbx_id, :find),
+      "FinancialAssistance::Application" => Resource.new(:"FinancialAssistance::Application", :id, :hbx_id, :find),
       "CensusEmployee" => Resource.new(:census_employee, :id, :census_employee_id, :find),
       "BrokerRole" => Resource.new(:broker, :id, :broker_role_id, :find),
       "EmployeeRole" => Resource.new(:employee, :id, :employee_role_id, :find),
