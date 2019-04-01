@@ -5,6 +5,7 @@ site:
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
+  mailer_logo_file_name: "dchealthlink.jpg"
   home_url: "https://www.dchealthlink.com/"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
@@ -29,6 +30,47 @@ contact_center:
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
+notices:
+
+  individual_market:
+    mail_address:
+      address_1: "PO Box 44018"
+      city: "Washington"
+      zip_code: "20026"
+
+  shop_market:
+    mail_address:
+      address_1: "1225 I Street, NW"
+      address_2: "Suite 400"
+      zip_code: "20005"
+
+  mailing_address:
+    address_1:
+    address_2:
+    city:
+    state: "DC"
+    zip:
+
+  shop:
+    attachments:
+      non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
+      envelope_without_address: "taglines.pdf"
+      employee_appeal_rights: "employee_appeal_rights.pdf"
+    partials:
+      template: "notifier/notice_kinds/template.html.erb"
+      header: "notices/shared/shop_header.html.erb"
+      footer: "notices/shared/shop_footer.html.erb"
+  individual:
+    attachments:
+      blank_page_attachment: "blank.pdf"
+      envelope_without_address: "taglines.pdf"
+      non_discrimination_attachment: "ivl_non_discrimination.pdf"
+      voter_application: "voter_application.pdf"
+    partials:
+      template: "notifier/notice_kinds/ivl_template.html.erb"
+      header: "notices/shared/header_ivl.html.erb"
+      footer: "notices/shared/footer_ivl.html.erb"
+
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
@@ -49,6 +91,10 @@ aca:
     open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
       end_on: <%= Date.new(2019,02,8) %>
+    upcoming_open_enrollment:
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
+
     dc_resident_application: true
     transition_family_members_link: true
 
@@ -71,6 +117,7 @@ aca:
       days: -60
 
     initial_application:
+      advertised_deadline_of_month: 1
       publish_due_day_of_month: 5
       earliest_start_prior_to_effective_on:
         months: -3
@@ -82,6 +129,7 @@ aca:
       quiet_period_end_on: 28
 
     renewal_application:
+      application_submission_soft_deadline: 5
       earliest_start_prior_to_effective_on:
         months: -3
       monthly_open_enrollment_end_on: 13
@@ -117,19 +165,6 @@ aca:
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
-
-notices:
-  individual_market:
-    mail_address:
-      address_1: "PO Box 44018"
-      city: "Washington"
-      zip_code: "20026"
-
-  shop_market:
-    mail_address:
-      address_1: "1225 I Street, NW"
-      address_2: "Suite 400"
-      zip_code: "20005"
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook

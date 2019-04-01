@@ -1,0 +1,94 @@
+<%= link_to "Back".html_safe, notice_kinds_path, class: 'btn btn-primary' %>
+
+<h2><%= notice_kind.persisted? ? 'Edit' : 'Create' %> Notice Template</h2>
+
+<div class="row">
+<%= form_for notice_kind do |f| %>
+  <div class="form-group col-xs-8">
+    <label for="noticeDescription">Select Market</label>
+    <%= f.select(:market_kind, options_for_select(Notifier::NoticeKind::MARKET_KINDS.collect{ |market| [market.to_s.titleize, market] }, selected: notice_kind.market_kind), { :class => 'form-control'}, required: true ) %>
+  </div>
+
+  <div class="form-group col-xs-8">
+    <label for="noticeDescription">MPI Indicator *</label>
+    <%= f.text_field :notice_number, class: 'form-control', required: true %>
+  </div>
+
+  <div class="form-group col-xs-8">
+    <label for="noticeTitle">Title *</label>
+    <%= f.text_field :title, class: 'form-control', required: true %>
+  </div>
+
+  <div class="form-group col-xs-8">
+    <label for="noticeDescription">Description</label>
+    <%= f.text_field :description, class: 'form-control' %>
+  </div>
+
+  <div class="form-group col-xs-8">
+    <label for="noticeEventName">Event Name</label>
+    <%= f.text_field :event_name, class: 'form-control' %>
+    <p class='memo'>Find the event name on the associated ticket</p>
+  </div>
+
+  <div class="form-group col-xs-8">
+    <label for="noticeDescription">Recipient *</label>
+    <%= f.select(:recipient, options_for_select(Notifier::NoticeKind::RECIPIENTS.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.recipient), { :class => 'form-control'}, required: true ) %>
+  </div>
+ 
+  <div class="form-group col-xs-12">
+    <%= f.fields_for :template do |template_form| %>
+    <label for="noticeBody">NoticeBody *</label>
+      <%= template_form.cktext_area :raw_body, value: notice_kind.template.raw_body, class: 'notice_template' %>
+    <% end %>
+  </div>
+
+  <%= hidden_field_tag 'notice_preview_url', preview_notice_kind_path(id: notice_kind.id) %>
+  <div class="form-group col-xs-12">
+    <div class="pull-right">
+    <%= link_to 'Cancel', notice_kinds_path, class: "btn btn-primary" %>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+  </div>
+<% end %>
+</div>
+
+<script>
+
+$(function() {
+
+  function updateCkEditor() {
+    for (instance in CKEDITOR.instances){ 
+      CKEDITOR.instances[instance].destroy(true); 
+    }
+    CKEDITOR.replace('notice_kind_template_raw_body', {});
+  }
+
+  $('#notice_kind_market_kind').change(function() {
+    $.ajax({
+      type:"GET",
+      url:"notice_kinds/get_recipients",
+      dataType:"json",
+      data: {market_kind: $('#notice_kind_market_kind').val()},
+      success:function(result){
+        var select = $('#notice_kind_recipient');
+        select.empty();
+
+        $.each( result.recipients, function( key, value ) {
+          select.append("<option value='" +value+ "'>" +key+ "</option>");
+        });
+
+        updateCkEditor();
+      }
+    })
+  })
+
+  $('#notice_kind_recipient').change(function() {
+    updateCkEditor();
+  })
+})
+
+</script>
+
+<%= stylesheet_link_tag "notifier/application", media: "all" %>
+<%= javascript_include_tag "notifier/application" %>
+

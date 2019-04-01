@@ -4,13 +4,13 @@ class ApplicationEventKind
   # PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
 
   RESOURCE_NAME_KINDS = %w(
-                          family 
+                          family
                           employer
-                          employee_role 
-                          consumer_role 
-                          broker_agency_profile 
-                          broker_role 
-                          issuer_profile 
+                          employee_role
+                          consumer_role
+                          broker_agency_profile
+                          broker_role
+                          issuer_profile
                           general_agent_profile
                         )
 

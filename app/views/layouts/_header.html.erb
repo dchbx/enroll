@@ -43,7 +43,7 @@
                 </span>
                 <span> | </span>
                 <span>
-                  <%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %>
+                  <%= link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text" %>
                 </span>
                 <br/>
                 <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>

@@ -22,7 +22,7 @@ And(/^the HBX admin clicks the Binder Transition tab$/) do
 end
 
 And(/^the HBX admin sees a checklist$/) do |checklist|
-  expect(page.text).to include eligibility_criteria(employer.employer_profile).gsub("<br>", " ")
+  expect(page.text).to include eligibility_criteria(employer).gsub("<br>", " ")
 end
 
 When(/^the HBX admin selects the employer to confirm$/) do
@@ -62,7 +62,7 @@ When(/^the DCHBX confirms binder payment has been received by third\-party proce
 end
 
 When(/^the HBX admin has verified new \(initial\) Employer meets minimum participation requirements \((\d+)\/(\d+) rule\)$/) do |arg1, arg2|
-  expect(page.text).to include(eligibility_criteria(employer.employer_profile).gsub("<br>", " "))
+  expect(page.text).to include(eligibility_criteria(employer).gsub("<br>", " "))
 end
 
 When(/^a sufficient number of 'non\-owner' employee\(s\) have enrolled and\/or waived in Employer\-sponsored benefits$/) do

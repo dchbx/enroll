@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => 'image/vnd.microsoft.icon' %>
+
+  <title>Notifier</title>
+  <%= stylesheet_link_tag    "notifier/application", media: "all" %>
+  <%= javascript_include_tag "notifier/application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+<%= render_flash %>
+<%= yield %>
+
+</body>
+</html>

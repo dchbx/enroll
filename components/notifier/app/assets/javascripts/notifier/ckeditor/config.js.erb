@@ -1,0 +1,51 @@
+function update_placeholders(config) {  
+  $.ajax({
+    type:"GET",
+    url:"notice_kinds/get_placeholders",
+    dataType:"json",
+    async: false,
+    data: {builder: $('#notice_kind_recipient').val(), market_kind: $('#notice_kind_market_kind').val()},
+    success:function(result){
+      config.placeholder_selects = [
+        {
+          key: 'select_system_settings',
+          title: 'Select Application Settings',
+          placeholders: result.setting_placeholders
+        },
+        {
+          key: 'select_conditional_statement',
+          title: 'Select Condition/Loop',
+          placeholders: result.placeholders
+        }
+      ];
+    }});
+
+  return config;
+}
+
+function update_tokens(config) {
+  $.ajax({
+    type:"GET",
+    url:"notice_kinds/get_tokens",
+    dataType:"json",
+    async: false,
+    data: {builder: $('#notice_kind_recipient').val(), market_kind: $('#notice_kind_market_kind').val()},
+    success:function(result){
+      config.availableTokens = result.tokens;
+      update_placeholders(config);
+    }
+  });
+}
+
+CKEDITOR.editorConfig = function( config )
+{
+  update_tokens(config);
+
+  config.removeButtons = "Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,About,Print,Save,NewPage,Preview,Save,Language,Flash,Smiley,Image,Iframe";
+  config.extraPlugins = 'button,lineutils,widgetselection,notification,toolbar,widget,dialogui,dialog,clipboard,token,placeholder,placeholder_select';
+  
+  config.language = 'en';
+
+  config.tokenStart = '#{';
+  config.tokenEnd = '}';
+};

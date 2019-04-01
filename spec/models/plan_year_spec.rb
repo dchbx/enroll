@@ -29,7 +29,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
     allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
-    allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
   context ".new" do
@@ -2361,7 +2360,6 @@ describe PlanYear, "plan year schedule changes" do
     context 'on force publish date' do
 
       before do
-        allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 

@@ -107,6 +107,10 @@ class TimeKeeper
     CensusEmployee.advance_day(self.date_of_record)
   end
 
+  def push_date_change_event
+    ModelEvents::PlanYear.date_change_event(self.date_of_record)
+  end
+
   def self.with_cache
     Thread.current[:time_keeper_local_cached_date] = date_of_record
     yield

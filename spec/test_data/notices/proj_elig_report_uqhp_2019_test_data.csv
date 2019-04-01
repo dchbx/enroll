@@ -1,0 +1,4 @@
+family.id,applid,policy.subscriber.coverage_start_on,policy.aasm_state,policy.plan.coverage_kind,policy.plan.metal_level,policy.plan.plan_name,person_hbx_id,incarcerated,citizen_status,resident,dependent
+5c6594605f326d004f000060,7894416f079343918d1333771c222879,2/7/2019,coverage_selected,Health,Silver,Test Standard Silver,91091f87b17d4f91af5fd1646d8acf66,N,Indian Tribe Member,Yes,No
+5c6594605f326d004f000060,7894416f079343918d1333771c222879,2/7/2019,coverage_selected,Health,Silver,Test Standard Silver,9215574a098d40208599c2d3401ca1b4,N,US,Yes,Yes
+

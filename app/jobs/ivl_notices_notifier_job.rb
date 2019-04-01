@@ -1,7 +1,7 @@
 class IvlNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 
-  def perform(person_id, event, options={})
+  def perform(person_id, event, options = {})
     Resque.logger.level = Logger::DEBUG
     person = Person.find(person_id)
     role = person.consumer_role || person.resident_role
@@ -14,6 +14,5 @@ class IvlNoticesNotifierJob < ActiveJob::Base
               options: options,
               mpi_indicator: notice_trigger.mpi_indicator,
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
-
   end
 end

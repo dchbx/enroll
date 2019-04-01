@@ -36,6 +36,7 @@
             <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
             <%if @hbx_enrollment.effective_on.year == 2019%>
+            <%#TODO uncomment this before merging to master %>
             <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
             <% elsif @hbx_enrollment.effective_on.year == 2018%>
             <%=link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary" %>

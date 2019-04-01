@@ -778,4 +778,26 @@ $(document).on('click', '#address_info + span.form-action', function(){
       var text = $("#person_first_name").val() == '' ? "this person" : $("#person_first_name").val()
       $("#is_applying_coverage_value").text("Does "+ text +" need coverage?");
     });
+
+    $('a.interaction-click-control-download-notices').click(function(e) {
+      e.preventDefault();
+      var selected_notices = new Array();
+      $("input:checkbox[name='bulk_actions_resources[]']:checked").each(function(){
+          selected_notices.push($(this).val());
+      });
+      window.location=$(this).attr('href') + "?ids=" + selected_notices.toString();
+    });
+
+    $('.interaction-choice-control-value-datatable-filter-bulk-actions').click(function(event) {
+        if(this.checked) {
+            // Iterate each checkbox
+            $("input:checkbox[name='bulk_actions_resources[]']").each(function() {
+                this.checked = true;
+            });
+        } else {
+            $("input:checkbox[name='bulk_actions_resources[]']").each(function() {
+                this.checked = false;
+            });
+        }
+    });
   });

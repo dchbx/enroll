@@ -48,7 +48,9 @@
       <td align="center">_____________________________________________________________________________________________________________________</td>
     </tr>
     <tr>
-      <td style="padding:3px 10px; font-size:8px;" align="center">Questions? Call DC Health Link at <%= notice.hbe.phone %>, or go to www.dchealthlink.com.</td>
+      <td style="padding:3px 10px; font-size:8px;" align="center">Questions?
+        Call DC Health Link at <%= notice.is_a?(Notifier::NoticeKind) ? Settings.contact_center.phone_number : notice.hbe.phone%>, or go to www.dchealthlink.com.
+      </td>
     </tr>
   </table>
 </body>

@@ -1,0 +1,36 @@
+set_tab_content("<%= escape_javascript render "notifier/notice_kinds/index"%>")
+
+
+$(document).ready(function () { 
+
+  $('.notice-preview').on('click', function() {
+
+    $.get( $('input[name=notice_preview_url]').val(), function() {
+      alert( "success" );
+    })
+    .done(function() {
+      window.open('/Sample.pdf');
+    });
+ 
+
+   // $.get( 
+   //  "test.cgi", 
+
+   //  { name: "John", time: "2pm" } ),
+   //  .done(function( data ) {
+
+
+   //  $.ajax({
+   //         type: "GET",
+   //         url: $('input[name=notice_preview_url]').val(),
+   //         // data: { template: CKEDITOR.instances['notice_kind_template_raw_body'].getData() },
+   //         // proccessData: false, // this is true by default
+   //         success:function(data) {
+   //           window.open('/Sample.pdf');
+   //         }
+   //       });
+  });
+
+
+
+})

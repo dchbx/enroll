@@ -35,6 +35,25 @@ PATH
       rails (~> 4.2.3)
 
 PATH
+  remote: components/notifier
+  specs:
+    notifier (0.0.1)
+      aasm (~> 4.8.0)
+      acapi
+      ckeditor
+      combine_pdf
+      curl
+      mongoid (~> 5.0.1)
+      non-stupid-digest-assets
+      rails (~> 4.2.3)
+      redcarpet (~> 3.4.0)
+      roo (~> 2.1.0)
+      slim (= 3.0.8)
+      virtus (~> 1.0.5)
+      wicked_pdf (= 1.0.6)
+      wkhtmltopdf-binary-edge (~> 0.12.3.0)
+
+PATH
   remote: project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
@@ -93,6 +112,7 @@ GEM
     animate-rails (1.0.10)
       rails
     arel (6.0.4)
+    awesome_print (1.8.0)
     ast (2.4.0)
     aws-sdk (2.2.4)
       aws-sdk-resources (= 2.2.4)
@@ -169,7 +189,13 @@ GEM
       timers (>= 4.1.1)
     childprocess (0.8.0)
       ffi (~> 1.0, >= 1.0.11)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
+    climate_control (0.2.0)
     cliver (0.3.2)
+    cocaine (0.6.0)
+      terrapin (= 0.6.0)
     coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -204,6 +230,9 @@ GEM
       nokogiri (~> 1.5)
       railties (>= 3, < 5)
     cucumber-wire (0.0.1)
+    curl (0.0.9)
+      awesome_print (>= 0.2.1)
+      unidecoder (>= 1.1.1)
     database_cleaner (1.5.3)
     debug_inspector (0.0.3)
     deep_merge (1.0.1)
@@ -371,6 +400,8 @@ GEM
       mini_portile2 (~> 2.0.0.rc2)
     nokogiri-happymapper (0.6.0)
       nokogiri (~> 1.5)
+    non-stupid-digest-assets (1.0.9)
+      sprockets (>= 2.0)
     origin (2.3.1)
     orm_adapter (0.5.0)
     parallel (1.12.1)
@@ -447,6 +478,7 @@ GEM
     rdoc (4.3.0)
     recaptcha (1.1.0)
       json
+    redcarpet (3.4.0)
     redis (3.3.5)
     redis-actionpack (5.0.2)
       actionpack (>= 4.0, < 6)
@@ -510,8 +542,6 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
-    rubocop-git (0.1.3)
-      rubocop (>= 0.24.1)
     ruby-progressbar (1.10.0)
     ruby-rc4 (0.1.5)
     ruby-saml (1.3.1)
@@ -555,7 +585,7 @@ GEM
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
-    slim (3.0.9)
+    slim (3.0.8)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 1.3.3, < 2.1)
     slim-rails (3.1.3)
@@ -585,6 +615,8 @@ GEM
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
     temple (0.8.0)
+    terrapin (0.6.0)
+      climate_control (>= 0.0.3, < 1.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -606,6 +638,7 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    unidecoder (1.1.2)
     vegas (0.1.11)
       rack (>= 1.0.0)
     virtus (1.0.5)
@@ -652,11 +685,13 @@ DEPENDENCIES
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+  ckeditor
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
   cucumber (= 2.3.3)
   cucumber-rails (= 1.4.3)
+  curl
   database_cleaner (= 1.5.3)
   devise (~> 3.4.1)
   effective_datatables!
@@ -693,6 +728,8 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
+  non-stupid-digest-assets (~> 1.0, >= 1.0.9)
+  notifier!
   openhbx_cv2!
   parallel_tests (= 2.21.3)
   poltergeist
@@ -707,18 +744,19 @@ DEPENDENCIES
   rails (= 4.2.7.1)
   rails-i18n (= 4.0.8)
   recaptcha (= 1.1.0)
+  redcarpet (= 3.4.0)
   redis-rails
   resque
   roo (~> 2.1.0)
   rspec-rails (~> 3.4.2)
   rspec_junit_formatter (= 0.2.3)
   rubocop (= 0.54.0)
-  rubocop-git
   ruby-progressbar (~> 1.7)
   ruby-saml (~> 1.3.0)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
+  slim (= 3.0.8)
   simplecov (= 0.14.1)
   slim-rails
   spring (= 1.6.3)
