@@ -100,7 +100,7 @@
                   - gutter: 2
                     type: label_radio
                     id: 'mailed_yes'
-                    label: "Yes"
+                    label: "Yes *"
                     value: true
                     classNames: 'span-text'
                     model: application
@@ -108,9 +108,9 @@
                     attribute: is_requesting_voter_registration_application_in_mail
                   - gutter: 2
                     type: label_radio
-                    label: "No"
+                    label: "No *"
                     id: 'mailed_no'
-                    classNames: 'span-text' 
+                    classNames: 'span-text'
                     value: false
                     classNames: 'span-text'
                     model: application
