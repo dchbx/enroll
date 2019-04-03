@@ -504,6 +504,13 @@ $(document).ready(function(){
   if($('#eligibility_easier_no').is(':checked')) {
     $('#eligibility_easier_no').parents(".row").next().removeClass('hide');
   }
+
+  $("#mailed_yes, #mailed_no").on('change', function() {
+    if( $('#mailed_yes, #mailed_no').is(':checked')){
+      $('.interaction-click-control-continue').prop('disabled', false)
+     }
+  });
+
   /* Preference Application Form Related */
 
   /* enable or disable submit application button by electronic siganture (first/last name match)*/

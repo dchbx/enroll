@@ -38,7 +38,7 @@
         <% if  @steps.last_step?(@current_step) %>
           <%= hidden_field_tag 'last_step', true %>
         <% end %>
-        <% if @model.class == FinancialAssistance::Applicant && (@model.is_required_to_file_taxes.nil? || @model.is_claimed_as_tax_dependent.nil?) %>
+        <% if (@model.class == FinancialAssistance::Applicant && (@model.is_required_to_file_taxes.nil? || @model.is_claimed_as_tax_dependent.nil?)) || (@model.class == FinancialAssistance::Application && @model.is_requesting_voter_registration_application_in_mail.nil?) %>
           <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" , disabled: (local_assigns[:disabled].nil? ? 'false' : disable) %>
         <% else %>
           <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
