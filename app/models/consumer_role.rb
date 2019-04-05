@@ -598,7 +598,7 @@ class ConsumerRole
 
   #after hook not working in sub level, moved after hook to top level
   def invoke_pending_verification!
-    invoke_verification! if aasm.current_state == (:dhs_pending || :ssa_pending)
+    invoke_verification! if [:dhs_pending, :ssa_pending].include?(aasm.current_state)
   end
 
   def invoke_verification!(*args)

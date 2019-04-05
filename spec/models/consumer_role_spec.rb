@@ -1084,4 +1084,24 @@ end
 #     end
 #   end
 # end
+
+describe 'coverage_purchased!' do
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+  let(:consumer) {person.consumer_role}
+  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
+  let(:start_date) { person.consumer_role.requested_coverage_start_date}
+
+
+  it "should trigger call to ssa hub" do
+    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with("local.enroll.lawful_presence.ssa_verification_request", {:person => person})
+    person.consumer_role.coverage_purchased!
+  end
+
+  it "should trigger call to dhs hub if person is non native and no ssn " do
+    person.update_attributes(ssn: nil)
+    person.consumer_role.lawful_presence_determination.update_attributes(citizen_status: nil)
+    expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with("local.enroll.lawful_presence.vlp_verification_request", {:person => person, :coverage_start_date => start_date})
+    person.consumer_role.coverage_purchased!
+  end
+end
 end
