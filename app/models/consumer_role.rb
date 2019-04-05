@@ -516,15 +516,14 @@ class ConsumerRole
 
     event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: :dhs_pending, to: :verification_outstanding
-      transitions from: :ssa_pending, to: :verification_outstanding
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
     event :pass_dhs, :guard => :is_non_native?, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
-      transitions from: [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_denied?
-      transitions from: [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding], to: :sci_verified, :guard => :residency_pending?
-      transitions from: [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_verified_and_tribe_member_not_verified?
-      transitions from: [:unverified, :ssa_pending,:dhs_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified_and_tribe_member_verified?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_denied?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :sci_verified, :guard => :residency_pending?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_verified_and_tribe_member_not_verified?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified_and_tribe_member_verified?
     end
 
     event :pass_residency, :after => [:mark_residency_authorized, :notify_of_eligibility_change, :record_transition] do
@@ -847,22 +846,6 @@ class ConsumerRole
 
   def verification_types
     person.verification_types.active.where(applied_roles: "consumer_role") if person
-  end
-
-  def mock_dummy_data
-    if person.ssn.present?
-      xml = File.read(Rails.root.join("spec", "test_data", "ssa_verification_payloads", "response.xml"))
-      payload = {:individual_id =>  self.person.hbx_id, :body => xml}
-      lawful_subscriber = ::Subscribers::SsaVerification.new
-      lawful_subscriber.call(nil, nil, nil, nil, payload )
-    elsif is_tribe_member_or_native_no_snn?
-      return
-    else
-      xml = [File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response2.xml")), File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response3.xml")) ].sample
-      payload = {:individual_id =>  self.person.hbx_id, :body => xml}
-      lawful_subscriber = ::Subscribers::LawfulPresence.new
-      lawful_subscriber.call(nil, nil, nil, nil, payload )
-    end
   end
 
   private
