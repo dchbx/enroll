@@ -51,7 +51,9 @@
               <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-default" %>
             </span>
             <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe, employers_employer_profile_export_census_employees_path(@employer_profile, format: :csv), class: "btn btn-default" %>
-
+              <% if current_user.has_hbx_staff_role? %>
+                <%= render partial: 'shared/employee_roster_terminate_employee_roster_enrollments', locals: { employer_profile: @employer_profile }%>
+              <% end %>
           </div>
         </div>
 

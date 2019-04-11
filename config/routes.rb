@@ -284,6 +284,7 @@ Rails.application.routes.draw do
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+      post 'terminate_employee_roster_enrollments'
       member do
         get "download_invoice"
         post 'generate_checkbook_urls'

@@ -302,6 +302,30 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
+  def terminate_employee_roster_enrollments
+    employer_profile = EmployerProfile.find(params["employer_profile_id"])
+    termination_date = params["termination_date"].to_date
+    # Todo, need to update the plan_year.rb#terminate_employee_enrollments method
+    # to accomdate this arguement
+    # termination_reason = params["termination_reason"]
+    transmit_xml = params["transmit_xml"]
+
+    if employer_profile.renewing_plan_year.present?
+      renewal_py = employer_profile.renewing_plan_year
+      renewal_py.cancel_employee_enrollments(transmit_xml)
+    end
+
+    if employer_profile.active_plan_year.present?
+      active_py = employer_profile.active_plan_year
+      active_py.terminate_employee_enrollments(termination_date, options = {transmit_xml: transmit_xml})
+    end
+
+    return_path = "/employers/employer_profiles/#{employer_profile.id}?tab=employees"
+    redirect_to return_path
+    message = "Successfully terminated Census Employees for this employer."
+    flash[:notice] = message
+  end
+
   private
 
   def updateable?
