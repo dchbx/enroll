@@ -798,4 +798,16 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
+  describe "POST terminate_employee_roster_enrollments" do
+    let(:renewing_plan_year) { FactoryGirl.create(:renewing_plan_year) }
+    let(:employer_profile) { renewing_plan_year.employer_profile }
+  
+    it "should terminate employees for a renewing plan year" do
+      # create plan years for employer profile
+      # Expect plan years to not be terminated
+      post :terminate_employee_roster_enrollments, :employer_profile
+      # expect plan year to be terminated
+    end
+  end
+
 end
