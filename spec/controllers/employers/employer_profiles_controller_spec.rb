@@ -799,15 +799,54 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
   describe "POST terminate_employee_roster_enrollments" do
-    let(:renewing_plan_year) { FactoryGirl.create(:renewing_plan_year) }
-    let(:employer_profile) { renewing_plan_year.employer_profile }
-  
-    it "should terminate employees for a renewing plan year" do
-      # create plan years for employer profile
-      # Expect plan years to not be terminated
-      post :terminate_employee_roster_enrollments, :employer_profile
-      # expect plan year to be terminated
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active')}
+    let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+    let!(:census_employees) do
+      FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+      employee = FactoryGirl.create(:census_employee,
+                                  employer_profile: employer_profile)
+      employee.add_benefit_group_assignment(benefit_group, benefit_group.start_on)
+    end
+    let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+    let!(:ce) { employer_profile.census_employees.non_business_owner.first }
+    let!(:family) do
+      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryGirl.create(:employee_role,
+                                       person: person,
+                                       census_employee: ce,
+                                       employer_profile: employer_profile)
+      ce.update_attributes({employee_role: employee_role})
+      Family.find_or_build_from_employee_role(employee_role)
+    end
+    let!(:person) { family.primary_applicant.person }
+    let!(:hbx_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: benefit_group.start_on,
+                       enrollment_kind: "open_enrollment",
+                       kind: "employer_sponsored",
+                       benefit_group_id: benefit_group.id,
+                       employee_role_id: person.active_employee_roles.first.id,
+                       benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                       plan_id: plan.id)
+    end
+    let(:user) { FactoryGirl.create(:user) }
+    let(:first_enrollment) { employer_profile.active_plan_year.enrollments_for_plan_year.first }
+
+    it "should terminate employees for a active plan year" do
+      sign_in(user)
+      expect(employer_profile.active_plan_year.present?).to eq(true)
+      expect(first_enrollment.terminated_on).to eq(nil)
+      post(
+        :terminate_employee_roster_enrollments,
+        employer_profile_id: employer_profile.id,
+        termination_date: "1/1/2020",
+        transmit_xml: true
+      )
+      first_enrollment.reload
+      expect(first_enrollment.terminated_on.present?).to eq(true)
+      expect(first_enrollment.terminated_on.class).to eq(Date)
     end
   end
-
 end

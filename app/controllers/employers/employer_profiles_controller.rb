@@ -306,7 +306,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     employer_profile = EmployerProfile.find(params["employer_profile_id"])
     termination_date = params["termination_date"].to_date
     # Todo, need to update the plan_year.rb#terminate_employee_enrollments method
-    # to accomdate this arguement
+    # to accomodate this arguement
     # termination_reason = params["termination_reason"]
     transmit_xml = params["transmit_xml"]
 
@@ -317,6 +317,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
     if employer_profile.active_plan_year.present?
       active_py = employer_profile.active_plan_year
+      # Todo: This method needs to be updated to ensure it takes transmit xml options
       active_py.terminate_employee_enrollments(termination_date, options = {transmit_xml: transmit_xml})
     end
 
