@@ -80,10 +80,11 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
         rescue Exception => e
           failed = failed + 1
           print 'F' unless Rails.env.test?
-          logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
-          validation_errors:
-          profile - #{new_profile.errors.messages},
-          #{e.inspect}" unless Rails.env.test?
+          # TODO
+          # logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
+          # validation_errors:
+          # profile - #{new_profile.errors.messages},
+          # #{e.inspect}" unless Rails.env.test?
         end
       end
 
