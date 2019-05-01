@@ -29,7 +29,7 @@ Then(/^the user will navigate to the FAA Household Info page for the correspondi
 end
 
 When(/^the user clicks Income & Coverage section on the left navigation$/) do
-	click_link 'Income and Coverage Info'
+	expect(page).not_to have_link("Income and Coverage Info")
 end
 
 Then(/^the cursor will display disabled\.$/) do
