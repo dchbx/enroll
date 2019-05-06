@@ -142,7 +142,7 @@ module FinancialAssistanceHelper
 
   def show_faa_status
     return true if (controller_name == 'applications' and action_name == 'edit') or controller_name == 'family_relationships'
-    return true if ( controller_name == 'family_members' and (action_name == 'create' or action_name == 'destroy')) # On AJAX renders for create / destory
+    return true if ( controller_name == 'family_members' and ['create', 'update', 'destroy'].include?(action_name)) # On AJAX renders for create / destory
     return false
   end
 

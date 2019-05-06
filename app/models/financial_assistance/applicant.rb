@@ -405,7 +405,8 @@ class FinancialAssistance::Applicant
       self.incomes.all? { |income| income.valid? :submission } &&
       self.benefits.all? { |benefit| benefit.valid? :submission } &&
       self.deductions.all? { |deduction| deduction.valid? :submission } &&
-      self.other_questions_complete?
+      self.other_questions_complete? &&
+      self.tax_info_complete?
   end
 
   def clean_conditional_params(model_params)
@@ -417,16 +418,15 @@ class FinancialAssistance::Applicant
   end
 
   def other_questions_complete?
-    if (age_of_the_applicant > 18 && age_of_the_applicant < 26)
-      !has_daily_living_help.nil? && !need_help_paying_bills.nil? && !is_former_foster_care.nil?
-    else
-      !has_daily_living_help.nil? && !need_help_paying_bills.nil?
-    end
+    return false if age_of_applicant.between?(18,19) && is_student.nil?
+    return false if age_of_applicant.between?(18,26) && is_former_foster_care.nil?
+    return false if person.no_ssn == "1" && is_ssn_applied.nil?
+    !has_daily_living_help.nil? && !need_help_paying_bills.nil?
   end
 
   def tax_info_complete?
-    !is_required_to_file_taxes.nil? &&
-      !is_claimed_as_tax_dependent.nil?
+    return false if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
+    !is_required_to_file_taxes.nil? && !is_claimed_as_tax_dependent.nil?
   end
 
   def incomes_complete?

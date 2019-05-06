@@ -23,11 +23,11 @@
               <span class="fa-text-color">Has this person applied for an SSN *</span>
             </div>
             <div class='col-md-2'>
-              <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes") %>
+              <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes", required: true) %>
               <label class="radio-yml" for="is_ssn_applied_yes">Yes</label>
             </div>
             <div class='col-md-2'>
-              <%= f.radio_button("is_ssn_applied", false, class: "radio-yml", id: "is_ssn_applied_no") %>
+              <%= f.radio_button("is_ssn_applied", false, class: "radio-yml", id: "is_ssn_applied_no", required: true) %>
               <label class="radio-yml" for="is_ssn_applied_no">No</label>
             </div>
           </div>
