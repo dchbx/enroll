@@ -65,12 +65,12 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
             @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
 
             raise Exception unless @benefit_sponsorship.valid?
-            BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save)
+            BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save, raise: false)
             @benefit_sponsorship.save!
 
             raise Exception unless new_organization.valid?
-            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
-            BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event)
+            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
+            BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
             new_organization.save!
 
             #employer staff roles migration
