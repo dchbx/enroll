@@ -115,7 +115,7 @@ notices:
       footer: "notices/shared/shop_footer.html.erb"
 
 invoices:
-  addendum: ""
+  addendum: "shop_non_discrimination_attachment.pdf"
 
 aca:
   state_name: "District of Columbia"
