@@ -75,7 +75,9 @@ class MigrateDcProducts < Mongoid::Migration
               is_reference_plan_eligible: true,
               premium_ages: (plan.minimum_age..plan.maximum_age),
               premium_tables: premium_tables,
-              issuer_assigned_id: plan.carrier_special_plan_identifier
+              issuer_assigned_id: plan.carrier_special_plan_identifier,
+              nationwide: plan.nationwide,
+              dc_in_network: plan.dc_in_network
             }
             # TODO Fix product_package_kinds for IVL products
 
@@ -101,6 +103,9 @@ class MigrateDcProducts < Mongoid::Migration
               dp = BenefitMarkets::Products::DentalProducts::DentalProduct.new({
                 dental_plan_kind: plan.try(:plan_type).try(:downcase),  # TODO 2014 plan issues, fix plan_type
                 metal_level_kind: :dental,
+                ehb: plan.ehb,
+                is_standard_plan: plan.is_standard_plan,
+                hsa_eligibility: plan.hsa_eligibility,
                 dental_level: plan.dental_level,
                 product_package_kinds: [:multi_product, :single_issuer]
               }.merge(shared_attributes))
