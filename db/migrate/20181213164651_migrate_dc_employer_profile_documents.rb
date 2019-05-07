@@ -71,8 +71,8 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
          build_inbox_messages(old_profile, new_profile)
 
          raise Exception unless new_profile.valid?
-         BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
-         BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event)
+         BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
+         BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
          new_profile.save
 
          print '.' unless Rails.env.test?
