@@ -2,10 +2,10 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
 
-      logger = Logger.new("#{Rails.root}/log/employer_profiles_documents_migration_data.log") unless Rails.env.test?
-      logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
+      @logger = Logger.new("#{Rails.root}/log/employer_profiles_documents_migration_data.log") unless Rails.env.test?
+      @logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
-      status = create_profile_document(logger)
+      status = create_profile_document
       if status
         puts "" unless Rails.env.test?
         puts "Check employer_profiles_documents_migration_data logs for additional information." unless Rails.env.test?
@@ -13,7 +13,7 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
         puts "" unless Rails.env.test?
         puts "Script execution failed" unless Rails.env.test?
       end
-      logger.info "End of the script" unless Rails.env.test?
+      @logger.info "End of the script" unless Rails.env.test?
     else
       say "Skipping for non-CCA site"
     end
@@ -25,7 +25,7 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
 
   private
 
-  def self.create_profile_document(logger)
+  def self.create_profile_document
 
     say_with_time("Time taken to migrate documents employer profile and organization") do
       Organization.collection.aggregate([ {"$match" => {"employer_profile" => { "$exists" => true }}},
@@ -80,17 +80,16 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
         rescue Exception => e
           failed = failed + 1
           print 'F' unless Rails.env.test?
-          # TODO
-          # logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
-          # validation_errors:
-          # profile - #{new_profile.errors.messages},
-          # #{e.inspect}" unless Rails.env.test?
+          @logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
+           validation_errors:
+           profile - #{new_profile.errors.messages},
+           #{e.inspect}" unless Rails.env.test?
         end
       end
 
-      logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
-      logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
-      logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?
+      @logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
+      @logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
+      @logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?
       return true
     end
 

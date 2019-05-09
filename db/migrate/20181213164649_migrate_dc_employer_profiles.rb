@@ -1,10 +1,10 @@
 class MigrateDcEmployerProfiles < Mongoid::Migration
   def self.up
-    # TODO do we need to set rating and service area on benefit_sponsorship
-    # TODO check registerd on date feild
-    # TODO check congress Organization & employer profiles
-    # TODO foreign_embassy_or_consulate entity kind organization
-    # TODO do we need to set fein for exempt organization
+    # TODO do we need to set rating and service area on benefit_sponsorship --> rating & service area not needed on benefit sponsorship
+    # TODO check registerd on date feild  --> benefit sponsorship
+    # TODO check congress Organization & employer profiles --> ??
+    # TODO foreign_embassy_or_consulate entity kind organization-??
+    # TODO do we need to set fein for exempt organization  --> adding fein
 
     if Settings.site.key.to_s == "dc"
       site_key = "dc"
@@ -28,6 +28,11 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.down
+    if Settings.site.key.to_s == "dc"
+      BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
+    else
+      say("Skipping migration for non-DC site")
+    end
   end
 
   private
@@ -54,14 +59,16 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.employer_profile
 
-            # TODO check enable_ssn_date & disable_ssn_date, workflow_state_transitions
-            json_data = @old_profile.to_json(:except => [:no_ssn, :sic_code, :enable_ssn_date, :disable_ssn_date, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            # TODO Adding enable_ssn_date & disable_ssn_date
+            # TODO check except _id
+            json_data = @old_profile.to_json(:except => [:sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
             new_organization = initialize_new_organization(old_org, site)
 
-            @benefit_sponsorship = new_organization.benefit_sponsorships.build(profile: @new_profile, benefit_market: benefit_market)
+            market = is_congress?(old_org) ? site.benefit_market_for(:fehb): benefit_market
+            @benefit_sponsorship = new_organization.benefit_sponsorships.build(profile: @new_profile, benefit_market: market)
             @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
 
             raise Exception unless @benefit_sponsorship.valid?

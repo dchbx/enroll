@@ -11,6 +11,7 @@ class MigrateDcServiceAreas < Mongoid::Migration
                                                                    active_year: year,
                                                                    issuer_provided_code: "DCS001",
                                                                    covered_states: ["DC"],
+                                                                   county_zip_ids: [],
                                                                    issuer_profile_id: issuer_profile.id,
                                                                    issuer_provided_title: issuer_profile.legal_name
                                                                })
