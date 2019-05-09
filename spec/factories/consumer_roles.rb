@@ -19,7 +19,7 @@ FactoryBot.define do
     last_name { Forgery(:name).first_name }
     gender { Forgery(:personal).gender }
     sequence(:ssn, 222222222)
-    dob Date.new(1980, 1, 1)
+    dob { Date.new(1980, 1, 1) }
   end
 
 

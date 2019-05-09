@@ -14,8 +14,8 @@ FactoryBot.define do
       dental_product_package_kinds { [:single_product] }
       number_of_products { 5 }
       product_kinds { [:health, :dental] }
-      service_area nil
-      issuer_profile nil
+      service_area { nil }
+      issuer_profile { nil }
     end
 
     association :benefit_market, factory: :benefit_markets_benefit_market

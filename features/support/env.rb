@@ -6,6 +6,7 @@
 
 ENV["RAILS_ENV"] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
+require 'webdrivers'
 require 'selenium-webdriver'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
@@ -72,6 +73,7 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 Capybara::Screenshot.prune_strategy = :keep_last_run
+Webdrivers::Chromedriver.required_version = '2.46'
 
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new

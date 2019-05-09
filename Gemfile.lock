@@ -10,7 +10,7 @@ GIT
 
 GIT
   remote: https://github.com/dchbx/openhbx_cv2.git
-  revision: 630e2b4e201ea331c0104694c8e1434d7e1c4bc8
+  revision: b2b71b74190f75c23098634fe609dbd6a14050e7
   branch: master
   specs:
     openhbx_cv2 (0.0.1)
@@ -34,6 +34,23 @@ GIT
       pdf-reader (~> 1.2)
       ruby-rc4
       ttfunk (~> 1.0.3)
+
+PATH
+  remote: project_gems/effective_datatables-2.6.14
+  specs:
+    effective_datatables (2.6.14)
+      coffee-rails
+      haml-rails
+      kaminari
+      rails (>= 3.2.0)
+      sass-rails
+      simple_form
+
+PATH
+  remote: project_gems/mongoid_userstamp-0.4.0
+  specs:
+    mongoid_userstamp (0.4.0)
+      mongoid (>= 3.0.4)
 
 PATH
   remote: components/benefit_markets
@@ -129,28 +146,12 @@ PATH
       symmetric-encryption (~> 3.9.1)
       transport_gateway
 
-PATH
-  remote: project_gems/effective_datatables-2.6.14
-  specs:
-    effective_datatables (2.6.14)
-      coffee-rails
-      haml-rails
-      kaminari
-      rails (>= 3.2.0)
-      sass-rails
-      simple_form
-
-PATH
-  remote: project_gems/mongoid_userstamp-0.4.0
-  specs:
-    mongoid_userstamp (0.4.0)
-      mongoid (>= 3.0.4)
-
 GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.0.3)
-    aasm (4.8.0)
+    aasm (4.12.3)
+      concurrent-ruby (~> 1.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
     actioncable (5.2.3)
@@ -220,10 +221,10 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    backports (3.12.0)
+    backports (3.14.0)
     bcrypt (3.1.12)
-    bindex (0.5.0)
-    bootsnap (1.4.2)
+    bindex (0.7.0)
+    bootsnap (1.4.4)
       msgpack (~> 1.0)
     bson (4.4.2)
     builder (3.2.3)
@@ -239,7 +240,7 @@ GEM
     capistrano-rails (1.4.0)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    capybara (3.15.0)
+    capybara (3.19.0)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -324,12 +325,12 @@ GEM
       cucumber-tag_expressions (~> 1.1.0)
       gherkin (~> 5.0)
     cucumber-expressions (6.0.1)
-    cucumber-rails (1.6.0)
-      capybara (>= 1.1.2, < 4)
+    cucumber-rails (1.7.0)
+      capybara (>= 2.3.0, < 4)
       cucumber (>= 3.0.2, < 4)
       mime-types (>= 1.17, < 4)
       nokogiri (~> 1.8)
-      railties (>= 4, < 6)
+      railties (>= 4.2, < 7)
     cucumber-tag_expressions (1.1.1)
     cucumber-wire (0.0.1)
     curl (0.0.9)
@@ -357,8 +358,8 @@ GEM
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.2.2)
     dry-inflector (0.1.2)
-    dry-logic (0.5.0)
-      dry-container (~> 0.2, >= 0.2.6)
+    dry-logic (0.6.1)
+      concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
     dry-types (0.14.1)
@@ -411,7 +412,7 @@ GEM
       haml (>= 4.0.6, < 6.0)
       html2haml (>= 1.0.1)
       railties (>= 4.0.1)
-    hashdiff (0.3.8)
+    hashdiff (0.3.9)
     hashery (2.1.2)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
@@ -419,7 +420,7 @@ GEM
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
-    httparty (0.16.4)
+    httparty (0.17.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.6.0)
@@ -445,6 +446,10 @@ GEM
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
+    kaminari-core (1.1.1)
+    kaminari-mongoid (1.0.1)
+      kaminari-core (~> 1.0)
+      mongoid
     kgio (2.11.2)
     language_list (1.2.1)
     launchy (2.4.3)
@@ -464,23 +469,23 @@ GEM
     method_source (0.9.2)
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2018.0812)
+    mime-types-data (3.2019.0331)
     mimemagic (0.3.3)
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
     monetize (1.9.1)
       money (~> 6.12)
-    money (6.13.2)
+    money (6.13.3)
       i18n (>= 0.6.4, <= 2)
-    money-rails (1.13.1)
+    money-rails (1.13.2)
       activesupport (>= 3.0)
       monetize (~> 1.9.0)
-      money (~> 6.13.0)
+      money (~> 6.13.2)
       railties (>= 3.0)
     mongo (2.8.0)
       bson (>= 4.4.2, < 5.0.0)
-    mongo_session_store (3.1.0)
+    mongo_session_store (3.2.0)
       actionpack (>= 4.0)
       mongo (~> 2.0)
     mongoid (7.0.2)
@@ -511,7 +516,7 @@ GEM
       rails (>= 4.2.0)
       railties (>= 4.2.0)
     mono_logger (1.1.0)
-    msgpack (1.2.9)
+    msgpack (1.2.10)
     multi_json (1.13.1)
     multi_test (0.1.2)
     multi_xml (0.6.0)
@@ -523,20 +528,20 @@ GEM
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
     nio4r (2.3.1)
-    nokogiri (1.10.2)
+    nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
     orm_adapter (0.5.0)
-    overcommit (0.47.0)
+    overcommit (0.48.0)
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
-    parallel (1.16.1)
+    parallel (1.17.0)
     parallel_tests (2.26.2)
       parallel
-    parser (2.6.2.0)
+    parser (2.6.3.0)
       ast (~> 2.4.0)
     pdf-reader (1.4.1)
       Ascii85 (~> 1.0.0)
@@ -548,12 +553,11 @@ GEM
       capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
-    psych (3.1.0)
     public_suffix (3.0.3)
     puma (3.12.1)
     pundit (2.0.1)
       activesupport (>= 3.0.0)
-    rack (2.0.6)
+    rack (2.0.7)
     rack-protection (2.0.5)
       rack
     rack-proxy (0.6.5)
@@ -596,7 +600,7 @@ GEM
     rb-inotify (0.10.0)
       ffi (~> 1.0)
     rdoc (6.1.1)
-    recaptcha (4.13.2)
+    recaptcha (4.14.0)
       json
     recurring_select (2.1.0)
       coffee-rails (>= 3.1)
@@ -605,7 +609,7 @@ GEM
       rails (>= 3.2)
       sass-rails (>= 4.0)
     redcarpet (3.4.0)
-    redis (4.1.0)
+    redis (4.1.1)
     redis-actionpack (5.0.2)
       actionpack (>= 4.0, < 6)
       redis-rack (>= 1, < 3)
@@ -624,7 +628,7 @@ GEM
       redis-store (>= 1.2, < 2)
     redis-store (1.6.0)
       redis (>= 2.2, < 5)
-    regexp_parser (1.3.0)
+    regexp_parser (1.4.0)
     responders (2.4.1)
       actionpack (>= 4.2.0, < 6.0)
       railties (>= 4.2.0, < 6.0)
@@ -634,16 +638,16 @@ GEM
       redis-namespace (~> 1.6)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    roo (2.1.1)
+    roo (2.8.2)
       nokogiri (~> 1)
-      rubyzip (~> 1.1, < 2.0.0)
+      rubyzip (>= 1.2.1, < 2.0.0)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
       rspec-mocks (~> 3.8.0)
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
-    rspec-expectations (3.8.2)
+    rspec-expectations (3.8.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.8.0)
     rspec-instafail (1.0.0)
@@ -662,11 +666,10 @@ GEM
     rspec-support (3.8.0)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (0.66.0)
+    rubocop (0.68.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)
-      psych (>= 3.1.0)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.6)
@@ -676,14 +679,14 @@ GEM
       rubocop (>= 0.60.0)
     ruby-progressbar (1.10.0)
     ruby-rc4 (0.1.5)
-    ruby-saml (1.10.0)
-      nokogiri (>= 1.8.2)
+    ruby-saml (1.10.2)
+      nokogiri (>= 1.5.10)
     ruby_dep (1.5.0)
     ruby_parser (3.13.1)
       sexp_processor (~> 4.9)
     rubyzip (1.2.2)
     safe_yaml (1.0.5)
-    sass (3.7.3)
+    sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -699,8 +702,8 @@ GEM
       sass (>= 3.3.0)
     sdoc (1.0.0)
       rdoc (>= 5.0)
-    selenium-webdriver (3.141.0)
-      childprocess (~> 0.5)
+    selenium-webdriver (3.142.1)
+      childprocess (>= 0.5, < 2.0)
       rubyzip (~> 1.2, >= 1.2.2)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)
@@ -790,7 +793,7 @@ GEM
       activemodel (>= 5.0)
       bindex (>= 0.4.0)
       railties (>= 5.0)
-    webdrivers (3.8.0)
+    webdrivers (3.9.0)
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
@@ -809,7 +812,7 @@ GEM
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    yard (0.9.18)
+    yard (0.9.19)
     yard-mongoid (0.1.0)
       yard (>= 0.8.4)
 
@@ -858,6 +861,7 @@ DEPENDENCIES
   jbuilder (~> 2.7)
   jquery-rails (~> 4.3)
   kaminari (~> 0.17)
+  kaminari-mongoid (~> 1.0)
   language_list (~> 1)
   listen (>= 3.0.5, < 3.2)
   mail (~> 2.7)
@@ -923,7 +927,7 @@ DEPENDENCIES
   warden (~> 1.2.7)
   watir (~> 6.10.3)
   web-console (>= 3)
-  webdrivers (= 3.8.0)
+  webdrivers (~> 3.0)
   webmock (~> 3.0.1)
   webpacker (~> 4.0.2)
   wicked_pdf (~> 1.1.0)

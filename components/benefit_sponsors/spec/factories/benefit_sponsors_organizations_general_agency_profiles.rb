@@ -1,13 +1,13 @@
 FactoryBot.define do
   factory :benefit_sponsors_organizations_general_agency_profile, class: '::BenefitSponsors::Organizations::GeneralAgencyProfile' do
-    entity_kind "s_corporation"
-    market_kind "shop"
+    entity_kind { "s_corporation" }
+    market_kind { "shop" }
     organization
 
     transient do
-      legal_name nil
-      office_locations_count 1
-      assigned_site nil
+      legal_name { nil }
+      office_locations_count { 1 }
+      assigned_site { nil }
     end
 
     after(:build) do |profile, evaluator|

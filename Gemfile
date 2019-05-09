@@ -74,6 +74,7 @@ gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.3'
 gem 'kaminari',                 '~> 0.17'
+gem 'kaminari-mongoid',         '~> 1.0'
 gem 'language_list',            '~> 1'
 gem 'mail',                     '~> 2.7'
 gem 'maskedinput-rails',        '~> 1.4'
@@ -157,7 +158,7 @@ group :test do
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers',                   '3.8.0'
+  gem 'webdrivers',                   '~> 3.0'
   gem 'webmock',                      '~> 3.0.1'
 end
 

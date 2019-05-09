@@ -83,10 +83,9 @@ And(/^an uploaded application in VERIFIED status is present$/) do
 	login_as hbx_admin
 	visit exchanges_hbx_profiles_root_path
 	find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
+  find('.interaction-click-control-identity-verification').click
   wait_for_ajax(10,2)
-	family_member = find('a', :text => /First/)
-	family_member.trigger("click")
+  find('a', :text => /First*/i).click
 	expect(page).to have_content('Application')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
@@ -125,7 +124,7 @@ When(/^the Admin clicks “Continue” on the doc upload page$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
   find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
-  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
+  find('.interaction-click-control-identity-verification').click
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
   family_member.trigger("click")

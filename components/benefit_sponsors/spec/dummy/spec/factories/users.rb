@@ -23,6 +23,6 @@ FactoryBot.define do
   end
 
   trait "general" do
-    roles ["general"]
+    roles { ["general"] }
   end
 end
