@@ -36,6 +36,10 @@ class EmployerProfile
 
   field :entity_kind, type: String
   field :sic_code, type: String
+  # Adding DC field for data migartion
+  field :no_ssn, type: Boolean, default: false
+  field :enable_ssn_date, type: DateTime
+  field :disable_ssn_date, type: DateTime
 
 #  field :converted_from_carrier_at, type: DateTime, default: nil
 #  field :conversion_carrier_id, type: BSON::ObjectId, default: nil

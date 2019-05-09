@@ -1,10 +1,13 @@
 module BenefitSponsors
   module Organizations
     class FehbEmployerProfile < BenefitSponsors::Organizations::Profile
-    include Mongoid::Document
+      include Mongoid::Document
 
+      field :no_ssn, type: Boolean, default: false
+      field :enable_ssn_date, type: DateTime
+      field :disable_ssn_date, type: DateTime
 
-      private 
+      private
 
       def initialize_profile
         return unless is_benefit_sponsorship_eligible.blank?

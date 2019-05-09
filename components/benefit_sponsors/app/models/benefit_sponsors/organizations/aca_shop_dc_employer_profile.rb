@@ -4,6 +4,10 @@ module BenefitSponsors
       # include BenefitSponsors::Employers::EmployerHelper
       include BenefitSponsors::Concerns::EmployerProfileConcern
 
+      field :no_ssn, type: Boolean, default: false
+      field :enable_ssn_date, type: DateTime
+      field :disable_ssn_date, type: DateTime
+
       def rating_area
         # FIX this
       end
