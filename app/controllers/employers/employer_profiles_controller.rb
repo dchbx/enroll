@@ -310,6 +310,18 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(employer_profile) + "?tab=employees"
   end
 
+  def terminate_employee_roster_enrollments
+    employer_profile = EmployerProfile.find(params["employer_profile_id"])
+    if employer_profile.active_plan_year.present?
+      employer_profile.terminate_roster_enrollments(terminate_employee_roster_enrollments_params)
+      flash[:notice] = "Successfully terminated employee enrollments."
+    else
+      flash[:error] = "No Active Plan Year present, unable to terminate employee enrollments."
+    end
+
+    redirect_to employers_employer_profile_path(employer_profile) + "?tab=employees"
+  end
+
   private
 
   def modify_admin_tabs?
