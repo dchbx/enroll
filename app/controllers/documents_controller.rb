@@ -26,6 +26,10 @@ class DocumentsController < ApplicationController
       #this is a fix for new model inbox-messages notice download
       if model == "AcaShopCcaEmployerProfile"
         model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
+      elsif model == "AcaShopDcEmployerProfile"
+        model = "BenefitSponsors::Organizations::AcaShopDcEmployerProfile"
+      elsif model == "FehbEmployerProfile"
+        model = "BenefitSponsors::Organizations::FehbEmployerProfile"
       elsif model == "BenefitSponsorsBrokerAgencyProfile"
         model = "BenefitSponsors::Organizations::BrokerAgencyProfile"
       end
