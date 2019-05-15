@@ -2,6 +2,7 @@ module BenefitSponsors
   module Organizations
     class FehbEmployerProfile < BenefitSponsors::Organizations::Profile
       include Mongoid::Document
+      include BenefitSponsors::Concerns::EmployerProfileConcern
 
       field :no_ssn, type: Boolean, default: false
       field :enable_ssn_date, type: DateTime
