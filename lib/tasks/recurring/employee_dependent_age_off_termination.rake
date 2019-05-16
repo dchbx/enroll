@@ -46,7 +46,7 @@ namespace :recurring do
           next if aged_off_dependents.empty?
           dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
           event_name ="employee_notice_dependent_age_off_termination_non_congressional"
-          observer = Observers::NoticeObserver.new
+          observer = BenefitSponsors::Observers::NoticeObserver.new
           observer.deliver(recipient: employee_role, event_object: employee_role.census_employee, notice_event: event_name,  notice_params: {dep_hbx_ids: dep_hbx_ids})
           puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}" unless Rails.env.test?
         end

@@ -125,7 +125,9 @@ notices:
       employee_appeal_rights: "ma_employee_appeal_rights.pdf"
     partials:
       template: "notifier/notice_kinds/template.html.erb"
-      header: "notifier/notice_kinds/header_with_page_numbers.html.erb"
+      header: "notices/shared/shop_header.html.erb"
+      footer: "notices/shared/shop_footer.html.erb"
+      layout: "notifier/pdf_layout.html.erb"
 
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
@@ -207,8 +209,8 @@ aca:
       days: -60
 
     initial_application:
-      publish_due_day_of_month: 15
-      advertised_deadline_of_month: 10
+      publish_due_day_of_month: 5
+      advertised_deadline_of_month: 1
       earliest_start_prior_to_effective_on:
         months: -2
         day_of_month: 0
@@ -225,10 +227,10 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -2
         day_of_month: 21
-      monthly_open_enrollment_end_on: 20
-      publish_due_day_of_month: 15
-      application_submission_soft_deadline: 10
-      force_publish_day_of_month: 16
+      monthly_open_enrollment_end_on: 13
+      publish_due_day_of_month: 10
+      application_submission_soft_deadline: 5
+      force_publish_day_of_month: 11
       open_enrollment:
         minimum_length:
           days: 5
@@ -244,7 +246,7 @@ aca:
 
     open_enrollment:
       monthly_start_on: 1
-      monthly_end_on: 20
+      monthly_end_on: 10
 
       minimum_length:
         days: 5

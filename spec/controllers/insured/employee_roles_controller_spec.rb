@@ -128,7 +128,6 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
     let(:family) { double("Family") }
     let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
-    let!(:notice_trigger_params) { {recipient: employee_role, event_object: census_employee, notice_event: "employee_matches_employer_rooster", :notice_params=>{}} }
 
     before :each do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
@@ -180,11 +179,6 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
         allow(person).to receive(:addresses).and_return([])
         expect(person.addresses.empty?).to eq true
       end
-    end
-
-    it "should trigger notice" do
-      expect_any_instance_of(BenefitSponsors::Services::NoticeService).to receive(:deliver).with(notice_trigger_params).and_return(true)
-      get :edit, params: {id: employee_role.id}
     end
   end
 

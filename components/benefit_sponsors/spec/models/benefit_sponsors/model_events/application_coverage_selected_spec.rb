@@ -53,7 +53,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_notice_to_employer"
+          expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_non_congressional_notice"
           expect(payload[:employer_id]).to eq model_instance.employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s

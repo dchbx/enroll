@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Lint/UselessAssignment
 module BenefitSponsors
   module ModelEvents
     module Document
@@ -5,7 +8,7 @@ module BenefitSponsors
       REGISTERED_EVENTS = [
         :initial_employer_invoice_available,
         :employer_invoice_available
-      ]
+      ].freeze
 
       def notify_on_create
         if subject == 'initial_invoice' && identifier.present?
@@ -17,11 +20,13 @@ module BenefitSponsors
         end
 
         REGISTERED_EVENTS.each do |event|
-          if event_fired = instance_eval("is_" + event.to_s)
-            # event_name = ("on_" + event.to_s).to_sym
-            event_options = {} # instance_eval(event.to_s + "_options") || {}
-            notify_observers(ModelEvent.new(event, self, event_options))
-          end
+          next unless (event_fired = instance_eval("is_" + event.to_s))
+
+          event_options = {}
+          notify_observers(ModelEvent.new(event, self, event_options))
+        rescue StandardError => e
+          Rails.logger.info { "Document REGISTERED_EVENTS: #{event} unable to notify observers" }
+          raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
         end
       end
 
@@ -36,3 +41,5 @@ module BenefitSponsors
     end
   end
 end
+
+# rubocop:enable Lint/UselessAssignment

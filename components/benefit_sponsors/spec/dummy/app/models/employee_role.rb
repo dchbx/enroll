@@ -1,5 +1,8 @@
 class EmployeeRole
   include Mongoid::Document
+  include Acapi::Notifiers
+  include ModelEvents::EmployeeRole
+  include ::BenefitSponsors::Concerns::Observable
 
   embedded_in :person
 
@@ -34,6 +37,9 @@ class EmployeeRole
   accepts_nested_attributes_for :person
 
   before_save :termination_date_must_follow_hire_date
+
+  after_create :notify_on_create
+  add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_employee_role_events]
 
   def self.find(employee_role_id)
     bson_id = BSON::ObjectId.from_string(employee_role_id)

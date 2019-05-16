@@ -4,7 +4,7 @@ module Notifier
     include Notifier::Builders::Broker
     include Notifier::ApplicationHelper
 
-    attr_accessor :general_agency, :merge_model, :payload
+    attr_accessor :general_agency, :merge_model, :payload, :event_name
 
     def initialize
       data_object = Notifier::MergeDataModels::GeneralAgency.new
@@ -63,25 +63,80 @@ module Notifier
       end
     end
 
-    def broker
+    def employer
+      return @employer if defined? @employer
+
+      return unless payload['event_object_kind'].constantize == BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+
+      @employer = BenefitSponsors::Organizations::Profile.find payload['event_object_id']
+    end
+
+    def employer_name
+      merge_model.employer_name = employer.legal_name
+    end
+
+    def employer_staff_role
+      employer.staff_roles.first
+    end
+
+    def employer_poc_firstname
+      merge_model.employer_poc_firstname = employer_staff_role.first_name
+    end
+
+    def employer_poc_lastname
+      merge_model.employer_poc_lastname = employer_staff_role.last_name
+    end
+
+    def general_agency_account
+      return @general_agency_account if defined? @general_agency_account
+
+      return unless payload['notice_params'].present? && payload['notice_params']['general_agency_account_id'].present?
+
+      employer.general_agency_accounts.find(payload['notice_params']['general_agency_account_id'])
+    end
+
+    def broker_role
       return @broker if defined? @broker
-      if payload[:event_object_kind].constantize == BrokerAgencyProfile
-        @broker = BrokerAgencyProfile.find(payload[:event_object_id])
+
+      if general_agency_account
+        @broker = BrokerRole.find(general_agency_account.broker_role_id)
+      elsif payload['event_object_kind'].constantize == BrokerAgencyProfile
+        @broker = BenefitSponsors::Organizations::BrokerAgencyProfile.find(payload['event_object_id']).primary_broker_role
+      elsif payload['notice_params'] && payload['notice_params']['broker_agency_profile_id']
+        @broker = BenefitSponsors::Organizations::BrokerAgencyProfile.find(payload['notice_params']['broker_agency_profile_id']).primary_broker_role
       end
     end
 
     def broker_primary_fullname
       return if broker.blank?
-      merge_model.broker.primary_fullname = broker.primary_broker_role.person.full_name.titleize
+
+      merge_model.broker.primary_fullname = broker_role.primary_broker_role.person.full_name.titleize
+    end
+
+    def broker_primary_first_name
+      return if broker_role.blank?
+
+      merge_model.broker.primary_first_name = broker_role.person.first_name.titleize
+    end
+
+    def broker_primary_last_name
+      return if broker_role.blank?
+
+      merge_model.broker.primary_last_name = broker_role.person.last_name.titleize
     end
 
     def broker_organization
       return if broker.blank?
-      merge_model.broker.organization = broker.legal_name.titleize
+
+      merge_model.broker.organization = broker_role.legal_name.titleize
     end
 
     def assignment_date
       merge_model.assignment_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    end
+
+    def termination_date
+      merge_model.termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
     end
   end
 end

@@ -46,7 +46,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   describe "NoticeTrigger" do
     context "whne binder payment is missed" do
       subject { BenefitSponsors::Observers::NoticeObserver.new  }
-      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, PlanYear, {}) }
+      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, BenefitSponsors::BenefitApplications::BenefitApplication, {}) }
 
       it "should trigger notice event for initial employer and employees" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|

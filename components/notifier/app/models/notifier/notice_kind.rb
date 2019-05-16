@@ -25,7 +25,7 @@ module Notifier
 
     embeds_one :cover_page
     embeds_one :template, class_name: "Notifier::Template"
-    embeds_many :workflow_state_transitions, as: :transitional
+    embeds_many :workflow_state_transitions, as: :transitional, class_name: "::WorkflowStateTransition"
 
     validates_presence_of :title, :notice_number, :recipient
     validates_uniqueness_of :notice_number

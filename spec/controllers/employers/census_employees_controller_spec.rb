@@ -408,7 +408,6 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
     context "with termination date" do
       it "should terminate census employee" do
-        expect(controller).to receive(:notify_employee_of_termination)
         get :terminate, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, termination_date: Date.today.to_s}, :format => :js, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns[:fa]).to eq census_employee
@@ -417,7 +416,6 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
     context "with no termination date" do
       it "should throw error" do
-        expect(controller).not_to receive(:notify_employee_of_termination)
         get :terminate, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, termination_date: ""}, :format => :js, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns[:fa]).to eq nil

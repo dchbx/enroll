@@ -8,7 +8,7 @@ module BenefitSponsors
       #TODO: This is the temporary fix until then.
       OTHER_EVENTS = [
         :generate_initial_employer_invoice
-      ]
+      ].freeze
 
       def trigger_model_event(event_name, event_options = {})
         if OTHER_EVENTS.include?(event_name)

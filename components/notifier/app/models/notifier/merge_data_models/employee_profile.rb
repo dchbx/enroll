@@ -7,7 +7,7 @@ module Notifier
     attribute :notice_date, String
     attribute :first_name, String
     attribute :last_name, String
-    # attribute :enrollment_plan_name, String
+    attribute :enrollment_plan_name, String
     attribute :mailing_address, MergeDataModels::Address
     attribute :employer_name, String
     # attribute :coverage_begin_date, Date
@@ -18,6 +18,7 @@ module Notifier
     attribute :date_of_hire, String
     attribute :termination_of_employment, String
     attribute :coverage_terminated_on, String
+    attribute :coverage_terminated_on_plus_30_days, String
     attribute :earliest_coverage_begin_date, String
     attribute :ivl_oe_start_date, Date
     attribute :ivl_oe_end_date, Date
@@ -35,12 +36,16 @@ module Notifier
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         first_name: 'John',
         last_name: 'Whitmore',
-        employer_name: 'MA Health Connector',
+        enrollment_plan_name: 'Aetna GOLD',
+        employer_name: 'Whitmore, Inc',
         email: 'johnwhitmore@yahoo.com',
         ivl_oe_start_date: Settings.aca.individual_market.upcoming_open_enrollment.start_on,
         ivl_oe_end_date: Settings.aca.individual_market.upcoming_open_enrollment.end_on,
         # coverage_begin_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
+        date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        termination_of_employment: TimeKeeper.date_of_record.prev_day.strftime('%m/%d/%Y'),
+        coverage_terminated_on: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y'),
+        coverage_terminated_on_plus_30_days: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
         earliest_coverage_begin_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
         new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
         new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%m,/%d/%Y')
@@ -61,7 +66,17 @@ module Notifier
     end
 
     def conditions
-      %w{broker_present? has_multiple_enrolled_enrollments? has_health_enrolled_enrollment? has_dental_enrolled_enrollment? census_employee_health_and_dental_enrollment? census_employee_health_enrollment? census_employee_dental_enrollment?}
+      %w[broker_present? has_parent_enrollment? future_sep?
+         has_multiple_enrolled_enrollments? has_health_enrolled_enrollment? has_dental_enrolled_enrollment?
+         census_employee_health_and_dental_enrollment? census_employee_health_enrollment? census_employee_dental_enrollment?]
+    end
+
+    def has_parent_enrollment?
+      enrollment.waiver_plan_name.present?
+    end
+
+    def future_sep?
+      Date.strptime(special_enrollment_period.event_on, '%m/%d/%Y').future?
     end
 
     def census_employee_health_enrollment?

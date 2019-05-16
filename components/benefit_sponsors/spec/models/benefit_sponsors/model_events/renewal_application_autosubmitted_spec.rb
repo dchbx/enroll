@@ -41,7 +41,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::PlanYearAutoPublished', dbclean: :
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.plan_year_auto_published"
+          expect(event_name).to eq "acapi.info.events.employer.renewal_application_autosubmitted"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s

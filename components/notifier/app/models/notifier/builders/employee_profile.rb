@@ -39,7 +39,13 @@ module Notifier
     end
 
     def append_contact_details
-      mailing_address = employee_role.person.mailing_address
+      mailing_address =
+        if employee_role.person.mailing_address
+          employee_role.person.mailing_address
+        elsif employee_role.census_employee
+          employee_role.census_employee.address
+        end
+
       if mailing_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
           street_1: mailing_address.address_1,
@@ -87,6 +93,10 @@ module Notifier
       merge_model.coverage_terminated_on = format_date(census_employee_record.coverage_terminated_on)
     end
 
+    def coverage_terminated_on_plus_30_days
+      merge_model.coverage_terminated_on_plus_30_days = format_date(census_employee_record.coverage_terminated_on + 30.days)
+    end
+
     def earliest_coverage_begin_date
       merge_model.earliest_coverage_begin_date = format_date census_employee_record.coverage_effective_on
     end
@@ -105,6 +115,11 @@ module Notifier
 
     def census_employee_dental_enrollment?
       merge_model.census_employee.latest_terminated_dental_enrollment_plan_name.present?
+    end
+
+    def has_parent_enrollment?
+      waiver_enr = census_employee_record.active_benefit_group_assignment.hbx_enrollments.select {|en| HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
+      waiver_enr.parent_enrollment.present?
     end
 
     def has_multiple_enrolled_enrollments?
@@ -179,8 +194,12 @@ module Notifier
     end
 
     def special_enrollment_period_event_on
-      event_on = special_enrollment_period.nil? ? payload['notice_params']['qle_event_on'] : special_enrollment_period.event_on
+      event_on = special_enrollment_period.nil? ? payload['notice_params']['qle_event_on'] : format_date(special_enrollment_period.event_on)
       merge_model.special_enrollment_period.event_on = event_on
+    end
+
+    def future_sep?
+      Date.strptime(special_enrollment_period_event_on, '%m/%d/%Y').future?
     end
 
     def special_enrollment_period_title

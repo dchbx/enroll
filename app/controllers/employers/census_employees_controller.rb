@@ -86,7 +86,6 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
       if termination_date >= (TimeKeeper.date_of_record - 60.days)
         @fa = @census_employee.terminate_employment(termination_date)
-        notify_employee_of_termination
       end
     end
 
@@ -225,14 +224,6 @@ class Employers::CensusEmployeesController < ApplicationController
       rescue => e
         render json: { status: 500, message: 'An error occured while submitting employees participation status' }
       end
-    end
-  end
-
-  def notify_employee_of_termination
-    begin
-      ShopNoticesNotifierJob.perform_later(@census_employee.id.to_s, "employee_termination_notice")
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver termination notice to #{@census_employee.full_name} due to #{e.inspect}" }) unless Rails.env.test?
     end
   end
 

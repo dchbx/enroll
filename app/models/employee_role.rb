@@ -2,6 +2,9 @@ class EmployeeRole
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include Acapi::Notifiers
+  include BenefitSponsors::ModelEvents::EmployeeRole
+  include BenefitSponsors::Concerns::Observable
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
 
@@ -37,6 +40,9 @@ class EmployeeRole
   accepts_nested_attributes_for :person
 
   before_save :termination_date_must_follow_hire_date
+
+  after_create :notify_on_create
+  add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_employee_role_events]
 
   # hacky fix for nested attributes
   # TODO: remove this when it is no longer needed

@@ -601,7 +601,7 @@ module ApplicationHelper
   end
 
   def trigger_notice_observer(recipient, event_object, notice_event, params={})
-    observer = Observers::NoticeObserver.new
+    observer = BenefitSponsors::Observers::NoticeObserver.new
     observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: params)
   end
 

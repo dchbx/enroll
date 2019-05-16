@@ -9,13 +9,11 @@ module Notifier
     attribute :zip, String
 
     def self.stubbed_object
-      Notifier::MergeDataModels::Address.new({
-        street_1: '330 Montague City Road',
-        street_2: 'Suite 200',
-        city: 'Turners Falls',
-        state: 'MA',
-        zip: '01373'
-      })
+      Notifier::MergeDataModels::Address.new({street_1: '1225 I Street, NW',
+                                              street_2: 'Suite 400',
+                                              city: 'Washington',
+                                              state: 'DC',
+                                              zip: '20005'})
     end
   end
 end

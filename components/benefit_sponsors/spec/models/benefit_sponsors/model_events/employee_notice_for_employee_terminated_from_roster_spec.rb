@@ -87,17 +87,25 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
+    let!(:terminated_employee) do
+      ee = model_instance.terminate_employment(termination_date)
+      ee.save
+      ee
+    end
+
     let(:payload)   { {
         "event_object_kind" => "CensusEmployee",
-        "event_object_id" => model_instance.id
+        "event_object_id" => terminated_employee.id,
+        "event_name" => 'employee_matches_employer_rooster'
     } }
 
     context "when notice event received" do
       before do
-        allow(subject).to receive(:resource).and_return(employee_role)
+        allow(subject).to receive(:resource).and_return(terminated_employee.employee_role)
         allow(subject).to receive(:payload).and_return(payload)
-        model_instance.terminate_employment(termination_date)
-        model_instance.save!
+        # model_instance.terminate_employment(termination_date)
+        # model_instance.save!
+        # binding.pry
       end
       
       it "should retrun merge model" do
@@ -109,19 +117,19 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
       end
 
       it "should return employee first name" do
-        expect(merge_model.first_name).to eq model_instance.employee_role.person.first_name
+        expect(merge_model.first_name).to eq terminated_employee.employee_role.person.first_name
       end
 
       it "should return employee last name" do
-        expect(merge_model.last_name).to eq model_instance.employee_role.person.last_name
+        expect(merge_model.last_name).to eq terminated_employee.employee_role.person.last_name
       end
 
       it "should return employer name" do
-        expect(merge_model.employer_name).to eq model_instance.employer_profile.legal_name
+        expect(merge_model.employer_name).to eq terminated_employee.employer_profile.legal_name
       end
 
       it "should return termination of employement" do
-        expect(merge_model.termination_of_employment).to eq model_instance.employment_terminated_on.strftime('%m/%d/%Y')
+        expect(merge_model.termination_of_employment).to eq terminated_employee.employment_terminated_on.strftime('%m/%d/%Y')
       end
 
       it "should return false when there is no broker linked to employer" do

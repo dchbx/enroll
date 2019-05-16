@@ -7,29 +7,32 @@ module BenefitSponsors
 
       APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
 
-      REGISTERED_EVENTS = [
+      REGISTERED_EVENTS_ON_SAVE = [
         :application_submitted,
         :ineligible_application_submitted,
         :employer_open_enrollment_completed,
         :application_denied,
-        :renewal_application_created,
         :renewal_application_autosubmitted,
-      ]
+      ].freeze
 
-      DATA_CHANGE_EVENTS = [
-          :initial_employer_no_binder_payment_received,
-          :initial_employer_first_reminder_to_publish_plan_year,
-          :initial_employer_second_reminder_to_publish_plan_year,
-          :initial_employer_final_reminder_to_publish_plan_year,
-          :renewal_employer_first_reminder_to_publish_plan_year,
-          :renewal_employer_second_reminder_to_publish_plan_year,
-          :renewal_employer_third_reminder_to_publish_plan_year,
-          :open_enrollment_end_reminder_and_low_enrollment
-      ]
+      REGISTERED_EVENTS_ON_CREATE = [
+        :renewal_application_created
+      ].freeze
+
+      DATE_CHANGE_EVENTS = [
+        :renewal_employer_first_reminder_to_publish_plan_year,
+        :renewal_employer_second_reminder_to_publish_plan_year,
+        :renewal_employer_third_reminder_to_publish_plan_year,
+        :initial_employer_no_binder_payment_received,
+        :initial_employer_first_reminder_to_publish_plan_year,
+        :initial_employer_second_reminder_to_publish_plan_year,
+        :initial_employer_final_reminder_to_publish_plan_year,
+        :open_enrollment_end_reminder_and_low_enrollment
+      ].freeze
 
       OTHER_EVENTS = [
         :group_advance_termination_confirmation
-      ]
+      ].freeze
 
       # Events triggered by state changes on individual instances
       def notify_on_save
@@ -61,15 +64,14 @@ module BenefitSponsors
           end
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
-          REGISTERED_EVENTS.each do |event|
-            begin
-              if event_fired = instance_eval("is_" + event.to_s)
-                event_options = {}
-                notify_observers(ModelEvent.new(event, self, event_options))
-              end
-            rescue Exception => e
-              Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
-            end
+          REGISTERED_EVENTS_ON_SAVE.each do |event|
+            next unless (event_fired = instance_eval("is_" + event.to_s))
+
+            event_options = {}
+            notify_observers(ModelEvent.new(event, self, event_options))
+          rescue StandardError => e
+            Rails.logger.info { "Benefit Application REGISTERED_EVENTS_ON_SAVE: #{event} unable to notify observers" }
+            raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
           end
         end
       end
@@ -79,15 +81,14 @@ module BenefitSponsors
           is_renewal_application_created = true
         end
 
-        REGISTERED_EVENTS.each do |event|
-          begin
-            if event_fired = instance_eval("is_" + event.to_s)
-              event_options = {}
-              notify_observers(ModelEvent.new(event, self, event_options))
-            end
-          rescue Exception => e
-            Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
-          end
+        REGISTERED_EVENTS_ON_CREATE.each do |event|
+          next unless (event_fired = instance_eval("is_" + event.to_s))
+
+          event_options = {}
+          notify_observers(ModelEvent.new(event, self, event_options))
+        rescue StandardError => e
+          Rails.logger.info { "Benefit Application REGISTERED_EVENTS_ON_CREATE: #{event} unable to notify observers" }
+          raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
         end
       end
 
@@ -113,19 +114,14 @@ module BenefitSponsors
 
       module ClassMethods
         def date_change_event(new_date)
-          # renewal employer publish plan_year reminder a day after advertised soft deadline i.e 11th of the month
-          if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline + 1
-            is_renewal_employer_publish_plan_year_reminder_after_soft_dead_line = true
-          end
 
-          # renewal_application with un-published plan year, send notice 2 days before soft dead line i.e 8th of the month
-          if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2
-            is_renewal_plan_year_first_reminder_before_soft_dead_line = true
-          end
 
-          # renewal_application with enrolling state, reached open-enrollment end date with minimum participation and non-owner-enrolle i.e 15th of month
-          if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month
-            is_renewal_employer_open_enrollment_completed = true
+          if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2 #2 days before soft dead line i.e 3th of the month
+            is_renewal_employer_first_reminder_to_publish_plan_year = true
+          elsif new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 1 #one day before advertised soft deadline i.e 4th of the month
+            is_renewal_employer_second_reminder_to_publish_plan_year = true
+          elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2 #2 days prior to the publish due date i.e 8th of the month
+            is_renewal_employer_third_reminder_to_publish_plan_year = true
           end
 
           #initial employers misses binder payment deadline
@@ -135,16 +131,11 @@ module BenefitSponsors
             is_initial_employer_no_binder_payment_received = true
           end
 
-          # renewal_application with un-published plan year, send notice 2 days prior to the publish due date i.e 13th of the month
-          if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
-            is_renewal_plan_year_publish_dead_line = true
-          end
-
-          if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 # 2 days prior to advertised deadline of month i.e., 8th of the month
+          if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 # 2 days prior to advertised deadline(1st) of month
             is_initial_employer_first_reminder_to_publish_plan_year = true
-          elsif new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 1 # 1 day prior to advertised deadline of month i.e., 9th of the month
+          elsif new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 1 # 1 day prior to advertised deadline(1st) of month
             is_initial_employer_second_reminder_to_publish_plan_year = true
-          elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 13th of the month
+          elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish due day(5th) of month
             is_initial_employer_final_reminder_to_publish_plan_year = true
           end
 
@@ -153,15 +144,14 @@ module BenefitSponsors
           # This also triggers low enrollment notice to employer
           is_open_enrollment_end_reminder_and_low_enrollment = true
 
-          DATA_CHANGE_EVENTS.each do |event|
-            begin
-              if event_fired = instance_eval("is_" + event.to_s)
-                event_options = {}
-                self.new.notify_observers(ModelEvent.new(event, self, event_options))
-              end
-            rescue Exception => e
-              Rails.logger.error { "Benefit Application DATA_CHANGE_EVENTS: #{event} - unable to notify observers" }
-            end
+          DATE_CHANGE_EVENTS.each do |event|
+            next unless (event_fired = instance_eval("is_" + event.to_s))
+
+            event_options = {}
+            new.notify_observers(ModelEvent.new(event, self, event_options))
+          rescue StandardError => e
+            Rails.logger.error { "Benefit Application DATE_CHANGE_EVENTS: #{event} - unable to notify observers" }
+            raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
           end
         end
       end

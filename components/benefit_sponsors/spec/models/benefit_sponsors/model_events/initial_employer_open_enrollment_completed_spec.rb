@@ -1,6 +1,6 @@
 require 'rails_helper'
  
-RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied', dbclean: :after_each do
+RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerOpenEnrollmentCompleted', dbclean: :after_each do
 
   let(:model_event) { "employer_open_enrollment_completed" }
   let(:notice_event) { "initial_employer_open_enrollment_completed" }

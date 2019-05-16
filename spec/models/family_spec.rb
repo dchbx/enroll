@@ -841,6 +841,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
 
     it "should have no current shop eligible open enrollments if the employee role is not active" do
       census_employee.update_attributes(aasm_state: "employment_terminated")
+      family.reload
       expect(family.current_shop_eligible_open_enrollments.count).to eq 0
     end
 

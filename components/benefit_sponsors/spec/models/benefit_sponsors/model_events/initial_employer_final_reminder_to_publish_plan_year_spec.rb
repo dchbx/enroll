@@ -23,10 +23,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
         expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
-
         expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_final_reminder_to_publish_plan_year, :klass_instance => model_instance, :options => {})
+        end
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
+          expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
       end
       BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)

@@ -43,6 +43,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoverageTermination', dbcl
       subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_termination, model_instance, {}) }
 
+      before do
+        model_instance.terminate_coverage!
+      end
+
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.employer_notice_for_employee_coverage_termination"

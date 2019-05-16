@@ -1,11 +1,11 @@
 module Notifier
   class Builders::BrokerProfile
-    # include Notifier::Builders::PlanYear
+    include Notifier::Builders::BenefitApplication
     include Notifier::Builders::Broker
 
-    attr_accessor :payload, :broker_role, :merge_model
+    attr_accessor :payload, :broker_role, :merge_model, :event_name
 
-   def initialize
+    def initialize
       data_object = Notifier::MergeDataModels::BrokerProfile.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       @merge_model = data_object

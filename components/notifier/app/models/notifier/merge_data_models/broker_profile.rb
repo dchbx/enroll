@@ -47,6 +47,10 @@ module Notifier
       mailing_address
     end
 
+    def broker_present?
+      false
+    end
+
     def shop?
       true
     end

@@ -15,7 +15,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearRemi
   let(:current_effective_date)  { renewal_effective_date.prev_year }
   let(:employer_profile) { abc_profile }
   let(:model_instance) { renewal_application }
-  let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.renewal_application.application_submission_soft_deadline + 1 )}
+  let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 1)}
 
   before do
     model_instance.update_attributes(:effective_period =>  renewal_effective_date..(renewal_effective_date + 1.year) - 1.day)
@@ -27,6 +27,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearRemi
         expect(observer).to receive(:process_application_events) do |_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :renewal_employer_second_reminder_to_publish_plan_year, :klass_instance => model_instance, :options => {})
+        end
+        expect(observer).to receive(:process_application_events) do |_instance, model_event|
+          expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
       end
       BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)

@@ -14,6 +14,11 @@ module Notifier
     attribute :employee_last_name, String
     attribute :coverage_end_on, String
     attribute :enrolled_count, String
+    attribute :enrollment_kind, String
+    attribute :waiver_effective_on, String
+    attribute :waiver_plan_name, String
+    attribute :waiver_enrolled_count, String
+    attribute :waiver_coverage_end_on, String
     # attribute :metal_level, String
     attribute :coverage_kind, String
     # attribute :plan_carrier, String
@@ -25,15 +30,22 @@ module Notifier
       enrollment = Notifier::MergeDataModels::Enrollment.new({
         coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
         coverage_end_on: end_on,
-        plan_name: 'KP SILVER',
+        plan_name: 'Aetna GOLD',
         employer_responsible_amount: '$250.0',
         employee_responsible_amount: '$90.0',
         premium_amount: '340.0',
         enrolled_count: '2',
+        enrollment_kind: "special_enrollment",
+        coverage_kind: 'health',
         employee_first_name: 'David',
         employee_last_name: 'Finch',
-        coverage_end_on_minus_60_days: ((end_on - 60.days).strftime('%m/%d/%Y')),
-        coverage_end_on_plus_60_days: ((end_on + 60.days).strftime('%m/%d/%Y'))
+        coverage_end_on_minus_60_days: (end_on - 60.days).strftime('%m/%d/%Y'),
+        coverage_end_on_plus_60_days: (end_on + 60.days).strftime('%m/%d/%Y'),
+        waiver_effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
+        waiver_plan_name: 'Aetna GOLD',
+        waiver_enrolled_count: '2',
+        waiver_coverage_end_on: end_on
+
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
@@ -53,8 +65,13 @@ module Notifier
         enrolled_count: '2',
         employee_first_name: 'David',
         employee_last_name: 'Finch',
-        coverage_end_on_minus_60_days: ((end_on - 60.days).strftime('%m/%d/%Y')),
-        coverage_end_on_plus_60_days: ((end_on + 60.days).strftime('%m/%d/%Y'))
+        coverage_end_on_minus_60_days: (end_on - 60.days).strftime('%m/%d/%Y'),
+        coverage_end_on_plus_60_days: (end_on + 60.days).strftime('%m/%d/%Y'),
+        waiver_effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
+        waiver_plan_name: 'Delta Dental',
+        waiver_enrolled_count: '2',
+        waiver_coverage_end_on: end_on
+
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object

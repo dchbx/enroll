@@ -7,9 +7,7 @@ module Notifier
     attribute :enrollments, Array[MergeDataModels::Enrollment]
 
     def self.stubbed_object
-      offered_product = Notifier::MergeDataModels::OfferedProduct.new({
-        product_name: 'KP SILVER'
-      })
+      offered_product = Notifier::MergeDataModels::OfferedProduct.new({product_name: 'Aetna SILVER'})
       offered_product.enrollments = [Notifier::MergeDataModels::Enrollment.stubbed_object]
       offered_product
     end

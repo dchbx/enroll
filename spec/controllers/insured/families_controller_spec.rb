@@ -698,7 +698,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       context "special qle events which can not have future date" do
-        subject { Observers::NoticeObserver.new }
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
 
         before(:each) do
           sign_in(user)

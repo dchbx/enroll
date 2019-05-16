@@ -9,7 +9,7 @@ module BenefitSponsors
         :application_coverage_selected,
         # :employee_waiver_confirmation,
         :employee_coverage_termination
-      ]
+      ].freeze
 
       def notify_on_save
 
@@ -33,9 +33,11 @@ module BenefitSponsors
           REGISTERED_EVENTS.each do |event|
             next unless (event_fired = instance_eval("is_" + event.to_s))
 
-              # event_name = ("on_" + event.to_s).to_sym
-            event_options = {} # instance_eval(event.to_s + "_options") || {}
+            event_options = {}
             notify_observers(ModelEvent.new(event, self, event_options))
+          rescue StandardError => e
+            Rails.logger.info { "HbxEnrollment REGISTERED_EVENTS: #{event} unable to notify observers" }
+            raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
           end
         end
       end

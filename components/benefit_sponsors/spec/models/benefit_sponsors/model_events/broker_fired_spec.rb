@@ -110,7 +110,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
       end
 
       it "should return broker termination date" do
-        expect(merge_model.broker.termination_date).to eq @broker_agency_account1.end_on
+        expect(merge_model.broker.termination_date).to eq @broker_agency_account1.end_on.strftime('%m/%d/%Y')
       end
 
       it "should set broker is_active to false" do

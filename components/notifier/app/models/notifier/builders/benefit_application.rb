@@ -8,6 +8,12 @@ module Notifier
       end
     end
 
+    def benefit_application_current_py_start_date_plus_one_year
+      return if current_benefit_application.blank?
+
+      merge_model.benefit_application.current_py_start_date_plus_one_year = format_date(current_benefit_application.start_on.next_year)
+    end
+
     def benefit_application_current_py_end_date
       if current_benefit_application.present?
         merge_model.benefit_application.current_py_end_date = format_date(current_benefit_application.end_on)
@@ -15,9 +21,21 @@ module Notifier
     end
 
     def benefit_application_renewal_py_start_date
-      if renewal_benefit_application.present?
-        merge_model.benefit_application.renewal_py_start_date = format_date(renewal_benefit_application.start_on)
-      end
+      return if renewal_benefit_application.blank?
+
+      merge_model.benefit_application.renewal_py_start_date = format_date(renewal_benefit_application.start_on)
+    end
+
+    def benefit_application_current_year
+      return if current_benefit_application.blank?
+
+      merge_model.benefit_application.current_year = current_benefit_application.start_on.year.to_s
+    end
+
+    def benefit_application_renewal_year
+      return if renewal_benefit_application.blank?
+
+      merge_model.benefit_application.renewal_year = renewal_benefit_application.start_on.year.to_s
     end
 
     def benefit_application_next_available_start_date
@@ -63,10 +81,28 @@ module Notifier
       end
     end
 
+    def benefit_application_group_termination_plus_31_days
+      return if load_benefit_application.blank?
+
+      merge_model.benefit_application.group_termination_plus_31_days = format_date(load_benefit_application.end_on + 31.days)
+    end
+
+    def benefit_application_py_end_on_plus_60_days
+      return if current_or_renewal_py.blank?
+
+      merge_model.benefit_application.py_end_on_plus_60_days = format_date(current_or_renewal_py.end_on + 60.days)
+    end
+
     def benefit_application_current_py_oe_end_date
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_oe_end_date = format_date(current_benefit_application.open_enrollment_period.max)
-      end
+      benefit_application =
+        if ['zero_employees_on_roster_notice', 'low_enrollment_notice_for_employer', 'open_enrollment_end_reminder_notice_to_employee'].include? event_name
+          load_benefit_application
+        else
+          current_benefit_application
+        end
+      return if benefit_application.blank?
+
+      merge_model.benefit_application.current_py_oe_end_date = format_date(benefit_application.open_enrollment_end_on)
     end
 
     def benefit_application_renewal_py_oe_start_date
@@ -155,20 +191,24 @@ module Notifier
     def benefit_application_enrollment_errors
       enrollment_errors = []
       benefit_application = (renewal_benefit_application || current_benefit_application)
-      if benefit_application.present?
-        policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
-        unless policy.is_satisfied?(benefit_application)
-          policy.fail_results.each do |k, _|
-            case k.to_s
-            when "minimum_participation_rule"
-              enrollment_errors << "At least seventy-five (75) percent of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
-            when "non_business_owner_enrollment_count"
-              enrollment_errors << "At least one non-owner employee enrolled in health coverage."
+      return if benefit_application.blank?
+
+      policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+      unless policy.is_satisfied?(benefit_application)
+        policy.fail_results.each do |k, _|
+          case k.to_s
+          when 'minimum_eligible_member_count'
+            enrollment_errors << 'at least one employee must be eligible to enroll'
+          when 'non_business_owner_enrollment_count'
+            enrollment_errors << "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll"
+          when 'minimum_participation_rule'
+            unless benefit_application.effective_date.yday == 1
+              enrollment_errors << "number of eligible participants enrolling (#{benefit_application.all_enrolled_and_waived_member_count}) is less than minimum required #{benefit_application.minimum_enrolled_count}"
             end
           end
         end
-        merge_model.benefit_application.enrollment_errors = enrollment_errors.join(' AND/OR ')
       end
+      merge_model.benefit_application.enrollment_errors = enrollment_errors.join(' AND/OR ')
     end
 
     def enrollment_policy
@@ -183,7 +223,8 @@ module Notifier
 
     def benefit_application_warnings
       benefit_application_warnings = []
-      if current_benefit_application.present?
+      benefit_application = current_benefit_application || renewal_benefit_application
+      if benefit_application.present?
         policy = eligibility_policy.business_policies_for(current_benefit_application, :submit_benefit_application)
         unless policy.is_satisfied?(current_benefit_application)
           policy.fail_results.each do |k, _|
@@ -205,12 +246,10 @@ module Notifier
         benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.find(payload['event_object_id'])
       end
 
-      if benefit_application.blank? && enrollment.present?
-        if enrollment.sponsored_benefit_package
-          benefit_application = enrollment.sponsored_benefit_package.benefit_application
-        end
+      if benefit_application.blank?
+        benefit_application = enrollment.sponsored_benefit_package.benefit_application if enrollment.present? && enrollment.sponsored_benefit_package
+        benefit_application = employer_profile.benefit_applications.published_or_renewing_published.first if event_name == 'out_of_pocker_url_notifier'
       end
-
       benefit_application
     end
 
@@ -236,6 +275,10 @@ module Notifier
           @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| (ba.is_submitted? || ba.draft?) && (ba.end_on == benefit_application.start_on.to_date.prev_day)}
         end
       end
+    end
+
+    def current_or_renewal_py
+      current_benefit_application || renewal_benefit_application
     end
 
     def format_date(date)

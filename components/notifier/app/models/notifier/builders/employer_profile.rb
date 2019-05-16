@@ -3,6 +3,7 @@ module Notifier
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
     include Notifier::Builders::BenefitApplication
+    include Notifier::Builders::BenefitPackage
     include Notifier::Builders::Broker
     include Notifier::Builders::Enrollment
     include Notifier::Builders::OfferedProduct
@@ -10,12 +11,13 @@ module Notifier
     include Config::ContactCenterHelper
     include Config::SiteHelper
 
-    attr_accessor :employer_profile, :merge_model, :payload
+    attr_accessor :employer_profile, :merge_model, :payload, :event_name
 
     def initialize
       data_object = Notifier::MergeDataModels::EmployerProfile.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.benefit_application = Notifier::MergeDataModels::BenefitApplication.new
+      data_object.benefit_packages = Notifier::MergeDataModels::BenefitPackage.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.offered_products = Notifier::MergeDataModels::OfferedProduct.new
@@ -51,6 +53,10 @@ module Notifier
 
     def notice_date
       merge_model.notice_date = format_date(TimeKeeper.date_of_record)
+    end
+
+    def notice_date_plus_31_days
+      merge_model.notice_date_plus_31_days = format_date(TimeKeeper.date_of_record + 31.days)
     end
 
     def employer_name
