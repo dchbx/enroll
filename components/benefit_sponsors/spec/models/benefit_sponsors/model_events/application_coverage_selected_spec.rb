@@ -28,6 +28,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
 
   describe "when employee plan coverage selected" do
     context "ModelEvent" do
+      before do
+        allow(model_instance).to receive(:can_select_coverage?).and_return(true)
+      end
       it "should trigger model event" do
         model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
           expect(observer).to receive(:process_enrollment_events) do |_instance, model_event|
@@ -98,6 +101,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         allow(subject).to receive(:resource).and_return(model_instance.employee_role)
         allow(subject).to receive(:payload).and_return(payload)
         allow(employee_role).to receive(:person).and_return(person)
+        allow(model_instance).to receive(:can_select_coverage?).and_return(true)
         model_instance.select_coverage!
       end
 
@@ -155,6 +159,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
       allow(subject).to receive(:resource).and_return(abc_profile)
       allow(subject).to receive(:payload).and_return(payload)
       employee_role.update_attributes(census_employee_id: census_employee.id)
+      allow(model_instance).to receive(:can_select_coverage?).and_return(true)
       model_instance.select_coverage!
     end
 
