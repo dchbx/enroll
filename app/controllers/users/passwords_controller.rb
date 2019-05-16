@@ -1,4 +1,5 @@
 class Users::PasswordsController < Devise::PasswordsController
+  layout 'bootstrap_4'
   before_action :confirm_identity, only: [:create]
   def create
     self.resource = resource_class.send_reset_password_instructions(resource_params)

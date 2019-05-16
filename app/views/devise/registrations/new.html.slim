@@ -1,0 +1,44 @@
+= render partial: 'devise/shared/captcha' if aca_recaptcha_enabled
+#signup.container.mt-5
+  .row.justify-content-md-center
+    #registration-form-container.col-md-6.col-sm-8.col-xs-12
+      h2.text-center.heading-text Create Account
+      = form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup'}, novalidate: true }) do |f|
+        = devise_error_messages!
+        .row.error-block.d-none
+          .col-xs-12
+            .alert.alert-danger.text-center
+        = f.hidden_field :referer, value: request.env["HTTP_REFERER"]
+        .form-group
+          = f.label :email_or_username
+          = f.text_field :oim_id, class: "form-control", placeholder: "Email or Username", required: true
+          .invalid-feedback
+            | You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.
+        .form-group
+          = f.label :password
+          small.pl-2.text-muted
+            = User.validators.select{|v| v.attributes == [:password] && v.options.has_key?(:minimum) }.first.options[:minimum]
+            |  characters minimum
+          = f.password_field :password, autocomplete: "off", class: "form-control", minlength:"8", required: true
+          .invalid-feedback
+            | Must be at least 8 characters and cannot contain username
+        .form-group
+          = f.label :password_confirmation, "Password Confirmation"
+          = f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"8", required: true
+          .invalid-feedback
+            | Must be at least 8 characters and cannot contain username
+        .form-group
+          = f.label :email
+          small.pl-2.text-muted
+            | (Optional)
+          = f.text_field :email, class: "form-control"
+          = f.hidden_field :invitation_id
+        .recaptcha-error.alert-error
+        .recaptcha#captcha-widget
+        .row.justify-content-md-center
+          = f.submit 'Create Account', class:'btn btn-primary create-account-btn'
+        .row.justify-content-md-center.pt-3
+          - if site_uses_default_devise_path?
+            = link_to "Sign In Existing Account", new_user_session_path, class:'btn btn-link'
+          - else
+            = link_to "Sign In Existing Account", new_user_session_path, class:'btn btn-link' unless Rails.env.production?

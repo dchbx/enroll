@@ -1,7 +1,29 @@
 .btn-outline-primary {
-    @include button-outline-variant($dc-alt-blue, $dc-alt-blue, lighten($white, 5%), $dc-alt-blue);
-    font-weight: 600;
-    text-transform: capitalize;
+  @include button-outline-variant($dc-alt-blue, $dc-alt-blue, lighten($white, 5%), $dc-alt-blue);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.btn-primary {
+  @include button-variant($dc-red, $dc-red, darken($dc-red, 10%), $dc-red);
+  text-transform: uppercase;
+  font-weight: 600;
+  border-color: $dc-dark-red;
+  border-bottom-width: medium;
+}
+
+.heading-text {
+  font-weight: 400;
+  color: $dc-dark-blue;
+}
+
+.invalid-feedback {
+  font-weight: bold;
+}
+
+.login-options {
+  border-left: solid 1px $dc-alt-gray;
+  min-height: 72px;
 }
 
 .navbar-main {
@@ -33,4 +55,9 @@
   .cc-number {
     color: $dc-dark-gray;
   }
+}
+
+.sub-text {
+  font-weight: 200;
+  color: $dc-dark-blue;
 }

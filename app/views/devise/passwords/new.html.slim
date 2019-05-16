@@ -1,0 +1,15 @@
+.container.forgot-password.mt-5
+	.row.justify-content-md-center
+	  .col-md-6.col-md-offset-3.col-sm-8.col-xs-12
+	    h2.sub-text = l10n(".forgot_your_password")
+	    = form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: 'input-no-pd'}) do |f|
+			= devise_error_messages!
+			.form-group
+				= f.label :email
+				br
+				= f.email_field :email, autofocus: true, class: "form-control"
+				= f.hidden_field :identity_confirmed_token
+			.form-group
+				= f.submit l10n(".send_me_reset_password_instructions"), class: 'btn btn-primary mb-3'
+				= render "devise/shared/links"
+			#securityChallengeModal.modal.fade aria-labelledby="securityChallengeModal" role="dialog" tabindex="-1"

@@ -1,5 +1,5 @@
 @import 'variables';
-@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
 
 body {
   background-color: $medium-gray;
@@ -20,15 +20,6 @@ footer {
     color: $white;
     text-decoration: none;
   }
-}
-
-.heading-text {
-  font-weight: 400;
-}
-
-.sub-text {
-  font-weight: 200;
-  color: $dc-dark-blue;
 }
 
 .welcome {

@@ -89,7 +89,8 @@ Then /^they should see updated status$/ do
 end
 
 Then /^they should see an account creation form$/ do
-  expect(page).to have_css('.interaction-click-control-create-account')
+  find('.create-account-btn', wait: 10)
+  expect(page).to have_css('.create-account-btn')
   screenshot("general_agency_staff_register_by_invitation")
 end
 
@@ -98,7 +99,7 @@ When /^they complete the account creation form and hit the 'Submit' button$/ do
   fill_in "user[oim_id]", with: email_address
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
-  click_button 'Create account'
+  find('.create-account-btn', wait: 10).click
 end
 
 Then /^they should see a welcome message$/ do

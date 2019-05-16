@@ -2,11 +2,7 @@
   <div class="col-md-12">
     <%- if controller_name != 'sessions' %>
       <%#= link_to "Sign in", new_session_path(resource_name), class: "btn btn-default btn-lg" %>
-      <%= link_to l10n(".sign_in"), root_path, class: "btn btn-default btn-lg" %>
-    <% end -%>
-
-    <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
-      <%= link_to l10n(".forgot_your_password"), new_password_path(resource_name), class: "btn btn-default btn-lg sm_full_width" %>
+      <%= link_to l10n(".sign_in"), root_path, class: "btn btn-outline-primary" %>
     <% end -%>
 
     <%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
@@ -14,7 +10,11 @@
     <% end -%>
 
     <%- if devise_mapping.registerable? && controller_name != 'registrations' && can_register_new_account %>
-      <%= link_to l10n(".create_account"), site_registration_path(resource_name, params), class: "btn btn-default btn-lg sm_full_width", data: { no_turbolink: true } %>
+      <%= link_to l10n(".create_account"), site_registration_path(resource_name, params), class: "btn btn-outline-primary", data: { no_turbolink: true } %>
+    <% end -%>
+
+    <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
+      <%= link_to l10n(".forgot_your_password"), new_password_path(resource_name), class: "btn btn-outline-primary" %>
     <% end -%>
 
     <%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>

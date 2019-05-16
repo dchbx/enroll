@@ -500,7 +500,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   fill_in "user[password]", :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
-  find('.interaction-click-control-sign-in').click
+  find('.sign-in-btn').click
   visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
   # which apeared to be throwing in at least the
@@ -619,8 +619,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
   fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
-  screenshot("create_account")
-  click_button "Create account"
+  find('.create-account-btn').click
 end
 
 And(/^Primary Broker select the all security question and give the answer$/) do

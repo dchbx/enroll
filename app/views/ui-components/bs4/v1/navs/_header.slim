@@ -21,6 +21,17 @@ nav.navbar.navbar-expand-lg.navbar-main.pt-0.pb-0
           .fas.fa-phone.mr-2.fa-rotate-90
           strong.cc-number
             = Settings.contact_center.phone_number
-      - if signed_in?
+    - if signed_in?
+      ul.list-group.list-group-flush.login-options
         li.list-group-item.user-actions.pt-0.pb-0
           = render partial: "shared/my_portal_links"
+          .mt-3
+          a.header-text href="https://dchealthlink.com/help" target="_blank" Help |
+          = link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text"
+        li.list-group-item.user-actions.pt-0.pb-0
+          strong
+            = user_first_name_last_name_and_suffix
+          - unless current_user.try(:person).try(:hbx_id).nil?
+            = l10n(".my_id")
+            | :
+            = truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '')
