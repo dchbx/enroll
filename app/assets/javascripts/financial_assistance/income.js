@@ -22,12 +22,13 @@ function currentlyEditing() {
 };
 
 $(document).ready(function() {
+  var faWindow = $('.incomes');
   if ($('.incomes-list, .other-incomes-list').length) {
-    $(window).bind('beforeunload', function(e) {
+    $(faWindow).bind('beforeunload', function(e) {
       if (!currentlyEditing() || $('#unsavedIncomeChangesWarning:visible').length)
         return undefined;
 
-      (e || window.event).returnValue = 'You have an unsaved income, are you sure you want to proceed?'; //Gecko + IE
+      (e || faWindow.event).returnValue = 'You have an unsaved income, are you sure you want to proceed?'; //Gecko + IE
       return 'You have an unsaved income, are you sure you want to proceed?';
     });
 
@@ -38,7 +39,7 @@ $(document).ready(function() {
 
         $('#unsavedIncomeChangesWarning').modal('show');
         $('.btn.btn-danger').click(function() {
-          window.location.href = $(self).attr('href');
+          faWindow.location.href = $(self).attr('href');
         });
 
         return false;
