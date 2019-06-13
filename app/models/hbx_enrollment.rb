@@ -405,7 +405,7 @@ class HbxEnrollment
   end
 
   def coverage_kind
-    read_attribute(:coverage_kind) || self.plan.coverage_kind
+    self[:coverage_kind] || product.kind
   end
 
   def benefit_package_name
@@ -934,7 +934,7 @@ class HbxEnrollment
     year = if self.is_shop?
              sponsored_benefit_package.benefit_application.start_on.year
            else
-             plan.try(:active_year) || effective_on.year
+             product.try(:active_year) || effective_on.year
            end
   end
 
@@ -968,7 +968,7 @@ class HbxEnrollment
   end
 
   def reset_dates_on_previously_covered_members(new_plan=nil)
-    new_plan ||= self.plan
+    new_plan ||= product
 
     if is_an_existing_plan?(new_plan)
       plan_selection = PlanSelection.new(self, product)
@@ -977,7 +977,7 @@ class HbxEnrollment
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
-    qhp_plan ||= self.plan
+    qhp_plan ||= product
 
     if self.is_shop?
       if benefit_group.is_congress
@@ -1606,9 +1606,7 @@ class HbxEnrollment
   end
 
   def update_coverage_kind_by_plan
-    if plan.present? && coverage_kind != plan.coverage_kind
-      self.update(coverage_kind: plan.coverage_kind)
-    end
+    update(coverage_kind: product.kind) if product.present? && coverage_kind != product.kind
   end
 
   def set_submitted_at

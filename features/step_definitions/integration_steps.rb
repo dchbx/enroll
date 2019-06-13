@@ -761,7 +761,7 @@ When(/^.+ clicks? delete on baby Soren$/) do
   @browser.button(text: /Confirm Member/i).wait_while_present
 end
 
-Then(/^.+ should see (\d+) dependents*$/) do |n|
+Then(/^.+ should see ([^"]*) dependents*$/) do |n|
   expect(page).to have_selector('li.dependent_list', :count => n.to_i)
 end
 
@@ -1030,7 +1030,6 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
-  find(".navbar-brand").click #to stop datepicker blocking shit
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end

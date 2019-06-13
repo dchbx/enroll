@@ -420,7 +420,8 @@ module ApplicationHelper
       issuer_hios_id = plan.hios_id[0..4].extract_value
       Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
     else
-      return "" if !plan.issuer_profile.legal_name.extract_value.present?
+      return '' if plan.extract_value.issuer_profile.legal_name.nil?
+
       issuer_hios_id = plan.hios_id[0..4].extract_value
       Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
     end

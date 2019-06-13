@@ -72,7 +72,7 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   elsif role == "Resident"
     dependent = FactoryBot.create :person, :with_resident_role, dob: dob
   else
-    dependent = FactoryBot.create :person, :with_consumer_role, dob: dob
+    dependent = FactoryBot.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
   end
   fm = FactoryBot.create :family_member, family: @family, person: dependent
   user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
@@ -84,7 +84,8 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   sep = FactoryBot.create :special_enrollment_period, family: @family
-  enrollment = FactoryBot.create(:hbx_enrollment,
+  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
+  enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: @family.active_household,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
@@ -177,10 +178,10 @@ end
 
 And(/(.*) should also see the reason for ineligibility/) do |named_person|
   person_hash = people[named_person]
+  person = person_hash ? Person.where(:first_name => /#{person_hash[:first_name]}/i, :last_name => /#{person_hash[:last_name]}/i).first : ''
+  role = named_person == 'consumer' ? 'consumer' : 'employee'
 
-  person = Person.where(:first_name => /#{person_hash[:first_name]}/i,
-                        :last_name => /#{person_hash[:last_name]}/i).first
-  if person.active_employee_roles.present?
+  if role == 'employee' && person.active_employee_roles.present?
     expect(page).to have_content "This dependent is ineligible for employer-sponsored"
   else
     expect(page).to have_content "eligibility failed on family_relationships"
@@ -203,17 +204,17 @@ end
 
 Then(/(.*) should see both dependent and primary/) do |role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
-  expect(page).to have_content "COVERAGE FOR: #{primary.full_name} + 1 Dependent"
+  expect(page).to have_content "Coverage For:   #{primary.full_name} + 1 Dependent"
 end
 
 Then(/(.*) should only see the dependent name/) do |role|
   dependent = Person.all.select { |person| person.primary_family.blank? }.first
-  expect(page).to have_content "COVERAGE FOR: #{dependent.full_name}"
+  expect(page).to have_content "Coverage For:   #{dependent.full_name}"
 end
 
 Then(/(.*) should see primary person/) do |role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
-  expect(page).to have_content "Covered: #{primary.first_name}"
+  expect(page).to have_content "Coverage For:   #{primary.first_name}"
 end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
