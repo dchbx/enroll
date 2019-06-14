@@ -1,4 +1,3 @@
-@wip
 Feature: IVL plan purchase
 
   Scenario: when Resident purchase plan for self & dependent

@@ -67,13 +67,13 @@ end
 And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role, kind, var|
   dob = (var == "greater" ? TimeKeeper.date_of_record - 35.years : TimeKeeper.date_of_record - 5.years)
   @family = Family.all.first
-  if role == "employee"
-    dependent = FactoryBot.create :person, dob: dob
-  elsif role == "Resident"
-    dependent = FactoryBot.create :person, :with_resident_role, dob: dob
-  else
-    dependent = FactoryBot.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
-  end
+  dependent = if role == 'employee'
+                FactoryBot.create :person, dob: dob
+              elsif role == 'Resident'
+                FactoryBot.create :person, :with_resident_role, :with_active_resident_role, dob: dob
+              else
+                FactoryBot.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
+              end
   fm = FactoryBot.create :family_member, family: @family, person: dependent
   user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
   ch = @family.active_household.immediate_family_coverage_household
@@ -179,7 +179,7 @@ end
 And(/(.*) should also see the reason for ineligibility/) do |named_person|
   person_hash = people[named_person]
   person = person_hash ? Person.where(:first_name => /#{person_hash[:first_name]}/i, :last_name => /#{person_hash[:last_name]}/i).first : ''
-  role = named_person == 'consumer' ? 'consumer' : 'employee'
+  role = named_person
 
   if role == 'employee' && person.active_employee_roles.present?
     expect(page).to have_content "This dependent is ineligible for employer-sponsored"

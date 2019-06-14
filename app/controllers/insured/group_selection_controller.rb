@@ -92,7 +92,7 @@ class Insured::GroupSelectionController < ApplicationController
       hbx_enrollment.plan = @hbx_enrollment.plan
     end
 
-    select_enrollment_members(hbx_enrollment, family_member_ids) if @market_kind == 'individual'
+    select_enrollment_members(hbx_enrollment, family_member_ids) if @market_kind == 'individual' || @market_kind == 'coverall'
 
     hbx_enrollment.generate_hbx_signature
     @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
@@ -107,13 +107,13 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.kind = @market_kind if (hbx_enrollment.kind != @market_kind) && (@market_kind != 'shop')
 
     if hbx_enrollment.save
-      if @market_kind == 'individual'
+      if @market_kind == 'individual' || @market_kind == 'coverall'
         hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       elsif @market_kind == 'shop'
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
       end
 
-      if @market_kind == 'individual' && keep_existing_plan
+      if (@market_kind == 'individual' || @market_kind == 'coverall') && keep_existing_plan
         hbx_enrollment.update_coverage_kind_by_plan
         redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
       elsif @market_kind == 'shop' && keep_existing_plan && @adapter.previous_hbx_enrollment.present?
