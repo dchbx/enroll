@@ -99,6 +99,8 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
+    Permission.super_admin.update_attributes!(can_complete_resident_application: true)
+    Permission.hbx_tier3.update_attributes!(can_complete_resident_application: true)
   end
 
   def hbx_admin_can_add_sep
