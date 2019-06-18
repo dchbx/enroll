@@ -208,9 +208,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-    @metal_levels = @plans.map(&:metal_level).uniq
-    @plan_types = @plans.map(&:product_type).uniq
-    @networks = ['Nationwide', 'DC-Metro']
+    collect_shopping_filters
 
     generate_eligibility_data
     generate_checkbook_service if params[:market_kind] == 'individual'
@@ -311,6 +309,17 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def find_hbx_enrollment
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+  end
+
+  def collect_shopping_filters
+    if params[:coverage_kind] == 'health'
+      @metal_levels = %w[bronze catastrophic silver gold platinum]
+      @plan_types = %w[hmo pos ppo]
+    else
+      @metal_levels = %w[high low]
+      @plan_types = %w[ppo hmo epo]
+    end
+    @networks = %w[Nationwide DC-Metro]
   end
 
   # no dental as of now
