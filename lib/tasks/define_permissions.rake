@@ -113,7 +113,7 @@ end
 
 namespace :permissions do
   desc 'hbx admin can view outstanding verification link tab'
-  DefinePermissions.define_task :hbx_admin_access_outstanding_verification_sub_tab => :environment
+  DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
 end
 
 namespace :permissions do
@@ -142,7 +142,6 @@ end
 #rake permissions:hbx_admin_access_new_consumer_application_sub_tab
 #rake permissions:hbx_admin_access_identity_verification_sub_tab
 #rake permissions:hbx_admin_access_outstanding_verification_sub_tab
-#rake permissions:hbx_admin_can_access_resident_application_sub_tab
 
 #RAILS_ENV=production bundle exec rake permissions:initial_hbx
 #RAILS_ENV=production bundle exec rake permissions:migrate_hbx

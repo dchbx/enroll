@@ -37,7 +37,6 @@ class Permission
   field :view_personal_info_page, type: Boolean, default: false
   field :can_access_new_consumer_application_sub_tab, type: Boolean, default: false
   field :can_access_outstanding_verification_sub_tab, type: Boolean, default: false
-  field :can_access_resident_application_sub_tab, type: Boolean, default: false
   field :can_access_identity_verification_sub_tab, type: Boolean, default: false
   field :can_access_accept_reject_identity_documents, type: Boolean, default: false
   field :can_access_accept_reject_paper_application_documents, type: Boolean, default: false

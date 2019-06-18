@@ -989,14 +989,18 @@ describe DefinePermissions, dbclean: :after_each do
     before do
       User.all.delete
       Person.all.delete
+      @super_admin = FactoryBot.create(:person)
       @hbx_staff_person = FactoryBot.create(:person)
       @hbx_read_only_person = FactoryBot.create(:person)
       @hbx_csr_supervisor_person = FactoryBot.create(:person)
       @hbx_csr_tier1_person = FactoryBot.create(:person)
       @hbx_csr_tier2_person = FactoryBot.create(:person)
+      @hbx_csr_tier3_person = FactoryBot.create(:person)
       permission_hbx_staff = FactoryBot.create(:permission, :hbx_staff)
+      permission_super_admin = FactoryBot.create(:permission, :super_admin)
       permission_hbx_read_only = FactoryBot.create(:permission, :hbx_read_only)
       permission_hbx_csr_supervisor = FactoryBot.create(:permission, :hbx_csr_supervisor)
+      permission_hbx_csr_tier3 = FactoryBot.create(:permission, :hbx_tier3)
       permission_hbx_csr_tier2 = FactoryBot.create(:permission, :hbx_csr_tier2)
       permission_hbx_csr_tier1 = FactoryBot.create(:permission, :hbx_csr_tier1)
       hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
@@ -1004,10 +1008,12 @@ describe DefinePermissions, dbclean: :after_each do
       hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
       hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
       hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
+      FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier3_person, subrole: "hbx_tier3", permission_id: permission_hbx_csr_tier3.id)
+      FactoryBot.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: permission_super_admin.id)
     end
     it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
       subject.hbx_admin_can_access_new_consumer_application_sub_tab
-      expect(Person.all.count).to eq(5)
+      expect(Person.all.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
@@ -1016,7 +1022,7 @@ describe DefinePermissions, dbclean: :after_each do
 
     it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
       subject.hbx_admin_can_access_identity_verification_sub_tab
-      expect(Person.all.count).to eq(5)
+      expect(Person.all.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
@@ -1024,22 +1030,24 @@ describe DefinePermissions, dbclean: :after_each do
     end
     it "updates hbx_admin_can_access_outstanding_verification_sub_tab to true" do
       subject.hbx_admin_can_access_outstanding_verification_sub_tab
-      expect(Person.all.count).to eq(5)
+      expect(Person.all.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
     end
     it "updates hbx_admin_can_complete_resident_application to true" do
       subject.hbx_admin_can_complete_resident_application
-      expect(Person.all.count).to eq(5)
+      expect(Person.all.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_complete_resident_application).to be true
+      expect(@super_admin.hbx_staff_role.permission.can_complete_resident_application).to be true
+      expect(@hbx_csr_tier3_person.hbx_staff_role.permission.can_complete_resident_application).to be true
     end
     it "updates hbx_admin_can_access_accept_reject_identity_documents to true" do
       subject.hbx_admin_can_access_accept_reject_identity_documents
-      expect(Person.all.count).to eq(5)
+      expect(Person.all.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
     end
     it "updates hbx_admin_can_access_accept_reject_paper_application_documents to true" do
       subject.hbx_admin_can_access_accept_reject_paper_application_documents
-      expect(Person.all.count).to eq(5)
+      expect(Person.all.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
@@ -1047,7 +1055,7 @@ describe DefinePermissions, dbclean: :after_each do
     end
     it "updates hbx_admin_can_delete_identity_application_documents to true" do
       subject.hbx_admin_can_delete_identity_application_documents
-      expect(Person.all.count).to eq(5)
+      expect(Person.all.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
     end
   end
