@@ -25,10 +25,11 @@ module Effective
           @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
         }, :filter => false
 
-        # TODO: Make this based on settings. MA does not use, but others might.
-        # table_column :general_agency, :proc => Proc.new { |row|
-        #   @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
-        # }, :filter => false
+        if aca_state_abbreviation == 'DC'
+          table_column :general_agency, :label => 'General Agency', :proc => proc {
+            @employer_profile.try(:active_ga_legal_name).try(:titleize)
+          }, :filter => false
+        end
 
         # table_column :conversion, :proc => Proc.new { |row|
         #   boolean_to_glyph(row.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}

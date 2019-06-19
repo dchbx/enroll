@@ -1,6 +1,7 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 module BenefitSponsors
   RSpec.describe Concerns::EmployerProfileConcern, type: :model, dbclean: :after_each do
@@ -58,6 +59,24 @@ module BenefitSponsors
             expect(profile.billing_benefit_application).to eq [nil, nil]
           end
         end
+      end
+    end
+
+    describe 'active_ga_legal_name' do
+      include_context 'set up broker agency profile for BQT, by using configuration settings'
+
+      let(:employer_profile) {plan_design_organization_with_assigned_ga.employer_profile}
+      let(:ga_legal_name) {plan_design_organization_with_assigned_ga.general_agency_profile.legal_name.to_s}
+      let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:abc_profile)    { organization.employer_profile }
+
+      it 'should return legal name when GA account is assigned' do
+        expect(employer_profile.active_ga_legal_name).to eq ga_legal_name
+      end
+
+      it 'should return nil when GA account is not assigned' do
+        expect(abc_profile.active_ga_legal_name).to be nil
       end
     end
   end
