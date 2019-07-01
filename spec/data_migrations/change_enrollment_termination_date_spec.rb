@@ -6,7 +6,7 @@ describe ChangeEnrollmentTerminationDate, dbclean: :after_each do
   let(:given_task_name) { 'change_enrollment_effective_on_date' }
   subject { ChangeEnrollmentTerminationDate.new(given_task_name, double(:current_scope => nil)) }
    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-   let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
+   let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household, family: family)}
    let!(:py_params) {{hbx_id: hbx_enrollment.hbx_id, new_termination_date: (hbx_enrollment.terminated_on + 1.month).to_s }}
 
   describe 'given a task name'do

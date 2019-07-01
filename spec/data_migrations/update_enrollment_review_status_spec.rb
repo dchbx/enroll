@@ -7,6 +7,7 @@ describe UpdateReviewStatus, dbclean: :after_each do
   let(:enrollment_with_nil_review) {
     FactoryBot.create(:hbx_enrollment,
                        household: family.active_household,
+                       family: family,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
                        enrollment_kind: "open_enrollment",
@@ -17,6 +18,7 @@ describe UpdateReviewStatus, dbclean: :after_each do
   }
   let(:enrollment_with_existing_review) {
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,

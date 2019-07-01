@@ -49,6 +49,7 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
     let(:hbx_enrollment) {
       FactoryBot.create(:hbx_enrollment,
         :individual_unassisted,
+        family: family,
         household: family.active_household)
     }
 
@@ -62,7 +63,8 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
       hbx_enrollment.hbx_enrollment_members.each do |member|
         expect(member.is_subscriber).to be(false)
       end
-
+      hbx_enrollment.reload
+      family.reload
       subject.migrate
       oldest_hbx_enrollment_member.reload
       hbx_enrollment_member_1.reload

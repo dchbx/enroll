@@ -2,7 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateReviewStatus < MongoidMigrationTask
   def get_families
-    Family.by_enrollment_individual_market.where("households.hbx_enrollments"=>{"$exists":true})
+    Family.by_enrollment_individual_market.all_with_hbx_enrollments
   end
 
   def migrate

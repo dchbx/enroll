@@ -4,7 +4,7 @@ class RemoveDependentFromEeEnrollment < MongoidMigrationTask
   def migrate
     enrollment_id = ENV["enrollment_id"]
     enrollment_memeber_id = ENV["enrollment_member_id"]
-    hbx_enrollment=HbxEnrollment.find(enrollment_id)
+    hbx_enrollment = HbxEnrollment.where(id: enrollment_id).first 
     if hbx_enrollment.nil?
       puts "No hbx_enrollment found with the given id" unless Rails.env.test?
     else

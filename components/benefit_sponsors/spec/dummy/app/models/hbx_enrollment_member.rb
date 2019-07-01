@@ -39,10 +39,6 @@ class HbxEnrollmentMember
     end
   end
 
-  def update_current(updates)
-    hbx_enrollment.hbx_enrollment_members.where(id: id).update_all(updates)
-  end
-
   def primary_relationship
     return @primary_relationship unless @primary_relationship.blank?
     @primary_relationship = family_member.primary_relationship

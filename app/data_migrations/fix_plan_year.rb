@@ -63,14 +63,13 @@ class FixPlanYear < MongoidMigrationTask
     else
       puts "employer Profile not found" unless Rails.env.test?
     end
-
   end
 
   def find_by_benefit_groups(benefit_groups)
-    id_list = benefit_groups.collect(&:_id).uniq
-    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
+    id_lists = benefit_groups.collect(&:_id).uniq
+    families = Family.all_enrollments_by_benefit_group_ids(id_lists)
     families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).to_a
+      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_lists).to_a
     end
   end
 end

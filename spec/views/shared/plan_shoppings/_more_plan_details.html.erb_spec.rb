@@ -5,7 +5,7 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
   let(:person_two) { FactoryBot.create(:person, first_name: 'iajsdias') }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:household) { FactoryBot.create(:household, family: family) }
-  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household) }
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family) }
   let(:hbx_enrollment_member_one) { double("hbx_enrollment_member") }
   let(:hbx_enrollment_member_two) { double("hbx_enrollment_member") }
   let(:mock_group){double("membergroup", count: 4)}

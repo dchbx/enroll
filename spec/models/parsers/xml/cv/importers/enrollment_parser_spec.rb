@@ -30,12 +30,12 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
         expect(enrollment.applied_aptc_amount).to eq 0
         expect(enrollment.carrier_profile_id).to eq '116036'
         expect(enrollment.coverage_kind).to eq 'health_and_dental'
-        expect(enrollment.household.class).to eq Household
+        expect(enrollment.family.households.first.class).to eq Household
         expect(enrollment.employee_role.class).to eq EmployeeRole
       end
 
       it "should get family_members" do
-        household = subject.get_enrollment_object.household
+        household = subject.get_enrollment_object.family.households.first
         expect(household.family.family_members.class).to eq Array
         expect(household.family.family_members.first.person.class).to eq Person
         expect(household.family.family_members.first.person.hbx_id).to eq '19801010'

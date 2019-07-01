@@ -63,6 +63,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
+                         family: family,
                          household: family.active_household,
                          kind: "employer_sponsored",
                          effective_on: start_on,

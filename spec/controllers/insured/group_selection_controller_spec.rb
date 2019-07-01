@@ -86,7 +86,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
                         person.employee_roles.first.save
                         person.save}
 
-    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household,
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household,
                             sponsored_benefit_package_id: initial_application.benefit_packages.first.id) }
     let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
     let!(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
@@ -266,30 +266,44 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(assigns(:new_effective_on)).to eq hbx_enrollment.effective_on
       end
     end
-#TODO: fix me when group selection controller is refactored per IVL new model.
-  #   context "individual" do
-  #     let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
-  #     before :each do
-  #       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-  #       allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
-  #       allow(person).to receive(:is_consumer_role_active?).and_return true
-  #       allow(person).to receive(:has_active_employee_role?).and_return false
-  #       allow(HbxEnrollment).to receive(:find).and_return nil
-  #       allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
-  #     end
-  #
-  #     it "should set session" do
-  #       sign_in user
-  #       get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
-  #       expect(session[:pre_hbx_enrollment_id]).to eq "123"
-  #     end
-  #
-  #     it "should get new_effective_on" do
-  #       sign_in user
-  #       get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
-  #       expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
-  #     end
-  #   end
+
+    #TODO: fix me when group selection controller is refactored per IVL new model.
+    context "individual" do
+      let(:family_member_ids) {{"0"=>family.family_members.first.id}}
+      let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
+      let!(:consumer_role) {person.consumer_role}
+      let!(:new_household) {family.households.where(:id => {"$ne"=>"#{family.households.first.id}"}).first}
+      let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
+
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
+        allow(person).to receive(:is_consumer_role_active?).and_return true
+        allow(person).to receive(:has_active_employee_role?).and_return false
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(HbxEnrollment).to receive(:find).and_return nil
+        allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
+      end
+
+      it "should set session" do
+        sign_in user
+        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
+        expect(session[:pre_hbx_enrollment_id]).to eq "123"
+      end
+
+      it "should get new_effective_on" do
+        sign_in user
+        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123" }
+        expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
+      end
+
+      it "should create an hbx enrollment" do
+        sign_in user
+        post :create, params: { person_id: person.id, consumer_role_id: consumer_role.id , market_kind:"individual", change_plan: "change", hbx_enrollment_id: "123",family_member_ids: family_member_ids, enrollment_kind:'sep' }
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(insured_plan_shopping_path(id: new_household.hbx_enrollments(true).first.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'individual', enrollment_kind: 'sep'))
+      end
+    end
   end
 
   context "GET terminate_selection" do

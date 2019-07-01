@@ -12,7 +12,7 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
   describe "creating new enrollment member record for an enrollment", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:enrollment) do
-      hbx = FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "individual")
+      hbx = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: "individual")
       hbx.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record - 30.days)
       hbx.save
       hbx
@@ -43,7 +43,7 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
 
   describe "creating primary member record for an enrollment", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let(:enrollment){ FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored") }
+    let(:enrollment){ FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: "employer_sponsored") }
     let(:family_member) { FactoryBot.create(:family_member, family: family)}
     before(:each) do
       

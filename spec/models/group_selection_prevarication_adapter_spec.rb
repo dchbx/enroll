@@ -44,6 +44,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
       let!(:hbx_enrollment) {
         FactoryBot.create(:hbx_enrollment,
           household: family.active_household,
+          family: family,
           coverage_kind: "dental",
           effective_on: enrollment_effective_date,
           enrollment_kind: "open_enrollment",

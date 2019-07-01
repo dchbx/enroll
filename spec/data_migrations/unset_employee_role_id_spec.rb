@@ -16,8 +16,8 @@ describe UnsetEmplyeeRoleId, dbclean: :after_each do
   describe 'unset employee role', dbclean: :after_each do
     let(:person) { family.primary_family_member.person }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment, household: family.active_household,id:'1', kind:'individual', employee_role_id: '1234')}
-    let!(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment, household: family.active_household,id:'2', kind:'employer_sponsored', employee_role_id: '1234')}
+    let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household,id:'1', kind:'individual', employee_role_id: '1234')}
+    let!(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment,family: family, household: family.active_household,id:'2', kind:'employer_sponsored', employee_role_id: '1234')}
     before(:each) do
       person.update_attributes(hbx_id: '1111')
     end

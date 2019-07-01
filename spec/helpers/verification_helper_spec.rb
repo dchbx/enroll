@@ -357,6 +357,34 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
+  # describe '#review button class' do
+  #   let(:obj) { double }
+  #   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  #   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent", family: family) }
+  #   before :each do
+  #     allow(obj).to receive_message_chain("family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+  #   end
+
+  #   it 'returns default when the status is verified' do
+  #      allow(helper).to receive(:get_person_v_type_status).and_return(['outstanding'])
+  #      expect(helper.review_button_class(family)).to eq('default')
+  #   end
+
+  #   it 'returns info when the status is in review and outstanding' do
+  #     allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'outstanding'])
+  #     expect(helper.review_button_class(family)).to eq('info')
+  #   end
+
+  #   it 'returns success when the status is in review ' do
+  #     allow(helper).to receive(:get_person_v_type_status).and_return(['review'])
+  #     expect(helper.review_button_class(family)).to eq('success')
+  #   end
+
+  #   it 'returns sucsess when the status is verified and in review but no outstanding' do
+  #     allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'verified'])
+  #     expect(helper.review_button_class(family)).to eq('success')
+  #   end
+  # end
 
   describe '#get_person_v_type_status' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}

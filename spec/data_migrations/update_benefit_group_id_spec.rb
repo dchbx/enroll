@@ -14,7 +14,7 @@ describe UpdateBenefitGroupId, dbclean: :after_each do
     let(:household) {Household.new}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, households: [household])}
     let(:benefit_group) { FactoryBot.create(:benefit_group) }
-    let(:hbx2) {FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", benefit_group_id: nil)}
+    let(:hbx2) {FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: "employer_sponsored", benefit_group_id: nil)}
     
     around do |example|
       ClimateControl.modify benefit_group_id: benefit_group.id, enrollment_hbx_id: hbx2.hbx_id do
@@ -31,8 +31,8 @@ describe UpdateBenefitGroupId, dbclean: :after_each do
     
     it "should update benefit group id" do
       subject.migrate
-      person.primary_family.active_household.hbx_enrollments.first.reload
-      expect(person.primary_family.active_household.hbx_enrollments.first.benefit_group_id).to be_present
+      person.primary_family.hbx_enrollments.first.reload
+      expect(person.primary_family.hbx_enrollments.first.benefit_group_id).to be_present
     end
   end
 end

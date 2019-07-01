@@ -14,7 +14,7 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
 
   describe "revering EE termination when EE in employment terminated status", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, terminate_reason: "by_error")}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, family: family, household: family.active_household, terminate_reason: "by_error")}
     let(:employee_role) { FactoryBot.create(:employee_role)}
     let(:census_employee) { FactoryBot.build(:census_employee, :termination_details) }
 
@@ -59,7 +59,7 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
   end
   describe "revering EE termination when EE in employee_termination_pending ", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, terminate_reason: "by_error")}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, family: family, household: family.active_household, terminate_reason: "by_error")}
     let(:employee_role) { FactoryBot.create(:employee_role)}
     let(:census_employee) { FactoryBot.build(:census_employee, :termination_details) }
 

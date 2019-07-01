@@ -153,8 +153,5 @@ end
 
 def enrollments_for_plan_year(plan_year)
   id_list = plan_year.benefit_groups.map(&:id)
-  families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-  enrollments = families.inject([]) do |enrollments, family|
-    enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
-  end
+  HbxEnrollment.where(:"benefit_group_id".in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
 end

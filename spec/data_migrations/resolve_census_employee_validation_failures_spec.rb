@@ -43,6 +43,7 @@ describe ResolveCensusEmployeeValidationFailures do
  
         let!(:enrollment) {
           FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
+            family: family,
             enrollment_members: family.family_members,
             household: family.active_household,
             coverage_kind: 'health',
@@ -63,7 +64,7 @@ describe ResolveCensusEmployeeValidationFailures do
             assignment = ce.active_benefit_group_assignment
             assignment.hbx_enrollment_id = '51212121212'
             assignment.aasm_state = 'coverage_selected'
-            assignment.save(:validate => false)
+            assignment.save!(:validate => false)
           end
 
           it 'should remove the incorrect enrollment id' do

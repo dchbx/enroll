@@ -23,7 +23,7 @@ describe UpdateBenefitGroupAssignmentStartDate, dbclean: :after_each do
     let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year)}
     let(:plan_year) { FactoryBot.create(:plan_year) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)}
     let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group, hbx_enrollment: hbx_enrollment, start_on: TimeKeeper.date_of_record - 5.years)}
     let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: plan_year.employer_profile.id)}
 

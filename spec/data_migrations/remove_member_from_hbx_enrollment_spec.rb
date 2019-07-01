@@ -17,7 +17,7 @@ describe RemoveMemberFromHbxEnrollment, dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:family_member1) { FactoryBot.create(:family_member, family: household.family) }
     let(:family_member2) { FactoryBot.create(:family_member, family: household.family) }
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household) }
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family) }
     let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member1.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
     let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
     context "it should not remove the hbx_enrollment" do

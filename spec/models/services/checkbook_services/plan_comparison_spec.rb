@@ -8,16 +8,18 @@ end
 
 describe Services::CheckbookServices::PlanComparision do
 
-  let(:census_employee) { FactoryBot.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
-  let(:household) { FactoryBot.create(:household, family: person.primary_family)}
-  let(:employee_role) { FactoryBot.create(:employee_role, person: person)}
-  let(:person) { FactoryBot.create(:person, :with_family)}
+  let!(:census_employee) { FactoryBot.create(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id, ssn: "112232222")}
+  let!(:household) { FactoryBot.create(:household, family: person.primary_family)}
+  let!(:ce_household) { census_employee.employee_role.person.primary_family.households.first }
+
+  let!(:employee_role) { FactoryBot.create(:employee_role, person: person)}
+  let!(:person) { FactoryBot.create(:person, :with_family)}
   let!(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
   let(:plan_year){ FactoryBot.create(:next_month_plan_year, :with_benefit_group)}
   let(:benefit_group){ plan_year.benefit_groups.first }
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id, benefit_group_id: benefit_group.id)}
-  let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment, kind: "individual", consumer_role_id: consumer_person.consumer_role.id, household: family.active_household)}
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, employee_role_id: employee_role.id, benefit_group_id: benefit_group.id)}
+  let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment,family: family, kind: "individual", consumer_role_id: consumer_person.consumer_role.id, household: family.active_household)}
 
   describe "when employee is not congress" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
@@ -32,6 +34,8 @@ describe Services::CheckbookServices::PlanComparision do
       if ApplicationHelperModStubber.plan_match_dc
         allow(subject).to receive(:construct_body_shop).and_return({})
         allow(HTTParty).to receive(:post).and_return(result)
+        hbx_enrollment.household = ce_household 
+        hbx_enrollment.reload
         # expect(subject.generate_url).to eq Rails.application.config.checkbook_services_congress_url+"#{hbx_enrollment.effective_on.year}/"
         expect(subject.generate_url).to eq checkbook_url
       end
@@ -112,7 +116,7 @@ describe Services::CheckbookServices::PlanComparision do
     let!(:ivl_tax_household){ FactoryBot.create(:tax_household, household: ivl_household, effective_ending_on: nil) }
     let!(:ivl_ed)           { FactoryBot.create(:eligibility_determination, tax_household: ivl_tax_household) }
     let!(:thh_start_on)     { ivl_tax_household.effective_starting_on }
-    let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, effective_on: thh_start_on, kind: 'individual', household: ivl_household, consumer_role_id: ivl_person.consumer_role.id.to_s) }
+    let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, effective_on: thh_start_on, family: ivl_family, kind: 'individual', household: ivl_family.active_household , consumer_role_id: ivl_person.consumer_role.id.to_s) }
     let!(:ivl_enr_member)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm_id, hbx_enrollment: ivl_enrollment, eligibility_date: thh_start_on) }
     let!(:ivl_thhm)         { ivl_tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: primary_fm_id, is_ia_eligible: true) }
 

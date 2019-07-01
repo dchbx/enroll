@@ -5,13 +5,16 @@ describe "exchanges/hbx_profiles/_edit_enrollment.html.erb" do
   let(:user) { FactoryBot.create(:user, :person => person) }
 
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-  let(:enrollment) { FactoryBot.create(:hbx_enrollment,
-                                      household: family.active_household,
-                                      kind: "employer_sponsored",
-                                      submitted_at: TimeKeeper.datetime_of_record - 3.days,
-                                      created_at: TimeKeeper.datetime_of_record - 3.days
-                              )}
-
+  let(:enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      family: family,
+      household: family.active_household,
+      kind: "employer_sponsored",
+      submitted_at: TimeKeeper.datetime_of_record - 3.days,
+      created_at: TimeKeeper.datetime_of_record - 3.days
+    )
+  end
   let(:new_dob) { 66.years.ago.to_date }
   let(:new_ssn) { '675498744' }
 

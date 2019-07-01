@@ -28,12 +28,20 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
                            kind: "individual",
                            submitted_at: TimeKeeper.date_of_record,
                            consumer_role: consumer_role,
+                           family: family1,
                            aasm_state: 'shopping')
                         }
     let!(:consumer_role) {FactoryBot.create(:consumer_role,person: family1.family_members[0].person)}
     let!(:consumer_role1) {FactoryBot.create(:consumer_role,person: family2.family_members[0].person)}
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-    let(:enr_env_support) {{old_account_hbx_id: family1.family_members[0].person.hbx_id, new_account_hbx_id: family2.family_members[0].person.hbx_id, enrollment_hbx_id: hbx_enrollment.hbx_id}}
+    around do |example|
+      ClimateControl.modify old_account_hbx_id: family1.family_members[0].person.hbx_id,  
+                            new_account_hbx_id: family2.family_members[0].person.hbx_id,    
+                            enrollment_hbx_id: hbx_enrollment.hbx_id do
+        example.run
+      end
+    end
+
     before do
       coverage_household_member = family1.households.first.coverage_households.first.coverage_household_members.first
       h = HbxEnrollmentMember.new_from(coverage_household_member: coverage_household_member)
@@ -44,20 +52,18 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
       consumer_role1=consumer_role1
     end
     it "should move an ivl enrollment" do
-      with_modified_env enr_env_support do 
-        expect(family1.active_household.hbx_enrollments).to include(hbx_enrollment)
-        expect(family2.active_household.hbx_enrollments).not_to include(hbx_enrollment)
-        @size1=family1.active_household.hbx_enrollments.size
-        @size2=family2.active_household.hbx_enrollments.size
-        subject.migrate
-        family1.reload
-        family2.reload
-        expect(family1.active_household.hbx_enrollments).not_to include(hbx_enrollment)
-        expect(family2.active_household.hbx_enrollments.last.kind).to eq "individual"
-        expect(family2.active_household.hbx_enrollments.last.consumer_role).to eq consumer_role1
-        expect(family1.active_household.hbx_enrollments.size).to eq @size1-1
-        expect(family2.active_household.hbx_enrollments.size).to eq @size2+1
-      end 
+      expect(family1.active_household.hbx_enrollments).to include(hbx_enrollment)
+      expect(family2.active_household.hbx_enrollments).not_to include(hbx_enrollment)
+      @size1=family1.active_household.hbx_enrollments.size
+      @size2=family2.active_household.hbx_enrollments.size
+      subject.migrate
+      family1.reload
+      family2.reload
+      expect(family1.active_household.hbx_enrollments).not_to include(hbx_enrollment)
+      expect(family2.active_household.hbx_enrollments.last.kind).to eq "individual"
+      expect(family2.active_household.hbx_enrollments.last.consumer_role).to eq consumer_role1
+      expect(family1.active_household.hbx_enrollments.size).to eq @size1-1
+      expect(family2.active_household.hbx_enrollments.size).to eq @size2+1
     end
   end
   describe "it should move a shop enrollment", dbclean: :after_each do
@@ -73,6 +79,7 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
                          household: family1.active_household,
                          coverage_kind: "health",
                          kind: "employer_sponsored",
+                         family: family1,
                          submitted_at: TimeKeeper.date_of_record,
                          employee_role: employee_role,
                          aasm_state: 'shopping',

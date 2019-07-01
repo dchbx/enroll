@@ -20,6 +20,7 @@ module BenefitSponsors
     let!(:employee_role)          { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
     let!(:model_instance)         { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                                     household: family.active_household, 
+                                    family: family,
                                     aasm_state: "shopping",
                                     submitted_at: benefit_application.open_enrollment_period.max,
                                     rating_area_id: benefit_application.recorded_rating_area_id,

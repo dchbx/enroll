@@ -22,6 +22,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: model_instance.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
   let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
+                        family: family,
                         aasm_state: "coverage_termination_pending",
                         effective_on: benefit_application.start_on,
                         rating_area_id: benefit_application.recorded_rating_area_id,

@@ -9,7 +9,7 @@ RSpec.describe IvlNotices::SecondIvlRenewalNotice, :dbclean => :after_each do
   data = csv.to_a
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :hbx_id => "383883748")}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "individual")}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.households.first, kind: "individual")}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'September Projected Renewal Notice',
                             :notice_template => 'notices/ivl/projected_eligibility_notice',

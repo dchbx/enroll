@@ -27,6 +27,7 @@ describe FixHbxEnrollments, dbclean: :after_each do
     FactoryBot.create(:hbx_enrollment,
                       product: product,
                       hbx_enrollment_members: [ hbx_enrollment_member ],
+                      family: family,
                       household: family.active_household,
                       coverage_kind: "health",
                       effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,

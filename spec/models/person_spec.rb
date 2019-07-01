@@ -1113,7 +1113,8 @@ describe Person, :dbclean => :after_each do
 
     context 'person_has_an_active_enrollment?' do
       let(:active_enrollment)   { FactoryBot.create( :hbx_enrollment,
-                                           household: primary_family.latest_household,
+                                          family: primary_family,
+                                          household: primary_family.latest_household,
                                           employee_role_id: employee_role.id,
                                           is_active: true
                                        )}
@@ -1128,7 +1129,8 @@ describe Person, :dbclean => :after_each do
 
     context 'person_has_an_inactive_enrollment?' do
       let(:inactive_enrollment)   { FactoryBot.create( :hbx_enrollment,
-                                           household: primary_family.latest_household,
+                                          family: primary_family,
+                                          household: primary_family.latest_household,
                                           employee_role_id: employee_role.id,
                                           is_active: false
                                        )}
@@ -1189,6 +1191,7 @@ describe Person, :dbclean => :after_each do
     let(:person) { FactoryBot.create(:person, dob: persons_dob) }
     let(:primary_family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:enrollment)   { FactoryBot.create( :hbx_enrollment,
+                                              family: primary_family,
                                               household: primary_family.latest_household,
                                               aasm_state: 'coverage_selected',
                                               effective_on: TimeKeeper.date_of_record - 10.days,
@@ -1220,7 +1223,7 @@ describe Person, :dbclean => :after_each do
       let(:person_older_than_sixty_one) { FactoryBot.create(:person, dob: age_older_than_sixty_one) }
       let(:primary_family) { FactoryBot.create(:family, :with_primary_family_member) }
       let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
-      let(:enrollment)   { FactoryBot.create( :hbx_enrollment, household: primary_family.latest_household, aasm_state: 'coverage_selected', effective_on: Date.new(2016,1,1), is_active: true)}
+      let(:enrollment)   { FactoryBot.create( :hbx_enrollment, family: primary_family, household: primary_family.latest_household, aasm_state: 'coverage_selected', effective_on: Date.new(2016,1,1), is_active: true)}
       let(:new_dob_to_make_person_sixty_one)    { Date.new(1955,1,1) }
 
       before do

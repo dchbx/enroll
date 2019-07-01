@@ -19,7 +19,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
     let(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
     let(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, effective_on: Date.new(2016,10,1))}
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, effective_on: Date.new(2016,10,1))}
 
     after do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)

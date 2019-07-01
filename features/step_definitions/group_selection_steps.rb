@@ -80,6 +80,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: @family.active_household,
+                                  family: @family,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
                                   enrollment_kind: "special_enrollment",
@@ -112,6 +113,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,
                                   coverage_kind: coverage_kind,
+                                  family: @family,
                                   enrollment_kind: "special_enrollment",
                                   special_enrollment_period_id: sep.id,
                                   employee_role_id: (var == "first" ? @person.active_employee_roles[0].id : @person.active_employee_roles[1].id),

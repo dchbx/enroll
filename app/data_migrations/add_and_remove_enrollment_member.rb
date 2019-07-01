@@ -7,7 +7,7 @@ class AddAndRemoveEnrollmentMember < MongoidMigrationTask
     @person_to_add_input = get_person_to_add_input.to_s
     @family = get_enrollment_family
     if @family
-      @enrollment = @family.active_household.hbx_enrollments.where(hbx_id: @enrollment_input).first
+      @enrollment = HbxEnrollment.where(hbx_id: @enrollment_input).first
       @family_member_id = @family.active_household.family_members.select{|fm| fm.person.hbx_id == @person_to_add_input}.try(:first).try(:id)
       fix_enrollment
     else
@@ -83,6 +83,6 @@ class AddAndRemoveEnrollmentMember < MongoidMigrationTask
   end
 
   def get_enrollment_family
-    Family.where("households.hbx_enrollments.hbx_id" => @enrollment_input).first
+    HbxEnrollment.where(hbx_id: @enrollment_input).first.family
   end
 end

@@ -11,7 +11,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalAqhp, :dbclean => :after
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :hbx_id => "383883742")}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: year, hios_id: "11111111122302-01") }
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "individual", plan: plan, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.households.first, family: family, kind: "individual", plan: plan, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Final Eligibility Notice for UQHP/AQHP individuals',
       :notice_template => 'notices/ivl/final_eligibility_notice_uqhp_aqhp',

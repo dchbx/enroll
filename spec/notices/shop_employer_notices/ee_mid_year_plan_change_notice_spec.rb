@@ -12,7 +12,7 @@ RSpec.describe ShopEmployerNotices::EeMidYearPlanChangeNotice, dbclean: :after_e
   let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:benefit_group_assignment)  { FactoryBot.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: renewal_plan, aasm_state: 'coverage_termination_pending', employee_role_id: employee_role.id)}
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, household: family.active_household, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: renewal_plan, aasm_state: 'coverage_termination_pending', employee_role_id: employee_role.id)}
   let(:renewal_plan) { FactoryBot.create(:plan)}
   let(:plan) { FactoryBot.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{

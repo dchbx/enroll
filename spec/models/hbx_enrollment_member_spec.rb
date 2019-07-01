@@ -72,10 +72,10 @@ describe HbxEnrollmentMember, dbclean: :around_each do
       end
     end
 
-    context "update_current" do
+    context "update_attributes" do
       before :all do
         @member = enrollment.hbx_enrollment_members.last
-        @member.update_current(applied_aptc_amount: 11.1)
+        @member.update_attributes!(applied_aptc_amount: 11.1)
       end
 
       it "member should update applied_aptc_amount" do

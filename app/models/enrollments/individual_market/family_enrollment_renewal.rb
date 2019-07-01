@@ -22,13 +22,14 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       @dependent_age_off = nil
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
-      puts "#{enrollment.hbx_id}---#{e.inspect}"
-      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.backtrace}"
+      puts "#{enrollment.hbx_id}---#{e.inspect}" unless Rails.env.test?
+      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
     end
   end
 
   def clone_enrollment
     renewal_enrollment = @enrollment.family.active_household.hbx_enrollments.new
+    renewal_enrollment.family_id = @enrollment.family.id
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
     renewal_enrollment.effective_on = renewal_coverage_start
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind

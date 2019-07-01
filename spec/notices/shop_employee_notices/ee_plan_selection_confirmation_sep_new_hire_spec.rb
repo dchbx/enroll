@@ -17,6 +17,7 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire, dbclean: :afte
   let(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
                                             household: household,
+                                            family: family,
                                             hbx_enrollment_members: [hbx_enrollment_member],
                                             coverage_kind: "health",
                                             external_enrollment: false,

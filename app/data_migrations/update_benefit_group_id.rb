@@ -11,7 +11,7 @@ class UpdateBenefitGroupId < MongoidMigrationTask
         if hbx_enrollment.first.benefit_group.present?
           puts " This HbxEnrollment has a benefit group which is not nil" unless Rails.env.test?
           else
-            hbx_enrollment.first.benefit_group_id = benefit_group_id
+            hbx_enrollment.first.update_attributes(benefit_group_id: benefit_group_id)
               if hbx_enrollment.first.valid?
                  hbx_enrollment.first.save!
                  hbx_enrollment.first.hbx_id

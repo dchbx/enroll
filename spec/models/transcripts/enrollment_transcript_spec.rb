@@ -40,7 +40,7 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
       }
 
       let(:other_enrollment) {
-        enrollment = other_family.active_household.hbx_enrollments.build({ hbx_id: '1000001', kind: 'individual',plan: other_plan, effective_on: other_effective_on })
+        enrollment = other_family.active_household.hbx_enrollments.build({ hbx_id: '1000001', family: other_family, kind: 'individual',plan: other_plan, effective_on: other_effective_on })
         enrollment.hbx_enrollment_members.build({applicant_id: other_family.primary_applicant.id, is_subscriber: true, coverage_start_on: other_effective_on })
         enrollment.hbx_enrollment_members.build({applicant_id: dependent2.id, is_subscriber: false, coverage_start_on: other_effective_on })
         enrollment
@@ -54,12 +54,12 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
          primary = family.family_members.build(is_primary_applicant: true, person: person)
          dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id1, kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 2.months), aasm_state: 'coverage_selected' })
+         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id1, family: family, kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 2.months), aasm_state: 'coverage_selected' })
          enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
          enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
          enrollment.save!
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: (source_effective_on), aasm_state: 'coverage_selected'})
+         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, family: family, kind: 'individual',plan: source_plan, effective_on: (source_effective_on), aasm_state: 'coverage_selected'})
          enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
          family.save
          family

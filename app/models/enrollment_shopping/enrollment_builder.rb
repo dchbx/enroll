@@ -182,6 +182,7 @@ module EnrollmentShopping
     def build_common_enrollment_information(enrollment_kind)
       enrollment = @household.hbx_enrollments.build
       enrollment.coverage_household_id = @coverage_household.id
+      enrollment.family = @coverage_household.household.family
       enrollment.kind = enrollment_kind
       enrollment.employee_role = @employee_role
       enrollment.coverage_kind = @coverage_kind

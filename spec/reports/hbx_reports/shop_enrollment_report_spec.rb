@@ -23,8 +23,9 @@ describe ShopEnrollmentReport do
     ClimateControl.modify purchase_date_start:"#{06/01/2018}", purchase_date_end:"#{06/10/2018}" do 
 
       CSV.foreach(@file, :headers => true) do |csv|
-        expect(csv).to eq field_names = %w('Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Employer State', 'Enrollment Group ID', 
-                'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name', 'Subscriber SSN', 'Plan HIOS Id', 'Covered lives on the enrollment', 'Enrollment Reason', 'In Glue')
+        expect(csv).to eq ['Employer ID', 'Employer FEIN', 'Employer Name', 'Plan Year Start', 'Plan Year State', 'Employer State',
+                           'Enrollment GroupID', 'Purchase Date', 'Coverage Start', 'Coverage Kind', 'Enrollment State', 'Subscriber HBXID',
+                           'Subscriber First Name','Subscriber Last Name', 'HIOS ID', 'Family Size', 'Enrollment Reason', 'In Glue']
       end
     end
   end

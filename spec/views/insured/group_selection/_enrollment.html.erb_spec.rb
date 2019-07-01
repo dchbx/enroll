@@ -20,7 +20,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile ) }
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:active_household) {family.active_household}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: active_household )}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: active_household )}
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
 
     before :each do
@@ -74,7 +74,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context 'Enrollment termination' do
       let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-      let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment, :with_enrollment_members, household: family.active_household, kind: kind)}
+      let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment, :with_enrollment_members, family: family, household: family.active_household, kind: kind)}
       let(:person) { FactoryBot.build(:person) }
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
 

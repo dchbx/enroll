@@ -140,38 +140,36 @@ module Queries
     end
 
     def self.query_for_initial_sponsored_benefit(sb, effective_on)
-        sb_id = sb.id
-        threshold_time = initial_sponsored_benefit_last_cancel_chance(sb)
-        Family.collection.aggregate([
-          {
-            "$match" => {
-              "households.hbx_enrollments.sponsored_benefit_id" => sb_id
-            }
-          },
-          {"$unwind" => "$households"},
-          {"$unwind" => "$households.hbx_enrollments"},
-          { "$match" => {
-            "households.hbx_enrollments.sponsored_benefit_id" => sb_id,
-            "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
-            "households.hbx_enrollments.effective_on" => effective_on,
-            "households.hbx_enrollments.kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
-            "households.hbx_enrollments.submitted_at" => {"$lte" => threshold_time}
-          }},
-          {"$sort" => {"households.hbx_enrollments.submitted_at" => 1}},
-          {
-            "$group" => {
-              "_id" => {
-                "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
-                "sponsored_benefit_id" => "$households.hbx_enrollments.sponsored_benefit_id"
-              },
-              "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
-              "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
-              "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"},
-              "workflow_state_transitions" => {"$last" => "$households.hbx_enrollments.workflow_state_transitions"},
-              "product_id" => {"$last" => "$households.hbx_enrollments.product_id"}
-            }
+      sb_id = sb.id
+      threshold_time = initial_sponsored_benefit_last_cancel_chance(sb)
+      HbxEnrollment.collection.aggregate([
+        {
+          "$match" => {
+            "sponsored_benefit_id" => sb_id
           }
-        ])
+        },
+        { "$match" => {
+          "sponsored_benefit_id" => sb_id,
+          "aasm_state" => {"$in" => new_enrollment_statuses},
+          "effective_on" => effective_on,
+          "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
+          "submitted_at" => {"$lte" => threshold_time}
+        }},
+        {"$sort" => {"submitted_at" => 1}},
+        {
+          "$group" => {
+            "_id" => {
+              "employee_role_id" => "$employee_role_id",
+              "sponsored_benefit_id" => "$sponsored_benefit_id"
+            },
+            "hbx_enrollment_id" => {"$last" => "$hbx_id"},
+            "aasm_state" => {"$last" => "$aasm_state"},
+            "submitted_at" => {"$last" => "$submitted_at"},
+            "workflow_state_transitions" => {"$last" => "$workflow_state_transitions"},
+            "product_id" => {"$last" => "$product_id"}
+          }
+        }
+      ])
     end
 
     def self.renewal_gate_lifted_enrollments(organization, effective_on, as_of_time = ::TimeKeeper.date_of_record)
@@ -191,32 +189,30 @@ module Queries
 
     def self.find_renewal_transmission_enrollments(sb, as_of_time)
       sb_id = sb.id
-      Family.collection.aggregate([
+      HbxEnrollment.collection.aggregate([
         {
           "$match" => {
-            "households.hbx_enrollments.sponsored_benefit_id" => sb_id
+            "sponsored_benefit_id" => sb_id
           }
         },
-        {"$unwind" => "$households"},
-        {"$unwind" => "$households.hbx_enrollments"},
         { "$match" => {
-          "households.hbx_enrollments.sponsored_benefit_id" => sb_id,
-          "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
-          "households.hbx_enrollments.kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
-          "households.hbx_enrollments.submitted_at" => {"$lte" => as_of_time}
+          "sponsored_benefit_id" => sb_id,
+          "aasm_state" => {"$in" => new_enrollment_statuses},
+          "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
+          "submitted_at" => {"$lte" => as_of_time}
         }},
-        {"$sort" => {"households.hbx_enrollments.submitted_at" => 1}},
+        {"$sort" => {"submitted_at" => 1}},
         {
           "$group" => {
             "_id" => {
-              "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
-              "sponsored_benefit_id" => "$households.hbx_enrollments.sponsored_benefit_id",
-              "effective_on" => "$households.hbx_enrollments.effective_on"
+              "employee_role_id" => "$employee_role_id",
+              "sponsored_benefit_id" => "$sponsored_benefit_id",
+              "effective_on" => "$effective_on"
             },
-            "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
-            "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
-            "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"},
-            "product_id" => {"$last" => "$households.hbx_enrollments.product_id"}
+            "hbx_enrollment_id" => {"$last" => "$hbx_id"},
+            "aasm_state" => {"$last" => "$aasm_state"},
+            "submitted_at" => {"$last" => "$submitted_at"},
+            "product_id" => {"$last" => "$product_id"}
           }
         }
       ])
@@ -227,7 +223,7 @@ module Queries
 
       benefit_sponsorships.flat_map do |bs|
         bs.benefit_applications.select do |ba|
-          (ba.start_on == effective_on) && ["active", "enrollment_eligible"].include?(ba.aasm_state.to_s)
+          (ba.start_on == effective_on) && ["active","binder_paid", "enrollment_eligible"].include?(ba.aasm_state.to_s)
         end
       end.flat_map(&:benefit_packages).flat_map(&:sponsored_benefits)
     end

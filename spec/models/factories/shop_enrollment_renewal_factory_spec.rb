@@ -1,3 +1,4 @@
+
 require 'rails_helper'
 
 RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean: :after_each do
@@ -61,7 +62,10 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean
         let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
 
         let!(:enrollment) {
-          FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
+          FactoryBot.create(
+            :hbx_enrollment,
+            :with_enrollment_members,
+            family: family,
             enrollment_members: family.family_members,
             household: family.active_household,
             coverage_kind: 'health',

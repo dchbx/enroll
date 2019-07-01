@@ -15,7 +15,7 @@ module Queries
     end
 
     def evaluate
-      Family.collection.aggregate(@pipeline)
+      HbxEnrollment.collection.aggregate(@pipeline)
     end
 
     def query_families_with_quiet_period_enrollments
@@ -25,14 +25,14 @@ module Queries
         "$match" => {
           "$or" => [
             {"$and" =>[
-              "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-              "households.hbx_enrollments.workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
+              "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+              "workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
             ]},
             {"$and" =>[
-              "households.hbx_enrollments.aasm_state" => {"$in" => @enrollment_statuses},
-              "households.hbx_enrollments.effective_on" => {"$gt" => @effective_on},
-              "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-              "households.hbx_enrollments.submitted_at" => {"$lt" => quiet_period.begin}
+              "aasm_state" => {"$in" => @enrollment_statuses},
+              "effective_on" => {"$gt" => @effective_on},
+              "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+              "submitted_at" => {"$lt" => quiet_period.begin}
             ]}
           ]
         }
@@ -44,7 +44,7 @@ module Queries
     def query_families_with_active_enrollments
        add({
         "$match" => {
-          "households.hbx_enrollments.benefit_group_id" => {
+          "benefit_group_id" => {
             "$in" => collect_benefit_group_ids
           }
         }
@@ -81,7 +81,7 @@ module Queries
     def query_families
       add({
         "$match" => {
-          "households.hbx_enrollments.benefit_group_id" => {
+          "benefit_group_id" => {
             "$in" => (collect_benefit_group_ids + collect_benefit_group_ids(@effective_on.prev_year))
           }
         }
@@ -91,8 +91,7 @@ module Queries
     end
 
     def unwind_enrollments
-      add({"$unwind" => "$households"})
-      add({"$unwind" => "$households.hbx_enrollments"})
+      # add({"$unwind" => "$households"})
       self
     end
 
@@ -124,9 +123,9 @@ module Queries
 
     def quiet_period_coverage_expression
       {
-        "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-        "households.hbx_enrollments.kind" => "employer_sponsored",
-        "households.hbx_enrollments.workflow_state_transitions" => { 
+        "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+        "kind" => "employer_sponsored",
+        "workflow_state_transitions" => { 
           "$elemMatch" => quiet_period_expression 
         }
       }
@@ -134,30 +133,30 @@ module Queries
 
     def new_hire_enrollment_expression
       {
-          "households.hbx_enrollments.effective_on" => {"$gt" => @effective_on},
-          "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-          "households.hbx_enrollments.kind" => "employer_sponsored",
-          "households.hbx_enrollments.submitted_at" => {"$lt" => quiet_period.begin}
+          "effective_on" => {"$gt" => @effective_on},
+          "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+          "kind" => "employer_sponsored",
+          "submitted_at" => {"$lt" => quiet_period.begin}
       }
     end
 
     def new_coverage_expression
       {
-        "households.hbx_enrollments.benefit_group_id" => {"$in" => collect_benefit_group_ids},
-        "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
-        "households.hbx_enrollments.effective_on" => @effective_on,
+        "benefit_group_id" => {"$in" => collect_benefit_group_ids},
+        "aasm_state" => {"$in" => new_enrollment_statuses},
+        "effective_on" => @effective_on,
         # Exclude COBRA, for now
-        "households.hbx_enrollments.kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]}
+        "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]}
       }
     end
 
     def existing_coverage_expression
       {
-        "households.hbx_enrollments.benefit_group_id" => {"$in" => collect_benefit_group_ids(@effective_on.prev_year)},
-        "households.hbx_enrollments.aasm_state" => {"$in" => existing_enrollment_statuses},
-        "households.hbx_enrollments.effective_on" => {"$gte" => @effective_on.prev_year},
+        "benefit_group_id" => {"$in" => collect_benefit_group_ids(@effective_on.prev_year)},
+        "aasm_state" => {"$in" => existing_enrollment_statuses},
+        "effective_on" => {"$gte" => @effective_on.prev_year},
         # Exclude COBRA, for now
-        "households.hbx_enrollments.kind" => "employer_sponsored"
+        "kind" => "employer_sponsored"
       }
     end
 
@@ -165,7 +164,7 @@ module Queries
       add({
         "$match" => {
           "$or" => [
-            new_coverage_expression.merge!("households.hbx_enrollments.enrollment_kind" => "open_enrollment"),
+            new_coverage_expression.merge!("enrollment_kind" => "open_enrollment"),
             existing_coverage_expression
           ]
         }
@@ -178,13 +177,13 @@ module Queries
       add({
         "$group" => {
           "_id" => {
-            "effective_on" => "$households.hbx_enrollments.effective_on",
-            "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
-            "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
-            "coverage_kind" => "$households.hbx_enrollments.coverage_kind"
+            "effective_on" => "$effective_on",
+            "employee_role_id" => "$employee_role_id",
+            "bga_id" => "$benefit_group_assignment_id",
+            "coverage_kind" => "$coverage_kind"
           },
-          "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
-          "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"}
+          "hbx_enrollment_id" => {"$last" => "$hbx_id"},
+          "submitted_at" => {"$last" => "$submitted_at"}
         }
       })
 
@@ -194,9 +193,9 @@ module Queries
     def group_enrollment_events
       add({
         "$group" => {
-          "_id" => "$households.hbx_enrollments.hbx_id",
-          "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
-          "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"}
+          "_id" => "$hbx_id",
+          "hbx_enrollment_id" => {"$last" => "$hbx_id"},
+          "submitted_at" => {"$last" => "$submitted_at"}
         }
       })
 
@@ -205,7 +204,7 @@ module Queries
 
     def sort_enrollments
       add({
-       "$sort" => {"households.hbx_enrollments.submitted_at" => 1}
+       "$sort" => {"submitted_at" => 1}
       })
       self
     end
@@ -223,8 +222,7 @@ module Queries
 
     def collect_benefit_group_ids(effective_on = nil)
       @feins.collect{|e| prepend_zeros(e.to_s, 9) }.inject([]) do |id_list, fein|
-        benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein:  fein).first.active_benefit_sponsorship
-
+        benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein: fein).try(:first).try(:active_benefit_sponsorship)
         if benefit_sponsorship.present?
           benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on , :aasm_state => :active).first
         end

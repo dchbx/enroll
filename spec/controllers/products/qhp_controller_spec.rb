@@ -11,6 +11,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
   let(:household){ family.active_household }
   let(:hbx_enrollment){ FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                           family: household.family,
                                            household: household,
                                            hbx_enrollment_members: [hbx_enrollment_member],
                                            coverage_kind: "health",
@@ -27,6 +28,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   let(:package_kind) { :single_product }
   let(:package) { initial_application.benefit_packages[0] }
   let(:shop_health_enrollment) { FactoryBot.create(:hbx_enrollment,
+    family: family,
     household: family.active_household,
     product: health_products[0],
     sponsored_benefit_id: package.health_sponsored_benefit.id,
@@ -36,6 +38,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   )}
 
   let(:shop_dental_enrollment) { FactoryBot.create(:hbx_enrollment,
+    family: family,
     household: family.active_household,
     product: dental_products[0],
     sponsored_benefit_id: package.dental_sponsored_benefit.id,

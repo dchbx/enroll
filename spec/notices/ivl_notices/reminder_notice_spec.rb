@@ -10,7 +10,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, :min_verification_due_date => TimeKeeper.date_of_record+95.days) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], household: family.active_household, kind: "individual", is_any_enrollment_member_outstanding: true)}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], household: family.active_household,family:   family, kind: "individual", aasm_state: "enrolled_contingent")}
   let(:plan){ FactoryBot.create(:plan) }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'First Outstanding Verification Notification',

@@ -7,10 +7,10 @@ describe DeleteDentalEnrollment, dbclean: :after_each do
 
     context "a family with 2 dental and 2 health enrollments" do
       let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-      let(:dental_enrollment1) {FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, household: family.active_household)}
-      let(:dental_enrollment2) {FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, household: family.active_household)}
-      let(:health_enrollment1) {FactoryBot.create(:hbx_enrollment,household: family.active_household)}
-      let(:health_enrollment2) {FactoryBot.create(:hbx_enrollment,household: family.active_household)}
+      let(:dental_enrollment1) {FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, family: family, household: family.active_household)}
+      let(:dental_enrollment2) {FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, family: family, household: family.active_household)}
+      let(:health_enrollment1) {FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)}
+      let(:health_enrollment2) {FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)}
 
       it "deletes the dentals" do
         expect(family.active_household.hbx_enrollments).to include dental_enrollment1

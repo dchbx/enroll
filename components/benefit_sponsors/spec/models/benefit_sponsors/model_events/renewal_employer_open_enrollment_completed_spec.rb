@@ -22,6 +22,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerOpenEnrollmentCompl
   let!(:hbx_enrollment) do
     hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                                        household: family.active_household,
+                                       family: family,
                                        aasm_state: "renewing_coverage_selected",
                                        effective_on: model_instance.start_on,
                                        rating_area_id: model_instance.recorded_rating_area_id,

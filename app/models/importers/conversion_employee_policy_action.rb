@@ -103,7 +103,6 @@ module Importers
       if employee_role.present? && find_enrollments(employee_role).present?
         is_new = false
       end
-
       proxy = is_new ? ::Importers::ConversionEmployeePolicy.new(@original_attributes) : ::Importers::ConversionEmployeePolicyUpdate.new(@original_attributes)
       result = proxy.save
       propagate_warnings(proxy)
@@ -133,8 +132,8 @@ module Importers
       plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
       active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
       return [] if active_plan_year.blank?
-
-      family.active_household.hbx_enrollments.where({
+      
+      family.hbx_enrollments.where({
         :benefit_group_id.in => active_plan_year.benefit_group_ids,
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
         })

@@ -15,13 +15,17 @@ describe MoveDueDateToVerificationTypeLevel do
 
   describe "move due date to v_type level" do
     let!(:person) { FactoryBot.create(:person, :with_family, :with_consumer_role)}
-    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, 
+    let!(:enrollment) { FactoryBot.create(
+      :hbx_enrollment, 
+      family: person.primary_family,
       household: person.primary_family.active_household, 
       special_verification_period: TimeKeeper.date_of_record - 5.days,
       is_any_enrollment_member_outstanding: true
     )}
 
-    let!(:enrollment2) { FactoryBot.create(:hbx_enrollment,
+    let!(:enrollment2) { FactoryBot.create(
+      :hbx_enrollment,
+      family: person.primary_family,
       household: person.primary_family.active_household,
       special_verification_period: nil,
       aasm_state: "shopping"

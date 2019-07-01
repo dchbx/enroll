@@ -28,9 +28,9 @@
       %individual_market
         %is_carrier_to_bill true
         %applied_aptc_amount= (hbx_enrollment.applied_aptc_amount).round(2)
-    %premium_total_amount= hbx_enrollment.decorated_hbx_enrollment.product_cost_total.round(2).to_f
-    %total_responsible_amount= (hbx_enrollment.is_shop? ? ((hbx_enrollment.decorated_hbx_enrollment.product_cost_total - hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total).round(2).to_f) : (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)).round(2)
-    - if hbx_enrollment.rating_area.present?
+    %premium_total_amount=  (hbx_enrollment.is_ivl_by_kind? ? hbx_enrollment.total_premium: hbx_enrollment.decorated_hbx_enrollment.product_cost_total).to_f.round(2)
+    %total_responsible_amount= (hbx_enrollment.is_ivl_by_kind? ? (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f): (hbx_enrollment.decorated_hbx_enrollment.product_cost_total - hbx_enrollment.decorated_hbx_enrollment.sponsor_contribution_total)).to_f.round(2)
+    - if hbx_enrollment.is_shop? && hbx_enrollment.rating_area.present?
       %rating_area= hbx_enrollment.rating_area.exchange_provided_code
     = render :partial => "events/hbx_enrollment/eligibility_event", :object => hbx_enrollment
   %request_submitted_timestamp= hbx_enrollment.created_at.strftime('%Y-%m-%dT%H:%M:%S') if hbx_enrollment.created_at

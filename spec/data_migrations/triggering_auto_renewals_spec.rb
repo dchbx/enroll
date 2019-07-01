@@ -41,6 +41,7 @@ describe TriggeringAutoRenewals, dbclean: :after_each do
           coverage_household: family.households.first.coverage_households.first,
           benefit_group_assignment: ce.renewal_benefit_group_assignment,
           benefit_group: renewing_benefit_group,
+          family: family,
           )
         enrollment_two.update_attributes(:aasm_state => 'renewing_waived', coverage_kind: "health")
 
@@ -49,6 +50,7 @@ describe TriggeringAutoRenewals, dbclean: :after_each do
           coverage_household: family.households.first.coverage_households.first,
           benefit_group_assignment: ce.active_benefit_group_assignment,
           benefit_group: benefit_group,
+          family: family,
           )
         enrollment_two.update_attributes(:aasm_state => 'coverage_selected', coverage_kind: "health", effective_on: Date.new(2015,12,1), plan_id: plan.id)
         ce.renewal_benefit_group_assignment.benefit_group.elected_plan_ids << enrollment_two.plan.renewal_plan_id

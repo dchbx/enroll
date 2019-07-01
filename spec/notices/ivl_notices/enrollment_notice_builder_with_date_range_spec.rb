@@ -5,11 +5,14 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_enrollment) do
-    FactoryBot.create(:hbx_enrollment,
-                      :created_at => (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
-                      :household => family.households.first,
-                      :kind => "individual",
-                      :is_any_enrollment_member_outstanding => true)
+    FactoryBot.create(
+      :hbx_enrollment,
+      family: family,
+      created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), 
+      household: family.households.first,
+      kind: "individual",
+      is_any_enrollment_member_outstanding: true
+    )
   end
   let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let(:application_event){ double("ApplicationEventKind",{

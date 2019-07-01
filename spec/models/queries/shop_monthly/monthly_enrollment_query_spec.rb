@@ -77,12 +77,15 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
       let(:feins) {
         [initial_employer.fein]
       }
-      skip "shop monthly queries updated here in new model app/models/queries/named_enrollment_queries.rb need to move." do
+      # it "shop monthly queries updated here in new model app/models/queries/named_enrollment_queries.rb need to move." do
 
-        # it "includes enrollment 1" do
-        #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-        #   expect(result).to include(enrollment_1.hbx_id)
-        # end
+        it "includes enrollment 1" do
+          result = Queries::ShopMonthlyEnrollments.new(feins, effective_on)
+          puts "family count = #{Family.count}"
+          # result.collect_benefit_group_ids(effective_on)
+          puts "bg_ids  = #{result.collect_benefit_group_ids(effective_on)}"
+          # expect(result).to include(enrollment_1.hbx_id)
+        end
         #
         # it "does not include enrollment 2" do
         #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
@@ -113,7 +116,7 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
         #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
         #   expect(result).to include(enrollment_7.hbx_id)
         # end
-      end
+      # end
     end
   end
 
@@ -253,6 +256,7 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
   def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health')
     benefit_group = benefit_group_assignment.benefit_group
     FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
+      family: family,
       enrollment_members: [family.primary_applicant],
       household: family.active_household,
       coverage_kind: coverage_kind,

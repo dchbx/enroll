@@ -26,7 +26,7 @@ class Insured::GroupSelectionController < ApplicationController
       if @adapter.if_changing_ivl?(params)
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = @adapter.previous_hbx_enrollment
-        pre_hbx.update_current(changing: true) if pre_hbx.present?
+        pre_hbx.update_attributes!(changing: true) if pre_hbx.present?
       end
 
       @benefit = @adapter.ivl_benefit

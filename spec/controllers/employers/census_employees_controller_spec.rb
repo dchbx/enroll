@@ -233,6 +233,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
     let(:current_employer_term_enrollment) do
       FactoryBot.create(:hbx_enrollment,
+                         family: family,
                          household: family.active_household,
                          kind: "employer_sponsored",
                          employee_role_id: employee_role1.id,
@@ -242,6 +243,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     end
     let(:current_employer_active_enrollment) do
       FactoryBot.create(:hbx_enrollment,
+                         famly: family,
                          household: family.active_household,
                          kind: "employer_sponsored",
                          employee_role_id: employee_role1.id,
@@ -251,6 +253,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     end
     let(:individual_term_enrollment) do
       FactoryBot.create(:hbx_enrollment,
+                         family: family,
                          household: family.active_household,
                          kind: "individual",
                          aasm_state: 'coverage_terminated'
@@ -258,6 +261,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     end
     let(:old_employer_term_enrollment) do
       FactoryBot.create(:hbx_enrollment,
+                         family: family,
                          household: family.active_household,
                          kind: "employer_sponsored",
                          benefit_group_assignment_id:benefit_group_assignment2.id,
@@ -266,6 +270,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     end
     let(:expired_enrollment) do
       FactoryBot.create(:hbx_enrollment,
+                         family: family,
                          household: family.active_household,
                          kind: "individual",
                          aasm_state: 'coverage_expired'

@@ -19,6 +19,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
                                             household: household,
                                             hbx_enrollment_members: [hbx_enrollment_member],
+                                            family: family,
                                             coverage_kind: "health",
                                             external_enrollment: false,
                                             rating_area_id: rating_area.id )

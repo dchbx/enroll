@@ -297,7 +297,7 @@ class CensusEmployee < CensusMember
       enrollments.each do |enrollment|
         if hired_on > enrollment.effective_on
           effective_on = enrollment.benefit_group.effective_on_for(hired_on)
-          enrollment.update_current(effective_on: effective_on)
+          enrollment.update_attributes!(effective_on: effective_on)
         end
       end
     end
@@ -511,7 +511,6 @@ class CensusEmployee < CensusMember
 
     term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
     term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
-
     enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments)).compact
 
     enrollments.each do |enrollment|
@@ -1191,38 +1190,20 @@ def self.to_csv
   # Enrollments with current active and renewal benefit applications
   def active_benefit_group_enrollments
     return nil if employee_role.blank?
-    family = Family.where({
-      "households.hbx_enrollments" => {:"$elemMatch" => {
+    HbxEnrollment.where({
         :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
-        :"employee_role_id" => self.employee_role_id}
-      }
-    }).first
-
-    return [] if family.blank?
-
-    family.active_household.hbx_enrollments.where(
-      :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
-      :"employee_role_id" => self.employee_role_id,
-      :"aasm_state".ne => "shopping"
-    )
+        :"employee_role_id" => self.employee_role_id,
+        :"aasm_state".ne => "shopping"
+    }) || []
   end
 
   def renewal_benefit_group_enrollments
     return nil if employee_role.blank?
-    family = Family.where({
-      "households.hbx_enrollments" => {:"$elemMatch" => {
-        :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
-        :"employee_role_id" => self.employee_role_id }
-      }
-    }).first
-
-    return [] if family.blank?
-
-    family.active_household.hbx_enrollments.where(
-      :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
-      :"employee_role_id" => self.employee_role_id,
-      :"aasm_state".ne => "shopping"
-    )
+    HbxEnrollment.where({
+          :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
+          :"employee_role_id" => self.employee_role_id,
+          :"aasm_state".ne => "shopping"
+      }) || []
   end
 
   # Enrollments eligible for Cobra

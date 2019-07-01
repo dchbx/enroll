@@ -19,7 +19,7 @@ describe ChangePlanYearEffectiveTerminatedon, dbclean: :after_each do
   describe "changing plan year's state" do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)}
     let(:py_env_support) {{hbx_id: hbx_enrollment.hbx_id, new_effective_on: "#{hbx_enrollment.effective_on + 1.month}".to_s, new_terminated_on: "#{TimeKeeper.date_of_record}"}}
 
     it "should change effective on date" do

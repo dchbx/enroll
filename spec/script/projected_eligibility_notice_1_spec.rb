@@ -9,7 +9,7 @@ describe "ProjectedEligibilityNotice_1" do
   let!(:user) {FactoryBot.create(:user, person: person) }
   let!(:family100) {FactoryBot.create(:family, :with_primary_family_member, person: person, id: "5c6594605f326d004f000060")}
   let!(:enrollment) do
-    FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual", hbx_id: "7894416f079343918d1333771c222879")
+    FactoryBot.create(:hbx_enrollment, household: family100.active_household, family: family100, kind: "individual", hbx_id: "7894416f079343918d1333771c222879")
   end
 
   it "should create projected_eligibility_notice_uqhp report" do

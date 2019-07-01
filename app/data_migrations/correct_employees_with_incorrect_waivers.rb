@@ -11,8 +11,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
         next if plan_year.benefit_groups.any?{|bg| bg.is_congress}
 
         renewal_plan_year = org.employer_profile.plan_years.where(:start_on => plan_year.start_on.next_year).first
-        families = Family.where(:'households.hbx_enrollments' => {:$elemMatch => enrollment_query(plan_year)})
-
+        families = Family.where(:'id'.in => HbxEnrollment.where(enrollment_query(plan_year)).map(&:family_id))
         families.each do |f|
           enrollments = f.active_household.hbx_enrollments.where(enrollment_query(plan_year)).sort_by{|e| e.submitted_at || e.created_at }
           next if enrollments.uniq.size < 2

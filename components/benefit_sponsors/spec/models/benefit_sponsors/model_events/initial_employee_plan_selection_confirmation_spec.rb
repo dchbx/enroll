@@ -25,6 +25,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
 
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                         household: family.active_household, 
+                        family: family,
                         aasm_state: "coverage_selected",
                         effective_on: benefit_application.start_on,
                         rating_area_id: benefit_application.recorded_rating_area_id,

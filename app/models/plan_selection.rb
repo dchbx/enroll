@@ -23,13 +23,13 @@ class PlanSelection
     if can_apply_aptc?(shopping_tax_household, elected_aptc)
       decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, elected_aptc, shopping_tax_household)
       hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
-      hbx_enrollment.update_current(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc/max_aptc)
+      hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc/max_aptc)
     end
   end
 
   # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
-    hbx_enrollment.update_current(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
+    hbx_enrollment.update_attributes!(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
     qle = hbx_enrollment.is_special_enrollment?
     if qle
       sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id

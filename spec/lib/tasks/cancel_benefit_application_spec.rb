@@ -19,6 +19,7 @@ describe 'cancel employer benefit application & enrollments', :dbclean => :aroun
     let(:reference_plan) {double("Product")}
     let(:hbx_enrollment){ FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
       household: household,
+      family: family,
       hbx_enrollment_members: [hbx_enrollment_member],
       coverage_kind: "health",
       external_enrollment: false )

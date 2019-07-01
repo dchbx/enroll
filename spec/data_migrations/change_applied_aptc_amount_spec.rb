@@ -16,7 +16,7 @@ describe ChangeAppliedAptcAmount, dbclean: :after_each do
   describe "updating applied aptc amount for a given hbx_id" do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)}
 
     it "should update the applied aptc amount" do
       ClimateControl.modify :hbx_id => hbx_enrollment.hbx_id, :applied_aptc_amount => "450" do

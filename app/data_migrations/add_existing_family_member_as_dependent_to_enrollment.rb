@@ -4,7 +4,7 @@ class AddExistingFamilyMemberAsDependentToEnrollment< MongoidMigrationTask
     enrollment_id = ENV["hbx_enrollment_id"]
     applicant_id = ENV["family_member_id"]
     coverage_begin=Date.strptime(ENV["coverage_begin"], '%Y-%m-%d')
-    hbx_enrollment=HbxEnrollment.find(enrollment_id)
+    hbx_enrollment= HbxEnrollment.where(id: enrollment_id).first
     if hbx_enrollment.nil?
       puts "No hbx_enrollment found with the given id" unless Rails.env.test?
     else

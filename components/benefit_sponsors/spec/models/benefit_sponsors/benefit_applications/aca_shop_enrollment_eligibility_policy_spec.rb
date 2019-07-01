@@ -34,7 +34,7 @@ module BenefitSponsors
         before do
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
-            FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
         end
@@ -48,7 +48,7 @@ module BenefitSponsors
         before do
           benefit_sponsorship.census_employees.limit(3).each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
-            FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
         end
@@ -68,7 +68,7 @@ module BenefitSponsors
 
         let!(:load_enrollments) {benefit_sponsorship.census_employees.each do |ce|
           family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           ce.save
         end
         }
@@ -83,7 +83,7 @@ module BenefitSponsors
 
         let!(:load_enrollments) {benefit_sponsorship.census_employees.limit(3).each do |ce|
           family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           ce.save
         end
         }
@@ -105,7 +105,7 @@ module BenefitSponsors
 
         let!(:load_enrollments1) {benefit_sponsorship.census_employees.each do |ce|
           family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           ce.save
         end
         }
@@ -121,7 +121,7 @@ module BenefitSponsors
 
           let!(:load_enrollments2) {benefit_sponsorship.census_employees.limit(3).each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
-            FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             ce.save
           end
           }
@@ -153,7 +153,7 @@ module BenefitSponsors
 
         let!(:load_enrollments) {benefit_sponsorship.census_employees.each do |ce|
           family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+          FactoryBot.create(:hbx_enrollment,family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           ce.save
         end
         }
@@ -169,7 +169,7 @@ module BenefitSponsors
 
         let!(:load_enrollments) {benefit_sponsorship.census_employees.limit(3).each do |ce|
           family = FactoryBot.create(:family, :with_primary_family_member)
-          FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_sponsorship: benefit_sponsorship, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           ce.save
         end
         }

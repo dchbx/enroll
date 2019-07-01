@@ -10,7 +10,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:person) { FactoryBot.create(:person) }
   let(:employee_role) { FactoryBot.create(:employee_role, person: person) }
   let(:primary_family) { FactoryBot.create(:family, :with_primary_family_member) }
-  let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: primary_family.active_household)}
+  let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: primary_family.active_household, family: primary_family)}
 
   let(:user) { FactoryBot.create(:user) }
 
@@ -22,12 +22,14 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee2, aasm_state: "coverage_terminated") }
   let!(:enrollment_with_coverage_selected)   { FactoryBot.create( :hbx_enrollment,
     household: primary_family.latest_household,
+    family: primary_family,
     employee_role_id: employee_role.id,
     benefit_group_assignment: benefit_group_assignment1
     )}
   let!(:enrollment_with_coverage_terminated)   { FactoryBot.create( :hbx_enrollment,
     household: primary_family.latest_household,
     employee_role_id: employee_role.id,
+    family: primary_family,
     benefit_group_assignment: benefit_group_assignment2,
     aasm_state: "coverage_terminated"
     )}
@@ -35,6 +37,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let!(:enrollment_with_coverage_waived)   { FactoryBot.create( :hbx_enrollment,
     household: primary_family.latest_household,
     employee_role_id: employee_role.id,
+    family: primary_family,
     benefit_group_assignment: benefit_group_assignment3,
     aasm_state: "inactive"
     )}

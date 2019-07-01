@@ -17,7 +17,7 @@ describe CancelPlanYear do
     let(:plan_year) { FactoryBot.create(:plan_year, benefit_groups: [benefit_group], aasm_state: 'enrolled')}
     let!(:plan_year2) { FactoryBot.create(:plan_year, aasm_state: 'active')}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: 'coverage_enrolled', benefit_group_id: plan_year.benefit_groups.first.id)}
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'coverage_enrolled', benefit_group_id: plan_year.benefit_groups.first.id)}
     let!(:py_params) {{plan_year_state: plan_year.aasm_state, plan_year_start_on: plan_year.start_on.to_s, feins: plan_year.employer_profile.parent.fein}}
 
     before(:each) do

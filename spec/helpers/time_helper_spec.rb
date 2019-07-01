@@ -11,9 +11,9 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person) }
   let(:employee_role) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let(:enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+  let(:enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)}
   let(:individual_family) { FactoryBot.create(:family, :with_primary_family_member)}
-  let(:individual_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: individual_family.active_household)}
+  let(:individual_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: individual_family,  household: individual_family.active_household)}
 
   before :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)

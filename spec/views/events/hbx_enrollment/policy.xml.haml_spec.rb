@@ -16,8 +16,9 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb", dbclean: :after_each do
                                              sponsored_benefit_package_id:benefit_application.benefit_packages.first.id,
                                              benefit_sponsorship_id:benefit_application.benefit_sponsorship.id,
                                              household: family.active_household, employee_role: employee_role,
+                                             family: family,
                                              created_at: Time.now,hbx_enrollment_members:[hbx_enrollment_member],
-                                             product_id:product.id
+                                             product_id: product.id
   )}
 
   let(:cobra_begin_date) { Date.new(2016,2,1) }

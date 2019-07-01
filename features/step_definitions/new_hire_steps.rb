@@ -148,9 +148,8 @@ end
 
 Then(/(.*) should see \"my account\" page with active enrollment/) do |named_person|
   sleep 3 #wait for e-mail nonsense
-  enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
+  enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:hbx_enrollments) if people[named_person].present?
   sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
-
   enrollment = page.all('.hbx-enrollment-panel')[1]
   qle  = sep_enr ? true : false
   enrollment.find('.panel-heading', text: 'Coverage Selected')

@@ -21,7 +21,7 @@ describe ChangeErToApplicantState do
     let(:census_employee)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
     let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile )}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
 
     before(:each) do
       ClimateControl.modify plan_year_state: plan_year.aasm_state, feins: plan_year.employer_profile.parent.fein do

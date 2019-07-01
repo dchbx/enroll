@@ -95,7 +95,9 @@ class HbxProfile
     end
 
     def current_hbx
-      find_by_state_abbreviation(aca_state_abbreviation)
+      Caches::CurrentHbx.fetch do
+        find_by_state_abbreviation(aca_state_abbreviation)
+      end
     end
 
     def transmit_group_xml(employer_profile_ids)

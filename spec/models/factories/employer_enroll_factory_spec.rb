@@ -24,7 +24,9 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
 
-        create(:hbx_enrollment,
+        create(
+          :hbx_enrollment,
+          family: family,
           household: family.active_household,
           coverage_kind: "health",
           effective_on: benefit_group.start_on,
@@ -104,7 +106,9 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
 
-        enrollment = create(:hbx_enrollment,
+        enrollment = create(
+          :hbx_enrollment,
+          family: family,
           household: family.active_household,
           coverage_kind: "health",
           effective_on: benefit_group.start_on,
@@ -118,7 +122,9 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
         ce.active_benefit_group_assignment.update_attributes(aasm_state: 'coverage_selected', hbx_enrollment_id: enrollment.id)
 
 
-        enrollment = create(:hbx_enrollment, 
+        enrollment = create(
+          :hbx_enrollment,
+          family: family,
           household: family.active_household,
           coverage_kind: "health",
           effective_on: renewing_benefit_group.start_on,
@@ -216,7 +222,9 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
           ce.update_attributes({:employee_role =>  employee_role })
           family = Family.find_or_build_from_employee_role(employee_role)
           
-          enrollment = create(:hbx_enrollment,
+          enrollment = create(
+            :hbx_enrollment,
+            family: family,
             household: family.active_household,
             coverage_kind: "health",
             effective_on: benefit_group.start_on,
@@ -229,7 +237,9 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
             )
           ce.active_benefit_group_assignment.update_attributes(aasm_state: 'coverage_selected', hbx_enrollment_id: enrollment.id)
 
-          create(:hbx_enrollment, 
+          create(
+            :hbx_enrollment,
+            family: family,
             household: family.active_household,
             coverage_kind: "health",
             effective_on: renewing_benefit_group.start_on,

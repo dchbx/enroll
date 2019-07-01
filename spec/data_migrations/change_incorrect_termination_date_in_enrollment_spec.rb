@@ -16,7 +16,8 @@ describe ChangeIncorrectTerminationDateInEnrollment do
        kind: "individual",
        submitted_at: TimeKeeper.date_of_record,
        aasm_state: 'shopping',
-       review_status: nil
+       review_status: nil,
+       family: family
     )
 
   }
@@ -25,6 +26,7 @@ describe ChangeIncorrectTerminationDateInEnrollment do
     FactoryBot.create(
       :hbx_enrollment,
       household: family.active_household,
+      family: family,
       coverage_kind: "health",
       effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
       enrollment_kind: "open_enrollment",

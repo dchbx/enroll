@@ -10,6 +10,8 @@ module Queries
 
     def initialize(attributes)
       @custom_attributes = attributes
+      @skip = 0
+      @limit = 25
     end
 
     def person_search search_string
@@ -62,12 +64,32 @@ module Queries
       family_scope.order_by(@order_by)
     end
 
+    def each
+      return to_enum(:each) unless block_given?
+      limited_scope, enrollment_cache = build_iteration_caches
+      limited_scope.each do |fam|
+        fam.set_admin_dt_enrollments(enrollment_cache[fam.id])
+        yield fam
+      end
+    end
+
+    def each_with_index
+      return to_enum(:each_with_index) unless block_given?
+      limited_scope, enrollment_cache = build_iteration_caches
+      limited_scope.each_with_index do |fam, idx|
+        fam.set_admin_dt_enrollments(enrollment_cache[fam.id])
+        yield fam, idx if block_given?
+      end
+    end
+
     def skip(num)
-      build_scope.skip(num)
+      @skip = num
+      self
     end
 
     def limit(num)
-      build_scope.limit(num)
+      @limit = num
+      self
     end
 
     def order_by(var)
@@ -81,6 +103,34 @@ module Queries
 
     def size
       build_scope.count
+    end
+
+    private
+
+    def build_iteration_caches
+      skipped_scope = apply_skip(build_scope)
+      limited_scope = apply_limit(skipped_scope)
+      family_ids = limited_scope.pluck(:id)
+      enrollment_cache = load_enrollment_cache_for(family_ids)
+      [limited_scope, enrollment_cache]
+    end
+
+    def load_enrollment_cache_for(family_ids)
+      enrollment_cache = Hash.new { |h, k| h[k] = Array.new }
+      HbxEnrollment.where(:family_id => {"$in" => family_ids}).without(:enrollment_members).each do |en|
+        enrollment_cache[en.family_id] = enrollment_cache[en.family_id] + [en]
+      end
+      enrollment_cache
+    end
+
+    def apply_skip(scope)
+      return scope unless @skip
+      scope.skip(@skip)
+    end
+
+    def apply_limit(scope)
+      return scope unless @limit
+      scope.limit(@limit)
     end
 
   end

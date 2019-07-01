@@ -12,6 +12,7 @@ describe Generate2017EhbReport do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person)}
   let(:plan){FactoryBot.create(:plan, :ehb => 0.9945)}
   let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                             family: family,
                                              household: family.active_household,
                                              effective_on: Date.parse("2017-1-1"),
                                              plan: plan,

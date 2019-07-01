@@ -26,18 +26,21 @@ describe ExpireConversionEmployers, dbclean: :after_each do
     let!(:employee_role) { person.employee_roles.create( employer_profile: organization.employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
     let!(:shop_family)       { create(:family, :with_primary_family_member, :person => person) }
 
-    let!(:health_enrollment)   { create(:hbx_enrollment,
-      household: shop_family.latest_household,
-      coverage_kind: "health",
-      effective_on: benefit_group.start_on,
-      enrollment_kind: "open_enrollment",
-      kind: "employer_sponsored",
-      submitted_at: benefit_group.start_on - 1.month,
-      benefit_group_id: benefit_group.id,
-      employee_role_id: employee_role.id,
-      benefit_group_assignment_id: benefit_group_assignment.id
+    let!(:health_enrollment)   do
+      create(
+        :hbx_enrollment,
+        household: shop_family.latest_household,
+        family: shop_family,
+        coverage_kind: "health",
+        effective_on: benefit_group.start_on,
+        enrollment_kind: "open_enrollment",
+        kind: "employer_sponsored",
+        submitted_at: benefit_group.start_on - 1.month,
+        benefit_group_id: benefit_group.id,
+        employee_role_id: employee_role.id,
+        benefit_group_assignment_id: benefit_group_assignment.id
       )
-    }
+    end
 
     it 'should cancel enrollments' do
       subject.update_employer_plan_years(employer_profile, benefit_group.start_on)

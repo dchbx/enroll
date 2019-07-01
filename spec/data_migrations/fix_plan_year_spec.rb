@@ -21,8 +21,8 @@ describe FixPlanYear, dbclean: :after_each do
     let (:term_date) {TimeKeeper.date_of_record.at_beginning_of_month.next_month}
     let(:person) { FactoryBot.create(:person) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, benefit_group_id:benefit_group.id,household: family.active_household)}
-    let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment, benefit_group_id:benefit_group.id,household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, benefit_group_id:benefit_group.id,household: family.active_household)}
+    let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment, family: family, benefit_group_id:benefit_group.id,household: family.active_household)}
 
     context "termianted plan year to active plan year" do
 

@@ -18,11 +18,7 @@ class ChangePlanYearEffectiveDate < MongoidMigrationTask
 
       def all_enrollments(benefit_groups=[])
         id_list = benefit_groups.collect(&:_id).uniq
-
-        families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-        families.inject([]) do |enrollments, family|
-          enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).to_a
-        end
+        HbxEnrollment.where(:benefit_group_id.in => id_list).to_a
       end
 
       plan_year = organizations.first.employer_profile.plan_years.where(aasm_state: state).first
@@ -66,10 +62,8 @@ class ChangePlanYearEffectiveDate < MongoidMigrationTask
       end
 
       bg_list = plan_year.benefit_groups.pluck(:id)
-      families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => bg_list)
-      enrollments = families.inject([]) do |enrollments, family|
-                      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => bg_list)
-                    end
+      
+      enrollments = HbxEnrollment.where(:benefit_group_id.in => bg_list)
 
       def invalid_enrollment?(enrollment, plan_year)
         enrollment.effective_on < plan_year.start_on

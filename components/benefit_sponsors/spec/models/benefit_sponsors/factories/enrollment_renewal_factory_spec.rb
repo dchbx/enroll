@@ -39,6 +39,7 @@ module BenefitSponsors
     let!(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         household: shop_family.latest_household,
+                        family: shop_family,
                         coverage_kind: coverage_kind,
                         effective_on: current_effective_date,
                         enrollment_kind: 'open_enrollment',

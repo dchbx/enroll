@@ -954,6 +954,7 @@ module BenefitSponsors
       let(:family) {person.primary_family}
 
       let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        family: family,
                         household: family.active_household,
                         aasm_state: "coverage_selected",
                         effective_on: initial_application.start_on,
@@ -966,6 +967,7 @@ module BenefitSponsors
       }
 
       let!(:dental_hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        family: family,
                         household: family.active_household,
                         aasm_state: "coverage_selected",
                         effective_on: initial_application.start_on,

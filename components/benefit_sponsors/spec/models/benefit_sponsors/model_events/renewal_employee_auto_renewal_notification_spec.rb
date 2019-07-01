@@ -20,6 +20,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
   let!(:open_enrollment_start_date) { renewal_application.open_enrollment_period.min }
   let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
+                        family: family,
                         aasm_state: "auto_renewing",
                         effective_on: renewal_application.start_on,
                         rating_area_id: renewal_application.recorded_rating_area_id,

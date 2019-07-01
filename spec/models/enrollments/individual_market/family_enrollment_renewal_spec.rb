@@ -41,7 +41,10 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
   let(:child2_dob) { current_date.next_month - 20.years }
 
   let!(:enrollment) {
-    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+    FactoryBot.create(
+      :hbx_enrollment,
+      :with_enrollment_members,
+      family: family,
       enrollment_members: enrollment_members,
       household: family.active_household,
       coverage_kind: coverage_kind,

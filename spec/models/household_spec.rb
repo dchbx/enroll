@@ -23,7 +23,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryBot.create(:consumer_role)}
     let(:person) { double(primary_family: family)}
-    let(:family) { double }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:coverage_household) {CoverageHousehold.new}
@@ -40,6 +40,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     it "should build hbx enrollment" do
       subject.new_hbx_enrollment_from(
         consumer_role: consumer_role,
+        family:family,
         coverage_household: coverage_household,
         benefit_package: benefit_package,
         qle: false
@@ -52,7 +53,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     let!(:household) {FactoryBot.create(:household, family: family)}
     let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_ending_on: nil)}
     let(:tax_household2) {FactoryBot.create(:tax_household, household: household)}
-    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, family: family, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
 
     it "return correct tax_household" do
       household.tax_households << tax_household
@@ -75,10 +76,10 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   context "current_year_hbx_enrollments" do
     let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
     let(:household) {FactoryBot.create(:household, family: family)}
-    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-    let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, is_active: false)}
-    let!(:hbx3) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
-    let!(:hbx4) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
+    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+    let!(:hbx2) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: false)}
+    let!(:hbx3) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+    let!(:hbx4) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
 
     it "should return right hbx_enrollments" do
       household.reload
@@ -94,7 +95,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     let(:plan2){ FactoryBot.create(:plan_template, :shop_dental) }
 
     context "for shop health enrollment" do
-      let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, family: family, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
 
       it "should return only health hbx enrollment" do
         expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 1
@@ -104,7 +105,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
 
     context "for shop dental enrollment" do
-      let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, family: family,is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
 
       it "should return only health hbx enrollment" do
         expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 1
@@ -114,11 +115,11 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
 
     context "for both shop health and dental enrollment" do
-      let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx3) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx4) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx5) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, family: family, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx3) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, family: family, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, family: family, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx4) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, family: family, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx5) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, family: family, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
 
       it "should return the latest hbx enrollments for each shop and dental" do
         expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 2

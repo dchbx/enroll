@@ -10,7 +10,12 @@ class ExpireOldContingentEnrollments < MongoidMigrationTask
 
   def migrate
     start_of_year = TimeKeeper.date_of_record.beginning_of_year
-    Family.by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => {:"$lt" => start_of_year}}}).each do |family|
+     families = Family.by_enrollment_individual_market.where(
+                :"_id".in => HbxEnrollment.where(
+                  aasm_state: "enrolled_contingent",
+                  effective_on: {:"$lte" =>  TimeKeeper.date_of_record.end_of_year}
+                  ).pluck(:family_id))
+    families.each do |family|
       begin
         contingent_enrollments = family.active_household.hbx_enrollments.where(aasm_state: "enrolled_contingent", :effective_on.lte => start_of_year)
         if contingent_enrollments.present?

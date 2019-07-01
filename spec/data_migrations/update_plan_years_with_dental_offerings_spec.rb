@@ -58,6 +58,7 @@ describe UpdatePlanYearsWithDentalOfferings do
       let!(:dental_enrollment) {
         FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
           enrollment_members: family.family_members,
+          family: family,
           household: family.active_household,
           coverage_kind: 'dental',
           effective_on: effective_on.prev_year,

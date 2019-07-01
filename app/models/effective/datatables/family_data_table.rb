@@ -10,7 +10,7 @@ module Effective
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.active_family_members.size }, :filter => false, :sortable => false
-        table_column :active_enrollments, :label => 'Active Enrollments?', :proc => Proc.new { |row| row.active_household.hbx_enrollments.active.enrolled_and_renewing.present? ? "Yes" : "No"}, :filter => false, :sortable => false
+        table_column :active_enrollments, :label => 'Active Enrollments?', :proc => Proc.new { |row| active_admin_dt_enrollments(row).any? ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :registered?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"} , :filter => false, :sortable => false
         if individual_market_is_enabled?
           table_column :consumer?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
@@ -76,18 +76,32 @@ module Effective
         allow ? 'ajax' : 'disabled'
       end
 
+      def active_admin_dt_enrollments(row)
+        row.admin_dt_enrollments.select do |en|
+          (en.household_id == row.active_household.id) &&
+            en.is_admin_active_enrolled_and_renewing?
+        end
+      end
+
       def cancel_enrollment_type(family, allow)
-        (family.all_enrollments.cancel_eligible.present? && allow) ? 'ajax' : 'disabled'
+        return 'disabled' unless allow
+        cancel_eligibles = family.admin_dt_enrollments.any? do |en|
+          en.is_admin_cancel_eligible?
+        end
+        cancel_eligibles ? 'ajax' : 'disabled'
       end
 
       def terminate_enrollment_type(family, allow)
-        (family.all_enrollments.can_terminate.present? && allow) ? 'ajax' : 'disabled'
+        return 'disabled' unless allow
+        terminate_eligibles = family.admin_dt_enrollments.any? do |en|
+          en.is_admin_terminate_eligible?
+        end
+        terminate_eligibles ? 'ajax' : 'disabled'
       end
 
       def new_eligibility_family_member_link_type(row, allow)
         allow && row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
       end
-
 
       def nested_filter_definition
         families_tab = [

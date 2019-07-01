@@ -438,12 +438,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:shop_enrollment) { FactoryBot.create(:hbx_enrollment,
                                         household: family.active_household,
+                                        family:family,
                                         kind: "employer_sponsored",
                                         submitted_at: TimeKeeper.datetime_of_record - 3.days,
                                         created_at: TimeKeeper.datetime_of_record - 3.days
                                 )}
     let(:ivl_enrollment)    { FactoryBot.create(:hbx_enrollment,
                                         household: family.latest_household,
+                                        family:family,
                                         coverage_kind: "health",
                                         effective_on: TimeKeeper.datetime_of_record - 10.days,
                                         enrollment_kind: "open_enrollment",

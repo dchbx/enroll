@@ -74,7 +74,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
-  describe "Model initialization" do
+  describe "Model initialization", dbclean: :after_each do
     context "with no arguments" do
       let(:params) {{}}
 
@@ -883,9 +883,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let(:benefit_group) {double}
 
-    before :all do
+    before :each do
       family = FactoryBot.create(:family, :with_primary_family_member)
-      @enrollment = FactoryBot.create(:hbx_enrollment, household: family.active_household)
+      @enrollment = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)
     end
 
     it "should update employee_role hired_on" do
@@ -901,8 +901,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       allow(@enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record - 10.days)
       allow(@enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:effective_on_for).and_return(TimeKeeper.date_of_record + 20.days)
-
       census_employee.update(hired_on: TimeKeeper.date_of_record + 10.days)
+      @enrollment.reload 
       expect(@enrollment.read_attribute(:effective_on)).to eq TimeKeeper.date_of_record + 20.days
     end
   end
@@ -926,7 +926,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
-  describe 'construct_employee_role' do
+  describe 'construct_employee_role', dbclean: :after_each do
     let(:user)  { FactoryBot.create(:user) }
     context 'when employee_role present' do
       let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile ) }
@@ -1052,7 +1052,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       )
     end
 
-    let(:hbx_enrollment) {HbxEnrollment.new(coverage_kind: 'health')}
+    let(:hbx_enrollment) {HbxEnrollment.new(coverage_kind: 'health', family: family)}
     let(:plan) {FactoryBot.create(:plan)}
     let(:builder) {instance_double("ShopEmployerNotices::OutOfPocketNotice", :deliver => true)}
     let(:notice_triggers) {double("notice_triggers")}
@@ -1107,9 +1107,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       let(:employee_role) {FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile)}
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
 
-      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id)}
-      let(:hbx_enrollment_two) {FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'dental', employee_role_id: employee_role.id)}
-      let(:hbx_enrollment_three) {FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, aasm_state: 'renewing_waived', employee_role_id: employee_role.id)}
+      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id)}
+      let(:hbx_enrollment_two) {FactoryBot.create(:hbx_enrollment, family: family, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, coverage_kind: 'dental', employee_role_id: employee_role.id)}
+      let(:hbx_enrollment_three) {FactoryBot.create(:hbx_enrollment, family: family, sponsored_benefit_package_id: benefit_group.id, household: family.active_household, aasm_state: 'renewing_waived', employee_role_id: employee_role.id)}
       let(:assignment) {double("BenefitGroupAssignment", benefit_package: benefit_group)}
 
       before do
@@ -1626,7 +1626,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         aasm_state: "coverage_terminated",
         terminated_on: TimeKeeper.date_of_record,
         coverage_kind: 'health'
-      )
+        # family: census_employee.employee_role.person.primary_family
+              )
     end
 
     it "should return true when employement is terminated and " do
@@ -1724,6 +1725,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         :hbx_enrollment,
         household: census_employee.employee_role.person.primary_family.active_household,
         coverage_kind: "health",
+        family:census_employee.employee_role.person.primary_family,
         kind: "employer_sponsored",
         benefit_sponsorship_id: benefit_sponsorship.id,
         sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
@@ -1738,6 +1740,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         :hbx_enrollment,
         household: census_employee.employee_role.person.primary_family.active_household,
         coverage_kind: "dental",
+        family: census_employee.employee_role.person.primary_family,
         kind: "employer_sponsored",
         benefit_sponsorship_id: benefit_sponsorship.id,
         sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
@@ -1752,6 +1755,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         :hbx_enrollment,
         household: census_employee.employee_role.person.primary_family.active_household,
         coverage_kind: "health",
+        family: census_employee.employee_role.person.primary_family,
         kind: "employer_sponsored",
         benefit_sponsorship_id: benefit_sponsorship.id,
         sponsored_benefit_package_id: census_employee.active_benefit_package.id,
@@ -1770,6 +1774,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
           household: census_employee.employee_role.person.primary_family.active_household,
           coverage_kind: "health",
           kind: "employer_sponsored",
+          family: census_employee.employee_role.person.primary_family,
           benefit_sponsorship_id: benefit_sponsorship.id,
           sponsored_benefit_package_id: census_employee.active_benefit_package.id,
           employee_role_id: census_employee.employee_role.id,
@@ -1783,6 +1788,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
           :hbx_enrollment,
           household: census_employee.employee_role.person.primary_family.active_household,
           coverage_kind: "dental",
+          family: census_employee.employee_role.person.primary_family,
           kind: "employer_sponsored",
           benefit_sponsorship_id: benefit_sponsorship.id,
           sponsored_benefit_package_id: census_employee.active_benefit_package.id,
@@ -1829,6 +1835,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       enrollment
       expect(census_employee.enrollments_for_display).to eq [enrollment, auto_renewing_health_enrollment, auto_renewing_dental_enrollment]
     end
+
+    it 'has renewal_benefit_group_enrollments' do 
+      renewal_application.approve_application! if renewal_application.may_approve_application?
+      benefit_sponsorship.benefit_applications << renewal_application
+      benefit_sponsorship.save
+      enrollment
+      census_employee.reload
+      expect(census_employee.renewal_benefit_group_enrollments.first.class).to eq HbxEnrollment
+    end
   end
 
   context '.past_enrollments' do
@@ -1862,6 +1877,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         household: census_employee.employee_role.person.primary_family.active_household,
         coverage_kind: "health",
         kind: "employer_sponsored",
+        family: census_employee.employee_role.person.primary_family,
         benefit_sponsorship_id: benefit_sponsorship.id,
         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
         employee_role_id: census_employee.employee_role.id,
@@ -1876,6 +1892,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         household: census_employee.employee_role.person.primary_family.active_household,
         coverage_kind: "health",
         kind: "employer_sponsored",
+        family: census_employee.employee_role.person.primary_family,
         benefit_sponsorship_id: benefit_sponsorship.id,
         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
         employee_role_id: census_employee.employee_role.id,
@@ -1889,6 +1906,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         :hbx_enrollment,
         household: census_employee.employee_role.person.primary_family.active_household,
         coverage_kind: "health",
+        family: census_employee.employee_role.person.primary_family,
         kind: "employer_sponsored",
         benefit_sponsorship_id: benefit_sponsorship.id,
         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,

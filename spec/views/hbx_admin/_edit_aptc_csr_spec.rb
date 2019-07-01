@@ -58,8 +58,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "with enrollment" do
       let(:family)       { FactoryBot.create(:family, :with_primary_family_member) }
       let(:household) {FactoryBot.create(:household, family: family)}
-      let!(:hbx_with_aptc_1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), applied_aptc_amount: 100)}
-      let!(:hbx_with_aptc_2) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 210)}
+      let!(:hbx_with_aptc_1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, family: family, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), applied_aptc_amount: 100)}
+      let!(:hbx_with_aptc_2) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, family: family, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 210)}
       let!(:hbx_enrollments) {[hbx_with_aptc_1, hbx_with_aptc_2]}
       let!(:hbxs) { double("hbxs") }
       before :each do

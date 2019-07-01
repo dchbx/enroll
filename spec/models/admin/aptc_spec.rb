@@ -22,6 +22,7 @@ RSpec.describe Admin::Aptc, :type => :model do
   let!(:hbx_with_aptc_1) do
     FactoryBot.create(:hbx_enrollment,
                       product: product1,
+                      family: family,
                       household: household,
                       is_active: true,
                       aasm_state: 'coverage_selected',
@@ -33,6 +34,7 @@ RSpec.describe Admin::Aptc, :type => :model do
   let!(:hbx_with_aptc_2) do
     FactoryBot.create(:hbx_enrollment,
                       product: product2,
+                      family: family,
                       household: household,
                       is_active: true,
                       aasm_state: 'coverage_selected',

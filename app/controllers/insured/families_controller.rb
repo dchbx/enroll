@@ -11,32 +11,34 @@ class Insured::FamiliesController < FamiliesController
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
   def home
-    authorize @family, :show?
-    build_employee_role_by_census_employee_id
-    set_flash_by_announcement
-    set_bookmark_url
-    set_admin_bookmark_url
-    @active_sep = @family.latest_active_sep
+    Caches::CurrentHbx.with_cache do
+      authorize @family, :show?
+      build_employee_role_by_census_employee_id
+      set_flash_by_announcement
+      set_bookmark_url
+      set_admin_bookmark_url
+      @active_sep = @family.latest_active_sep
 
-    log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
+      log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
-    @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
-    @enrollment_filter = @family.enrollments_for_display
+      @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+      @enrollment_filter = @family.enrollments_for_display
 
-    valid_display_enrollments = Array.new
-    @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
+      valid_display_enrollments = Array.new
+      @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
 
-    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
-    update_changing_hbxs(@hbx_enrollments)
+      # log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
+      update_changing_hbxs(@hbx_enrollments)
 
-    # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
+      # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
-    @employee_role = @person.active_employee_roles.first
-    @tab = params['tab']
-    @family_members = @family.active_family_members
+      @employee_role = @person.active_employee_roles.first
+      @tab = params['tab']
+      @family_members = @family.active_family_members
 
-    respond_to do |format|
-      format.html
+      respond_to do |format|
+        format.html
+      end
     end
   end
 

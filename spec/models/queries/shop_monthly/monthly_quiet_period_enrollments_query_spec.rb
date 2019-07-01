@@ -212,7 +212,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       end
 
       it "includes enrollment 11" do
-        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_enrolled'])
         expect(result).to include(enrollment_11.hbx_id)
       end
 
@@ -431,6 +431,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       enrollment_members: [family.primary_applicant],
       household: family.active_household,
       coverage_kind: coverage_kind,
+      family: family,
       effective_on: effective_date || benefit_group.start_on,
       enrollment_kind: enrollment_kind,
       kind: "employer_sponsored",

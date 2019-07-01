@@ -11,7 +11,7 @@ RSpec.describe "app/views/insured/group_selection/terminate_confirm.html.erb" do
   context "DCHL ID and Premium" do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment, :with_enrollment_members, :individual_assisted, { household: family.households.first })}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :individual_assisted, { household: family.households.first, family: family })}
     let(:benefit_sponsorship) { FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
     let(:benefit_application) { benefit_sponsorship.benefit_applications.first }
     let(:employer_profile) { benefit_sponsorship.organization.employer_profile }

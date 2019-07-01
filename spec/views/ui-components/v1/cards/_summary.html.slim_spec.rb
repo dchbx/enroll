@@ -6,7 +6,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:active_household) {family.active_household}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true, applicant_id: family.family_members.first.id, coverage_start_on: TimeKeeper.date_of_record, eligibility_date: TimeKeeper.date_of_record) }
-  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, hbx_enrollment_members:[hbx_enrollment_member])}
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, family: family, hbx_enrollment_members:[hbx_enrollment_member])}
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: mock_product, member_enrollments:[member_enrollment])}
   let(:member_group) {double(group_enrollment:group_enrollment)}

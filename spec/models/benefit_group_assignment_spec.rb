@@ -247,6 +247,32 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     end
   end
 
+  describe '#hbx_enrollments', dbclean: :after_each do
+
+    let(:household) { FactoryBot.create(:household, family: family)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
+
+    shared_examples_for "active, waived and terminated enrollments" do |state, status, result|
+
+      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
+                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                          aasm_state: state
+                          )}
+
+      it "should #{status}return the #{state} enrollments" do
+        result = (result == "enrollment") ?  [enrollment] : result
+        expect(census_employee.active_benefit_group_assignment.hbx_enrollments).to eq result
+      end
+    end
+
+    it_behaves_like "active, waived and terminated enrollments", "coverage_canceled", "not", []
+    it_behaves_like "active, waived and terminated enrollments", "coverage_terminated", "", "enrollment"
+    it_behaves_like "active, waived and terminated enrollments", "coverage_expired", "", "enrollment"
+    it_behaves_like "active, waived and terminated enrollments", "coverage_selected", "", "enrollment"
+    it_behaves_like "active, waived and terminated enrollments", "inactive", "", "enrollment"
+  end
+
   describe '#active_and_waived_enrollments', dbclean: :after_each do
 
     let(:household) { FactoryBot.create(:household, family: family)}
@@ -255,7 +281,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     shared_examples_for "active and waived enrollments" do |state, status, result|
 
-      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household,
+      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
@@ -270,6 +296,35 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     it_behaves_like "active and waived enrollments", "coverage_expired", "not ", []
     it_behaves_like "active and waived enrollments", "coverage_selected", "", "active_enrollment"
     it_behaves_like "active and waived enrollments", "inactive", "", "active_enrollment"
+  end
+
+  describe '#active_enrollments', dbclean: :after_each do
+
+    let(:household) { FactoryBot.create(:household, family: family)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
+
+    shared_examples_for "active enrollments" do |state, status, result|
+
+      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
+                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                          aasm_state: state
+                          )}
+      
+      it "#covered_families" do
+        expect(census_employee.active_benefit_group_assignment.covered_families.count).to eq 1
+      end
+
+      it "should #{status}return the #{state} enrollments" do
+        result = (result == "active_enrollment") ?  [enrollment] : result
+        expect(census_employee.active_benefit_group_assignment.active_enrollments).to eq result
+      end
+    end
+
+    it_behaves_like "active enrollments", "coverage_terminated", "not ", []
+    it_behaves_like "active enrollments", "coverage_expired", "not ", []
+    it_behaves_like "active enrollments", "coverage_selected", "", "active_enrollment"
+    it_behaves_like "active enrollments", "inactive", "not", []
   end
 
   describe "make_active", dbclean: :after_each do

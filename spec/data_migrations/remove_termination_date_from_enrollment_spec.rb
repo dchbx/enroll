@@ -11,7 +11,7 @@ describe RemoveTerminationDateFromEnrollment do
   end
   describe "remove termination date from enrollment" do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, terminated_on:DateTime.now())}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, terminated_on:DateTime.now())}
    
     it "should change aasm state to coverage terminated" do
       ClimateControl.modify enrollment_hbx_id: hbx_enrollment.hbx_id do 

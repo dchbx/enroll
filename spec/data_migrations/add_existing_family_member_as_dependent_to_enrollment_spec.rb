@@ -6,7 +6,7 @@ describe AddExistingFamilyMemberAsDependentToEnrollment, dbclean: :after_each do
   let(:family){FactoryBot.create(:family,:with_primary_family_member)}
   let(:person) { FactoryBot.create(:person) }
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let!(:hbx_enrollment){FactoryBot.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member], household:family.active_household)}
+  let!(:hbx_enrollment){FactoryBot.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member], family: family, household:family.active_household)}
 
   let(:family_member){FactoryBot.create(:family_member, family: family,is_primary_applicant: false, is_active: true, person: person)}
   context "won't add enrollment memeber if not found hbx_enrollment" do

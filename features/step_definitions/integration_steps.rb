@@ -236,7 +236,7 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
 end
 
 Given(/^a Hbx admin with super admin access exists$/) do
@@ -248,7 +248,7 @@ Given(/^a Hbx admin with super admin access exists$/) do
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
 end
 
 Given(/^a Hbx admin with read only permissions exists$/) do
@@ -260,7 +260,7 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
 end
 
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
@@ -1012,6 +1012,7 @@ And(/(.*) should have a ER sponsored enrollment/) do |named_person|
   benefit_package = ce.active_benefit_group_assignment.benefit_package
   FactoryBot.create(:hbx_enrollment,
                      household: person_rec.primary_family.active_household,
+                     family:person_rec.primary_family,
                      coverage_kind: "health",
                      effective_on: benefit_package.start_on,
                      enrollment_kind: "open_enrollment",

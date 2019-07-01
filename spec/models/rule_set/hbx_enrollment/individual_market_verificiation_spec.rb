@@ -11,6 +11,7 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
   let(:family)        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:enrollment)    { FactoryBot.create(:hbx_enrollment,
                                           household: family.latest_household,
+                                          family: family,
                                           effective_on: effective_on,
                                           kind: "individual",
                                           submitted_at: effective_on - 10.days,

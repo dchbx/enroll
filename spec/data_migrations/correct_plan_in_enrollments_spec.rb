@@ -15,7 +15,15 @@ describe CorrectPlanInEnrollment do
   describe "fix_enrollment" do
     
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members, household: family.active_household) }
+    let(:hbx_enrollment) do
+    	FactoryBot.create(
+    		:hbx_enrollment,
+    		:individual_unassisted,
+    		:with_enrollment_members,
+    		family: family,
+    		household: family.active_household
+      )
+    end
     let(:incorrect_plan) { FactoryBot.create(:plan, hios_id: hbx_enrollment.plan.hios_id, active_year: hbx_enrollment.plan.active_year - 1 ) }
     let(:correct_plan) { hbx_enrollment.plan }
 

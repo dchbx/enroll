@@ -11,6 +11,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
   let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
     enrollment_members: family.family_members,
     household: family.active_household,
+    family: family,
     product_id: product.id,
     benefit_sponsorship_id: benefit_sponsorship.id,
     sponsored_benefit_package_id: current_benefit_package.id

@@ -37,13 +37,9 @@ class HbxEnrollmentMember
   end
 
   def family_member
-    self.hbx_enrollment.household.family.family_members.detect do |fm|
+    self.hbx_enrollment.family.family_members.detect do |fm|
       fm.id == applicant_id
     end
-  end
-
-  def update_current(updates)
-    hbx_enrollment.hbx_enrollment_members.where(id: id).update_all(updates)
   end
 
   def primary_relationship

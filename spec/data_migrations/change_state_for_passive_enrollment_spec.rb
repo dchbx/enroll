@@ -34,6 +34,7 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
     let(:family)                            { person.primary_family }
     let!(:enrollment_one)              { FactoryBot.create(:hbx_enrollment,
                                              household: family.active_household,
+                                             family:family,
                                              coverage_kind: "dental",
                                              effective_on: renewing_plan_year.start_on.next_month,
                                              enrollment_kind: "open_enrollment",
@@ -44,6 +45,7 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
                                              aasm_state: 'coverage_selected') }
     let!(:enrollment_two)              { FactoryBot.create(:hbx_enrollment,
                                              household: family.active_household,
+                                             family:family,
                                              coverage_kind: "health",
                                              effective_on: renewing_plan_year.start_on.next_month,
                                              enrollment_kind: "open_enrollment",

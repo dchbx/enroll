@@ -32,7 +32,7 @@ module Factories
 
     def clone_cobra_enrollment
       clone_enrollment = family.active_household.hbx_enrollments.new
-
+      clone_enrollment.family = family
       clone_enrollment.sponsored_benefit_package_id = enrollment.sponsored_benefit_package_id
       clone_enrollment.employee_role_id = enrollment.employee_role_id
       clone_enrollment.product_id = enrollment.product_id

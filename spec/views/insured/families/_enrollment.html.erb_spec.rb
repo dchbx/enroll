@@ -54,6 +54,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       instance_double(
         HbxEnrollment,
         id: "hbxenrollmentid",
+        family: family,
         hbx_id: "hbxenrollmenthbxid",
         enroll_step: 1,
         aasm_state: "coverage_selected",
@@ -124,6 +125,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:hbx_enrollment) do
       instance_double(
         HbxEnrollment,
+        family: family,
         id: "hbxenrollmentid",
         hbx_id: "hbxenrollmenthbxid",
         enroll_step: 1,

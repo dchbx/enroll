@@ -14,7 +14,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
   let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: :single_issuer).first }
   let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
   let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
-  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_package.id, household: family.active_household)}
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, sponsored_benefit_package_id: benefit_package.id, household: family.active_household)}
   let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
   let(:benefit_group_assignment2) {FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
   let(:benefit_group_assignment3) {FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }

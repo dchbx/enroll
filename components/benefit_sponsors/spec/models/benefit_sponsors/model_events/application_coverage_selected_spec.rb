@@ -14,6 +14,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
   let!(:model_instance) { 
     hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                         household: family.active_household, 
+                        family: family,
                         aasm_state: "shopping",
                         effective_on: initial_application.start_on,
                         rating_area_id: initial_application.recorded_rating_area_id,

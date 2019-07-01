@@ -4,6 +4,7 @@ module Factories
     def generate_passive_renewal(options = {})
       if renewal_plan_offered_by_er?(enrollment)
         renewal_enrollment = family.active_household.hbx_enrollments.new
+        renewal_enrollment.family = family
         renewal_enrollment = assign_common_attributes(enrollment, renewal_enrollment)
         renewal_enrollment = clone_shop_enrollment(enrollment, renewal_enrollment)
         renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment))
@@ -114,7 +115,7 @@ module Factories
     end
 
     def renew_waived_enrollment
-      renewal_enrollment = family.active_household.hbx_enrollments.new
+      renewal_enrollment = family.hbx_enrollments.new(family:family,household: family.active_household)
 
       renewal_enrollment.coverage_kind = enrollment.try(:coverage_kind) || coverage_kind || "health"
       renewal_enrollment.enrollment_kind = "open_enrollment"
@@ -131,13 +132,14 @@ module Factories
         raise ShopEnrollmentRenewalFactoryError, message
       end
 
-      renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
-      renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
-      renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
-      renewal_enrollment.employee_role_id = @census_employee.employee_role_id
-      renewal_enrollment.waiver_reason = enrollment.try(:waiver_reason) || "I do not have other coverage"
+      renewal_enrollment.update_attributes(benefit_group_assignment_id:benefit_group_assignment.id,
+                                           benefit_group_id:benefit_group_assignment.benefit_group_id,
+                                           effective_on: benefit_group_assignment.benefit_group.start_on,
+                                           employee_role_id: @census_employee.employee_role_id,
+                                           waiver_reason: (enrollment.try(:waiver_reason) || "I do not have other coverage"))
+
       renewal_enrollment.renew_waived
-      renewal_enrollment.submitted_at = TimeKeeper.datetime_of_record
+      renewal_enrollment.update_attributes(submitted_at:TimeKeeper.datetime_of_record)
 
       if renewal_enrollment.save
         return

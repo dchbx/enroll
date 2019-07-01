@@ -23,6 +23,7 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeCoverageTermination', dbcl
   let!(:model_instance) do
     FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                       household: family.active_household,
+                      family: family,
                       aasm_state: "coverage_selected",
                       submitted_at: benefit_application.open_enrollment_period.max,
                       rating_area_id: benefit_application.recorded_rating_area_id,

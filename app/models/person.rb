@@ -200,6 +200,7 @@ class Person
   # Employer role index
   index({"employer_staff_roles._id" => 1})
   index({"employer_staff_roles.employer_profile_id" => 1})
+  index({"employer_staff_roles.benefit_sponsor_employer_profile_id" => 1})
 
   # Consumer child model indexes
   index({"consumer_role._id" => 1})

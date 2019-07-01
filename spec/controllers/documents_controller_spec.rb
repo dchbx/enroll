@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe DocumentsController, :type => :controller do
   let(:user) { FactoryBot.create(:user) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person_with_family) { FactoryBot.create(:person, :with_family) }
+  let(:person_with_fam_hbx_enrollment) { person_with_family.primary_family.active_household.hbx_enrollments.build }
   let(:consumer_role) {FactoryBot.build(:consumer_role)}
   let(:document) {FactoryBot.build(:vlp_document)}
   let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
@@ -33,6 +35,26 @@ RSpec.describe DocumentsController, :type => :controller do
     end
   end
 
+  describe 'GET show_docs' do
+    before :each do
+      allow(user).to receive(:person).and_return(person_with_family)
+      person_with_fam_hbx_enrollment.family = person_with_family.primary_family
+      person_with_fam_hbx_enrollment.kind = 'individual'
+      person_with_fam_hbx_enrollment.save!
+      user.person.stub_chain(
+        'primary_family.active_household.hbx_enrollments.verification_needed'
+      ).and_return([person_with_fam_hbx_enrollment])
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+    end
+
+    it "should update enrollments to in review and redirect to verification_insured_families_path" do
+      get :show_docs
+      enrollment = user.person.primary_family.active_household.hbx_enrollments.verification_needed.first
+      expect(enrollment.review_status).to eq('in review')
+      expect(response).to redirect_to(verification_insured_families_path)
+    end
+  end
+
   describe 'POST Fed_Hub_Request' do
     let(:consumer_role) { person.consumer_role }
     before :each do
@@ -40,7 +62,7 @@ RSpec.describe DocumentsController, :type => :controller do
       allow(consumer_role).to receive(:invoke_residency_verification!).and_return(true)
     end
     context 'Call Hub for SSA verification' do
-      it 'should redirect if verification type is SSN or Citozenship' do
+      it 'should redirect if verification type is SSN or Citizenship' do
         post :fed_hub_request, params: { verification_type: ssn_type.id, person_id: person.id, id: document.id }
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end

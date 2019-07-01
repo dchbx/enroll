@@ -25,7 +25,7 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_
                 family
               }
 
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "employer_sponsored", aasm_state: "coverage_selected", benefit_group_assignment_id: benefit_group_assignment.id) }
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "employer_sponsored", family: family, aasm_state: "coverage_selected", benefit_group_assignment_id: benefit_group_assignment.id) }
   let!(:hbx_enrollment_member1){ FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members[0].id, eligibility_date: TimeKeeper.date_of_record.prev_month) }
   let!(:hbx_enrollment_member2){ FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members[1].id, eligibility_date: TimeKeeper.date_of_record.prev_month, is_subscriber: false) }
   let!(:hbx_enrollment_member3){ FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members[2].id, eligibility_date: TimeKeeper.date_of_record.prev_month, is_subscriber: false) }

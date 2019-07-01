@@ -13,7 +13,7 @@ describe ChangeEnrollmentMemberApplicantId, dbclean: :after_each do
   describe 'do not change enrollment member if no enrollment_member was found', dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
     let(:family_member){FactoryBot.create(:family_member,family:family)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household, family: family)}
     let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
     let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
 

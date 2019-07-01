@@ -273,8 +273,7 @@ class Admin::Aptc < ApplicationController
       max_aptc = latest_eligibility_determination.max_aptc
       csr_percent_as_integer = latest_eligibility_determination.csr_percent_as_integer
       csr_percentage_param = params[:csr_percentage] == "limited" ? -1 : params[:csr_percentage].to_i # storing "limited" CSR as -1
-
-      if !(params[:max_aptc].to_f == max_aptc && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
+      if !(params[:max_aptc].to_f == max_aptc.to_f && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
         effective_starting_on = family.active_household.latest_active_tax_household_with_year(year).effective_starting_on
         if effective_starting_on > TimeKeeper.date_of_record
           eligibility_date = effective_starting_on
@@ -364,7 +363,7 @@ class Admin::Aptc < ApplicationController
             # Cancel or Terminate Coverage.
             if original_hbx.may_terminate_coverage? && (duplicate_hbx.effective_on > original_hbx.effective_on)
               original_hbx.terminate_coverage!
-              original_hbx.update_current(terminated_on: duplicate_hbx.effective_on - 1.day)
+              original_hbx.update_attributes!(terminated_on: duplicate_hbx.effective_on - 1.day)
             else
               original_hbx.cancel_coverage! if original_hbx.may_cancel_coverage?
             end

@@ -15,7 +15,7 @@ describe ExpireOldContingentEnrollments, dbclean: :after_each do
   describe "migrate hbx enrollment" do
     let!(:person)           { FactoryBot.create(:person, :with_consumer_role) }
     let!(:family)           { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:hbx_enrollment)   { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent", household: family.active_household,
+    let!(:hbx_enrollment)   { FactoryBot.create(:hbx_enrollment, family: family, aasm_state: "enrolled_contingent", household: family.active_household,
                               effective_on: TimeKeeper.date_of_record.prev_year, kind: "individual") }
 
     context "for successful migration" do

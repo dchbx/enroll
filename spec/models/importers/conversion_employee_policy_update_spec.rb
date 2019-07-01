@@ -39,8 +39,8 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
     let!(:person) { FactoryBot.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on, person_relationships: family_relationships) }
     let!(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: family_members) }
 
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: benefit_group.id, benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, effective_on: benefit_group.start_on, household: family.active_household, active_year: benefit_group.start_on.year)}
-    let(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,:with_enrollment_members,  family: family, enrollment_members: family.family_members, benefit_group_id: benefit_group.id, benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, effective_on: benefit_group.start_on, household: family.active_household, active_year: benefit_group.start_on.year)}
+    let(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, family: family, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year)}
 
     let(:record_attrs) do
       {
@@ -120,7 +120,7 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
       end
 
       context 'when renewing enrollment is a passive renewal' do
-        let!(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year, aasm_state: 'auto_renewing')}
+        let!(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, family: family, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year, aasm_state: 'auto_renewing')}
 
         it 'should drop the dependent from both current and renewing enrollment' do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
@@ -163,7 +163,7 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
       end
 
       context 'when renewing enrollment is a passive renewal' do
-        let!(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year, aasm_state: 'auto_renewing')}
+        let!(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year, aasm_state: 'auto_renewing')}
 
         it 'should add dependent to both current and renewing enrollment' do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
@@ -207,7 +207,7 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
       end
 
       context 'when renewing enrollment is a passive renewal' do
-        let!(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year, aasm_state: 'auto_renewing')}
+        let!(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year, aasm_state: 'auto_renewing')}
 
         it 'should add and drop children on both current and renewing enrollment' do
           expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]

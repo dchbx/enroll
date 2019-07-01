@@ -5,6 +5,7 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_enrollment) do
     FactoryBot.create(:hbx_enrollment,
+                      :family => family,
                       :created_at => (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
                       :household => family.households.first,
                       :kind => "individual",

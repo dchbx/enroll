@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :hbx_enrollment do
-    household
+    household { family.households.first }
+    family
     kind { "employer_sponsored" }
     elected_premium_credit { 0 }
     applied_premium_credit { 0 }

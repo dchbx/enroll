@@ -8,6 +8,7 @@ describe AssignAttestedResidency, :dbclean => :after_each do
   let(:active_household) { family.active_household }
   let(:enrollment) { FactoryBot.create(:hbx_enrollment,
                        household: active_household,
+                       family: family,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.beginning_of_month,
                        enrollment_kind: "open_enrollment",

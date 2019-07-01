@@ -15,12 +15,10 @@ class UpdateEmployeePlanSelection < MongoidMigrationTask
             benefit_groups = active_plan_year.benefit_groups
             if benefit_groups.present?
               bg_list = benefit_groups.map{|a| a.id}
-              Family.where(:"households.hbx_enrollments.benefit_group_id".in => bg_list).each do |family|
-                family.active_household.hbx_enrollments.where(:benefit_group_id.in => bg_list, :plan_id.ne => nil).to_a.each do |enrollment|
+                HbxEnrollment.where(:benefit_group_id.in => bg_list, :plan_id.ne => nil).to_a.each do |enrollment|
                   enrollment.update_attributes(plan_id: plan_id)
                   puts "Changed Plan of Enrollment for #{family.primary_family_member.person.hbx_id}" unless Rails.env.test?
                 end
-              end
             else
               puts "No benefit groups found with given information" unless Rails.env.test?
             end

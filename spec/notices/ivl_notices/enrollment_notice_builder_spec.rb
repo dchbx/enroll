@@ -5,13 +5,16 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_enrollment) do
-    FactoryBot.create(:hbx_enrollment,
-                      :created_at => (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
-                      :household => family.households.first,
-                      :kind => "individual",
-                      :is_any_enrollment_member_outstanding => true)
+    FactoryBot.create(
+      :hbx_enrollment,
+      created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+      family: family,
+      household: family.households.first,
+      kind: "individual",
+      aasm_state: "enrolled_contingent"
+    )
   end
-  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
+  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Enrollment Notice',
                             :notice_template => 'notices/ivl/enrollment_notice',
@@ -101,7 +104,11 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       end
     end
     context "when special verification does not exist" do
+      let (:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number', due_date: (Date.today + 95.days), due_date_type: 'notice')}
       it "should update the due date" do
+        person.consumer_role.verification_types.by_name('Social Security Number').first.due_date = ssn_type.due_date
+        person.consumer_role.verification_types.by_name('Social Security Number').first.due_date_type = ssn_type.due_date_type
+        person.consumer_role.save!
         @eligibility_notice.build
         expect(@eligibility_notice.document_due_date(person, ssn_type)).to eq (TimeKeeper.date_of_record+Settings.aca.individual_market.verification_due.days)
       end

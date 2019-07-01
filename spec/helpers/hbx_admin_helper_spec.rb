@@ -4,7 +4,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe HbxAdminHelper, :type => :helper do
   let(:family)    { FactoryBot.create(:family, :with_primary_family_member) }
   let(:household) { FactoryBot.create(:household, family: family)}
-  let(:hbx)   { FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), applied_aptc_amount: 100)}
+  let(:hbx)   { FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), applied_aptc_amount: 100)}
   let(:hbx_inactive)   { FactoryBot.create(:hbx_enrollment, household: household, is_active: false, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), applied_aptc_amount: 100)}
   let(:hbx_without_aptc)   { FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), applied_aptc_amount: 0)}
 

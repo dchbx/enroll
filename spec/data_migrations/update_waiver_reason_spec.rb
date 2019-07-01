@@ -14,7 +14,7 @@ describe UpdateWaiverReason, dbclean: :after_each do
 
   describe 'update waiver reason' do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, waiver_reason: 'this is the reason')}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, waiver_reason: 'this is the reason')}
 
     it 'should update waiver reason' do
       ClimateControl.modify id: "#{hbx_enrollment.hbx_id}", waiver_reason: 'waiver_reason' do

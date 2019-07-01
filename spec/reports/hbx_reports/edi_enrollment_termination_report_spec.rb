@@ -33,7 +33,8 @@ describe TerminatedHbxEnrollments do
   let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
   let(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment,
                                             household: family1.active_household,
-                                             product: product,
+                                            product: product,
+                                            family: family1,
                                             aasm_state:"coverage_terminated",
                                             hbx_enrollment_members: [hbx_enrollment_member1],
                                             termination_submitted_on: Date.yesterday.midday,
@@ -41,7 +42,8 @@ describe TerminatedHbxEnrollments do
   let(:family2) { FactoryBot.create(:family, :with_primary_family_member, :person => person2)}
   let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment,
                                              household: family2.active_household,
-                                              product: product,
+                                             family: family2,
+                                             product: product,
                                              aasm_state:"coverage_termination_pending",
                                              hbx_enrollment_members: [hbx_enrollment_member2],
                                              termination_submitted_on: Date.yesterday.midday,

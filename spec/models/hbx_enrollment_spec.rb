@@ -107,7 +107,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
   context "for verifying newly added attribute" do
     let!(:person100)          { FactoryBot.create(:person, :with_consumer_role) }
     let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
-    let!(:hbx_enrollment100)  { FactoryBot.create(:hbx_enrollment, household: family100.active_household) }
+    let!(:hbx_enrollment100)  { FactoryBot.create(:hbx_enrollment, household: family100.active_household, family: family100) }
 
     it "should not raise error" do
       expect{hbx_enrollment100.is_any_enrollment_member_outstanding}.not_to raise_error
@@ -377,7 +377,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
       let!(:hbx_enrollment)           { FactoryBot.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
-                                          household: family.active_household, kind: "individual") }
+                                          household: family.active_household, kind: "individual", family: family) }
       let!(:hbx_enrollment_member)     { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
       let(:active_year)               {TimeKeeper.date_of_record.year}
 
@@ -398,12 +398,12 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryBot.create(:consumer_role) }
       let(:person) { household.family.primary_applicant.person}
-      let(:family) { household.family }
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
           coverage_household: coverage_household,
           benefit_package: benefit_package,
+          family: family,
           qle: true
         )
         enrollment.save
@@ -497,6 +497,69 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #       end
     #     end
     #   end
+
+      # context "status_step" do
+      #   let(:hbx_enrollment) {HbxEnrollment.new()}
+
+      #   it "return 1 when coverage_selected" do
+      #     hbx_enrollment.aasm_state = "coverage_selected"
+      #     expect(hbx_enrollment.status_step).to eq 1
+      #   end
+
+      #   it "return 2 when transmitted_to_carrier" do
+      #     hbx_enrollment.aasm_state = "transmitted_to_carrier"
+      #     expect(hbx_enrollment.status_step).to eq 2
+      #   end
+
+      #   it "return 3 when enrolled_contingent" do
+      #     hbx_enrollment.aasm_state = "enrolled_contingent"
+      #     expect(hbx_enrollment.status_step).to eq 3
+      #   end
+
+      #   it "return 4 when coverage_enrolled" do
+      #     hbx_enrollment.aasm_state = "coverage_enrolled"
+      #     expect(hbx_enrollment.status_step).to eq 4
+      #   end
+
+      #   it "return 5 when coverage_canceled" do
+      #     hbx_enrollment.aasm_state = "coverage_canceled"
+      #     expect(hbx_enrollment.status_step).to eq 5
+      #   end
+
+      #   it "return 5 when coverage_terminated" do
+      #     hbx_enrollment.aasm_state = "coverage_terminated"
+      #     expect(hbx_enrollment.status_step).to eq 5
+      #   end
+      # end
+
+      context "enrollment_kind" do
+        let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+        let(:hbx_enrollment) {HbxEnrollment.new(family: family)}
+        it "should fail validation when blank" do
+          hbx_enrollment.enrollment_kind = ""
+          expect(hbx_enrollment.valid?).to eq false
+          expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
+        end
+
+        it "should fail validation when not in ENROLLMENT_KINDS" do
+          hbx_enrollment.enrollment_kind = "test"
+          expect(hbx_enrollment.valid?).to eq false
+          expect(hbx_enrollment.errors[:enrollment_kind].any?).to eq true
+        end
+
+        it "is_open_enrollment?" do
+          hbx_enrollment.enrollment_kind = "open_enrollment"
+          expect(hbx_enrollment.is_open_enrollment?).to eq true
+          expect(hbx_enrollment.is_special_enrollment?).to eq false
+        end
+
+        it "is_special_enrollment?" do
+          hbx_enrollment.enrollment_kind = "special_enrollment"
+          expect(hbx_enrollment.is_open_enrollment?).to eq false
+          expect(hbx_enrollment.is_special_enrollment?).to eq true
+        end
+      end
     end
 
     context "#propogate_waiver", dbclean: :around_each do
@@ -505,9 +568,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_group_assignment) {FactoryBot.create(:benefit_group_assignment, benefit_group: package, census_employee: census_employee)}
       let(:application) {double(:start_on => TimeKeeper.date_of_record.beginning_of_month, :end_on => (TimeKeeper.date_of_record.beginning_of_month + 1.year) - 1.day, :aasm_state => :active)}
       let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(2019,4,1),end_on: Date.new(2020,3,31))}
-      let(:ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
-      let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household)}
-      let(:enrollment_for_waiver) {FactoryBot.create(:hbx_enrollment, household: family.active_household, predecessor_enrollment_id: existing_shop_enrollment.id, benefit_group_assignment_id: benefit_group_assignment.id)}
+      let(:ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, family: family)}
+      let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family)}
+      let(:enrollment_for_waiver) {FactoryBot.create(:hbx_enrollment, household: family.active_household, predecessor_enrollment_id: existing_shop_enrollment.id, benefit_group_assignment_id: benefit_group_assignment.id, family: family)}
 
       before do
         allow(census_employee).to receive(:benefit_group_assignments).and_return [benefit_group_assignment]
@@ -542,11 +605,11 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #   create_brady_census_families
     # end
 
-    context "#find" do
-      it "should return nil with invalid id" do
-        expect(HbxEnrollment.find("text")).to eq nil
-      end
-    end
+    # context "#find" do
+    #   it "should return nil with invalid id" do
+    #     expect(HbxEnrollment.find("text")).to eq nil
+    #   end
+    # end
 
     context "new_from" do
       include_context "BradyWorkAfterAll"
@@ -575,18 +638,18 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
         allow(consumer_role).to receive(:person).and_return(person)
         allow(household).to receive(:family).and_return family
-        allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
-        allow(family).to receive(:current_sep).and_return sep
+        allow(mikes_family).to receive(:is_under_ivl_open_enrollment?).and_return true
+        allow(mikes_family).to receive(:current_sep).and_return sep
       end
 
       shared_examples_for "new enrollment from" do |qle, sep, enrollment_period, error|
         context "#{enrollment_period} period" do
           let(:enrollment) {HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: qle)}
-          before do
-            allow(family).to receive(:is_under_special_enrollment_period?).and_return sep
-            allow(family).to receive(:is_under_ivl_open_enrollment?).and_return enrollment_period == "open_enrollment"
+          before :each do
+            allow(mikes_family).to receive(:is_under_special_enrollment_period?).and_return sep
+            allow(mikes_family).to receive(:is_under_ivl_open_enrollment?).and_return enrollment_period == "open_enrollment"
           end
-
+          
           unless error
             it "assigns #{enrollment_period} as enrollment_kind when qle is #{qle}" do
               expect(enrollment.enrollment_kind).to eq enrollment_period
@@ -613,6 +676,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       it_behaves_like "new enrollment from", true, true, "special_enrollment", false
       it_behaves_like "new enrollment from", false, false, "not_open_enrollment", "raise_an_error"
     end
+
 
     context "is reporting a qle before the employer plan start_date and having a expired plan year" do
       include_context "setup benefit market with market catalogs and product packages"
@@ -657,7 +721,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       it "should return a sep with an effective date that equals to sep date" do
-        enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
+        enrollment = HbxEnrollment.new_from(employee_role: employee_role, family: family, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
         expect(enrollment.effective_on).to eq sep.qle_on
       end
     end
@@ -750,6 +814,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                               product: product1,
                               household: family1.latest_household,
                               enrollment_kind: "open_enrollment",
+                              family: family1,
                               aasm_state: 'coverage_selected',
                               consumer_role: person1.consumer_role,
                               enrollment_signature: true)
@@ -758,6 +823,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
             FactoryBot.create(:hbx_enrollment,
                               kind: 'individual',
                               product: product2,
+                              family: family1,
                               household: family1.latest_household,
                               enrollment_kind: 'open_enrollment',
                               aasm_state: 'shopping',
@@ -775,15 +841,16 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           end
 
           it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
-            hbx_enrollment1.effective_on = date + 1.day
+            hbx_enrollment1.update_attributes!(effective_on: date + 1.day)
             hbx_enrollment2.effective_on = date
             # This gets processed on 31st Dec
             if hbx_enrollment1.effective_on.year != hbx_enrollment2.effective_on.year
               hbx_enrollment1.effective_on = date + 2.day
               hbx_enrollment2.effective_on = date + 1.day
             end
+
             hbx_enrollment2.select_coverage!
-            hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first
+            hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first.reload
             expect(hbx_enrollment1_from_db.coverage_canceled?).to be_truthy
             expect(hbx_enrollment2.coverage_selected?).to be_truthy
           end
@@ -806,10 +873,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           end
 
           it "terminates previous enrollments if both effective on in the future" do
-            hbx_enrollment1.effective_on = date + 10.days
-            hbx_enrollment2.effective_on = date + 20.days
+            hbx_enrollment1.update_attributes!(effective_on: date + 10.days)
+            hbx_enrollment2.update_attributes!(effective_on: date + 20.days)
             hbx_enrollment2.select_coverage!
-            expect(hbx_enrollment1.coverage_terminated?).to be_truthy
+            expect(hbx_enrollment1.reload.coverage_terminated?).to be_truthy
             expect(hbx_enrollment2.coverage_selected?).to be_truthy
             expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
           end
@@ -911,7 +978,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
     context "cancel_coverage!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "inactive")}
 
       it "should cancel the enrollment" do
         hbx_enrollment.cancel_coverage!
@@ -926,7 +993,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
     context "cancel_for_non_payment!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive", family: family)}
 
       it "should cancel the enrollment" do
         hbx_enrollment.cancel_for_non_payment!
@@ -941,7 +1008,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
     context "terminate_for_non_payment!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected")}
+      let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family,aasm_state: "coverage_selected")}
 
       it "should terminate enrollment" do
         hbx_enrollment.terminate_for_non_payment!
@@ -978,6 +1045,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:shop_enrollment) { FactoryBot.create(:hbx_enrollment,
                                                 household: shop_family.latest_household,
                                                 coverage_kind: "health",
+                                                family: shop_family,
                                                 effective_on: effective_on,
                                                 enrollment_kind: enrollment_kind,
                                                 kind: "employer_sponsored",
@@ -1113,7 +1181,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                                                effective_on: effective_on_date,
                                                enrollment_kind: "open_enrollment",
                                                kind: "individual",
-                                               submitted_at: effective_on_date - 10.days
+                                               submitted_at: effective_on_date - 10.days,
+                                               family: ivl_family
       )
       }
       let(:ivl_termination_date) {TimeKeeper.date_of_record}
@@ -1356,6 +1425,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         household: family.active_household,
         benefit_group_assignment_id: benefit_group_assignment.id,
         aasm_state: "coverage_selected",
+        family: family,
         coverage_kind: "health",
         kind: "employer_sponsored"
       )}
@@ -1393,14 +1463,15 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
        household: family.active_household,
        kind: "employer_sponsored",
        submitted_at: TimeKeeper.datetime_of_record - 3.day,
-       created_at: TimeKeeper.datetime_of_record - 3.day
+       created_at: TimeKeeper.datetime_of_record - 3.day,
+       family: family
        )
     end
 
     before do
-      enrollment.aasm_state = "coverage_canceled"
-      enrollment.terminated_on = enrollment.effective_on
-      enrollment.external_enrollment = true
+      enrollment.update_attributes(aasm_state:"coverage_canceled")
+      enrollment.update_attributes(terminated_on: enrollment.effective_on)
+      enrollment.update_attributes(external_enrollment: true)
       enrollment.hbx_enrollment_members.each do |em|
         em.coverage_end_on = em.coverage_start_on
       end
@@ -1440,8 +1511,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     it "should not be visible to the family" do
-      enrollment.aasm_state = "coverage_selected"
-      enrollment.external_enrollment = false
+      enrollment.update_attributes!(aasm_state: "coverage_selected")
+      enrollment.update_attributes!(external_enrollment: false)
       enrollment.save!
       expect(family.enrollments_for_display.to_a).not_to eq([])
     end
@@ -1542,6 +1613,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       coverage_kind: "health",
       effective_on: effective_on,
       enrollment_kind: enrollment_kind,
+      family: shop_family,
       kind: "employer_sponsored",
       submitted_at: effective_on - 20.days,
       benefit_sponsorship_id: benefit_sponsorship.id,
@@ -1572,6 +1644,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                                                 coverage_kind: "health",
                                                 effective_on: new_enrollment_eff_on,
                                                 enrollment_kind: enrollment_kind,
+                                                family: shop_family,
                                                 kind: "employer_sponsored",
                                                 submitted_at: TimeKeeper.date_of_record,
                                                 benefit_sponsorship_id: benefit_sponsorship.id,
@@ -1626,6 +1699,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         let(:new_enrollment) { FactoryBot.create(:hbx_enrollment,
           household: shop_family.latest_household,
           coverage_kind: "health",
+          family: shop_family,
           effective_on: enrollment_effective_on,
           enrollment_kind: enrollment_kind,
           kind: "employer_sponsored",
@@ -1692,6 +1766,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           let(:new_enrollment) { FactoryBot.create(:hbx_enrollment,
             household: shop_family.latest_household,
             coverage_kind: "health",
+            family: shop_family,
             effective_on: enrollment_effective_on,
             enrollment_kind: enrollment_kind,
             kind: "employer_sponsored",
@@ -1748,6 +1823,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
           let(:new_enrollment) { FactoryBot.create(:hbx_enrollment,
             household: shop_family.latest_household,
+            family: shop_family,
             coverage_kind: "health",
             effective_on: enrollment_effective_on,
             enrollment_kind: enrollment_kind,
@@ -1800,7 +1876,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
   describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :around_each do
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
     let(:family) {FactoryBot.build(:individual_market_family)}
-    let(:hbx_enrollment) {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record)}
+    let(:hbx_enrollment) {FactoryBot.build(:hbx_enrollment, :individual_unassisted, family: family, household: family.active_household, effective_on: TimeKeeper.date_of_record)}
 
     context "Enrollment is in active state" do
       it "enrollment is in coverage_selected state" do
@@ -1849,7 +1925,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
   describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :around_each do
     let(:family) {FactoryBot.build(:individual_market_family)}
-    let(:hbx_enrollment) {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, kind: 'individual')}
+    let(:hbx_enrollment) {FactoryBot.build(:hbx_enrollment, :individual_unassisted, family: family, household: family.active_household, kind: 'individual')}
 
     context "open enrollment" do
       before do
@@ -1857,17 +1933,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       it "should return true when auto_renewing" do
-        FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'auto_renewing')
+        FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, household: family.active_household, aasm_state: 'auto_renewing')
         expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
       end
 
       it "should return true when renewing_coverage_selected" do
-        FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'renewing_coverage_selected')
+        FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, household: family.active_household, aasm_state: 'renewing_coverage_selected')
         expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
       end
 
       it "should return false when coverage_selected" do
-        FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'coverage_selected')
+        FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, household: family.active_household, aasm_state: 'coverage_selected')
         expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
       end
     end
@@ -1886,7 +1962,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
   describe HbxEnrollment, 'state machine', dbclean: :around_each do
     let(:family) {FactoryBot.build(:individual_market_family)}
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-    subject {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, product: product)}
+    subject {FactoryBot.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, product: product, family: family)}
 
     shared_examples_for "state machine transitions" do |current_state, new_state, event|
       it "transition #{current_state} to #{new_state} on #{event} event" do
@@ -1980,6 +2056,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let!(:enrollment) {
         FactoryBot.create(:hbx_enrollment,
          household: family.active_household,
+         family: family,
          coverage_kind: "health",
          effective_on: benefit_group.start_on,
          enrollment_kind: "open_enrollment",
@@ -2024,6 +2101,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
          effective_on: TimeKeeper.date_of_record.beginning_of_month,
          enrollment_kind: "open_enrollment",
          kind: "individual",
+         family: family,
          plan_id: plan.id
          )
       }
@@ -2044,8 +2122,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
     context "Cancel / Terminate Previous Enrollments for Shop" do
       let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-      let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, effective_on: TimeKeeper.date_of_record)}
-      let(:new_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, predecessor_enrollment_id: existing_shop_enrollment.id, effective_on: TimeKeeper.date_of_record)}
+      let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, effective_on: TimeKeeper.date_of_record, family: family)}
+      let(:new_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family, predecessor_enrollment_id: existing_shop_enrollment.id, effective_on: TimeKeeper.date_of_record)}
 
       it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
         new_enrollment.update_existing_shop_coverage
@@ -2061,28 +2139,31 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
       let(:benefit_package) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first}
       let(:benefit_coverage_period) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first}
+      let(:family) {mikes_family}
+      let(:existing_ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month, family: family, benefit_package_id: benefit_package.id)}
+      let(:new_ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month, family: family, benefit_package_id: benefit_package.id)}
+
 
       before :each do
         @household = mikes_family.households.first
-        family =  @household.family
         @coverage_household = household.coverage_households.first
         allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
         allow(coverage_household).to receive(:household).and_return household
         allow(household).to receive(:family).and_return family
         allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
-        @enrollment1 = household.create_hbx_enrollment_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package)
-        @enrollment1.update_current(aasm_state: "coverage_selected", enrollment_signature: "somerandomthing!", effective_on: TimeKeeper.date_of_record.beginning_of_month)
-        @enrollment2 = household.create_hbx_enrollment_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package)
-        @enrollment2.update_current(enrollment_signature: "somerandomthing!", effective_on: TimeKeeper.date_of_record.beginning_of_month)
+        existing_ivl_enrollment.update_attributes(aasm_state: "coverage_selected", enrollment_signature: "somerandomthing!",effective_on: TimeKeeper.date_of_record.beginning_of_month)
+        new_ivl_enrollment.update_attributes(enrollment_signature: "somerandomthing!", effective_on: TimeKeeper.date_of_record.beginning_of_month)
       end
 
       it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
-        @enrollment2.cancel_previous(TimeKeeper.date_of_record.year)
-        expect(@enrollment1.aasm_state).to eq "coverage_canceled"
+        new_ivl_enrollment.cancel_previous(TimeKeeper.date_of_record.year)
+        existing_ivl_enrollment.reload
+        expect(existing_ivl_enrollment.aasm_state).to eq "coverage_canceled"
       end
     end
   end
 end
+
 
 describe HbxEnrollment, type: :model, :dbclean => :around_each do
   let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
@@ -2206,7 +2287,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
 
         context 'renewing employee A' do
 
-          before do
+          before(:each) do
             renewal_benefit_package.renew_member_benefit(census_employees[0])
             family.reload
           end
@@ -2311,6 +2392,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
             household: family.active_household,
             coverage_kind: coverage_kind,
             effective_on: benefit_package.start_on,
+            family: family,
             enrollment_kind: enrollment_kind,
             kind: "employer_sponsored",
             submitted_at: submitted_at,
@@ -2331,7 +2413,7 @@ end
 
   describe "#notify_enrollment_cancel_or_termination_event", :dbclean => :after_each do
     let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
-    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family,household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
     let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
     it "should notify event" do # loud transaction
@@ -2382,7 +2464,7 @@ end
 describe HbxEnrollment, dbclean: :after_all do
   let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
-  let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, household: ivl_family.active_household,
+  let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, household: ivl_family.active_household, family: ivl_family,  
                             kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected") }
   let!(:ivl_enrollment_member)  { FactoryBot.create(:hbx_enrollment_member, is_subscriber: true,
                                   applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,

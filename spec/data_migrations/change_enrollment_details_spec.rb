@@ -28,11 +28,11 @@ describe ChangeEnrollmentDetails do
   describe "changing enrollment attributes" do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
-    let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
-    let(:term_enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household)}
-    let(:term_enrollment2) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household)}
-    let(:term_enrollment3) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, kind: "individual")}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family)}
+    let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family)}
+    let(:term_enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, family: family)}
+    let(:term_enrollment2) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, family: family)}
+    let(:term_enrollment3) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, kind: "individual", family: family)}
     let(:new_plan) { FactoryBot.create(:plan) }
     let(:new_benefit_group) { FactoryBot.create(:benefit_group) }
 

@@ -291,10 +291,20 @@ module BenefitSponsors
     end
 
     def hbx_enrollments_by_month(date)
-      s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten
-      collection = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit, date)] }.reject { |pair| pair.last.nil? }
-      enrollments = collection.inject([]) do |enrollments, coll|
-        enrollments += coll.last.map { |x| x["hbx_enrollments"]}
+      end_date = (benefit_application.effective_period.min > date.end_of_month) ? benefit_application.effective_period.min : date.end_of_month
+      s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten      
+      enrollments = nil
+      s_benefits.each do |sponsored_benefit|
+        enrollments_by_month = HbxEnrollment.by_benefit_application_and_sponsored_benefit(
+          benefit_application,
+          sponsored_benefit,
+          date
+        )
+        if enrollments.nil?
+          enrollments = enrollments_by_month
+        else
+          enrollments = enrollments + enrollments_by_month
+        end
       end
       enrollments
     end

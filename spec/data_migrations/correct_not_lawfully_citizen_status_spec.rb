@@ -11,6 +11,7 @@ describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:enrollment) {
     FactoryBot.create(:hbx_enrollment,
+                       family: family,
                        household: family.active_household,
                        coverage_kind: 'health',
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
