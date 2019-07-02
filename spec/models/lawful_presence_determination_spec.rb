@@ -121,7 +121,7 @@ describe LawfulPresenceDetermination do
   end
 
   context 'qualified non citizenship code' do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     subject { person.consumer_role.lawful_presence_determination }
 
     context 'store qnc result if present' do
