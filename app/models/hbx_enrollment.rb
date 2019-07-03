@@ -1172,7 +1172,7 @@ class HbxEnrollment
     return nil if family.blank?
 
     case market_kind
-      when 'shop'
+      when 'shop', 'fehb'
         if qle && family.is_under_special_enrollment_period? && benefit_group.present?
           family.current_sep.effective_on
         else

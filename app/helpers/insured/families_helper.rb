@@ -135,7 +135,7 @@ module Insured::FamiliesHelper
       # 2) new hire covered under enrolment period
       # 3) qle enrolmlent period check
     return false if hbx_enrollment.sponsored_benefit_package.open_enrollment_contains?(TimeKeeper.date_of_record)
-    return false if hbx_enrollment.employee_role.can_enroll_as_new_hire?
+    return false if hbx_enrollment.try(:employee_role).try(:can_enroll_as_new_hire?)
     return false if hbx_enrollment.family.is_under_special_enrollment_period? && hbx_enrollment.active_during?(hbx_enrollment.family.current_sep.effective_on)
 
     # Disable only  if non of the above conditions match
