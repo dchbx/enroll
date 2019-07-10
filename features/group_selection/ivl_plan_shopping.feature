@@ -56,8 +56,10 @@ Feature: IVL plan purchase
     And consumer has a dependent in spouse relationship with age greater than 26
     And consumer also has a health enrollment with primary person covered
     When consumer visits home page after successful ridp
-    Then consumer should see the enrollment with make changes button
-    When consumer clicked on make changes button
+    Then consumer should see the enrollment with edit plan button
+    When consumer clicks on the edit plan button
+    And consumer clicks on the Shop for Plans button
+    And consumer clicks continue
     Then consumer should see the ineligible family member disabled and unchecked
     And consumer should see the eligible family member enabled and checked
     And consumer should also see the reason for ineligibility
