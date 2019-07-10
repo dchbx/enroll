@@ -1,15 +1,12 @@
-$(document).ready(function() {
+$(document).on("ready ajax:success", function() {
 
-  $('#terminate-button').click(function(e){
-    e.preventDefault();
-    $('.confirmation').addClass('hidden');
-    $('#action-confirm').removeClass('hidden');
-    $('.action-msg').addClass('hidden');
-    $('#term-msg').removeClass('hidden');
-    $('#calendar-div').removeClass('hidden');
-    $('#enter-text').removeClass('hidden').html('Enter the date of termination');
-    $('#term_date').val('');
-    $('#applied-aptc-text').addClass('hidden');
+  $("#agreement_action-confirm-yes").click(function(){
+    $(".interaction-click-control-action-confirm").attr("disabled", false);
+    $("#action-confirm-date").attr("hidden", false);
+  });
+  $("#agreement_action-confirm-no").click(function(){
+    $(".interaction-click-control-action-confirm").attr("disabled", true);
+    $("#action-confirm-date").attr("hidden", true);
   });
 
   $('#cancel-button').click(function(e){
@@ -18,24 +15,27 @@ $(document).ready(function() {
     $('#action-confirm').removeClass('hidden');
     $('.action-msg').addClass('hidden');
     $('#cancel-msg').removeClass('hidden');
-    $('#calendar-div').removeClass('hidden');
-    $('#enter-text').removeClass('hidden').html('Enter the date of cancellation');
-    $('#term_date').val('');
+    $('#cancel-form').removeClass('hidden');
+    $('#calendar-div').addClass('hidden');
     $('#applied-aptc-text').addClass('hidden');
   });
 
-  $('#aptc-button').click(function(e){
-    e.preventDefault();
-    $('.confirmation').addClass('hidden');
-    $('#action-confirm').removeClass('hidden');
-    $('.action-msg').addClass('hidden');
-    $('#aptc-msg').removeClass('hidden');
-    $('#calendar-div').removeClass('hidden');
-    $('#enter-text').addClass('hidden');
-    $('#term_date').val('07/01/2019');
-    $('#applied-aptc-text').removeClass('hidden');
-  });
+  // Mockup temporarily disabled
+  // $('#aptc-button').click(function(e){
+  //   e.preventDefault();
+  //   $('.confirmation').addClass('hidden');
+  //   $('#action-confirm').removeClass('hidden');
+  //   $('.action-msg').addClass('hidden');
+  //   $('#aptc-msg').removeClass('hidden');
+  //   $('#calendar-div').removeClass('hidden');
+  //   $('#enter-text').addClass('hidden');
+  //   $('#aptc_date').val('07/01/2019');
+  //   $('#applied-aptc-text').removeClass('hidden');
+  //   $('#cancel-form').addClass('hidden');
+  // });
 
+
+  // APTC JS
   $('#applied_pct_1').change(function(){
     calculatePercent('#applied_pct_1', 100);
   });

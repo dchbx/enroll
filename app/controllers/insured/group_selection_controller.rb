@@ -161,13 +161,26 @@ class Insured::GroupSelectionController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
     @family = Family.find(params.require(:family_id))
     @sep = @family.try(:latest_active_sep)
+    @should_term_or_cancel = @hbx_enrollment.should_term_or_cancel_ivl
+    @calendar_enabled = @should_term_or_cancel == 'cancel' ? false : true
   end
 
-  def cancel
-    hbx = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-    hbx.cancel_coverage! if hbx.may_cancel_coverage?
-    # TODO: Decide how transmit will be handled
-    # BulkActionsForAdmin.handle_edi_transmissions(@hbx_enrollment.id, transmit_flag)
+  def term_or_cancel
+    hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    term_date = params[:term_date].present? ? Date.strptime(params[:term_date], '%m/%d/%Y') : TimeKeeper.date_of_record
+    hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, term_date)
+    if params.require(:term_or_cancel) == 'cancel'
+      transmit_flag = true
+      notify(
+        "acapi.info.events.hbx_enrollment.terminated",
+        {
+          :reply_to => "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler",
+          "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+          "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+          "is_trading_partner_publishable" => transmit_flag
+        }
+      )
+    end
     redirect_to family_account_path
   end
 

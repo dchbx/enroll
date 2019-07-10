@@ -305,6 +305,7 @@ Rails.application.routes.draw do
       collection do
         post :cancel
         post :edit_aptc
+        post :term_or_cancel
         post :terminate
         get :edit_plan
         get :terminate_selection
