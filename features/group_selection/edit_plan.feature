@@ -85,7 +85,6 @@ Scenario: Consumer cancel Plan
     When consumer clicks the submit button
     Then the enrollment should be canceled
 
-
 Scenario: EE with IVL cancels Plan
     Given consumer has an employee role
     When consumer's health enrollment has an effective date in the future
@@ -96,7 +95,6 @@ Scenario: EE with IVL cancels Plan
     Then the submit button should be enabled
     When consumer clicks the submit button
     Then the enrollment should be canceled
-
 
 Scenario: Resident cancels plan
     Given consumer has a resident role 
