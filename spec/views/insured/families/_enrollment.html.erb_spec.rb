@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:person) { double(id: '31111113') }
-  let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true) }
+  let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true, id: 'familyid') }
 
   let(:employee_role) do
     instance_double(EmployeeRole)
@@ -110,6 +110,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     it "when kind is individual" do
       allow(hbx_enrollment).to receive(:kind).and_return('individual')
+      allow(hbx_enrollment).to receive(:is_ivl_by_kind?)
+      allow(hbx_enrollment).to receive(:is_enrolled_by_aasm_state?)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
       allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
@@ -288,8 +290,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
-    it "should display terminate plan option tile" do
-      expect(rendered).to have_text(/Terminate Plan/)
+    it "should display edit plan button" do
+      expect(rendered).to have_text("Edit Plan")
     end
   end
 

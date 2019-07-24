@@ -145,13 +145,8 @@
               <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
-              <% if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
-                <% if (@market_kind == 'shop' || @market_kind == 'fehb') && @hbx_enrollment.kind != 'individual' %>
+              <% if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record && (@market_kind == 'shop' || @market_kind == 'fehb') && @hbx_enrollment.is_shop?%>
                   <%= link_to l10n('select_plan_to_terminate'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: ('btn btn-primary btn-lg' + pundit_class(Family, :updateable?)) %>
-                <% else %>
-                  <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
-                          class: ('btn btn-primary ' + pundit_class(Family, :updateable?)) %>
-                <% end %>
               <% end %>
             <% end %>
           <% else %>

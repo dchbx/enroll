@@ -34,15 +34,13 @@ module Services
     end
 
     def applicable_aptc(selected_aptc)
-      return @applicable_aptc if @applicable_aptc.present?
-
       product_id = @hbx_enrollment.product.id.to_s
       applicable_aptc_service = ::Services::ApplicableAptcService.new(@hbx_enrollment.id, selected_aptc, [product_id])
-      @applicable_aptc ||= applicable_aptc_service.applicable_aptcs[product_id]
+      applicable_aptc_service.applicable_aptcs[product_id]
     end
 
     def calculate_applicable_aptc(aptc_values)
-      @calculate_applicable_aptc ||= applicable_aptc(aptc_values[:applied_aptc].to_f)
+      applicable_aptc(aptc_values[:applied_aptc].to_f)
     end
   end
 end

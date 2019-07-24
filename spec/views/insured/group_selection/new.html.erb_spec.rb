@@ -407,7 +407,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:benefit_group) { current_benefit_package }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: true)}
     let(:employer_profile) { benefit_sponsorship.profile }
     let(:current_user) { FactoryBot.create(:user) }
 
@@ -417,7 +417,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
-      assign :market_kind, 'individual'
+      assign :market_kind, 'shop'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
       assign :effective_on_date, TimeKeeper.date_of_record.beginning_of_month
@@ -467,14 +467,12 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     it "when hbx_enrollment not terminated and not shop_for_plans" do
       assign(:shop_for_plans, "shop_for_plans")
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
+      expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
       expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)
     end
 
     it "when hbx_enrollment is terminated" do
-      allow(hbx_enrollment).to receive(:coverage_enrolled?).and_return(false)
-      allow(hbx_enrollment).to receive(:auto_renewing?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_enrolled?).and_return(false)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
     end
@@ -642,6 +640,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       it "shouldn't see marketplace options" do
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('h3', text: 'Marketplace')
+      end
+
+      it "shouldn't see terminate plan" do
+        render file: "insured/group_selection/new.html.erb"
+        expect(rendered).to_not have_selector("a", text: "Select Plan to Terminate")
       end
     end
   end

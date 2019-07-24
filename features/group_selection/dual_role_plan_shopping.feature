@@ -32,7 +32,7 @@ Feature: EE with consumer role plan purchase
     And employee clicked on continue for plan shopping
     Then employee should see primary and valid dependent
 
-  Scenario: user plan shopping by clicking on 'make changes' button of IVL health enrollment
+  Scenario: user plan shopping by clicking on 'edit plan' button of IVL health enrollment
     Given a matched Employee exists with consumer role
     And first ER not offers dental benefits to spouse
     And user has a dependent in spouse relationship with age less than 26
@@ -40,9 +40,11 @@ Feature: EE with consumer role plan purchase
     And user did not apply coverage for child as ivl
     And user also has a health enrollment with primary person covered
     Then Employee sign in to portal
-    Then employee should see the enrollment with make changes button
-    When employee clicked on make changes button
-    Then user should see the ivl error message
+    Then employee should see the enrollment with edit plan button
+    When consumer clicks on the edit plan button
+    And consumer clicks on the Shop for Plans button
+    And consumer clicks continue
+    Then employee should see primary and valid dependent
 
   Scenario: user plan shopping by clicking on 'make changes' button of SHOP dental enrollment
             -- ER not offers shop dental benefits for child under 26
@@ -60,3 +62,12 @@ Feature: EE with consumer role plan purchase
     And employee should also see the reason for ineligibility
     And employee clicked on shop for new plan
     Then employee should see primary and valid dependent
+
+  Scenario: User should not see edit plan button for SHOP enrollments
+    Given a matched Employee exists with consumer role
+    And user has a dependent in child relationship with age less than 26
+    And user has a dependent in spouse relationship with age greater than 26
+    And user did not apply coverage for child as ivl
+    And employee also has a health enrollment with primary covered under first employer
+    Then Employee sign in to portal
+    And consumer should not see the edit plan button

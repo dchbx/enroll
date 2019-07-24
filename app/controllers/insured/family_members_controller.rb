@@ -46,7 +46,7 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.save
       @market_kind = qle.market_kind
     end
-
+    @market_kind = params[:market_kind] if params[:market_kind].present?
     if request.referer.present?
       @prev_url_include_intractive_identity = request.referer.include?("interactive_identity_verifications")
       @prev_url_include_consumer_role_id = request.referer.include?("consumer_role_id")

@@ -77,7 +77,8 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
-  sep = FactoryBot.create :special_enrollment_period, family: family
+  qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
+  sep = FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id)
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                   household: family.active_household,
@@ -224,9 +225,9 @@ Then(/(.*) should see primary person/) do |role|
   expect(page).to have_content "Coverage For:   #{primary.first_name}"
 end
 
-Then(/(.*) should see the enrollment with make changes button/) do |role|
+Then(/(.*) should see the enrollment with (.*) button/) do |_role, button_text|
   expect(page).to have_content "#{(current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
-  expect(page).to have_link "Make Changes"
+  expect(page).to have_link(button_text.titleize)
 end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
@@ -368,3 +369,97 @@ And(/Resident clicked on "Married" qle/) do
   click_link "Married"
 end
 
+Then(/consumer (.*) see the edit plan button/) do |visibility|
+  if visibility.eql?("should")
+    expect(page).to have_selector("a", text: "Edit Plan",  count: 1)
+  else
+    expect(page).to_not have_selector("a", text: "Edit Plan",  count: 1)
+  end
+end
+
+When(/(.*) clicks on the edit plan button/) do |_role|
+  click_link 'Edit Plan'
+end
+
+Then(/(.*) should see the edit plan page/) do |_role|
+  expect(page).to have_content('Cancel Plan')
+end
+
+When(/(.*) clicks on the Cancel Plan button/) do |_role|
+  find('.interaction-click-control-cancel-plan').click
+end
+
+Then(/(.*) should see the calender/) do |_role|
+  expect(page).to have_selector :css, '.date-picker'
+end
+
+Then(/the submit button should be disabled/) do
+  expect(page).to have_button('Are you sure?', disabled: true)
+end
+
+When(/(.*) selects a date/) do |_role|
+  fill_in 'term-date', :with => (TimeKeeper.date_of_record + 10).to_s
+end
+
+Then(/the submit button should be enabled/) do
+  expect(page).to have_button('Are you sure?', disabled: false)
+end
+
+When(/(.*) clicks the submit button/) do |_role|
+  click_button('Are you sure?')
+end
+
+Then(/the enrollment should be pending termination/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_termination_pending')
+  expect(page).to have_content('Coverage End: ' + (TimeKeeper.date_of_record + 10).to_s)
+end
+
+Given(/(.*) has a (.*) secondary role/) do |_primary_role, secondary_role|
+  family = Family.all.first
+  # Assumes primary role is consumer.
+  if secondary_role.eql?('resident')
+    FactoryBot.create(:resident_role_object, person: family.primary_person)
+  elsif secondary_role.eql?('employee')
+    FactoryBot.create(:employee_role, person: family.primary_person)
+  end
+end
+
+When(/consumer's health enrollment has an effective date in the future/) do
+  Family.all.first.all_enrollments.first.update_attributes(effective_on: TimeKeeper.date_of_record + 20)
+end
+
+Then(/(.*) should not see the calender/) do |_role|
+  expect(page).not_to have_selector :css, '.date-picker'
+end
+
+When(/(.*) selects (.*) to are you sure/) do |_role, option|
+  if option.eql?('yes')
+    choose('agreement_action-confirm-yes')
+  else
+    choose('agreement_action-confirm-no')
+  end
+end
+
+Then(/the enrollment should be canceled/) do
+  expect(Family.all.first.all_enrollments.first.aasm_state).to eq('coverage_canceled')
+  #Enrollment tile should not show
+  expect(page).not_to have_content("View Details")
+end
+
+When(/(.*) clicks on the Shop for Plans button/) do |_role|
+  find('.interaction-click-control-shop-for-plans').click
+end
+
+And(/the enrollment is in (.*) state/) do |state|
+  Family.all.first.all_enrollments.first.update_attributes(aasm_state: state)
+  # Refresh page to ensure UI change
+  visit current_path
+end
+
+And(/the consumer (.*) see the make changes button/) do |visibility|
+  if visibility.eql?("should")
+    expect(page).to have_button("Make Changes")
+  else
+    expect(page).to_not have_button("Make Changes")
+  end
+end
