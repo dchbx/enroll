@@ -13,7 +13,7 @@ module BenefitSponsors
     let(:ce) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
     let(:address_params) {ce.address.attributes}
     let(:ini_address_form) {Organizations::OrganizationForms::AddressForm.new(address_params)}
-    let(:params) {{first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: ce.ssn, dob: ce.dob.strftime("%m/%d/%Y"), hired_on: ce.hired_on.strftime("%m/%d/%Y"), address: ini_address_form }}
+    let(:params) {{first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: ce.ssn, dob: ce.dob, hired_on: ce.hired_on.strftime("%m/%d/%Y"), address: ini_address_form }}
 
     describe "init_census_record" do
       before :each do

@@ -224,6 +224,7 @@ module BenefitSponsors
           address: build_address(form)
         })
         member.assign_attributes(params)
+        member.no_ssn_allowed = true if profile.active_benefit_sponsorship.is_no_ssn_enabled
         assign_benefit_package_assignments(form, member)
         member
       end

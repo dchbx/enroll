@@ -17,6 +17,7 @@ module BenefitSponsors
       attribute :hired_on, String
       attribute :employment_terminated_on, Date
       attribute :is_business_owner, String
+      attribute :no_ssn_allowed, Boolean
       
       # template attributes
       attribute :benefit_group, String

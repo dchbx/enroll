@@ -46,7 +46,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.attributes = census_employee_params.merge!({
       active_benefit_group_assignment: benefit_group_id,
       renewal_benefit_group_assignment: renewal_benefit_group_id,
-      no_ssn_allowed: @benefit_sponsorship.is_no_ssn_enabled
+      no_ssn_allowed: @census_employee.no_ssn_allowed || @benefit_sponsorship.is_no_ssn_enabled
     })
 
     destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
@@ -57,6 +57,8 @@ class Employers::CensusEmployeesController < ApplicationController
       e.destroy
       @census_employee.reload
     end
+
+    @census_employee.unset(:encrypted_ssn) if (@census_employee.no_ssn_allowed || @benefit_sponsorship.is_no_ssn_enabled) && @census_employee.ssn.blank?
 
     if @census_employee.save
       if destroyed_dependent_ids.present?
@@ -185,7 +187,10 @@ class Employers::CensusEmployeesController < ApplicationController
   def show
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @status = params[:status] || ''
-    flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required." if @census_employee.no_ssn_allowed && !@benefit_sponsorship.is_no_ssn_enabled && @census_employee.encrypted_ssn.nil?
+    @no_ssn = @census_employee.no_ssn_allowed || false
+    if @census_employee.no_ssn_allowed && !@benefit_sponsorship.is_no_ssn_enabled && @census_employee.encrypted_ssn.nil?
+      flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required."
+    end
   end
 
   def delink
