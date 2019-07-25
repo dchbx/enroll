@@ -268,7 +268,14 @@ class FinancialAssistance::Applicant
   end
 
   def has_spouse
-    application.family.primary_applicant.person.person_relationships.where(kind: 'spouse').first.present? ? true : false
+    self.person.person_relationships.where(kind: 'spouse').present?  
+  end
+
+  def is_spouse_filing_jointly
+    return false unless self.has_spouse
+    spouse = Person.find(self.person.person_relationships.where(kind: 'spouse').first.successor_id)
+    spouse_applicant = application.active_applicants.detect { |applicant| spouse == applicant.person }
+    return spouse_applicant.is_joint_tax_filing
   end
 
   def tax_household_of_spouse
@@ -632,6 +639,11 @@ class FinancialAssistance::Applicant
   def presence_of_attr_step_1
     if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
       errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank")
+    end
+
+    if (has_spouse) && (is_spouse_filing_jointly) && (!is_joint_tax_filing) ||
+          (has_spouse) && (is_spouse_filing_jointly) && (!is_required_to_file_taxes) 
+      errors.add(:is_joint_tax_filing, "Both spouses must have the same filing status if filing jointly.")
     end
 
     if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?

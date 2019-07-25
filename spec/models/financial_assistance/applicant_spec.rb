@@ -308,7 +308,46 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       end
     end
 
-  end
+    context ".presence_of_attr_step_1" do
 
+      it "applicant must answer is filing jointly if filing taxes & has spouse" do
+        allow(applicant1).to receive(:is_required_to_file_taxes).and_return(true)
+        applicant1.send(:presence_of_attr_step_1)
+        expect(applicant1.errors[:is_joint_tax_filing].first).to include("Will this person be filling jointly?' can't be blank")
+      end
+
+      it "applicant must file taxes if spouse is filing jointly" do
+        allow(applicant2).to receive(:is_joint_tax_filing).and_return(true)
+        allow(applicant1).to receive(:is_required_to_file_taxes).and_return(false)
+        applicant1.send(:presence_of_attr_step_1)
+        expect(applicant1.errors["is_joint_tax_filing"].first).to include("Both spouses must have the same filing status if filing jointly")
+      end
+
+      it "applicant must file taxes jointly if spouse is filing jointly" do
+        allow(applicant2).to receive(:is_joint_tax_filing).and_return(true)
+        allow(applicant1).to receive(:is_required_to_file_taxes).and_return(true)
+        allow(applicant1).to receive(:is_joint_tax_filing).and_return(false)
+        applicant1.send(:presence_of_attr_step_1)
+        expect(applicant1.errors["is_joint_tax_filing"].first).to include("Both spouses must have the same filing status if filing jointly")
+      end
+
+      it "applicant must answer is being claimed as a tax dependent" do
+        applicant1.send(:presence_of_attr_step_1)
+        expect(applicant1.errors["is_claimed_as_tax_dependent"].first).to include("is_claimed_as_tax_dependent can't be blank")
+      end
+
+      it "applicant must specifiy who is claiming them if they are being claimed as a tax dependent" do
+        allow(applicant1).to receive(:is_claimed_as_tax_dependent).and_return(true)
+        applicant1.send(:presence_of_attr_step_1)
+        expect(applicant1.errors["claimed_as_tax_dependent_by"].first).to include("This person will be claimed as a dependent by' can't be blank")
+      end
+
+      it "applicant must answer if they are required to file taxes" do
+        allow(applicant1).to receive(:is_required_to_file_taxes).and_return(nil)
+        applicant1.send(:presence_of_attr_step_1)
+        expect(applicant1.errors["is_claimed_as_tax_dependent"].first).to include("is_claimed_as_tax_dependent can't be blank")
+      end
+    end
+  end
 end
 
