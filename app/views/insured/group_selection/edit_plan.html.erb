@@ -79,10 +79,12 @@
                   <div class="col-sm-4 transm">
                     <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
                   </div>
-
-                  <div class="col-sm-4">
-                    <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
-                  </div>
+                  
+                  <% if @hbx_enrollment.is_aptc_eligible? && @tax_household.aptc_members.present?%>
+                    <div class="col-sm-4">
+                      <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
+                    </div>
+                  <% end %>
 
                   <div class="col-sm-4">
                     <% if @sep.qualifying_life_event_kind.market_kind == "individual" || @family.is_under_ivl_open_enrollment? %>

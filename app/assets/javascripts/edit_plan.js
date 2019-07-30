@@ -21,18 +21,18 @@ $(document).on("ready ajax:success", function() {
   });
 
   // Mockup temporarily disabled
-  // $('#aptc-button').click(function(e){
-  //   e.preventDefault();
-  //   $('.confirmation').addClass('hidden');
-  //   $('#action-confirm').removeClass('hidden');
-  //   $('.action-msg').addClass('hidden');
-  //   $('#aptc-msg').removeClass('hidden');
-  //   $('#calendar-div').removeClass('hidden');
-  //   $('#enter-text').addClass('hidden');
-  //   $('#aptc_date').val('07/01/2019');
-  //   $('#applied-aptc-text').removeClass('hidden');
-  //   $('#cancel-form').addClass('hidden');
-  // });
+  $('#aptc-button').click(function(e){
+    e.preventDefault();
+    $('.confirmation').addClass('hidden');
+    $('#action-confirm').removeClass('hidden');
+    $('.action-msg').addClass('hidden');
+    $('#aptc-msg').removeClass('hidden');
+    $('#calendar-div').removeClass('hidden');
+    $('#enter-text').addClass('hidden');
+    $('#aptc_date').val('07/01/2019');
+    $('#applied-aptc-text').removeClass('hidden');
+    $('#cancel-form').addClass('hidden');
+  });
 
 
   // APTC JS

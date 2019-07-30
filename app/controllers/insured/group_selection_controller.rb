@@ -176,6 +176,8 @@ class Insured::GroupSelectionController < ApplicationController
     @sep = @family.try(:latest_active_sep)
     @should_term_or_cancel = @hbx_enrollment.should_term_or_cancel_ivl
     @calendar_enabled = @should_term_or_cancel == 'cancel' ? false : true
+    @hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
+    @tax_household = @family.active_household.latest_active_tax_household if @family.active_household.latest_active_tax_household.present?
   end
 
   def term_or_cancel

@@ -462,4 +462,45 @@ And(/the consumer (.*) see the make changes button/) do |visibility|
   else
     expect(page).to_not have_button("Make Changes")
   end
+end 
+
+And(/the family has an active tax household/) do
+  @family = Family.all.first
+  FactoryBot.create(:tax_household, household: @family.active_household)
+end
+
+And(/the tax household has at least one member that is APTC eligible/) do
+  tax_household = @family.active_household.latest_active_tax_household
+  tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.id)
+  FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)
+end
+
+And(/the metal level is (.*)/) do |metal_level|
+  @family.enrollments.first.product.update_attributes(metal_level_kind: metal_level.to_sym)
+end
+
+Then(/the Edit APTC button should be available/) do
+  expect(page).to have_content("Edit APTC")
+end
+
+Then(/the Edit APTC button should NOT be available/) do
+  expect(page).to_not have_content("Edit APTC")
+end
+
+Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|
+  hios_id = @family.enrollments.first.product.hios_id
+  changed_id = hios_id.gsub(hios_id[-2..-1], id_number)
+  @family.enrollments.first.product.update_attributes(hios_id: changed_id)
+end
+
+Given(/the enrollment is a Health plan/) do
+  @family.enrollments.first.update_attributes(coverage_kind: "health")
+end
+
+Given(/the enrollment is a Dental plan/) do
+  @family.enrollments.first.update_attributes(coverage_kind: "dental")
+end
+
+Given(/the coverall enrollment flag is TRUE/) do
+  @family.enrollments.first.update_attributes(kind: "coverall")
 end
