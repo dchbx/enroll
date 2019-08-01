@@ -907,7 +907,7 @@ class Family
   end
 
   def has_aptc_hbx_enrollment?
-    enrollments = latest_household.hbx_enrollments.active rescue []
+    enrollments = hbx_enrollments.active rescue []
     enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
   end
 
