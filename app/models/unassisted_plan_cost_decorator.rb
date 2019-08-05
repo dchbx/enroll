@@ -28,7 +28,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def large_family_factor(member)
-    if (age_of(member) > 20) || (kind == "dental")
+    if (age_of(member) > 20) || (kind == :dental)
       1.00
     else
       if child_index(member) > 2

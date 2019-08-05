@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health") }
-  let!(:dental_plan)             { double("Product", id: "dental_plan_id", kind: "dental") }
+  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental) }
   let(:plan_cost_decorator)     { UnassistedPlanCostDecorator.new(plan, member_provider) }
   context "rating a large family" do
     let(:plan)            {default_plan}
@@ -80,6 +80,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
   describe 'UnassistedPlanCostDecorator' do
     let!(:family10) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
+    let!(:member2_age_update) {family10.dependents.first.person.update_attributes(dob: 14.years.ago)}
     let!(:hbx_enrollment10) { FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: product) }
     let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
     let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
@@ -109,6 +110,18 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       it 'should return 0.00 when invalid information is given' do
         expect(unassisted_plan_cost_decorator2.aptc_amount(hbx_enrollment_member1)).to eq 0.00
+      end
+    end
+
+    context 'large_family_factor for dental kind' do
+      let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile) }
+      let!(:hbx_enrollment10) { FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: dental_product) }
+      let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
+      let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
+      let(:unassisted_plan_cost_decorator_dental) { UnassistedPlanCostDecorator.new(dental_product, hbx_enrollment10) }
+
+      it 'should return 1 for dental kind' do
+        expect(unassisted_plan_cost_decorator_dental.large_family_factor(hbx_enrollment_member1)).to eq 1
       end
     end
   end
