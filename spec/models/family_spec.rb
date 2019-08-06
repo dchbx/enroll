@@ -1513,3 +1513,80 @@ describe "terminated_enrollments", dbclean: :after_each do
     expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_termination_pending", "coverage_terminated"]
   end
 end
+
+describe "terminated_and updateable enrollments", dbclean: :before_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:effective_on) { current_effective_date }
+  let(:hired_on) { TimeKeeper.date_of_record - 3.months }
+  let(:employee_created_at) { hired_on }
+  let(:employee_updated_at) { employee_created_at }
+
+  let(:person) {FactoryBot.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789')}
+  let!(:sponsored_benefit) {benefit_sponsorship.benefit_applications.first.benefit_packages.first.health_sponsored_benefit}
+  let!(:update_sponsored_benefit) {sponsored_benefit.update_attributes(product_package_kind: :single_product)}
+
+  let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                       family: family,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
+                       aasm_state: 'coverage_termination_pending',
+                       terminated_on:  TimeKeeper.date_of_record.last_month.last_month.end_of_month.next_year,
+                       benefit_sponsorship_id: benefit_sponsorship.id,
+                       sponsored_benefit_package_id: current_benefit_package.id,
+                       sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+
+    )}
+
+  let!(:second_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month.next_month,
+                      aasm_state: 'coverage_termination_pending',
+                      terminated_on:  TimeKeeper.date_of_record.last_month.end_of_month.next_year,
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+
+    )}
+  let!(:third_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month.next_month,
+                      aasm_state: 'coverage_termination_pending',
+                      terminated_on:  TimeKeeper.date_of_record.last_month.last_month.end_of_month.next_year.next_year,
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: "12",
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+
+    )}
+  let!(:fourth_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month.next_month,
+                      aasm_state: 'coverage_termination_pending',
+                      terminated_on:  TimeKeeper.date_of_record.last_month.end_of_month.next_year.next_year,
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: "12",
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+
+    )}
+    
+  it "should include the last terminated enrollment sorted by benefit package id" do
+    expect(family.terminated_and_updateable_enrollments.count).to eq 2
+    expect(family.terminated_and_updateable_enrollments.map(&:terminated_on)).to eq [second_enrollment.terminated_on, fourth_enrollment.terminated_on ]
+  end
+end

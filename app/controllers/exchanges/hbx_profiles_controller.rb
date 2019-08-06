@@ -449,7 +449,7 @@ def employer_poc
   def view_enrollment_to_update_end_date
     @person = Person.find(params[:person_id])
     @row = params[:family_actions_id]
-    @enrollments = @person.primary_family.terminated_enrollments
+    @enrollments = @person.primary_family.terminated_and_updateable_enrollments
   end
 
   def update_enrollment_termianted_on_date

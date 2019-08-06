@@ -310,6 +310,11 @@ class Family
     hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending"])
   end
 
+  def terminated_and_updateable_enrollments
+    #group enrollments by sponsored_benefit_package_id, sort by terminated date and pull last enrollment of that group
+    terminated_enrollments.group_by{|er| er.sponsored_benefit_package_id}.values.map{|a|a.sort_by(&:terminated_on).last}.flatten
+  end
+
   # @deprecated Use {primary_applicant}
   alias_method :primary_family_member, :primary_applicant
 
