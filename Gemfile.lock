@@ -360,7 +360,7 @@ GEM
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.1.0)
     mime-types (2.99.3)
-    mini_portile2 (2.0.0)
+    mini_portile2 (2.4.0)
     minitest (5.10.3)
     monetize (1.1.0)
       money (~> 6.5.0)
@@ -413,8 +413,8 @@ GEM
     net-ssh (4.2.0)
     newrelic_rpm (4.6.0.338)
     nio4r (2.1.0)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.10.4)
+      mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.6.0)
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
@@ -733,7 +733,7 @@ DEPENDENCIES
   mongoid_rails_migrations!
   mongoid_userstamp
   newrelic_rpm
-  nokogiri (= 1.6.7.2)
+  nokogiri (= 1.10.4)
   nokogiri-happymapper
   non-stupid-digest-assets (~> 1.0, >= 1.0.9)
   notifier!
