@@ -131,6 +131,8 @@ class Person
   embeds_one :assister_role, cascade_callbacks: true, validate: true
   embeds_one :inbox, as: :recipient
 
+  embeds_one :sbc_role, cascade_callbacks: true, validate: true
+
   embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true

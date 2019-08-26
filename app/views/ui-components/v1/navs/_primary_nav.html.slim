@@ -32,13 +32,13 @@
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
             = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers", remote: true, pundit_object: nil, pundit_method: nil }
+        - if policy(HbxProfile).can_upload_sbc?
+          li role="presentation"
+          = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'issuers', link_path: main_app.exchanges_issuers_path, display_name: 'Issuers', active_tab: "issuers", remote: true, pundit_object: HbxProfile, pundit_method: :can_upload_sbc? }
         - if aca_user_accounts_enabled
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
             = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'user-account', link_path: main_app.user_account_index_exchanges_hbx_profiles_path, display_name: 'User Accounts',active_tab: "user-account", remote: false, pundit_object: HbxProfile, pundit_method: :can_access_user_account_tab? }
-          li role="presentation"
-            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
-            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'issuers', link_path: main_app.exchanges_issuers_path, display_name: 'Issuers', active_tab: "issuers", remote: true, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
           li.dropdown.pl-1 role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" Brokers
             i.fas.fa-caret-down

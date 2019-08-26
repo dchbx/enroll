@@ -175,6 +175,9 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_add_pdc
   end
 
+  def can_upload_sbc?
+    user&.person&.sbc_role&.present?
+  end
 
   private
 

@@ -10,26 +10,26 @@ var table = $('#products-ajax-dt').DataTable( {
   "deferRender": true,
   // Build filters for table
   initComplete: function () {
-            $('#subFilters').show();
-            this.api().columns([2,3,4]).every( function () {
-                var column = this;
-                var select = $('<select class="col-md-2" style="margin-left:5px"><option value=""></option></select>')
-                    .appendTo( '#subFilters' )
-                    .on( 'change', function () {
-                        var val = $.fn.dataTable.util.escapeRegex(
-                            $(this).val()
-                        );
+    $('#subFilters').show();
+    this.api().columns([2,3,4]).every( function () {
+      var column = this;
+      var select = $('<select class="col-md-2" style="margin-left:5px"><option value="">All</option></select>')
+        .appendTo( '#subFilters' )
+        .on( 'change', function () {
+          var val = $.fn.dataTable.util.escapeRegex(
+            $(this).val()
+          );
 
-                        column
-                            .search( val ? '^'+val+'$' : '', true, false )
-                            .draw();
-                    } );
+          column
+            .search( val ? '^'+val+'$' : '', true, false )
+            .draw();
+        } );
 
-                column.data().unique().sort().each( function ( d, j ) {
-                    select.append( '<option value="'+d+'">'+d+'</option>' )
-                } );
-            } );
-        },
+      column.data().unique().sort().each( function ( d, j ) {
+        select.append( '<option value="'+d+'">'+d+'</option>' )
+      } );
+    });
+  },
   // Call back event when table renders
   "drawCallback": function() {
     resetMainCheckbox()
@@ -46,6 +46,7 @@ var table = $('#products-ajax-dt').DataTable( {
     { "data": "attributes.active_year" },
     { "data": "attributes.benefit_market_kind" },
     { "data": "attributes.kind" },
+    { "data": "attributes.hios_id" },
     { "data": "attributes.size" },
     { "data": "attributes.size" },
     { "data": "attributes.size" },
@@ -59,29 +60,6 @@ var table = $('#products-ajax-dt').DataTable( {
     }
   ]
 });
-/*
-$("div.toolbar").html(
-  `<div class="btn-group main-group" role="group" aria-label="...">
-    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">All</button>
-    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">2019</button>
-    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">2018</button>
-   </div> <br />
-
-   <div class="btn-group main-group" role="group" aria-label="...">
-    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Shop</button>
-    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">IVL</button>
-   </div> <br />
-
-   <div class="btn-group main-group" role="group" aria-label="...">
-    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Health</button>
-    <button type="button" class="btn btn-default" onclick="filterProductDataTable(this.innerText)">Dental</button>
-   </div> <br /> <br />
-
-   <div class="btn-group main-group" role="group" aria-label="...">
-    <button type="button" class="btn btn-default" onclick="bulkUpload(this.innerText)">Bulk Upload</button>
-   </div> <br />
-  </div>`
-);*/
 
 function resetMainCheckbox() {
   var element = $('.all-product-chkbx');
@@ -126,34 +104,6 @@ function buildDropDownMenu(sData) {
               <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Download</a></li>
             </ul>
           </div>`
-}
-
-function filterProductDataTable(type) {
-  var url = '';
-  switch (type) {
-    case 'All':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_year]=nil";
-      break;
-    case '2019':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_year]=2019";
-      break;
-    case '2018':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_year]=2018";
-      break;
-    case 'Shop':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_benefit_market_kind]=aca_shop";
-      break;
-    case 'IVL':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_benefit_market_kind]=aca_individual";
-      break;
-    case 'Health':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_kind]=health";
-      break;
-    case 'Dental':
-      url = "/exchanges/issuers/<%=params['issuer_id']%>/products?query[by_kind]=dental";
-      break;
-  }
-  table.ajax.url(url).load();
 }
 
 // needs to be updated accordingly

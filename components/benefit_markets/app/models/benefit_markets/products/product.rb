@@ -142,6 +142,11 @@ module BenefitMarkets
       ])
     }
 
+    scope :across_years, lambda { |years|
+      where('$and' => [{'application_period.min' => {'$lte' => Date.new(years.max.to_i)}},
+                       {'application_period.max' => {'$gte' => Date.new(years.min.to_i)}}])
+    }
+
     scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
 
     scope :by_product_ids, ->(product_ids) { where(:id => {'$in' => product_ids}) }

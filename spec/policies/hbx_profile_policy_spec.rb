@@ -244,12 +244,22 @@ describe HbxProfilePolicy do
       end
     end
   end
-    describe HbxProfilePolicy do
-      context 'super admin can view config tab?' do
-        let!(:user10)                  { FactoryBot.create(:user) }
-        let!(:person)                  { FactoryBot.create(:person, :with_hbx_staff_role, user: user10) }
 
-        subject                        { HbxProfilePolicy.new(user10, nil) }
+  describe HbxProfilePolicy do
+    context "#can_upload_sbc?" do
+      let!(:sbc_user)                { FactoryBot.create(:user) }
+      let!(:person)                  { FactoryBot.create(:person, :with_sbc_role, user: sbc_user) }
+      subject                        { HbxProfilePolicy.new(sbc_user, nil) }
+
+      it "should show issuers if person has sbc_role" do
+        expect(subject.can_upload_sbc?).to eq true
+      end
+    end
+    context 'super admin can view config tab?' do
+      let!(:user10)                  { FactoryBot.create(:user) }
+      let!(:person)                  { FactoryBot.create(:person, :with_hbx_staff_role, user: user10) }
+
+      subject                        { HbxProfilePolicy.new(user10, nil) }
 
       ['super_admin'].each do |kind|
         context "for permissions which doesn't allow the user" do

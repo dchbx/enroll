@@ -5,6 +5,7 @@ module Exchanges
     before_action :check_hbx_staff_role, only: [:index]
 
     def index
+      authorize HbxProfile, :can_upload_sbc?
       issuers = ::BenefitSponsors::Services::IssuerDataTableService.new
       table_data = issuers.retrieve_table_data
       @data = ::BenefitSponsors::Serializers::IssuerDatatableSerializer.new(table_data).serialized_json

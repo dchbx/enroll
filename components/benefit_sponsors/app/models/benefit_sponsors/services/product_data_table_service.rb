@@ -21,8 +21,15 @@ module BenefitSponsors
         filter.empty? || value == "nil"
       end
 
+      def filtered_plans
+        today = TimeKeeper.date_of_record
+        current_year = today.year
+        years = [current_year, current_year - 1]
+        (10..12).cover?(today.month) ? (years << current_year + 1) : years
+      end
+
       def retrieve_table_data
-        records = ::BenefitMarkets::Products::Product.by_issuer_profile_id(issuer_profile_id)
+        records = ::BenefitMarkets::Products::Product.by_issuer_profile_id(issuer_profile_id).across_years(filtered_plans)
         records = all? ? records : records.send(key, value)
         records.sort_by(&:active_year).reverse!
       end
