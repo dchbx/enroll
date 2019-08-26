@@ -115,7 +115,7 @@
           th CO-PAY
           th COINSURANCE
       tbody
-        = render partial: "shared/service_visit_details", locals: { qhp: qhp }
+        = render partial: "shared/service_visit_details", locals: { qhp: qhp, services: services}
         tr
           td
           td.text-center colspan="3"

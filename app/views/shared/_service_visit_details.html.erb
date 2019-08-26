@@ -1,9 +1,17 @@
-<% qhp.qhp_service_visits.each do |service_visit| %>
-  <% if service_visit.present? %>
+<% services.each do |k,v| %>
     <tr>
-      <td style="text-align: left;"><%= service_visit.visit_type %></td>
-      <td><%= service_visit.copay_in_network_tier_1 %></td>
-      <td><%= service_visit.co_insurance_in_network_tier_1.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A" %></td>
+      <td><b><%= k %></b></td>
+      <td></td>
+      <td></td>
     </tr>
-  <% end %>
+    <% v.each do |visit_type| %>
+      <% service_visit = qhp.qhp_service_visits.where(visit_type: visit_type).first %>
+      <% if service_visit.present? %>
+        <tr>
+          <td style="text-align: left;"><%= visit_type %></td>
+          <td><%= service_visit.copay_in_network_tier_1 %></td>
+          <td><%= service_visit.co_insurance_in_network_tier_1.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A" %></td>
+        </tr>
+      <% end %>
+    <% end %>
 <% end %>

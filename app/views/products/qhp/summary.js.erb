@@ -1,6 +1,6 @@
 $('h1:first').text('Choose Plan – Plan Details');
 $('.switch-header').text('Carefully review the details of this plan. If this is the plan you want, choose \'Select Plan\'. If you want to review more plans, select \'Back to Results\'.');
-$("#plan-summary").html("<%= escape_javascript(render partial: "ui-components/v1/cards/summary", locals: {qhp: @qhp}) %>");
+$("#plan-summary").html("<%= escape_javascript(render partial: "ui-components/v1/cards/summary", locals: {qhp: @qhp, services: @services_list}) %>");
 $("#all-plans").hide();
 $("a.all-plans").on('click', function() {
   $('h1:first').text('Choose Plan');

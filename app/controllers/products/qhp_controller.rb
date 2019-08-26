@@ -49,6 +49,7 @@ class Products::QhpController < ApplicationController
     @standard_component_ids = [] << @new_params[:standard_component_id]
     @active_year = params[:active_year]
     @qhp = find_qhp_cost_share_variances.first
+    @services_list = Products::QhpCostShareVariance::SERVICES_YOU_MAY_NEED
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
 
