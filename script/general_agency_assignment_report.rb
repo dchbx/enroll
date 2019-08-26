@@ -18,6 +18,13 @@ field_names  = %w(
 processed_count = 0
 file_name = "#{Rails.root}/ga_assignment_report_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
 
+def staff_role(general_agency_profile_id)
+  Rails.cache.fetch("ga-staff-role#{general_agency_profile_id}", expires_in: 2.hours) do
+    person = Person.where(:general_agency_staff_roles.exists => true, :"general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id)).first
+    person.general_agency_staff_roles.detect {|s| s.benefit_sponsors_general_agency_profile_id.to_s == general_agency_profile_id}
+  end
+end
+
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
 
@@ -26,8 +33,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       employer = org.employer_profile
       employer.general_agency_accounts&.each do |ga_account|
         next if ga_account.nil? || ga_account.general_agency_profile.nil? || ga_account.general_agency_profile.market_kind.to_s == "individual"
-
-        ga_staff_role = ga_account.general_agency_profile.general_agency_staff_roles.first
+        ga_staff_role = staff_role(ga_account.general_agency_profile.id.to_s)
         csv << [
           employer.legal_name,
           employer.fein,
