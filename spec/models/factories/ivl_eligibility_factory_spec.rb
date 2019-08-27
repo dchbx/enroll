@@ -3,7 +3,7 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
+RSpec.describe Factories::IvlEligibilityFactory, dbclean: :after_each do
 
   def reset_premium_tuples
     p_table = @product.premium_tables.first

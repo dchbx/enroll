@@ -21,7 +21,7 @@ module Services
     end
 
     def factory_klass
-      Factories::EligibilityFactory
+      Factories::IvlEligibilityFactory
     end
   end
 end

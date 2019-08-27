@@ -924,6 +924,8 @@ DEPENDENCIES
   curl (~> 0.0.9)
   database_cleaner (~> 1.7)
   devise (~> 4.5)
+  dry-auto_inject (= 0.6.1)
+  dry-container
   effective_datatables!
   email_spec (~> 2)
   eye (= 0.8)

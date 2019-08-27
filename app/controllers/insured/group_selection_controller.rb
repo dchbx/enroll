@@ -170,6 +170,17 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
+  def edit_aptc
+    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    enrollment_policies = BusinessPolicies::IvlMarketPolicies::EnrollmentPolicyService.new(policies: ["aptc_policy_rules"], enrollment: @hbx_enrollment)
+    policies_applied = enrollment_policies.apply_policies
+    if policies_applied
+      #proceed
+    else
+
+    end
+  end
+
   private
 
   def permit_params

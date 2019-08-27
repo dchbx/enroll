@@ -311,6 +311,7 @@ Rails.application.routes.draw do
         post :terminate
         get :terminate_selection
         get :terminate_confirm
+        get :edit_aptc
       end
     end
 

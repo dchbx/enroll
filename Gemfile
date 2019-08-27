@@ -103,6 +103,8 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
+gem 'dry-auto_inject', '0.6.1'
+gem 'dry-container'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
