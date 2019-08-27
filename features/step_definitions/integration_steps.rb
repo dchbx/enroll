@@ -76,6 +76,10 @@ def people
       email: 'max.plank@example.com',
       password: 'aA1!aA1!aA1!'
     },
+    "Primary Ga" => {
+      email: 'john.snow@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
     "Jane Goodall" => {
       email: 'jane.goodall@example.com',
       password: 'aA1!aA1!aA1!'

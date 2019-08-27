@@ -184,14 +184,15 @@ When(/^.+ assign employer to general agency$/) do
 end
 
 Then(/^.+ should see assign successful message$/) do
-  expect(page).to have_content('Assign successful.')
+  expect(page).to have_content('Succesfully Assigned General Agency')
 end
 
 Then(/^.+ should see the assigned general agency$/) do
-  expect(page).to have_content('Employers')
-  expect(page).to have_content('Acmega LLC')
-  expect(page).to have_content('General Agencies')
-  expect(page).to have_content('Housecare Inc')
+  expect(page).to have_content(general_agency_profile.legal_name)
+  # expect(page).to have_content('Employers')
+  # expect(page).to have_content('Acmega LLC')
+  # expect(page).to have_content('General Agencies')
+  # expect(page).to have_content('Housecare Inc')
 end
 
 When(/^General Agency staff logs on the General Agency Portal$/) do
