@@ -159,7 +159,7 @@ group :test do
   gem 'simplecov',                    '~> 0.14',  :require => false
   gem 'test-prof',                    '~> 0.5.0'
   gem 'warden',                       '~> 1.2.7'
-  gem 'watir',                        '~> 6.10.3'
+  gem 'watir',                        '~> 6.16.5'
   gem 'webdrivers', '~> 3.0'
   gem 'webmock',                      '~> 3.0.1'
 end
