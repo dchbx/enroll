@@ -36,7 +36,7 @@ class QhpCostShareVariance
   field :having_diabetes_co_insurance, type: String
   field :having_diabetes_limit, type: String
 
-  embeds_one :qhp_deductable,
+  embeds_many :qhp_deductables,
     class_name: "Products::QhpDeductable",
     cascade_callbacks: true,
     validate: true
@@ -51,7 +51,7 @@ class QhpCostShareVariance
     cascade_callbacks: true,
     validate: true
 
-  accepts_nested_attributes_for :qhp_maximum_out_of_pockets, :qhp_service_visits
+  accepts_nested_attributes_for :qhp_maximum_out_of_pockets, :qhp_service_visits, :qhp_deductables
 
 
   def self.find_qhp(ids, year)

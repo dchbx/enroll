@@ -23,7 +23,7 @@ module Parser
         deductible_type: deductible_type.gsub(/\n/,'').strip,
         in_network_tier_1_individual: in_network_tier_1_individual.gsub(/\n/,'').strip,
         in_network_tier_1_family: in_network_tier_1_family.gsub(/\n/,'').strip,
-        coinsurance_in_network_tier_1: coinsurance_in_network_tier_1.gsub(/\n/,'').strip,
+        coinsurance_in_network_tier_1: coinsurance_in_network_tier_1.present? ? coinsurance_in_network_tier_1.gsub(/\n/,'').strip : "",
         in_network_tier_two_individual: in_network_tier_two_individual.present? ? in_network_tier_two_individual.gsub(/\n/,'').strip : "",
         in_network_tier_two_family: in_network_tier_two_family.present? ? in_network_tier_two_family.gsub(/\n/,'').strip : "",
         coinsurance_in_network_tier_2: coinsurance_in_network_tier_2.present? ? coinsurance_in_network_tier_2.gsub(/\n/,'').strip : "",

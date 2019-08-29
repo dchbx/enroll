@@ -117,7 +117,6 @@ class ProductBuilder
       )
       if products.exists?
         products.each do |product|
-
           all_attributes = build_product_attributes(product.benefit_market_kind)
           product.update_attributes(all_attributes)
           @existing_qhp_counter += 1
@@ -236,7 +235,13 @@ class ProductBuilder
   end
 
   def build_deductible
-    @csv.build_qhp_deductable(deductible_params)
+    plan_deductible_list_params.each do |plan_deductible|
+      @csv.qhp_deductables.build(plan_deductible)
+    end
+  end
+
+  def plan_deductible_list_params
+    @csvp[:plan_deductible_list_attributes][:plan_deductible_attributes]
   end
 
   def build_service_visits

@@ -4,11 +4,6 @@ module Parser
   class PlanListParser
     include HappyMapper
 
-    #register_namespace "xmlns", "http://vo.ffe.cms.hhs.gov"
-    #register_namespace "impl", "http://vo.ffe.cms.hhs.gov"
-    #register_namespace "targetNamespace", "http://vo.ffe.cms.hhs.gov"
-    #register_namespace "xsd", "http://www.w3.org/2001/XMLSchema"
-
     tag 'plansList'
 
     has_many :plans, Parser::PlanParser, tag: "plans"
