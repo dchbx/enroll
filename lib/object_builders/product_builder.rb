@@ -78,13 +78,15 @@ class ProductBuilder
       hios_base_id, csr_variant_id = cost_share_variance.hios_plan_and_variant_id.split("-")
       if csr_variant_id != "00"
         csr_variant_id = retrieve_metal_level == "dental" ? "" : csr_variant_id
-        product = ::BenefitMarkets::Products::Product.where(
+        product = ::BenefitMarkets::Products::Product.by_year(@qhp.active_year).where(
           hios_base_id: hios_base_id,
           csr_variant_id: csr_variant_id
-        ).select{|a| a.active_year == @qhp.active_year}.first
+        ).first
 
-        shared_attributes ={
-          benefit_market_kind: "aca_#{parse_market}",
+        benefit_market_kind = product.present? ? product.benefit_market_kind : "aca_#{parse_market}"
+
+        shared_attributes = {
+          benefit_market_kind: benefit_market_kind,
           title: cost_share_variance.plan_marketing_name.squish!,
           issuer_profile_id: get_issuer_profile_id,
           hios_id: is_health_product? ? cost_share_variance.hios_plan_and_variant_id : hios_base_id,

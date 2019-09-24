@@ -111,6 +111,26 @@ describe "qhp builder" do
           expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => product.hios_id).count).to eq 1
         end
       end
+
+      context "products already present" do
+        before(:all) do
+          xml = Nokogiri::XML(File.open(@files.first))
+          product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+          product = ProductBuilder.new({})
+          product.add(product_parser.to_hash)
+          product.run
+        end
+
+        it "should update 2 aca_shop product(s) from file" do
+          expect(BenefitMarkets::Products::Product.aca_shop_market.count).to eq 2
+        end
+
+        it "should update the congressional_market product(s) if already present" do
+          expect(BenefitMarkets::Products::Product.congressional_market.count).to eq 1
+        end
+
+      end
+
     end
   end
 
