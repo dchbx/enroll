@@ -73,64 +73,69 @@ class ProductBuilder
     create_product_from_serff_data
   end
 
+  def build_product_attributes(benefit_market_kind = nil)
+    shared_attributes = {
+      benefit_market_kind: benefit_market_kind || "aca_#{parse_market}",
+      title: @cost_share_variance.plan_marketing_name.squish!,
+      issuer_profile_id: get_issuer_profile_id,
+      hios_id: is_health_product? ? @cost_share_variance.hios_plan_and_variant_id : @hios_base_id,
+      hios_base_id: @hios_base_id,
+      csr_variant_id: @csr_variant_id,
+      application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
+      service_area_id: mapped_service_area_id,
+      deductible: @cost_share_variance.qhp_deductable.in_network_tier_1_individual,
+      family_deductible: @cost_share_variance.qhp_deductable.in_network_tier_1_family,
+      is_reference_plan_eligible: true,
+      metal_level_kind: retrieve_metal_level.to_sym
+    }
+
+    if is_health_product?
+      {
+        health_plan_kind: @qhp.plan_type.downcase,
+        ehb: @qhp.ehb_percent_premium.presence || 1.0,
+        product_package_kinds: [:metal_level, :single_issuer, :single_product]
+      }
+    else
+      {
+        dental_plan_kind: @qhp.plan_type.downcase,
+        dental_level: @qhp.metal_level.downcase,
+        product_package_kinds: [:multi_product, :single_issuer]
+      }
+    end.merge(shared_attributes)
+  end
+
   def create_product_from_serff_data
     @qhp.qhp_cost_share_variances.each do |cost_share_variance|
-      hios_base_id, csr_variant_id = cost_share_variance.hios_plan_and_variant_id.split("-")
-      if csr_variant_id != "00"
-        csr_variant_id = retrieve_metal_level == "dental" ? "" : csr_variant_id
-        product = ::BenefitMarkets::Products::Product.by_year(@qhp.active_year).where(
-          hios_base_id: hios_base_id,
-          csr_variant_id: csr_variant_id
-        ).first
+      @cost_share_variance = cost_share_variance
+      @hios_base_id, @csr_variant_id = cost_share_variance.hios_plan_and_variant_id.split("-")
+      next if @csr_variant_id == "00"
 
-        benefit_market_kind = product.present? ? product.benefit_market_kind : "aca_#{parse_market}"
+      @csr_variant_id = retrieve_metal_level == "dental" ? "" : @csr_variant_id
+      products = ::BenefitMarkets::Products::Product.by_year(@qhp.active_year).where(
+        hios_base_id: @hios_base_id,
+        csr_variant_id: @csr_variant_id
+      )
+      if products.exists?
+        products.each do |product|
 
-        shared_attributes = {
-          benefit_market_kind: benefit_market_kind,
-          title: cost_share_variance.plan_marketing_name.squish!,
-          issuer_profile_id: get_issuer_profile_id,
-          hios_id: is_health_product? ? cost_share_variance.hios_plan_and_variant_id : hios_base_id,
-          hios_base_id: hios_base_id,
-          csr_variant_id: csr_variant_id,
-          application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
-          service_area_id: mapped_service_area_id,
-          deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
-          family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
-          is_reference_plan_eligible: true,
-          metal_level_kind: retrieve_metal_level.to_sym,
-        }
-
-        all_attributes = if is_health_product?
-          {
-            health_plan_kind: @qhp.plan_type.downcase,
-            ehb: @qhp.ehb_percent_premium.presence || 1.0,
-            product_package_kinds: [:metal_level, :single_issuer, :single_product]
-          }
-        else
-          {
-            dental_plan_kind: @qhp.plan_type.downcase,
-            dental_level: @qhp.metal_level.downcase,
-            product_package_kinds: [:multi_product, :single_issuer]
-          }
-        end.merge(shared_attributes)
-
-        if product.present?
-          @existing_qhp_counter += 1
+          all_attributes = build_product_attributes(product.benefit_market_kind)
           product.update_attributes(all_attributes)
+          @existing_qhp_counter += 1
+        end
+      else
+        all_attributes = build_product_attributes
+        new_product = if is_health_product?
+                        ::BenefitMarkets::Products::HealthProducts::HealthProduct.new(all_attributes)
+                      else
+                        ::BenefitMarkets::Products::DentalProducts::DentalProduct.new(all_attributes)
+                      end
+        if new_product.valid?
+          new_product.save!
+          create_congressional_products(new_product)
+          @success_plan_counter += 1
+          cost_share_variance.product_id = new_product.id
         else
-          new_product = if is_health_product?
-            BenefitMarkets::Products::HealthProducts::HealthProduct.new(all_attributes)
-          else
-            ::BenefitMarkets::Products::DentalProducts::DentalProduct.new(all_attributes)
-          end
-          if new_product.valid?
-            new_product.save!
-            create_congressional_products(new_product)
-            @success_plan_counter += 1
-            cost_share_variance.product_id = new_product.id
-          else
-            @logger.error "\n Failed to create product: #{new_product.title}, \n hios product id: #{new_product.hios_id}\n Errors: #{new_product.errors.full_messages}\n ******************** \n"
-          end
+          @logger.error "\n Failed to create product: #{new_product.title}, \n hios product id: #{new_product.hios_id}\n Errors: #{new_product.errors.full_messages}\n ******************** \n"
         end
       end
     end
