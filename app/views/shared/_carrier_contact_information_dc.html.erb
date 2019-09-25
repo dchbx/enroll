@@ -1,0 +1,125 @@
+<div class="modal fade carrier-contact" id="<%= plan.kind %>-<%= plan.id %>" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal" type="button">&times;</button>
+        <h4 class="modal-title"><%= plan.issuer_profile.legal_name %>
+          <%=l10n("dc_cci.csl")%></h4>
+      </div>
+      <div class="modal-body">
+        <i class="fa fa-phone fa-3x"></i>
+        <% if false %>
+          <div class="carrier-numbers">
+            <% case plan.issuer_profile.legal_name %>
+            <% when "Aetna" %>
+              <div>
+                <strong><%=l10n("dc_cci.aetna_brokers_and_emprs")%></strong><br/>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n("dc_cci.aetna_href_broker_and_emprs_phone")%> ><%=l10n("dc_cci.aetna_broker_and_emprs_phone")%></a>
+                </strong><br/>
+                <%=l10n("dc_cci.aetna_broker_and_emprs_hours")%>
+                <br/>
+                <br/>
+                <strong><%=l10n("dc_cci.aetna_sbe")%></strong><br/>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.aetna_href_sbe_call')%> ><%=l10n("dc_cci.aetna_sbe_call")%></a>
+                </strong><br/>
+                <%=l10n("dc_cci.aetna_sbe_hours")%>
+                <br/>
+                <br/>
+                <strong><%=l10n("dc_cci.aetna_congressional_employees")%></strong><br/>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.aetna_congressional_employees_href_phone')%>><%=l10n("dc_cci.aetna_congressional_employees_phone")%></a>
+                </strong><br/>
+                <%=l10n("dc_cci.aetna_congressional_employees_hours")%>
+                <br/>
+              </div>
+            <% when "CareFirst" %>
+              <div>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.cf_href_phone')%> ><%=l10n("dc_cci.cf_phone")%></a>
+                </strong>
+                <br/>
+                <strong><%=l10n("dc_cci.cf_congressional")%></strong><br/>
+                <strong>
+                  <a href=<%=l10n('dc_cci.cf_congressional_href_phone')%> ><%=l10n("dc_cci.cf_congressional_phone")%></a>
+                </strong>
+              </div>
+            <% when "Kaiser" %>
+              <div>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.kaiser_href_phone')%> ><%=l10n("dc_cci.kaiser_phone")%></a>
+                </strong>
+                <br/>
+                <strong><%=l10n("dc_cci.kaiser_congressional")%></strong><br/>
+                <strong>
+                  <a href=<%=l10n('dc_cci.kaiser_congressional_href_phone')%> ><%=l10n("dc_cci.kaiser_congressional_phone")%></a>
+                </strong>
+              </div>
+            <% when "UnitedHealthcare" %>
+              <div>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.uh_href_phone')%> ><%=l10n("dc_cci.uh_phone")%></a>
+                </strong>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="carrier-numbers">
+            <% case "BestLife" %>
+            <% when "CareFirst" %>
+                <div>
+                  <%=l10n("dc_cci.call")%>
+                  <strong>
+                  <a href=<%=l10n('dc_cci.cf_href_phone')%> ><%=l10n("dc_cci.cf_phone")%></a>
+                  </strong><br/>
+                </div>
+            <% when  "Delta Dental"%>
+              <div>
+                <%=l10n("dc_cci.call")%>
+                <strong> <a href=<%=l10n('dc_cci.dd_href_phone_1')%> ><%=l10n("dc_cci.dd_phone_1")%></a> </strong> <br/>
+                <%=l10n("dc_cci.or")%></br>
+                <strong> <a href=<%=l10n('dc_cci.dd_href_phone_2')%> ><%=l10n("dc_cci.dd_phone_2")%></a> </strong>
+                <br/>
+              </div>
+            <% when "MetLife"%>
+              <div>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.metlife_href_phone')%> ><%=l10n("dc_cci.metlife_phone")%></a>
+                </strong><br/>
+              </div>
+            <% when "Dentegra" %>
+              <div>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.dentegra_href_phone')%> ><%=l10n("dc_cci.dentegra_phone")%></a>
+                </strong><br/>
+              </div>
+            <% when "Dominion" %>
+              <div>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.dominion_href_phone')%> ><%=l10n("dc_cci.dominion_phone")%></a>
+                </strong><br/>
+              </div>
+            <% when "BestLife" %>
+              <div><br/>
+                <%=l10n("dc_cci.call")%>
+                <strong>
+                  <a href=<%=l10n('dc_cci.bestlife_href_phone')%> ><%=l10n("dc_cci.bestlife_phone")%></a>
+                </strong><br/>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
