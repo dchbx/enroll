@@ -8,7 +8,7 @@
       </div>
       <div class="modal-body">
         <i class="fa fa-phone fa-3x"></i>
-        <% if false %>
+        <% if plan.kind.to_s == "health" %>
           <div class="carrier-numbers">
             <% case plan.issuer_profile.legal_name %>
             <% when "Aetna" %>
@@ -72,7 +72,7 @@
           </div>
         <% else %>
           <div class="carrier-numbers">
-            <% case "BestLife" %>
+            <% case plan.issuer_profile.legal_name %>
             <% when "CareFirst" %>
                 <div>
                   <%=l10n("dc_cci.call")%>
