@@ -44,7 +44,6 @@ namespace :recurring do
         relations = person.person_relationships.select{ |rel| (covered_members_ids.include? rel.relative_id) && (rel.kind == "child")}
         if relations.present?
           aged_off_dependents = relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
-          binding.pry
           next if aged_off_dependents.empty?
 
           dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
