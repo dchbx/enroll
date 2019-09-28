@@ -80,6 +80,8 @@ gem 'wicked_pdf', '1.0.6'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
 gem 'webpacker'
 
+gem "configurable_model",  "0.1.0", path: "vendor/plugins/configurable_model"
+
 #######################################################
 # Removed gems
 #######################################################

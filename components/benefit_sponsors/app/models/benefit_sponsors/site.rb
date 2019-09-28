@@ -2,6 +2,7 @@ module BenefitSponsors
   class Site
     include Mongoid::Document
     include Mongoid::Timestamps
+    include ConfigurableModel
 
     SITE_KEY_MAX_LENGTH = 6
 
@@ -59,6 +60,8 @@ module BenefitSponsors
     has_many :benefit_markets,
              class_name: "::BenefitMarkets::BenefitMarket"
 
+    embeds_one :contact_center, class_name: "BenefitMarkets::ContactCenterConfiguration",
+                                        autobuild: true
 
     accepts_nested_attributes_for :owner_organization
 
