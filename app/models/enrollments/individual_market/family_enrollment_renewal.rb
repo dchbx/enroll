@@ -135,7 +135,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def is_cat_product_ineligible?
     @enrollment.hbx_enrollment_members.any? do |member|
-      member.person.age_on(renewal_coverage_start) > 29
+      member.person.age_on(renewal_coverage_start) < 30
     end
   end
 
