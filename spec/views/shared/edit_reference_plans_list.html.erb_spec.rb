@@ -33,8 +33,7 @@ describe "shared/_edit_reference_plans_list.html.erb", dbclean: :after_each do
     expect(rendered).to have_selector("option[value='bronze']")
   end
 
-  it "should have a selection option for dental" do
-    # Plan::REFERENCE_PLAN_METAL_LEVELS does not have "dental"
+  it "should not have a selection option for dental" do
     expect(rendered).to have_selector("option[value='dental']")
   end
 

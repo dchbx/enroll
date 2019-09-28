@@ -1,12 +1,11 @@
 class Plan
   include Mongoid::Document
   include Mongoid::Timestamps
-  #  include Mongoid::Versioning
+#  include Mongoid::Versioning
   include Config::AcaModelConcern
   COVERAGE_KINDS = %w[health dental]
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
-  REFERENCE_PLAN_METAL_LEVELS_NO_DENTAL = %w[bronze silver gold platinum].freeze
   MARKET_KINDS = %w(shop individual)
   INDIVIDUAL_MARKET_KINDS = %w(individual coverall)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]

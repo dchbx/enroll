@@ -1,4 +1,3 @@
-# frozen_string_literal: true.
 require 'rails_helper'
 
 describe BenefitGroup, dbclean: :after_each do
@@ -87,22 +86,6 @@ describe BenefitGroup, "instance methods", dbclean: :after_each do
 
     it "should include the same census_employees" do
       expect(benefit_group_census_employees).to eq census_employees
-    end
-  end
-
-  context "#elected_plans_by_option_kind" do
-    let!(:plan1) { FactoryBot.create(:plan, active_year: benefit_group.start_on.year)}
-    let!(:plan2) { FactoryBot.create(:plan,active_year: benefit_group.start_on.year)}
-    let!(:plan3) { FactoryBot.create(:plan,metal_level: "gold", active_year: benefit_group.start_on.year)}
-    before do
-      benefit_group.plan_option_kind = "metal_level"
-      benefit_group.metal_level_for_elected_plan = "silver"
-    end
-    it "should include the plans from the same metal level" do
-      expect(benefit_group.elected_plans_by_option_kind.sort).to eq [plan1,plan2]
-    end
-    it "should not include the plans from other  metal levels" do
-      expect(benefit_group.elected_plans_by_option_kind).not_to include(plan3)
     end
   end
 
