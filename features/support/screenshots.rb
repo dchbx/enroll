@@ -15,7 +15,12 @@ end
 module Screenshots
   def screenshot(name, options={})
     if ENV['SCREENSHOTS'] == 'true' or options[:force]
+      width  = page.execute_script("return Math.max(document.body.scrollWidth, document.body.offsetWidth, document.documentElement.clientWidth, document.documentElement.scrollWidth, document.documentElement.offsetWidth);")
+      height = page.execute_script("return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);")
+
+      page.driver.browser.manage.window.resize_to(width+50, height+50)
       page.save_screenshot "tmp/#{@feature_name}/#{@scenario_name}/#{@count += 1} - #{name}.png", full: true
+      page.driver.browser.manage.window.resize_to(1024,768)
     end
   end
 end

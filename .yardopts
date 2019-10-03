@@ -1,0 +1,20 @@
+--title Enroll
+--exclude README.md
+--exclude app/data_migrations/.*
+-r documentation/PROJECT.md
+app/**/*.rb
+lib/**/*.rb
+components/benefit_markets/lib/**/*.rb
+components/benefit_markets/app/**/*.rb
+components/benefit_sponsors/lib/**/*.rb
+components/benefit_sponsors/app/**/*.rb
+components/notifier/lib/**/*.rb
+components/notifier/app/**/*.rb
+components/sponsored_benefits/lib/**/*.rb
+components/sponsored_benefits/app/**/*.rb
+components/transport_gateway/lib/**/*.rb
+components/transport_gateway/app/**/*.rb
+components/transport_profiles/lib/**/*.rb
+components/transport_profiles/app/**/*.rb
+- 
+documentation/PROJECT.md

@@ -1,0 +1,23 @@
+<fieldset *ngIf="isVisible">
+  <legend>Select Market</legend>
+  <div class="form-group" *ngIf="isVisible">
+      <div class="checkbox" *ngFor="let category of categories()">
+          <label class='capitalize-text' for="qle_wizard_kind_selected_radio_category_{{category}}">
+                  <input
+                    id="qle_wizard_kind_selected_radio_category_{{category}}"
+                    name="qle_wizard_kind_selected_radio_category_radio"
+                    type="radio"
+                    (change)="selectCategory(category)"
+                    [checked]="selectedCategory == category"
+                    >
+                  {{category}}
+          </label>
+      </div>
+  </div>
+  <div class="form-group" *ngIf="showSelection()">
+    <legend>Select QLE</legend>
+    <select #kindSelection>
+      <option *ngFor="let selectable of filteredItems" value="{{selectable.value}}" class="capitalize-text">{{selectable.label}}</option>
+    </select>
+  </div>
+</fieldset>

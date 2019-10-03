@@ -93,6 +93,13 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
     end
 
+    it 'should have hbx enrollment members' do
+      expect(family.enrollments.size).to eq 1
+      expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
+      generate_cobra_enrollment
+      expect(family.enrollments.map(&:hbx_enrollment_members).blank?).to be_falsy
+    end
+
     it "the effective_on of cobra enrollment should greater than start_on of plan_year" do
       generate_cobra_enrollment
       cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}

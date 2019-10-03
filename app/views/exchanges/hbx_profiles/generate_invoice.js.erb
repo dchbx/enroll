@@ -1,1 +1,4 @@
-set_tab_content("<%= escape_javascript render "gen_invoice"%>")
+// set_tab_content("<%= escape_javascript render "gen_invoice"%>")
+
+$('#employerDataTable').hide();
+$('#generateInvoice').html('<%= j render partial: 'gen_invoice'%>');

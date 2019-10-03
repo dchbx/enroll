@@ -1,5 +1,5 @@
 require 'rails_helper'
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbclean => :after_each do
@@ -9,8 +9,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
   let(:aasm_state) { "enrollment_eligible" }
   let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
-  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
+  let!(:employee_role) {
+    FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
+  let!(:census_employee)  { 
+    FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile)
+  }
   let!(:model_instance) { 
     hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                         household: family.active_household, 
@@ -30,6 +33,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
   describe "when employee plan coverage selected" do
     context "ModelEvent" do
       before do
+        initial_application
         allow(model_instance).to receive(:can_select_coverage?).and_return(true)
       end
       it "should trigger model event" do

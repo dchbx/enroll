@@ -64,6 +64,7 @@ class PlanSelection
   def verify_and_set_member_coverage_start_dates
     if existing_coverage.present? && (existing_coverage.product_id == plan.id)
       set_enrollment_member_coverage_start_dates(hbx_enrollment)
+      hbx_enrollment.predecessor_enrollment_id = existing_coverage._id unless hbx_enrollment.is_shop?
     end
   end
 
@@ -89,7 +90,11 @@ class PlanSelection
   end
 
   def existing_coverage
-    @hbx_enrollment.parent_enrollment
+    if hbx_enrollment.is_shop?
+      @hbx_enrollment.parent_enrollment
+    else
+      existing_enrollment_for_covered_individuals
+    end
   end
 
   def set_enrollment_member_coverage_start_dates(enrollment_obj = hbx_enrollment)
@@ -109,27 +114,26 @@ class PlanSelection
     enrollment_obj
   end
 
-=begin
   def existing_enrollment_for_covered_individuals
-    previous_active_coverages.detect{|en|
+    previous_active_coverages.detect do |en|
       (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? && en.id != hbx_enrollment.id
-    }
+    end
   end
 
   def previous_active_coverages
-    coverage_year_start = hbx_enrollment.effective_on.year
+    coverage_year_start = hbx_enrollment.effective_on.beginning_of_year
 
-    family.active_household.hbx_enrollments.where({
-      :_id.ne => hbx_enrollment.id,
-      :kind => hbx_enrollment.kind,
-      :coverage_kind => hbx_enrollment.coverage_kind,
-      :effective_on.gte => coverage_year_start,
-      }).or(
-        {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES},
-        {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
-      ).order("effective_on DESC")
+    family.active_household.hbx_enrollments.where(
+      {:_id.ne => hbx_enrollment.id,
+       :kind => hbx_enrollment.kind,
+       :coverage_kind => hbx_enrollment.coverage_kind,
+       :effective_on.gte => coverage_year_start}
+    ).or(
+      {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES},
+      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
+    ).order('effective_on DESC')
   end
-=end
+
   def family
     @hbx_enrollment.family
   end

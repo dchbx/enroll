@@ -77,6 +77,6 @@ Rails.application.configure do
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
 
 
-  Mongoid.logger.level = Logger::ERROR
-  Mongo::Logger.logger.level = Logger::ERROR
+#  Mongoid.logger.level = Logger::ERROR
+#  Mongo::Logger.logger.level = Logger::ERROR
 end

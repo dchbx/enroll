@@ -6,7 +6,7 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::NewProfileRegistrationService }
     let!(:security_question)  { FactoryBot.create_default :security_question }
-    let!(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
+    let!(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let!(:employer_profile) {general_org.employer_profile}
     let!(:user) { FactoryBot.create(:user)}
@@ -18,7 +18,8 @@ module BenefitSponsors
     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
     let!(:general_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
     let!(:general_agency_profile) {general_agency.profiles.first }
-    let!(:general_role) {FactoryBot.create(:general_agency_staff_role, aasm_state: "active", benefit_sponsors_general_agency_profile_id: general_agency_profile.id, person: person)}
+    let(:general_role) {FactoryBot.create(:general_agency_staff_role, aasm_state: "active", benefit_sponsors_general_agency_profile_id: general_agency_profile.id)}
+    let!(:primary_general_agency_staff_role) { FactoryBot.build(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: "active",  person: person, is_primary: true)}
 
     def agency(type)
       case type
@@ -196,6 +197,49 @@ module BenefitSponsors
           service = subject.new params
           expect(service.is_staff_for_agency?(user, nil)). to eq false
         end
+      end
+    end
+
+    describe ".is_general_agency_staff_for_employer?" do
+
+      let(:plan_design_organization) do
+        FactoryBot.create(
+          :sponsored_benefits_plan_design_organization,
+          owner_profile_id: broker_agency_profile.id,
+          sponsor_profile_id: employer_profile.id
+        )
+      end
+
+      let(:plan_design_organization_with_assigned_ga) {
+        plan_design_organization.general_agency_accounts.create(
+          start_on: TimeKeeper.date_of_record,
+          broker_role_id: broker_agency_profile.primary_broker_role.id
+        ).tap do |account|
+          account.general_agency_profile = general_agency_profile
+          account.broker_agency_profile = broker_agency_profile
+          account.save
+        end
+        plan_design_organization
+      }
+
+      let(:params) {{ profile_id: employer_profile.id, profile_type: "benefit_sponsor" }}
+      let(:service) {subject.new params}
+
+      before do
+        allow(person).to receive(:active_general_agency_staff_roles).and_return([primary_general_agency_staff_role])
+        allow(employer_profile).to receive(:general_agency_accounts).and_return(plan_design_organization_with_assigned_ga.general_agency_accounts)
+        allow(service).to receive(:load_profile) do
+          service.instance_variable_set(:@profile, employer_profile)
+        end
+      end
+
+      it "should return true if general agency staff is assigned to a general agency profile" do
+        expect(service.is_general_agency_staff_for_employer?(user, nil)).to eq true
+      end
+
+      it "should return false if general agency staff is not assigned to a general agency profile" do
+        person.general_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_general_agency_profile_id: nil)}
+        expect(service.is_general_agency_staff_for_employer?(user, nil)).to eq false
       end
     end
   end

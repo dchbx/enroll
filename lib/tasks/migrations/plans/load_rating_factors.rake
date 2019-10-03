@@ -25,27 +25,29 @@ namespace :load_rating_factors do
   end
 
   desc "DC rating factors"
-  task :dc_rating_factors => :environment do
+  task :dc_rating_factors, [:active_year] => :environment do |t, args|
     if Settings.site.key.to_s == "dc"
-      (2014..TimeKeeper.date_of_record.year).each do |year|
+      years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2020)
+      years.each do |year|
         puts "creating dc rating factors for #{year}" unless Rails.env.test?
         ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
           issuer_profile = issuer_organization.issuer_profile
           # participation rate factor
-          ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.create!(
+
+          ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.find_or_create_by!(
               active_year: year,
               default_factor_value: 1.0,
               max_integer_factor_key: 100,
-              issuer_profile_id: issuer_profile.id,
-              actuarial_factor_entries: []
+              issuer_profile_id: issuer_profile.id.to_s,
+              # actuarial_factor_entries: []
           )
           # group size factor
-          ::BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.create!(
+          ::BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.find_or_create_by!(
               active_year: year,
               default_factor_value: 1.0,
               max_integer_factor_key: 1,
               issuer_profile_id: issuer_profile.id,
-              actuarial_factor_entries: []
+              # actuarial_factor_entries: []
           )
         end
       end

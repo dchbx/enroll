@@ -1,7 +1,7 @@
 module BenefitSponsors
   module SponsoredBenefits
     class HbxEnrollmentPricingDeterminationCalculator
-      EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
+      EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year, :kind)
 
       EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
         def is_disabled?
@@ -36,46 +36,62 @@ module BenefitSponsors
         end
 
         def search_criteria(enrollment_ids)
-          Family.collection.aggregate([
+          HbxEnrollment.collection.aggregate([
             {"$match" => {
-              "households.hbx_enrollments" => { "$elemMatch" => {
-                "hbx_id" => {"$in" => enrollment_ids}
-              }}}},
-              {"$project" => {"households" => {"hbx_enrollments": 1}, "family_members" => {"_id": 1, "person_id": 1}}},
-              {"$unwind" => "$households"},
-              {"$unwind" => "$households.hbx_enrollments"},
-              {"$match" => {
-                "households.hbx_enrollments.hbx_id" => {"$in" => enrollment_ids}
-              }},
-              {"$project" => {
-                "hbx_enrollment" => {
-                  "effective_on" => "$households.hbx_enrollments.effective_on",
-                  "hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
-                  "_id" => "$households.hbx_enrollments.hbx_id",
-                  "product_id" => "$households.hbx_enrollments.product_id"
-                },
-                "family_members" => 1,
-                "people_ids" => {
-                  "$map" => {
-                    "input" => "$family_members",
-                    "as" => "fm",
-                    "in" => "$$fm.person_id"
-                  }
+              "hbx_id" => {"$in" => enrollment_ids}
+            }},
+            {"$lookup" => {
+              "from" => "families",
+              "localField" => "family_id",
+              "foreignField" => "_id",
+              "as" => "family"
+            }},
+            {
+              "$unwind" => "$family"
+            },
+            {"$project" => {
+              "family_members" => "$family.family_members",
+              "hbx_enrollment" => {
+                "effective_on" => "$effective_on",
+                "hbx_enrollment_members" => "$hbx_enrollment_members",
+                "_id" => "$_id",
+                "product_id" => "$product_id",
+                "kind" => "$kind",
+                "employee_role_id" => "$employee_role_id",
+                "coverage_kind" => "$coverage_kind"
+              },
+              "people_ids" => {
+                "$map" => {
+                  "input" => "$family.family_members",
+                  "as" => "fm",
+                  "in" => "$$fm.person_id"
                 }
-              }},
-              {"$lookup" => {
-                "from" => "people",
-                "localField" => "people_ids",
-                "foreignField" => "_id",
-                "as" => "people"
-              }},
-              {"$project" => {
-                "hbx_enrollment" => 1,
-                "product" => 1,
-                "family_members" => 1,
-                "people" => {"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1}
-              }}
+              }
+              }
+            },
+            {"$lookup" => {
+              "from" => "people",
+              "localField" => "people_ids",
+              "foreignField" => "_id",
+              "as" => "people"
+            }},
+            {"$project" => {
+              "hbx_enrollment" => 1,
+              "family_members" => 1,
+              "people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
+            }}
           ])
+        end
+
+        def person_info_fields
+          {
+            "first_name" => 1,
+            "last_name" => 1,
+            "middle_name" => 1,
+            "name_pfx" => 1,
+            "name_sfx" => 1,
+            "encrypted_ssn" => 1
+          }
         end
 
         def rosterize_hbx_enrollment(enrollment_record)
@@ -135,7 +151,8 @@ module BenefitSponsors
           product = EnrollmentProductAdapter.new(
             enrollment_record["hbx_enrollment"]["product_id"],
             @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
-            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]]
+            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]],
+            enrollment_record["hbx_enrollment"]["coverage_kind"]
           )
           group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
             {

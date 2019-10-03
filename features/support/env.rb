@@ -72,7 +72,6 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 Capybara::Screenshot.prune_strategy = :keep_last_run
-Webdrivers::Chromedriver.required_version = '2.46'
 Webdrivers.cache_time = 86_400
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -81,13 +80,19 @@ Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.add_argument("headless")
   options.add_argument("--window-size=1024,768")
+
   if RUBY_PLATFORM =~ /darwin/
     options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
   end
 
+  client = Selenium::WebDriver::Remote::Http::Default.new
+  client.open_timeout = 120 # instead of the default 60
+  client.read_timeout = 120 # instead of the default 60
+
   Capybara::Selenium::Driver.new(app,
     browser: :chrome,
-    options: options
+    options: options,
+    http_client: client
   )
 end
 

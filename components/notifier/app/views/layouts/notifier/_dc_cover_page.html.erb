@@ -11,15 +11,9 @@
 
   <table class="total_table" border="0">
     <tbody>
-      <% if recipient.shop? %>
       <tr>
         <br></br>
       </tr>
-      <% else %>
-      <tr>
-        <br />
-      </tr>
-      <% end %>
       <tr>
         <td style="text-align: center"><h1><b>THIS IS A COVER PAGE</b></h1>
         <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
@@ -36,7 +30,7 @@
     </tbody>
   </table>
 
-  <table class="total_table" border="0" style="margin-top: 220px;">
+  <table class="total_table" border="0" <% if recipient.shop? %>style="margin-top: 220px;" <% else %> style="margin-top: 260px;" <% end%>>
     <tbody>
       <tr>
         <td><%= notice.notice_number %></td>

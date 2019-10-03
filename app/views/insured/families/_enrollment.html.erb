@@ -2,7 +2,13 @@
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || disable_make_changes_button?(hbx_enrollment), hbx_enrollment: hbx_enrollment } %>
 <% else %>
 <% product = hbx_enrollment.product %>
-<div class="module hbx-enrollment-panel panel panel-default">
+<% # This assures that hbx enrollments in the original scope will be displayed on the page. Otherwise, they're hidden,
+   # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
+   #  initially_hidden_enrollment class. %>
+<% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>
+<% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : ""%>
+
+<div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
       <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> Coverage
@@ -204,3 +210,29 @@
 </div>
 </div>
 <% end %>
+
+
+<script>
+  var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");
+  var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
+  function toggleDisplayEnrollments(event) {
+    if (event.target.checked) {
+      for (var i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
+        initiallyHiddenEnrollmentPanels[i].classList.remove("hidden");
+      }
+    } else {
+        for (var i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
+        initiallyHiddenEnrollmentPanels[i].classList.add("hidden");
+      }
+    }
+  };
+  // For when family home page loaded through clicking off of the families index page
+  if (enrollmentToggleCheckbox != null || enrollmentToggleCheckbox != undefined) {
+    enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
+  };
+  // For when families home page is refreshed when user on it
+  document.addEventListener("DOMContentLoaded", function() {
+    var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
+    enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
+  })
+ </script> 

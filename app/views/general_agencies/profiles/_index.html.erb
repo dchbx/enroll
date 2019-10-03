@@ -45,10 +45,10 @@
             <%#benefit_sponsors.profiles_general_agencies_general_agency_profile_path(general_agency_profile)%>
             <td><%= general_agency_profile.dba %></td>
             <td><%= general_agency_profile.fein %></td>
-            <td><%= general_agency_profile.entity_kind.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.entity_kind.present? %></td>
+            <td><%= general_agency_profile.entity_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.entity_kind.present? %></td>
             <td><%= general_agency_profile.market_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.market_kind.present? %></td>
             <%# UnComment spec too after uncommenting below line %>
-            <td><%#= general_agency_profile.current_state %></td>
+            <td><%= general_agency_profile.current_state %></td>
             <td><%#= link_to 'Send Secure Message'.html_safe,
             new_broker_agencies_inbox_path(id: general_agency_profile.id, profile_id: @profile._id), class: "btn btn-default", remote: true %></td>
           </tbody>

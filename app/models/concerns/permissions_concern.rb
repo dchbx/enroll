@@ -42,7 +42,7 @@ module PermissionsConcern
     end
 
     def has_general_agency_staff_role?
-      has_role?(:general_agency_staff)
+      person&.has_active_general_agency_staff_role?
     end
 
     def has_insured_role?

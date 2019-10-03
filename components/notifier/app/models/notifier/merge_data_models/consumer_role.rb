@@ -99,7 +99,7 @@ module Notifier
             aqhp_eligible? uqhp_eligible? incarcerated? irs_consent?
             magi_medicaid? magi_medicaid_members_present? aqhp_or_non_magi_medicaid_members_present? uqhp_or_non_magi_medicaid_members_present?
             irs_consent_not_needed? aptc_amount_available? csr?
-            aqhp_event_and_irs_consent_not_needed? csr_is_73? csr_is_87?
+            aqhp_event_and_irs_consent_no? csr_is_73? csr_is_87?
             csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
             aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present?
         ]
@@ -150,7 +150,7 @@ module Notifier
       end
 
       def aptc_is_zero?
-        aptc.present? && aptc.to_i.zero?
+        aptc.present? && aptc.gsub(/\D/, ' ').to_f.zero?
       end
 
       def csr?
@@ -181,7 +181,7 @@ module Notifier
         totally_ineligible_members_present
       end
 
-      def aqhp_event_and_irs_consent_not_needed?
+      def aqhp_event_and_irs_consent_no?
         aqhp_event? && !irs_consent?
       end
 

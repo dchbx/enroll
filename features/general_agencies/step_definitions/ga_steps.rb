@@ -61,16 +61,16 @@ Then(/^Hbx Admin is on Broker Index and clicks General Agencies$/) do
 end
 
 Then /^they should see the pending general agency$/ do
-  expect(page).to have_content(@general_agency_organization.legal_name)
+  expect(page).to have_content(general_agency_organization.legal_name)
   screenshot("general_agency_list")
 end
 
 When /^they click the link of general agency$/ do
-  click_link @general_agency_organization.legal_name
+  click_link general_agency_organization.legal_name
 end
 
 Then /^they should see the home of general agency$/ do
-  expect(page).to have_content("General Agency : #{@general_agency_organization.legal_name}")
+  expect(page).to have_content("General Agency : #{general_agency_organization.legal_name}")
   screenshot("general_agency_homepage")
 end
 
@@ -95,7 +95,7 @@ Then /^they should see an account creation form$/ do
 end
 
 When /^they complete the account creation form and hit the 'Submit' button$/ do
-  email_address = @general_agency_organization.general_agency_profile.general_agency_staff_roles.last.email_address
+  email_address = general_agency_organization.general_agency_profile.general_agency_primary_staff.email_address
   fill_in "user[oim_id]", with: email_address
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
@@ -108,7 +108,7 @@ Then /^they should see a welcome message$/ do
 end
 
 Then /^they see the General Agency homepage$/ do
-  expect(page).to have_content(@general_agency_organization.legal_name)
+  expect(page).to have_content(general_agency_organization.legal_name)
 end
 
 Given /^a general agency, approved, confirmed, exists$/ do

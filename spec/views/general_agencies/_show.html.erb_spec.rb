@@ -3,8 +3,10 @@ require 'rails_helper'
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_show.html.erb", dbclean: :after_each do
   let(:general_agency_profile) {FactoryBot.create(:general_agency_profile)}
-  let(:user) {FactoryBot.create(:user, :general_agency_staff)}
-  let(:person) {FactoryBot.create(:person)}
+  let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true) }
+  let(:person) { general_agency_staff_role.person }
+  let(:user) { FactoryBot.create(:user, :general_agency_staff, person: person) }
+
   before :each do
     sign_in user
     assign(:general_agency_profile, general_agency_profile)

@@ -1263,7 +1263,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                                }
     let(:effective_period)     { (TimeKeeper.date_of_record + 3.months)..(TimeKeeper.date_of_record + 1.year + 3.months - 1.day) }
     let!(:current_benefit_market_catalog) do
-      BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
       benefit_market.benefit_market_catalogs.where(
         "application_period.min" => effective_period.min.to_s
       ).first

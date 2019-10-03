@@ -1,8 +1,9 @@
 FactoryBot.define do
 
-  sequence(:random_count, (1..25).cycle) do |n|
+  sequence(:random_count) do |n|
+    @random ||= Random.new
     @random_counts ||= (1..25).to_a.shuffle
-    @random_counts[n]
+    @random_counts[@random.rand(26)]
   end
 
   factory :benefit_sponsors_benefit_application, class: 'BenefitSponsors::BenefitApplications::BenefitApplication' do

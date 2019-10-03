@@ -55,7 +55,7 @@ class SbcProcessor2015
     end
 
     # old model
-    Plan.all.each do |plan|
+    Plan.where(active_year: 2020).each do |plan|
       product = ::BenefitMarkets::Products::Product.where(hios_id: plan.hios_id).select{|a| a.active_year.to_i  == plan.active_year.to_i}.first
 
       plan.sbc_document = product.sbc_document

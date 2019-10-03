@@ -4,7 +4,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 module BenefitSponsors
-  RSpec.describe Concerns::EmployerProfileConcern, type: :model, dbclean: :after_each do
+  RSpec.describe Concerns::EmployerProfileConcern, type: :model, dbclean: :around_each do
     describe "#billing_benefit_application" do
       let(:organization) { FactoryBot.build(:benefit_sponsors_organizations_general_organization,
         :with_site,
@@ -68,7 +68,7 @@ module BenefitSponsors
       let(:employer_profile) {plan_design_organization_with_assigned_ga.employer_profile}
       let!(:update_plan_design) {plan_design_organization_with_assigned_ga.update_attributes!(has_active_broker_relationship: true)}
       let(:ga_legal_name) {plan_design_organization_with_assigned_ga.general_agency_profile.legal_name.to_s}
-      let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:site)            { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:abc_profile)    { organization.employer_profile }
 
@@ -81,7 +81,7 @@ module BenefitSponsors
       end
     end
 
-    describe 'terminate_roster_enrollments',  dbclean: :after_each do
+    describe 'terminate_roster_enrollments',  dbclean: :around_each do
       let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let!(:rating_area)           { FactoryBot.create_default :benefit_markets_locations_rating_area }
       let!(:service_area)          { FactoryBot.create_default :benefit_markets_locations_service_area }

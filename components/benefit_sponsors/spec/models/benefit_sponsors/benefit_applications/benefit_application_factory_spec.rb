@@ -5,7 +5,6 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationFactory, type: :model, :dbclean => :after_each do
 
     describe "constructor" do
-      # let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
       let(:site)  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:employer_profile)    { organization.employer_profile }

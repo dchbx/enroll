@@ -1,10 +1,9 @@
+# frozen_string_literal: true
+
 class TranscriptGenerator
 
   attr_accessor :cv_path, :identifier
 
-  # TRANSCRIPT_PATH = "#{Rails.root}/xml_files_10_27/ivl_policy_transcript_files/"
-  # TRANSCRIPT_PATH = "#{Rails.root}/xml_files/shop_policies_transcript_files/"
-  # TRANSCRIPT_PATH = "#{Rails.root}/individual_xmls_with_timestamps/ivl_transcript_batch/"
   TRANSCRIPT_PATH = "#{Rails.root}/person_transcripts"
 
 

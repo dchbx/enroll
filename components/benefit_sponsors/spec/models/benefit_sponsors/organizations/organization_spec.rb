@@ -166,5 +166,41 @@ module BenefitSponsors
           expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, true).count). to eq 0
         end
       end
-    end end
+    end
+
+    context "search for general agencies" do
+      let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:organization_with_hbx_profile)  { site.owner_organization }
+      let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+      let!(:general_agency_profile1) { organization.general_agency_profile }
+
+      let!(:second_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+      let!(:second_general_agency_profile) { second_organization.general_agency_profile }
+      let!(:subject) { BenefitSponsors::Organizations::Organization }
+      let!(:new_person_for_staff) { FactoryBot.create(:person) }
+      let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile1.id, person: new_person_for_staff, is_primary: true) }
+      let(:gap_id) { organization.broker_agency_profile.id }
+
+      context "search for general agencies from ga staff portal" do
+
+        before do
+          organization.update_attributes(legal_name: 'org1')
+          general_agency_profile1.update_attributes(aasm_state: 'is_approved')
+        end
+
+        it "should return searched general agency profile" do
+          search_params = {q: organization.legal_name}
+          expect(subject.general_agencies_with_matching_ga(search_params, true).count). to eq 1
+          expect(subject.general_agencies_with_matching_ga(search_params, true).first.legal_name). to eq organization.legal_name
+        end
+
+        it "should not return any broker agency profiles if no search string is passed" do
+          second_organization.update_attributes(legal_name: 'org2')
+          second_general_agency_profile.update_attributes(aasm_state: 'is_approved')
+          search_params = {q: ''}
+          expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, true).count). to eq 0
+        end
+      end
+    end
+  end
 end

@@ -97,6 +97,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if @enrollment.is_shop?
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
     else
+      @enrollment.reset_dates_on_previously_covered_members(@plan)
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     end
 

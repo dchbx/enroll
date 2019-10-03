@@ -254,9 +254,17 @@ module BenefitSponsors
       end
 
       def is_general_agency_staff_for_employer?(user, form)
-        return false unless user.person.general_agency_staff_roles.present?
-        # TODO - check ER has this GA or not
-        true
+        person = user.person
+        staff_roles = person.active_general_agency_staff_roles
+        return false unless staff_roles.present?
+        profile = load_profile
+        if staff_roles
+          ga_profiles = staff_roles.map(&:benefit_sponsors_general_agency_profile_id)
+          return false if profile.general_agency_accounts.blank?
+          profile.general_agency_accounts.any? {|acc|  ga_profiles.include?(acc.benefit_sponsrship_general_agency_profile_id)}
+        else
+          false
+        end
       end
 
       def has_broker_role_for_profile?(user, profile) # When profile is broker agency

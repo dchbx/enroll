@@ -1,0 +1,29 @@
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+<%
+editable_list = @editable_qles.map do |qle|
+   {
+     label: qle.qle_dropdown_label,
+     category: qle.market_kind,
+     value: edit_exchanges_qle_path(qle)
+   }
+end
+deactivatable_list = @deactivatable_qles.map do |qle|
+   {
+     label: qle.qle_dropdown_label,
+     category: qle.market_kind,
+     value: deactivation_form_exchanges_qle_path(qle)
+   }
+end
+
+ %>
+
+ <admin-qle-management-wizard
+   data-new-location="<%= new_exchanges_qle_path %>"
+   data-editable-list="<%= editable_list.to_json %>"
+   data-deactivatable-list="<%= deactivatable_list.to_json %>"
+   data-sorting-order-list="<%= sorting_order_exchanges_qles_path %>"
+   data-qle-kind-market-kind-list="
+   <%= QualifyingLifeEventKind::MARKET_KINDS.dup.reject { |kind| ['individual', 'shop'].exclude?(kind) }.to_json %>"
+ >
+ </admin-qle-management-wizard>

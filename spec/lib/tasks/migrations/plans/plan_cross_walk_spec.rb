@@ -30,7 +30,7 @@ describe "plan_cross_walk" do
     end
   end
 
-  context "failed scenarios" do
+  context "when plan renewing to the same hios id during renewal year scenario" do
     before :all do
       @plan_2017.update_attributes(renewal_plan_id: nil, hios_id: "42690MA1234503-01")
       @product_2017.update_attributes(renewal_product_id: nil, hios_id: "42690MA1234503-01")
@@ -43,14 +43,14 @@ describe "plan_cross_walk" do
       invoke_cross_walk_tasks
     end
 
-    it "should not update the renewal_plan_id if there is no old plan" do
+    it "should update the renewal_plan_id to same hios id in renewal year if there is no old plan data in the template" do
       @plan_2017.reload
-      expect(@plan_2017.renewal_plan_id).to eq nil
+      expect(@plan_2017.renewal_plan_id).to eq @plan_2018.id
     end
 
-    it "should update the renewal_product_id if there is no old product" do
+    it "should update the renewal_product_id to same hios id in renewal year if there is no old product data in the template" do
       @product_2017.reload
-      expect(@product_2017.renewal_product_id).to eq nil
+      expect(@product_2017.renewal_product_id).to eq @product_2018.id
     end
   end
 

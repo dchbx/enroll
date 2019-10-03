@@ -38,6 +38,8 @@ require 'csv'
            State
            Zipcode
            Ethnicity
+           Consumer_Role
+           Active_Employee_Role
          )
        count = 0
        file_name = fetch_file_format('new_registered_persons_data_report', 'NEWREGISTEREDPERSONSDATA')
@@ -101,7 +103,9 @@ require 'csv'
                 fm.person.home_address.try(:city),
                 fm.person.home_address.try(:state),
                 fm.person.home_address.try(:zip),
-                fm.person.ethnicity
+                fm.person.ethnicity,
+                fm.person.consumer_role.present?,
+                fm.person.active_employee_roles.present?
               ]
               count += 1
             rescue

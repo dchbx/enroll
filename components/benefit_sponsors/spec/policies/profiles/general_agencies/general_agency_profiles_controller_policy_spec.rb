@@ -10,7 +10,7 @@ module BenefitSponsors
 
       shared_examples_for "should not permit for invalid user" do |policy_type|
         it "should not permit" do
-          expect(policy.send(policy_type)).to be false
+          expect(policy.send(policy_type)).not_to be true
         end
       end
 

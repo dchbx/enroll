@@ -330,7 +330,7 @@ module BenefitSponsors
       let!(:update_profile) { broker_agency.profiles.first.update_attributes(primary_broker_role_id: broker_role.id)}
 
       let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
-      let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency.profiles.first.id, person: person)}
+      let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency.profiles.first.id, person: person, aasm_state: 'active', is_primary: true)}
 
       shared_examples_for "initialize profile for edit" do |profile_type|
 

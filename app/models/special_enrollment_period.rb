@@ -59,6 +59,9 @@ class SpecialEnrollmentPeriod
   # Date Options Array
   field :optional_effective_on, type: Array, default: []
 
+  # Range from QLE kind
+  field :effective_range, type: Range
+
   # CSL#
   field :csl_num, type: String
 
@@ -82,6 +85,7 @@ class SpecialEnrollmentPeriod
   scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id) + QualifyingLifeEventKind.shop_market_non_self_attested_events.map(&:id) ) }
   scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
+  scope :covering_today,     ->{ where(:"effective_range.max" => { :$gte => TimeKeeper.date_of_record }, :"effective_range.min" => { :$lte => TimeKeeper.date_of_record })}
 
   after_initialize :set_submitted_at
 

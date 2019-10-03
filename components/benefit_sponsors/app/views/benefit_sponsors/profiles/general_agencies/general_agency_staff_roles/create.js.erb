@@ -1,0 +1,9 @@
+<% if @status %>
+  $("#general_agency_form").replaceWith('<%= j render partial: "benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/success_message" %>')
+<% else %>
+  $("#ga_staff").html('<%= j render partial: "benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/error_message" %>')
+
+  $(document).ajaxComplete(function() {
+      $('html').scrollTop(0);
+  });
+<% end %>

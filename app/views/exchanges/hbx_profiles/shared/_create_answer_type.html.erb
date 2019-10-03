@@ -1,0 +1,12 @@
+  <div class = 'container' id='custom-answer-type'>
+  <h5>Please select the type of answer that is allowed for this question</h5>
+  <%= fields_for @answer, method: "post", class: "form" do |s| %>
+    <tr>
+      <p > <%=label_tag  "date"%> 
+      <input type="radio" id="huey" name="drone" value="huey"
+         checked>
+      
+      
+    </tr>
+  </div>
+  <% end %>

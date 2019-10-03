@@ -24,22 +24,27 @@ namespace :import do
         puts "Importing provider, formulary url's, network_data, standard_plan from #{file}..." unless Rails.env.test?
         if file.present?
           result = Roo::Spreadsheet.open(file)
-          sheets = ["IVL", "SHOP Q1", "Dental SHOP", "IVL Dental"]
+          sheets =  if Rails.env.test?
+                      result.sheets
+                    else
+                      ["IVL", "SHOP Q1", "Dental SHOP", "IVL Dental"]
+                    end
+
           sheets.each do |sheet_name|
+            next if result.sheets.exclude?(sheet_name)
             puts "processing sheet ::: #{sheet_name} :::" unless Rails.env.test?
             sheet_data = result.sheet(sheet_name)
 
             @header_row = sheet_data.row(1)
             assign_headers
             last_row = sheet_data.last_row
-
             (2..last_row).each do |row_number| # data starts from row 2, row 1 has headers
               row_info = sheet_data.row(row_number)
               hios_id = row_info[@headers["hios/standard component id"]].squish
               provider_directory_url = row_info[@headers["provider directory url"] || @headers["provider network url"]]
-
               plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
               plans.each do |plan|
+                plan.name = row_info[@headers["plan name"]]
                 plan.nationwide, plan.dc_in_network = [true, false] if NATIONWIDE_NETWORK.include?(row_info[@headers["network"]])
                 plan.dc_in_network, plan.nationwide = [true, false] if DC_IN_NETWORK.include?(row_info[@headers["network"]])
                 plan.provider_directory_url = provider_directory_url
@@ -55,6 +60,7 @@ namespace :import do
 
               products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
               products.each do |product|
+                product.title = row_info[@headers["plan name"]]
                 product.nationwide, product.dc_in_network = [true, false] if NATIONWIDE_NETWORK.include?(row_info[@headers["network"]])
                 product.dc_in_network, product.nationwide = [true, false] if DC_IN_NETWORK.include?(row_info[@headers["network"]])
                 product.provider_directory_url = provider_directory_url

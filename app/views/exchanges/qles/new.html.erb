@@ -1,0 +1,14 @@
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+<admin-qle-kind-creation-form
+  data-qle-kind-create-url="<%= exchanges_qles_path %>"
+  data-qle-kind-market-kinds="
+  <%= ['individual', 'shop'].to_json %>
+  "
+</admin-qle-kind-creation-form>
+
+
+<script type="text/javascript">
+  var disableSelectric = true;
+</script>
+

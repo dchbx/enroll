@@ -46,7 +46,7 @@
             </td>
             <td><%= general_agency_profile.dba %></td>
             <td><%= general_agency_profile.fein %></td>
-            <td><%= general_agency_profile.entity_kind.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.entity_kind.present? %></td>
+            <td><%= general_agency_profile.entity_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.entity_kind.present? %></td>
             <td><%= general_agency_profile.market_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") if general_agency_profile.market_kind.present? %></td>
             <td><%= general_agency_profile.current_state %></td>
             <td>

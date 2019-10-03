@@ -8,6 +8,7 @@ puts "::: Generating English Translations :::"
 MAIN_TRANSLATIONS = {
   "en.shared.my_portal_links.my_insured_portal" => "My Insured Portal",
   "en.shared.my_portal_links.my_broker_agency_portal" => "My Broker Agency Portal",
+  "en.shared.my_portal_links.my_general_agency_portal" => "My General Agency Portal",
   "en.shared.my_portal_links.my_employer_portal" => "My Employer Portal"
 }
 translations = [

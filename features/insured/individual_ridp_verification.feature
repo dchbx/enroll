@@ -110,7 +110,6 @@ Feature: Consumer RIDP verification process
   Scenario: New insured user chooses I Agree on Auth and Consent Page
     Given that the consumer has navigated to the AUTH & CONSENT page
     When the consumer selects “I Agree”
-    And the consumer clicks CONTINUE
     Then the consumer will be directed to answer the Experian Identity Proofing questions
 
   Scenario: New insured user chooses I Agree on Auth and Consent Page and user uploaded identity on failed experain page

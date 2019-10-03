@@ -2,14 +2,16 @@
 <% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || []%>
 <% employer = employer_staff.first %>
 <% broker_staff_roles =  (current_user.person && current_user.person.active_broker_staff_roles) || []%>
+<% ga_staff_roles =  (current_user.person && current_user.person.active_general_agency_staff_roles) || []%>
 <% roles = [insured] %>
-<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_staff_roles.count%>
+<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_staff_roles.count + ga_staff_roles.count%>
 
   <% if portal_count == 1 %>
     <span>
       <%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'header-text' if insured %>
       <%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'header-text' if employer_staff.present? %>
       <%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' if broker_staff_roles.any? %>
+      <%= link_to l10n('.my_general_agency_portal'), benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_staff_roles.first.general_agency_profile, tab:'home'), class: 'header-text' if ga_staff_roles.any? %>
       <span> | </span>
     </span>
     <%elsif portal_count > 1 %>
@@ -35,7 +37,7 @@
           <% end %>
           <% broker_staff_roles.each do |broker_staff_role| %>
             <%profile = broker_staff_role.broker_agency_profile%>
-            
+
             <% if profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile %>
               <% broker_link = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(profile, tab:'home') %>
             <% else %>
@@ -44,6 +46,17 @@
             <% end %>
 
             <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
+          <% end %>
+          <% ga_staff_roles.each do |ga_staff_role| %>
+            <%profile = ga_staff_role.general_agency_profile%>
+
+            <% if profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile %>
+              <% ga_link = benefit_sponsors.profiles_general_agencies_general_agency_profile_path(profile, tab:'home') %>
+            <% else %>
+              <% ga_link =  main_app.general_agencies_profile_path(profile) %>
+            <% end %>
+
+            <li style="text-align:left"><%= link_to profile.legal_name, ga_link, class: 'header-text' %></li>
           <% end %>
         </ul>
         <span> | </span>

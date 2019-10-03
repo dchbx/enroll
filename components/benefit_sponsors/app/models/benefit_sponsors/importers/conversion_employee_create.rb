@@ -2,22 +2,6 @@ module BenefitSponsors
   module Importers
     class ConversionEmployeeCreate < Importers::ConversionEmployeeCommon
 
-      # validate :validate_fein
-      # validate :validate_relationships
-      # validates_length_of :fein, is: 9
-
-      # def validate_relationships
-      #   (1..8).to_a.each do |num|
-      #     dep_ln = "dep_#{num}_name_last".to_sym
-      #     dep_rel = "dep_#{num}_relationship".to_sym
-      #     unless self.send(dep_ln).blank?
-      #       if self.send(dep_rel).blank?
-      #         errors.add("dep_#{num}_relationship", "invalid.  must be one of: #{RELATIONSHIP_MAP.keys.join(", ")}")
-      #       end
-      #     end
-      #   end
-      # end
-
       def map_subscriber
         last_name = subscriber_name_last
         first_name = subscriber_name_first

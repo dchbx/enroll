@@ -70,7 +70,14 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
 
-    let(:product) {health_products[0]}
+    let(:product) do
+      current_benefit_market_catalog
+      BenefitMarkets::Products::Product.where({
+        _type: /Health/,
+        "application_period.min" => current_benefit_market_catalog.application_period.min
+      }).first
+    end
+
     let(:family1) {FactoryBot.create(:family, :with_primary_family_member)}
     let(:family2) {FactoryBot.create(:family, :with_primary_family_member)}
     let(:enr_env_support) {{old_account_hbx_id: family1.family_members[0].person.hbx_id, new_account_hbx_id: family2.family_members[0].person.hbx_id, enrollment_hbx_id: hbx_enrollment.hbx_id}}

@@ -359,13 +359,14 @@ module BenefitSponsors
             person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({
               :npn => factory.npn,
               :benefit_sponsors_general_agency_profile_id => profile.id,
+              :is_primary => true
             })
             profile.office_locations.each do |office_location|
               person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
             end
             person.save!
           end
-          
+
           def fetch_organization(attributes)
             if organization.present? && !organization.general_agency_profile.present?
               organization.profiles << build_profile(attributes)
@@ -381,6 +382,7 @@ module BenefitSponsors
             Person.where(:"general_agency_staff_roles" => {
               '$elemMatch' => {
                 :benefit_sponsors_general_agency_profile_id => BSON::ObjectId(profile_id),
+                :is_primary => true
               }
             })
           end

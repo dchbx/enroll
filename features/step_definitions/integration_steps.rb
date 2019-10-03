@@ -239,7 +239,7 @@ Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true,
                             list_enrollments: true, send_broker_agency_message: true, approve_broker: true, approve_ga: true,
                             modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true,
-                            can_reset_password: true, view_the_configuration_tab: true, can_access_new_consumer_application_sub_tab: true,
+                            can_reset_password: true, view_the_configuration_tab: true, can_add_custom_qle: true, can_access_new_consumer_application_sub_tab: true,
                             can_complete_resident_application: true, can_add_sep: true, can_view_username_and_email: true, can_view_application_types: true,
                             view_personal_info_page: true, can_access_outstanding_verification_sub_tab: true, can_access_identity_verification_sub_tab: true,
                             can_access_accept_reject_paper_application_documents: true, can_delete_identity_application_documents: true,
@@ -770,11 +770,7 @@ end
 And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
   benefit_sponsorship = CensusEmployee.where(first_name: people[named_person][:first_name]).first.benefit_sponsorship
   # cannot select a SEP date from expired plan year on 31st.
-  if TimeKeeper.date_of_record.day != 31 || plan_year_state != "expired"
-    expect(page).to have_content benefit_sponsorship.benefit_applications.where(aasm_state: plan_year_state.to_sym).first.benefit_packages.first.health_sponsored_benefit.reference_product.name
-  else
-    expect(page).to have_content benefit_sponsorship.benefit_applications.where(:aasm_state.ne => plan_year_state.to_sym).first.benefit_packages.first.health_sponsored_benefit.reference_product.name
-  end
+  expect(page).to have_content benefit_sponsorship.benefit_applications.where(aasm_state: plan_year_state.to_sym).first.benefit_packages.first.health_sponsored_benefit.reference_product.name
 end
 
 Then(/(.*?) should see (.*?) page with (.*?) plan year start as coverage effective date/) do |_named_person, screen, status|
@@ -917,6 +913,17 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
   scroll_then_click(@browser.element(class: /interaction-click-control-#{tab_name}/))
 end
 
+Then(/^I should see "(.*?)" in qle carousel$/) do |qle_event|
+  expect(page).to have_content(qle_event)
+end
+
+Then(/^I should not see "(.*?)" in qle carousel$/) do |qle_kind_title|
+  qle_kind = qualifying_life_event_kind(qle_kind_title, market_kind = 'individual')
+  expect(qle_kind.market_kind).to eq('individual')
+  expect(qle_kind.visible_to_customer).to eq(false)
+  expect(page).to_not have_content(qle_kind_title)
+end
+
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
   click_link "#{qle_event}"
 end
@@ -932,7 +939,6 @@ When(/^I click on continue on qle confirmation page$/) do
   click_link "GO TO MY ACCOUNT"
 end
 
-
 When(/^I select a future qle date$/) do
   expect(page).to have_content "Married"
   screenshot("future_qle_date")
@@ -946,7 +952,7 @@ Then(/^I should see not qualify message$/) do
 end
 
 When(/^I select a past qle date$/) do
-  expect(page).to have_content "Married"
+  # expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link((TimeKeeper.date_of_record - 5.days).day)

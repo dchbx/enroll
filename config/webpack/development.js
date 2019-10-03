@@ -3,6 +3,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const environment = require('./environment');
 
+/*
 environment.plugins.append(
       'UglifyJs',
       new UglifyJsPlugin({
@@ -26,7 +27,7 @@ environment.plugins.append(
         }
       })
     );
-
+*/
 var webpack_environment = environment.toWebpackConfig()
 
 webpack_environment.module.rules.push(

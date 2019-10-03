@@ -7,18 +7,23 @@ module BenefitSponsors
     let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_sponsor) { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile) { benefit_sponsor.employer_profile }
-    let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:broker_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
     let(:broker_agency_profile) { broker_organization.broker_agency_profile }
     let!(:broker_agency_staff_role) {FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
     let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
     let!(:person) { FactoryBot.create(:person, employer_staff_roles: [active_employer_staff_role]) }
+
+    let!(:general_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+    let(:general_agency_profile) { general_agency_organization.general_agency_profile }
+    let!(:general_agency_staff_role) {FactoryBot.build(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true)}
+
     let(:user) { FactoryBot.create(:user, :person => person)}
 
     subject { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
     describe "model attributes", dbclean: :after_each do
       it {
-        [:npn, :first_name, :last_name, :email, :phone, :status, :dob, :person_id, :area_code, :number, :extension, :profile_id, :profile_type, :filter_criteria, :is_broker_registration_page].each do |key|
+        [:npn, :first_name, :last_name, :email, :phone, :status, :dob, :person_id, :area_code, :number, :extension, :profile_id, :profile_type, :filter_criteria, :is_broker_registration_page, :is_general_agency_registration_page].each do |key|
           expect(subject.new.attributes.has_key?(key)).to be_truthy
         end
       }
@@ -47,6 +52,10 @@ module BenefitSponsors
 
         it "should return false" do
           expect(subject.new(params).is_broker_agency_staff_profile?).to eq false
+        end
+
+        it "should return false" do
+          expect(subject.new(params).is_general_agency_staff_profile?).to eq false
         end
       end
 
@@ -95,6 +104,30 @@ module BenefitSponsors
 
         it "should return false" do
           expect(subject.new(params).is_employer_profile?).to eq false
+        end
+      end
+
+      context "#is_general_agency_staff_profile?" do
+
+        let!(:params) do
+          {
+            profile_type: 'general_agency_staff',
+            first_name: person.first_name,
+            last_name: person.last_name,
+            dob: person.dob.to_s
+          }
+        end
+
+        it "should return true" do
+          expect(subject.new(params).is_general_agency_staff_profile?).to eq true
+        end
+
+        it "should return false" do
+          expect(subject.new(params).is_general_agency_profile?).to eq false
+        end
+
+        it "should return false" do
+          expect(subject.new(params).is_general_agency_profile?).to eq false
         end
       end
     end
@@ -291,6 +324,44 @@ module BenefitSponsors
 
           it "should return empty result if broker profile is not approved" do
             expect(broker_search_form.broker_agency_search).to eq []
+          end
+        end
+      end
+    end
+
+    describe '#for_general_agency_search' do
+
+      let!(:person) { FactoryBot.create(:person) }
+      let!(:params) do
+        {
+          filter_criteria: {"q" => general_agency_profile.legal_name},
+          is_general_agency_registration_page: "true"
+        }
+      end
+
+      context "with valid form attributes " do
+
+        let!(:general_agency_search_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_general_agency_search params }
+
+
+        it "should assign the params for general_agency_search_form" do
+          expect(general_agency_search_form.filter_criteria.class).to eq Hash
+          expect(general_agency_search_form.is_general_agency_registration_page).to eq true
+        end
+
+        context '#general_agency_search!' do
+
+          it 'should instantiates a new Staff Role Service' do
+            expect(general_agency_search_form.send(:service)).to be_an_instance_of(Services::StaffRoleService)
+          end
+
+          it "should search for general agencies and return result if ga profile is approved" do
+            general_agency_profile.update_attributes!(aasm_state: "is_approved")
+            expect(general_agency_search_form.general_agency_search).to eq [general_agency_profile]
+          end
+
+          it "should return empty result if general agency profile is not approved" do
+            expect(general_agency_search_form.general_agency_search).to eq []
           end
         end
       end

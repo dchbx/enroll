@@ -119,7 +119,6 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
 
     hbx_enrollment.kind = @market_kind if (hbx_enrollment.kind != @market_kind) && @market_kind != 'shop' && @market_kind != 'fehb'
-
     if hbx_enrollment.save
       if @market_kind == 'individual' || @market_kind == 'coverall'
         hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away

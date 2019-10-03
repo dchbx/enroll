@@ -16,7 +16,7 @@ end
 
 puts "#{(total_time/60.0)} minutes total"
 
-proc_sets = Array.new(3) { Array.new }
+proc_sets = Array.new(4) { Array.new }
 
 timed_lines.each do |item|
   proc_sets[0] << item

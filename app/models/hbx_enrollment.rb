@@ -324,6 +324,16 @@ class HbxEnrollment
   scope :outstanding_enrollments, ->{ individual_market.enrolled.current_year.where(:is_any_enrollment_member_outstanding => true) }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
+  scope :family_home_page_hidden_enrollments, ->(family) do
+    where(
+      family_id: family.id,
+      :product_id.nin => [nil],
+      aasm_state: "coverage_canceled"
+    ).order(
+      effective_on: :desc,
+      submitted_at: :desc, coverage_kind: :desc
+    )
+  end
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
@@ -1143,18 +1153,6 @@ class HbxEnrollment
     updated_at
   end
 
-=begin
-  def broker_agency_profile=(new_broker_agency_profile)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a? BrokerAgencyProfile
-    self.broker_agency_profile_id = new_broker_agency_profile._id
-    @broker_agency_profile = new_broker_agency_profile
-  end
-
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless broker_agency_profile_id.blank?
-  end
-=end
   def has_broker_agency_profile?
     broker_agency_profile_id.present?
   end
@@ -1219,7 +1217,7 @@ class HbxEnrollment
     return if decorated_plan.blank? && hbx_enrollment_members.blank?
 
     hbx_enrollment_members.each do |member|
-      #TODO update applied_aptc_amount error like hbx_enrollment
+      # TODO: update applied_aptc_amount error like hbx_enrollment
       member.update_attributes!(applied_aptc_amount: decorated_plan.aptc_amount(member))
     end
   end
@@ -1526,7 +1524,7 @@ class HbxEnrollment
                          :coverage_kind => self.coverage_kind,
                          :employee_role_id => self.employee_role_id,
                          :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_AND_UPDATE_END_DATE)}).any?
-end
+  end
 
   def notify_of_coverage_start(publish_to_carrier)
     config = Rails.application.config.acapi
@@ -1593,10 +1591,6 @@ end
     benefit_group_assignment_id = benefit_group_assignment.id
     HbxEnrollment.where(:"benefit_group_assignment_id" => benefit_group_assignment_id).show_enrollments_sans_canceled.non_terminated.shop_market.to_a
   end
-
-  # def self.covered(enrollments)
-  #   enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
-  # end
 
   aasm do
     state :shopping, initial: true
@@ -1777,8 +1771,8 @@ end
         coverage_effective_date = open_enrollment_effective_date
       end
 
-      # TODO Have Trey confirm this isn't necessary anymore
-      #benefit_group_assignment_valid?(coverage_effective_date)
+      # TODO: Have Trey confirm this isn't necessary anymore
+      # benefit_group_assignment_valid?(coverage_effective_date)
     else
       true
     end
@@ -1938,30 +1932,6 @@ end
     return false if sponsored_benefit.blank?
     sponsored_benefit.single_plan_type? && sponsored_benefit.pricing_determinations.any?
   end
-
-  # def ee_plan_selection_confirmation_sep_new_hire
-  #   if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
-  #     if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
-  #       begin
-  #         census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
-  #         ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)
-  #       rescue Exception => e
-  #         (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
-  #       end
-  #     end
-  #   end
-  # end
-
-  # def notify_employee_confirming_coverage_termination
-  #   if is_shop? && census_employee.present?
-  #     begin
-  #       census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
-  #       ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "notify_employee_confirming_coverage_termination", hbx_enrollment_hbx_id: hbx_id.to_s)
-  #     rescue Exception => e
-  #       (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" })
-  #     end
-  #   end
-  # end
 
   def any_dependent_members_age_above_26?
     hbx_enrollment_members.where(is_subscriber: false).map(&:family_member).map(&:person).each do |person|

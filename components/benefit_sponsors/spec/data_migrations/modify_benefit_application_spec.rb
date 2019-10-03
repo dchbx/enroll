@@ -1,4 +1,6 @@
 require "rails_helper"
+require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_site_spec_helpers")
+require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_product_spec_helpers")
 require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
 
 RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
@@ -15,14 +17,33 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
   describe "modifying benefit application", dbclean: :after_each do
 
     let(:current_effective_date)  { TimeKeeper.date_of_record.beginning_of_month }
-    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:benefit_market_catalog) { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, benefit_market: benefit_market, title: "SHOP Benefits for #{current_effective_date.year}", application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                          }
+    let(:site)                { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+    let!(:effective_period) { (current_effective_date.beginning_of_year..current_effective_date.end_of_year) }
+
+    let(:benefit_market_catalog) do
+      BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      benefit_market.benefit_market_catalogs.where(
+        "application_period.min" => effective_period.min
+      ).first
+    end
+
+    let(:service_areas) do
+      ::BenefitMarkets::Locations::ServiceArea.where(
+        :active_year => benefit_market_catalog.application_period.min.year
+      ).all.to_a
+    end
+
+    let(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.where(
+        :active_year => benefit_market_catalog.application_period.min.year
+      ).first
+    end
+
     let(:benefit_market)      { site.benefit_markets.first }
     let!(:product_package) { benefit_market_catalog.product_packages.first }
 
-    let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
+    # let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let(:service_area) { service_areas.first }
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
     let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -324,24 +345,15 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       end
     end
 
-
     context "Should update effective period and approve renewing benefit application", dbclean: :after_each do
       let(:effective_date) {start_on.next_month.beginning_of_month}
       let(:new_start_date) { (start_on + 2.months).beginning_of_month}
       let(:new_end_date) { new_start_date + 1.year }
       let(:current_effective_date)  { TimeKeeper.date_of_record }
-      let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-      let!(:renewing_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                            benefit_market: benefit_market,
-                                            title: "SHOP Benefits for #{current_effective_date.year}",
-                                            application_period: ((current_effective_date.beginning_of_year)-1.year..(current_effective_date.end_of_year)-1.year))
-                                          }
-      let(:benefit_market)      { site.benefit_markets.first }
+
       let!(:product_package_1) { benefit_market_catalog.product_packages.first }
       let!(:product_package_2) { renewing_benefit_market_catalog.product_packages.first }
 
-      let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
-      let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
       let!(:security_question)  { FactoryBot.create_default :security_question }
 
       let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -358,6 +370,21 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
           benefit_market: site.benefit_markets[0],
           employer_attestation: employer_attestation)
       end
+
+      let!(:benefit_market_catalog) do
+        BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, old_effective_period)
+        benefit_market.benefit_market_catalogs.where(
+          "application_period.min" => old_effective_period.min
+        ).first
+      end
+
+      let!(:renewing_benefit_market_catalog) do
+        benefit_market_catalog
+        benefit_market.benefit_market_catalogs.where(
+          "application_period.min" => renewing_effective_period.min
+        ).first
+      end
+  
 
       let(:old_effective_period)  { start_on.next_month.beginning_of_month - 1.year ..start_on.end_of_month }
       let!(:old_benefit_application) {

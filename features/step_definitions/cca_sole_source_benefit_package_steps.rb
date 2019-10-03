@@ -13,9 +13,9 @@ def effective_date(start_or_end)
 end
 
 Given (/^.*a configured CCA benefit market, pricing models, and catalog$/) do
-  @site = ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market(:aca_shop)
+  @site = ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market(:aca_shop)
   benefit_market = @site.benefit_markets.first
-  ::BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(
+  ::BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(
     @site,
     benefit_market,
     (effective_date("start")..effective_date("end"))

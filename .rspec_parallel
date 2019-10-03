@@ -1,6 +1,4 @@
 --color
 --require rails_helper
 --format progress
---format RspecJunitFormatter --out tmp/rspec<%= ENV['TEST_ENV_NUMBER'] %>.xml
---format json --out rspec-<%= ENV['TEST_ENV_NUMBER'].empty? ? '1' : ENV['TEST_ENV_NUMBER'] %>.json
---order defined
+--format RspecJunitFormatter --out tmp/rspec_junit_<%= ENV['TEST_ENV_NUMBER'] %>.xml

@@ -1,0 +1,30 @@
+<div [formGroup]="responseFormGroup" *ngIf="responseIndex < 4">
+  <div class="from-group-response">
+    <span class="col-sm-2 control-label"><strong>Response</strong></span>
+    <div class="col-md-12">
+      <input
+        id="qle_kind_response_response_{{responseIndex}}_content"
+        type="text"
+        formControlName="content"
+        id="response-content col-md-2"
+        class='form-control'>
+      <div class="btn-group" role="group" aria-label="Response Actions">
+        <button
+          (click)="removeResponse(responseIndex)"
+          class='btn btn-default margin-right-10px'>
+          Remove Response
+        </button>
+        <strong>Action to Take:</strong>
+        &nbsp;
+        <label for="qle_kind_response_response_{{responseIndex}}_action_to_take">
+          <select class='form-control' id="qle_kind_response_response_{{responseIndex}}_action_to_take" formControlName="action_to_take">
+            <option value='accepted'>Accepted</option>
+            <option value='declined'>Declined</option>
+            <option value='to_question_two'>To Question 2</option>
+            <option value='call_center'>Call Center</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,11 +3,12 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 # require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
-# require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
+require File.join(File.dirname(__FILE__), "..", "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 
 module BenefitSponsors
   RSpec.describe Organizations::Factories::ProfileFactory, type: :model, dbclean: :after_each do
-    include_context 'setup benefit market with market catalogs and product packages'
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+
 
     let(:current_user) { FactoryBot.create :user }
     let(:fein) { "878998789" }
@@ -17,6 +18,7 @@ module BenefitSponsors
     let(:phone_number)            { '0987987' }
     let(:new_organization_name)   { 'New Organization LLC' }
     let(:valid_employer_params) do
+      site
       {
         :current_user_id => current_user.id,
         :profile_type => "benefit_sponsor",
@@ -82,6 +84,7 @@ module BenefitSponsors
       }
     end
     let(:valid_broker_params) do
+      site
       {
         :current_user_id => current_user.id,
         :profile_type => "broker_agency",
@@ -108,7 +111,7 @@ module BenefitSponsors
         :organization =>
         {
           :entity_kind => :s_corporation,
-          :fein => nil,
+          :fein => fein,
           :dba => "Doing Business As",
           :legal_name => "Lannister Army",
           :profiles_attributes =>
@@ -156,7 +159,9 @@ module BenefitSponsors
 
     context '.persist' do
       context 'when type is benefit sponsor' do
-        let(:profile_factory) { profile_factory_class.call(valid_employer_params) }
+        let(:profile_factory) do
+          profile_factory_class.call(valid_employer_params)
+        end
 
         it 'should create general organization with given fein' do
           expect(profile_factory.organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
@@ -242,12 +247,16 @@ module BenefitSponsors
           expect(profile_factory.organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
         end
 
-        it 'should create broker agency profile' do
+        it 'should create general agency profile' do
           expect(profile_factory.profile.class).to eq BenefitSponsors::Organizations::GeneralAgencyProfile
         end
 
         it 'should create person with given data' do
           expect(profile_factory.person.full_name).to eq "Tyrion Lannister"
+        end
+
+        it 'should create general agency staff role with is_primary true' do
+          expect(profile_factory.person.general_agency_staff_roles.first.is_primary).to be_truthy
         end
 
         it 'should return redirection url' do
@@ -258,7 +267,9 @@ module BenefitSponsors
 
     context '.update' do
       context 'when type is benefit sponsor' do
-        let!(:abc_organization)         { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+        let!(:abc_organization) do
+          FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)
+        end
         let!(:benefit_sponsorship) do
           benefit_sponsorship = employer_profile.add_benefit_sponsorship
           benefit_sponsorship.aasm_state = :applicant

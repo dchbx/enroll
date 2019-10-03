@@ -10,18 +10,19 @@ class DummyNoticeKind
     self.market_kind = params[:market_kind]
     self.notice_number = params[:notice_number]
   end
+
+  def shop_market?; end
 end
 
 module Notifier
   module NoticeBuilder
     RSpec.describe NoticeBuilder, dbclean: :around_each do
       let(:hbx_id) { "1234" }
-      let(:resource) { EmployeeRole.new }
-      let(:event_name) {"acapi.info.events.employer.welcome_notice_to_employer"}
+      let(:event_name) {"acapi.info.events.notices.notice"}
       let(:payload) do
         {
           "employer_id" => hbx_id,
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShopDcEmployerProfile",
+          "event_object_kind" => "EventObjectKind",
           "event_object_id" => "12345"
         }
       end
@@ -38,17 +39,75 @@ module Notifier
         before do
           allow(FileUtils).to receive(:cp)
           allow(File).to receive(:delete)
-          allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
-          allow(subject).to receive(:is_employer?).and_return(false)
           allow(subject).to receive(:resource).and_return(resource)
           allow(subject).to receive(:notice_path).and_return("notice_path")
-          allow(subject).to receive(:notice_type).and_return("ER")
+          allow(subject).to receive(:notice_type).and_return("notice")
           allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
-          subject.store_paper_notice
         end
 
-        it 'AWS Storage to save doc_uri' do
-          expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+
+        context "ivl_market" do
+          let(:resource) { ConsumerRole.new }
+
+          it 'should store paper notices for person with paper contact method' do
+            allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+            allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+            allow(subject).to receive(:shop_market?).and_return(false)
+            subject.store_paper_notice
+            expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+          end
+
+          it 'should not store paper notices for person with electronic communication contact method' do
+            allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+            allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
+            allow(subject).to receive(:shop_market?).and_return(false)
+            subject.store_paper_notice
+            expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+          end
+        end
+
+        context 'shop_market' do
+          context 'Notices for Employee' do
+
+            let(:resource) { EmployeeRole.new }
+
+            it 'should not store paper notices for Employee with paper contact method' do
+              allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+              allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+              allow(subject).to receive(:shop_market?).and_return(true)
+              subject.store_paper_notice
+              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+            end
+
+            it 'should not store paper notices for Employee with electronic communication contact method' do
+              allow(resource).to receive(:person).and_return(double(hbx_id: '1234'))
+              allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
+              allow(subject).to receive(:shop_market?).and_return(true)
+              subject.store_paper_notice
+              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+            end
+          end
+
+          context 'Notices for Employer' do
+
+            let(:resource) { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
+
+            it 'should not store paper notices for Employer with paper contact method' do
+              allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
+              allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
+              allow(subject).to receive(:shop_market?).and_return(true)
+              subject.store_paper_notice
+              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+            end
+
+            it 'should not store paper notices for Employer with electronic communication contact method' do
+              allow(resource).to receive(:organization).and_return(double(hbx_id: '1234'))
+              allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
+              allow(subject).to receive(:shop_market?).and_return(true)
+              subject.store_paper_notice
+              expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
+            end
+          end
         end
       end
 

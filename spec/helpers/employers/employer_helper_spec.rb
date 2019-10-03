@@ -1,6 +1,9 @@
 require "rails_helper"
 
 RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each do
+  before do
+    DatabaseCleaner.clean
+  end
 
   describe "Employer Helper Module" do
     let(:employee_role) {FactoryBot.create(:employee_role, person: person)}

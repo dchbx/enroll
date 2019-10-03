@@ -270,6 +270,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
 
     it "when general_agency_staff" do
+      allow(user).to receive(:has_general_agency_staff_role?).and_return true
       user.roles = ['general_agency_staff']
       expect(user.get_announcements_by_roles_and_portal("dc.org/general_agencies")).to eq ["msg for GA"]
     end
@@ -428,6 +429,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       end
 
       it "should return false when general agency staff" do
+        allow(user).to receive(:has_general_agency_staff_role?).and_return true
         user.roles = ['general_agency_staff']
         expect(user.can_change_broker?).to eq false
       end
@@ -449,7 +451,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       allow(hbx_staff_role).to receive(:permission).and_return(permission)
     end
-    
+
     context "should set the return the permission for the user " do
       it 'returns the permission for the user' do
         allow(user).to receive(:permission).and_return(person.hbx_staff_role.permission)

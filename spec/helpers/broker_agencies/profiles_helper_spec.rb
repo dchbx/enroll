@@ -26,22 +26,34 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
   end
 
   describe 'can_show_destroy?' do
+    context "with broker role" do
+      it 'should return true if current user is logged in' do
+        allow(person).to receive(:broker_role).and_return true
+        expect(helper.can_show_destroy?(user, person)). to eq true
+      end
 
-    it 'should return true if current user is logged in' do
-      allow(person).to receive(:broker_role).and_return true
-      expect(helper.can_show_destroy?(user, person)). to eq true
+      it 'should return true if staff has broker role' do
+        allow(person).to receive(:broker_role).and_return true
+        expect(helper.can_show_destroy?(user, person)). to eq true
+      end
+
+      it 'should return false if staff has broker role' do
+        allow(person).to receive(:broker_role).and_return false
+        expect(helper.can_show_destroy?(user, person2)). to eq nil
+      end
     end
 
-    it 'should return true if staff has broker role' do
-      allow(person).to receive(:broker_role).and_return true
-      expect(helper.can_show_destroy?(user, person)). to eq true
-    end
+    context "with general agency staff" do
+      it 'should return true if staff has ga staff role' do
+        allow(person).to receive(:general_agency_primary_staff).and_return true
+        expect(helper.can_show_destroy?(user, person)). to eq true
+      end
 
-    it 'should return false if staff has broker role' do
-      allow(person).to receive(:broker_role).and_return false
-      expect(helper.can_show_destroy?(user, person2)). to eq nil
+      it 'should return false if staff has broker role' do
+        allow(person).to receive(:general_agency_primary_staff).and_return false
+        expect(helper.can_show_destroy?(user, person2)). to eq nil
+      end
     end
-
   end
 
 end

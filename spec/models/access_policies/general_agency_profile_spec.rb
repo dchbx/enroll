@@ -7,7 +7,7 @@ describe AccessPolicies::GeneralAgencyProfile, :dbclean => :after_each do
   let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
 
   context "authorize new" do
-    let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role) }
+    let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true) }
     let(:person) { general_agency_staff_role.person }
     let(:user) { FactoryBot.create(:user, :general_agency_staff, person: person) }
 
@@ -55,7 +55,7 @@ describe AccessPolicies::GeneralAgencyProfile, :dbclean => :after_each do
     end
 
     context "for normal user with general_agency_profile" do
-      let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role) }
+      let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true) }
       let(:person) { general_agency_staff_role.person }
       let(:user) { FactoryBot.create(:user, :general_agency_staff, person: person) }
 

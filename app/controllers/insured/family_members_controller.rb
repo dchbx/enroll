@@ -37,15 +37,23 @@ class Insured::FamilyMembersController < ApplicationController
       @change_plan_date = @sep.qle_on
     elsif params[:qle_id].present? && !params[:shop_for_plan]
 
-      qle = QualifyingLifeEventKind.find(params[:qle_id])
-      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
-      special_enrollment_period.qualifying_life_event_kind = qle
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
-      special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
-      special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
-      special_enrollment_period.save
-      @market_kind = qle.market_kind
+      @qle = QualifyingLifeEventKind.find(params[:qle_id])      
+      @sep = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
+      if params[:effective_on_date].present?
+        effective_on_date = Date.strptime(params[:effective_on_date], "%m/%d/%Y")
+        # For employee gaining medicare qle
+        @sep.selected_effective_on = effective_on_date
+      end
+      @sep.qualifying_life_event_kind = @qle
+      @sep.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      @sep.effective_on = effective_on_date if params[:effective_on_date].present?
+      # effective_range will be used to pull the presence of a special enrollment period
+      @sep.effective_range = (@sep.effective_on - @qle.pre_event_sep_in_days)..(@sep.effective_on + @qle.post_event_sep_in_days)
+      @sep.market_kind = @qle.market_kind == "individual" ? "ivl" : @qle.market_kind
+      @sep.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
+      @sep.save!
+      @family.save!
+      @market_kind = @qle.market_kind
     end
 
     if request.referer.present?

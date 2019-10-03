@@ -34,9 +34,9 @@ h1.heading-text Add Benefit Package
     - oe_end_on = f.object.open_enrollment_end_on.present? ? Date.strptime(f.object.open_enrollment_end_on, "%m/%d/%Y") : nil
     .row.row-form-wrapper#uic-wrapper
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", onchange:"isValidDate(this)", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on
+        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", onchange:"isValidDate(this)", "data-oe-end-date" => oe_end_on
+        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", "data-oe-end-date" => oe_end_on
 .row.pl-1
   h3 Add the total number of employees in your workforce
 .row
@@ -61,9 +61,17 @@ h1.heading-text Add Benefit Package
 javascript:
 
   var disableSelectric = false;
+  var defaultOEStartOn = '';
+  var defaultOEEndOn = '';
+
+  function setDefaultDates() {
+    defaultOEStartOn = document.querySelector("input#benefit_application_open_enrollment_start_on").value;
+    defaultOEEndOn = document.querySelector("input#benefit_application_open_enrollment_end_on").value
+  }
 
   function selectedDate(element) {
-    showHideRecommendDates(element.value)
+    showHideRecommendDates(element.value);
+    setDefaultDates();
   }
 
   function setDueDates(id,newvalue) {
@@ -148,8 +156,15 @@ javascript:
   }
 
   function showDatepicker(id) {
-    selectedDate(document.getElementById("baStartDate"))
-    initDatepicker(id,new Date(dateOptions.oeStartOn),new Date(dateOptions.oeEndOn))
+    //selectedDate(document.getElementById("baStartDate"));
+    var minDate = document.querySelector("input#benefit_application_open_enrollment_start_on").dataset.dateMin;
+    var maxDate = document.querySelector("input#benefit_application_open_enrollment_end_on").dataset.oeEndDate;
+    if (minDate) {
+      initDatepicker(id,new Date(minDate),new Date(maxDate));
+    } else {
+      initDatepicker(id,new Date(defaultOEStartOn),new Date(defaultOEEndOn));
+    }
+
   }
 
   function initDatepicker(id,minDate,maxDate) {
@@ -162,7 +177,6 @@ javascript:
       minDate:minDate,
       maxDate:maxDate
     })
-
     .on("change", function (e) {
       validateDate(e, minDate, maxDate)
     });
@@ -204,17 +218,18 @@ javascript:
     });
   }
 
-  function isValidDate(element)
-  {
-    var oe_start_date = $("#benefit_application_open_enrollment_start_on").attr("data-oe-start-date")
-    var oe_end_date = $("#benefit_application_open_enrollment_end_on").attr("data-oe-end-date")
-    var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
-    if (!(date_regex.test(element.value)) && element.id == "benefit_application_open_enrollment_start_on") {
-      alert('Invalid Date Format');
-      element.value = oe_start_date;
+  // Prevents dates entered outside of minDate/maxDate from being submitted
+  function validateDate(element, minDate, maxDate) {
+    var selectedDate = new Date(element.target.value)
+    console.log('Min Date', minDate);
+    console.log('Max Date', maxDate);
+    if (selectedDate < minDate) {
+      swal("Invalid Date!","Date entered is less then the minimum allowable date","error");
+      element.target.value = '';
     }
-    else if (!(date_regex.test(element.value)) && element.id == "benefit_application_open_enrollment_end_on") {
-      alert('Invalid Date Format');
-      element.value = oe_end_date;
+
+    if (selectedDate > maxDate) {
+      swal("Invalid Date!","Date entered exceeds maximum allowed date","error");
+      element.target.value = '';
     }
   }

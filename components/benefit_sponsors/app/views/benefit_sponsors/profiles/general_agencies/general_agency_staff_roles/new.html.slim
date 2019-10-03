@@ -1,0 +1,61 @@
+.general_agency-staff-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3
+  h1.heading-text#loaded = l10n("general_agency_staff")
+  = form_for @staff, as: :staff, url: {action: "create"}, remote: true,  html: {class: "needs-ajax-validation s508", id: 'general_agency_staff_registration_form', novalidate:true} do |f|
+    div#general_agency_staff
+    = render partial: './ui-components/v1/forms/general_agency_registration/general_agency_staff_information', locals: {f: f}
+    .row
+      .col-md-9.col-sm-9.col-xs-12.general-agency-search
+        .row.search-dropdown-wrapper
+          .col-md-12.col-sm-12.col-xs-12
+            h4
+              = l10n("select_your_general_agency")
+            .col-md-4.col-sm-6.col-xs-12.input-group.input-no-pd
+              = f.hidden_field :profile_id
+              = f.hidden_field :profile_type, value: "general_agency_staff"
+              = f.hidden_field :is_general_agency_registration_page, value: true
+              = f.text_field :agency_search, placeholder: 'General Agency Name/NPN', class: 'form-control'
+              .input-group-btn
+                a.btn.btn-select.search[href="#" onclick="generalAgencySearch(); return false" data-loading-text="Loading..."]
+                  i.fa.fa-search
+                  = l10n("search").to_s.downcase
+        .result
+
+
+      br
+    .row
+      .col-md-9.col-sm-9.col-xs-12
+        .row.no-buffer
+          .col-md-4.col-sm-4.col-xs-12.form-group-lg.no-pd
+            br
+            button.btn.btn-primary[type="submit" disabled='disabled' id= 'general-agency-staff-btn']
+              = l10n("submit_application")
+
+javascript:
+  validateAjaxForm();
+
+  function generalAgencySearch() {
+    var general_agency_search = document.getElementById('staff_agency_search').value
+    var general_agency_registration_page = document.getElementById('staff_is_general_agency_registration_page').value
+    document.getElementById('general-agency-staff-btn').disabled = true;
+    if (generalAgencySearch != undefined) {
+        $.ajax({
+          url: '/benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/search_general_agency.js',
+          type: "GET",
+          data: {'q': general_agency_search, "general_agency_registration_page": general_agency_registration_page}
+        });
+    };
+
+  }
+
+  function selectGeneralAgency(element) {
+    var result = document.querySelectorAll('.result');
+    result.forEach(function (result) {
+        var element = result.querySelectorAll('.select-ga')
+        element.forEach(function (ele) {
+            ele.classList.remove("agency-selected");
+        })
+    });
+    document.getElementById('staff_profile_id').value = element.dataset.general_agency_profile_id;
+    element.closest(".select-ga").classList.add('agency-selected')
+      document.getElementById('general-agency-staff-btn').disabled = false;
+  }

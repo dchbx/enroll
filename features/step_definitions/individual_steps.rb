@@ -311,6 +311,18 @@ Then(/I click on back to my account$/) do
   find('.interaction-click-control-back-to-my-account').click
 end
 
+And(/^I click the (.*?) QLE Kind link$/) do |qle_kind_title|
+  click_link(qle_kind_title)
+end
+
+And(/^I fill in the QLE date with the first date of this month and click continue$/) do
+  fill_in('qle_date', with: Date.today.to_s)
+  sleep 2
+  find('#qle_submit').click
+  # Next continue
+  find('input[name="commit"]').click
+end
+
 And(/^I click on continue button on group selection page$/) do
   click_button 'CONTINUE', :wait => 10
 end

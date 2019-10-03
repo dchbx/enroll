@@ -53,5 +53,27 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       end
     end
 
+    context "has_general_agency_staff_role?" do
+      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
+      let!(:general_agency_profile)    { benefit_sponsor.general_agency_profile }
+      let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: 'active', person: person)}
+      let!(:person) { FactoryBot.build(:person, user: current_user) }
+      let!(:current_user) { FactoryBot.build(:user)}
+
+      before(:each) do
+        allow(controller).to receive(:controller_path).and_return("general_agencies")
+      end
+
+      it "should have I'm a General Agency link when user has active employer_staff_role" do
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/general_agencies/general_agency_profiles/" + general_agency_profile.id.to_s + "\"><img src=\"/images/icons/icon-expert.png\" /> &nbsp; I'm a General Agency</a>"
+      end
+
+      it "should have Welcome prompt when user has no active role" do
+        allow(current_user).to receive(:has_general_agency_staff_role?).and_return(false)
+        expect(portal_display_name(controller)).to eq "<a class='portal'>#{Settings.site.byline}</a>"
+      end
+    end
+
   end
 end

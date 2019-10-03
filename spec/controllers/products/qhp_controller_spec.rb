@@ -27,10 +27,24 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   let(:product_kinds) { [:health, :dental] }
   let(:package_kind) { :single_product }
   let(:package) { initial_application.benefit_packages[0] }
+  let(:health_product) do
+    BenefitMarkets::Products::Product.where({
+      :_type => /Health/,
+      "application_period.min" => initial_application.benefit_packages[0].effective_period.min.beginning_of_year
+    }).first
+  end
+  let(:dental_product) do
+    BenefitMarkets::Products::Product.where({
+      :_type => /Dental/,
+      "application_period.min" => initial_application.benefit_packages[0].effective_period.min.beginning_of_year
+    }).first
+  end
+
+
   let(:shop_health_enrollment) { FactoryBot.create(:hbx_enrollment,
     family: family,
     household: family.active_household,
-    product: health_products[0],
+    product: health_product,
     sponsored_benefit_id: package.health_sponsored_benefit.id,
     benefit_sponsorship_id: benefit_sponsorship.id,
     sponsored_benefit_package_id: package.id,
@@ -40,7 +54,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   let(:shop_dental_enrollment) { FactoryBot.create(:hbx_enrollment,
     family: family,
     household: family.active_household,
-    product: dental_products[0],
+    product: dental_product,
     sponsored_benefit_id: package.dental_sponsored_benefit.id,
     benefit_sponsorship_id: benefit_sponsorship.id,
     sponsored_benefit_package_id: package.id,

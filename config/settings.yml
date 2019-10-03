@@ -175,8 +175,8 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      start_on: <%= Date.new(2019,11,1) %>
+      end_on: <%= Date.new(2020,01,31) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true
@@ -249,7 +249,7 @@ aca:
       ineligible_period_after_application_denial:
         days: 90
       quiet_period:
-        month_offset: 0
+        month_offset: -1
         mday: 28
 
     renewal_application:
@@ -330,6 +330,7 @@ notices:
       zip_code: "20005"
 
   shop:
+    store_paper_notice: false
     attachments:
       envelope_without_address: "taglines.pdf"
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
@@ -341,6 +342,7 @@ notices:
       layout: "notifier/pdf_layout.html.erb"
 
   individual:
+    store_paper_notice: true
     attachments:
       blank_page_attachment: "blank.pdf"
       envelope_without_address: "taglines.pdf"

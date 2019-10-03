@@ -1,1 +1,2 @@
-$(".general_agency_profiles.content-bottom").html("<%= j render partial: 'show' %>")
+$(".general_agency_profiles.content-bottom").html("<%= j render partial: 'show', :active_tab => 'home-tab' %>")
+set_active_ontab("#home-tab");

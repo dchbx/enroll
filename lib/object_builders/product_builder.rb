@@ -96,13 +96,13 @@ class ProductBuilder
           family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
           is_reference_plan_eligible: true,
           metal_level_kind: retrieve_metal_level.to_sym,
-          product_package_kinds: [:metal_level, :single_issuer, :single_product]
         }
 
         all_attributes = if is_health_product?
           {
             health_plan_kind: @qhp.plan_type.downcase,
-            ehb: @qhp.ehb_percent_premium.present? ? @qhp.ehb_percent_premium : 1.0
+            ehb: @qhp.ehb_percent_premium.presence || 1.0,
+            product_package_kinds: [:metal_level, :single_issuer, :single_product]
           }
         else
           {

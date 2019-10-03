@@ -34,6 +34,24 @@ module Insured::FamiliesHelper
     policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
+  def qle_kind_eligible_success_message
+    "You are eligible to enroll. Please continue."
+  end
+
+  def qle_kind_ineligible_message
+    "Based on the information you have provided, you are not eligible for this special enrollment period. " \
+    "If you have questions or would like to provide additional information, please contact DC Health Link customer service at (855) 532-5465."
+  end
+
+  def qle_kind_call_center_message
+    "Based on the information you entered, you may be eligible for a special enrollment period. " \
+    "Please call us at #{Settings.contact_center.phone_number} to give us more information so we can see if you qualify."
+  end
+
+  def second_qle_question_message
+    "Based on your response to the first question, we need to ask you another question to clarify your eligibility."
+  end
+
   def shift_waived_time(policy)
     (policy.submitted_at || policy.created_at).in_time_zone('Eastern Time (US & Canada)')
   end
@@ -72,10 +90,18 @@ module Insured::FamiliesHelper
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
-  def qle_link_generater(qle, index)
+  def qle_link_generator(qle, index)
     options = {class: 'qle-menu-item'}
+    if qle.custom_qle_questions.present?
+      # TODO: Redo this as a single angular component or partial on the families home page
+      link_url = "/insured/families/#{qle.id}/custom_qle_question"
+    else
+      link_url = "javascript:void(0)"
+    end
     data = {
-      title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
+      title: qle.title,
+      id: qle.id.to_s,
+      label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     }
@@ -86,7 +112,7 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    link_to qle.title, "javascript:void(0)", options
+    link_to qle.title, link_url, options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)

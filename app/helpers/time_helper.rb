@@ -27,10 +27,9 @@ module TimeHelper
     has_dual_roles         = person.has_consumer_role? && person.has_active_employee_role?
     has_only_employee_role = person.has_active_employee_role? && !person.has_consumer_role?
 
-    if has_only_employee_role || (has_dual_roles && market_kind == "shop")
-      active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:benefit_applications).map(&:published_or_renewing_published).flatten
-      min_or_max == 'min' ? active_plan_years.map(&:start_on).min : active_plan_years.map(&:end_on).max
-    end
-  end
+    return nil unless has_only_employee_role || (has_dual_roles && ['shop', 'fehb'].include?(market_kind))
 
+    active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:benefit_applications).map(&:published_or_renewing_published).flatten
+    min_or_max == 'min' ? active_plan_years.map(&:start_on).min : active_plan_years.map(&:end_on).max
+  end
 end

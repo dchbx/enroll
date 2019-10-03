@@ -24,7 +24,7 @@
         <% if @benefit_applications.present? && (@benefit_applications.published.blank? || (@benefit_applications.active.present? && @benefit_applications.canceled.select{ |ba| ba.start_on > @benefit_applications.active.first.end_on }.present?)) && !@benefit_applications.any?{|app| app.is_renewing?} %>
         <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship), class: "btn btn-default btn-block mt-1", data: {loading_text: "Loading..."}, onclick:"checkForDraftPlans(this)" %>
         <% end %>
-      </span>
+      <!-- </span> -->
     </div>
     <% unless @benefit_applications.blank? || @benefit_applications.published.present? %>
     <% if @employer_profile.renewal_benefit_application.blank? || @employer_profile.active_benefit_application.blank? %>
@@ -46,9 +46,8 @@
 
     <% @benefit_applications.each do |benefit_application| %>
       <div class="row no-buffer module plan-year">
-        <div class="col-xs-6">
+        <div class="col-md-6">
           <h3 class="no-buffer heading-text">
-            <div class="row">
               <span data-toggle="tooltip" title="<%= benefit_application.aasm_state.to_s.humanize.titleize %>">
                 <% if benefit_application.draft? %>
                 <i class="fa fa-file"></i>
@@ -60,7 +59,6 @@
               </span>
               <%= benefit_application.start_on.to_date.year %>
               Plan Year (<%= benefit_application_summarized_state(benefit_application) %>)
-            </div>
           </h3>
         </div>
         <div class="row" style="margin-right:1px">
@@ -82,10 +80,7 @@
           <% end %>
           <span></span>
         </div>
-      <div class="col-xs-1">
-            &nbsp;
-      </div>
-
+        <br> <!-- this is needed because the flow is kind of messy, and otherwise the buttons will be overlapped by the benefit divs //-->
         <% if benefit_application.draft? && benefit_application.benefit_packages.empty? %>
           <div class="benefit-group">
             <div class="panel benefitgroup col-xs-12">
@@ -260,7 +255,7 @@
         groups of employees.
       </h4>
       <br/>
-      <%=pundit_span @employer_profile, :updateable?%>
+      <%= pundit_span @employer_profile, :updateable?%>
         <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."}, id:'AddPlanYearBtn' %>
       </span>
   <% end %>

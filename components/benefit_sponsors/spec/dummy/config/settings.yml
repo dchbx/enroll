@@ -249,7 +249,7 @@ aca:
       ineligible_period_after_application_denial:
         days: 90
       quiet_period:
-        month_offset: 0
+        month_offset: -1
         mday: 28
 
     renewal_application:

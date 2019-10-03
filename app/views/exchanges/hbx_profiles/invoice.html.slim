@@ -1,9 +1,12 @@
 = render "ui-components/v1/navs/primary_nav.html.slim"
-.container
-  h1.heading-text Employers
-
-  = render_datatable(@datatable)
-
+#employerDataTable
+  .container
+    h1.heading-text Employers
+    = render_datatable(@datatable)
+#generateInvoice
   javascript:
     initializeDataTables()
     disableSelectric = true
+
+
+

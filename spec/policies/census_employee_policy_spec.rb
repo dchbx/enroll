@@ -1,33 +1,45 @@
 require "rails_helper"
 require "spec_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+
 
 describe CensusEmployeePolicy, dbclean: :after_each do
   subject { described_class }
-  let(:employer_profile){ FactoryBot.create(:employer_profile)}
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+  let(:employer_profile){abc_profile}
   let(:person) { FactoryBot.create(:person) }
+  let!(:benefit_group) { current_benefit_package }
+  let!(:employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group) }
+  let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: employee.id) }
+  let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: employee)}
   let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
   let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
   let(:employer_staff_person) { FactoryBot.create(:person,:with_employer_staff_role) }
   let(:general_agency_person) { FactoryBot.create(:person,:with_general_agency_staff_role) }
 
-  before do 
+  before do
     allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
   end
 
   permissions :delink? do
     context "already linked" do
-      let(:employee) { FactoryBot.build(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "employee_role_linked") }
+      let(:employee_state) { "employee_role_linked"}
 
       context "with perosn with appropriate roles" do
         it "grants access when hbx_staff" do
+          employee.link_employee_role
           expect(subject).to permit(FactoryBot.create(:user, :hbx_staff, person: admin_person), employee)
         end
 
         it "grants access when broker" do
+          employee.link_employee_role
           expect(subject).to permit(FactoryBot.create(:user, :broker, person: broker_person), employee)
         end
 
         it "grants access when broker_agency_staff" do
+          employee.link_employee_role
           expect(subject).to permit(FactoryBot.create(:user, :broker_agency_staff, person: broker_person), employee)
         end
       end
@@ -38,7 +50,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
     end
 
     context "not linked" do
-      let(:employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
+      let(:employee_state) { "eligible"}
 
       it "denies access when hbx_staff" do
         expect(subject).not_to permit(FactoryBot.create(:user, :hbx_staff, person: admin_person), employee)
@@ -59,8 +71,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
   end
 
   permissions :update? do
-    let(:employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
-
+    let(:employee_state) { "eligible"}
     context "when is hbx_staff user" do
       let(:user) { FactoryBot.create(:user, :hbx_staff, person: admin_person) }
 
@@ -136,7 +147,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -156,7 +167,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is not staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -182,7 +193,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -202,7 +213,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "when employee is not staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -269,7 +280,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
   end
 
   permissions :show? do
-    let(:employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
+    let(:employee_state) { "eligible"}
 
     context "hbx_staff user" do
       let(:user) { FactoryBot.create(:user, :hbx_staff, person: admin_person) }
@@ -319,7 +330,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "employee is staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -333,7 +344,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "employee is not staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -352,7 +363,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "employee is staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: employee.benefit_sponsors_employer_profile_id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -366,7 +377,8 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         end
 
         context "employee is not staff of current user" do
-          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+
+          let(:employer_staff_role) {double(benefit_sponsor_employer_profile_id: EmployerProfile.new.id)}
           let(:employer_staff_roles) { [employer_staff_role] }
           before :each do
             allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
@@ -390,6 +402,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
         # return true if a.general_agency_profile.id == ga_id
         # in #show? of census_employee_policy
         before do
+          allow(user).to receive(:has_general_agency_staff_role?).and_return true
           allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employee.employer_profile]
           allow(user.person.general_agency_staff_roles.last).to receive(:general_agency_profile).and_return(general_agency_profile_double)
           allow(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:find_by_sponsor).with(CensusEmployee.first.employer_profile.id).and_return(organizations_scope_double)

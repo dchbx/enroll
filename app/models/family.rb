@@ -390,7 +390,7 @@ class Family
 
   # Get list of Individual and SHOP market {EnrollmentEligibilityReason EnrollmentEligibilityReasons} currently available to this family
   #
-  # @example Get the list of {EnrollmentEligibilityReason EnrollmentEligibilityReasons}
+  # @example Get the list of EnrollmentEligibilityReasonEnrollmentEligibilityReasons:
   #   model.current_ivl_eligible_open_enrollments
   #
   # @see current_ivl_eligible_open_enrollments
@@ -910,8 +910,7 @@ class Family
   end
 
   def has_aptc_hbx_enrollment?
-    enrollments = latest_household.hbx_enrollments.active rescue []
-    enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
+    hbx_enrollments.current_year.individual_market.with_aptc.present?
   end
 
   def self.by_special_enrollment_period_id(special_enrollment_period_id)

@@ -42,8 +42,7 @@
     <%= render 'users/security_question_responses/modal' %>
 
     <div class="content <%= controller_name %> content-bottom">
-
-        <%= yield %>
+      <%= content_for?(:single_column) ? yield(:single_column) : yield %>
     </div>
 
     <%= render partial: './ui-components/v1/layouts/footer' %>

@@ -41,7 +41,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       dependents = members.select{|m| m["dependent"].casecmp('YES').zero?}
       next if primary_member.nil?
       next if members.select{ |m| m["resident"] && m["resident"].casecmp('NO')&.zero? }.present?
-      next if members.select{ |m| m["incarcerated"] && m["incarcerated"].casecmp('YES')&.zero? }.present?
+      next if members.select{ |m| m["incarcerated"] && m["incarcerated"].casecmp('Y')&.zero? }.present?
       next if members.any?{ |m| m["citizen_status"].blank? || (m["citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["citizen_status"] == "not_lawfully_present_in_us")}
 
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first

@@ -35,7 +35,14 @@ module BenefitSponsors
       end
 
       def build_scope
-        criteria = { "family_members.person_id" => {"$in" => employee_person_ids }}
+        criteria = {
+          "family_members" => {
+            :$elemMatch => {
+              :is_primary_applicant => true,
+              :person_id => {"$in" => employee_person_ids}
+            }
+          }
+        }
         if @search_string
           person_id = Person.unscoped.where(Person.search_hash(@search_string)).limit(700).pluck(:_id)
           criteria = {

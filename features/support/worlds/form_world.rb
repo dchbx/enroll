@@ -16,15 +16,22 @@ module FormWorld
   end
 
   def generate_sic_codes
-    cz_pattern = Rails.root.join("db", "seedfiles", "fixtures", "sic_codes", "sic_code_*.yaml")
-
     Mongoid::Migration.say_with_time("Load SIC Codes") do
-      Dir.glob(cz_pattern).each do |f_name|
-        loaded_class_1 = ::SicCode
-        yaml_str = File.read(f_name)
-        data = YAML.load(yaml_str)
-        data.new_record = true
-        data.save!
+      if $sic_code_precache
+        ::SicCode.collection.insert_many($sic_code_precache)
+      else
+        sic_code_json_precache = []
+        cz_pattern = Rails.root.join("db", "seedfiles", "fixtures", "sic_codes", "sic_code_*.yaml")
+        Dir.glob(cz_pattern).each do |f_name|
+          loaded_class_1 = ::SicCode
+          yaml_str = File.read(f_name)
+          data = YAML.load(yaml_str)
+          data.new_record = true
+          data_as_json = data.as_json
+          sic_code_json_precache << data_as_json
+          ::SicCode.collection.insert_one(data_as_json)
+        end
+        $sic_code_precache = sic_code_json_precache
       end
     end
   end

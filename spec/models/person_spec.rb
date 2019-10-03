@@ -1434,4 +1434,54 @@ describe Person, :dbclean => :after_each do
 
     end
   end
+
+  describe 'get staff for general agency' do
+    let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:general_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+    let(:general_agency_profile) { general_agency_organization.general_agency_profile }
+
+    let(:ga_staff_people) { FactoryBot.create_list(:person, 5)}
+    let(:terminated_staff_member) { FactoryBot.create(:person)}
+    let(:pending_staff_member) { FactoryBot.create(:person)}
+
+    before do
+      ga_staff_people.each do |person|
+        FactoryBot.create(:general_agency_staff_role, general_agency_profile_id: general_agency_profile.id, person: person, general_agency_profile: general_agency_profile, aasm_state: 'active')
+      end
+      FactoryBot.create(:general_agency_staff_role, general_agency_profile_id: general_agency_profile.id, person: terminated_staff_member, general_agency_profile: general_agency_profile, aasm_state: 'general_agency_terminated')
+      FactoryBot.create(:general_agency_staff_role, general_agency_profile_id: general_agency_profile.id, person: pending_staff_member, general_agency_profile: general_agency_profile, aasm_state: 'general_agency_pending')
+    end
+
+    context 'finds all active staff for general agency with same general agency profile id' do
+      before do
+        @ga_staff = Person.staff_for_ga(general_agency_profile)
+      end
+      it "should return all active staff for ga" do
+        expect(@ga_staff.size).to eq(5)
+      end
+
+      it "should only return active staff for ga" do
+        @ga_staff.each do |staff|
+          expect(staff.general_agency_staff_roles.first.active?).to be true
+        end
+      end
+    end
+
+    context "finds all active & pending ga staff" do
+      before do
+        @ga_staff = Person.staff_for_ga_including_pending(general_agency_profile)
+      end
+
+      it "should return all active staff for ga" do
+        expect(@ga_staff.size).to eq(6)
+      end
+
+      it "should only return active & pending staff for ga" do
+        @ga_staff.each do |staff|
+          expect(staff.general_agency_staff_roles.first.is_open?).to be true
+        end
+      end
+
+    end
+  end
 end

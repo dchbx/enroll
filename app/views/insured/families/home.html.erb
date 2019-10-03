@@ -17,14 +17,26 @@
     <div class="col-md-8">
       <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
       <%= render partial: 'qle_detail' %>
-      <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present?%>
-      <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+      <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? %>
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+        <% enrollments = @all_hbx_enrollments_for_admin %>
+      <% else %>
+        <% enrollments = @hbx_enrollments %>
+      <% end %>
+      <%= render partial: "enrollment",
+                 :collection => enrollments,
+                 :as => :hbx_enrollment,
+                 locals: { read_only: false } %>
       <%= render partial: 'shop_for_plans_widget' %>
       <% if individual_market_is_enabled? %>
       <%= render partial: 'apply_for_medicaid_widget' %>
       <% end %>
     </div>
     <div class="col-md-4 right-column">
+      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+        <strong>Display All Enrollments?</strong>&nbsp;&nbsp;
+        <input type="checkbox" id="display_all_enrollments"> <br>
+      <% end %>
       <%= render 'right_column' %>
     </div>
   </div>

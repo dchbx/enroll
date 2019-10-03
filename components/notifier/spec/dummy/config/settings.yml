@@ -329,6 +329,7 @@ notices:
       zip_code: "20005"
 
   shop:
+    store_paper_notice: false
     attachments:
       envelope_without_address: "taglines.pdf"
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
@@ -340,6 +341,7 @@ notices:
       layout: "notifier/pdf_layout.html.erb"
 
   individual:
+    store_paper_notice: true
     attachments:
       blank_page_attachment: "blank.pdf"
       envelope_without_address: "taglines.pdf"

@@ -1,0 +1,50 @@
+<h3> General Agency Staff</h3>
+
+<% if ga_staff %>
+  <div class="table-border">
+    <table class="table">
+      <thead>
+        <th><%= l10n("first_name")%></th>
+        <th><%= l10n("last_name")%></th>
+        <th><%= l10n("email")%></th>
+        <th><%= l10n("phone")%></th>
+        <th><%= l10n("status")%></th>
+        <th><%= l10n("remove_role")%></th>
+      </thead>
+      <% ga_staff.each do |staff| %>
+            <tbody>
+              <td><%= staff.first_name.capitalize %></td>
+              <td><%= staff.last_name.capitalize %></td>
+              <td><%= staff.work_email_or_best %></td>
+              <td><%= staff.work_phone %></td>
+              <td>
+                <%= staff.has_pending_ga_staff_role?(@general_agency_profile.id) ? "Pending" : "Active"%>
+                <%= staff.user_id ? ' Linked  ' : ' Unlinked  ' %>
+                <% if staff.has_pending_ga_staff_role?(@general_agency_profile.id) %>
+                  <%= render "staff_approval_modal", staff: staff %>
+                  <%= link_to "approve", ('javascript:;'), class: "approve disable-link", data: {toggle: "modal", target: "#ga_staff_approval_#{staff.id}"} %>
+                <% end %>
+              </td>
+
+              <td>
+                <%= link_to(profiles_general_agencies_general_agency_staff_role_path(profile_id:@general_agency_profile.id, person_id: staff.id), :id => "destroy", :class => "disable-link", hidden: can_show_destroy?(current_user, staff), method: 'delete') do %>
+                  <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
+                <% end %>
+              </td>
+
+            </tbody>
+      <% end %>
+    </table>
+  </div>
+<% end %>
+
+
+<%= link_to 'Add General Agency Staff Role', new_profiles_general_agencies_general_agency_staff_role_path(profile_id:@general_agency_profile.id), disabled: disable_edit_general_agency?(current_user), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>
+
+<script>
+  var disable = <%= disable_edit_general_agency?(current_user) %>
+
+  if (disable){
+    $('.disable-link').css({'pointer-events': 'none', 'opacity': 0.5})
+  }
+</script>

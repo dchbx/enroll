@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -22,6 +24,8 @@ class QualifyingLifeEventKind
 
   # first_of_next_month: not subject to 15th of month effective date rule
   EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
+
+  EffectiveOnKindsWithCode = QualifyingLifeEventKind::EffectiveOnKinds.dup.map { |effective_on_kind| { name: effective_on_kind.humanize.titleize, code: effective_on_kind } }
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -61,6 +65,28 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
+  DEFAULT_QUALIFYING_LIFE_EVENTS = [
+    "Started a new job",
+    "Married",
+    "Entered into a legal domestic partnership",
+    "Had a baby",
+    "Adopted a child",
+    "Losing other health insurance",
+    "Divorced",
+    "A family member has died",
+    "Child losing or lost coverage due to age",
+    "Drop coverage due to new eligibility",
+    "Drop family member due to new eligibility",
+    "Moved or moving",
+    "Exceptional circumstances",
+    "Health plan contract violation",
+    "Court order to provide coverage for someone"
+  ]
+  
+
+  embeds_many :custom_qle_questions, as: :questionable
+
+
   field :event_kind_label, type: String
   field :action_kind, type: String
 
@@ -82,10 +108,14 @@ class QualifyingLifeEventKind
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
+  field :visibility, type: Symbol
+  field :visible_to_customer, type: Mongoid::Boolean, default: false
 
   index({action_kind: 1})
   index({market: 1, ordinal_position: 1 })
   index({start_on: 1, end_on: 1})
+
+  accepts_nested_attributes_for :custom_qle_questions
 
   # validates :effective_on_kinds,
   #           presence: true,
@@ -105,7 +135,29 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
+  # TODO: This scope should be update depdning on what the business definition of deactivation is
+  # At the moment, setting 'end on' is how they are deactivated.
+  scope :not_set_for_deactivation, ->{ where(end_on: nil).sort_by_title_alphabetical }
+  scope :sort_by_title_alphabetical, ->{ order('title ASC') }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
+  scope :within_current_start_on_end_on_dates, -> {
+    where(start_on: {"$lte" => TimeKeeper.date_of_record}, end_on: { "$gte" => TimeKeeper.date_of_record})
+  }
+  # Active vs visible_to_customer:
+  # In the current UI scopes in the QLEKind model,
+  # the scopes appearing to the end user have
+  # is_active set to true and are creatd with is_active = true by default.
+  # To non intrusively bring in
+  # the Custom Qle kinds, the new attribute visible_to_customer
+  # was added. That way, Custom QLE Kinds will only appear on the UI
+  # when they're confirmed as ready by business and visible_to_customer = true
+  scope :is_visible_to_customer, -> { where(visible_to_customer: true) }
+  # TODO: Need to determine what this scope should be. Perhaps all QLE Kinds should be
+  # editable. Or perhaps there needs to be a new action to determine their visibility
+  # to the customer, and only those where is_visible_to_customer set to false should be
+  # editable.
+  scope :editable, ->{where(is_active: false)}
+
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -159,6 +211,11 @@ class QualifyingLifeEventKind
     %w(employee_gaining_medicare employer_sponsored_coverage_termination).include? reason
   end
 
+  # Example of this is "Date that feds order that coverage starts". If not present, just show "Date of Event."
+  def show_event_kind_label_if_present
+    event_kind_label.to_s.length > 0 ? event_kind_label.to_s + ":" : "Date of Event:" 
+  end
+
   def is_moved_to_dc?
     #title == "I'm moving to the District of Columbia"
     reason == 'relocate'
@@ -185,45 +242,50 @@ class QualifyingLifeEventKind
     reason == "lost_access_to_mec"
   end
 
+  # TODO: This can be updated depending on business requirements
+  def qle_dropdown_label
+    edi_code.to_s + " | " + title.to_s
+  end
+
   class << self
     def shop_market_events
-      by_market_kind('shop').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => false).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def shop_market_events_admin
-      by_market_kind('shop').active.to_a
+      by_market_kind('shop').is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('shop').and(:is_self_attested.ne => true).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => false).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def fehb_market_events_admin
-      by_market_kind('fehb').active.to_a
+      by_market_kind('fehb').is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('fehb').and(:is_self_attested.ne => true).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => false).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_events_admin
-      by_market_kind('individual').active.to_a
+      by_market_kind('individual').is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('individual').and(:is_self_attested.ne => true).is_visible_to_customer.within_current_start_on_end_on_dates.to_a
     end
 
     def individual_market_events_without_transition_member_action
-      by_market_kind('individual').active.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kind('individual').is_visible_to_customer.within_current_start_on_end_on_dates.to_a.reject {|qle| qle.action_kind == "transition_member"}
     end
 
     def qualifying_life_events_for(role, hbx_staff = false)
@@ -232,11 +294,10 @@ class QualifyingLifeEventKind
       market_kind = 'shop'
       market_kind = 'individual' if role.is_a?(ConsumerRole) || role.is_a?(ResidentRole)
       market_kind = 'fehb' if role.is_a?(EmployeeRole) && role.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
-
       if hbx_staff
-        __send__(market_kind + '_market_events_admin')
+        send(market_kind + '_market_events_admin')
       else
-        __send__(market_kind + '_market_events')
+        send(market_kind + '_market_events')
       end
     end
   end

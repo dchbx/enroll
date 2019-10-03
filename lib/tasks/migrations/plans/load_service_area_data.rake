@@ -24,14 +24,16 @@ namespace :load_service_reference do
     end
   end
 
+  # will only create if the service areas are not present.
   desc "dc service areas"
-  task :dc_service_areas => :environment do
+  task :dc_service_areas, [:active_year] => :environment do |t, args|
     if Settings.site.key.to_s == "dc"
-      (2014..TimeKeeper.date_of_record.year).each do |year|
+      years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2020)
+      years.each do |year|
         puts "Creating Service areas for new model #{year}" unless Rails.env.test?
         ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
           issuer_profile = issuer_organization.issuer_profile
-          ::BenefitMarkets::Locations::ServiceArea.create!({
+          ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
              active_year: year,
              issuer_provided_code: "DCS001",
              covered_states: ["DC"],

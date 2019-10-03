@@ -13,10 +13,10 @@ cp = org.create_carrier_profile(id: "53e67210eb899a4603000010", abbrev: "DDPA", 
 org = Organization.new(office_locations: [hbx_office], fein: "020000000", legal_name: "Dentegra")
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000013", abbrev: "DTGA", hbx_carrier_id: "116180", ivl_health: false, ivl_dental: true, shop_health: false, shop_dental: false, issuer_hios_ids: ['96156'])
 
-org = Organization.new(office_locations: [hbx_office], fein: "030000000", legal_name: "Dominion")
+org = Organization.new(office_locations: [hbx_office], fein: "030000000", legal_name: "Dominion National")
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000016", abbrev: "DMND", hbx_carrier_id: "116184", ivl_health: false, ivl_dental: true, shop_health: false, shop_dental: false, issuer_hios_ids: ['92479'])
 
-org = Organization.new(office_locations: [hbx_office], fein: "050000000", legal_name: "BestLife")
+org = Organization.new(office_locations: [hbx_office], fein: "050000000", legal_name: "BEST Life")
 cp = org.create_carrier_profile(id: "53e67210eb899a460300001a", abbrev: "BLHI", hbx_carrier_id: nil, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: false, issuer_hios_ids: ['95051'])
 
 org = Organization.new(office_locations: [hbx_office], fein: "060000000", legal_name: "MetLife")

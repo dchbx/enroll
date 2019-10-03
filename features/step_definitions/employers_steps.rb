@@ -981,6 +981,17 @@ When(/^employer selects one of their employees on Employee Roster$/) do
   click_link census_employee.full_name
 end
 
+When(/^employer selects (.*) employee on Employee Roster$/) do |named_person|
+  person = people[named_person]
+  CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  expect(page).to have_content "Patrick Doe"
+  click_link census_employee.full_name
+end
+
+Then(/^employer should see enrollment tile$/) do
+  expect(page).to have_content('Coverage Selected')
+end
+
 Then(/^employer should see (terminated )?census employee's details$/) do |terminated|
   sleep(3)
   if terminated

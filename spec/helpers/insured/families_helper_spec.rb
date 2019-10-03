@@ -188,6 +188,32 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
     end
 
+    context "#qle_link_generator" do
+      let(:qle_kind_double) do
+        instance_double(
+          QualifyingLifeEventKind,
+          custom_qle_questions: nil,
+          id: 1,
+          title: "Fake Event",
+          event_kind_label: "Fake label",
+          is_self_attested: true,
+          tool_tip: "Fake tool tip"
+        )
+      end
+      let(:qle_kind_index) { 1 }
+
+      it "generates link for custom qle with custom_qle_questions" do
+        qle_kind_double.stub_chain(:custom_qle_questions, :present?).and_return(true)
+        questions_page_href = "href=\"/insured/families/1/custom_qle_question\""
+        expect(qle_link_generator(qle_kind_double, qle_kind_index)).to include(questions_page_href)
+      end
+
+      it "generates link for qle without custom_qle_questions" do
+        javascript_href = "href=\"javascript:void(0)\""
+        expect(qle_link_generator(qle_kind_double, qle_kind_index)).to include(javascript_href)
+      end
+    end
+
     context "#build_link_for_sep_type" do
       it "returns nil if sep nil" do
         expect(helper.build_link_for_sep_type(nil)).to be_nil

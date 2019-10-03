@@ -11,6 +11,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
   let(:product_kinds)  { [:health, :dental] }
   let(:dental_sponsored_benefit) { true }
   let(:roster_size) { 2 }
+  let(:current_effective_date) { start_on }
   let(:start_on) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
   let(:effective_period) { start_on..start_on.next_year.prev_day }
   let(:ce) { benefit_sponsorship.census_employees.non_business_owner.first }

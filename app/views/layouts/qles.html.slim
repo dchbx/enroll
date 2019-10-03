@@ -1,0 +1,5 @@
+= render "ui-components/v1/navs/primary_nav", :active_tab => "home-tab"
+= render template: 'layouts/single_column'
+
+- content_for :single_column do
+  = yield

@@ -1,0 +1,49 @@
+fieldset
+  legend = l10n("personal_information")
+
+  .row
+    .col-md-4.mb-2
+      label for="inputFirstname"   #{l10n('first_name')} *
+      = f.text_field :first_name, placeholder:'First Name', required:'true', id:'inputFirstname', class:'form-control'
+      .invalid-feedback
+
+        = l10n("invalid_first_name")
+
+    .col-md-4.mb-2
+      label for="inputLastname"  #{l10n('last_name')} *
+      = f.text_field :last_name, placeholder:'Last Name', required:'true', id:'inputLastname', class:'form-control'
+      .invalid-feedback
+
+        = l10n("invalid_last_name")
+
+    .col-md-4.mb-2
+      label for="inputDOB"  #{l10n('date_of_birth')} *
+      = f.text_field :dob, placeholder: 'MM/DD/YYYY', required: 'true', id: 'inputStaffDOB', class:'form-control', onblur:'validDob(this)'
+      .invalid-feedback
+
+        = l10n("invalid_dob")
+
+    .col-md-4.mb-2
+      label for="inputEmail"  #{l10n('email')} *
+      = f.email_field :email, placeholder:'Email', required:'true', id:'inputEmail', class:'form-control'
+      .invalid-feedback
+
+        = l10n("invalid_email")
+
+
+javascript:
+  var cleave = new Cleave('#inputDOB', {
+    date: true,
+    datePattern: ['m', 'd', 'Y']
+  });
+
+  function validDob(element) {
+    if (element.value && element.value.length < 10) {
+      swal({
+        title: "Invalid DOB Format",
+        text: "DOB must be entered as MM/DD/YYYY",
+        icon: "warning"
+      }),
+      element.value = ''
+    }
+  }

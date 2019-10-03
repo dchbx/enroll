@@ -8,12 +8,12 @@ module BenefitSponsors
    # include_context "setup benefit market with market catalogs and product packages"
 
     routes { BenefitSponsors::Engine.routes }
-    let(:site) { BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market }
+    let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
     let(:benefit_market) { site.benefit_markets.first }
     let(:effective_period) { (effective_period_start_on..effective_period_end_on) }
     # let(:premium_tabels) { FactoryBot.create(:benefit_markets_products_premium_table, rating_area: ben_app1.recorded_rating_area_id)}
     let!(:current_benefit_market_catalog) do
-      BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
       benefit_market.benefit_market_catalogs.where(
         "application_period.min" => effective_period_start_on
       ).first

@@ -8,7 +8,7 @@ attributes: !ruby/hash:BSON::Document
   created_at: 2015-10-09 23:55:44.525000000 Z
   dba: 
   hbx_id: 5f6a8c5f8d144700946da4308b7a9262
-  legal_name: Dominion
+  legal_name: Dominion National
   updated_at: 2015-10-09 23:55:44.525000000 Z
   site_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-

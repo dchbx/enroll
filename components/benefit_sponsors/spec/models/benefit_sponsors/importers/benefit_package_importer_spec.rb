@@ -36,12 +36,18 @@ module BenefitSponsors::Importers
     }
 
 
-    let(:reference_plan) { health_products[0] }
+    let(:reference_plan) do
+      BenefitMarkets::Products::Product.where(
+        "application_period.min" => current_benefit_market_catalog.application_period.min,
+        :_type => /Health/i
+      ).first
+    end
 
     let(:product_kinds)  { [:health, :dental] }
     let(:catalog_dental_package_kinds) { [:multi_product] }
 
     let(:new_application) {
+      current_benefit_market_catalog
       application = benefit_sponsorship.benefit_applications.new(
         effective_period: (current_effective_date..current_effective_date.next_year.prev_day)
         )
@@ -95,11 +101,24 @@ module BenefitSponsors::Importers
           dental_plan_option_kind: "single_plan",
           dental_reference_plan_hios_id: dental_reference_plan.hios_id,
           dental_relationship_benefits: dental_relationship_benefits,
-          elected_dental_plan_hios_ids: dental_products.pluck(:hios_id)
+          elected_dental_plan_hios_ids: dental_hios_ids
         }
       }
 
-      let(:dental_reference_plan) { dental_products[0] }
+      let(:dental_hios_ids) do
+        BenefitMarkets::Products::Product.where(
+          "application_period.min" => current_benefit_market_catalog.application_period.min,
+          :_type => /Dental/i
+        ).pluck(:hios_id)
+      end
+
+      let(:dental_reference_plan) do
+        BenefitMarkets::Products::Product.where(
+          "application_period.min" => current_benefit_market_catalog.application_period.min,
+          :_type => /Dental/i,
+          "product_package_kinds" => "multi_product"
+        ).first
+      end
 
       let(:dental_relationship_benefits) {
         [

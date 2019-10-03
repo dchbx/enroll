@@ -32,6 +32,10 @@ class FamilyPolicy < ApplicationPolicy
     false
   end
 
+  def can_view_entire_family_enrollment_history?
+    return true if user.person.hbx_staff_role
+  end
+
   def can_modify_family?(user_person)
     hbx_staff_role = user_person.hbx_staff_role
     return false unless hbx_staff_role

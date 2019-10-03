@@ -33,6 +33,3 @@ Scenario: HBX Staff with Super Admin subroles and a time travel ability enabled 
   And the user is on the Main Page
   And the user goes to the Config Page
   Then the user will see the Time Tavel option
-
-
-

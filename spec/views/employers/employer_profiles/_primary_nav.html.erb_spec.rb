@@ -120,14 +120,11 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS GeneralAgency" do
   let(:person) { FactoryBot.create(:person,:with_ssn, :first_name=>'fred', :last_name=>'flintstone'  )}
   let(:current_user) { FactoryBot.create(:user, :roles => ['general_agency_staff'], :person => person) }
   before :each do
-    # general_agency = FactoryBot.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
-    # staff = general_agency.general_agency_profile.general_agency_staff_roles.last
-    staff = FactoryBot.create(:general_agency_staff_role, person: person)
+    staff = FactoryBot.create(:general_agency_staff_role, person: person, is_primary: true)
     staff.person.emails.last.update(kind: 'work')
-    user = FactoryBot.create(:user, :roles => ['general_agency_staff'], :person => staff.person)
-
     @employer_profile = employer_profile
-    sign_in user
+    sign_in current_user
+    allow(current_user).to receive(:has_general_agency_staff_role?).and_return true
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
   end
   it "should display the standard tabs for Employer [broker and employer control]" do
@@ -140,7 +137,6 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS GeneralAgency" do
     expect(rendered).to match(/tab=benefits/)
     expect(rendered).to match(/tab=documents/)
     expect(rendered).to match(/tab=brokers/)
-    expect(rendered).to match(/tab=families/)
   end
   it "should show different tabs when Broker not employer" do
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)

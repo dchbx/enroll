@@ -1,4 +1,6 @@
 require 'rails_helper'
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
 
 module BenefitSponsors
   RSpec.describe BenefitPackages::BenefitPackagesController, type: :controller, dbclean: :after_each do
@@ -9,14 +11,23 @@ module BenefitSponsors
     let!(:benefit_markets_location_service_area) { FactoryBot.create_default(:benefit_markets_locations_service_area) }
     let!(:security_question)  { FactoryBot.create_default :security_question }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
-    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
 
     let(:benefit_market)      { site.benefit_markets.first }
-    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                            benefit_market: benefit_market,
-                                            title: "SHOP Benefits for #{current_effective_date.year}",
-                                            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                          }
+    let!(:benefit_market_catalog) do
+      bmc_id = BenefitSponsors::ProductSpecHelpers.construct_simple_benefit_market_catalog(
+        site,
+        benefit_market,
+        (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
+      )
+      BenefitMarkets::BenefitMarketCatalog.find(bmc_id)
+    end
+      
+     # create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+      #                                      benefit_market: benefit_market,
+       #                                     title: "SHOP Benefits for #{current_effective_date.year}",
+        #                                    application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+         #                                 }
 
     # let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
     let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }

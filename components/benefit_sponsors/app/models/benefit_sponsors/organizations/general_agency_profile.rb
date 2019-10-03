@@ -15,7 +15,6 @@ module BenefitSponsors
 
       MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
 
-      field :entity_kind, type: String
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
       field :primary_broker_role_id, type: BSON::ObjectId
@@ -67,7 +66,12 @@ module BenefitSponsors
       end
 
       def primary_staff
+        # TODO: need replace this with general_agency_primary_staff
         general_agency_staff_roles.present? ? general_agency_staff_roles.last : nil
+      end
+
+      def general_agency_primary_staff
+        general_agency_staff_roles.present? ? general_agency_staff_roles.select { |role| role.is_primary }.first : nil
       end
 
       def current_staff_state

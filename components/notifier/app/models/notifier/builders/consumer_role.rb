@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 module Notifier
   module Builders
     class ConsumerRole
@@ -33,12 +32,21 @@ module Notifier
       end
 
       def first_name
-        merge_model.first_name = consumer_role.person.first_name if consumer_role.present?
+        merge_model.first_name =
+          if uqhp_notice? && consumer_role.present?
+            consumer_role.person.first_name
+          else
+            payload['notice_params']['primary_member']['first_name'].titleize
+         end
       end
 
       def last_name
-        merge_model.last_name = consumer_role.person.last_name if
-        consumer_role.present?
+        merge_model.last_name =
+          if uqhp_notice? && consumer_role.present?
+            consumer_role.person.last_name
+          else
+            payload['notice_params']['primary_member']['last_name'].titleize
+          end
       end
 
       def primary_fullname
@@ -68,7 +76,7 @@ module Notifier
           if uqhp_notice?
             consumer_role.person.age_on(TimeKeeper.date_of_record)
           else
-            (Date.current.year - Date.strptime(payload['notice_params']['primary_member']['dob'],"%m-%d-%Y").year)
+            age_of_aqhp_person(TimeKeeper.date_of_record, Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y"))
           end
       end
 
@@ -197,7 +205,7 @@ module Notifier
       end
 
       def incarcerated
-        merge_model.incarcerated = payload['notice_params']['primary_member']['incarcerated'] == 'N' ? 'No' : 'Yes'
+        merge_model.incarcerated = (payload['notice_params']['primary_member']['incarcerated'] == 'N' || payload['notice_params']['primary_member']['incarcerated'] == '') ? 'No' : 'Yes'
       end
 
       def irs_consent
@@ -301,7 +309,7 @@ module Notifier
       end
 
       def aptc_is_zero?
-        aptc.present? && aptc.to_i.zero?
+        aptc.present? && aptc.gsub(/\D/, ' ').to_f.zero?
       end
 
       def aqhp_or_non_magi_medicaid?
@@ -326,7 +334,7 @@ module Notifier
         csr
       end
 
-      def aqhp_event_and_irs_consent_not_needed?
+      def aqhp_event_and_irs_consent_no?
         return false if uqhp_notice?
 
         aqhp_event? && !irs_consent?

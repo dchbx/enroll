@@ -19,6 +19,24 @@ class TimeKeeper
     a_time.in_time_zone("Eastern Time (US & Canada)").to_date
   end
 
+  def self.exchange_zone
+    "Eastern Time (US & Canada)"
+  end
+
+  def self.start_of_exchange_day_from_utc(date)
+    start_of_day = date.beginning_of_day
+    Time.use_zone(exchange_zone) do
+      Time.zone.local(start_of_day.year, start_of_day.month, start_of_day.day, 0,0,0)
+    end.utc
+  end
+
+  def self.end_of_exchange_day_from_utc(date)
+    start_of_next_day = (date + 1.day).beginning_of_day
+    Time.use_zone(exchange_zone) do
+      Time.zone.local(start_of_next_day.year, start_of_next_day.month, start_of_next_day.day, 0,0,0)
+    end.utc
+  end
+
   def self.set_date_of_record(new_date)
     new_date = new_date.to_date
     if instance.date_of_record != new_date

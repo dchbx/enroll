@@ -32,3 +32,10 @@ Then(/^the user will see the Time Tavel option$/) do
   expect(page).to have_button('Set Current Date', disabled: false)
 end
 
+Then(/^the user will not see the Manage QLEs link$/) do
+  page.should have_link('Manage QLEs'), disabled: true
+end
+
+Then(/^the user will see the Manage QLEs link$/) do
+  page.should have_link('Manage QLEs'), disabled: false
+end

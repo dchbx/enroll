@@ -132,6 +132,14 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
         expect(helper.sep_optional_date(family, 'max', 'shop')).to eq(plan_year.end_on)
       end
 
+      it "returns minmum range as start_date of plan_year when market kind is shop" do
+        expect(helper.sep_optional_date(family, 'min', 'fehb')).to eq(plan_year.start_on)
+      end
+
+      it "returns maximum range as end_date of plan_year when market kind is shop" do
+        expect(helper.sep_optional_date(family, 'max', 'fehb')).to eq(plan_year.end_on)
+      end
+
       it "returns minimum range as nil when market kind is nil" do
         expect(helper.sep_optional_date(family, 'min', nil)).to eq nil
       end

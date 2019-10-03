@@ -187,15 +187,11 @@ module BenefitSponsors
         end
 
         context "when renewal product available for health only" do
-          let!(:dental_products) do
-            create_list(
-              :benefit_markets_products_dental_products_dental_product,
-              5,
-              application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-              product_package_kinds: [:single_product],
-              service_area: service_area,
-              metal_level_kind: :dental
-            )
+          before :each do
+            BenefitMarkets::Products::Product.where({
+              "application_period.min" => renewal_benefit_market_catalog.application_period.min,
+              "_type" => /Dental/i
+            }).delete_all
           end
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
@@ -225,15 +221,12 @@ module BenefitSponsors
         end
 
         context "when renewal product available for dental only" do
-          let!(:health_products) do
-            create_list(
-              :benefit_markets_products_health_products_health_product,
-              5,
-              application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-              product_package_kinds: [:single_issuer, :metal_level, :single_product],
-              service_area: service_area,
-              metal_level_kind: :gold
-            )
+
+          before :each do
+            BenefitMarkets::Products::Product.where({
+              "application_period.min" => renewal_benefit_market_catalog.application_period.min,
+              "_type" => /Health/i
+            }).delete_all
           end
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
@@ -263,26 +256,10 @@ module BenefitSponsors
         end
 
         context "when renewal product not available for both health and dental" do 
-          let!(:health_products) do
-            create_list(
-              :benefit_markets_products_health_products_health_product,
-              5,
-              application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-              product_package_kinds: [:single_issuer, :metal_level, :single_product],
-              service_area: service_area,
-              metal_level_kind: :gold
-            )
-          end
-
-          let!(:dental_products) do
-            create_list(
-              :benefit_markets_products_dental_products_dental_product,
-              5,
-              application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-              product_package_kinds: [:single_product],
-              service_area: service_area,
-              metal_level_kind: :dental
-            )
+          before :each do
+            BenefitMarkets::Products::Product.where({
+              "application_period.min" => renewal_benefit_market_catalog.application_period.min
+            }).delete_all
           end
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }

@@ -12,16 +12,17 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :around_each do
   let(:product_kinds)  { [:health, :dental] }
   let(:roster_size) { 2 }
   let(:start_on) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
-  let(:effective_period) {start_on..start_on.next_year.prev_day}
+  let(:current_effective_date) { start_on }
+  let(:effective_period) { start_on..start_on.next_year.prev_day }
 
   let(:ce) { benefit_sponsorship.census_employees.non_business_owner.first }
 
-  let!(:family) {
+  let!(:family) do
     person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
     employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: abc_profile)
     ce.update_attributes({employee_role: employee_role})
     Family.find_or_build_from_employee_role(employee_role)
-  }
+  end
 
   let(:person) { family.primary_applicant.person }
   let(:effective_on) { start_on }

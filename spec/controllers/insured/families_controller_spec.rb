@@ -41,10 +41,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hbx_enrollments) { double("HbxEnrollment") }
+  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today) }
   let(:user) { FactoryBot.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
-  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
+  let(:person) do
+    double(
+      "Person",
+      id: "test",
+      addresses: [],
+      no_dc_address: false,
+      no_dc_address_reason: "",
+      is_consumer_role_active?: false,
+      has_active_employee_role?: true,
+      has_multiple_roles?: false
+    )
+  end
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family", id: 1) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
@@ -58,6 +69,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
 
   before :each do
+    allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_home_page_hidden_enrollments(family)).and_return(
+      HbxEnrollment.family_home_page_hidden_enrollments(family) + [hbx_enrollments]
+    )
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
@@ -72,6 +86,36 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
+  end
+
+  describe "GET home variables" do
+    context "HBX admin variables to show all enrollments" do
+      let(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_family, :with_hbx_staff_role) }
+      let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:testing_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+      let(:testing_enrollments) do
+        5.times do
+          instance_double("HbxEnrollment", family_id: testing_family.id)
+        end
+      end
+      let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
+
+      it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user_with_hbx_staff_role.person.id)
+        sign_in(user_with_hbx_staff_role)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to include("all_hbx_enrollments_for_admin")
+      end
+
+      it "should not assign all_hbx_enrollments_for_admin for non hbx admin user" do
+        testing_family.stub_chain('primary_applicant.person_id').and_return(user.person.id)
+        allow_any_instance_of(Person).to receive(:has_multiple_roles?).and_return(false)
+        allow(testing_family).to receive(:person).and_return(user.person)
+        sign_in(user)
+        get :home, params: {:family => testing_family.id.to_s}
+        expect(assigns.keys).to_not include("all_hbx_enrollments_for_admin")
+      end
+    end
   end
 
   describe "GET home" do
@@ -1023,5 +1067,59 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     it "should get terminate" do
       expect(assigns(:terminate)).to eq 'terminate'
     end
+  end
+end
+
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:qle_kind) do
+    FactoryBot.create(
+      :qualifying_life_event_kind,
+      :with_one_question_and_accepted_and_declined_responses
+    )
+  end
+
+  before :each do
+    sign_in(user)
+  end
+
+  describe "GET custom_qle_question" do
+    it "should only render question 1 by default" do
+      custom_qle_action_params = {id: qle_kind.id, family: family}
+      get :custom_qle_question, params: custom_qle_action_params
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "POST verify_custom_qle_question" do
+    # Condition that date needs to meet to qualify (these are in the file custom_qle_validator.rb,
+    # which in itself is addapted code from the families_controller.rb#check_qle_date)
+    # @qualified_date = (@start_date <= @qle_date && @qle_date <= @end_date) ? true : false
+    # @start_date = @today - 30.days
+    # @end_date = @today + 30.days
+    # TODO: Not working currently
+    xit "redirects to home if QLE date does not qualify" do
+      verify_custom_qle_question_params = {
+        questions_and_responses: {
+          family_id: family.id,
+          qle_kind_id: qle_kind.id,
+          qle_date: TimeKeeper.date_of_record - 1.year, # Doesn't qualify
+          custom_qle_question_id: qle_kind.custom_qle_questions.first.id,
+          end_user_selected_response_content: 'accepted'
+        }
+      binding.pry
+      post :verify_custom_qle_question, params: verify_custom_qle_question_params
+    end
+
+    it "redirects to insured_family_members_path if accepted question response submitted" do
+
+    end
+
+    it "redirects to custom_qle_question_insured_family_path with question 2 as instance variable if to_question_2 question response submitted" do
+
+    end
+
   end
 end

@@ -1513,3 +1513,36 @@ describe "terminated_enrollments", dbclean: :after_each do
     expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_termination_pending", "coverage_terminated"]
   end
 end
+
+shared_examples_for 'has aptc enrollment' do |created_at, applied_aptc, market_kind, result|
+  let(:family) { FactoryBot.build(:family, :with_primary_family_member) }
+  let(:enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      family: family,
+      household: household,
+      coverage_kind: "health",
+      kind: market_kind,
+      created_at: created_at,
+      enrollment_kind: "open_enrollment",
+      applied_aptc_amount: applied_aptc
+    )
+  end
+
+
+  it "should return #{result}" do
+    expect(family.has_aptc_hbx_enrollment?).to eq result
+  end
+
+  context 'enrollment is shop' do
+    it_behaves_like "has aptc enrollment", Date.new(1,1, TimeKeeper.date_of_record.year), 0.0, 'employer_sponsored', false
+  end
+
+  context 'current year individual applied aptc enrollment' do
+    it_behaves_like "has aptc enrollment", Date.new(1,1, TimeKeeper.date_of_record.year), 50.0, 'individual', true
+  end
+
+  context 'previous year individual applied aptc enrollment' do
+    it_behaves_like "has aptc enrollment", Date.new(1,1, (TimeKeeper.date_of_record.year - 1)), 50.0, 'individual', false
+  end
+end

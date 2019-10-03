@@ -96,6 +96,7 @@ class Person
   after_create :create_inbox
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
+  scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
 
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
@@ -161,6 +162,10 @@ class Person
     SymmetricEncryption.encrypt(ssn_val)
   end
 
+  def active_general_agency_staff_roles
+    general_agency_staff_roles.where(:aasm_state => :active)
+  end
+
   def has_active_employer_staff_role?
     employer_staff_roles.present? and employer_staff_roles.active.present?
   end
@@ -179,6 +184,10 @@ class Person
 
   def self.decrypt_ssn(val)
     SymmetricEncryption.decrypt(val)
+  end
+
+  def general_agency_primary_staff
+    general_agency_staff_roles.present? ? general_agency_staff_roles.where(is_primary: true).first : nil
   end
 
   # Strip non-numeric chars from ssn
@@ -211,7 +220,7 @@ class Person
   def update_full_name
     full_name
   end
-  
+
   def full_name
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
@@ -278,6 +287,10 @@ class Person
         })
     end
 
+    def general_agencies_matching_search_criteria(search_str)
+      general_agency_staff_certified.search_first_name_last_name_npn(search_str)
+    end
+
     def match_existing_person(personish)
       return nil if personish.ssn.blank?
       Person.where(:encrypted_ssn => encrypt_ssn(personish.ssn), :dob => personish.dob).first
@@ -326,6 +339,41 @@ class Person
                              {broker_agency_profile_id: broker_profile.id}
                            ]
                          }
+                     })
+    end
+
+    def staff_for_ga(general_agency_profile)
+      Person.where(:general_agency_staff_roles =>
+                     {
+                       '$elemMatch' =>
+                         {
+                           aasm_state: :active,
+                           '$or' => [
+                             {benefit_sponsors_general_agency_profile_id: general_agency_profile.id},
+                             {general_agency_profile_id: general_agency_profile.id}
+                           ]
+                         }
+                     })
+    end
+
+    def staff_for_ga_including_pending(general_agency_profile)
+      Person.where(:general_agency_staff_roles =>
+                     {
+                       '$elemMatch' => {
+                         '$and' => [
+                           {
+                             '$or' => [
+                               {benefit_sponsors_general_agency_profile_id: general_agency_profile.id}
+                             ]
+                           },
+                           {
+                             '$or' => [
+                               {aasm_state: :general_agency_pending},
+                               {aasm_state: :active}
+                             ]
+                           }
+                         ]
+                       }
                      })
     end
 

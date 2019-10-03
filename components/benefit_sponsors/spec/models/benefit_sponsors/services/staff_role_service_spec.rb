@@ -11,7 +11,9 @@ module BenefitSponsors
     let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
     let(:broker_agency_profile) { broker_organization.broker_agency_profile }
-
+    let!(:general_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+    let(:general_agency_profile) { general_agency_organization.general_agency_profile }
+    let!(:primary_general_agency_staff_role) {FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true, aasm_state: 'active')}
 
     # let!(:employer_profile) {benefit_sponsor.employer_profile}
     let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
@@ -110,6 +112,44 @@ module BenefitSponsors
 
         it 'should not add broker staff role' do
           expect(subject.add_profile_representative!(staff_role_form)).to eq [false, "you are already associated with this Broker Agency"]
+        end
+      end
+
+      context "adding general agency staff role for new person" do
+        before do
+          person.general_agency_staff_roles << primary_general_agency_staff_role
+        end
+        let!(:new_person) { FactoryBot.create(:person) }
+        let(:staff_role_form) do
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: general_agency_profile.id,
+                                                                               profile_type: "general_agency_staff",
+                                                                               first_name: new_person.first_name,
+                                                                               last_name: new_person.last_name,
+                                                                               dob: new_person.dob.to_s,
+                                                                               email: "steve@gmail.com")
+        end
+
+        it 'should add ga staff role for general agency profile' do
+          expect(subject.add_profile_representative!(staff_role_form)).to eq [true, new_person]
+        end
+      end
+
+      context "adding person to general agency in which he is already a staff" do
+        before do
+          person.general_agency_staff_roles << primary_general_agency_staff_role
+        end
+        let(:staff_role_form) do
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(profile_id: general_agency_profile.id,
+                                                                               profile_type: "general_agency_staff",
+                                                                               first_name: person.first_name,
+                                                                               last_name: person.last_name,
+                                                                               dob: person.dob.to_s,
+                                                                               email: "steve@gmail.com")
+        end
+
+
+        it 'should not add ga staff role' do
+          expect(subject.add_profile_representative!(staff_role_form)).to eq [false, "you are already associated with this General Agency"]
         end
       end
     end
@@ -263,6 +303,31 @@ module BenefitSponsors
 
     end
 
+    describe ".general_agency_search!", dbclean: :after_each do
+      context 'when general agency profile is in approved state' do
+
+        let(:staff_role_form) do
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(filter_criteria: {"q" => general_agency_profile.legal_name},
+                                                                               is_general_agency_registration_page: "true")
+        end
+        it "should return result if general agency profile is approved" do
+          general_agency_profile.update_attributes!(aasm_state: "is_approved")
+          expect(subject.general_agency_search!(staff_role_form)).to eq [general_agency_profile]
+        end
+      end
+
+      context 'when general agency profile is not in approved state' do
+        let(:staff_role_form) do
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(filter_criteria: {"q" => general_agency_profile.legal_name},
+                                                                               is_general_agency_registration_page: "true")
+        end
+        it "should return empty result if general agency profile is not approved" do
+          expect(subject.general_agency_search!(staff_role_form)).to eq []
+        end
+      end
+
+    end
+
     describe ".add_broker_agency_staff_role", dbclean: :after_each  do
 
       let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
@@ -325,6 +390,64 @@ module BenefitSponsors
       end
     end
 
+    describe ".add_general_agency_staff_role", dbclean: :after_each  do
+      let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
+      let(:person1) {FactoryBot.create(:person, person_params)}
+
+      context 'duplicate person PII' do
+        before do
+          FactoryBot.create(:person, person_params)
+          @status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
+        end
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+      end
+
+      context 'zero matching person PII' do
+        before {@status, @result = subject.add_general_agency_staff_role('sam', person1.last_name, person1.dob,'#default@email.com', general_agency_profile)}
+
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+      end
+
+      context 'matching one person PII' do
+        before {@status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)}
+
+        it 'returns true' do
+          expect(@status).to eq true
+        end
+
+        it 'returns the person' do
+          expect(@result).to eq person1
+        end
+      end
+
+      context 'person already has general agency staff role with this general agency' do
+        before do
+          subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
+          @status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
+        end
+
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns the person' do
+          expect(@result).to be_instance_of String
+        end
+      end
+    end
+
     describe ".deactivate_broker_agency_staff_role" do
       let(:person) {FactoryBot.create(:person)}
       let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
@@ -372,6 +495,49 @@ module BenefitSponsors
       end
     end
 
+    describe ".deactivate_general_agency_staff_role" do
+      let(:person) {FactoryBot.create(:person)}
+      let!(:ga_organization)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+      let(:general_agency_profile) { ga_organization.general_agency_profile }
+      let!(:ga_organization_second) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+      let(:general_agency_profile_second) { ga_organization_second.general_agency_profile }
+      before do
+        FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, person: person, general_agency_profile: general_agency_profile, aasm_state: 'active')
+      end
 
+      context 'finds the person and deactivates the role' do
+        before do
+          @status, @result = subject.deactivate_general_agency_staff_role(person.id, general_agency_profile.id)
+        end
+        it 'returns true' do
+          expect(@status).to be true
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+
+        it 'should terminate general agency staff role' do
+          expect(person.reload.general_agency_staff_roles.first.aasm_state).to eq "general_agency_terminated"
+        end
+      end
+
+      context 'person does not have general agency staff role' do
+        before do
+          @status, @result = subject.deactivate_general_agency_staff_role(person.id, general_agency_profile_second.id)
+        end
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+
+        it 'should not terminate other broker agency staff role' do
+          expect(person.reload.general_agency_staff_roles.first.aasm_state).to eq "active"
+        end
+      end
+    end
   end
 end

@@ -23,6 +23,10 @@ PreCommit:
   RuboCop:
     enabled: true
 
+  GitSecrets:
+    enabled: true
+    command: ['git/hooks/git-secrets']
+
 #  TrailingWhitespace:
 #    enabled: true
 #    exclude:

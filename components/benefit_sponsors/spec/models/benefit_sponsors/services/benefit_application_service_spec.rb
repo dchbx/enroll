@@ -243,7 +243,7 @@ module BenefitSponsors
         }
       end
       let!(:current_benefit_market_catalog) do
-        BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+        BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
         benefit_market.benefit_market_catalogs.where(
           "application_period.min" => effective_period.min.to_s
         ).first

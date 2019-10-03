@@ -37,7 +37,7 @@
     padding: 0;
     font-size: 12px;
     text-align: center;
-      
+
     h4 {
       font-weight: 600;
       font-size: 14px;
@@ -97,7 +97,7 @@
         display: block !important;
     }
   }
-  
+
 }
 
 #application-dates {
@@ -116,7 +116,7 @@
   }
   .panel-heading {
     background-color: transparent;
-    
+
     h3 {
       font-weight: bold;
       color: #333333;
@@ -132,12 +132,12 @@
     display: inline-block;
     width: (13em / 14);
     height: 1em;
-    
+
     .fa-calendar,
     #benefit_application_latest_submitted_on_day, #benefit_application_latest_submitted_on_month, #binder_payment_deadline_day, #binder_payment_deadline_month {
       position: absolute;
     }
-    
+
     #benefit_application_latest_submitted_on_day, #binder_payment_deadline_day {
       top:42px;
       left: (4em / 8);
@@ -150,7 +150,7 @@
       text-align: center;
       color:$mhc-orange;
     }
-    
+
     #benefit_application_latest_submitted_on_month, #binder_payment_deadline_month {
       top:70px;
       left: (18em / 8);
@@ -244,7 +244,7 @@
     .rp-view-summary {
       display:none;
     }
-    
+
   }
 }
 
@@ -393,7 +393,7 @@
       background: $mhc-dark-blue;
       cursor: pointer;
   }
-  
+
   /* The container */
   .sc-container {
       display: block;
@@ -459,7 +459,7 @@
       -ms-transform: rotate(45deg);
       transform: rotate(45deg);
   }
-  
+
 }
 
 
@@ -471,9 +471,9 @@
     margin: 0;}
 
 
-/* Hides number spinner for mozilla */  
+/* Hides number spinner for mozilla */
    input[type=number] {-moz-appearance: textfield;}
-   
+
    input[type=range] {border:none !important;}
 
 .reference-plans, .multiProductOptions {
@@ -486,7 +486,7 @@
     padding: 0 0 5px 0;
     color: #333333;
     background-color: transparent;
-    
+
     h3 {
       font-size: 12px;
       margin-bottom: 0;
@@ -694,4 +694,12 @@
   .tool-tip [disabled] {
     pointer-events: none;
   }
+}
+
+.general-agency-staff th {
+  text-align: center;
+}
+
+.general-agency-staff td {
+  text-align: center;
 }

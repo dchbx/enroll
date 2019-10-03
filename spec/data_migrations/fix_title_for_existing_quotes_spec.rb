@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "fix_title_for_existing_quotes")
 
-describe FixTitleForExistingQuotes, dbclean: :after_each do
+describe FixTitleForExistingQuotes, dbclean: :around_each do
 
   let(:given_task_name) { "fix_title_for_existing_quotes" }
   subject { FixTitleForExistingQuotes.new(given_task_name, double(:current_scope => nil)) }
@@ -12,7 +12,7 @@ describe FixTitleForExistingQuotes, dbclean: :after_each do
     end
   end
 
-  describe "fix title for existing quotes", dbclean: :after_each do
+  describe "fix title for existing quotes", dbclean: :around_each do
     let(:broker_agency) { FactoryBot.create(:broker_agency_profile)}
     let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, :with_profile, owner_profile_id: broker_agency.id) }
     let(:proposal) { plan_design_organization.plan_design_proposals.first }

@@ -154,6 +154,10 @@ describe FamilyPolicy, "given a user who has the modify family permission" do
   it "can show" do
     expect(subject.show?).to be_truthy
   end
+
+  it "can can_view_entire_family_enrollment_history" do
+    expect(subject.can_view_entire_family_enrollment_history?).to be_truthy
+  end
 end
 
 describe FamilyPolicy, 'given a family with an active broker with only broker role' do

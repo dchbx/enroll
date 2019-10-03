@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notify
   include Acapi::Notifiers
 
@@ -16,7 +18,6 @@ module Notify
     Rails.logger(e)
   end
 
-  # return {"status" =>"created/changed", "first_name" => ["before", "now"]}
   def payload(obj, field:)
     return nil unless obj.send(field)
 

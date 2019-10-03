@@ -199,8 +199,10 @@
             p
               | $
               input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}"
-      input#max_aptc style=("display: none") value="#{@max_aptc}"
-      input#set_elected_aptc_url style=("display: none") value=("#{set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?}")
+      = hidden_field_tag :max_aptc, @max_aptc
+      = hidden_field_tag :market_kind, @market_kind
+      = hidden_field_tag :coverage_kind, @coverage_kind
+      = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
       form oninput=("pct.value = (elected_pct.value*100).toFixed(0)") onsubmit=("return false")
         input max="1" min="0" name="elected_pct" step="0.05" type="range" value="0.85"
         span

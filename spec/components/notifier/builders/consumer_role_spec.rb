@@ -17,7 +17,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
                            "primary_member" => data.detect{ |m| m["dependent"].casecmp('NO').zero? }.to_hash}}
     end
 
-    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Test", last_name: "Data") }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Test", last_name: "Data", middle_name: "M", name_sfx: "Jr") }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
     subject do
@@ -28,12 +28,33 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     context "Model attributes" do
-      it "should have first name from payload" do
-        expect(subject.first_name).to eq(payload["notice_params"]["primary_member"]["first_name"])
+
+      context 'first name' do
+        it 'should get first name from person object for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(true)
+          expect(subject.first_name).to eq(person.first_name)
+        end
+
+        it 'should get first name from payload for projected aqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(false)
+          expect(subject.first_name).to eq(payload["notice_params"]["primary_member"]["first_name"])
+        end
       end
 
-      it "should have last name from payload" do
-        expect(subject.last_name).to eq(payload["notice_params"]["primary_member"]["last_name"])
+      context 'last name' do
+        it 'should get last name from person object for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(true)
+          expect(subject.last_name).to eq(person.last_name)
+        end
+
+        it 'should get last name from payload for projected aqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(false)
+          expect(subject.last_name).to eq(payload["notice_params"]["primary_member"]["last_name"])
+        end
+      end
+
+      it "should have full name from person object" do
+        expect(subject.primary_fullname).to eq(person.full_name)
       end
 
       it "should have aptc from payload" do
@@ -43,11 +64,36 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       it "should have incarcerated from payload" do
         expect(subject.incarcerated).to eq("No")
       end
+
+      context 'age' do
+        it 'should get age from person object for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(true)
+          expect(subject.age).to eq(person.age_on(TimeKeeper.date_of_record))
+        end
+
+        it 'should get age from payload for projected aqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(false)
+          expect(subject.age).to eq(subject.age_of_aqhp_person(TimeKeeper.date_of_record, Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y")))
+        end
+      end
+
+      context 'irs_consent' do
+        it 'should return false for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(true)
+          expect(subject.irs_consent).to eq(false)
+        end
+
+        it 'should get age from payload for projected aqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(false)
+          expect(subject.irs_consent).to eq(payload['notice_params']['primary_member']['irs_consent'].casecmp('YES').zero?)
+        end
+      end
     end
 
     context "Model dependent attributes" do
       it "should have dependent filer type attributes" do
         expect(subject.dependents.first['filer_type']).to eq('Filers')
+        expect(subject.dependents.last['filer_type']).to eq('Married Filing Separately')
         expect(subject.dependents.count).to eq(2)
       end
 
@@ -108,6 +154,27 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
       it "should have csr_is_100?" do
         expect(subject.csr_is_100?).to eq(false)
+      end
+
+      it "should return false if APTC amount is greater than 0" do
+        expect(subject.aptc_is_zero?).to eq(false)
+      end
+
+      it "should return true if APTC amount is $0" do
+        allow(subject).to receive(:aptc).and_return "$0"
+        expect(subject.aptc_is_zero?).to eq(true)
+      end
+
+      context 'aqhp_event_and_irs_consent_no?' do
+        it 'should always return false for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(true)
+          expect(subject.aqhp_event_and_irs_consent_no?).to eq(false)
+        end
+
+        it 'should return  for projected uqhp notice' do
+          allow(subject).to receive(:uqhp_notice?).and_return(false)
+          expect(subject.aqhp_event_and_irs_consent_no?).to eq(false)
+        end
       end
     end
 

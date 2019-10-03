@@ -1,0 +1,24 @@
+<div class="modal fade" id="ga_staff_approval_<%= staff.id %>" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal" type="button">&times;</button>
+        <h4 class="modal-title">Approve This Employee?</h4>
+      </div>
+      <div class="modal-body">
+        <p>By authorizing this employee to access your book of business on DC Health Link,
+          <strong>
+            you are attesting that your employee has completed the applicable privacy training and that you will ensure that your employee will comply with all applicable privacy and security policies,
+          </strong>
+           including annual employee training as indicated on the
+           <a href="https://hbx.dc.gov/page/dc-health-link-broker-attestations" target="_blank">DC Health Link Broker Attestation.</a>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-dismiss="modal" type="button">DON'T APPROVE</button>
+        <%= link_to 'CONTINUE & APPROVE'.html_safe, approve_profiles_general_agencies_general_agency_staff_role_path(profile_id:@general_agency_profile.id, person_id: staff.id), class: "btn btn-primary  mtz" %>
+      </div>
+    </div>
+  </div>
+</div>

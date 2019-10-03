@@ -43,13 +43,11 @@ module BenefitSponsors
     end
 
     def is_general_agency_staff_for_employer?(profile)
-      # TODO: Need to fix this after updating general agency account
-      if general_agency_staff_role = user.person.general_agency_staff_roles.first
-        general_agency_account = profile.general_agency_accounts.active.first
-        return false if general_agency_account.blank?
-        general_agency_profile = general_agency_account.general_agency_profile
-        return false if general_agency_profile.blank?
-        general_agency_profile.general_agency_staff_roles.select{|role| role.id == general_agency_staff_role.id}.present?
+      staff_roles = user.person.active_general_agency_staff_roles
+      if staff_roles
+        ga_profiles = staff_roles.map(&:benefit_sponsors_general_agency_profile_id)
+        return false if profile.general_agency_accounts.blank?
+        profile.general_agency_accounts.any? {|acc|  ga_profiles.include?(acc.benefit_sponsrship_general_agency_profile_id)}
       else
         false
       end

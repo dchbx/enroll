@@ -48,6 +48,7 @@ module Factories
       clone_enrollment.issuer_profile_id = enrollment.issuer_profile_id
       assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
       clone_enrollment.benefit_group_assignment_id = assignment.id
+      clone_enrollment.hbx_enrollment_members = clone_enrollment_members
 
       if enrollment.sponsored_benefit_package.benefit_application.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
@@ -59,7 +60,6 @@ module Factories
       end
 
       clone_enrollment.generate_hbx_signature
-      clone_enrollment.hbx_enrollment_members = clone_enrollment_members
       clone_enrollment
     end
 

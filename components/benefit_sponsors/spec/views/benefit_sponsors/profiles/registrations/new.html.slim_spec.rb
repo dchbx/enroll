@@ -15,6 +15,7 @@ RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, db
   let(:agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'benefit_sponsor', portal: true) }
 
   before :each do
+    current_benefit_market_catalog
     view.extend Pundit
     view.extend BenefitSponsors::Engine.routes.url_helpers
     @profile_type = 'benefit_sponsor'

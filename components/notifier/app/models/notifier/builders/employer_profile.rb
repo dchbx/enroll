@@ -121,7 +121,7 @@ module Notifier
     end
 
     def total_amount_due
-      merge_model.total_amount_due = number_to_currency(submitted_benefit_application.enrollments_till_given_effective_on(current_sys_date.next_month.beginning_of_month).map(&:total_premium).sum)
+      merge_model.total_amount_due = number_to_currency(submitted_benefit_application.enrollments_till_given_effective_on(current_sys_date.next_month.beginning_of_month).reject{|enr| enr.aasm_state == "inactive"}.map(&:total_premium).sum)
     end
 
     def date_due

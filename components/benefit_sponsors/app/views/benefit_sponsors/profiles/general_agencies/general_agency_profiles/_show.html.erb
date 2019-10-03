@@ -5,7 +5,7 @@
       <div class="container bottom-pd">
         <h3><%= l10n("general_agency")%> : <%= @general_agency_profile.organization.legal_name %></h3>
         <% if current_user.has_general_agency_staff_role? || current_user.has_hbx_staff_role? %>
-          <%= link_to "Edit General Agency Profile", edit_profiles_registration_path(@general_agency_profile.id), class: 'btn btn-primary ' %>
+          <%= link_to "Edit General Agency Profile", edit_profiles_registration_path(@general_agency_profile.id), class: 'btn btn-primary', disabled: disable_edit_general_agency?(current_user) %>
         <% end %>
         <p></p>
         <div class="table-border table-responsive">
@@ -27,6 +27,7 @@
 
         <%#= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/genral_agency_contacts", broker_agency_contacts: @general_agency_profile.genral_agency_contacts %>
         <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/office_locations", office_locations: @general_agency_profile.office_locations %>
+        <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/general_agency_staff_table", ga_staff: Person.staff_for_ga_including_pending(@general_agency_profile) %>
       </div>
     </div>
   </div>

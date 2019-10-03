@@ -48,7 +48,7 @@ describe "import_provider_and_rx_formulary_url" do
 
   end
 
-  xcontext "common_data_from_master_xml" do # TODO Fix Spec after task fixed.
+  context "common_data_from_master_xml" do
     it "should be nil for plan" do
       expect(@plan.rx_formulary_url).to eq nil
       expect(@plan.provider_directory_url).to eq nil
@@ -60,22 +60,27 @@ describe "import_provider_and_rx_formulary_url" do
       expect(@health_product2.provider_directory_url).to eq nil
     end
 
-    it "should run task" do
-      invoke_url_tasks
-      @plan.reload
-      @health_product2.reload
-    end
+    context "when import master excel" do
+      let(:product_name) { "TEST Blue $1,000 Deductible" }
+      let(:plan_name) { "TEST Blue Premium" }
+      before(:all) do
+        invoke_url_tasks
+      end
 
-    it "should update plan attributes" do
-      expect(@plan.rx_formulary_url).to eq "http://#{@row_info[13]}"
-      expect(@plan.provider_directory_url).to eq @row_info[14]
-      expect(@plan.network_information).to eq @row_info[11]
-    end
+      it "should update plan attributes" do
+        @plan.reload
+        expect(@plan.rx_formulary_url).to eq "http://#{@row_info[13]}"
+        expect(@plan.provider_directory_url).to eq @row_info[14]
+        expect(@plan.network_information).to eq @row_info[11]
+        expect(@plan.name).to eq plan_name
+      end
 
-    it "should update product attributes" do
-      expect(@health_product2.rx_formulary_url).to eq "http://#{@row_info[13]}"
-      expect(@health_product2.provider_directory_url).to eq @row_info[14]
-      expect(@health_product2.product_package_kinds).to eq [:metal_level, :single_issuer, :single_product]
+      it "should update product attributes" do
+        @health_product2.reload
+        expect(@health_product2.rx_formulary_url).to eq "http://#{@row_info[13]}"
+        expect(@health_product2.provider_directory_url).to eq @row_info[14]
+        expect(@health_product2.title).to eq product_name
+      end
     end
   end
 end

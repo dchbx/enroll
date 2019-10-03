@@ -1,8 +1,14 @@
+require File.expand_path(File.join(File.dirname(__FILE__), "../../../components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers"))
+
 module SiteWorld
 
   def site(*traits)
     attributes = traits.extract_options!
-    @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key, attributes)
+    if attributes.empty?
+      @site ||= ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
+    else
+      @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key, attributes)
+    end
   end
 
   def reset_product_cache

@@ -197,8 +197,8 @@ class Invitation
     UserMailer.renewal_invitation_email(invitation_email, census_employee, self).deliver_now
   end
 
-  def send_agent_invitation!(invitee_name)
-    UserMailer.agent_invitation_email(invitation_email, invitee_name, self).deliver_now
+  def send_agent_invitation!(invitee_name, person_id=nil)
+    UserMailer.agent_invitation_email(invitation_email, invitee_name, self, person_id).deliver_now
   end
 
   def send_broker_invitation!(invitee_name)
@@ -312,7 +312,7 @@ class Invitation
         :source_id => staff_role.id,
         :invitation_email => staff_role.email_address
       )
-      invitation.send_agent_invitation!(staff_role.parent.full_name)
+      invitation.send_agent_invitation!(staff_role.parent.full_name, staff_role.parent.id)
       invitation
     end
   end

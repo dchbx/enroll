@@ -14,6 +14,7 @@ RSpec.describe 'Components::Notifier::Builders::DependentService', :dbclean => :
        "event_object_kind" => "ConsumerRole",
        "event_object_id" => "5bcdec94eab5e76691000cec",
        "notice_params" => {"dependents" => data.select{ |m| m["dependent"].casecmp('YES').zero? }.map(&:to_hash),
+
                            "primary_member" => data.detect{ |m| m["dependent"].casecmp('NO').zero? }.to_hash}}
     end
 
@@ -47,7 +48,7 @@ RSpec.describe 'Components::Notifier::Builders::DependentService', :dbclean => :
       end
 
       it "should have member age from payload" do
-        expect(aqhp_dependent.age).to eq(Date.current.year - Date.parse(member['dob']).year)
+        expect(aqhp_dependent.age).to eq(Date.current.year - Date.strptime(member['dob'], '%m/%d/%Y').year)
       end
     end
   end

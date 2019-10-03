@@ -165,7 +165,8 @@
       </div>
       <div class="col-xs-3 right-section pull-right">
         <% if @change_plan.blank?  && @market_kind == "individual" %>
-          <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+          <% if @enrollment_kind.blank? && (is_under_open_enrollment? || @family.special_enrollment_periods.last.effective_date.month == TimeKeeper.date_of_record.month) %>
+            This is hitting the conditions for individual progress bar.
             <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
           <% else %>
             <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>

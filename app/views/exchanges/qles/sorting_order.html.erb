@@ -1,0 +1,6 @@
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+ <admin-qle-kind-sorting-order-form
+  data-qle-kind-sorting-order-url="<%= sorting_order_exchanges_qles_path %>"
+  data-qle-kind-market-kinds="<%= QualifyingLifeEventKind::MARKET_KINDS.to_json %>">
+ </admin-qle-kind-sorting-order-form>

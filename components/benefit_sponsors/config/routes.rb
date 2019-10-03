@@ -64,6 +64,14 @@ BenefitSponsors::Engine.routes.draw do
         end
       end
 
+      resources :general_agency_staff_roles do
+        collection do
+          get :search_general_agency
+        end
+        member do
+          get :approve
+        end
+      end
     end
     namespace :employers do
       resources :employer_profiles, only: [:show] do

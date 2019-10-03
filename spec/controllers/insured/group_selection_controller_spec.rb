@@ -8,10 +8,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     #include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:site) { BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market }
+  let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
   let(:benefit_market) { site.benefit_markets.first }
   let!(:current_benefit_market_catalog) do
-    BenefitSponsors::ProductSpecHelpers.construct_cca_simple_benefit_market_catalog(site, benefit_market, effective_period)
+    BenefitSponsors::ProductSpecHelpers.construct_simple_benefit_market_catalog(site, benefit_market, effective_period)
     benefit_market.benefit_market_catalogs.where(
       "application_period.min" => effective_period.min
     ).first

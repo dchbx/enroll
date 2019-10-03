@@ -4,6 +4,8 @@
 
 class Notifier::Services::DependentService
 
+  include Notifier::ConsumerRoleHelper
+
   def initialize(is_uqhp_notice, member)
     @is_uqhp_notice = is_uqhp_notice
     @payload_member = member
@@ -39,7 +41,7 @@ class Notifier::Services::DependentService
     if is_uqhp_notice
       person.age_on(TimeKeeper.date_of_record).presence || nil
     else
-      Date.current.year - Date.parse(payload_member['dob']).year
+      age_of_aqhp_person(TimeKeeper.date_of_record, Date.strptime(payload_member['dob'], '%m/%d/%Y'))
     end
   end
 

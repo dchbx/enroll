@@ -61,6 +61,19 @@ Rails.application.routes.draw do
   get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
+    resources :qles, only: [:new, :create, :edit, :update] do
+      member do
+        get :deactivation_form
+        get :question_flow
+        post :question_flow
+        put :deactivate
+      end
+      collection do
+        get :manage
+        get :sorting_order
+        post :sorting_order
+      end
+    end
 
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
@@ -93,11 +106,16 @@ Rails.application.routes.draw do
 
     resources :hbx_profiles do
       root 'hbx_profiles#show'
-
       collection do
         post :reinstate_enrollment
         get :family_index
         get :family_index_dt
+        get :custom_qle_answer
+        post :custom_qle_answer
+        get :build_attestation_flow
+        post :build_attestation_flow
+        get :create_qle_answer
+        post :create_qle_answer
         get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
@@ -241,6 +259,8 @@ Rails.application.routes.draw do
       member do
         delete 'delete_consumer_broker'
         get 'generate_out_of_pocket_url'
+        get 'custom_qle_question'
+        post 'verify_custom_qle_question'
       end
 
       collection do

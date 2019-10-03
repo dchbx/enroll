@@ -74,4 +74,48 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
     end
   end
 
+  context "with general agency staff role" do
+    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
+    let!(:general_agency_profile)    { benefit_sponsor.general_agency_profile }
+    let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: 'active', person: person)}
+    let!(:person) { FactoryBot.create(:person) }
+
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["general_agency_staff"]) }
+
+    it "should have one portal link" do
+      allow(user).to receive(:has_general_agency_staff_role?).and_return(true)
+      sign_in(user)
+      render 'shared/my_portal_links'
+      expect(rendered).to have_content('My General Agency Portal')
+      expect(rendered).to_not have_selector('dropdownMenu1')
+    end
+  end
+
+  context "with general agency staff and employer role" do
+    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
+    let!(:general_agency_profile)    { benefit_sponsor.general_agency_profile }
+    let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: 'active', person: person)}
+    let!(:person) { FactoryBot.create(:person, :with_employer_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["general_agency_staff", "employer_staff"]) }
+
+    let(:general_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile) }
+    let(:employer_profile)    { general_organization.employer_profile }
+    let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+    let(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+
+    it "should have one portal link" do
+      allow(user).to receive(:has_general_agency_staff_role?).and_return(true)
+      allow(employer_profile).to receive(:active_benefit_sponsorship).and_return(benefit_sponsorship)
+      employer_profile.reload
+      sign_in(user)
+      render 'shared/my_portal_links'
+      expect(rendered).to have_content(general_agency_profile.legal_name)
+      expect(rendered).to have_content(employer_profile.legal_name)
+      expect(rendered).to have_selector('.dropdown-menu')
+      expect(rendered).to have_selector('.dropdown-menu')
+    end
+  end
+
 end

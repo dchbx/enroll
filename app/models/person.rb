@@ -201,6 +201,17 @@ class Person
   index({"broker_role.broker_agency_id" => 1})
   index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
+  index({"general_agency_staff_roles.npn" => 1}, {sparse: true})
+  index({"general_agency_staff_roles.is_primary" => 1}, {sparse: true})
+  index({"general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1}, {sparse: true})
+
+  index({"first_name" => 1, "last_name" => 1, "broker_role.npn" => 1}, {name: "first_name_last_name_broker_npn_search"})
+  index({"first_name" => 1, "last_name" => 1, "general_agency_staff_roles.npn" => 1}, {name: "first_name_last_name_ga_npn_search"})
+
+  index({
+          "general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1,
+          "general_agency_staff_roles.is_primary" => 1
+        }, {name: "agency_search_by_id_and_is_primary"})
 
   # Employer role index
   index({"employer_staff_roles._id" => 1})
@@ -265,10 +276,11 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
+  # scope :general_agency_primary_staff,     -> { where("general_agency_staff_roles.is_primary" => { "$eq" => true })}
+
   scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending] })}
   scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending] })}
   scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
-
 
 #  ViewFunctions::Person.install_queries
 
@@ -279,7 +291,11 @@ class Person
 
 
   def active_general_agency_staff_roles
-    general_agency_staff_roles.select(&:active?)
+    general_agency_staff_roles.where(:aasm_state => :active)
+  end
+
+  def has_active_general_agency_staff_role?
+    !active_general_agency_staff_roles.empty?
   end
 
   def contact_addresses
@@ -638,12 +654,26 @@ class Person
                                     }).size > 0
   end
 
+  def has_pending_ga_staff_role?(general_agency_profile_id)
+    general_agency_staff_roles.where({
+                                      aasm_state: :general_agency_pending,
+                                      '$or' => [
+                                        {benefit_sponsors_general_agency_profile_id: general_agency_profile_id},
+                                        {general_agency_profile_id: general_agency_profile_id}
+                                      ]
+                                    }).size > 0
+  end
+
   def active_broker_staff_roles
     broker_agency_staff_roles.where(:aasm_state => :active)
   end
 
   def has_active_broker_staff_role?
     !active_broker_staff_roles.empty?
+  end
+
+  def general_agency_primary_staff
+    general_agency_staff_roles.present? ? general_agency_staff_roles.where(is_primary: true).first : nil
   end
 
   class << self
@@ -690,9 +720,14 @@ class Person
         "$or" => ([
           {"first_name" => s_rex},
           {"last_name" => s_rex},
-          {"broker_role.npn" => s_rex}
+          {"broker_role.npn" => s_rex},
+          {"general_agency_staff_roles.npn" => s_rex}
           ] + additional_exprs(clean_str))
         })
+    end
+
+    def general_agencies_matching_search_criteria(search_str)
+      general_agency_staff_certified.search_first_name_last_name_npn(search_str)
     end
 
     # Find all employee_roles.  Since person has_many employee_roles, person may show up
@@ -816,6 +851,20 @@ class Person
                      })
     end
 
+    def staff_for_ga(general_agency_profile)
+      Person.where(:general_agency_staff_roles =>
+                     {
+                       '$elemMatch' =>
+                         {
+                           aasm_state: :active,
+                           '$or' => [
+                             {benefit_sponsors_general_agency_profile_id: general_agency_profile.id},
+                             {general_agency_profile_id: general_agency_profile.id}
+                           ]
+                         }
+                     })
+    end
+
     def staff_for_employer_including_pending(employer_profile)
       if employer_profile.is_a? (EmployerProfile)
         self.where(:employer_staff_roles => {
@@ -847,6 +896,27 @@ class Person
                            {
                              '$or' => [
                                {aasm_state: :broker_agency_pending},
+                               {aasm_state: :active}
+                             ]
+                           }
+                         ]
+                       }
+                     })
+    end
+
+    def staff_for_ga_including_pending(general_agency_profile)
+      Person.where(:general_agency_staff_roles =>
+                     {
+                       '$elemMatch' => {
+                         '$and' => [
+                           {
+                             '$or' => [
+                               {benefit_sponsors_general_agency_profile_id: general_agency_profile.id}
+                             ]
+                           },
+                           {
+                             '$or' => [
+                               {aasm_state: :general_agency_pending},
                                {aasm_state: :active}
                              ]
                            }

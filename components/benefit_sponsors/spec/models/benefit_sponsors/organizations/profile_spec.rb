@@ -10,7 +10,7 @@ module BenefitSponsors
     let(:fein)              { "100001001" }
     let(:entity_kind)       { :c_corporation }
     let(:contact_method)    { :paper_and_electronic }
-    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                 site: site,
                                 hbx_id: hbx_id,
