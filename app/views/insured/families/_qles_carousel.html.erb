@@ -35,7 +35,7 @@
         <div class="item <%= 'active' if count == 0 %>">
           <ul class="list-qle">
             <% qles.each_with_index do |qle, index| %>
-              <p class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generater(qle, index) %></p>
+              <p class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generator(qle, index) %></p>
             <% end %>
           </ul>
         </div>

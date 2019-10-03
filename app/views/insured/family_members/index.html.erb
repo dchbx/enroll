@@ -44,7 +44,6 @@
             </div>
           </div>
         </div>
-
         <br>
         <div class="row no-buffer">
           <ul class="" id="dependent_ul">
@@ -57,7 +56,8 @@
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
           <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
             <%= link_to l10n('add_member'), new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
-            <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], change_plan_date: @change_plan_date) %>
+            <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], change_plan_date: @change_plan_date,
+              enrollment_kind: @family.special_enrollment_periods.covering_today.count > 0 ? 'sep' : '') %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
 
             <% if @change_plan.present? %>
@@ -80,9 +80,14 @@
             url: group_selection_url
           } %>
         <% else %>
+          <% if @consumer_role.present? && (is_under_open_enrollment? || @family.special_enrollment_periods.covering_today.count > 0) %>
+            <% individual_link_url =  group_selection_url %>
+          <% else %>
+            <% individual_link_url = find_sep_url %>
+          <% end %>
           <%= render  partial: 'shared/individual_progress', locals: {
             step: '3',
-            url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
+            url: individual_link_url
           } %>
         <% end %>
       </div>

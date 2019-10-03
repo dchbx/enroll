@@ -34,5 +34,59 @@ FactoryBot.define do
       effective_on_kinds { ["date_of_event", "first_of_next_month"] }
       tool_tip { "Enroll or add a family member due to birth" }
     end
+
+    trait :with_one_question_and_accepted_and_declined_responses do
+      after(:create) do |qlek, evaluator|
+        first_custom_qle_question = qlek.custom_qle_questions.build(
+          content: "Please, we need clarification, when did this event occur?"
+        )
+        first_custom_qle_question.save!
+        first_custom_qle_question = qlek.custom_qle_questions.last
+        first_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
+          content: "Recently",
+          action_to_take: 'accepted'
+        )
+        first_qle_question_response_1.save!
+        first_qle_question_response_2 = first_custom_qle_question.custom_qle_responses.build(
+          content: "No idea",
+          action_to_take: 'declined'
+        )
+        first_qle_question_response_2.save!
+      end
+    end
+
+    trait :with_two_questions_accepted_two_question_two_responses_and_accepted_and_declined_responses do
+      after(:create) do |qlek, evaluator|
+        first_custom_qle_question = qlek.custom_qle_questions.build(
+          content: "Please, we need clarification, when did this event occur?"
+        )
+        first_custom_qle_question.save!
+        first_custom_qle_question = qlek.custom_qle_questions.last
+        first_qle_question_response_1 = first_custom_qle_question.custom_qle_responses.build(
+          content: "Recently",
+          action_to_take: 'accepted'
+        )
+        first_qle_question_response_1.save!
+        first_qle_question_response_2 = first_custom_qle_question.custom_qle_responses.build(
+          content: "I'll have to think about it.",
+          action_to_take: 'two_question_two'
+        )
+        first_qle_question_response_2.save!
+        second_custom_qle_question = qlek.custom_qle_questions.build(
+          content: "Let's try this again. When did this event occur?"
+        )
+        second_custom_qle_question.save!
+        second_custom_qle_question = qlek.custom_qle_questions.last
+        second_qle_question_response_1 = second_qle_question_response_1.custom_qle_responses.build(
+          content: "Recently",
+          action_to_take: 'accepted'
+        )
+        second_qle_question_response_1.save!
+        second_qle_question_response_1 = second_qle_question_response_1.custom_qle_responses.build(
+          content: "Not sure.",
+          action_to_take: 'declined'
+        )
+      end
+    end
   end
 end

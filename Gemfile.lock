@@ -257,12 +257,15 @@ GEM
     benchmark-perf (0.5.0)
     benchmark-trend (0.3.0)
     bindex (0.7.0)
+    binding_of_caller (0.8.0)
+      debug_inspector (>= 0.0.1)
     bootsnap (1.4.4)
       msgpack (~> 1.0)
     bson (4.5.0)
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
+    byebug (11.0.1)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -325,6 +328,7 @@ GEM
     cliver (0.3.2)
     cocaine (0.6.0)
       terrapin (= 0.6.0)
+    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.2.2)
@@ -371,6 +375,7 @@ GEM
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
     database_cleaner (1.7.0)
+    debug_inspector (0.0.3)
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -625,6 +630,20 @@ GEM
       capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    pry-byebug (3.7.0)
+      byebug (~> 11.0)
+      pry (~> 0.10)
+    pry-rails (0.3.9)
+      pry (>= 0.10.4)
+    pry-remote (0.1.8)
+      pry (~> 0.9)
+      slop (~> 3.0)
+    pry-stack_explorer (0.4.9.3)
+      binding_of_caller (>= 0.7)
+      pry (>= 0.9.11)
     public_suffix (3.1.0)
     puma (3.12.1)
     pundit (2.0.1)
@@ -671,6 +690,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
+    rb-readline (0.5.5)
     rdoc (6.1.1)
     recaptcha (4.14.0)
       json
@@ -809,6 +829,7 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
+    slop (3.6.0)
     sneakers (1.1.2)
       bunny (>= 1.7.0, <= 2.0.0)
       serverengine (~> 1.5.5)
@@ -924,6 +945,7 @@ DEPENDENCIES
   curl (~> 0.0.9)
   database_cleaner (~> 1.7)
   devise (~> 4.5)
+  dry-auto_inject (~> 0.6.1)
   effective_datatables!
   email_spec (~> 2)
   eye (= 0.8)
@@ -963,11 +985,17 @@ DEPENDENCIES
   parallel_tests (~> 2.26.2)
   poltergeist (~> 1.18.0)
   prawn!
+  pry
+  pry-byebug
+  pry-rails
+  pry-remote
+  pry-stack_explorer
   puma (~> 3.11)
   pundit (~> 2.0)
   railroady (~> 1.5.3)
   rails (~> 5.2.3)
   rails-controller-testing
+  rb-readline
   recaptcha (~> 4.13)
   recurring_select
   redcarpet (~> 3.4)

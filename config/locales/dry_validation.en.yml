@@ -97,3 +97,6 @@ en:
       not_found: "was not found"
       broker_person_identity_available: 'broker identity unavailable'
       only_one_mailing_office_location: 'must have only one mailing office location'
+      duplicate_title: "title must be unique"
+      reason_is_invalid: "reason is not valid"
+      end_on_present: "end on date must be present"

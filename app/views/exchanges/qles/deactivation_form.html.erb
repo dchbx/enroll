@@ -1,0 +1,8 @@
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+ <admin-qle-kind-deactivation-form 
+  data-qle-kind-to-deactivate="<%= @qle.to_json %>"
+  data-qle-kind-deactivate-url="<%= deactivate_exchanges_qle_path(@qle) %>"
+>
+
+ </admin-qle-kind-deactivation-form >

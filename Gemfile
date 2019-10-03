@@ -28,6 +28,8 @@ gem 'database_cleaner',       '~> 1.7'
 
 #######################################################
 
+gem 'pry'
+
 #######################################################
 # Local components/engines
 #######################################################
@@ -105,6 +107,7 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
+gem 'dry-auto_inject', '~> 0.6.1'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
@@ -143,6 +146,12 @@ group :development, :test do
   gem 'yard-mongoid',           '~> 0.1',     require: false
   gem 'rails-controller-testing'
   gem 'climate_control', '~> 0.2.0'
+  gem 'rb-readline'
+  gem 'pry'
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'pry-remote'
+  gem 'pry-stack_explorer'
 end
 
 group :test do

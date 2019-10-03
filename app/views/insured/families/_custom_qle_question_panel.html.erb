@@ -1,0 +1,41 @@
+<div class='container top-padding-20px'>
+  <%# Form %>
+  <div class='panel panel-primary'>
+    <div class='panel-heading'>
+      <strong>
+        Verification Question(s)
+      </strong>
+    </div>
+    <div class='panel-body'>
+      <div class="form-group">
+        <%= form_with url: verify_custom_qle_question_insured_family_path(@qle_kind.id), scope: 'question_and_responses' do |f| %>
+          <p>
+            <strong><%= @qle_kind.show_event_kind_label_if_present %></strong> 
+          </p>
+          <%# This is the date that the event took place (I.E. Birth of Child) %>
+          <%# Hide if the date is present- I.E. on the second question after the user has put in the date %>
+          <%= f.text_field(:qle_date, value: @qle_date, class: @qle_date.present? ? 'hidden' : '') %>
+          <%= f.hidden_field(:family_id, value: @family._id.to_s) %>
+          <%= f.hidden_field(:qle_kind_id, value: @qle_kind._id.to_s) %>
+          <%= f.hidden_field(:custom_qle_question_id, value: @qle_question._id.to_s) %>
+          <% if params[:only_display_question_two].present? %>
+            <h4>
+              <%= second_qle_question_message %>
+            </h4>
+          <% end %>
+          <p>Question: <%= @qle_question.content %></p>
+          <%= f.select(
+              :end_user_selected_response_content,
+              @qle_question.custom_qle_responses.map(&:content),
+              {},
+              {class: 'response-content-options'}
+            )
+          %>
+          <div class="actions">
+            <%= f.submit('Submit', class: 'btn btn-primary') %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

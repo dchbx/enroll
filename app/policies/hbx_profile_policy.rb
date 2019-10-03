@@ -25,6 +25,13 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_submit_time_travel_request
   end
 
+  def can_add_custom_qle?
+    role = user_hbx_staff_role
+    return false unless role
+    return false unless role
+    role.permission.can_add_custom_qle
+  end
+
   def send_broker_agency_message?
     role = user_hbx_staff_role
     return false unless role
@@ -51,7 +58,6 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def can_modify_plan_year?
     return true unless (role = user.person.hbx_staff_role)
-
     role.permission.can_modify_plan_year
   end
 
@@ -164,14 +170,12 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def can_access_user_account_tab?
     return @user.person.hbx_staff_role.permission.can_access_user_account_tab if @user&.person && @user.person.hbx_staff_role
-
     false
   end
 
   def can_add_pdc?
     role = user_hbx_staff_role
     return false unless role
-
     role.permission.can_add_pdc
   end
 

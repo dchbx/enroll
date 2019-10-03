@@ -1,10 +1,13 @@
 {
   "dependencies": {
+    "@angular/animations": "^7.2.15",
+    "@angular/cdk": "^7.3.7",
     "@angular/common": "^7.2.15",
     "@angular/compiler": "^7.2.15",
     "@angular/core": "^7.2.15",
     "@angular/elements": "^7.2.15",
     "@angular/forms": "^7.2.15",
+    "@angular/material": "^7.2.15",
     "@angular/platform-browser": "^7.2.15",
     "@angular/platform-browser-dynamic": "^7.2.15",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
@@ -35,7 +38,8 @@
     "rails-ujs": "^5.2.3",
     "rxjs": "^6.5.2",
     "stimulus": "^1.0.1",
-    "sweetalert2": "^8.13.0",
+    "sweetalert2": "^8.13.4",
+    "tslib": "^1.10.0",
     "turbolinks": "^5.2.0",
     "typescript": "3.2.4",
     "webpack-merge": "^4.2.2",
@@ -51,14 +55,12 @@
     "@types/jasmine": "~2.8.8",
     "angular2-template-loader": "^0.6.2",
     "jasmine-core": "~2.99.1",
-    "jest-junit": "^6.4.0",
     "jsdom-mount": "0.1.0",
     "karma": "~4.0.0",
     "karma-chrome-launcher": "~2.2.0",
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
-    "karma-junit-reporter": "^1.2.0",
     "lodash": "^4.17.10",
     "moment": "^2.22.1",
     "protractor": "~5.4.0",
@@ -72,29 +74,18 @@
   "scripts": {
     "angular-docs": "compodoc -p app/javascript/incremental_angular/tsconfig.app.json -d angular_documentation --unitTestCoverage angular_coverage/coverage-summary.json",
     "test": "jest",
-    "test-watch": "jest --watch"
+    "test-watch": "jest --watch",
+    "ng-test": "ng test",
+    "ng-test-watch": "ng test --watch"
   },
   "jest": {
     "testURL": "http://localhost",
-    "reporters": [
-      "default",
-      "jest-junit"
-    ],
     "roots": [
       "spec/javascript"
     ],
     "moduleDirectories": [
       "node_modules",
-      "app/javascript"
+      "app/javascript/packs"
     ]
-  },
-  "jest-junit": {
-    "suiteName": "jest tests",
-    "outputDirectory": "./tmp",
-    "outputName": "jest_junit.xml",
-    "classNameTemplate": "{classname}",
-    "titleTemplate": "{classname}-{title}",
-    "ancestorSeparator": " › ",
-    "usePathForSuiteName": "true"
   }
 }

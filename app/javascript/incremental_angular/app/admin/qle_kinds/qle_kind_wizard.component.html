@@ -1,0 +1,50 @@
+  <div class='row container'>
+    <div class='col-md-12'>
+        <div class="panel-body">
+          <form class="form">
+            <legend>Manage QLEs</legend>
+            <fieldset>
+              <div class="form-group">
+                <div class='row'>
+                  <div class='col-md-12'>
+                    <legend>Select Action</legend>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-md-4'>
+                    <label for="qle_wizard_new_qle_selected_radio">
+                      <input id="qle_wizard_new_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('new')">
+                      Create a Custom QLE
+                    </label>
+                  </div>
+                  <div class='col-md-4'>
+                    <label for="qle_wizard_modify_qle_selected_radio">
+                      <input id="qle_wizard_modify_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('edit')">
+                      Modify Existing QLE
+                    </label>
+                  </div>
+                  <div class='col-md-4'>
+                    <label for="qle_wizard_deactivate_qle_selected_radio">
+                      <input id="qle_wizard_deactivate_qle_selected_radio" name="qle_kind_wizard_action" type="radio" (change)="selectAction('deactivate')">
+                      Deactivate Active QLE
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+            <qle-kind-wizard-selection
+              [selectionList]="editableList"
+              [isVisible]="showEdit()"
+              #editSelection>
+            </qle-kind-wizard-selection>
+            <qle-kind-wizard-selection
+              [selectionList]="deactivatableList"
+              [isVisible]="showDeactivate()"
+              #deactivateSelection>
+            </qle-kind-wizard-selection>
+              <div class="form-group">
+                <button class="btn btn-primary" (click)="submit()">Submit</button>
+              </div>
+          </form>
+        </div>
+      </div>

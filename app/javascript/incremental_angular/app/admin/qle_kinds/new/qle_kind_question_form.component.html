@@ -1,0 +1,35 @@
+<!-- questionIndex enforces number of questions to 2 -->
+<div [formGroup]="questionFormGroup" *ngIf="questionIndex < 2">
+  <div class="from-group-question">
+      <div class="col-sm-12">
+      <span class="col-sm-2 control-label"> <strong>Question</strong></span>
+    <div class="col-sm-8">
+      <input 
+        id="qle_kind_question_{{questionIndex}}_title"
+        type="text"
+        formControlName="content"
+        class="form-control col-md-2">
+      <div class="btn-group" role="group" aria-label="Question Actions">
+        <button
+          (click)="addResponse()"
+          class='btn btn-secondary btn-default margin-right-10px'>
+          Add Response
+        </button>
+        <button
+          (click)="removeQuestion(questionIndex)"
+          class='btn btn-secondary btn-default'>
+          Delete
+        </button>
+      </div>
+      <div *ngIf="showResponseForm()">
+        <qle-question-response-form
+          *ngFor="let response of getResponseArray(); let i = index"
+          [responseFormGroup]="response"
+          [responseIndex]="i"
+          [responseComponentParent]="this">    
+        </qle-question-response-form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

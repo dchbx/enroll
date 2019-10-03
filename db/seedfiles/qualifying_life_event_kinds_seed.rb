@@ -223,7 +223,7 @@ QualifyingLifeEventKind.create!(
     date_options_available: false,
     ordinal_position: 10,
     event_kind_label: 'Date of start a new job',
-    tool_tip: "Enroll due to becoming newly eligibile"
+    tool_tip: "Enroll due to becoming newly eligible"
   )
 
 QualifyingLifeEventKind.create!(
@@ -239,8 +239,10 @@ QualifyingLifeEventKind.create!(
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 60,
     is_self_attested: false,
-    date_options_available: false,
+    date_options_available: false
 )
+
+QualifyingLifeEventKind.update_all(is_visible_to_customer: true)
 
 puts "::: QualifyingLifeEventKinds Complete :::"
 puts "*"*80

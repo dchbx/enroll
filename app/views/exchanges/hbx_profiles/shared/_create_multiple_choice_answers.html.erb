@@ -1,0 +1,8 @@
+<div id='multiple-choice-answers'>
+  <h5>Please input three possible options for answers to this question</h5>
+  <%= fields_for @answer, method: "post", class: "form" do |s| %>  
+    <p> <%=s.text_field :option_1, class:'form-control' %></p>
+    <p> <%=s.text_field :option_2, class:'form-control' %></p>
+    <p> <%=s.text_field :option_3, class:'form-control' %></p>
+  <% end %>
+</div>

@@ -129,6 +129,7 @@ class GroupSelectionPrevaricationAdapter
 
   def ivl_benefit
     correct_effective_on = calculate_ivl_effective_on
+    # I passed the 'enrollment_kind' param as sep and then i got a new error. This is correct-effective_on is returning nil and failing
     HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
   end
 
@@ -148,7 +149,8 @@ class GroupSelectionPrevaricationAdapter
       family: @family,
       employee_role: employee_role,
       benefit_group: benefit_group,
-      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)
+    )
   end
 
   def if_qle_with_date_option_selected(params)
