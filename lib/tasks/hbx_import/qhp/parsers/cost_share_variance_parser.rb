@@ -1,6 +1,7 @@
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','sbc_parser')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','maximum_out_of_pockets_parser')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','deductible_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','plan_deductible_list_parser')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','service_visits_parser')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','hsa_parser')
 
@@ -29,7 +30,7 @@ module Parser
 
     has_one :sbc_attributes, Parser::SbcParser, tag: "sbc"
     has_many :maximum_out_of_pockets_attributes, Parser::MaximumOutOfPocketsParser, tag: "moop", deep: true
-    has_one :deductible_attributes, Parser::DeductibleParser, tag: "planDeductible", deep:true
+    has_one :plan_deductible_list_attributes, Parser::PlanDeductibleListParser, tag: "planDeductibleList", deep:true
     has_many :service_visits_attributes, Parser::ServiceVisitsParser, tag: "serviceVisit", deep: true
     has_one :hsa_attributes, Parser::HsaParser, tag: "hsa", deep: true
 
@@ -53,7 +54,7 @@ module Parser
           default_co_insurance_out_of_network: default_co_insurance_out_of_network.present? ? default_co_insurance_out_of_network.gsub(/\n/,'').strip : ""
         },
         maximum_out_of_pockets_attributes: maximum_out_of_pockets_attributes.map(&:to_hash),
-        deductible_attributes: deductible_attributes.to_hash,
+        plan_deductible_list_attributes: plan_deductible_list_attributes.to_hash,
         hsa_attributes: hsa_attributes.present? ? hsa_attributes.to_hash : {},
         service_visits_attributes: service_visits_attributes.map(&:to_hash)
       }

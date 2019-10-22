@@ -4,6 +4,8 @@
       <td style="text-align: left;"><%= service_visit.visit_type %></td>
       <td><%= service_visit.copay_in_network_tier_1 %></td>
       <td><%= service_visit.co_insurance_in_network_tier_1.present? ? service_visit.co_insurance_in_network_tier_1 : "N/A" %></td>
+      <td><%= service_visit.in_network_result %></td>
+      <td><%= service_visit.out_network_result %></td>
     </tr>
   <% end %>
 <% end %>

@@ -92,8 +92,8 @@ class ProductBuilder
           csr_variant_id: csr_variant_id,
           application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
           service_area_id: mapped_service_area_id,
-          deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
-          family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
+          deductible: cost_share_variance.qhp_deductables.first.in_network_tier_1_individual,
+          family_deductible: cost_share_variance.qhp_deductables.first.in_network_tier_1_family,
           is_reference_plan_eligible: true,
           metal_level_kind: retrieve_metal_level.to_sym,
         }
@@ -229,7 +229,13 @@ class ProductBuilder
   end
 
   def build_deductible
-    @csv.build_qhp_deductable(deductible_params)
+    plan_deductible_list_params.each do |plan_deductible|
+      @csv.qhp_deductables.build(plan_deductible)
+    end
+  end
+
+  def plan_deductible_list_params
+    @csvp[:plan_deductible_list_attributes][:plan_deductible_attributes]
   end
 
   def build_service_visits
