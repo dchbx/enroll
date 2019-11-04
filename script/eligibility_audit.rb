@@ -1,5 +1,5 @@
-AUDIT_START_DATE = Date.new(2017,10,1)
-AUDIT_END_DATE = Date.new(2018,10,1)
+AUDIT_START_DATE = Date.new(2018,10,1)
+AUDIT_END_DATE = Date.new(2019,10,1)
 
 hbx = HbxProfile.current_hbx
 bcps = hbx.benefit_sponsorship.benefit_coverage_periods
@@ -10,7 +10,6 @@ end
 
 non_curam_ivl = Person.collection.aggregate([
   {"$match" => {
-    "consumer_role.lawful_presence_determination.vlp_authority" => {"$ne" => "curam"},
     "consumer_role" => {"$ne" => nil},
     "created_at" => {"$lt" => AUDIT_END_DATE} 
   }},
@@ -30,7 +29,7 @@ end
 ivl_people = Person.where("_id" => {"$in" => ivl_person_ids})
 
 families_of_interest = Family.where(
-  {"family_members.person_id" => {"$in" => ivl_person_ids}, "e_case_id" => nil}
+  {"family_members.person_id" => {"$in" => ivl_person_ids}}
 )
 
 
@@ -55,9 +54,9 @@ def relationship_for(person, family)
   family.primary_applicant.person.find_relationship_with(person)
 end
 
-def version_in_window?(pers)
-  return true if pers.updated_at.blank?
-  (pers.updated_at >= AUDIT_START_DATE) && (pers.updated_at < AUDIT_END_DATE)
+def version_in_window?(person)
+  return true if person.updated_at.blank?
+  (person.updated_at >= AUDIT_START_DATE) && (person.updated_at < AUDIT_END_DATE)
 end
 
 def calc_eligibility_for(cr, family, benefit_packages, ed)
@@ -120,27 +119,16 @@ def not_authorized_by_curam?(person)
   !(lpd.vlp_authority == "curam")
 end
 
-def auditable?(person)
-  version_in_window?(pers) &&
-    primary_has_address?(pers_record, pers, fam) &&
-    primary_answered_data?(pers_record, pers, fam) &&
-    not_authorized_by_curam?(pers)
+def auditable?(person_record, person_version, family)
+  version_in_window?(person_record) &&
+  primary_has_address?(person_record, person_version, family) &&
+  primary_answered_data?(person_record, person_version, family) &&
+  not_authorized_by_curam?(person_record)
 end
 
 def each_person_version(person)
   person.versions.each do |person|
-    families = person_family_map[pers_record.id]
-    familes.each do |family|
-      yield
-#      if consumer_role = person.consumer_role && lpd = consumer_role.lawful_presence_determination
-#        consumer_role.person ||= person
-#        if auditable?(person)
-#        end
-#      end
-    end
-  end
-  person.history_tracks.each do |track|
-    yield track
+    yield person
   end
 end
 
@@ -179,9 +167,19 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Eligible"
   ]
   ivl_people.each do |pers_record|
-    person_versions = [pers_record] + pers_record.versions
-    person_versions.each do |pers|
+    person_versions = [pers_record] + pers_record.versions + pers_record.history_tracks
+    person_versions.each do |p_version|
+      pers_record.reload
+      p_version = if p_version.kind_of?(HistoryTracker)
+        if (p_version.created_at >= AUDIT_END_DATE) || (p_version.created_at < AUDIT_START_DATE)
+          next
+        end
+        pers_record.history_track_to_person(p_version.created_at)
+      else
+        p_version
+      end
       families = person_family_map[pers_record.id]
+      pers = pers_record
       families.each do |fam|
         cr = pers.consumer_role
         if cr
@@ -189,7 +187,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
             cr.person = pers
           end
           begin
-            if version_in_window?(pers) && primary_has_address?(pers_record, pers, fam) && primary_answered_data?(pers_record, pers, fam) && not_authorized_by_curam?(pers)
+            if auditable?(pers_record, p_version, fam)
               eligible = calc_eligibility_for(cr, fam, health_benefit_packages, pers.updated_at)
               lpd = cr.lawful_presence_determination
               if lpd
