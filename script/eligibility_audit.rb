@@ -166,7 +166,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Is applying for coverage",
     "Eligible"
   ]
-  ivl_people.each do |pers_record|
+  ivl_people.no_timeout.each do |pers_record|
     person_versions = [pers_record] + pers_record.versions + pers_record.history_tracks
     person_versions.each do |p_version|
       pers_record.reload
