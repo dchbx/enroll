@@ -174,7 +174,8 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
         if (p_version.created_at >= AUDIT_END_DATE) || (p_version.created_at < AUDIT_START_DATE)
           next
         end
-        pers_record.history_track_to_person(p_version.created_at)
+        # This will be a HistoryTracker
+        pers_record.history_track_to_person(p_version)
       else
         p_version
       end
