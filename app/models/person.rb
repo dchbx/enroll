@@ -7,6 +7,38 @@ class Person
   include Notify
   include UnsetableSparseFields
   include FullStrippedNames
+  include ::BenefitSponsors::Concerns::Observable
+  include SponsoredBenefits::Concerns::Dob
+  include LegacyVersioningRecords
+  include HistoryTrackerToRecord
+
+  # verification history tracking
+  include Mongoid::History::Trackable
+
+  track_history :on => [:first_name,
+                        :middle_name,
+                        :last_name,
+                        :full_name,
+                        :alternate_name,
+                        :encrypted_ssn,
+                        :dob,
+                        :gender,
+                        :is_incarcerated,
+                        :is_disabled,
+                        :ethnicity,
+                        :race,
+                        :tribal_id,
+                        :no_dc_address,
+                        :no_dc_address_reason,
+                        :is_active,
+                        :no_ssn],
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true     # track document destruction, default is false
+
 
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
@@ -202,13 +234,6 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
-  def history_track_to_person(history_track)
-    versions_to_reverse = self.history_tracks.select { |ht| (ht.created_at >= history_track.created_at) }
-    tracked_versions  = versions_to_reverse.sort_by(&:created_at).reverse
-    tracked_versions.each { |tv| tv.undo_attr({}) }
-    self
-  end
-
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)
   end
@@ -239,7 +264,6 @@ class Person
   delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
   delegate :all_types_verified?, :to => :consumer_role
 
->>>>>>> fab6949d40... REFS 54284 - fixes up the eligbility audit spec more to use history trackers
   def notify_created
     notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end

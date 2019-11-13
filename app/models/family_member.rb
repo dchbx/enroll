@@ -73,11 +73,11 @@ class FamilyMember
     person.history_tracks.each do |track|
       if track.created_at <= v_date
         # Returns a person in memory
-        return person.history_track_to_person(track)
+        return person.history_tracker_to_record(track, 'Person')
       end
     end
 
-    person.history_track_to_person(person.history_tracks.last) || versions_to_search.reject do |v|
+    person.history_tracker_to_record(person.history_tracks.last, 'Person') || versions_to_search.reject do |v|
       v.created_at > v_date
     end.sort_by(&:updated_at).last
   end

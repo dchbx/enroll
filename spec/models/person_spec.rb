@@ -20,7 +20,59 @@ describe Person do
       }
     end
 
+<<<<<<< HEAD
     describe ".create", dbclean: :after_each do
+=======
+    describe ".history_track_to_person" do
+      let(:non_curam_ivl_person) do
+        FactoryBot.create(:person, :with_family, first_name: "Tom", last_name: "Cruise")
+      end
+      let!(:consumer_role) do
+        ConsumerRole.create!(
+          person: non_curam_ivl_person,
+          is_state_resident: true,
+          citizen_status: 'us_citizen',
+          vlp_documents: [FactoryBot.build(:vlp_document)],
+          ridp_documents: [FactoryBot.build(:ridp_document)],
+          is_applicant: true
+        )
+      end
+      context "embedded consumer role" do
+        before do
+          non_curam_ivl_person.consumer_role.update_attributes!(is_state_resident: false, citizen_status: 'undocumented_immigrant')
+          non_curam_ivl_person.consumer_role.update_attributes!(is_state_resident: true, citizen_status: 'us_citizen')
+        end
+
+        it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
+          target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => false}).last
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
+          expect(past_person.consumer_role.is_state_resident).to eq(false)
+          target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"is_state_resident" => true}).last
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
+          expect(past_person.consumer_role.is_state_resident).to eq(true)
+        end
+      end
+
+      context "just person record itself" do
+        before do
+          non_curam_ivl_person.update_attributes!(gender: 'female')
+          non_curam_ivl_person.update_attributes!(gender: 'male')
+          non_curam_ivl_person.update_attributes!(gender: 'female')
+        end
+
+        it "undoes changes to a person when a HistoryTrack instance passed as arguement" do
+          target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"gender" => 'male'}).last
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
+          expect(past_person.gender).to eq('male')
+          target_history_track =  non_curam_ivl_person.history_tracks.where(modified: {"gender" => 'female'}).last
+          past_person = non_curam_ivl_person.history_tracker_to_record(target_history_track, "Person")
+          expect(past_person.gender).to eq('female')
+        end
+      end
+    end
+
+    describe ".create", dbclean: :around_each do
+>>>>>>> d77feda1ad... REFS 54284 - Creates module to convert HistoryTracker records and changes into parent record, such as Person.
       context "with valid arguments" do
         let(:params) {valid_params}
         let(:person) {Person.create(**params)}
