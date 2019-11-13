@@ -20,9 +20,6 @@ describe Person do
       }
     end
 
-<<<<<<< HEAD
-    describe ".create", dbclean: :after_each do
-=======
     describe ".history_track_to_person" do
       let(:non_curam_ivl_person) do
         FactoryBot.create(:person, :with_family, first_name: "Tom", last_name: "Cruise")
@@ -72,7 +69,6 @@ describe Person do
     end
 
     describe ".create", dbclean: :around_each do
->>>>>>> d77feda1ad... REFS 54284 - Creates module to convert HistoryTracker records and changes into parent record, such as Person.
       context "with valid arguments" do
         let(:params) {valid_params}
         let(:person) {Person.create(**params)}
