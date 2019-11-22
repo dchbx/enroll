@@ -464,6 +464,12 @@ class HbxEnrollment
     end
   end
 
+  def has_at_least_one_aptc_eligible_member?
+    family.active_household.latest_active_tax_household_with_year(effective_on.year).to_a.compact.each do |household|
+      latest_active_tax_household.tax_household_members.detect { |member| member.is_ia_eligible? }
+    end
+  end
+
   class << self
 
     # terminate all Enrollments scheduled for termination

@@ -30,6 +30,18 @@ module Insured
       def self.self_term_or_cancel_service(attrs)
         ::Insured::Services::SelfTermOrCancelService.new(attrs)
       end
+
+      def product
+        hbx_enrollment.product
+      end
+
+      def hbx_enrollment
+        enrollment&.hbx_enrollment
+      end
+
+      def special_enrollment_period
+        hbx_enrollment.special_enrollment_period
+      end
     end
   end
 end

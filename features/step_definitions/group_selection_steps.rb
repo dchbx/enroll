@@ -582,6 +582,11 @@ And(/the tax household has at least one member that is APTC eligible/) do
   FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)
 end
 
+And(/the tax household has no members that are APTC eligible/) do
+  tax_household = @family.active_household.latest_active_tax_household
+  tax_household.tax_household_members.update_all(is_ia_eligible: false, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.id)
+end
+
 And(/the metal level is (.*)/) do |metal_level|
   @family.enrollments.first.product.update_attributes(metal_level_kind: metal_level.to_sym)
 end
@@ -601,13 +606,13 @@ Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|
 end
 
 Given(/the enrollment is a Health plan/) do
-  @family.enrollments.first.update_attributes(coverage_kind: "health")
+  @family.enrollments.first.update_attributes!(coverage_kind: "health")
 end
 
 Given(/the enrollment is a Dental plan/) do
-  @family.enrollments.first.update_attributes(coverage_kind: "dental")
+  @family.enrollments.first.update_attributes!(coverage_kind: "dental")
 end
 
 Given(/the coverall enrollment flag is TRUE/) do
-  @family.enrollments.first.update_attributes(kind: "coverall")
+  @family.enrollments.first.update_attributes!(kind: "coverall")
 end

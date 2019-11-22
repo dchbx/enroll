@@ -10,8 +10,9 @@
       <div class="container">
         <div class="row">
           <div class="col-xs-9">
-            <% hbx_enrollment = @self_term_or_cancel_form.enrollment %>
+            <% hbx_enrollment = @self_term_or_cancel_form.hbx_enrollment %>  
             <% product = @self_term_or_cancel_form.product %>
+            <% sep = @self_term_or_cancel_form.special_enrollment_period %>
             <div class="hbx-enrollment-panel module">
             <div class="panel panel-default min-h">
 
@@ -24,9 +25,9 @@
                 <div class="row">
                   <div class="col-xs-8">
                     <div><%=raw product[:display_carrier_logo] %></div>
-                    <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id:hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
+                    <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
                     </h4>
-                      <div><p><%=raw render_product_type_details(product[:metal_level_kind],product[:nationwide]) %></p></div>
+                      <div><p><%=raw render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p></div>
                       <div>
                         <p>
                           <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
@@ -81,13 +82,16 @@
                     <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
                   </div>
 
-                  <div class="col-sm-4">
-                    <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
-                  </div>
+                  <%# TODO: May need a condition for "has at least one APTC eligible household member" %>
+                  <% if hbx_enrollment.has_at_least_one_aptc_eligible_member? && product.can_use_aptc? && !hbx_enrollment.is_coverall? && hbx_enrollment.coverage_kind != 'dental'%>
+                    <div class="col-sm-4">
+                      <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
+                    </div>
+                  <% end %>
 
                   <div class="col-sm-4">
-                    <% if @sep.qualifying_life_event_kind.market_kind == "individual" || @family.is_under_ivl_open_enrollment? %>
-                      <%= link_to 'Shop for Plans', insured_family_members_path(sep_id: @sep.id, qle_id: @sep.qualifying_life_event_kind_id, market_kind: "individual"), class: "btn btn-default btn-block"%>
+                    <% if sep.qualifying_life_event_kind.market_kind == "individual" || hbx_enrollment.family.is_under_ivl_open_enrollment? %>
+                      <%= link_to 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: sep.qualifying_life_event_kind_id, market_kind: "individual"), class: "btn btn-default btn-block"%>
                     <% end %>
                   </div>
                 </div>
@@ -135,7 +139,7 @@
             <!-- TODO: add terminate-calendar id -->
             <!-- Calendar form functionality only necessary for terminate -->
             <div id="calendar-div" class="hidden">
-              <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: @hbx_enrollment.id), :method => :post do %>
+              <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), :method => :post do %>
               <div id="date-confirm" class="col-xs-3">
                 <%= text_field_tag 'confirm_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required date-picker aptc-date-picker floatlabel form-control", required: true, id: "aptc_date" %>
               </div>

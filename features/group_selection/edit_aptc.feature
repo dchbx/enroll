@@ -1,4 +1,3 @@
-@edit_aptc
 Feature: Edit APTC button
 
 Background:
@@ -48,11 +47,17 @@ Scenario Outline: Edit APTC button is available for all HIOS ID endings
     | "05" |
     | "06" |
 
-Scenario: Edit APTC button is available for IVL market
-  And the tax household has at least one member that is APTC eligible
+# Scenario: Edit APTC button is available for IVL market
+#  And the tax household has at least one member that is APTC eligible
+#  When consumer clicks on the edit plan button
+#  Then consumer should see the edit plan page
+#  Then the Edit APTC button should be available
+
+Scenario: Edit APTC button is not available for families with no members that are APTC eligible
+  And the tax household has no members that are APTC eligible
   When consumer clicks on the edit plan button
   Then consumer should see the edit plan page
-  Then the Edit APTC button should be available
+  Then the Edit APTC button should NOT be available
 
 Scenario: Edit APTC button is not available for Resident
   Given the coverall enrollment flag is TRUE
@@ -82,7 +87,3 @@ Scenario: Edit APTC button is available for families with at least 1 member that
   Then consumer should see the edit plan page
   Then the Edit APTC button should be available
 
-Scenario: Edit APTC button is not available for families with no members that are APTC eligible
-  When consumer clicks on the edit plan button
-  Then consumer should see the edit plan page
-  Then the Edit APTC button should NOT be available
