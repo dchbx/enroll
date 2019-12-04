@@ -2369,6 +2369,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         coverage_date = census_employee.benefit_group_assignments.first.start_on - 1.month
         expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq nil
       end
+
+      it "should return latest bga for given coverage_date" do
+        bga = census_employee.benefit_group_assignments.first
+        coverage_date = bga.start_on
+        bga.update_attributes(is_active: false)
+        bga1 = bga.dup
+        bga.update_attributes(created_at: bga.created_at - 1.day)
+        census_employee.benefit_group_assignments << bga1
+        expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq bga1
+      end
     end
 
     context "when ER has active and renewal benefit applications" do

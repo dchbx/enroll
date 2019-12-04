@@ -147,7 +147,7 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         get :lockable, params: {id: user_id}
-        expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url)
+        expect(flash[:notice]).to be_present
       end
     end
 
@@ -181,7 +181,8 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         get :reset_password, params:{id: user_id, format: :js}
-        expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url)
+        expect(flash[:alert]).to be_present
+        expect(flash[:alert]).to include('You are not authorized for this action.')
       end
     end
 
@@ -191,13 +192,15 @@ describe UsersController, dbclean: :after_each do
         sign_in(admin)
         get :reset_password, params: {id: user_id, format: :js}
       end
-      it { expect(response).to render_template('reset_password') }
+      it do
+        expect(response.status).to equal(200)
+      end
     end
   end
 
   describe '.confirm_reset_password' do
     let(:can_reset_password) { false }
-    
+
     before do
       allow(user_policy).to receive(:reset_password?).and_return(can_reset_password)
     end
@@ -247,7 +250,7 @@ describe UsersController, dbclean: :after_each do
       let(:can_reset_password) { true }
       let(:params) {{ email: user_email } }
       let(:strong_params){ActionController::Parameters.new(params).permit(:email)}
-      
+
       before do
         allow(user).to receive(:errors).and_return(double(:full_messages => ["error message"]))
         allow(user).to receive(:update_attributes).with(strong_params).and_return(false)

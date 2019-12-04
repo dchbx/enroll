@@ -24,6 +24,7 @@ class Permission
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_transition_family_members, type: Boolean, default: false
   field :can_access_user_account_tab, type: Boolean, default: false
+  field :view_login_history, type: Boolean, default: false
 
   field :can_reset_password, type: Boolean, default: false
   field :can_extend_open_enrollment, type: Boolean, default: false

@@ -1373,7 +1373,7 @@ def self.to_csv
     assignments = benefit_group_assignments.select do |assignment|
       (assignment.start_on..assignment.benefit_end_date).cover?(coverage_date) && assignment.benefit_package.is_active
     end
-    assignments.detect{|assignment| assignment.is_active} || assignments.first
+    assignments.detect(&:is_active) || assignments.sort_by(&:created_at).reverse.first
   end
 
 

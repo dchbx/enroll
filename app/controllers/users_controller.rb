@@ -7,20 +7,26 @@ class UsersController < ApplicationController
     params.permit!
     authorize User, :lockable?
     @user_id  = params[:user_action_id]
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "You are not authorized for this action."
+    render inline: "location.reload();"
   end
 
   def lockable
     authorize User, :lockable?
     @user.lock!
-    redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "User #{user.email} is successfully #{user.lockable_notice}."
+    flash[:notice] = "User #{user.email} is successfully #{user.lockable_notice}."
+    render file: 'users/lockable.js.erb'
   rescue Pundit::NotAuthorizedError
     redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
   def reset_password
     authorize User, :reset_password?
+    render file: 'users/reset_password.js.erb'
   rescue Pundit::NotAuthorizedError
-    redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
+    flash[:alert] = "You are not authorized for this action."
+    render inline: "location.reload();"
   end
 
   def confirm_reset_password
@@ -47,7 +53,7 @@ class UsersController < ApplicationController
     end
     redirect_to personal_insured_families_path
   end
-  
+
   def change_username_and_email
     authorize User, :change_username_and_email?
     @user_id = params[:user_id]
@@ -84,9 +90,13 @@ class UsersController < ApplicationController
   end
 
   def login_history
+    authorize User, :view_login_history?
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "You are not authorized for this action."
+    render inline: "location.reload();"
   end
-  
+
   private
 
   helper_method :user

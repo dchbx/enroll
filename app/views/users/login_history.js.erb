@@ -1,5 +1,5 @@
 if ($("#user-login-history-modal").length == 0) {
-  $('.tab-content').append("<%=escape_javascript(render('login_history', login_history: @user_login_history, user: @user)) %>");
+  $('.hbx_profiles').append("<%=escape_javascript(render('login_history', login_history: @user_login_history, user: @user)) %>");
 } else {
   $('#user-login-history-modal').replaceWith("<%=escape_javascript(render('login_history', login_history: @user_login_history)) %>");
 }
