@@ -7,6 +7,7 @@ module Insured
       attribute :covered_members_first_names
       attribute :current_premium
       attribute :should_term_or_cancel_ivl
+      attribute :applied_aptc_amount
 
       def covered_members_first_names
         object.hbx_enrollment_members.inject([]) do |names, member|

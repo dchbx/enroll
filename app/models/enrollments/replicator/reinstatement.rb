@@ -92,38 +92,77 @@ module Enrollments
       end
 
       def build
-        family = base_enrollment.family
         reinstated_enrollment = HbxEnrollment.new
-        reinstated_enrollment.family = family
-        reinstated_enrollment.household = family.active_household
-
-
-        reinstated_enrollment.effective_on = new_effective_date
-        reinstated_enrollment.coverage_kind = base_enrollment.coverage_kind
-        reinstated_enrollment.enrollment_kind = base_enrollment.enrollment_kind
-        reinstated_enrollment.kind = base_enrollment.kind
-        reinstated_enrollment.predecessor_enrollment_id = base_enrollment.id
+        assign_attributes_to_reinstate_enrollment(reinstated_enrollment, common_params)
 
         if base_enrollment.is_shop?
-          if can_be_reinstated?
-            reinstated_enrollment.employee_role_id = base_enrollment.employee_role_id
-            reinstated_enrollment.benefit_group_assignment_id = reinstatement_benefit_group_assignment
-            reinstated_enrollment.sponsored_benefit_package_id = reinstatement_sponsored_benefit_package.id
-            reinstated_enrollment.sponsored_benefit_id = reinstatement_sponsored_benefit.id
-            reinstated_enrollment.benefit_sponsorship_id = base_enrollment.benefit_sponsorship_id
-            reinstated_enrollment.product_id = reinstatement_plan.id
-            reinstated_enrollment.rating_area_id = reinstate_rating_area
-            reinstated_enrollment.issuer_profile_id = reinstatement_plan.issuer_profile_id
-          end
-        else
-          reinstated_enrollment.product_id = base_enrollment.product_id
-          reinstated_enrollment.consumer_role_id = base_enrollment.consumer_role_id
-          reinstated_enrollment.elected_aptc_pct = base_enrollment.elected_aptc_pct
-          reinstated_enrollment.applied_aptc_amount = base_enrollment.applied_aptc_amount
+          assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
+        elsif base_enrollment.is_ivl_by_kind? && new_aptc
+          #TODO: why this much calculations
+          aptc_ratio_by_member = base_enrollment.family.active_household.latest_active_tax_household.aptc_ratio_by_member
+          percent_sum_for_all_enrolles = duplicate_hbx.hbx_enrollment_members.inject(0.0) { |sum, member| sum + aptc_ratio_by_member[member.applicant_id.to_s] || 0.0 }
+
+          assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_ivl_params)
+
+          apply_aptc_to_members(duplicate_hbx,{
+            aptc_ratio_by_member: aptc_ratio_by_member,
+            new_aptc: new_aptc,
+            percent_sum_for_all_enrolles: percent_sum_for_all_enrolles
+          })
+
+          # To do for this path: Handle enrollment state & handle 15th of month rule for effective date (outside of service, probably)
         end
 
         reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
         reinstated_enrollment
+      end
+
+      def assign_attributes_to_reinstate_enrollment(enrollment, options = {})
+        enrollment.assign_attributes(options)
+      end
+
+      def form_shop_params
+        {
+          employee_role_id: base_enrollment.employee_role_id,
+          benefit_group_assignment_id: reinstatement_benefit_group_assignment,
+          sponsored_benefit_package_id: reinstatement_sponsored_benefit_package.id,
+          sponsored_benefit_id: reinstatement_sponsored_benefit.id,
+          benefit_sponsorship_id: base_enrollment.benefit_sponsorship_id,
+          product_id: reinstatement_plan.id,
+          rating_area_id: reinstate_rating_area,
+          issuer_profile_id: reinstatement_plan.issuer_profile_id
+        }
+      end
+
+      def form_ivl_params
+        #TODO: Query is too long
+        max_aptc = base_enrollment.family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
+        {
+          product_id: base_enrollment.product_id,
+          consumer_role_id: base_enrollment.consumer_role_id,
+          applied_aptc_amount: new_aptc,
+          elected_aptc_pct: new_aptc / max_aptc
+        }
+      end
+
+      def common_params
+        {
+          family: base_enrollment.family,
+          household: base_enrollment.family.active_household,
+          effective_on: new_effective_date,
+          coverage_kind: base_enrollment.coverage_kind,
+          enrollment_kind: base_enrollment.enrollment_kind,
+          kind: base_enrollment.kind,
+          predecessor_enrollment_id: base_enrollment.id,
+          hbx_enrollment_members: clone_hbx_enrollment_members
+        }
+      end
+
+      def apply_aptc_to_members(duplicate_hbx, options = {})
+        duplicate_hbx.hbx_enrollment_members.each do |mem|
+          aptc_pct_for_member = options[:aptc_ratio_by_member][mem.applicant_id.to_s] || 0.0
+          mem.applied_aptc_amount = otpions[:new_aptc] * aptc_pct_for_member / options[:percent_sum_for_all_enrolles]
+        end
       end
 
       def member_coverage_start_date(hbx_enrollment_member)

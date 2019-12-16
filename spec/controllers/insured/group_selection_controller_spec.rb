@@ -1,3 +1,4 @@
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -85,9 +86,15 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
                         person.employee_roles.first.hired_on =  census_employee.hired_on
                         person.employee_roles.first.save
                         person.save}
+    let(:sbc_document) { FactoryBot.build(:document,subject: "SBC",identifier: "urn:openhbx#123") }
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                              family: family,
+                                              household: family.active_household,
+                                              sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                              product: product)
+                                            }
 
-    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household,
-                            sponsored_benefit_package_id: initial_application.benefit_packages.first.id) }
     let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
     let!(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
@@ -318,6 +325,32 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
     end
+
+    context "POST term_or_cancel" do
+      let (:family) { FactoryBot.create(:individual_market_family) }
+      let (:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
+      let (:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
+      let (:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+      let (:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now + 1.month) }
+      let (:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: DateTime.now - 1.month) }
+
+      it "should cancel enrollment with no term date given" do
+        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
+        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_cancel.id, term_or_cancel: 'cancel' }
+        enrollment_to_cancel.reload
+        expect(enrollment_to_cancel.aasm_state).to eq "coverage_canceled"
+        expect(response).to redirect_to(family_account_path)
+      end
+
+      it "should schedule terminate enrollment with term date given" do
+        family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
+        post :term_or_cancel, params: { hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate' }
+        enrollment_to_term.reload
+        expect(enrollment_to_term.aasm_state).to eq "coverage_terminated"
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
+
   end
 
   context "IVL edit plan paths" do

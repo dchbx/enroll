@@ -11,6 +11,7 @@ module Insured
       attribute :hbx_id,                      String
       attribute :id,                          String
       attribute :should_term_or_cancel_ivl,   String
+      attribute :applied_aptc_amount,         Integer
     end
   end
 end

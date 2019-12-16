@@ -37,6 +37,8 @@ module Insured
       end
 
       def is_aptc_eligible(enrollment, family)
+        return false if enrollment.kind == "coverall" || enrollment.coverage_kind == "dental"
+        
         allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
         product = enrollment.product
         tax_household = family.active_household.latest_active_tax_household if family.active_household.latest_active_tax_household.present?
