@@ -363,7 +363,7 @@ module Importers::Transcripts
     end
 
     def find_instance
-      ::HbxEnrollment.find(@transcript[:source]['_id'])
+      ::HbxEnrollment.find(@transcript[:source]['_id']) rescue nil
     end
 
     def create_new_enrollment
