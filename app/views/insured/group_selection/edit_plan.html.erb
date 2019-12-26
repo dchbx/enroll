@@ -1,171 +1,103 @@
-<div class="container">
+<div class="container-fluid">
   <div class="row">
     <div class="col-md-2">
-      <br>
+      <br class="clear"/>
       <%= link_to l10n("back_to_my_account"),  family_account_path, class: 'btn btn-default btn-default' %>
+      <br class="clear"/>
     </div>
-    <br class="clear"/>
-    <br/>
-    <div class="col-md-12 row">
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-9">
-            <% hbx_enrollment = @self_term_or_cancel_form.hbx_enrollment %>  
-            <% product = @self_term_or_cancel_form.product %>
-            <% sep = @self_term_or_cancel_form.special_enrollment_period %>
-            <div class="hbx-enrollment-panel module">
-            <div class="panel panel-default min-h">
-
-              <div class="panel-heading">
-                <h4><%= product[:application_period].min.year %> <%= l10n("health_coverage") %> <span class="separator"><%= l10n("DCHL") %></span></h4>
-                <hr>
-              </div>
-
-              <div class="panel-body">
-                <div class="row">
-                  <div class="col-xs-8">
-                    <div><%=raw product[:display_carrier_logo] %></div>
-                    <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
-                    </h4>
-                      <div><p><%=raw render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p></div>
-                      <div>
-                        <p>
-                          <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
-
-                          <label class="bullet-separator">&nbsp;<%= l10n("DCHL_ID") %>:</label> <strong><%= hbx_enrollment[:hbx_id] %></strong>
-                        </p>
-                      </div>
-                      <!-- TODO: fix hardcoded value -->
-                      <div class="current-applied-aptc">
-                        <label>APTC Amount:</label><strong>$100.00/month</strong>
-                      </div>
-                      <!-- ^^^ -->
-                        <% names = @self_term_or_cancel_form.enrollment.covered_members_first_names %>
-                        <div class="family-members">
-                          <p>
-                            <label><%= l10n("covered") %>:</label>
-                              <a href="#"><%= names.delete_at(0).camelcase %></a>
-                              <% names.each do |name| %>
-                                <span class="separator"><a href="#"><%= name.camelcase %></a></span>
-                              <% end %>
-                          </p>
-                        </div>
-                        <div>
-                          <label><%= l10n("effective_date") %>: </label>
-                          <strong><%= hbx_enrollment[:effective_on] %></strong>
-                        </div>
-                      </div>
-                      <div class="col-xs-4">
-                        <div class="family-plan-selection">
-                          <div class="status">
-
-                          </div>
-                         </div>
-                      </div>
-                </div>
-
-                <div class="row">
-                      <div class="col-xs-4 fa-icon-link">
-                        <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
-                      </div>
-                      <div class="col-xs-4">
-                        <a href="#">
-                          <i class="fa fa-phone fa-2x"></i><div class="fa-icon-label"><%= l10n("plan_contact_info") %></div>
-                        </a>
-                      </div>
-                      <div class="col-xs-4">
-                      </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-sm-4 transm">
-                    <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan" >Cancel Plan</a>
-                  </div>
-
-                  <%# TODO: May need a condition for "has at least one APTC eligible household member" %>
-                  <% if hbx_enrollment.has_at_least_one_aptc_eligible_member? && product.can_use_aptc? && !hbx_enrollment.is_coverall? && hbx_enrollment.coverage_kind != 'dental'%>
-                    <div class="col-sm-4">
-                      <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc" >Edit APTC</a>
-                    </div>
-                  <% end %>
-
-                  <div class="col-sm-4">
-                    <% if sep.qualifying_life_event_kind.market_kind == "individual" || hbx_enrollment.family.is_under_ivl_open_enrollment? %>
-                      <%= link_to 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: sep.qualifying_life_event_kind_id, market_kind: "individual"), class: "btn btn-default btn-block"%>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-
-                  <!-- <div class="alert alert-warning alert-dismissible panel-footer" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-                    </button>
-                    <strong>Important:</strong> Your enrollment application requires information that needs to be verified. <a href="#">Learn more</a>
-                  </div> -->
-            </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <% hbx_enrollment = @self_term_or_cancel_form.hbx_enrollment %>  
+      <% product = @self_term_or_cancel_form.product %>
+      <% sep = @self_term_or_cancel_form.special_enrollment_period %>
+      <div class="hbx-enrollment-panel module">
+        <div class="panel panel-default min-h">
+          <div class="panel-heading">
+            <h4>
+              <%= product[:application_period].min.year %> <%= l10n("health_coverage") %> 
+            </h4>
+            <hr>
           </div>
-
-            </div>
-            <div>
-              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section confirmation hidden" id="action-confirm">
-                <h3><%= l10n("confirmation") %>:</h3>
-                <p id="cancel-msg" class="action-msg hidden"><%= l10n(".cancel_this_plan_do_you_wish_to_proceed") %></p>
-                <p id="aptc-msg" class="action-msg hidden"><%= l10n(".do_you_wish_to_proceed_with_updating_the_applied_aptc") %></p>
-              <div>
-                <%= radio_button_tag :agreement, "action-confirm-yes" %><%= l10n("yes") %><br>
-                <%= radio_button_tag :agreement, "action-confirm-no" %><%= l10n("no") %>
-              </div>
-              <br/>
-            </div>
-
-            <div id="cancel-form" class="hidden">
-              <%= form_for @self_term_or_cancel_form, as: :self_term_or_cancel_form, url: term_or_cancel_insured_group_selections_path do |f| %>
-                <%= hidden_field_tag :hbx_enrollment_id, hbx_enrollment[:id] %>
-                <%= hidden_field_tag :term_or_cancel,    @should_term_or_cancel %>
-                <div class="col-xs-3" style="float:right;">
-                  <% term_or_cancel = @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl %>
-                  <%calendar_enabled = !(term_or_cancel == 'cancel') %>
-                  <% if calendar_enabled %>
-                    <h5 id="enter-text">Enter the date of cancellation</h5>
-                    <%= text_field_tag 'term_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required date-picker term-date-picker floatlabel form-control", required: true, id: "term-date" %>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-xs-8">
+                <div><%=raw product[:display_carrier_logo] %></div>
+                <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
+                </h4>
+                <div>
+                  <p><%=raw render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p>
+                </div>
+                <div>
+                  <p>
+                    <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(@self_term_or_cancel_form.enrollment.current_premium, precision:2) %></strong>/<%= l10n("month").to_s.downcase %>
+                    <label class="bullet-separator">&nbsp;<%= l10n("ID") %>:</label> <strong><%= hbx_enrollment[:hbx_id] %></strong>
                     <br>
-                  <% end %>
-                  <%= f.submit l10n("confirm"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'btn-cancel', :disabled => true %>
-               </div>
-             <% end %>
+                  </p>
+                </div>
+                <% names = @self_term_or_cancel_form.enrollment.covered_members_first_names %>
+                <div class="family-members">
+                  <p>
+                    <label><%= l10n("covered") %>:</label>
+                    <% if names.length > 0 %>
+                    <a href="#"><%= names.delete_at(0).camelcase %></a>
+                    <% names.each do |name| %>
+                    <span class="separator"><a href="#"><%= name.camelcase %></a></span>
+                    <% end %>
+                    <% end %>
+                    <br>
+                    <label><%= l10n("effective_date") %>: </label>
+                    <strong><%= hbx_enrollment[:effective_on] %></strong>
+                  </p>
+                </div>
+              </div>
+              <div class="col-xs-4">
+                <div class="family-plan-selection">
+                  <div class="status">
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <!-- Placeholder APTC Form - work functionality in later -->
-            <!-- TODO: add terminate-calendar id -->
-            <!-- Calendar form functionality only necessary for terminate -->
-            <div id="calendar-div" class="hidden">
-              <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), :method => :post do %>
-              <div id="date-confirm" class="col-xs-3">
-                <%= text_field_tag 'confirm_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required date-picker aptc-date-picker floatlabel form-control", required: true, id: "aptc_date" %>
+            <div class="row">
+              <div class="col-md-6">
+                <i class="fa fa-icon-link fa-2x"></i>
+                <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
               </div>
-
-              <div id="applied-aptc-text" class="col-xs-3 hidden">
-                <h5>Max Applied APTC</h5>
-                <h5>100.00</h5>
-                <h5>Applied APTC Ratio</h5>
-                <span align= "center"><output id="aptc_applied_pct_1_percent" name="aptc_applied_pct">88%</output></span>
-                 <input id = "applied_pct_1" name='applied_pct_1' type="range" min="0" max="1" step="0.01" value=".88" style = "padding: 0px;">
-                 <h5>New Applied APTC</h5>
-                 <input type="text" name="aptc_applied_5cf6c9ec9ee4f43836000020" id="aptc_applied_5cf6c9ec9ee4f43836000020" value="87.50" placeholder="APTC Applied" class="form-control" size="8px">
-                 <h5><strong>New Premiun:</strong></h5>
-                 <span>$<span id="new-premium">290</span>/month</span>
+              <div class="col-md-3 margin-top-15px">
+                <a href="#">
+                <i class="fa fa-phone fa-2x"></i>&nbsp;<%= l10n("plan_contact_info") %>
+                </a>
               </div>
-
-               <div class="col-xs-3" style="float:right;">
-                 <br>
-                 <%= submit_tag l10n("confirm"), class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-action-confirm', id: 'btn-aptc', :disabled => true %>
+            </div>
+            <div class="row">
+              <div class="col-sm-6 transm">
+                <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan">Cancel Plan</a>
               </div>
+              <% if hbx_enrollment.has_at_least_one_aptc_eligible_member? && product.can_use_aptc? && !hbx_enrollment.is_coverall? && hbx_enrollment.coverage_kind != 'dental'%>
+                <div class="col-sm-4">
+                  <a id="aptc-button" class="btn btn-default btn-block interaction-click-control-edit-aptc">Change Tax Credit</a>
+                </div>
               <% end %>
-
             </div>
-
           </div>
         </div>
       </div>
     </div>
+    <!-- Cancel Plan Form -->
+    <%= render 'cancel_plan_form',
+        locals: {
+          self_term_or_cancel_form: @self_term_or_cancel_form,
+          hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
+          term_or_cancel: @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl, 
+        }
+    %>
+    <!-- Placeholder APTC Form - work functionality in later -->
+    <!-- TODO: add terminate-calendar id -->
+    <!-- Calendar form functionality only necessary for terminate -->
+    <%= render 'change_tax_credit_form',
+        locals: {
+          hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
+        }
+    %>
+  </div>
 </div>

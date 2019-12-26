@@ -10,6 +10,7 @@ module Insured
         @family_id      = attrs[:family_id]
         @term_date      = attrs[:term_date].present? ? Date.strptime(attrs[:term_date], '%m/%d/%Y') : TimeKeeper.date_of_record
         @term_or_cancel = attrs[:term_or_cancel]
+        @elected_aptc_pct = attrs[:elected_aptc_pct]
         @factory_class  = ::Insured::Factories::SelfServiceFactory
       end
 
@@ -20,6 +21,10 @@ module Insured
 
       def term_or_cancel
         @factory_class.term_or_cancel(@enrollment_id, @term_date, @term_or_cancel)
+      end
+
+      def update_aptc
+        @factory_class.update_aptc(@enrollment_id, @elected_aptc_pct.to_f, @elected_aptc_pct.to_f.to_money)
       end
 
       def attributes_to_form_params(attrs)

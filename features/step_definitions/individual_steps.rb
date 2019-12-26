@@ -655,6 +655,10 @@ When(/consumer visits home page after successful ridp/) do
   visit "/families/home"
 end
 
+And(/current user visits the family home page/) do
+  visit "/families/home"
+end
+
 And(/consumer clicked on "Married" qle/) do
   click_link "Married"
 end

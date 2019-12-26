@@ -11,7 +11,6 @@ module Insured
       attribute :hbx_id,                      String
       attribute :id,                          String
       attribute :should_term_or_cancel_ivl,   String
-
       def hbx_enrollment
         HbxEnrollment.where(id: id).first
       end

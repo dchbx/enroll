@@ -13,6 +13,7 @@ module Insured
       attribute :market_kind,           String
       attribute :product,               ::Insured::Forms::ProductForm
       attribute :term_date,             Date
+      attribute :elected_aptc_pct,      String
 
       validates :market_kind,           presence: true
 
@@ -25,6 +26,11 @@ module Insured
       def self.for_post(attrs)
         service = self_term_or_cancel_service(attrs)
         service.term_or_cancel
+      end
+
+      def self.for_aptc_update_post(attrs)
+        service = self_term_or_cancel_service(attrs)
+        service.update_aptc
       end
 
       def self.self_term_or_cancel_service(attrs)

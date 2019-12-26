@@ -36,6 +36,13 @@ module Insured
         )
       end
 
+      def self.update_aptc(enrollment_id, elected_aptc_pct, applied_aptc_amount)
+        # field :elected_aptc_pct, type: Float, default: 0.0
+        # field :applied_aptc_amount, type: Money, default: 0.0
+        enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
+        enrollment.update_attributes!(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount)
+      end
+
       def is_aptc_eligible(enrollment, family)
         allowed_metal_levels = ["platinum", "silver", "gold", "bronze"]
         product = enrollment.product
