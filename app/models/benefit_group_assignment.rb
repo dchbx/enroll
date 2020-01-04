@@ -16,7 +16,8 @@ class BenefitGroupAssignment
 
   field :start_on, type: Date
   field :end_on, type: Date
-  field :coverage_end_on, type: Date
+
+  field :coverage_end_on, type: Date # Deprecate
   field :aasm_state, type: String, default: "initialized"
   field :is_active, type: Boolean, default: true
   field :activated_at, type: DateTime
@@ -32,23 +33,64 @@ class BenefitGroupAssignment
   scope :active,         -> { where(:is_active => true) }
   scope :effective_on,   ->(effective_date) { where(:start_on => effective_date) }
 
+  scope :cover_date, lambda { |compare_date|
+    result = where(
+      {
+        :$or => [
+          {:start_on.lte => compare_date, :end_on.gte => compare_date},
+          {:start_on => compare_date, :end_on => nil},
+          {:start_on.lte => compare_date, :end_on => nil, :is_active => true}
+        ]
+      }
+    ).order(start_on: :desc)
+    if result.empty?
+      result = where(
+        {
+          :$and => [
+            {:start_on.lte => compare_date, :end_on => nil},
+            {:start_on.gte => (compare_date == compare_date.end_of_month ? (compare_date - 1.year + 1.day) : (compare_date - 1.year))}
+          ]
+        }
+      ).order(start_on: :desc)
+    end
+
+    # we need to deal with multiples returned
+    #   1) canceled benefit group assignments
+    #   2) multiple draft applications
+    if result.size > 1 && result.and(is_active: true).any?
+      result.and(is_active: true)
+    else
+      result
+    end
+  }
+
+  scope :by_benefit_package,     ->(benefit_package) { where(:benefit_package_id => benefit_package.id) }
   scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
     where(:start_on.lte => effective_on, :end_on.gte => effective_on, :benefit_package_id => benefit_package.id)
   }
 
-  def self.by_benefit_group_id(bg_id)
-    census_employees = CensusEmployee.where({
-      "benefit_group_assignments.benefit_group_id" => bg_id
-    })
-    census_employees.flat_map(&:benefit_group_assignments).select do |bga|
-      bga.benefit_group_id == bg_id
-    end
-  end
-
   class << self
+
     def find(id)
       ee = CensusEmployee.where(:"benefit_group_assignments._id" => id).first
       ee.benefit_group_assignments.detect { |bga| bga._id == id } unless ee.blank?
+    end
+
+    def on_date(census_employee, date)
+      assignments = census_employee.benefit_group_assignments.cover_date(date)
+
+      if assignments.size > 1
+        assignments.detect{|assignment| assignment.end_on.blank? } || assignments.first
+      else
+        assignments.first
+      end
+    end
+
+    def by_benefit_group_id(bg_id)
+      census_employees = CensusEmployee.where({:"benefit_group_assignments.benefit_group_id" => bg_id})
+      census_employees.flat_map(&:benefit_group_assignments).select do |bga|
+        bga.benefit_group_id == bg_id
+      end
     end
 
     def new_from_group_and_census_employee(benefit_group, census_ee)
@@ -112,10 +154,6 @@ class BenefitGroupAssignment
     raise ArgumentError.new("expected HbxEnrollment") unless new_hbx_enrollment.is_a? HbxEnrollment
     self.hbx_enrollment_id = new_hbx_enrollment._id
     @hbx_enrollment = new_hbx_enrollment
-  end
-
-  def benefit_end_date
-     end_on || benefit_group.end_on
   end
 
   def covered_families
@@ -216,10 +254,28 @@ class BenefitGroupAssignment
       end
   end
 
-  def end_benefit(end_on)
+  def end_benefit(end_date)
     return if coverage_waived?
-    self.coverage_end_on = end_on
+    self.coverage_end_on = end_date
     terminate_coverage! if may_terminate_coverage?
+  end
+
+  def end_date=(end_date)
+    end_date = [self.start_on, end_date].max
+    self[:end_on] = benefit_package.cover?(end_date) ? end_date : benefit_end_date
+  end
+
+  def benefit_end_date
+    end_on || benefit_package.end_on
+  end
+
+  def is_belong_to?(new_benefit_package)
+    benefit_package == new_benefit_package
+  end
+
+  def canceled?
+    return false if end_on.blank?
+    start_on == end_on
   end
 
   def update_status_from_enrollment(hbx_enrollment)

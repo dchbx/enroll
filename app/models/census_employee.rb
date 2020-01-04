@@ -307,6 +307,85 @@ class CensusEmployee < CensusMember
   # @param benefit_package [BenefitPackage]
   # @param effective_on [Date]
   # @return [BenefitGroupAssignment]
+  def benefit_package_assignment_on(date = TimeKeeper.date_of_record)
+    BenefitGroupAssignment.on_date(self, date)
+  end
+
+  def assign_benefit_package(new_benefit_package, start_on = TimeKeeper.date_of_record)
+    unless new_benefit_package.cover?(start_on)
+      Rails.logger.error { "start_on date (#{start_on}) is not within the benefit package (#{new_benefit_package.id}) effective period" }
+      return
+    end
+
+    if benefit_group_assignments.empty?
+      create_benefit_package_assignment(new_benefit_package, start_on)
+    else
+      update_benefit_package_assignment(new_benefit_package, start_on)
+    end
+  end
+
+  def create_benefit_package_assignment(new_benefit_package, start_on)
+    new_assignment = benefit_group_assignments.build(start_on: start_on, end_on: nil, benefit_package: new_benefit_package)
+
+    if new_assignment.save
+      new_assignment
+    else
+      Rails.logger.error { "Failed to create new_assignment for census employee (#{self.id}) with benefit package (#{new_benefit_package.id}) with start_on: #{start_on} due to #{assignment.errors.inspect}" }
+      return
+    end
+  end
+
+  def update_benefit_package_assignment(new_benefit_package, start_on)
+    current_assignment = benefit_package_assignment_on(start_on)
+
+    if current_assignment.blank?
+      create_benefit_package_assignment(new_benefit_package, start_on)
+    elsif current_assignment.is_belong_to?(new_benefit_package)
+      current_assignment
+    else
+      replace_package_assignment(current_assignment, new_benefit_package, start_on)
+    end
+  end
+
+  def replace_package_assignment(assignment, new_benefit_package, start_on)
+    assignment.end_date = start_on.prev_day
+
+    if assignment.save
+      create_benefit_package_assignment(new_benefit_package, start_on)
+    else
+      Rails.logger.error { "Failed to save package assignment (#{assignment.id}) for census employee (#{self.id}) due to #{assignment.errors.inspect}" }
+      return
+    end
+  end
+
+  def terminate_benefit_package_assignment(benefit_package, terminated_on)
+    package_assignments = benefit_group_assignments.by_benefit_package(benefit_package).by_date(terminated_on).reject(&:canceled?)
+    package_assignments.each do |assignment|
+      assignment.end_on = terminated_on
+      Rails.logger.error { "Failed to terminate package assignment (#{assignment.id}) with termination date #{terminated_on} for census employee (#{self.id}) due to #{assignment.errors.inspect}" } unless assignment.save
+    end
+  end
+
+  def cancel_benefit_package_assignment(benefit_package)
+    package_assignments = benefit_group_assignments.by_benefit_package(benefit_package).reject(&:canceled?)
+    package_assignments.each do |assignment|
+      assignment.end_on = assignment.start_on
+      Rails.logger.error { "Failed to cancel package assignment (#{assignment.id}) for census employee (#{self.id}) due to #{assignment.errors.inspect}" } unless assignment.save
+    end
+  end
+
+  # CensusEmployee.with_session do |session|
+  #   session.start_transaction
+  #   existing_assignment.save! if existing_assignment.present?
+  #   new_assignment.save!
+  #   begin
+  #     session.commit_transaction
+  #   rescue Mongo::Error => e
+  #     Rails.logger.error { "Failed to assign benefit package (#{benefit_package.id}) with start_on: #{start_on} due to #{e.inspect}" }
+  #     raise
+  #   end
+  # end
+
   def benefit_group_assignment_for(benefit_package, effective_on = TimeKeeper.date_of_record)
     benefit_group_assignments.by_benefit_package_and_assignment_on(benefit_package, effective_on).first
   end
@@ -376,9 +455,9 @@ class CensusEmployee < CensusMember
     }
   end
 
-  def benefit_package_assignment_on(effective_date)
-    benefit_group_assignments.effective_on(effective_date).active.first
-  end
+  # def benefit_package_assignment_on(effective_date)
+  #   benefit_group_assignments.effective_on(effective_date).active.first
+  # end
 
   def update_hbx_enrollment_effective_on_by_hired_on
     if employee_role.present? && hired_on != employee_role.hired_on
@@ -481,29 +560,19 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment
-    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+    benefit_package_assignment_on(TimeKeeper.date_of_record) || benefit_group_assignments.benefit_group_assignments.order_by(:start_on.asc).last
   end
 
   def renewal_benefit_group_assignment
-    return benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? } if is_case_old?
-    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.benefit_application && assignment.benefit_application.is_renewing? }
+    renewal_begin_date = active_benefit_group_assignment.benefit_package.end_on + 1.day
+    benefit_package_assignment_on(renewal_begin_date)
   end
 
-  def inactive_benefit_group_assignments
-    benefit_group_assignments.reject(&:is_active?)
-  end
-
+  # DEPRECATE IF POSSIBLE
   def published_benefit_group_assignment
     benefit_group_assignments.select do |benefit_group_assignment|
       benefit_group_assignment.benefit_group.is_active && benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
     end.first
-  end
-
-  def active_and_renewing_benefit_group_assignments
-    result = []
-    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
-    result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
-    result
   end
 
   def active_benefit_package
@@ -1091,7 +1160,6 @@ class CensusEmployee < CensusMember
   end
 
 def self.to_csv
-
     columns = [
       "Family ID # (to match family members to the EE & each household gets a unique number)(optional)",
       "Relationship (EE, Spouse, Domestic Partner, or Child)",
@@ -1271,7 +1339,6 @@ def self.to_csv
     enrollments.compact.uniq
   end
 
-
   def expected_to_enroll?
     expected_selection == 'enroll'
   end
@@ -1356,10 +1423,6 @@ def self.to_csv
     benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
   end
 
-  def benefit_package_for_open_enrollment(shopping_date)
-    active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
-  end
-
   def benefit_package_for_date(coverage_date)
     benefit_assignment = benefit_group_assignment_for_date(coverage_date)
     benefit_package = benefit_assignment.benefit_package if benefit_assignment.present?
@@ -1375,11 +1438,6 @@ def self.to_csv
       (assignment.start_on..assignment.benefit_end_date).cover?(coverage_date) && assignment.benefit_package.is_active
     end
     assignments.detect(&:is_active) || assignments.sort_by(&:created_at).reverse.first
-  end
-
-
-  def earliest_benefit_package_after(coverage_date)
-    active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
   end
 
   def ssn=(new_ssn)

@@ -4,16 +4,17 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   it { should validate_presence_of :benefit_package_id }
   it { should validate_presence_of :start_on }
   it { should validate_presence_of :is_active }
+
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:benefit_sponsor)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
-  let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
-  let(:employer_profile)      {  benefit_sponsorship.profile }
-  let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
-  let(:census_employee)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
-  let(:start_on)          { benefit_package.start_on }
+  let(:benefit_sponsor)       { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+  let(:benefit_sponsorship)   { benefit_sponsor.active_benefit_sponsorship }
+  let(:employer_profile)      { benefit_sponsorship.profile }
+  let!(:benefit_package)      { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
+  let(:census_employee)       { create(:census_employee, employer_profile: employer_profile) }
+  let(:start_on)              { benefit_package.start_on }
 
 
-  describe ".new" do
+  describe '.new' do
     let(:valid_params) do
       {
         census_employee: census_employee,
@@ -247,7 +248,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe '#hbx_enrollments', dbclean: :after_each do
+  describe '.hbx_enrollments' do
 
     let(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
@@ -273,7 +274,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     it_behaves_like "active, waived and terminated enrollments", "inactive", "", "enrollment"
   end
 
-  describe '#active_and_waived_enrollments', dbclean: :after_each do
+  describe '.active_and_waived_enrollments' do
 
     let(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
@@ -298,7 +299,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     it_behaves_like "active and waived enrollments", "inactive", "", "active_enrollment"
   end
 
-  describe '#active_enrollments', dbclean: :after_each do
+  describe '.active_enrollments' do
 
     let(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
@@ -327,7 +328,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     it_behaves_like "active enrollments", "inactive", "not", []
   end
 
-  describe "make_active", dbclean: :after_each do
+  describe '.make_active' do
     let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year)}
     let(:plan_year) { FactoryBot.create(:plan_year) }
     let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group, start_on: TimeKeeper.date_of_record)}
@@ -343,4 +344,114 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
     end
   end
+
+  describe '.cover_date' do
+
+    before do
+      census_employee.benefit_group_assignments = []
+    end
+
+    context 'for offcyle renewal' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2017,5,1), end_on: nil) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: Date.new(2019,3,31)) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,4,1), end_on: nil) }
+
+      it 'should pull benefit group assignment' do
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2020, 10, 30))).to be_empty
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2019, 10, 30))).to eq [assignment_three]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 6, 30))).to eq [assignment_two]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 5, 30))).to eq [assignment_one]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 1, 30))).to be_empty
+      end
+    end
+
+    context 'for gapped coverage' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2017,5,1), end_on: nil) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: Date.new(2019,3,31)) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil) }
+
+      it 'should pull benefit group assignment' do
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2020, 10, 30))).to be_empty
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2019, 10, 30))).to eq [assignment_three]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 6, 30))).to eq [assignment_two]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 5, 30))).to eq [assignment_one]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 1, 30))).to be_empty
+      end
+    end
+
+    context 'for renewal' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2017,5,1), end_on: nil) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: nil) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil) }
+
+      it 'should pull benefit group assignment' do
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2020, 10, 30))).to be_empty
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2019, 10, 30))).to eq [assignment_three]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 10, 30))).to eq [assignment_two]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 10, 30))).to eq [assignment_one]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 1, 30))).to be_empty
+      end
+    end
+
+    context 'for renewal cancel draft' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2017,5,1), end_on: nil) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: Date.new(2019,3,31)) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: Date.new(2019,5,1)) }
+      let!(:assignment_four)  { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil) }
+
+      it 'should pull benefit group assignment' do
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2020, 10, 30))).to be_empty
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2019, 5, 1))).to eq [assignment_three, assignment_four]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 6, 30))).to eq [assignment_two]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 5, 30))).to eq [assignment_one]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 1, 30))).to be_empty
+      end
+    end
+
+    context 'for cancel draft' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: Date.new(2018,5,1)) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: nil) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil) }
+
+      it 'should pull benefit group assignment' do
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2020, 10, 30))).to be_empty
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2019, 10, 30))).to eq [assignment_three]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 5, 1))).to eq [assignment_one, assignment_two]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2017, 5, 30))).to be_empty
+      end
+    end
+
+    context 'for multiple assignments' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: nil) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,8,1), end_on: nil) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil) }
+
+      it 'should pull benefit group assignment' do
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2019, 10, 30))).to eq [assignment_three]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 5, 20))).to eq  [assignment_one]
+        expect(census_employee.benefit_group_assignments.cover_date(Date.new(2018, 10, 10))).to eq [assignment_two, assignment_one]
+      end
+    end
+  end
+
+  describe '.on_date' do
+
+    before do
+      census_employee.benefit_group_assignments = []
+    end
+
+    context 'for multiple assignments' do
+      let!(:assignment_one)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: nil, is_active: false) }
+      let!(:assignment_two)   { census_employee.benefit_group_assignments.build(start_on: Date.new(2018,8,1), end_on: nil, is_active: false) }
+      let!(:assignment_three) { census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil, is_active: true) }
+
+      it 'should pull benefit group assignment with later begin date' do
+        expect(BenefitGroupAssignment.on_date(census_employee, Date.new(2019, 10, 30))).to eq assignment_three
+        expect(BenefitGroupAssignment.on_date(census_employee, Date.new(2018, 5, 20))).to  eq assignment_one
+        expect(BenefitGroupAssignment.on_date(census_employee, Date.new(2018, 10, 10))).to eq assignment_two
+      end
+    end
+  end
 end
+
+

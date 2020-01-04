@@ -368,25 +368,18 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def active_and_renewing_benefit_group_assignments
-    result = []
-    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
-    result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
-    result
-  end
-
   def coverage_effective_on(package = nil)
-  package = possible_benefit_package if (package.blank? || package.is_conversion?) # cautious
-  if package.present?
-    
-    effective_on_date = package.effective_on_for(hired_on)
-    if newly_designated_eligible? || newly_designated_linked?
-      effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max
-    end
+    package = possible_benefit_package if (package.blank? || package.is_conversion?) # cautious
+    if package.present?
 
-    effective_on_date
+      effective_on_date = package.effective_on_for(hired_on)
+      if newly_designated_eligible? || newly_designated_linked?
+        effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max
+      end
+
+      effective_on_date
+    end
   end
-end
 
   def new_hire_enrollment_period
     start_on = [hired_on, TimeKeeper.date_according_to_exchange_at(created_at)].max

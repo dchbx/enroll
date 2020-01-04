@@ -2545,4 +2545,81 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
     end
   end
+
+  describe "#assign_benefit_package" do
+
+    let(:current_effective_date) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+    let(:effective_period)       { current_effective_date..(current_effective_date.next_year.prev_day) }
+
+    context "when previous benefit package assignment not present" do
+      let!(:census_employee) do
+        ce = create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile)
+        ce.benefit_group_assignments.delete_all
+        ce
+      end
+
+      context "when benefit package and start_on date passed" do
+
+        it "should create assignments" do
+          expect(census_employee.benefit_group_assignments.blank?).to be_truthy
+          census_employee.assign_benefit_package(current_benefit_package, current_benefit_package.start_on)
+          expect(census_employee.benefit_group_assignments.count).to eq 1
+          assignment = census_employee.benefit_group_assignments.first
+          expect(assignment.start_on).to eq current_benefit_package.start_on
+          expect(assignment.end_on).to be_nil
+        end
+      end
+
+      context "when benefit package passed and start_on date nil" do
+
+        it "should create assignment with current date as start date" do
+          expect(census_employee.benefit_group_assignments.blank?).to be_truthy
+          census_employee.assign_benefit_package(current_benefit_package)
+          expect(census_employee.benefit_group_assignments.count).to eq 1
+          assignment = census_employee.benefit_group_assignments.first
+          expect(assignment.start_on).to eq TimeKeeper.date_of_record
+          expect(assignment.end_on).to be_nil
+        end
+      end
+    end
+
+    context "when previous benefit package assignment present" do
+      let!(:census_employee)     { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
+      let!(:new_benefit_package) { initial_application.benefit_packages.create({title: 'Second Benefit Package', probation_period_kind: :first_of_month})}
+
+      context "when new benefit package and start_on date passed" do
+
+        it "should create new assignment and cancel existing assignment" do
+          expect(census_employee.benefit_group_assignments.present?).to be_truthy
+          census_employee.assign_benefit_package(new_benefit_package, new_benefit_package.start_on)
+          expect(census_employee.benefit_group_assignments.count).to eq 2
+
+          prev_assignment = census_employee.benefit_group_assignments.first
+          expect(prev_assignment.start_on).to eq current_benefit_package.start_on
+          expect(prev_assignment.end_on).to eq current_benefit_package.start_on
+
+          new_assignment = census_employee.benefit_group_assignments.last
+          expect(new_assignment.start_on).to eq new_benefit_package.start_on
+          expect(new_assignment.end_on).to be_nil
+        end
+      end
+
+      context "when new benefit package passed and start_on date nil" do
+
+        it "should create new assignment and term existing assignment with an end date" do
+          expect(census_employee.benefit_group_assignments.present?).to be_truthy
+          census_employee.assign_benefit_package(new_benefit_package)
+          expect(census_employee.benefit_group_assignments.count).to eq 2
+
+          prev_assignment = census_employee.benefit_group_assignments.first
+          expect(prev_assignment.start_on).to eq current_benefit_package.start_on
+          expect(prev_assignment.end_on).to eq TimeKeeper.date_of_record.prev_day
+
+          new_assignment = census_employee.benefit_group_assignments.last
+          expect(new_assignment.start_on).to eq TimeKeeper.date_of_record
+          expect(new_assignment.end_on).to be_nil
+        end
+      end
+    end
+  end
 end

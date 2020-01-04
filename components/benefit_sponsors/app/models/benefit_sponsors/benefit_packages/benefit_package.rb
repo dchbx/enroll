@@ -30,7 +30,7 @@ module BenefitSponsors
       delegate :benefit_sponsor_catalog, to: :benefit_application
       delegate :rate_schedule_date,      to: :benefit_application
       delegate :effective_period,        to: :benefit_application
-      delegate :recorded_sic_code, to: :benefit_application
+      delegate :recorded_sic_code,       to: :benefit_application
 
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
@@ -40,7 +40,8 @@ module BenefitSponsors
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
       delegate :is_renewing?,   to: :benefit_application
-      delegate :shoppable?,   to: :benefit_application
+      delegate :shoppable?,     to: :benefit_application
+      delegate :cover?,         to: :effective_period
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
@@ -73,6 +74,12 @@ module BenefitSponsors
       def open_enrollment_contains?(date)
         open_enrollment_period.include?(date)
       end
+
+      # def cover?(date)
+      #   effective_period.cover?(date)
+      # end
+
+
 
       def package_for_open_enrollment(shopping_date)
         if open_enrollment_period.include?(shopping_date)
