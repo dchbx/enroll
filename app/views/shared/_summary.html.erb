@@ -1,185 +1,356 @@
-<% if @hbx_enrollment.shopping?%>
-<% else %>
-<%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
-<br/>
-<br/>
-<% end %>
-<% if qhp.present? %>
-<div class="row plan module" style="margin-top: 0;">
-  <div class="col-xs-12">
-    <div class="col-xs-6">
-      <span class="pull-left">
-        <%= display_carrier_logo(Maybe.new(@plan), {width: 180}) %>
-      </span>
-    </div>
-    <div class="col-xs-6">
-      <span class="pull-right">
-        <span style="font-size: 24px;">
-          <% if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.coverage_kind == 'health' %>
-          <%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source, @plan.can_use_aptc?)) %>
-          <% else %>
-          <%= number_to_currency(@plan.total_employee_cost) %>
-          <% end %>
-        </span>
-        <br/>
-        <span class="lg">per month</span>
-      </span>
-    </div>
-    <div class="col-xs-12">
-      <h3 class="text-blue"><%= @plan.name %></h3>
-    </div>
-    <div>
-      <% if @plan.try(:is_standard_plan) %>
-      <div class="col-md-12">
-        <i class="fa fa-bookmark">
-          STANDARD PLAN
-        </i>
-      </div>
-      <% end %>
-    </div>
-    <div class="col-xs-12">
+<div class="container" id="plan-summary">
+
+  <div class="panel panel-default">
+    <div class="panel-body">
       <div class="row">
-        <div class="col-xs-7">
-          <table style="width: 100%; table-layout:fixed;">
-            <tr>
-              <td>
-                <span class="ttu lg twelve">
-                  Type
-                </span>
-                <br/>
-                <span class="ttu dg fourteen">
-                  <%= @plan.plan_type ? @plan.plan_type.upcase : "" %>
-                </span>
-              </td>
-              <td>
-                <span class="ttu lg twelve" style="margin-left: -10px">
-                  Metal Level
-                </span>
-                <br/>
-                <span class="ttu dg fourteen" style="margin-left: -10px">
-                  <%= display_dental_metal_level @plan %>
-                </span>
-              </td>
-              <td>
-                <span class="ttu lg twelve" style="margin-left: -10px">
-                  Network
-                </span>
-                <br/>
-                <span class="ttu dg fourteen" style="margin-left: -10px">
-                  <% if offers_nationwide_plans? %>
-                    <%= @plan.nationwide ? "Nationwide" : "DC-Metro" %>
-                  <% else %>
-                    <% if @plan.network_information.present? %>
-                        Network Notes
-                        <i class='fa fa-question-circle' data-toggle="tooltip" data-container="body" title="<%= @plan.network_information %>"></i>
-                    <% end %>
-                  <% end %>
-                </span>
-              </td>
-              <td>
-                <span class="ttu lg twelve" style="margin-left: -10px">
-                  <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
-                  Family Deductible
-                  <% else %>
-                  Deductible
-                  <% end %>
-                </span>
-                <br/>
-                <span class="ttu dg fourteen" style="margin-left: -10px">
-                  <%= deductible_display(@hbx_enrollment, @plan) %>
-                </span>
-              </td>
-            </tr>
-          </table>
+        <div class="col-md-3 col-sm-3 col-xs-3">
+          <a class="icon-lg summary-icon"> Summary of Benefits and Coverage (pdf)</a>
         </div>
-        <div class="col-xs-5">
-          <div class="pull-right">
-            <% if @hbx_enrollment.shopping?%>
-            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
-            <% end %>
-          </div>
+        <div class="col-md-3 col-sm-3 col-xs-3">
+          <a class="icon-lg drug-icon ext-link"> Drug Formulary</a>
         </div>
-      </div>
-      <div class="col-xs-12">
-        <div class="row">
-          <hr>
-          <div class="col-xs-4">
-            <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
-          </div>
-          <div class="col-xs-4">
-            <% if @plan.coverage_kind == "health" && @plan.rx_formulary_url.present? %>
-            <%= link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank" %>
-            <% end %>
-          </div>
-          <div class="col-xs-4">
-            <% if offers_nationwide_plans? %>
-              <% if @plan.nationwide %>
-              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
-              <% end %>
-            <% else %>
-              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
-            <% end %>
-          </div>
+        <div class="col-md-3 col-sm-3 col-xs-3">
+          <a class="icon-lg in-nw-icon ext-link"> In-Network Doctors</a>
         </div>
       </div>
     </div>
   </div>
-</div>
-</div>
-<div class="col-md-6 col-sm-6 col-xs-12" style="display: none;">
-<div class="row">
-  <% if @market_kind == "employer_sponsored" && @coverage_kind == 'health' %>
-  <div class="col-md-4 col-sm-4 col-xs-12">
-    <h3><%= number_to_currency(@plan.total_premium) %></h3>
-    <small>Premium</small>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active" onclick="setIcon(this)"><a href="#home" aria-controls="home" role="tab" data-toggle="tab"><span class="hdp-filter hdp-fil-com item-1"></span> In-Network Costs and Coverage</a></li>
+    <li role="presentation" onclick="setIcon(this)"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab"><span class="hdp-compare hdp-fil-com item-2"></span> Out-of-Network Costs and Coverage</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content panel">
+    <div role="tabpanel" class="tab-pane active" id="home">
+      <div class="row pt-3">
+        <div class="col-md-05 col-sm-05 col-xs-05">
+          <i class="far fa-check-circle"></i>
+        </div>
+        <div class="col-md-10 col-sm-10 col-xs-10">
+          <p><strong>Remember:</strong> Unless otherwise stated in the plan’s benefits and coverage description, <strong>you must pay all the costs up to the deductible amount</strong> before the plan begins to pay for covered services you use. This plan also covers some services before you’ve met the medical deductible See the information below for details.</p>
+          <p>If you receive <strong>a covered service from an in-network service provider</strong>, that provider <strong>may not bill you</strong> for <strong>any remaining balances</strong> between their own charges, and what the insurance company says you must pay for that service.</p>
+        </div>
+      </div>
+      <div>
+        <table class="table table-striped table-bordered">
+          <tbody>
+            <tr>
+              <th colspan="2" class="text-center">YOUR COST AT A PARTICIPATING PROVIDER</th>
+            </tr>
+            <tr>
+              <th colspan="2">Doctors Visits</th>
+            </tr>
+            <tr>
+              <td>Primary Care Visit to Treat an Injury or Illness</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>25%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Specialist Visit</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>25%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Other Practitioner Office Visit (Nurse, Physician Assistant)</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>25%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Prenatal and Postnatal Care</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Well Baby Visits and Care</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Preventive Care/Screening/Immunization</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Allergy Testing</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Testing and Imaging</th>
+            </tr>
+            <tr>
+              <td>Imaging (CT/PET Scans, MRIs)</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>X-rays and Diagnostic Imaging</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Laboratory Outpatient and Professional Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Prescription Drugs</th>
+            </tr>
+            <tr>
+              <td>Generic Drugs</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Preferred Brand Drugs</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Non-Preferred Brand Drugs</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Specialty Drugs</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Emergency</th>
+            </tr>
+            <tr>
+              <td>Emergency Room Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Emergency Medical<br /> Transportation/Ambulance</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Urgent Care Centers or Facilities</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>$100</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Hospital</th>
+            </tr>
+            <tr>
+              <td>Inpatient Hospital Services (e.g., Hospital Stay)</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Inpatient Physician and Surgical Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Outpatient Facility Fee (e.g., Ambulatory Surgery Center)</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Outpatient Surgery Physician/Surgical Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Delivery and All Inpatient Services for Maternity Care</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Mental/Behavioral Health</th>
+            </tr>
+            <tr>
+              <td>Mental/Behavioral Health Inpatient Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Mental/Behavioral Health Outpatient Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Substance Abuse Disorder Inpatient Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Substance Abuse Disorder Outpatient Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Outpatient Rehabilitation Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Vision and Dental</th>
+            </tr>
+            <tr>
+              <td>Child - Routine Eye Exam</td>
+              <td><strong>$50</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <td>Child - Eye Glasses</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Child - Dental Check-Up</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Child - Basic Dental Care</td>
+              <td><strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Child - Major Dental Care</td>
+              <td><strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Child - Orthodontia</td>
+              <td><strong>50%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Adult - Routine Eye Exam</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Accidental Dental</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Other Services</th>
+            </tr>
+            <tr>
+              <td>Nutritional Counseling</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Diabetes Education</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Treatment for Temporomandibular Joint Disorders</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Chiropractic Care</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Dialysis</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Rehabilitative Speech Therapy</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Rehabilitative Occupational and Rehabilitative Physical<br /> Therapy</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Habilitation Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Home Health Care Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Skilled Nursing Facility</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Hospice Services</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Chemotherapy</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Radiation</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Infusion Therapy</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Transplant</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Reconstructive Surgery</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Durable Medical Equipment</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Prosthetic Devices</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+            <tr>
+              <td>Abortion for Which Public Funding is Prohibited</td>
+              <td>You must <strong>meet the deductible</strong> first, then <strong>20%</strong> of <span id="allowed-charges-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">allowed charges.</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="profile">
+      <div class="row pt-3">
+        <div class="col-md-05 col-sm-05 col-xs-05">
+          <i class="far fa-check-circle"></i>
+        </div>
+        <div class="col-md-10 col-sm-10 col-xs-10">
+          <p><strong>Remember:</strong> Unless otherwise stated in the plan’s benefits and coverage description, <strong>you must pay all the costs up to the out-of-network deductible amount</strong> before the plan begins to pay for covered services you use. See the information below for details.</p>
+          <p>If you receive <strong>a covered service from an out-network service provider</strong>, your insurance company will only cover what they agree to pay for that service. The provider <strong>may bill you</strong> for the difference between what they charge and what your insurance covers. <strong>You could be responsible for paying the difference even when it exceeds your out-of-pocket limit</strong>. This is known as balance billing.</p>
+        </div>
+      </div>
+
+      <div>
+        <table class="table table-striped table-bordered">
+          <tbody>
+            <tr>
+              <th colspan="2" class="text-center">YOUR COST AT AN OUT-OF-NETWORK PROVIDER</th>
+            </tr>
+            <tr>
+              <th colspan="2">Doctors Visits</th>
+            </tr>
+            <tr>
+              <td>Primary Care Visit to Treat an Injury or Illness</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$120</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <td>Specialist Visit</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$120</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <td>Other Practitioner Office Visit (Nurse, Physician Assistant)</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$120</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <td>Prenatal and Postnatal Care</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$120</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <td>Well Baby Visits and Care</td>
+              <td><strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">No charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Preventive Care/Screening/Immunization</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong><span id="no-charge-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">no charge.</span></strong></td>
+            </tr>
+            <tr>
+              <td>Allergy Testing</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$120</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <th colspan="2">Testing and Imaging</th>
+            </tr>
+            <tr>
+              <td>Imaging (CT/PET Scans, MRIs)</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$300</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <td>X-rays and Diagnostic Imaging</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$300</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+            <tr>
+              <td>Laboratory Outpatient and Professional Services</td>
+              <td>You must <strong>meet the out-of-network deductible</strong> first, then <strong>$100</strong> <span id="per-visit-tooltip" class="glossary_lookup" data-toggle="popover" data-html="true" data-placement="top" data-title="<button class='close' type='button' id='close-popover-btn' onclick='hidePopover()'></button>">per visit.</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-  <div class="col-md-4 col-sm-4 col-xs-12">
-    <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3>
-    <small>Employer</small>
-  </div>
-  <% end %>
-</div><br><br>
-<div class="row">
-  <div class="col-md-12 col-sm-12 col-xs-12"></div>
+<%= link_to 'Back to Plan Comparison', :back, class:'icon left-triangle' %>
 </div>
-</div>
-<% if @coverage_kind == "health" %>
-<div class="details">
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th width="30%">SERVICES YOU MAY NEED</th>
-      <th width="40%">YOUR COST AT PARTICIPATING PROVIDER
-      </th>
-      <th width="30%">(IN-NETWORK)</th>
-    </tr>
-    <tr>
-      <th>&nbsp;</th>
-      <th>CO-PAY</th>
-      <th>COINSURANCE</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
-    <tr>
-      <td></td>
-      <td class="text-center" colspan="3">
-        <% if @hbx_enrollment.shopping?%>
-        <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
-        <% else %>
-        <%= link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans' %>
-        <% end %>
-      </td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<% end %>
-<% if @hbx_enrollment.shopping? %>
-<%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-default all-plans' %>
-<br/>
-<br/>
-<% end %>
-<% else %>
-No Plan found
-<% end %>

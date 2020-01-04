@@ -1,3 +1,7 @@
+$(document).ready(function() {
+    setTooltipsForDetailsView()
+});
+
 function hidePlanTabs() {
   $(".all-filters-row").hide();
   $("ul[role='tablist'] li[role='presentation']").each(function(idx, ele) {
@@ -265,4 +269,46 @@ function disableSelectricInModal() {
   $('#waive_confirm').on('shown.bs.modal', function (e) {
     $('select#waiver_reason_selection_dropdown').selectric('destroy');
   })
+}
+
+function hidePopover() {
+  $('[data-toggle="popover"]').popover('hide');
+}
+
+function setIcon(element) {
+  icon = $(element).find('span')[0];
+  if ($(icon).hasClass('hdp-compare')) {
+    $(icon).removeClass('hdp-compare');
+    $(icon).addClass('active-hdp-compare');
+    $('.item-1').removeClass('hdp-filter');
+    $('.item-1').addClass('inactive-hdp-filter');
+  }
+
+  if ($(icon).hasClass('inactive-hdp-filter')) {
+    $(icon).removeClass('inactive-hdp-filter');
+    $(icon).addClass('active-hdp-filter');
+    $('.item-2').removeClass('active-hdp-compare');
+    $('.item-2').addClass('inactive-hdp-compare');
+  }
+}
+
+function setTooltipsForDetailsView() {
+  $("span#per-visit-tooltip").each(function() {
+    $(this).popover({
+      content: "<b>Per Visit</b><br>Also known as “<b>Copay</b>”<br><br>A fixed dollar amount you pay for a covered service, usually when you receive the service. The amount can vary depending on the type of service. (For example, $25 to visit your doctor, $10 for prescription drugs). Once you reach your out-of-pocket limit, you no longer have copays for the rest of the plan year.<br><br>For more terms we use, go to <a href='https://www.dchealthlink.com/glossary' target='_blank'>https://www.dchealthlink.com/glossary</a>."
+    });
+  })
+
+  $("span#no-charge-tooltip").each(function() {
+    $(this).popover({
+      content: "<b>No Charge</b> <br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed semper elit, at bibendum velit. Nam commodo, dolor eget tempus pellentesque, lacus ipsum lobortis justo, eget posuere massa est et mi.<br><br>For more terms we use, go to <a href='https://www.dchealthlink.com/glossary' target='_blank'>https://www.dchealthlink.com/glossary</a>."
+    });
+  })
+
+  $("span#allowed-charges-tooltip").each(function() {
+    $(this).popover({
+      content: "<b>Allowed Charges</b><br>Also known as “<b>Coinsurance</b>”<br><br>Your contribution towards the costs of covered services. Coinsurance is calculated as a percent of the allowed amount for a covered service. For example, if your health insurance plan’s allowed amount to visit your doctor is $100, and you’ve already paid your annual deductible, a coinsurance payment of 20 percent would be $20. Once you reach your out-of-pocket limit, you no longer have to pay coinsurance for the rest of the plan year.<br><br>For more terms we use, go to <a href='https://www.dchealthlink.com/glossary' target='_blank'>https://www.dchealthlink.com/glossary</a>."
+    });
+  })
+
 }
