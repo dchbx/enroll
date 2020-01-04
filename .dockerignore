@@ -1,0 +1,55 @@
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+/public/packs/*
+!/log/.keep
+!/tmp/.keep
+.DS_Store
+.idea
+.env.development
+.env.staging
+
+# Ignore node_modules
+/node_modules/*
+
+# Ignore bundler config.
+/.bundle
+
+# Ignore the tags file used by VIM
+tags
+
+# Ignore Byebug command history file.
+.byebug_history
+
+# Ignore .git as it's not needed with the docker built.
+.git
+.cache
+
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
+# rspec failure tracking
+.rspec_status
+
+# SimpleCov output
+coverage
+
+# byebug history
+/.byebug_history
+
+# Make sure no PII is accidently commited
+# add w/ git add --force if actually docs
+*.csv
+*.txt
+*.xml
+*.xls
+*.xlst
+*.xlsx
+*.doc
+*.docx

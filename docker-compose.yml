@@ -1,0 +1,85 @@
+version: '3.4'
+
+services:
+  app: &app
+    build:
+      context: .
+      dockerfile: ./.docker/development/app/Dockerfile
+      args:
+        RUBY_VERSION: '2.6.3'
+        BUNDLER_VERSION: '2.0.2'
+        NODE_MAJOR: '10'
+        YARN_VERSION: '1.17.3'
+    image: enroll:dev-0.1.0
+    tmpfs:
+      - /tmp
+    networks:
+      - local
+
+  backend: &backend
+    <<: *app
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app:cached
+      - rails_cache:/app/tmp/cache
+      - bundle:/bundle
+      - node_modules_app:/app/node_modules
+      - packs:/app/public/packs
+
+    environment:
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - REDIS_URL=redis://redis:6379/
+      - BOOTSNAP_CACHE_DIR=/bundle/bootsnap
+      - WEB_CONCURRENCY=1
+      - HISTFILE=/app/log/.bash_history
+      - EDITOR=vi
+
+    depends_on:
+      - mongo
+      - redis
+
+  runner:
+    <<: *backend
+    command: /bin/bash
+    ports:
+      - '3002:3002'
+
+  rails:
+    <<: *backend
+    stdin_open: true
+    tty: true
+    command: bash -c "rm -f tmp/pids/server.pid && bundle && yarn install --check-files && bundle exec rails server -b 0.0.0.0"
+    ports:
+      - '3000:3000'
+
+  mongo:
+    image: mongo:4.2
+    volumes:
+      - mongodb:/data/db
+      - mongodb_config:/data/configdb
+    ports:
+      - 27017
+    networks:
+      - local
+
+  redis:
+    image: redis:3.2-alpine
+    volumes:
+      - redis:/data
+    ports:
+      - 6379
+    networks:
+      - local
+
+volumes:
+  redis:
+  bundle:
+  node_modules_app:
+  packs:
+  rails_cache:
+  mongodb: 
+  mongodb_config:
+
+networks:
+  local:

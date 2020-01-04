@@ -84,6 +84,7 @@ fixture_dumps
 *.doc
 *.docx
 
+/public/assets
 /public/packs
 /public/packs-test
 /node_modules
@@ -97,3 +98,5 @@ angular_documentation
 angular_coverage
 rubocop
 coverage
+**/*/.rspec_parallel
+rspec*.json

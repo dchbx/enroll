@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.1'
+ruby '2.6.3'
 gem 'rails', '~> 5.2.3'
 
 #######################################################
@@ -167,7 +167,7 @@ group :test do
 end
 
 group :production do
-  gem 'eye',          '0.8'
+  gem 'eye',          '0.10.0'
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
 end
