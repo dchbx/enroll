@@ -1075,5 +1075,18 @@ module BenefitSponsors
       end
 
     end
+
+    describe '.active_states_per_dt_action', dbclean: :after_each do
+
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      context "should return eligible benefit application", dbclean: :after_each do
+        it 'should return benefit applications' do
+          expect(benefit_sponsorship.benefit_applications.active_states_per_dt_action.count).to eq 2
+          expect(benefit_sponsorship.benefit_applications.active_states_per_dt_action.map(&:aasm_state)).to eq [:draft, :active]
+        end
+      end
+    end
   end
 end

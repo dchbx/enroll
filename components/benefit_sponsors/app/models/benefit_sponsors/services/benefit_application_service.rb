@@ -48,7 +48,7 @@ module BenefitSponsors
         if term_pending_bas.present?
           can_create_draft_for_tp?(term_pending_bas, form) ? false : true
         else
-          bas.active_states_per_dt_action.present? || bas.draft.present?
+          !bas.active_states_per_dt_action.present?
         end
       end
 

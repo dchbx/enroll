@@ -183,9 +183,9 @@ module BenefitSponsors
         context 'with dt active state' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
 
-          it 'should return true as dt active state exists for one of the bas' do
+          it 'should return false as dt active state exists for one of the bas' do
             set_bs_for_service(@form)
-            expect(subject.can_create_draft_ba?(@form)).to be_truthy
+            expect(subject.can_create_draft_ba?(@form)).to be_falsy
           end
         end
       end
@@ -194,9 +194,9 @@ module BenefitSponsors
       [:terminated, :canceled, :suspended].each do |non_active_state|
         context 'for benefit applications in non active states' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: non_active_state) }
-          it 'should return false as no bas has dt active state' do
+          it 'should return true as no bas has dt active state' do
             set_bs_for_service(@form)
-            expect(subject.can_create_draft_ba?(@form)).to be_falsy
+            expect(subject.can_create_draft_ba?(@form)).to be_truthy
           end
         end
       end
@@ -268,16 +268,16 @@ module BenefitSponsors
               @model_attrs = subject.form_params_to_attributes(@form)
               result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
               benefit_sponsorship.reload
-              expect(result).to eq [true, benefit_sponsorship.benefit_applications.last]
+              expect(result).to eq [false, nil]
             end
 
-            it 'the existing benefit application should be turned into cancelled state' do
+            it 'the existing benefit application should not be turned into cancelled state' do
               ba2.update_attribute(:aasm_state, active_state)
               set_bs_for_service(@form)
               @model_attrs = subject.form_params_to_attributes(@form)
               subject.create_or_cancel_draft_ba(@form, @model_attrs)
               benefit_sponsorship.reload
-              expect(benefit_sponsorship.benefit_applications.find(ba2.id)).to have_attributes(:aasm_state => :canceled)
+              expect(benefit_sponsorship.benefit_applications.find(ba2.id)).to have_attributes(:aasm_state => active_state)
             end
 
             it 'the existing ineligible benefit application should not be turned into cancelled state ' do
@@ -293,22 +293,22 @@ module BenefitSponsors
 
         context 'with dt active state' do
 
-          it 'should return true and instance as ba succesfully created' do
+          it 'should return false and not created' do
             ba2.update_attribute(:aasm_state, :active)
             set_bs_for_service(@form)
             @model_attrs = subject.form_params_to_attributes(@form)
             result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
             benefit_sponsorship.reload
-            expect(result).to eq [true, benefit_sponsorship.benefit_applications.last]
+            expect(result).to eq [false, nil]
           end
 
-          it 'the existing active application should be in turned into termination pending state' do
+          it 'the existing active application should be kept active' do
             ba2.update_attribute(:aasm_state, :active)
             set_bs_for_service(@form)
             @model_attrs = subject.form_params_to_attributes(@form)
             subject.create_or_cancel_draft_ba(@form, @model_attrs)
             benefit_sponsorship.reload
-            expect(benefit_sponsorship.benefit_applications.map(&:aasm_state)).to include(:termination_pending)
+            expect(benefit_sponsorship.benefit_applications.map(&:aasm_state)).to include(:active)
           end
         end
 
@@ -325,11 +325,11 @@ module BenefitSponsors
             end
 
             it 'should add errors to form' do
-              expect(@form.errors.full_messages).to eq ['Existing plan year with overlapping coverage exists']
+              expect(@form.errors.full_messages).to eq []
             end
 
             it 'should return a combination of false and nil' do
-              expect(@result).to eq [false, nil]
+              expect(@result).to eq [true, benefit_sponsorship.benefit_applications.last]
             end
           end
         end
