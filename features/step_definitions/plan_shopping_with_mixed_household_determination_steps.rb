@@ -3,7 +3,7 @@ Given(/^all plan shopping are of mixed determination$/) do
 end
 
 Then(/^selects a csr plan$/) do
-  find(:xpath, "//*[@id='plans']/div[1]/div/div[5]/div[3]/a[1]").click
+  find('.btn', text: 'Select Plan', wait: 10).click
 end
 
 Then(/^the page should redirect to thankyou page$/) do
@@ -28,7 +28,7 @@ When(/^the db has standard plans$/) do
 end
 
 Then(/^selects a non csr plan$/) do
-  find(:xpath, "//*[@id='plans']/div[2]/div/div[5]/div[3]/a[1]").click
+  all('.btn', text: 'Select Plan', wait: 10).first.click
 end
 
 Then(/^the page should open a model pop-up for confirmation$/) do
@@ -41,7 +41,7 @@ Then(/^user clicks close button$/) do
 end
 
 Then(/^the page should have csr plans$/) do
-  expect(page).to have_css('.fa-check-square-o')
+  expect(page).to have_css('.fa-check-square')
 end
 
 When(/^user is shopping for Health benefit$/) do
