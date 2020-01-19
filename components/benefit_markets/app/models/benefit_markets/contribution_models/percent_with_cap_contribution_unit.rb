@@ -15,7 +15,7 @@ module BenefitMarkets
         super(cv)
         cv.contribution_cap = default_contribution_cap
         cv.contribution_factor = default_contribution_factor
-        cv.min_contribution_factor = default_contribution_factor
+        cv.min_contribution_factor = minimum_contribution_factor
       end
     end
   end

@@ -129,8 +129,9 @@ javascript:
   var planOptions = #{@benefit_package_form.catalog.plan_options.to_json.html_safe};
   var applicationStartOn = #{@benefit_package_form.service.benefit_application.effective_period.min.strftime("%m-%d").to_json.html_safe};
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
-  var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
   var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
+  var minContributions = #{@benefit_package_form.sponsored_benefits.first.sponsor_contribution.contribution_levels.inject({}) {|data, cl| data[cl.display_name] = cl.min_contribution_factor * 100; data;}.to_json.html_safe};
+
 	var productsTotal;
 
   function radioSelected(element) {
@@ -489,9 +490,9 @@ javascript:
       if (applicationStartOn === "01-01") {
         enableNewPlanYearButton()
       } else {
-        if (eeContribution < erCL || employeeOnly < erCL) {
+        if (eeContribution < minContributions['Employee'] || employeeOnly < minContributions['Employee']) {
           disableNewPlanYearButton()
-        } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
+        } else if (familyOnly < familyCL || spouse < minContributions['Spouse'] || domesticPartner < minContributions['Domestic Partner'] || childUnder26 < minContributions['Child Under 26']) {
           disableNewPlanYearButton()
         }  else {
           enableNewPlanYearButton()

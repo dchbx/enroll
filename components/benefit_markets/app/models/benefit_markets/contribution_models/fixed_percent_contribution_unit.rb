@@ -12,7 +12,7 @@ module BenefitMarkets
       def assign_contribution_value_defaults(cv)
         super(cv)
         cv.contribution_factor = default_contribution_factor
-        cv.min_contribution_factor = default_contribution_factor
+        cv.min_contribution_factor = minimum_contribution_factor
       end
     end
   end
