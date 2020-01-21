@@ -113,6 +113,126 @@ module SponsoredBenefits
       end
     end
 
+    describe '#claim', dbclean: :after_each do
+      let(:plan_design_organization) do
+        FactoryBot.create :sponsored_benefits_plan_design_organization,
+                          owner_profile_id: owner_profile.id,
+                          sponsor_profile_id: sponsor_profile.id
+      end
+
+      let(:plan_design_proposal) do
+        pdp =
+          FactoryBot.create(
+            :plan_design_proposal,
+            :with_profile,
+            plan_design_organization: plan_design_organization
+          ).tap do |proposal|
+            sponsorship = proposal.profile.benefit_sponsorships.first
+            sponsorship.initial_enrollment_period = benefit_sponsorship_enrollment_period
+            sponsorship.save
+          end
+        pdp.publish!
+        pdp
+      end
+
+      let(:ofice_location) { proposal_profile.office_locations.where(is_primary: true).first }
+
+      let(:proposal_profile) { plan_design_proposal.profile }
+
+      let(:benefit_sponsorship_enrollment_period) do
+        begin_on = SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates[0]
+        end_on = begin_on + 1.year - 1.day
+        begin_on..end_on
+      end
+
+      let(:benefit_sponsorship) { proposal_profile.benefit_sponsorships.first }
+
+      let(:benefit_application) do
+        FactoryBot.create :plan_design_benefit_application,
+                          :with_benefit_group,
+                          benefit_sponsorship: benefit_sponsorship
+      end
+
+      let(:benefit_group) do
+        benefit_application.benefit_groups.first.tap do |benefit_group|
+          benefit_group.update_attributes(reference_plan_id: benefit_group.reference_plan_id, plan_option_kind: 'single_plan')
+        end
+      end
+
+      let(:owner_profile) { broker_agency_profile }
+      let(:broker_agency) { owner_profile.organization }
+      let(:general_agency_profile) { ga_profile }
+
+      let(:employer_profile) { sponsor_profile }
+      let(:benefit_sponsor) { sponsor_profile.organization }
+
+      [2016, 2017, 2018, 2019].each do |year|
+        let!("health_plans_for_#{year}".to_sym) do
+          FactoryBot.create_list(:plan, 77, :with_complex_premium_tables, active_year: year, coverage_kind: "health")
+        end
+      end
+
+      let(:organization) { plan_design_organization.sponsor_profile.organization }
+
+      let!(:current_effective_date) do
+        (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year
+      end
+
+      let!(:broker_agency_profile) do
+        if Settings.aca.state_abbreviation == "DC" # toDo
+          FactoryBot.create(:broker_agency_profile)
+        else
+          FactoryBot.create(
+            :benefit_sponsors_organizations_general_organization,
+            :with_site,
+            :with_broker_agency_profile
+          ).profiles.first
+        end
+      end
+
+      let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :with_benefit_market_catalog_and_product_packages, :dc) }
+
+      let(:benefit_market)      { site.benefit_markets.first }
+      let(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+
+      let!(:sponsor_profile) do
+        if Settings.aca.state_abbreviation == "DC" # toDo
+          FactoryBot.create(
+            :benefit_sponsors_organizations_general_organization,
+            :with_aca_shop_dc_employer_profile,
+            site: site
+          ).profiles.first
+        else
+          FactoryBot.create(
+            :benefit_sponsors_organizations_general_organization,
+            :with_site,
+            :with_aca_shop_cca_employer_profile
+          ).profiles.first
+        end
+      end
+
+      let!(:sponsor_profile_benefit_sponsorship) do
+        bs = sponsor_profile.add_benefit_sponsorship
+        bs.save
+        bs
+      end
+
+      let!(:relationship_benefit) { benefit_group.relationship_benefits.first }
+
+      before :each do
+        get :claim, params: { employer_profile_id: sponsor_profile_benefit_sponsorship.profile.id, claim_code: plan_design_proposal.claim_code}
+      end
+
+      it 'should claim the code successfully' do
+        sponsor_profile_benefit_sponsorship.organization.reload
+        expect(sponsor_profile_benefit_sponsorship.reload.benefit_applications.count).to eq 1
+      end
+
+      # it 'should show success flash message' do
+      #   expect(flash[:notice]).to eq 'Code claimed with success. Your Plan Year has been created.'
+      # end
+    end
+
     # describe "PUT #update" do
     #   context "with valid params" do
     #     let(:new_attributes) {

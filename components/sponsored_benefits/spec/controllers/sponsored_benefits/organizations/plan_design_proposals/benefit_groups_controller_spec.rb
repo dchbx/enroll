@@ -1,6 +1,10 @@
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
+class AcaHelperModStubber
+  include Config::AcaModelConcern
+end
+
 module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignProposals::BenefitGroupsController, type: :controller, dbclean: :around_each  do
     routes { SponsoredBenefits::Engine.routes }
@@ -43,6 +47,36 @@ module SponsoredBenefits
       it "should render json" do
         parsed_response = JSON.parse(response.body)
         expect(parsed_response['url']).to eq("/sponsored_benefits/organizations/plan_design_proposals/#{plan_design_proposal.id}/plan_reviews/new")
+      end
+    end
+
+    if AcaHelperModStubber.amnesty_enabled_for_bqt?
+      describe "POST #create" do
+
+        let(:relationship_attrs) do
+          {
+            "0" => {"relationship" => "employee", "premium_pct" => "0", "offered" => "true"},
+            "1" => {"relationship" => "spouse", "premium_pct" => "0", "offered" => "true"},
+            "2" => {"relationship" => "domestic_partner", "premium_pct" => "0", "offered" => "true"},
+            "3" => {"relationship" => "child_under_26", "premium_pct" => "0", "offered" => "true"},
+            "4" => {"relationship" => "child_26_and_over", "premium_pct" => "0", "offered" => "false"}
+          }
+        end
+        before do
+          benefit_application.benefit_groups.delete_all
+          sign_in user_with_broker_role
+          person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
+          post :create, params: {plan_design_proposal_id: plan_design_proposal.id, benefit_group: attrs}
+        end
+
+        it "should be success when employee contribution is less than 50 percent" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render json when employee contribution is less than 50 percent" do
+          parsed_response = JSON.parse(response.body)
+          expect(parsed_response['url']).to eq("/sponsored_benefits/organizations/plan_design_proposals/#{plan_design_proposal.id}/plan_reviews/new")
+        end
       end
     end
 
