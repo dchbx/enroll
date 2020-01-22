@@ -113,40 +113,6 @@ module SponsoredBenefits
       end
     end
 
-    describe '#claim', dbclean: :after_each do
-
-      let(:published_plan_design_proposal) do
-        pdp = plan_design_proposal
-        pdp.publish!
-        pdp
-      end
-
-      let(:benefit_sponsorship_enrollment_period) do
-        begin_on = SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates[0]
-        end_on = begin_on + 1.year - 1.day
-        begin_on..end_on
-      end
-
-      let!(:sponsor_profile_benefit_sponsorship) do
-        bs = sponsor_profile.add_benefit_sponsorship
-        bs.save
-        bs
-      end
-
-      before :each do
-        get :claim, params: { employer_profile_id: sponsor_profile_benefit_sponsorship.profile.id, claim_code: published_plan_design_proposal.claim_code}
-      end
-
-      it 'should claim the code successfully' do
-        sponsor_profile_benefit_sponsorship.organization.reload
-        expect(sponsor_profile_benefit_sponsorship.reload.benefit_applications.count).to eq 1
-      end
-
-      it 'should show success flash message' do
-        expect(flash[:notice]).to eq 'Code claimed with success. Your Plan Year has been created.'
-      end
-    end
-
     # describe "PUT #update" do
     #   context "with valid params" do
     #     let(:new_attributes) {

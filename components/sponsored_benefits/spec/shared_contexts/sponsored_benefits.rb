@@ -64,21 +64,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
     benefit_sponsorship: benefit_sponsorship
   )}
 
-  let!(:benefit_group) do
-    benefit_application.benefit_groups.first
-    bg = benefit_application.benefit_groups.first
-    bg.reference_plan = reference_plan_for_benefit_group
-    bg.elected_plans = [reference_plan_for_benefit_group]
-    bg.save!
-    bg
-  end
-
-  let(:reference_plan_for_benefit_group) do
-    p_package = product_package('single_plan', :health)
-    product = p_package.products[0]
-    plan = FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: current_effective_date.year, hios_id: product.hios_id)
-    plan
-  end
+  let(:benefit_group) { benefit_application.benefit_groups.first }
 
   let(:prospect_benefit_group) { prospect_benefit_application.benefit_groups.first }
 
@@ -164,43 +150,27 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
     Settings.site.key
   end
 
-  def site
-    BenefitSponsors::Site.by_site_key(site_key).first || FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :as_hbx_profile, site_key)
-  end
-
-  def product_package(pp_kind, kind)
-    product_packages = site.benefit_markets[0].benefit_market_catalogs.last.product_packages.by_product_kind(kind)
-    case pp_kind
-    when 'single_plan'
-      product_packages.by_package_kind(:single_product).first
-    when 'single_carrier'
-      product_packages.by_package_kind(:single_issuer).first
-    when 'metal_level'
-      product_packages.by_package_kind(:metal_level).first
-    end
-  end
-
   def broker_agency_profile
     FactoryBot.create(
       :benefit_sponsors_organizations_general_organization,
-      :with_broker_agency_profile,
-      site: site
+      :with_site,
+      :with_broker_agency_profile
     ).profiles.first
   end
 
   def sponsor_profile
     FactoryBot.create(
       :benefit_sponsors_organizations_general_organization,
-      "with_aca_shop_#{site_key}_employer_profile".to_sym,
-      site: site
+      :with_site,
+      "with_aca_shop_#{site_key}_employer_profile".to_sym
     ).profiles.first
   end
 
   def ga_profile
     FactoryBot.create(
       :benefit_sponsors_organizations_general_organization,
-      :with_general_agency_profile,
-      site: site
+      :with_site,
+      :with_general_agency_profile
     ).profiles.first
   end
 end
