@@ -21,9 +21,10 @@ class UpdateMinimumContributionFactorOnContributionUnit < MongoidMigrationTask
       contribution_model = product_package.contribution_model
       contribution_model.contribution_units.each do |contribution_unit|
         prev_factor = contribution_unit.minimum_contribution_factor
-        contribution_unit.update_attributes!(minimum_contribution_factor: min_contribution_factor)
+        contribution_unit.minimum_contribution_factor = min_contribution_factor
         puts "Updated #{product_package.product_kind} - #{product_package.package_kind} product package's minimum contribution factor for #{contribution_unit.display_name} from #{prev_factor} to #{contribution_unit.minimum_contribution_factor}."
       end
     end
+    benefit_market_catalog.save
   end
 end
