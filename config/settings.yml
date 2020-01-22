@@ -189,6 +189,10 @@ aca:
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
+    # below settings are for bqt only.
+    amnesty:
+      enabled_for_bqt: true
+      employer_contribution_percent_minimum: 0
     employer_contribution_percent_minimum: 50
     employer_dental_contribution_percent_minimum: 0
     employer_family_contribution_percent_minimum: 0

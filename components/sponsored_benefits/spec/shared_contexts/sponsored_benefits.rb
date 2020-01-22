@@ -65,6 +65,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   )}
 
   let(:benefit_group) { benefit_application.benefit_groups.first }
+
   let(:prospect_benefit_group) { prospect_benefit_application.benefit_groups.first }
 
   let(:owner_profile) { broker_agency_profile }
@@ -145,29 +146,29 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
     )
   end
 
+  def site_key
+    Settings.site.key
+  end
+
   def broker_agency_profile
-    FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+    FactoryBot.create(
+      :benefit_sponsors_organizations_general_organization,
       :with_site,
       :with_broker_agency_profile
     ).profiles.first
   end
 
   def sponsor_profile
-    if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_aca_shop_dc_employer_profile
-      ).profiles.first
-    else
-      FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_aca_shop_cca_employer_profile
-      ).profiles.first
-    end
+    FactoryBot.create(
+      :benefit_sponsors_organizations_general_organization,
+      :with_site,
+      "with_aca_shop_#{site_key}_employer_profile".to_sym
+    ).profiles.first
   end
 
   def ga_profile
-    FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+    FactoryBot.create(
+      :benefit_sponsors_organizations_general_organization,
       :with_site,
       :with_general_agency_profile
     ).profiles.first

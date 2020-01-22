@@ -28,6 +28,7 @@ describe FixTitleForExistingQuotes, dbclean: :around_each do
     let(:plan) { FactoryBot.create(:plan, :with_premium_tables)}
     let!(:benefit_group) do
       bg = benefit_application.benefit_groups.first
+      bg.title = ""
       bg.relationship_benefits.build(relationship: "employee", premium_pct: 100)
       bg.assign_attributes(reference_plan_id: plan.id, elected_plans: [plan])
       bg.save!
