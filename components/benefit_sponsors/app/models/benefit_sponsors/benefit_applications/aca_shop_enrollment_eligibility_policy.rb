@@ -60,12 +60,14 @@ module BenefitSponsors
 
     private
 
+    # Making the system to default to amnesty rules for release 1.
     def enrollment_eligiblity_policy_for(model_instance)
-      if model_instance.start_on.yday == 1
-        business_policies[:non_minimum_participation_enrollment_eligiblity_policy]
-      else
-        business_policies[:enrollment_elgibility_policy]
-      end
+      business_policies[:non_minimum_participation_enrollment_eligiblity_policy]
+      # if model_instance.start_on.yday == 1
+      #   business_policies[:non_minimum_participation_enrollment_eligiblity_policy]
+      # else
+      #   business_policies[:enrollment_elgibility_policy]
+      # end
     end
   end
 end

@@ -211,11 +211,13 @@ module BenefitSponsors
         # 1+ non-owner rule does apply
         it "should fail the policy" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
-          if benefit_application.start_on.yday == 1
-            expect(policy.is_satisfied?(benefit_application)).to eq true
-          else
-            expect(policy.is_satisfied?(benefit_application)).to eq false
-          end
+          # Making the system to default to amnesty rules for release 1.
+          expect(policy.is_satisfied?(benefit_application)).to eq true
+          # if benefit_application.start_on.yday == 1
+          #   expect(policy.is_satisfied?(benefit_application)).to eq true
+          # else
+          #   expect(policy.is_satisfied?(benefit_application)).to eq false
+          # end
         end
       end
     end
