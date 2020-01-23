@@ -17,8 +17,8 @@ module BenefitSponsors
 
       validates_presence_of :contribution_factor
 
-      def self.for_new
-        contribution_levels.collect do |level_attrs|
+      def self.for_new(params)
+        contribution_levels(params[:contribution_model]).collect do |level_attrs|
           form = self.new(level_attrs)
           form
         end
@@ -29,9 +29,9 @@ module BenefitSponsors
         super is_offered
       end
 
-      def self.contribution_levels
+      def self.contribution_levels(contribution_model = nil)
         # TODO: query contribution model based on market
-        contribution_model = BenefitMarkets::ContributionModels::ContributionModel.all.first
+        contribution_model ||= BenefitMarkets::ContributionModels::ContributionModel.all.first
         return [] unless contribution_model
         contribution_model.contribution_units.inject([]) do |data, unit|
           data << { display_name: unit.display_name,

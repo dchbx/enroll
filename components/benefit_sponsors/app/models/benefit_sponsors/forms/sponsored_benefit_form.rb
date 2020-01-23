@@ -43,10 +43,10 @@ module BenefitSponsors
         @sponsor_contribution = SponsorContributionForm.new(attributes)
       end
 
-      def self.for_new
+      def self.for_new(params)
         kinds.collect do |kind|
           form = self.new(kind: kind)
-          form.sponsor_contribution = SponsorContributionForm.for_new
+          form.sponsor_contribution = SponsorContributionForm.for_new({product_package: form.product_package_for(kind, params[:application])})
           form
         end
       end
@@ -137,6 +137,11 @@ module BenefitSponsors
       def self.kinds
         %w(health)
         # get kinds from catalog based on products/product packages
+      end
+
+      def product_package_for(kind, application)
+        catalog = application.benefit_sponsor_catalog
+        catalog.product_packages.by_product_kind(kind.to_sym).first
       end
 
       def assign_attributes(atts)
