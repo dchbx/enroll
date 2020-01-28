@@ -113,6 +113,18 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       end
     end
 
+    context 'total_premium' do
+      let(:unassisted_plan_cost_decorator1) { UnassistedPlanCostDecorator.new(product, hbx_enrollment10, 100.00, tax_household10) }
+
+      before :each do
+        allow(unassisted_plan_cost_decorator1).to receive(:members).and_return([])
+      end
+
+      it "does not throw error if members blank" do
+        expect(unassisted_plan_cost_decorator1.total_premium).to eq(nil)
+      end
+    end
+
     context 'large_family_factor for dental kind' do
       let!(:dental_product) { FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile) }
       let!(:hbx_enrollment10) { FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: dental_product) }

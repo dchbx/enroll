@@ -70,21 +70,25 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_premium
+    return if members.blank?
     members.reduce(0.00) do |sum, member|
       (sum + premium_for(member)).round(2)
     end
   end
+
   def total_employer_contribution
     0.00
   end
 
   def total_aptc_amount
+    return if members.blank?
     members.reduce(0.00) do |sum, member|
       (sum + aptc_amount(member)).round(2)
     end.round(2)
   end
 
   def total_employee_cost
+    return if members.blank?
     members.reduce(0.00) do |sum, member|
       (sum + employee_cost_for(member)).round(2)
     end.round(2)
