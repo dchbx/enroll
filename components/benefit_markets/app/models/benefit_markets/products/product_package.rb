@@ -37,6 +37,12 @@ module BenefitMarkets
     embeds_one  :contribution_model,
                 class_name: "BenefitMarkets::ContributionModels::ContributionModel"
 
+    embeds_one  :assigned_contribution_model,
+                class_name: "BenefitMarkets::ContributionModels::ContributionModel"
+
+    embeds_many :contribution_models,
+                class_name: "BenefitMarkets::ContributionModels::ContributionModel"
+
     embeds_one  :pricing_model,
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
