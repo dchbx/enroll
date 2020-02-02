@@ -110,6 +110,8 @@ module BenefitMarkets
       def initialize(name, options={})
         @name = name
         @rules = options[:rules] || []
+        @commands = options[:commands] || []
+        @policy_result = options[:policy_result]
         @fail_results = {}
         @success_results = {}
       end
@@ -168,8 +170,21 @@ module BenefitMarkets
         @rules || []
       end
 
+      def commands
+        @commands || []
+      end
+
+      def policy_result
+        @policy_result
+      end
+
       def reset_rules
         @rules = []
+        reset_errors
+      end
+
+      def reset_commands
+        @commands = []
         reset_errors
       end
 
@@ -181,7 +196,6 @@ module BenefitMarkets
       def inspect
         "<#{self.class.name} name: #{name}, rules: #{rules.each {|rule| rule.inspect} }, errors: #{errors} >"
       end
-
     end
 
     class Rule
