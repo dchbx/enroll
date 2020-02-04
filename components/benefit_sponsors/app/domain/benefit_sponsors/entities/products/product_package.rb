@@ -14,10 +14,10 @@ module BenefitSponsors
         attribute :description,                  Types::Strict::String
 
         attribute :products,                     Types::Array.of(Products::Product)
-        attribute :contribution_model,           Types::ContributionModels::ContributionModel
-        attribute :assigned_contribution_model,  Types::ContributionModels::ContributionModel
+        attribute :contribution_model,           ContributionModels::ContributionModel
+        attribute :assigned_contribution_model,  ContributionModels::ContributionModel
         attribute :contribution_models,          Types::Array.of(ContributionModels::ContributionModel)
-        attribute :pricing_model,                Types::Products::PricingModel
+        attribute :pricing_model,                PricingModels::PricingModel
 
       end
     end

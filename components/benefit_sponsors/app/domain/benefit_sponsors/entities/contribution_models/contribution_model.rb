@@ -13,7 +13,7 @@ module BenefitSponsors
         attribute :many_simultaneous_contribution_units,  Types::Strict::Bool
         attribute :product_multiplicities, Types::Strict::Array
         attribute :contribution_units, Types::Array.of(ContributionModels::ContributionUnit)
-        attribute :member_relationships, Types::Array.of(ContributionModels::MemberRealtionship)
+        attribute :member_relationships, Types::Array.of(ContributionModels::MemberRelationship)
 
       end
     end

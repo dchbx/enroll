@@ -11,7 +11,7 @@ module BenefitSponsors
       attribute :description,         Types::Strict::String
       attribute :publisher,           Types::Strict::String
       attribute :contributor,         Types::Strict::String
-      attribute :date,                Types::Strict::Duration
+      attribute :date,                Types::Duration
       attribute :type,                Types::Strict::String
       attribute :format,              Types::Strict::String
       attribute :identifier,          Types::Strict::String
