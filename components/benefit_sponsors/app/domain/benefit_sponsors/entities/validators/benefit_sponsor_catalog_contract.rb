@@ -18,21 +18,21 @@ module BenefitSponsors
         rule(:benefit_application) do
           if key? && value
             result = BenefitApplicationContract.call(value)
-            key.failure(text: "invalid benefit application", error: result.errors.to_h) if result && result.failure?
+            key.failure(text: "invalid benefit application", error: result.errors.to_h) if result&.failure?
           end
         end
 
         rule(:product_packages).each do
           if key? && value 
             result = ProductPackageContract.call(value)
-            key.failure(text: "invalid product package", error: result.errors.to_h) if result && result.failure?
+            key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
           end
         end
 
         rule(:service_areas).each do
           if key? && value
             result = ServiceAreaContract.call(value)
-            key.failure(text: "invalid service area", error: result.errors.to_h) if result && result.failure?
+            key.failure(text: "invalid service area", error: result.errors.to_h) if result&.failure?
           end
         end
       end
