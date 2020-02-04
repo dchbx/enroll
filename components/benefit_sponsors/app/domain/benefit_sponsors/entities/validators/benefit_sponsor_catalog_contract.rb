@@ -3,7 +3,7 @@
 module BenefitSponsors
   module Entities
     module Validators
-      class BenefitSponsorCatalogContract < ApplicationContract
+      class BenefitSponsorCatalogContract < Dry::Validation::Contract
 
         params do
           required(:effective_date).filled(:date)

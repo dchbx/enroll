@@ -4,7 +4,7 @@ module BenefitSponsors
   module Entities
     module Validators
       module ContributionModels
-        class MemberRelationshipContract < ApplicationContract
+        class MemberRelationshipContract < Dry::Validation::Contract
 
           params do
             required(:relationship_name).filled(:symbol)

@@ -4,7 +4,7 @@ module BenefitSponsors
   module Entities
     module Validators
       module Products
-        class PremiumTableContract < ApplicationContract
+        class PremiumTableContract < Dry::Validation::Contract
 
           params do
             required(:effective_period).filled(Type::Duration)

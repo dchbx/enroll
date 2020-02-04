@@ -4,7 +4,7 @@ module BenefitSponsors
   module Entities
     module Validators
       module Products
-        class ProductPackageContract < ApplicationContract
+        class ProductPackageContract < Dry::Validation::Contract
 
           params do
             required(:application_period).value(Types::Duration)

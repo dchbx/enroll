@@ -4,7 +4,7 @@ module BenefitSponsors
   module Entities
     module Validators
       module Products
-        class ProductContract < ApplicationContract
+        class ProductContract < Dry::Validation::Contract
 
           params do
             required(:benefit_market_kind).filled(:symbol)
