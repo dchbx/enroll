@@ -91,6 +91,41 @@ describe ConsumerRole, dbclean: :after_each do
   end
 end
 
+describe '.verify_ivl_by_admin' do
+  context "sci_verified?" do
+    let(:consumer_role) { FactoryBot.create(:consumer_role, aasm_state: :sci_verified) }
+    before :each do
+      consumer_role.verify_ivl_by_admin
+      consumer_role.reload
+    end
+    it "passes residency" do
+      expect(consumer_role.aasm_state).to eq("fully_verified")
+    end
+  end
+
+  context "may_ssn_valid_citizenship_valid?" do
+    let(:consumer_role) { FactoryBot.create(:consumer_role, aasm_state: :ssn_valid_citizenship_valid) }
+    before :each do
+      consumer_role.verify_ivl_by_admin
+      consumer_role.reload
+    end
+    it "ssn citizenship valid" do
+      expect(consumer_role.aasm_state).to eq(:ssn_valid_citizenship_valid)
+    end
+  end
+
+  context "may_pass_dhs?" do
+    let(:consumer_role) { FactoryBot.create(:consumer_role, aasm_state: :unverified) }
+    before :each do
+      consumer_role.verify_ivl_by_admin
+      consumer_role.reload
+    end
+    it "ssn citizenship valid" do
+      expect(consumer_role.aasm_state).to eq('fully_verified')
+    end
+  end
+end
+
 describe "#find_document" do
   let(:consumer_role) {ConsumerRole.new}
   context "consumer role does not have any vlp_documents" do
