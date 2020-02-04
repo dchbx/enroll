@@ -7,7 +7,7 @@ module BenefitSponsors
         class PremiumTableContract < Dry::Validation::Contract
 
           params do
-            required(:effective_period).filled(Type::Duration)
+            required(:effective_period).filled(Types::Duration)
             required(:rating_area).filled(:hash)
             required(:premium_tuples).array(:hash)
           end

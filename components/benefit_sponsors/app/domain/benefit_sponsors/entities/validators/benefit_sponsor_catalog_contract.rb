@@ -7,8 +7,8 @@ module BenefitSponsors
 
         params do
           required(:effective_date).filled(:date)
-          required(:effective_period).value(Type::Duration)
-          required(:open_enrollment_period).value(Type::Duration)
+          required(:effective_period).value(Types::Duration)
+          required(:open_enrollment_period).value(Types::Duration)
           required(:probation_period_kinds).array(:symbol)
           optional(:benefit_application).maybe(:hash)
           required(:product_packages).array(:hash)
