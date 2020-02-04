@@ -10,7 +10,7 @@ module BenefitSponsors
       attribute :open_enrollment_period,  Types::Duration
       attribute :probation_period_kinds,  Types::Strict::Array
       attribute :benefit_application_id,  Types::Strict::String
-      attribute :product_packages,        Types::Strict::Array
+      attribute :product_packages,        Types::Array.of(Products::ProductPackage)
 
     end
   end
