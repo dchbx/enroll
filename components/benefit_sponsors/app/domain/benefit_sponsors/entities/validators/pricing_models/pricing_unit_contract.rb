@@ -4,7 +4,7 @@ module BenefitSponsors
   module Entities
     module Validators
       module PricingModels
-        class PricingUnitContract < ApplicationContract
+        class PricingUnitContract < Dry::Validation::Contract
 
           params do
             required(:name).filled(:string)

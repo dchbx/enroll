@@ -4,7 +4,7 @@ module BenefitSponsors
   module Entities
     module Validators
       module ContributionModels
-        class ContributionUnitContract < ApplicationContract
+        class ContributionUnitContract < Dry::Validation::Contract
 
           params do
             required(:name).filled(:string)

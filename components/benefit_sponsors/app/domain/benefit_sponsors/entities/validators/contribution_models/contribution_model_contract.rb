@@ -4,7 +4,7 @@ module BenefitSponsors
   module Entities
     module Validators
       module ContributionModels
-        class ContributionModelContract < ApplicationContract
+        class ContributionModelContract < Dry::Validation::Contract
 
           params do
             required(:title).filled(:string)
