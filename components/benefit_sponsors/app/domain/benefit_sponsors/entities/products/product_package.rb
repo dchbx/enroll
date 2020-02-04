@@ -13,7 +13,7 @@ module BenefitSponsors
         attribute :title,                        Types::Strict::String
         attribute :description,                  Types::Strict::String
 
-        attribute :products,                     Types::Products::Product
+        attribute :products,                     Types::Array.of(Products::Product)
         attribute :contribution_model,           Types::ContributionModels::ContributionModel
         attribute :assigned_contribution_model,  Types::ContributionModels::ContributionModel
         attribute :contribution_models,          Types::Array.of(ContributionModels::ContributionModel)
