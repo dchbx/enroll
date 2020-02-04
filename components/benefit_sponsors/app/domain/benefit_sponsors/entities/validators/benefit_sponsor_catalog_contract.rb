@@ -29,12 +29,12 @@ module BenefitSponsors
           end
         end
 
-        rule(:service_areas).each do
-          if key? && value
-            result = ServiceAreaContract.call(value)
-            key.failure(text: "invalid service area", error: result.errors.to_h) if result&.failure?
-          end
-        end
+        # rule(:service_areas).each do
+        #   if key? && value
+        #     result = ServiceAreaContract.call(value)
+        #     key.failure(text: "invalid service area", error: result.errors.to_h) if result&.failure?
+        #   end
+        # end
       end
     end
   end

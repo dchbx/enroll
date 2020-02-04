@@ -11,13 +11,13 @@ module BenefitSponsors
             required(:key).filled(:symbol)
             required(:sponsor_contribution_kind).filled(:string)
             required(:contribution_calculator_kind).filled(:string)
-            required(:many_simultaneous_contribution_units).filled(:boolean)
+            required(:many_simultaneous_contribution_units).filled(:bool)
             required(:product_multiplicities).array(:symbol)
             required(:contribution_units).array(:hash)
             required(:member_relationships).array(:hash)
           end
 
-          rule(:conribution_units).each do
+          rule(:contribution_units).each do
             if key? && value
               result = ContributionUnitContract.call(value)
               key.failure(text: "invalid contribution unit for contribution model", error: result.errors.to_h) if result&.failure?

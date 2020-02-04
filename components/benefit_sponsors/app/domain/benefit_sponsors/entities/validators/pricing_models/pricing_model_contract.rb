@@ -3,7 +3,7 @@
 module BenefitSponsors
   module Entities
     module Validators
-      class PricingModels
+      module PricingModels
         class PricingModelContract < Dry::Validation::Contract
 
           params do
