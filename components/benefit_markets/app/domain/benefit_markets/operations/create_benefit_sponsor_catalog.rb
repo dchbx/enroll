@@ -21,58 +21,62 @@ module BenefitMarkets
         sponsor_catalog_attrs = yield validate_sponsor_catalog(sponsor_catalog_hash)
         sponsor_catalog       = yield create_sponsor_catalog(sponsor_catalog_attrs.values.data)
 
+
         Success(sponsor_catalog)
       end
 
       private
 
-      def validate(params)
-        # effective_date = params[:effective_date]
-        # validate effective date
-        Success(params)
-      end
+      # def extract_attributes(sponosor_eligibility, contribution_model)
+      #   attrs = {
+      #     effective_date: sponsor_eligibility[:effective_date],
+      #     benefit_type: sponsor_eligibility[:benefit_type],
+      #     exception_granted: sponsor_eligibility[:flexibile_contribution_model_enabled],
+      #     contribution_model: contribution_model.attributes.slice(:_id, :contribution_type, :effective_period, :eligibility_policies)
+      #   }
+      #   Success(attrs)
+      # end
 
-      def construct_sponsor_catalog(values)
-        benefit_market_catalog = values[:benefit_market_catalog]
+      def assign_default_contribution_model(benefit_sponsor_catalog)
+        enrollment_eligibility = benefit_sponsorship.enrollment_eligibility_for(effective_date)
+        business_policy = business_policy_for(benefit_sponsor_catalog, enrollment_eligibility)
+        contribution_model_title = business_policy.policy_result.to_s.humanize.titleize
 
-        enrollment_dates = enrollment_dates_for(values)[:enrollment_dates]
-
-        sponsor_catalog_hash = {
-          effective_date: values[:effective_date],
-          effective_period: enrollment_dates[:effective_period],
-          open_enrollment_period: enrollment_dates[:open_enrollment_period],
-          probation_period_kinds: benefit_market_catalog[:probation_period_kinds],
-          business_policies: benefit_market_catalog[:business_policies],
-          service_areas: values[:service_areas].collect(&:attributes),
-          product_packages: build_product_packages(values)
-        }
-
-        Success(sponsor_catalog_hash)
-      end
-
-      def build_product_packages(values)
-        values[:benefit_market_catalog][:product_packages].collect do |product_package|
-          BenefitMarkets::Operations::Products::CreateProductPackage.new.call(
-            values.merge({product_package: product_package, application_period: @enrollment_dates[:effective_period]})
-          ).success
+        benefit_sponsor_catalog.product_packages.each do |product_package|
+          product_package.assigned_contribution_model = product_package.contribution_models.detect do |cm|
+            cm.title == contribution_model_title
+          end
         end
+
+        Success(contribution_model_criteria)
       end
 
-      def validate_sponsor_catalog(catalog_hash)
-        contract = BenefitMarkets::Validators::BenefitSponsorCatalogContract.new
+      def validate(params)
+        contract = BenefitMarkets::Entities::Validators::BenefitSponsorshipContract.new
 
-        Success(contract.call(catalog_hash))
+        Success(contract.call(params))
+      end
+      # benefit_sponsorship
+      # effective_date
+      # benefit_market
+
+      def get_benefit_market_catalog(values)
+        benefit_market.benefit_market_catalog_for(values)
       end
 
-      def create_sponsor_catalog(attrs)
-        catalog_entity = BenefitMarkets::Entities::BenefitSponsorCatalog.new(attrs)
+      def build(_values)
+        benefit_market = benefit_sponsorship.benefit_market
+        benefit_market.benefit_market_catalog_for(effective_date)
 
-        Success(catalog_entity)
+        benefit_sponsor_catalog = benefit_market.benefit_sponsor_catalog_for(benefit_sponsorship.recorded_service_areas, effective_date)
+
+        Success(benefit_sponsor_catalog)
       end
 
-      def enrollment_dates_for(values)
-        return @enrollment_dates if defined? @enrollment_dates
-        @enrollment_dates = BenefitMarkets::Operations::BenefitMarketCatalog::GetEnrollmentDates.new.call(effective_date: values[:effective_date], market_kind: values[:market_kind]).success
+      def business_policy_for(benefit_sponsor_catalog, _enrollment_eligibility)
+        eligibility_policy = benefit_sponsor_catalog.enrollment_eligibility_policy
+        policies = eligibility_policy.business_policies_for(:create_application)
+        policies.detect{|business_policy| business_policy.is_satisfied?(enrollment.eligibility)}
       end
     end
   end
