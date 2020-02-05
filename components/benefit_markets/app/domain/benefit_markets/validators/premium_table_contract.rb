@@ -19,7 +19,7 @@ module BenefitMarkets
 
       rule(:premium_tuples).each do
         if key? && value
-          result = Products::PremiumTupleContract.call(value)
+          result = PremiumTupleContract.call(value)
           key.failure(text: "invalid premium tuple", error: result.errors.to_h) if result&.failure?
         end
       end

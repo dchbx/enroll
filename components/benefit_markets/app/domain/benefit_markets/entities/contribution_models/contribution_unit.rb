@@ -9,7 +9,7 @@ module BenefitMarkets
         attribute :name,              Types::Strict::String
         attribute :display_name,      Types::Strict::String
         attribute :order,             Types::Strict::Integer
-        attribute :member_relationship_maps, Types::Array.of(ContributionModels::MemberRelationshipMaps)
+        attribute :member_relationship_maps, Types::Array.of(ContributionModels::MemberRelationshipMap)
 
       end
     end
