@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BenefitMarkets
+module BenefitSponsors
   module Validators
     class SponsorContributionContract < Dry::Validation::Contract
 

@@ -13,7 +13,7 @@ module BenefitSponsors
         attribute :is_active, Types::Strict::Bool
         attribute :predecessor_id, Types::Strict::String
 
-        attribute :sponsored_benefits, SponsoredBenefits::SponsoredBenefit
+        attribute :sponsored_benefits, Entities::SponsoredBenefits::SponsoredBenefit
 
       end
     end
