@@ -37,7 +37,7 @@ module BenefitMarkets
 
       rule(:premium_tables).each do
         if key? && value
-          result = Products::PremiumTableContract.call(value)
+          result = PremiumTableContract.call(value)
           key.failure(text: "invalid premium table", error: result.errors.to_h) if result&.failure?
         end
       end

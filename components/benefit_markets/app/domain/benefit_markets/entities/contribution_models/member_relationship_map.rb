@@ -3,7 +3,7 @@
 module BenefitMarkets
   module Entities
     module ContributionModels
-      class MemberRelationshipMaps < Dry::Struct
+      class MemberRelationshipMap < Dry::Struct
         transform_keys(&:to_sym)
 
         attribute :relationship_name,     Types::Strict::Symbol

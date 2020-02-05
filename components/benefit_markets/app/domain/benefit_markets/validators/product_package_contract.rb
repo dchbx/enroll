@@ -27,28 +27,28 @@ module BenefitMarkets
 
       rule(:contribution_model) do
         if key? && value
-          result = ContributionModels::ContributionModelContract.call(value)
+          result = ContributionModelContract.call(value)
           key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
         end
       end
 
       rule(:assigned_contribution_model) do
         if key? && value
-          result = ContributionModels::ContributionModelContract.call(value)
+          result = ContributionModelContract.call(value)
           key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?
         end
       end
 
       rule(:contribution_models).each do
         if key? && value
-          result = ContributionModels::ContributionModelContract.call(value)
+          result = ContributionModelContract.call(value)
           key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
         end
       end
 
       rule(:pricing_model) do
         if key? && value
-          result = PricingModels::PricingModelContract.call(value)
+          result = PricingModelContract.call(value)
           key.failure(text: "invalid pricing model", error: result.errors.to_h) if result&.failure?
         end
       end

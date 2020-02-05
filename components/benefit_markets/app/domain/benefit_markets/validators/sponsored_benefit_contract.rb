@@ -17,7 +17,7 @@ module BenefitMarkets
 
       rule(:reference_product) do
         if key? && value
-          result = Products::ProductContract.call(value)
+          result = ProductContract.call(value)
           key.failure(text: "invalid reference product", error: result.errors.to_h) if result&.failure?
         end
       end
