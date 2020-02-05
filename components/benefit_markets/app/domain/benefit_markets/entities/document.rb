@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BenefitSponsors
+module BenefitMarkets
   module Entities
     class Document < Dry::Struct
       transform_keys(&:to_sym)

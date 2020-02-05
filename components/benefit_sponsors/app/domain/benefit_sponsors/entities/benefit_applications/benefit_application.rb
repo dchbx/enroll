@@ -21,7 +21,7 @@ module BenefitSponsors
         attribute :benefit_sponsor_catalog_id,  Types::Strict::String
         attribute :termination_kind,            Types::Strict::String
         attribute :termination_reason,          Types::Strict::String
-        attribute :benefit_packages,            BenefitPackages::BenefitPackage
+        attribute :benefit_packages,            Entities::BenefitPackages::BenefitPackage
 
       end
     end

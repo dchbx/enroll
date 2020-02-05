@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BenefitMarkets
+module BenefitSponsors
   module Validators
     class SponsoredBenefitContract < Dry::Validation::Contract
 
@@ -17,7 +17,7 @@ module BenefitMarkets
 
       rule(:reference_product) do
         if key? && value
-          result = ProductContract.call(value)
+          result = ::BenefitMarkets::Validators::ProductContract.call(value)
           key.failure(text: "invalid reference product", error: result.errors.to_h) if result&.failure?
         end
       end

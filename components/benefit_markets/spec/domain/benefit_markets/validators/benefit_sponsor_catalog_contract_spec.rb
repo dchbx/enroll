@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe BenefitSponsors::Entities::Validators::BenefitSponsorCatalogContract do
+RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogContract do
 
   let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:effective_period)        { effective_date..(effective_date + 1.year) }

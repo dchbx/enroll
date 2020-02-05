@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BenefitMarkets
+module BenefitSponsors
   module Entities
     module SponsoredBenefits
       class ContributionLevel < Dry::Struct
