@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    module BenefitMarketCatalog
+    module ProductPackage
       include Dry::Monads[:result]
       include Dry::Monads::Do.for(:call)
 
@@ -13,17 +13,27 @@ module BenefitMarkets
 
         # @param [ Date ] effective_date Effective date of the benefit application
         # @param [ Symbol ] market_kind Benefit Market Catalog for the given Effective Date
+        # @param [ Symbol ] package_kind PackageKind
+        # @param [ Array<BenefitMarkets::Entities::Locations::ServiceArea> ] service areas by benefit sponsor location
         def call(params)
           @params = params
 
           products = yield filter_products_by_service_areas(params[:service_areas])
+
+          Success(products)
         end
 
         private
 
         def filter_products_by_service_areas(service_areas)
-
-          Success(products)
+          products = product_package.all_benefit_market_products
+          products_by_service_areas = products.by_service_areas(service_areas.map(&:id))
+          products_hash = products_by_service_areas.effective_with_premiums_on(@params[:effective_date]).collect{|product|
+            product_hash = product.attributes.except(:premium_tables)
+            product_hash[:premium_tables] = product.attributes[:premium_tables].collect{|pt| pt.except(:premium_tuples)}
+            product_hash
+          }
+          Success(products_hash)
         end
 
         def product_package
