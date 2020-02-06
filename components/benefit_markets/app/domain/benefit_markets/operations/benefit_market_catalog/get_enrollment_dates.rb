@@ -30,7 +30,7 @@ module BenefitMarkets
         private 
 
         def get_effective_period(effective_date)
-          Success(benefit_market_catalog.effective_period_on(effective_date)
+          Success(benefit_market_catalog.effective_period_on(effective_date))
         end
 
         def get_open_enrollment_period(effective_date)

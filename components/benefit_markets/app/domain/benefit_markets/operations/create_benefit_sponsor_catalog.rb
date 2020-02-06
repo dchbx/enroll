@@ -50,6 +50,32 @@ module BenefitMarkets
         Success(sponsor_catalog_hash)
       end
 
+      def filter_product_packages(service_areas, product_package)
+        product_package_hash = product_package.except(:products)
+        product_package_hash[:products] = BenefitMarkets::Operations::BenefitMarketCatalog::ScopeProductsByServiceArea.new.call({
+          effective_date: values[:effective_date], 
+          market_kind: values[:market_kind], 
+          package_kind: product_package[:package_kind]
+        })
+
+      #   {
+      #   title: market_product_package.title,
+      #   description: market_product_package.description,
+      #   product_kind: market_product_package.product_kind,
+      #   benefit_kind: market_product_package.benefit_kind, 
+      #   package_kind: market_product_package.package_kind
+      # )
+
+      # product_package.application_period = benefit_sponsor_catalog.effective_period
+      # product_package.contribution_model = market_product_package.contribution_model.create_copy_for_embedding
+      # product_package.pricing_model = market_product_package.pricing_model.create_copy_for_embedding
+      # product_package.products = market_product_package.load_embedded_products(benefit_sponsor_catalog.service_areas, @effective_date)
+      # product_package
+
+        # }
+        benefit_market_catalog[:product_packages].collect{}
+      end
+
       def build_product_packages(values)
         values[:benefit_market_catalog][:product_packages].collect do |product_package|
           BenefitMarkets::Operations::Products::CreateProductPackage.new.call(
