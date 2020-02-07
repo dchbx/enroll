@@ -14,7 +14,7 @@ module BenefitMarkets
 
         rule(:member_relationship_maps).each do
           if key? && value
-            result = MemberRelationshipMapContract.call(value)
+            result = MemberRelationshipMapContract.new.call(value)
             key.failure(text: "invalid member relationship maps for contribution unit", error: result.errors.to_h) if result&.failure?
           end
         end

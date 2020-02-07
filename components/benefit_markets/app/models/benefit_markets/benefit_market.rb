@@ -31,6 +31,8 @@ module BenefitMarkets
 
     index({ kind:  1 })
 
+    scope :by_market_kind,         ->(market_kind){ where(:kind => market_kind) }
+
     delegate :enforce_employer_attestation, to: :configuration, allow_nil: true
 
     # BenefitMarketCatalogs may not overlap application_periods

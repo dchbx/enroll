@@ -16,14 +16,14 @@ module BenefitMarkets
 
       rule(:benefit_application) do
         if key? && value
-          result = BenefitApplicationContract.call(value)
+          result = BenefitApplicationContract.new.call(value)
           key.failure(text: "invalid benefit application", error: result.errors.to_h) if result&.failure?
         end
       end
 
       rule(:product_packages).each do
         if key? && value
-          result = Products::ProductPackageContract.call(value)
+          result = BenefitMarkets::Validators::Products::ProductPackageContract.new.call(value)
           key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
         end
       end

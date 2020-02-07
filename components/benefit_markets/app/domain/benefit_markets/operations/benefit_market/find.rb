@@ -6,10 +6,9 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module BenefitMarket
-      include Dry::Monads[:result]
-      include Dry::Monads::Do.for(:call)
-
+      # include Dry::Monads::Do.for(:call)
       class Find
+        include Dry::Monads[:result, :do]
 
         # @param [ Symbol ] market_kind Benefit Market Catalog for the given Effective Date
         def call(params)
@@ -21,7 +20,7 @@ module BenefitMarkets
         private
         
         def benefit_market(market_kind)
-          benefit_market = BenefitMarkets::BenefitMarket.find_by_kind(market_kind)
+          benefit_market = BenefitMarkets::BenefitMarket.by_market_kind(market_kind).first
 
           Success(benefit_market)
         end

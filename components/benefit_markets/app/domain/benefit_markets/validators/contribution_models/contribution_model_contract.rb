@@ -18,14 +18,14 @@ module BenefitMarkets
 
         rule(:contribution_units).each do
           if key? && value
-            result = ContributionUnitContract.call(value)
+            result = ContributionUnitContract.new.call(value)
             key.failure(text: "invalid contribution unit for contribution model", error: result.errors.to_h) if result&.failure?
           end
         end
 
         rule(:member_relationships).each do
           if key? && value
-            result = MemberRelationshipContract.call(value)
+            result = MemberRelationshipContract.new.call(value)
             key.failure(text: "invalid member relationshp for contribution model", error: result.errors.to_h) if result&.failure?
           end
         end

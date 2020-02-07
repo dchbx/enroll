@@ -5,10 +5,11 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    include Dry::Monads[:result]
-    include Dry::Monads::Do.for(:call)
+    # include Dry::Monads::Do.for(:call)
 
     class CreateBenefitSponsorCatalog
+      include Dry::Monads[:result, :do]
+
 
       # @param [ Date ] effective_date Effective date of the benefit application
       # @param [ Hash ] benefit_market_catalog Benefit Market Catalog for the given Effective Date
@@ -16,11 +17,11 @@ module BenefitMarkets
       # @param [ Symbol ] market_kind Benefit Marketplace Type
       # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog
       def call(params)
-        values = yield validate(params)
-
-        sponsor_catalog_hash = yield create_sponsor_catalog(values)
-        result = yield validate_catalog(sponsor_catalog_hash)
-
+        values                = yield validate(params)
+        sponsor_catalog_hash  = yield construct_sponsor_catalog(values)
+        sponsor_catalog_attrs = yield validate_sponsor_catalog(sponsor_catalog_hash)
+        sponsor_catalog       = yield create_sponsor_catalog(sponsor_catalog_attrs.values.data)
+        
         Success(sponsor_catalog)
       end
 
@@ -32,9 +33,10 @@ module BenefitMarkets
         Success(params)
       end
 
-      def create_sponsor_catalog(values)
-        benefit_market_catalog = values[:benefit_sponsor_catalog]
-        enrollment_dates = enrollment_dates_for(values)
+      def construct_sponsor_catalog(values)
+        benefit_market_catalog = values[:benefit_market_catalog]
+
+        enrollment_dates = enrollment_dates_for(values)[:enrollment_dates]
 
         sponsor_catalog_hash = {
           effective_date: values[:effective_date],
@@ -53,19 +55,25 @@ module BenefitMarkets
         values[:benefit_market_catalog][:product_packages].collect do |product_package|
           BenefitMarkets::Operations::Products::CreateProductPackage.new.call(
             values.merge({product_package: product_package, application_period: @enrollment_dates[:effective_period]})
-          )
+          ).success
         end
       end
 
-      def validate(params)
-        contract = BenefitMarkets::Entities::Validators::BenefitSponsorshipContract.new
+      def validate_sponsor_catalog(catalog_hash)
+        contract = BenefitMarkets::Validators::BenefitSponsorCatalogContract.new
 
-        Success(contract.call(params))
+        Success(contract.call(catalog_hash))
+      end
+
+      def create_sponsor_catalog(attrs)
+        catalog_entity = BenefitMarkets::Entities::BenefitSponsorCatalog.new(attrs)
+
+        Success(catalog_entity)
       end
 
       def enrollment_dates_for(values)
         @enrollment_dates if defined? @enrollment_dates
-        @enrollment_dates = BenefitMarkets::Operations::BenefitMarketCatalog::GetEnrollmentDates.new.call(effective_date: values[:effective_date], market_kind: values[:market_kind])
+        @enrollment_dates = BenefitMarkets::Operations::BenefitMarketCatalog::GetEnrollmentDates.new.call(effective_date: values[:effective_date], market_kind: values[:market_kind]).success
       end
     end
   end

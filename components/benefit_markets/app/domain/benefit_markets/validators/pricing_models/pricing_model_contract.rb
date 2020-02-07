@@ -15,14 +15,14 @@ module BenefitMarkets
 
         rule(:pricing_units).each do
           if key? && value
-            result = PricingUnitContract.call(value)
+            result = PricingUnitContract.new.call(value)
             key.failure(text: "invalid pricing unit for pricing model", error: result.errors.to_h) if result&.failure?
           end
         end
 
         rule(:member_relationships).each do
           if key? && value
-            result = MemberRelationshipContract.call(value)
+            result = MemberRelationshipContract.new.call(value)
             key.failure(text: "invalid member relationship for pricing model", error: result.errors.to_h) if result&.failure?
           end
         end
