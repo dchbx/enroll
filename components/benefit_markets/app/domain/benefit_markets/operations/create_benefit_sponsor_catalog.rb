@@ -26,7 +26,7 @@ module BenefitMarkets
         sponsor_catalog_hash  = yield construct_sponsor_catalog(values)
         sponsor_catalog_attrs = yield validate_sponsor_catalog(sponsor_catalog_hash)
         sponsor_catalog       = yield create_sponsor_catalog(sponsor_catalog_attrs.values.data)
-        
+
         Success(sponsor_catalog)
       end
 

@@ -6,8 +6,8 @@ module BenefitMarkets
 
       params do
         required(:effective_date).filled(:date)
-        required(:effective_period).value(type?: BSON::Document)
-        required(:open_enrollment_period).value(type?: BSON::Document)
+        required(:effective_period).value(type?: Range)
+        required(:open_enrollment_period).value(type?: Range)
         required(:probation_period_kinds).array(:symbol)
         # optional(:benefit_application).maybe(:hash)
         required(:product_packages).array(:hash)
