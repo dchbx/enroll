@@ -15,7 +15,7 @@ module BenefitMarkets
 
         # attribute :products,                     Types::Array.of(BenefitMarkets::Entities::Products::Product)
         attribute :contribution_model,           BenefitMarkets::Entities::ContributionModels::ContributionModel
-        attribute :assigned_contribution_model,  BenefitMarkets::Entities::ContributionModels::ContributionModel
+        attribute :assigned_contribution_model,  BenefitMarkets::Entities::ContributionModels::ContributionModel.meta(omittable: true)
         attribute :contribution_models,          Types::Array.of(BenefitMarkets::Entities::ContributionModels::ContributionModel)
         attribute :pricing_model,                PricingModels::PricingModel
 

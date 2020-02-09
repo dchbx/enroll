@@ -9,9 +9,9 @@ module BenefitMarkets
         attribute :relationship_name,         Types::Strict::Symbol
         attribute :relationship_kinds,        Types::Strict::Array
 
-        attribute :age_threshold,             Types::Integer.optional
-        attribute :age_comparison,            Types::Symbol.optional
-        attribute :disability_qualifier,      Types::Bool.optional
+        attribute :age_threshold,             Types::Integer.optional.meta(omittable: true)
+        attribute :age_comparison,            Types::Symbol.optional.meta(omittable: true)
+        attribute :disability_qualifier,      Types::Bool.optional.meta(omittable: true)
       end
     end
   end

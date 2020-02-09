@@ -14,7 +14,7 @@ module BenefitMarkets
           optional(:description).maybe(:string)
           required(:products).array(:hash)
           required(:contribution_model).filled(:hash)
-          # optional(:assigned_contribution_model).maybe(:hash)
+          optional(:assigned_contribution_model).maybe(:hash)
           required(:contribution_models).array(:hash)
           required(:pricing_model).filled(:hash)
         end
@@ -33,12 +33,12 @@ module BenefitMarkets
           end
         end
 
-        # rule(:assigned_contribution_model) do
-        #   if key? && value
-        #     result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
-        #     key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?
-        #   end
-        # end
+        rule(:assigned_contribution_model) do
+          if key? && value
+            result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
+            key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?
+          end
+        end
 
         rule(:contribution_models).each do
           if key? && value
