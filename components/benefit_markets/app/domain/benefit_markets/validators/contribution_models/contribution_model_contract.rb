@@ -7,7 +7,7 @@ module BenefitMarkets
 
         params do
           required(:title).filled(:string)
-          required(:key).filled(:symbol)
+          optional(:key).maybe(:symbol)
           required(:sponsor_contribution_kind).filled(:string)
           required(:contribution_calculator_kind).filled(:string)
           required(:many_simultaneous_contribution_units).filled(:bool)
