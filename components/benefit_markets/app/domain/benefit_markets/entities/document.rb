@@ -11,7 +11,7 @@ module BenefitMarkets
       attribute :description,         Types::Strict::String
       attribute :publisher,           Types::Strict::String
       attribute :contributor,         Types::Strict::String
-      attribute :date,                Types::Duration
+      attribute :date,                Types::Date
       attribute :type,                Types::Strict::String
       attribute :format,              Types::Strict::String
       attribute :identifier,          Types::Strict::String

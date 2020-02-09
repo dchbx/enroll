@@ -6,8 +6,6 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module ProductPackage
-      # include Dry::Monads::Do.for(:call)
-
       class ScopeProductsByServiceAreas
         include Dry::Monads[:result, :do]
 

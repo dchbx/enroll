@@ -6,11 +6,11 @@ module BenefitMarkets
       transform_keys(&:to_sym)
 
       attribute :effective_date,          Types::Strict::Date
-      attribute :effective_period,        Types::Duration
-      attribute :open_enrollment_period,  Types::Duration
+      attribute :effective_period,        Types::Range
+      attribute :open_enrollment_period,  Types::Range
       attribute :probation_period_kinds,  Types::Strict::Array
-      attribute :benefit_application_id,  Types::Strict::String
-      attribute :product_packages,        Types::Array.of(Products::ProductPackage)
+      # attribute :benefit_application_id,  Types::String.optional
+      attribute :product_packages,        Types::Array.of(BenefitMarkets::Entities::Products::ProductPackage)
 
     end
   end

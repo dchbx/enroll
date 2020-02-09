@@ -10,7 +10,6 @@ module BenefitMarkets
     class CreateBenefitSponsorCatalog
       include Dry::Monads[:result, :do]
 
-
       # @param [ Date ] effective_date Effective date of the benefit application
       # @param [ Hash ] benefit_market_catalog Benefit Market Catalog for the given Effective Date
       # @param [ Array<BenefitMarkets::Entities::Locations::ServiceArea> ] benefit_market_catalog Benefit Market Catalog for the given Effective Date
@@ -21,7 +20,7 @@ module BenefitMarkets
         sponsor_catalog_hash  = yield construct_sponsor_catalog(values)
         sponsor_catalog_attrs = yield validate_sponsor_catalog(sponsor_catalog_hash)
         sponsor_catalog       = yield create_sponsor_catalog(sponsor_catalog_attrs.values.data)
-        
+
         Success(sponsor_catalog)
       end
 

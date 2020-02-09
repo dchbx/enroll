@@ -33,7 +33,7 @@ module BenefitMarkets
 
         def extract_package_attributes(values)
           product_package_hash = values[:product_package].except(:products)
-          product_package_hash[:application_period] = values[:application_period]
+          product_package_hash[:application_period] = values[:product_package][:application_period]
           product_package_hash
         end
 

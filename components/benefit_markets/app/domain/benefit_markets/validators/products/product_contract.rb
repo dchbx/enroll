@@ -7,7 +7,7 @@ module BenefitMarkets
 
         params do
           required(:benefit_market_kind).filled(:symbol)
-          required(:application_period).filled(Types::Duration)
+          required(:application_period).filled(type?: Range)
           required(:hbx_id).filled(:string)
           required(:title).filled(:string)
           required(:description).filled(:string)

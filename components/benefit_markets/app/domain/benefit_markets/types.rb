@@ -3,6 +3,8 @@
 require 'uri'
 require 'cgi'
 require 'dry-types'
+
+Dry::Types.load_extensions(:maybe)
 module BenefitMarkets
   module Types
     include Dry.Types()
@@ -17,6 +19,7 @@ module BenefitMarkets
     Duration            = Types.Constructor(ActiveSupport::Duration) {|val| ActiveSupport::Duration.build(val) }
     PositiveInteger     = Coercible::Integer.constrained(gteq: 0)
     HashOrNil           = Types::Hash | Types::Nil
+    DateRange           = Types.Constructor(Types::Range) { |val| val[:min]..val[:max] }
     StringOrNil         = Types::String | Types::Nil
 
     RequiredSymbol  = Types::Strict::Symbol.constrained(min_size: 2)
