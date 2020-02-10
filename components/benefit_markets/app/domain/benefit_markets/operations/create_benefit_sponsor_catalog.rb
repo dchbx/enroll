@@ -49,7 +49,7 @@ module BenefitMarkets
           open_enrollment_period: enrollment_dates[:open_enrollment_period],
           probation_period_kinds: benefit_market_catalog[:probation_period_kinds],
           business_policies: benefit_market_catalog[:business_policies],
-          service_areas: values[:service_areas].collect(&:to_h),
+          service_areas: values[:service_areas].collect(&:attributes),
           product_packages: build_product_packages(values)
         }
 
