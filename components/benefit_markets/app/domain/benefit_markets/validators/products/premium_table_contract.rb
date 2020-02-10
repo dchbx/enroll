@@ -8,7 +8,7 @@ module BenefitMarkets
         params do
           required(:effective_period).filled(Types::Duration)
           required(:rating_area).filled(:hash)
-          required(:premium_tuples).array(:hash)
+          optional(:premium_tuples).maybe(:hash)
         end
 
         rule(:rating_area) do

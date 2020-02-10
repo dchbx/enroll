@@ -8,20 +8,20 @@ module BenefitMarkets
       attribute :title,               Types::Strict::String
       attribute :creator,             Types::Strict::String
       attribute :subject,             Types::Strict::String
-      attribute :description,         Types::Strict::String
+      attribute :description,         Types::String.optional.meta(omittable: true)
       attribute :publisher,           Types::Strict::String
-      attribute :contributor,         Types::Strict::String
-      attribute :date,                Types::Date
+      attribute :contributor,         Types::String.optional.meta(omittable: true)
+      attribute :date,                Types::Date.optional.meta(omittable: true)
       attribute :type,                Types::Strict::String
       attribute :format,              Types::Strict::String
       attribute :identifier,          Types::Strict::String
       attribute :source,              Types::Strict::String
       attribute :language,            Types::Strict::String
-      attribute :relation,            Types::Strict::String
-      attribute :coverage,            Types::Strict::String
-      attribute :rights,              Types::Strict::String
+      attribute :relation,            Types::String.optional.meta(omittable: true)
+      attribute :coverage,            Types::String.optional.meta(omittable: true)
+      attribute :rights,              Types::String.optional.meta(omittable: true)
       attribute :tags,                Types::Strict::Array
-      attribute :size,                Types::Strict::String
+      attribute :size,                Types::String.optional.meta(omittable: true)
     end
   end
 end

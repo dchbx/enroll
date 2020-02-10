@@ -10,7 +10,7 @@ module BenefitMarkets
           required(:application_period).filled(type?: Range)
           required(:hbx_id).filled(:string)
           required(:title).filled(:string)
-          required(:description).filled(:string)
+          optional(:description).maybe(:string)
           required(:issuer_profile_id).filled(:string)
           required(:product_package_kinds).array(:symbol)
           required(:kind).filled(:symbol)
@@ -25,20 +25,20 @@ module BenefitMarkets
           required(:nationwide).filled(:bool)
           required(:dc_in_network).filled(:bool)
 
-          required(:sbc_document).filled(:hash)
+          optional(:sbc_document).maybe(:hash)
           required(:premium_tables).array(:hash)
         end
 
         rule(:sbc_document) do
           if key? && value
-            result = DocumentContract.call(value)
+            result = DocumentContract.new.call(value)
             key.failure(text: "invalid document", error: result.errors.to_h) if result&.failure?
           end
         end
 
         rule(:premium_tables).each do
           if key? && value
-            result = PremiumTableContract.call(value)
+            result = PremiumTableContract.new.call(value)
             key.failure(text: "invalid premium table", error: result.errors.to_h) if result&.failure?
           end
         end

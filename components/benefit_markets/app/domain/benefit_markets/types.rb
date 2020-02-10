@@ -19,7 +19,8 @@ module BenefitMarkets
     Duration            = Types.Constructor(ActiveSupport::Duration) {|val| ActiveSupport::Duration.build(val) }
     PositiveInteger     = Coercible::Integer.constrained(gteq: 0)
     HashOrNil           = Types::Hash | Types::Nil
-    DateRange           = Types.Constructor(Types::Range) { |val| val[:min]..val[:max] }
+    CustomRange         = Types.Constructor(Types::Range) { |val| val[:min]..val[:max] }
+    Bson                = Types.Constructor(BSON::ObjectId) { |val| BSON::ObjectId val }
     StringOrNil         = Types::String | Types::Nil
 
     RequiredSymbol  = Types::Strict::Symbol.constrained(min_size: 2)
