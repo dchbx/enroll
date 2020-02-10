@@ -397,7 +397,7 @@ class ConsumerRole
   end
 
   def has_i327?
-    vlp_documents.any?{|doc| doc.subject == "I-327 (Reentry Permit)" }
+    vlp_documents.any?{|doc| doc.subject == "I-327 (Reentry Permit)" && doc.alien_number.present? }
   end
 
   def has_i571?
@@ -405,27 +405,27 @@ class ConsumerRole
   end
 
   def has_cert_of_citizenship?
-    vlp_documents.any?{|doc| doc.subject == "Certificate of Citizenship" }
+    vlp_documents.any?{|doc| doc.subject == "Certificate of Citizenship" && doc.citizenship_number.present?}
   end
 
   def has_cert_of_naturalization?
-    vlp_documents.any?{|doc| doc.subject == "Naturalization Certificate" }
+    vlp_documents.any?{|doc| doc.subject == "Naturalization Certificate" && doc.naturalization_number.present? }
   end
 
   def has_temp_i551?
-    vlp_documents.any?{|doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" }
+    vlp_documents.any?{|doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" && doc.alien_number.present? }
   end
 
   def has_i94?
-    vlp_documents.any?{|doc| doc.subject == "I-94 (Arrival/Departure Record)" || doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport"}
+    vlp_documents.any?{|doc| doc.i94_number.present? && (doc.subject == "I-94 (Arrival/Departure Record)" || (doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.passport_number.present? && doc.expiration_date.present?))}
   end
 
   def has_i20?
-    vlp_documents.any?{|doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
+    vlp_documents.any?{|doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" && doc.sevis_id.present? }
   end
 
   def has_ds2019?
-    vlp_documents.any?{|doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
+    vlp_documents.any?{|doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" && doc.sevis_id.present? }
   end
 
   def i551
@@ -437,7 +437,7 @@ class ConsumerRole
   end
 
   def mac_read_i551
-    vlp_documents.select{|doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.passport_number.present? && doc.alien_number.present? }.first
   end
 
   def foreign_passport_i94
@@ -449,11 +449,11 @@ class ConsumerRole
   end
 
   def case1
-    vlp_documents.select{|doc| doc.subject == "Other (With Alien Number)" }.first
+    vlp_documents.select{|doc| doc.subject == "Other (With Alien Number)" && doc.alien_number.present? && doc.description.present? }.first
   end
 
   def case2
-    vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
+    vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" && doc.i94_number.present? && doc.description.present? }.first
   end
 
   def can_receive_paper_communication?

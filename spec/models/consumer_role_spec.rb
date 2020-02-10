@@ -1196,5 +1196,306 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    context 'i327' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid i327 document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document, subject: 'I-327 (Reentry Permit)')
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_i327?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid i327 document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_i327?).to eq(false)
+        end
+      end
+    end
+
+    context 'Certificate of Citizenship' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid Certificate of Citizenship document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document, subject: 'Certificate of Citizenship', citizenship_number: '1234567')
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_cert_of_citizenship?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid Certificate of Citizenship document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_cert_of_citizenship?).to eq(false)
+        end
+      end
+    end
+
+    context 'Naturalization Certificate' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid Naturalization Certificate document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document, subject: 'Naturalization Certificate', naturalization_number: '1234567')
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_cert_of_naturalization?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid Naturalization Certificate document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_cert_of_naturalization?).to eq(false)
+        end
+      end
+    end
+
+    context 'Temporary I-551 Stamp (on passport or I-94)' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid Temporary I-551 Stamp (on passport or I-94) document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document, subject: 'Temporary I-551 Stamp (on passport or I-94)')
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_temp_i551?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid Temporary I-551 Stamp (on passport or I-94) document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_temp_i551?).to eq(false)
+        end
+      end
+    end
+
+    context 'I-94 (Arrival/Departure Record)' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid I-94 (Arrival/Departure Record) document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document, subject: 'I-94 (Arrival/Departure Record)', i94_number: '123456789a0')
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_i94?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid I-94 (Arrival/Departure Record) document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_i94?).to eq(false)
+        end
+      end
+    end
+
+    context 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid I-94 (Arrival/Departure Record) in Unexpired Foreign Passport document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport',
+                           i94_number: '123456789a0',
+                           passport_number: 'N000000',
+                           expiration_date: TimeKeeper.date_of_record)
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_i94?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid I-94 (Arrival/Departure Record) in Unexpired Foreign Passport document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_i94?).to eq(false)
+        end
+      end
+    end
+
+    context 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status) document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)',
+                           sevis_id: '1234567890')
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_i20?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status) document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_i20?).to eq(false)
+        end
+      end
+    end
+
+    context 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status) document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)',
+                           sevis_id: '1234567890')
+        end
+
+        it 'should return true' do
+          expect(consumer_role.has_ds2019?).to eq(true)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.vlp_documents.first.subject)
+        end
+      end
+
+      context 'valid DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status) document does not exist' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.has_ds2019?).to eq(false)
+        end
+      end
+    end
+
+    context 'Machine Readable Immigrant Visa (with Temporary I-551 Language)' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid Machine Readable Immigrant Visa (with Temporary I-551 Language) document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'Machine Readable Immigrant Visa (with Temporary I-551 Language)',
+                           passport_number: 'N000000')
+        end
+
+        it 'should return an object of type VlpDocument' do
+          expect(consumer_role.mac_read_i551).to be_a(::VlpDocument)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.mac_read_i551.subject)
+        end
+      end
+
+      context 'invalid Machine Readable Immigrant Visa (with Temporary I-551 Language) document' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.mac_read_i551).to be_nil
+        end
+      end
+    end
+
+    context 'Other (With Alien Number)' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid Other (With Alien Number) document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'Other (With Alien Number)',
+                           description: 'document description')
+        end
+
+        it 'should return an object of type VlpDocument' do
+          expect(consumer_role.case1).to be_a(::VlpDocument)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.case1.subject)
+        end
+      end
+
+      context 'invalid Other (With Alien Number) document' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.case1).to be_nil
+        end
+      end
+    end
+
+    context 'Other (With I-94 Number)' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid Other (With I-94 Number) document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'Other (With I-94 Number)',
+                           description: 'document description',
+                           i94_number: '123456789i0')
+        end
+
+        it 'should return an object of type VlpDocument' do
+          expect(consumer_role.case2).to be_a(::VlpDocument)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.case2.subject)
+        end
+      end
+
+      context 'invalid Other (With I-94 Number) document' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.case2).to be_nil
+        end
+      end
+    end
   end
 end

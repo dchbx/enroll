@@ -158,17 +158,17 @@ class VlpDocument < Document
         "I-551 (Permanent Resident Card)": [:alien_number, :card_number],
         "I-571 (Refugee Travel Document)": [:alien_number],
         "I-766 (Employment Authorization Card)": [:alien_number, :card_number, :expiration_date],
-        "Certificate of Citizenship": [:alien_number, :citizenship_number],
-        "Naturalization Certificate": [:alien_number, :naturalization_number],
-        "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number, :country_of_citizenship],
+        "Certificate of Citizenship": [:citizenship_number],
+        "Naturalization Certificate": [:naturalization_number],
+        "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number],
         "Temporary I-551 Stamp (on passport or I-94)": [:alien_number],
         "I-94 (Arrival/Departure Record)": [:i94_number],
-        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": [:i94_number, :passport_number, :country_of_citizenship, :expiration_date],
-        "Unexpired Foreign Passport": [:passport_number, :country_of_citizenship, :expiration_date],
+        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": [:i94_number, :passport_number, :expiration_date],
+        "Unexpired Foreign Passport": [:passport_number, :expiration_date],
         "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)": [:sevis_id],
         "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)": [:sevis_id],
-        "Other (With Alien Number)": [:alien_number],
-        "Other (With I-94 Number)": [:i94_number]
+        "Other (With Alien Number)": [:alien_number, :description],
+        "Other (With I-94 Number)": [:i94_number, :description]
     }
   end
 
