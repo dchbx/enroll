@@ -77,7 +77,7 @@ module BenefitMarkets
       end
 
       def enrollment_dates_for(values)
-        @enrollment_dates if defined? @enrollment_dates
+        return @enrollment_dates if defined? @enrollment_dates
         @enrollment_dates = BenefitMarkets::Operations::BenefitMarketCatalog::GetEnrollmentDates.new.call(effective_date: values[:effective_date], market_kind: values[:market_kind]).success
       end
     end
