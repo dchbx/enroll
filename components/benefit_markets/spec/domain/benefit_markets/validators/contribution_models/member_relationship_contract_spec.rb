@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe BenefitMarkets::Validators::MemberRelationshipContract do
+RSpec.describe BenefitMarkets::Validators::ContributionModels::MemberRelationshipContract do
 
   let(:relationship_name)   { :Employee }
   let(:relationship_kinds)  { [{}] }

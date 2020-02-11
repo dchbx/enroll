@@ -5,11 +5,11 @@ require "spec_helper"
 RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogContract do
 
   let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }
-  let(:effective_period)        { effective_date..(effective_date + 1.year) }
+  let(:effective_period)        { effective_date..(effective_date + 1.year).prev_day }
   let(:oe_start_on)             { TimeKeeper.date_of_record.beginning_of_month}
   let(:open_enrollment_period)  { oe_start_on..(oe_start_on + 10.days) }
   let(:probation_period_kinds)  { [] }
-  let(:benefit_application)     { {} }
+  # let(:benefit_application)     { {} }
   let(:product_packages)        { [{}] }
   let(:service_areas)           { [{}] }
 
@@ -37,13 +37,13 @@ RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogContract do
       end
     end
 
-    context "with all params" do
-      let(:all_params)          { required_params.merge({benefit_application: benefit_application}) }
+    # context "with all params" do
+    #   let(:all_params)          { required_params.merge({benefit_application: benefit_application}) }
 
-      it "should pass validation" do
-        expect(subject.call(all_params).success?).to be_truthy
-        expect(subject.call(all_params).to_h).to eq all_params
-      end
-    end
+    #   it "should pass validation" do
+    #     expect(subject.call(all_params).success?).to be_truthy
+    #     expect(subject.call(all_params).to_h).to eq all_params
+    #   end
+    # end
   end
 end

@@ -14,7 +14,7 @@ module BenefitMarkets
           required(:issuer_profile_id).filled(:string)
           required(:product_package_kinds).array(:symbol)
           required(:kind).filled(:symbol)
-          required(:premium_ages).array(Types::Duration)
+          required(:premium_ages).array(type?: Range)
           required(:provider_directory_url).filled(:string)
           required(:is_reference_plan_eligible).filled(:bool)
           required(:deductible).filled(:string)
