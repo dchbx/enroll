@@ -2,21 +2,24 @@
 
 require "spec_helper"
 
-RSpec.describe BenefitMarkets::Validators::MemberRelationshipContract do
+RSpec.describe BenefitMarkets::Validators::PricingModels::MemberRelationshipContract do
 
-  let(:relationship_name)   { :Employee }
-  let(:relationship_kinds)  { [{}] }
+  let(:relationship_name)      { :employee }
+  let(:relationship_kinds)     { [{}] }
+  let(:age_threshold)          { 18 }
+  let(:age_comparison)         { :== }
+  let(:disability_qualifier)   { false }
 
-  let(:missing_params)      { {relationship_name: relationship_name} }
-  let(:invalid_params)      { {relationship_name: relationship_name, relationship_kinds: ['array']} }
-  let(:required_params)     { {relationship_name: relationship_name, relationship_kinds: relationship_kinds} }
-  let(:error_message)       { {:relationship_kinds => ["is missing"]} }
-  let(:error_message2)      { {:relationship_kinds => {0 => ["must be a hash"]}} }
+  let(:missing_params)          { {relationship_kinds: relationship_kinds, age_threshold: age_threshold} }
+  let(:required_params)         { missing_params.merge({relationship_name: relationship_name}) }
+  let(:invalid_params)          { required_params.merge({relationship_name: 123})}
+  let(:error_message1)          { {:relationship_name => ["is missing"]} }
+  let(:error_message2)          { {:relationship_name => ["must be Symbol"]} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do
       it { expect(subject.call(missing_params).failure?).to be_truthy }
-      it { expect(subject.call(missing_params).errors.to_h).to eq error_message }
+      it { expect(subject.call(missing_params).errors.to_h).to eq error_message1 }
     end
 
     context "sending with invalid parameters should fail validation with errors" do
@@ -36,7 +39,7 @@ RSpec.describe BenefitMarkets::Validators::MemberRelationshipContract do
 
     context "with all params" do
       let(:all_params) do
-        required_params.merge({age_threshold: 26, age_comparison: :age_comparison, disability_qualifier: true})
+        required_params.merge({age_comparison: age_comparison, disability_qualifier: disability_qualifier})
       end
 
       it "should pass validation" do
