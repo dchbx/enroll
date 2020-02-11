@@ -126,7 +126,8 @@ And(/(.*) selects eligible immigration status$/) do |text|
     find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
-    find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+    find('label[for=person_eligible_immigration_status_true]').click
+    choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
   end
 end
 

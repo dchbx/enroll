@@ -255,11 +255,15 @@ var PersonValidations = (function(window, undefined) {
 
           }
         }
-        if ($(this).attr('placeholder') == 'Alien Number') {
-          if ($(this).val().length < 1) {
-            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-            PersonValidations.restoreRequiredAttributes(e);
-          } else {}
+        if ($('#immigration_doc_type').val() == 'Naturalization Certificate' || $('#immigration_doc_type').val() == 'Certificate of Citizenship') {
+        }
+        else {
+          if ($(this).attr('placeholder') == 'Alien Number') {
+            if ($(this).val().length < 1) {
+              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+              PersonValidations.restoreRequiredAttributes(e);
+            } else {}
+          }
         }
         if ($(this).attr('placeholder') == 'Card Number') {
           if ($(this).val().length < 1) {
@@ -273,7 +277,7 @@ var PersonValidations = (function(window, undefined) {
             PersonValidations.restoreRequiredAttributes(e);
           } else {}
         }
-        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
+        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' || $('#immigration_doc_type').val() == 'Temporary I-551 Stamp (on passport or I-94)') {
 
         } else {
           if ($(this).attr('placeholder') == 'Passport Number') {
