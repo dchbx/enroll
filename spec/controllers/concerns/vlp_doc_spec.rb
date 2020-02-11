@@ -92,4 +92,48 @@ describe FakesController do
       expect(subject.sensitive_info_changed?(person.consumer_role)[1]).to eq true
     end
   end
+
+  context '#validate_vlp_params' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+    context 'for primary' do
+      context 'invalid case' do
+        let(:invalid_params) do
+          {"person"=>{"consumer_role"=>{"vlp_documents_attributes"=>{"0"=>{"subject"=>"Other (With Alien Number)",
+            "alien_number"=>"123456789", "passport_number"=>"Jsdhf73", "sevis_id"=>"1234567891", "expiration_date"=>"02/29/2020",
+            "country_of_citizenship"=>"Algeria"}}}}
+          }
+        end
+
+        let(:params) { ActionController::Parameters.new(invalid_params)}
+
+        before do
+          subject.validate_vlp_params(params, 'person', person.consumer_role, nil)
+        end
+
+        it 'should add errors to the object if params are invalid' do
+          expect(person.errors.full_messages).to eq(['Description is required for VLP Document type: Other (With Alien Number)'])
+        end
+      end
+
+      context 'valid case' do
+        let(:valid_params) do
+          {"person"=>{"consumer_role"=>{"vlp_documents_attributes"=>{"0"=>{"subject"=>"Other (With Alien Number)",
+            "alien_number"=>"123456789", "passport_number"=>"Jsdhf73", "sevis_id"=>"1234567891", "expiration_date"=>"02/29/2020",
+            "country_of_citizenship"=>"Algeria", "description"=>"Some type of document"}}}}
+          }
+        end
+
+        let(:params) { ActionController::Parameters.new(valid_params)}
+
+        before do
+          subject.validate_vlp_params(params, 'person', person.consumer_role, nil)
+        end
+
+        it 'should not add any errors to the object if params are valid' do
+          expect(person.errors.full_messages).to be_empty
+        end
+      end
+    end
+  end
 end

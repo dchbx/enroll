@@ -4,6 +4,10 @@ require 'rails_helper'
 
 RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
 
+  def message(subject_name)
+    "is required for VLP Document type: #{subject_name}"
+  end
+
   context 'bad subject' do
     before do
       @result = subject.call({subject: 'subject'})
@@ -52,7 +56,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ alien_number: ["Alien Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ alien_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -106,7 +110,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ alien_number: ["Alien Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ alien_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -174,7 +178,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ alien_number: ["Alien Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ alien_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -196,7 +200,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
 
   context "I-766 (Employment Authorization Card)" do
     let(:valid_params) do
-      { subject: 'I-766 (Employment Authorization Card)', alien_number: '123456789', card_number: '1234567890123', expiration_date: TimeKeeper.date_of_record }
+      { subject: 'I-766 (Employment Authorization Card)', alien_number: '123456789', card_number: '1234567890123', expiration_date: TimeKeeper.date_of_record.to_s }
     end
 
     context 'for success case' do
@@ -228,7 +232,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ alien_number: ["Alien Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ alien_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -296,7 +300,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ citizenship_number: ["Citizenship Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ citizenship_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -350,7 +354,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ naturalization_number: ["Naturalization Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ naturalization_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -404,7 +408,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ passport_number: ["Passport Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ passport_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -458,7 +462,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ alien_number: ["Alien Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ alien_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -512,7 +516,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ i94_number: ["I94 Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ i94_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -534,7 +538,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
 
   context "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" do
     let(:valid_params) do
-      { subject: 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport', i94_number: '123456789t6', passport_number: 'N000000', expiration_date: TimeKeeper.date_of_record }
+      { subject: 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport', i94_number: '123456789t6', passport_number: 'N000000', expiration_date: TimeKeeper.date_of_record.to_s }
     end
 
     context 'for success case' do
@@ -566,7 +570,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ i94_number: ["I94 Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ i94_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -588,7 +592,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
 
   context "Unexpired Foreign Passport" do
     let(:valid_params) do
-      { subject: 'Unexpired Foreign Passport', passport_number: 'N000000', expiration_date: TimeKeeper.date_of_record }
+      { subject: 'Unexpired Foreign Passport', passport_number: 'N000000', expiration_date: TimeKeeper.date_of_record.to_s }
     end
 
     context 'for success case' do
@@ -620,7 +624,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ passport_number: ["Passport Number is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ passport_number: [message(valid_params[:subject])] })
         end
       end
 
@@ -674,7 +678,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ sevis_id: ["Sevis ID is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ sevis_id: [message(valid_params[:subject])] })
         end
       end
 
@@ -728,7 +732,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ sevis_id: ["Sevis ID is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ sevis_id: [message(valid_params[:subject])] })
         end
       end
 
@@ -782,7 +786,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ description: ["Description is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ description: [message(valid_params[:subject])] })
         end
       end
 
@@ -836,7 +840,7 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
 
         it 'should return errors' do
-          expect(@result.errors.to_h).to eq({ description: ["Description is required for VLP Document type: #{valid_params[:subject]}"] })
+          expect(@result.errors.to_h).to eq({ description: [message(valid_params[:subject])] })
         end
       end
 

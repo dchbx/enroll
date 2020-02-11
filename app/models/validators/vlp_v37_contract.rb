@@ -30,7 +30,9 @@ module Validators
     CARD_NUMBER_REQUIRED_SUBJECTS = ['I-551 (Permanent Resident Card)',
                                      'I-766 (Employment Authorization Card)'].freeze
 
-    EXPIRATION_DATE_REQUIRED_SUBJECTS = ['I-94 (Arrival/Departure Record) in Unexpired Foreign Passport'].freeze
+    EXPIRATION_DATE_REQUIRED_SUBJECTS = ['I-766 (Employment Authorization Card)',
+                                         'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport',
+                                         'Unexpired Foreign Passport'].freeze
 
     DESCRIPTION_REQUIRED_SUBJECTS = ['Other (With Alien Number)',
                                      'Other (With I-94 Number)'].freeze
@@ -47,7 +49,7 @@ module Validators
       optional(:citizenship_number).filled(:string).value(size?: 6..12)
       optional(:card_number).filled(:string).value(size?: 13)
       optional(:country_of_citizenship).filled(:string)
-      optional(:expiration_date).filled(:date)
+      optional(:expiration_date).filled(:string)
       optional(:issuing_country).filled(:string)
       optional(:status).filled(:string)
       optional(:comment).filled(:string)
@@ -59,39 +61,45 @@ module Validators
     end
 
     rule(:alien_number) do
-      key.failure("Alien Number is required for VLP Document type: #{values[:subject]}") if ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if ALIEN_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:i94_number) do
-      key.failure("I94 Number is required for VLP Document type: #{values[:subject]}") if I94_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if I94_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:passport_number) do
-      key.failure("Passport Number is required for VLP Document type: #{values[:subject]}") if PASSPORT_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if PASSPORT_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:sevis_id) do
-      key.failure("Sevis ID is required for VLP Document type: #{values[:subject]}") if SEVIS_ID_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if SEVIS_ID_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:naturalization_number) do
-      key.failure("Naturalization Number is required for VLP Document type: #{values[:subject]}") if NATURALIZATION_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if NATURALIZATION_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:citizenship_number) do
-      key.failure("Citizenship Number is required for VLP Document type: #{values[:subject]}") if CITIZENSHIP_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if CITIZENSHIP_CERTIFICATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:card_number) do
-      key.failure("Card Number is required for VLP Document type: #{values[:subject]}") if CARD_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if CARD_NUMBER_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:expiration_date) do
-      key.failure("Expiration Date is required for VLP Document type: #{values[:subject]}") if EXPIRATION_DATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if EXPIRATION_DATE_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
     end
 
     rule(:description) do
-      key.failure("Description is required for VLP Document type: #{values[:subject]}") if DESCRIPTION_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+      key.failure(message(values[:subject])) if DESCRIPTION_REQUIRED_SUBJECTS.include?(values[:subject]) && value.blank?
+    end
+
+    private
+
+    def message(subject_name)
+      "is required for VLP Document type: #{subject_name}"
     end
   end
 end
