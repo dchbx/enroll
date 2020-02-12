@@ -86,11 +86,12 @@ module BenefitMarkets
             {name: "products_premium_tables_search_index"}
           )
 
-    scope :by_product_package,    ->(product_package) { by_application_period(product_package.application_period).where(
+    scope :by_product_package,    ->(product_package) { 
+              where(
                 :"benefit_market_kind"          => product_package.benefit_kind,
                 :"kind"                         => product_package.product_kind,
-                :"product_package_kinds".in     => [product_package.package_kind]
-              )
+                :"product_package_kinds".in     => product_package.package_kind.to_a
+              ).by_application_period(product_package.application_period)
             }
 
     scope :aca_shop_market,             ->{where(benefit_market_kind: :aca_shop) }
