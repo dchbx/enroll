@@ -358,43 +358,55 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(bucket).to eq("#{Settings.site.s3_prefix}-sbc")
     end
   end
-  describe "current_cost" do
-    it "should return cost without session" do
-      expect(helper.current_cost(100, 0.9)).to eq 100
+
+  describe 'current_cost' do
+    let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100, coverage_kind: 'health')}
+    let(:hbx_enrollment2) {double(applied_aptc_amount: 0.0, total_premium: 100, coverage_kind: 'health')}
+
+    it 'should return nil when shopping' do
+      expect(helper.current_cost(hbx_enrollment, 'shopping')).to eq nil
     end
 
-    context "with session" do
+    it 'should return family premium' do
+      expect(helper.current_cost(hbx_enrollment, 'account')).to eq 90
+    end
+
+    it 'should return total premium when 0 aptc' do
+      expect(helper.current_cost(hbx_enrollment2, 'account')).to eq 100
+    end
+  end
+
+
+  describe 'family_premium' do
+    it 'should return cost without session' do
+      expect(helper.family_premium(100, 98.44)).to eq 100
+    end
+
+    context 'with session' do
       before :each do
         session['elected_aptc'] = 100
         session['max_aptc'] = 200
       end
 
-      it "when ehb_premium > aptc_amount" do
-        expect(helper.current_cost(200, 0.9)).to eq (200 - 0.5*200)
+      it 'when ehb_premium > aptc_amount' do
+        expect(helper.family_premium(200, 196.88)).to eq(100)
       end
 
-      it "when ehb_premium < aptc_amount" do
-        expect(helper.current_cost(100, 0.9)).to eq (100 - 0.9*100)
+      it 'when ehb_premium < aptc_amount' do
+        expect(helper.family_premium(100, 98.44)).to eq(1.56)
       end
 
-      it "should return 0" do
-        session['elected_aptc'] = 160
-        expect(helper.current_cost(100, 1.2)).to eq 0
+      it 'should return rounded plan cost value' do
+        session['elected_aptc'] = nil
+        expect(helper.family_premium(520.48, 512.360512)).to eq 520.48
       end
 
-      it "when can_use_aptc is false" do
-        expect(helper.current_cost(100, 1.2, nil, 'shopping', false)).to eq 100
+      it 'when can_use_aptc is false' do
+        expect(helper.family_premium(100, 98.44, false)).to eq 100
       end
 
-      it "when can_use_aptc is true" do
-        expect(helper.current_cost(100, 1.2, nil, 'shopping', true)).to eq 0
-      end
-    end
-
-    context "with hbx_enrollment" do
-      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100, coverage_kind: 'health')}
-      it "should return cost from hbx_enrollment" do
-        expect(helper.current_cost(100, 0.8, hbx_enrollment, 'account')).to eq 90
+      it 'when can_use_aptc is true' do
+        expect(helper.family_premium(100, 98.44, true)).to eq 1.56
       end
     end
   end

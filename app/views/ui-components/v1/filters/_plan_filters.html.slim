@@ -219,7 +219,7 @@
 
 
 // Needed to fix for shop if user hits back button in browser
-- if @market_kind == 'shop' || @market_kind == 'fehb'
+- if @market_kind == 'shop' || @market_kind == 'fehb' || @market_kind == 'individual'
   javascript:
     var promise1 = new Promise(function(resolve, reject) {
       setTimeout(function() {

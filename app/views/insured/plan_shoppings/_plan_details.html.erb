@@ -1,6 +1,6 @@
 <% plan_carrier = Caches::MongoidCache.lookup(BenefitSponsors::Organizations::Organization.issuer_profiles, plan.issuer_profile_id) { plan.issuer_profile } %>
 
-<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= ivl_metal_network(plan) %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= ivl_hsa_status(@plan_hsa_status, plan) %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
+<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= ivl_metal_network(plan) %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-ehb-premium="<%= plan.total_ehb_premium %>" data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= ivl_hsa_status(@plan_hsa_status, plan) %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
@@ -28,7 +28,11 @@
       </div>
       <div class="col-md-3">
         <div class="price-wrapper pull-right">
-          <h2 class="no-buffer plan-premium"><%= number_to_currency(current_cost(plan.total_employee_cost, plan.ehb, nil, 'shopping', plan.can_use_aptc?)) %></h2>
+          <% if @tax_household.present? && params[:market_kind]=='individual' %>
+            <h2 class="no-buffer plan-premium"><%= number_to_currency(family_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.can_use_aptc?)) %></h2>
+          <% else %>
+            <h2 class="no-buffer plan-premium"><%= number_to_currency(plan.total_employee_cost) %></h2>
+          <% end %>
           <small>/<%= l10n("month") %></small>
         </div>
       </div>
