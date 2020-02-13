@@ -63,7 +63,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
       let(:rating_area)      { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
       let(:effective_period) { effective_date.beginning_of_year..(effective_date.end_of_year) }
 
-      let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: premium_tuples, rating_area: rating_area}] }
+      let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area: rating_area}] }
       let(:all_params)       { missing_params.merge({kind: kind, premium_tables: premium_tables })}
 
       it "should pass validation" do

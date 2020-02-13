@@ -90,7 +90,7 @@ module BenefitMarkets
               where(
                 :"benefit_market_kind"          => product_package.benefit_kind,
                 :"kind"                         => product_package.product_kind,
-                :"product_package_kinds".in     => product_package.package_kind.to_a
+                :"product_package_kinds".in     => [product_package.package_kind]
               ).by_application_period(product_package.application_period)
             }
 

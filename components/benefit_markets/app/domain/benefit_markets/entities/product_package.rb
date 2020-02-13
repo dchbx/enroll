@@ -10,7 +10,7 @@ module BenefitMarkets
       attribute :product_kind,                 Types::Strict::Symbol
       attribute :package_kind,                 Types::Strict::Symbol
       attribute :title,                        Types::Strict::String
-      attribute :description,                  Types::Strict::String
+      attribute :description,                  Types::String.meta(omittable: true)
 
       attribute :products,                     Types::Array.of(Product)
       attribute :contribution_model,           BenefitMarkets::Entities::ContributionModel

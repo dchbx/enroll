@@ -4,14 +4,6 @@ require "spec_helper"
 
 RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitContract do
 
-        #   required(:product_package_kind).filled(:symbol)
-        #   required(:product_option_choice).filled(:string)
-        #   required(:source_kind).filled(:symbol)
-        #   required(:reference_product).filled(:hash)
-        #   required(:sponsor_contribution).filled(:hash)
-        #   required(:pricing_determinations).array(:hash)
-        # end
-
   let(:product_package_kind)       { :product_package_kind }
   let(:product_option_choice)      { 'product_option_choice' }
   let(:source_kind)                { :source_kind }

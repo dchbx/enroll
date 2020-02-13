@@ -9,8 +9,8 @@ RSpec.describe BenefitMarkets::Validators::Products::PremiumTableContract do
   let(:premium_tuples)      { {age: 12, cost: 227.07} }
   let(:rating_area)         { {} }
 
-  let(:missing_params)      { {effective_period: effective_period, premium_tuples: premium_tuples} }
-  let(:invalid_params)      { {premium_tuples: premium_tuples, effective_period: effective_date, rating_area: {}} }
+  let(:missing_params)      { {effective_period: effective_period, premium_tuples: [premium_tuples]} }
+  let(:invalid_params)      { {premium_tuples: [premium_tuples], effective_period: effective_date, rating_area: {}} }
   let(:error_message1)      { {:rating_area => ["is missing"]} }
   let(:error_message2)      { {:effective_period => ["must be Range"], :rating_area => ["must be filled"]} }
 

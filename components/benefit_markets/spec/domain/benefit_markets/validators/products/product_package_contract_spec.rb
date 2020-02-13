@@ -63,7 +63,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
   context "Given valid required parameters" do
 
-    let(:premium_ages)                  { [1..15, 16..40]}
+    let(:premium_ages)                  { [16..40]}
     let(:sbc_document) do
       {
         title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format',
@@ -74,7 +74,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
     let(:premium_tuples)   { {age: 12, cost: 227.07} }
     let(:rating_area)      { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
     let(:effective_period) { effective_date.beginning_of_year..(effective_date.end_of_year) }
-    let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: premium_tuples, rating_area: rating_area}] }
+    let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area: rating_area}] }
 
     let(:product) do
       {

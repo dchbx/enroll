@@ -9,7 +9,7 @@ module BenefitMarkets
       attribute :application_period,          Types::CustomRange
       attribute :hbx_id,                      Types::String.optional.meta(omittable: true)
       attribute :title,                       Types::Strict::String
-      attribute :description,                 Types::String.optional
+      attribute :description,                 Types::String.optional.meta(omittable: true)
       attribute :issuer_profile_id,           Types::Bson
       attribute :product_package_kinds,       Types::Strict::Array
       attribute :kind,                        Types::Strict::Symbol
