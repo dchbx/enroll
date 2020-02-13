@@ -10,7 +10,7 @@ module BenefitMarkets
       attribute :open_enrollment_period,  Types::Range
       attribute :probation_period_kinds,  Types::Strict::Array
       # attribute :benefit_application_id,  Types::String.optional
-      attribute :product_packages,        Types::Array.of(BenefitMarkets::Entities::Products::ProductPackage)
+      attribute :product_packages,        Types::Array.of(ProductPackage)
 
     end
   end
