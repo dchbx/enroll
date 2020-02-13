@@ -8,8 +8,8 @@ module BenefitMarkets
       attribute :name,                           Types::Strict::String
       attribute :price_calculator_kind,          Types::Strict::String
       attribute :product_multiplicities,         Types::Strict::Array
-      attribute :member_relationships,           Types::Array.of(MemberRelationship)
-      attribute :pricing_units,                  Types::Array.of(PricingUnit)
+      attribute :member_relationships,           Types::Array.of(BenefitMarkets::Entities::MemberRelationship)
+      attribute :pricing_units,                  Types::Array.of(BenefitMarkets::Entities::PricingUnit)
 
     end
   end

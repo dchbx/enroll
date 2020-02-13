@@ -11,7 +11,7 @@ module BenefitSponsors
 
         rule(:contribution_levels).each do
           if key? && value
-            result = ContributionLevelContract.new.call(value)
+            result = ::BenefitSponsors::Validators::SponsoredBenefits::ContributionLevelContract.new.call(value)
             key.failure(text: "invalid contribution level", error: result.errors.to_h) if result&.failure?
           end
         end

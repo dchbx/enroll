@@ -13,10 +13,10 @@ module BenefitMarkets
       attribute :description,                  Types::Strict::String
 
       attribute :products,                     Types::Array.of(Product)
-      attribute :contribution_model,           ContributionModel
-      attribute :assigned_contribution_model,  ContributionModel.meta(omittable: true)
-      attribute :contribution_models,          Types::Array.of(ContributionModel)
-      attribute :pricing_model,                PricingModel
+      attribute :contribution_model,           BenefitMarkets::Entities::ContributionModel
+      attribute :assigned_contribution_model,  BenefitMarkets::Entities::ContributionModel.meta(omittable: true)
+      attribute :contribution_models,          Types::Array.of(BenefitMarkets::Entities::ContributionModel)
+      attribute :pricing_model,                BenefitMarkets::Entities::PricingModel
 
     end
   end

@@ -24,14 +24,14 @@ module BenefitSponsors
 
         rule(:sponsor_contribution) do
           if key? && value
-            result = SponsorContributionContract.new.call(value)
+            result = ::BenefitSponsors::Validators::SponsoredBenefits::SponsorContributionContract.new.call(value)
             key.failure(text: "invalid sponsor contribution", error: result.errors.to_h) if result&.failure?
           end
         end
 
         rule(:pricing_determinations).each do
           if key? && value
-            result = PricingDeterminationContract.new.call(value)
+            result = ::BenefitSponsors::Validators::SponsoredBenefits::PricingDeterminationContract.new.call(value)
             key.failure(text: "invalid pricing determination tier", error: result.errors.to_h) if result&.failure?
           end
         end

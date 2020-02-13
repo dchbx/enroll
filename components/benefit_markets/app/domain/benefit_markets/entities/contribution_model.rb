@@ -11,8 +11,8 @@ module BenefitMarkets
       attribute :contribution_calculator_kind,          Types::Strict::String
       attribute :many_simultaneous_contribution_units,  Types::Strict::Bool
       attribute :product_multiplicities,                Types::Strict::Array
-      attribute :contribution_units,                    Types::Array.of(ContributionUnit)
-      attribute :member_relationships,                  Types::Array.of(MemberRelationship)
+      attribute :contribution_units,                    Types::Array.of(BenefitMarkets::Entities::ContributionUnit)
+      attribute :member_relationships,                  Types::Array.of(BenefitMarkets::Entities::MemberRelationship)
 
     end
   end

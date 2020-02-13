@@ -24,8 +24,8 @@ module BenefitMarkets
       attribute :nationwide,                  Types::Strict::Bool
       attribute :dc_in_network,               Types::Strict::Bool
 
-      attribute :sbc_document,                Document.meta(omittable: true)
-      attribute :premium_tables,              Types::Array.of(PremiumTable)
+      attribute :sbc_document,                BenefitMarkets::Entities::Document.meta(omittable: true)
+      attribute :premium_tables,              Types::Array.of(BenefitMarkets::Entities::PremiumTable)
     end
   end
 end
