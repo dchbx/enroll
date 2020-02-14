@@ -462,13 +462,22 @@ class Person
     end
   end
 
+  def update_census_dependent_relationship(existing_relationship)
+    return  unless existing_relationship.valid? && Settings.site.employee_roster_updates_enabled?
+
+    factory = Factories::CensusMemberUpdateFactory.new
+    factory.update_census_dependent_relationship(existing_relationship)
+  end
+
   def ensure_relationship_with(person, relationship)
     return if person.blank?
     existing_relationship = self.person_relationships.detect do |rel|
       rel.relative_id.to_s == person.id.to_s
     end
     if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+      existing_relationship.assign_attributes(:kind => relationship)
+      update_census_dependent_relationship(existing_relationship)
+      existing_relationship.save!
     else
       self.person_relationships << PersonRelationship.new({
         :kind => relationship,
@@ -504,6 +513,10 @@ class Person
 
   def work_email
     emails.detect { |adr| adr.kind == "work" }
+  end
+
+  def work_or_home_email
+    work_email || home_email
   end
 
   def work_email_or_best

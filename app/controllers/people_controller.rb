@@ -201,7 +201,9 @@ class PeopleController < ApplicationController
     end
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     respond_to do |format|
-      if @person.update_attributes(person_params.except(:is_applying_coverage))
+      @person.assign_attributes(person_params.except(:is_applying_coverage))
+      update_census_employee(@person)
+      if @person.save
         if @person.is_consumer_role_active?
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
         end
@@ -276,6 +278,13 @@ class PeopleController < ApplicationController
   def get_member
     member = find_person(params[:id])
     render partial: 'people/landing_pages/member_address', locals: {person: member}
+  end
+
+  def update_census_employee(person)
+    return  unless person.valid? && Settings.site.employee_roster_updates_enabled?
+
+    factory = Factories::CensusMemberUpdateFactory.new
+    factory.update_census_employee_records(person)
   end
 
 private
