@@ -15,11 +15,11 @@ module BenefitMarkets
         # @param [ Array<BenefitMarkets::Entities::Product> ] products Product
         # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
         def call(sponsor_catalog_params, product_packages)
-          values = yield validate(sponsor_catalog_params)
-          sponsor_catalog_values = yield assign_product_packages(values)
-          product_packages = yield create(sponsor_catalog_values)
+          values                  = yield validate(sponsor_catalog_params)
+          sponsor_catalog_values  = yield assign_product_packages(values)
+          benefit_sponsor_catalog = yield create(sponsor_catalog_values)
     
-          Success(product_package_hash)
+          Success(benefit_sponsor_catalog)
         end
 
         private
@@ -37,9 +37,9 @@ module BenefitMarkets
         end
 
         def create(sponsor_catalog_values)
-          product_package = BenefitMarkets::Entities::BenefitSponsorCatalog.new(sponsor_catalog_values)
+          benefit_sponsor_catalog = BenefitMarkets::Entities::BenefitSponsorCatalog.new(sponsor_catalog_values)
           
-          Success(product_package)
+          Success(benefit_sponsor_catalog)
         end
       end
     end
