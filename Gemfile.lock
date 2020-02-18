@@ -66,6 +66,10 @@ PATH
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
       config (~> 2.0)
+      dry-monads
+      dry-struct
+      dry-types
+      dry-validation
       language_list (~> 1)
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
@@ -86,7 +90,9 @@ PATH
       dry-auto_inject (= 0.6.1)
       dry-container
       dry-initializer
+      dry-monads
       dry-schema (~> 1.0)
+      dry-struct
       dry-types
       dry-validation (~> 1.0)
       interactor (~> 3.0)
@@ -207,9 +213,9 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    active_model_serializers (0.10.9)
-      actionpack (>= 4.1, < 6)
-      activemodel (>= 4.1, < 6)
+    active_model_serializers (0.10.10)
+      actionpack (>= 4.1, < 6.1)
+      activemodel (>= 4.1, < 6.1)
       case_transform (>= 0.2)
       jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     activejob (5.2.3)
