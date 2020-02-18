@@ -19,8 +19,8 @@ module BenefitMarkets
           effective_date         = yield validate_effective_date(effective_date)
           market_kind            = yield validate_market_kind(market_kind)
           benefit_market_catalog = yield find_benefit_market_catalog(effective_date, market_kind)
-          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog, effective_date, service_areas, sponsor_catalog_params[:effective_period])
-          product_packages       = yield build_product_packages(benefit_market_catalog, effective_date, market_kind)
+          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog.value!, effective_date, service_areas)
+          product_packages       = yield build_product_packages(benefit_market_catalog.value!, effective_date, service_areas, sponsor_catalog_params[:effective_period])
           sponsor_catalog        = yield create(sponsor_catalog_params, product_packages)
 
           Success(sponsor_catalog)
@@ -38,12 +38,13 @@ module BenefitMarkets
           Success(market_kind)
         end
 
-        def get_enrollment_policies(benefit_market_catalog, effective_date)
+        def get_enrollment_policies(benefit_market_catalog, effective_date, service_areas)
           policies = {
+            effective_date: effective_date,
             effective_period: benefit_market_catalog.effective_period_on(effective_date),
             open_enrollment_period: benefit_market_catalog.open_enrollment_period_on(effective_date),
             probation_period_kinds: benefit_market_catalog.probation_period_kinds,
-            business_policies: benefit_market_catalog.business_policies.collect(&:to_h),
+            # business_policies: benefit_market_catalog.business_policies.collect(&:to_h),
             service_areas: service_areas
           }
           
@@ -54,15 +55,15 @@ module BenefitMarkets
           product_packages = benefit_market_catalog.product_packages.collect do |product_package|
             product_package_params = product_package.attributes.except(:products)
             product_package_params.merge!(application_period: application_period)
-            filtered_products = filter_products_by_service_areas(product_package, effective_date, service_areas)
-            BenefitMarkets::Operations::ProductPackage::Create.new.call(product_package_params, filtered_products)
+            filtered_products = filter_products_by_service_areas(product_package, effective_date, service_areas).value!
+            BenefitMarkets::Operations::ProductPackage::Create.new.call(product_package_params, filtered_products).value!
           end
 
           Success(product_packages)
         end
 
         def filter_products_by_service_areas(product_package, effective_date, service_areas)
-          BenefitMarkets::Operations::Products::FindBenefitMarketProducts.new.call(effective_date, service_areas, product_package)
+          BenefitMarkets::Operations::Products::FindBenefitMarketProducts.new.call(effective_date: effective_date, service_areas: service_areas, product_package: product_package)
         end
 
         def create(sponsor_catalog_params, product_packages)
@@ -72,7 +73,7 @@ module BenefitMarkets
         end
 
         def find_benefit_market_catalog(effective_date, market_kind)
-          market_catalog = BenefitMarkets::Operations::BenefitMarketCatalog::FindModel.new.call(effective_date, market_kind)
+          market_catalog = BenefitMarkets::Operations::BenefitMarketCatalog::FindModel.new.call({effective_date: effective_date, market_kind: market_kind})
 
           Success(market_catalog)
         end

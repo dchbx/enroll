@@ -24,11 +24,12 @@ module BenefitMarkets
 
         # date type check
         def validate_effective_date(effective_date)
+          Success(effective_date)
         end
 
         def scope_products(effective_date, service_areas, product_package)
           product_params = BenefitMarkets::Products::Product.by_product_package(product_package)
-            .by_service_areas(service_areas.pluck(:id))
+            .by_service_areas(service_areas.map(&:id))
             .effective_with_premiums_on(effective_date)
             .collect{|product| product.create_copy_for_embedding}
             .map(&:attributes)
@@ -38,7 +39,7 @@ module BenefitMarkets
 
         def create_products(products_params)
           products = products_params.collect do |params|
-            BenefitMarkets::Operations::Products::Create.new.call(params)
+            BenefitMarkets::Operations::Products::Create.new.call(params).value!
           end
 
           Success(products)

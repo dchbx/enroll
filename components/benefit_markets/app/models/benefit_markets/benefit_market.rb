@@ -67,8 +67,17 @@ module BenefitMarkets
       # BenfitMarkets::Operations::BenefitMarketCatalog::Find.new.call(effective_date, market_kind)
       # BenefitSponsorCatalogFactory.call(effective_date, benefit_catalog, service_areas)
 
-      service_area_entities = service_areas.collect {|service_area| BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area.attributes)}
-      BenfitMarkets::Operations::BenefitMarket::CreateBenefitSponsorCatalog.new.call(effective_date, service_area_entities, market_kind)
+      service_area_entities = service_areas.inject([]) do |entities, service_area| 
+        result = BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area.attributes)
+
+        if result.success?
+          entities << result.value!
+        else
+          entities
+        end
+      end
+
+      BenefitMarkets::Operations::BenefitMarket::CreateBenefitSponsorCatalog.new.call(effective_date: effective_date, service_areas: service_area_entities, market_kind: kind).value!
     end
 
     # Calculate available effective dates periods using passed date

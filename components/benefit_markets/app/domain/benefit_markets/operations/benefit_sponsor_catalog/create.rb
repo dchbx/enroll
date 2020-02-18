@@ -16,7 +16,7 @@ module BenefitMarkets
         # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
         def call(sponsor_catalog_params, product_packages)
           values                  = yield validate(sponsor_catalog_params)
-          sponsor_catalog_values  = yield assign_product_packages(values)
+          sponsor_catalog_values  = yield assign_product_packages(values, product_packages)
           benefit_sponsor_catalog = yield create(sponsor_catalog_values)
     
           Success(benefit_sponsor_catalog)
@@ -25,9 +25,8 @@ module BenefitMarkets
         private
 
         def validate(params)
-          values = BenefitMarkets::Validators::ProductPackageContract.new.call(params)
 
-          Success(values)
+          Success(params)
         end
 
         def assign_product_packages(values, product_packages)

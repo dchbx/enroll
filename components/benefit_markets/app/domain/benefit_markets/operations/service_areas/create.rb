@@ -5,13 +5,13 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    module ServiceArea
+    module ServiceAreas
       class Create
         send(:include, Dry::Monads[:result, :do])
 
         # @param [ Hash ] params Service Area attributes
         # @return [ BenefitMarkets::Entities::ServiceArea ] service_area Service Area
-        def call(params:)
+        def call(params)
           values       = yield validate(params)
           service_area = yield create(values)
           
@@ -21,13 +21,17 @@ module BenefitMarkets
         private
   
         def validate(params)
-          result = BenefitMarkets::Validators::ServiceAreas::ServiceAreaContract.new.call(params)
+          result = BenefitMarkets::Validators::Locations::ServiceAreaContract.new.call(params)
 
-          Success(result)
+          if result.success?
+            Success(result)
+          else
+            Failure(result)
+          end
         end
 
         def create(values)
-          service_area = BenefitMarkets::Entities::ServiceArea.new(values)
+          service_area = BenefitMarkets::Entities::ServiceArea.new(values.to_h)
 
           Success(service_area)
         end

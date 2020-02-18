@@ -16,10 +16,10 @@ module BenefitMarkets
         # @return [ BenefitMarkets::Entities::ProductPackage ] product_package Product Package
         def call(params, products)
           values                 = yield validate(params)
-          product_package_values = yield assign_products(values)
-          product_packages       = yield create(product_package_values)
+          product_package_values = yield assign_products(values.values, products)
+          product_package        = yield create(product_package_values)
     
-          Success(product_package_hash)
+          Success(product_package)
         end
 
         private
@@ -31,6 +31,7 @@ module BenefitMarkets
         end
 
         def assign_products(values, products)
+          products = products.collect(&:value!)
           values[:products] = products.collect(&:to_h)
 
           Success(values)
