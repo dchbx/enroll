@@ -30,10 +30,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'virtus',                    '~> 1.0'
   s.add_dependency "slim",                      "~> 3.0"
   s.add_dependency 'symmetric-encryption',      '~> 3.9.1'
-  s.add_dependency 'dry-monads',                '~> 1.2'
-  s.add_dependency 'dry-validation',            '~> 1.2'
-  s.add_dependency 'dry-struct',                '~> 1.0'
-  s.add_dependency 'dry-types',                 '~> 1.2'
 
   # s.add_development_dependency 'bundler-audit',             '~> 0.6'
   s.add_development_dependency 'capybara',                  '~> 3.12'
