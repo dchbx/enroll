@@ -5,9 +5,9 @@ require "spec_helper"
 RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogContract do
 
   let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }
-  let(:effective_period)        { BSON::Document.new('min' => effective_date, 'max' => (effective_date + 1.year).prev_day) }
+  let(:effective_period)        { effective_date..(effective_date + 1.year).prev_day }
   let(:oe_start_on)             { TimeKeeper.date_of_record.beginning_of_month}
-  let(:open_enrollment_period)  { BSON::Document.new('min' => oe_start_on, 'max' => (oe_start_on + 10.days)) }
+  let(:open_enrollment_period)  { oe_start_on..(oe_start_on + 10.days) }
   let(:probation_period_kinds)  { [] }
   # let(:benefit_application)     { {} }
   let(:product_packages)        { [{}] }

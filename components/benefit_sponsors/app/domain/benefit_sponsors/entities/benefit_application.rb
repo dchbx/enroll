@@ -6,8 +6,8 @@ module BenefitSponsors
       transform_keys(&:to_sym)
 
       attribute :expiration_date,             Types::Strict::Date
-      attribute :effective_period,            Types::Duration
-      attribute :open_enrollment_period,      Types::Duration
+      attribute :effective_period,            Types::Range
+      attribute :open_enrollment_period,      Types::Range
       attribute :terminated_on,               Types::Strict::Date
       attribute :aasm_state,                  Types::Strict::Symbol
       attribute :fte_count,                   Types::Strict::Integer

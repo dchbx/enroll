@@ -10,7 +10,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
   let(:hbx_id)                        { 'Hbx id'}
   let(:title)                         { 'Title' }
   let(:description)                   { 'Description' }
-  let(:issuer_profile_id)             { 'issuer_profile_id' }
+  let(:issuer_profile_id)             { BSON::ObjectId.new }
   let(:product_package_kinds)         { [:product_package_kinds] }
   let(:kind)                          { :kind }
   let(:premium_ages)                  { [1..15]}
@@ -19,7 +19,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
   let(:deductible)                    { 'deductible' }
   let(:family_deductible)             { 'family_deductible' }
   let(:issuer_assigned_id)            { 'issuer_assigned_id' }
-  let(:service_area_id)               { 'service_area_id' }
+  let(:service_area_id)               { BSON::ObjectId.new }
   let(:network_information)           { 'network_information'}
   let(:nationwide)                    { true }
   let(:dc_in_network)                 { false }

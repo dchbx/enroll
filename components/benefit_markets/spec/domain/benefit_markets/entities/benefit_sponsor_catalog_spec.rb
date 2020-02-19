@@ -9,9 +9,9 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
     let(:contract)                { BenefitMarkets::Validators::BenefitSponsorCatalogContract.new }
 
     let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }
-    let(:effective_period)        { BSON::Document.new('min' => effective_date, 'max' => (effective_date + 1.year).prev_day) }
+    let(:effective_period)        { effective_date..((effective_date + 1.year).prev_day) }
     let(:oe_start_on)             { TimeKeeper.date_of_record.beginning_of_month}
-    let(:open_enrollment_period)  { BSON::Document.new('min' => oe_start_on, 'max' => (oe_start_on + 10.days)) }
+    let(:open_enrollment_period)  { oe_start_on..(oe_start_on + 10.days) }
 
     let(:probation_period_kinds)  { [] }
     let(:service_areas) do
@@ -21,7 +21,7 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
         county_zip_ids: [{}], covered_states: [{}]
       }]
     end
-    let(:premium_ages)            { BSON::Document.new('min' => 16, 'max' => 40) }
+    let(:premium_ages)            { 16..40 }
 
     let(:pricing_units)           { [{name: 'name', display_name: 'Employee Only', order: 1}] }
     let(:member_relationships)    { [{relationship_name: :employee, relationship_kinds: [{}], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }

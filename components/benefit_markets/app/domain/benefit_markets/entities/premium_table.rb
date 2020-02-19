@@ -5,7 +5,7 @@ module BenefitMarkets
     class PremiumTable < Dry::Struct
       transform_keys(&:to_sym)
 
-      attribute :effective_period,    Types::CustomRange
+      attribute :effective_period,    Types::Range
       # attribute :rating_area,         RatingArea
       attribute :premium_tuples,      Types::Array.of(BenefitMarkets::Entities::PremiumTuple).meta(omittable: true)
 

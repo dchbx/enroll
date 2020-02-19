@@ -10,7 +10,7 @@ RSpec.describe BenefitMarkets::Entities::ServiceArea do
     let(:required_params) do
       {
         active_year: 2020, issuer_provided_title: 'Title', issuer_provided_code: 'issuer_provided_code',
-        issuer_profile_id: 'issuer_profile_id', issuer_hios_id: 'issuer_profile_id',
+        issuer_profile_id: BSON::ObjectId.new, issuer_hios_id: 'issuer_hios_id',
         county_zip_ids: [{}], covered_states: [{}]
       }
     end

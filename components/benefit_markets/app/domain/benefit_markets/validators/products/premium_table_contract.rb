@@ -13,7 +13,7 @@ module BenefitMarkets
 
         rule(:rating_area) do
           if key? && value
-            result = Locations::RatingAreaContract.new.call(value)
+            result = Validators::Locations::RatingAreaContract.new.call(value)
             key.failure(text: "invalid rating area", error: result.errors.to_h) if result&.failure?
           end
         end

@@ -5,7 +5,7 @@ module BenefitMarkets
     class ProductPackage < Dry::Struct
       transform_keys(&:to_sym)
 
-      attribute :application_period,           Types::Any #Fix ME: Types::CustomRange
+      attribute :application_period,           Types::Range
       attribute :benefit_kind,                 Types::Strict::Symbol
       attribute :product_kind,                 Types::Strict::Symbol
       attribute :package_kind,                 Types::Strict::Symbol

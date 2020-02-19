@@ -68,7 +68,7 @@ module BenefitMarkets
       # BenefitSponsorCatalogFactory.call(effective_date, benefit_catalog, service_areas)
 
       service_area_entities = service_areas.inject([]) do |entities, service_area| 
-        result = BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area.attributes)
+        result = BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area.as_json.deep_symbolize_keys)
 
         if result.success?
           entities << result.value!

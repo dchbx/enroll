@@ -60,7 +60,7 @@ module BenefitMarkets
           benefit_market_catalog = benefit_market_catalog.value!
 
           product_packages = benefit_market_catalog.product_packages.collect do |product_package|
-            product_package_params = product_package.attributes.except(:products)
+            product_package_params = product_package.as_json.deep_symbolize_keys.except(:products)
             product_package_params.merge!(application_period: application_period)
             filtered_products = filter_products_by_service_areas(product_package, effective_date, service_areas).value!
             BenefitMarkets::Operations::ProductPackage::Create.new.call(product_package_params, filtered_products).value!

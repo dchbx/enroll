@@ -9,9 +9,9 @@ RSpec.describe BenefitMarkets::Entities::ProductPackage do
     let(:contract)                  { BenefitMarkets::Validators::Products::ProductPackageContract.new }
 
     let(:effective_date)            { TimeKeeper.date_of_record.next_month.beginning_of_month }
-    let(:application_period)        { BSON::Document.new('min' => effective_date, 'max' => (effective_date + 1.year).prev_day) }
+    let(:application_period)        { effective_date..(effective_date + 1.year).prev_day }
 
-    let(:premium_ages)              { BSON::Document.new('min' => 16, 'max' => 40) }
+    let(:premium_ages)              { 16..40 }
 
     let(:pricing_units)             { [{name: 'name', display_name: 'Employee Only', order: 1}] }
     let(:member_relationships)      { [{relationship_name: :employee, relationship_kinds: [{}], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
@@ -48,7 +48,7 @@ RSpec.describe BenefitMarkets::Entities::ProductPackage do
 
     let(:premium_tuples)   { {age: 12, cost: 227.07} }
     # let(:rating_area)      { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
-    let(:effective_period)    { BSON::Document.new('min' => effective_date.beginning_of_year, 'max' => effective_date.end_of_year) }
+    let(:effective_period)    { effective_date.beginning_of_year..effective_date.end_of_year }
 
     let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples]}] }
 

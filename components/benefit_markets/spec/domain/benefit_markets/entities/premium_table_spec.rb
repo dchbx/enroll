@@ -8,7 +8,7 @@ RSpec.describe BenefitMarkets::Entities::PremiumTable do
     let(:contract)            { BenefitMarkets::Validators::Products::PremiumTableContract.new }
 
     let(:effective_date)      { TimeKeeper.date_of_record.next_month.beginning_of_month }
-    let(:effective_period)    { BSON::Document.new('min' => effective_date.beginning_of_year, 'max' => effective_date.end_of_year) }
+    let(:effective_period)    { effective_date.beginning_of_year..effective_date.end_of_year }
 
     # let(:rating_area)         { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
     let(:required_params)     { {effective_period: effective_period} }
