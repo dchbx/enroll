@@ -23,7 +23,7 @@ module VlpDoc
         return false
       end
     end
-    return true
+    true
   end
 
   def update_vlp_documents(consumer_role, source = 'person', dependent = nil)
