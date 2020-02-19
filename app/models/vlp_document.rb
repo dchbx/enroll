@@ -101,6 +101,7 @@ class VlpDocument < Document
   field :citizenship_number, type: String
   field :card_number, type: String
   field :country_of_citizenship, type: String
+  field :description, type: String
 
 
   # date of expiration of the document. e.g. passport / documentexpiration date

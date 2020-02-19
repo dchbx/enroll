@@ -265,6 +265,12 @@ var PersonValidations = (function(window, undefined) {
             } else {}
           }
         }
+        if ($(this).attr('placeholder') == 'Document Description') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+          } else {}
+        }
         if ($(this).attr('placeholder') == 'Card Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
@@ -277,7 +283,7 @@ var PersonValidations = (function(window, undefined) {
             PersonValidations.restoreRequiredAttributes(e);
           } else {}
         }
-        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' || $('#immigration_doc_type').val() == 'Temporary I-551 Stamp (on passport or I-94)') {
+        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' || $('#immigration_doc_type').val() == 'Temporary I-551 Stamp (on passport or I-94)' || $('#immigration_doc_type').val() == 'Other (With Alien Number)' || $('#immigration_doc_type').val() == 'Other (With I-94 Number)') {
 
         } else {
           if ($(this).attr('placeholder') == 'Passport Number') {
@@ -302,6 +308,15 @@ var PersonValidations = (function(window, undefined) {
 //
 //          } else {}
 //        }
+        if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport') {
+          if ($(this).attr('placeholder') == 'Passport Expiration Date') {
+            if ($(this).val().length != 10) {
+             alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
+             PersonValidations.restoreRequiredAttributes(e);
+
+            } else {}
+          }
+        }
         if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
 
         } else {

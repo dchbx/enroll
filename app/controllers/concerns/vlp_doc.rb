@@ -6,7 +6,7 @@ module VlpDoc
        [:vlp_documents_attributes =>
         [:subject, :citizenship_number, :naturalization_number,
          :alien_number, :passport_number, :sevis_id, :visa_number,
-         :receipt_number, :expiration_date, :card_number,
+         :receipt_number, :expiration_date, :card_number, :description,
          :i94_number, :country_of_citizenship]]}
     ]
   end

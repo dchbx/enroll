@@ -24,15 +24,22 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
     Then Individual logs out
 
   Examples:
-    | document type                   |
-    | i327                            |
-    | i551                            |
-    | i571                            |
-    | i766                            |
-    | Certificate of Citizenship      |
-    | Naturalization Certificate      |
-    | Machine Readable Immigrant Visa |
-    | Temporary i551 Stamp            |
+    | document type                     |
+    | i327                              |
+    | i551                              |
+    | i571                              |
+    | i766                              |
+    | Certificate of Citizenship        |
+    | Naturalization Certificate        |
+    | Machine Readable Immigrant Visa   |
+    | Temporary i551 Stamp              |
+    | i94                               |
+    | i94 in Unexpired Foreign Passport |
+    | Unexpired Foreign Passport        |
+    | i20                               |
+    | DS2019                            |
+    | Other With Alien Number           |
+    | Other With i94 Number             |
 
 
   Scenario Outline: The ability to enter my document information for my <document type> Document and should not able to validates the inputs
@@ -49,12 +56,20 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
     Then Individual logs out
 
   Examples:
-    | document type                   |
-    | i327                            |
-    | i551                            |
-    | i571                            |
-    | i766                            |
-    | Certificate of Citizenship      |
-    | Naturalization Certificate      |
-    | Machine Readable Immigrant Visa |
-    | Temporary i551 Stamp            |
+    | document type                     |
+    | i327                              |
+    | i551                              |
+    | i571                              |
+    | i766                              |
+    | Certificate of Citizenship        |
+    | Naturalization Certificate        |
+    | Machine Readable Immigrant Visa   |
+    | Temporary i551 Stamp              |
+    | i94                               |
+    | i94 in Unexpired Foreign Passport |
+    | Unexpired Foreign Passport        |
+    | i20                               |
+    | DS2019                            |
+    | Other With Alien Number           |
+    | Other With i94 Number             |
+

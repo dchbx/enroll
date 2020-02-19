@@ -10,6 +10,8 @@ INSURED_TRANSLATIONS = {
   -li- How to find Citizenship Certification Number: The Certificate of Citizenship certification number is most often in the upper right hand corner of the Certificate. \
   The Certificate of Citizenship certification number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
   "en.insured.consumer_roles.docs_shared.country_of_citizenship" => "Country of Citizenship",
+  "en.insured.consumer_roles.docs_shared.document_description" => "Document Description",
+  "en.insured.consumer_roles.docs_shared.document_description_req" => "The length of the Document Description parameter is invalid. Document Descriptions can be up to 35 characters long. You may not enter any special characters",
   "en.insured.consumer_roles.docs_shared.expiration_date" => "%{name} Expiration Date",
   "en.insured.consumer_roles.docs_shared.i94_number" => "I 94 Number",
   "en.insured.consumer_roles.docs_shared.i94_number_req" => "When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position. Do not enter any other characters or spaces. -li- You must enter exactly 11 characters into the I-94 field. \
