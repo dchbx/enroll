@@ -53,7 +53,7 @@ module Validators
       optional(:issuing_country).filled(:string)
       optional(:status).filled(:string)
       optional(:comment).filled(:string)
-      optional(:description).filled(:string)
+      optional(:description).filled(:string).value(size?: 0..35)
     end
 
     rule(:subject) do

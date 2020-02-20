@@ -790,6 +790,20 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
         end
       end
 
+      context 'description is longer' do
+        before do
+          @result = subject.call(valid_params.merge({description: 'Description for the document with type Other (With Alien Number)'}))
+        end
+
+        it 'should return errors' do
+          expect(@result.errors.to_h).not_to be_empty
+        end
+
+        it 'should return errors' do
+          expect(@result.errors.to_h).to eq({ description: ['length must be within 0 - 35'] })
+        end
+      end
+
       context 'alien_number is shorter' do
         before do
           @result = subject.call(valid_params.merge!({alien_number: '1234'}))
@@ -841,6 +855,20 @@ RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
 
         it 'should return errors' do
           expect(@result.errors.to_h).to eq({ description: [message(valid_params[:subject])] })
+        end
+      end
+
+      context 'description is longer' do
+        before do
+          @result = subject.call(valid_params.merge({description: 'Description for the document with type Other (With I-94 Number)'}))
+        end
+
+        it 'should return errors' do
+          expect(@result.errors.to_h).not_to be_empty
+        end
+
+        it 'should return errors' do
+          expect(@result.errors.to_h).to eq({ description: ['length must be within 0 - 35'] })
         end
       end
 
