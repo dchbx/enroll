@@ -19,8 +19,8 @@ module BenefitMarkets
           effective_date         = yield validate_effective_date(effective_date)
           market_kind            = yield validate_market_kind(market_kind)
           benefit_market_catalog = yield find_benefit_market_catalog(effective_date, market_kind)
-          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog.value!, effective_date, service_areas)
-          product_packages       = yield build_product_packages(benefit_market_catalog.value!, effective_date, service_areas, sponsor_catalog_params[:effective_period])
+          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog, effective_date, service_areas)
+          product_packages       = yield build_product_packages(benefit_market_catalog, effective_date, service_areas, sponsor_catalog_params[:effective_period])
           sponsor_catalog        = yield create(sponsor_catalog_params, product_packages)
 
           Success(sponsor_catalog)
@@ -29,16 +29,21 @@ module BenefitMarkets
         private
 
         def validate_effective_date(effective_date)
-
+          # Should valid rfc3339 date format
           Success(effective_date)
         end
 
         def validate_market_kind(market_kind)
-
-          Success(market_kind)
+          if BenefitMarkets::BENEFIT_MARKET_KINDS.include?(market_kind)
+            Success(market_kind)
+          else
+            Failure(:market_kind_not_found)
+          end
         end
 
         def get_enrollment_policies(benefit_market_catalog, effective_date, service_areas)
+          benefit_market_catalog = benefit_market_catalog.value!
+          
           policies = {
             effective_date: effective_date,
             effective_period: benefit_market_catalog.effective_period_on(effective_date),
@@ -52,6 +57,8 @@ module BenefitMarkets
         end
 
         def build_product_packages(benefit_market_catalog, effective_date, service_areas, application_period)
+          benefit_market_catalog = benefit_market_catalog.value!
+
           product_packages = benefit_market_catalog.product_packages.collect do |product_package|
             product_package_params = product_package.attributes.except(:products)
             product_package_params.merge!(application_period: application_period)

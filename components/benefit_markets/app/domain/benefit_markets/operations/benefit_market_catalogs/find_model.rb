@@ -31,7 +31,7 @@ module BenefitMarkets
 
         def benefit_market(params)
           return @benefit_market if defined? @benefit_market
-          @benefit_market = BenefitMarkets::Operations::BenefitMarket::Find.new.call(market_kind: params[:market_kind]).success
+          @benefit_market = BenefitMarkets::Operations::BenefitMarket::FindModel.new.call(market_kind: params[:market_kind]).success
         end
       end
     end
