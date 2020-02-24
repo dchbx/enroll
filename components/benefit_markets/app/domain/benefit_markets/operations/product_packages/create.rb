@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    module ProductPackage
+    module ProductPackages
 
       class Create
         # include Dry::Monads::Do.for(:call)

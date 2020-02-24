@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    module BenefitMarket
+    module BenefitMarkets
       # Creates benefit sponsor catalog entity
       class CreateBenefitSponsorCatalog
         # send(:include, Dry::Monads::Do.for(:call))
@@ -63,7 +63,7 @@ module BenefitMarkets
             product_package_params = product_package.as_json.deep_symbolize_keys.except(:products)
             product_package_params.merge!(application_period: application_period)
             filtered_products = filter_products_by_service_areas(product_package, effective_date, service_areas).value!
-            BenefitMarkets::Operations::ProductPackage::Create.new.call(product_package_params, filtered_products).value!
+            BenefitMarkets::Operations::ProductPackages::Create.new.call(product_package_params, filtered_products).value!
           end
 
           Success(product_packages)
@@ -74,13 +74,13 @@ module BenefitMarkets
         end
 
         def create(sponsor_catalog_params, product_packages)
-          benefit_sponsor_catalog = BenefitMarkets::Operations::BenefitSponsorCatalog::Create.new.call(sponsor_catalog_params, product_packages)
+          benefit_sponsor_catalog = BenefitMarkets::Operations::BenefitSponsorCatalogs::Create.new.call(sponsor_catalog_params, product_packages)
         
           Success(benefit_sponsor_catalog)
         end
 
         def find_benefit_market_catalog(effective_date, market_kind)
-          market_catalog = BenefitMarkets::Operations::BenefitMarketCatalog::FindModel.new.call({effective_date: effective_date, market_kind: market_kind})
+          market_catalog = BenefitMarkets::Operations::BenefitMarketCatalogs::FindModel.new.call({effective_date: effective_date, market_kind: market_kind})
 
           Success(market_catalog)
         end

@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    module BenefitMarket
+    module BenefitMarkets
       # include Dry::Monads::Do.for(:call)
       class FindModel
         include Dry::Monads[:result, :do]

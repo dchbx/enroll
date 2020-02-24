@@ -77,7 +77,7 @@ module BenefitMarkets
         end
       end
 
-      BenefitMarkets::Operations::BenefitMarket::CreateBenefitSponsorCatalog.new.call(effective_date: effective_date, service_areas: service_area_entities, market_kind: kind).value!
+      BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorCatalog.new.call(effective_date: effective_date, service_areas: service_area_entities, market_kind: kind).value!
     end
 
     # Calculate available effective dates periods using passed date
