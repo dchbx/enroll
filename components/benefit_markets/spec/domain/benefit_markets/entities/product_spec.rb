@@ -9,9 +9,8 @@ RSpec.describe BenefitMarkets::Entities::Product do
     let(:contract)           { BenefitMarkets::Validators::Products::ProductContract.new }
 
     let(:premium_tuples)     { {age: 12, cost: 227.07} }
-    # let(:rating_area)        { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
     let(:effective_period)   { effective_date.beginning_of_year..effective_date.end_of_year }
-    let(:premium_tables)     { [{effective_period: effective_period, premium_tuples: [premium_tuples]}] }
+    let(:premium_tables)     { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
     let(:required_params)    { {relationship_name: :employee, relationship_kinds: [{}]} }
 
     let(:effective_date)     { TimeKeeper.date_of_record.next_month.beginning_of_month }

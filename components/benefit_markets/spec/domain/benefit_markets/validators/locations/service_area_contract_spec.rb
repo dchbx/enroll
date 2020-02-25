@@ -7,7 +7,7 @@ RSpec.describe BenefitMarkets::Validators::Locations::ServiceAreaContract do
   let(:active_year)             { TimeKeeper.date_of_record.year }
   let(:issuer_provided_title)   { 'Issuer Provided Title' }
   let(:issuer_provided_code)    { 'Issuer Provided Code' }
-  let(:issuer_profile_id)       { 'id' }
+  let(:issuer_profile_id)       { BSON::ObjectId.new }
   let(:issuer_hios_id)          { 'hios id' }
   let(:county_zip_ids)          { [{}] }
   let(:covered_states)          { [{}] }
@@ -22,9 +22,9 @@ RSpec.describe BenefitMarkets::Validators::Locations::ServiceAreaContract do
     }
   end
 
-  let(:invalid_params)      { missing_params.merge({issuer_profile_id: '', issuer_hios_id: :issuer_hios_id}) }
+  let(:invalid_params)      { missing_params.merge({issuer_profile_id: issuer_profile_id, issuer_hios_id: :issuer_hios_id}) }
   let(:error_message1)      { {:issuer_profile_id => ["is missing"], :issuer_hios_id => ["is missing"]} }
-  let(:error_message2)      { {:issuer_hios_id => ["must be a string"], :issuer_profile_id => ["must be filled"]} }
+  let(:error_message2)      { {:issuer_hios_id => ["must be a string"]} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do
@@ -40,7 +40,7 @@ RSpec.describe BenefitMarkets::Validators::Locations::ServiceAreaContract do
 
   context "Given valid required parameters" do
     context "with all params" do
-      let(:required_params)     { missing_params.merge({issuer_profile_id: issuer_profile_id, issuer_hios_id: issuer_hios_id}) }
+      let(:required_params)     { missing_params.merge({issuer_profile_id: BSON::ObjectId.new, issuer_hios_id: issuer_hios_id}) }
 
       it "should pass validation" do
         expect(subject.call(required_params).success?).to be_truthy

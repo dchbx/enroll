@@ -10,8 +10,7 @@ RSpec.describe BenefitMarkets::Entities::PremiumTable do
     let(:effective_date)      { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:effective_period)    { effective_date.beginning_of_year..effective_date.end_of_year }
 
-    # let(:rating_area)         { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
-    let(:required_params)     { {effective_period: effective_period} }
+    let(:required_params)     { {effective_period: effective_period, rating_area_id: BSON::ObjectId.new} }
 
     context "with required only" do
 

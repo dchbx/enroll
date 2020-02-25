@@ -58,8 +58,7 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
     end
 
     let(:premium_tuples)   { {age: 12, cost: 227.07} }
-    # let(:rating_area)      { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
-    let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples]}] }
+    let(:premium_tables)   { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
 
     let(:product) do
       {

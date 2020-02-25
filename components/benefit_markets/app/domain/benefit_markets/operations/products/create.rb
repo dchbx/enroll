@@ -12,8 +12,8 @@ module BenefitMarkets
         # @param [ Hash ] params Product Attributes
         # @return [ BenefitMarkets::Entities::Product ] product Product
         def call(product_params:)
-          values   = yield validate(params)
-          product  = yield create(values)
+          values   = yield validate(product_params)
+          product  = yield create(values.to_h)
           
           Success(product)
         end
@@ -21,13 +21,13 @@ module BenefitMarkets
         private
   
         def validate(params)
-          result = BenefitMarkets::Validators::Products::ProductContract.new.call(params)
+          result = ::BenefitMarkets::Validators::Products::ProductContract.new.call(params)
 
           Success(result)
         end
 
         def create(values)
-          product = BenefitMarkets::Entities::Product.new(values)
+          product = ::BenefitMarkets::Entities::Product.new(values)
 
           Success(product)
         end

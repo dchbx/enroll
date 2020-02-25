@@ -63,7 +63,6 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
   context "Given valid required parameters" do
 
-    let(:premium_ages)                  { [16..40]}
     let(:sbc_document) do
       {
         title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format',
@@ -72,15 +71,14 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
     end
 
     let(:premium_tuples)   { {age: 12, cost: 227.07} }
-    let(:rating_area)      { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
     let(:effective_period) { effective_date.beginning_of_year..(effective_date.end_of_year) }
-    let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area: rating_area}] }
+    let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
 
     let(:product) do
       {
         benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :kind,
         hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
-        issuer_profile_id: BSON::ObjectId.new, premium_ages: premium_ages, provider_directory_url: 'provider_directory_url',
+        issuer_profile_id: BSON::ObjectId.new, premium_ages: 18..60, provider_directory_url: 'provider_directory_url',
         is_reference_plan_eligible: true, deductible: 'deductible', family_deductible: 'family_deductible',
         issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information',
         nationwide: true, dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables

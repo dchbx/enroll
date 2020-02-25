@@ -13,7 +13,6 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
   let(:issuer_profile_id)             { BSON::ObjectId.new }
   let(:product_package_kinds)         { [:product_package_kinds] }
   let(:kind)                          { :kind }
-  let(:premium_ages)                  { [1..15]}
   let(:provider_directory_url)        { 'provider_directory_url' }
   let(:is_reference_plan_eligible)    { true }
   let(:deductible)                    { 'deductible' }
@@ -34,7 +33,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
     {
       benefit_market_kind: benefit_market_kind, application_period: application_period,
       hbx_id: hbx_id, title: title, description: description, product_package_kinds: product_package_kinds,
-      issuer_profile_id: issuer_profile_id, premium_ages: premium_ages, provider_directory_url: provider_directory_url,
+      issuer_profile_id: issuer_profile_id, premium_ages: 19..60, provider_directory_url: provider_directory_url,
       is_reference_plan_eligible: is_reference_plan_eligible, deductible: deductible, family_deductible: family_deductible,
       issuer_assigned_id: issuer_assigned_id, service_area_id: service_area_id, network_information: network_information,
       nationwide: nationwide, dc_in_network: dc_in_network, sbc_document: sbc_document
@@ -60,10 +59,9 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
   context "Given valid required parameters" do
     context "with all/required params" do
       let(:premium_tuples)   { {age: 12, cost: 227.07} }
-      let(:rating_area)      { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
       let(:effective_period) { effective_date.beginning_of_year..(effective_date.end_of_year) }
 
-      let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area: rating_area}] }
+      let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
       let(:all_params)       { missing_params.merge({kind: kind, premium_tables: premium_tables })}
 
       it "should pass validation" do

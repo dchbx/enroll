@@ -14,7 +14,7 @@ module BenefitMarkets
       attribute :product_package_kinds,       Types::Strict::Array
       attribute :kind,                        Types::Strict::Symbol
       attribute :premium_ages,                Types::Range
-      attribute :provider_directory_url,      Types::Strict::String
+      attribute :provider_directory_url,      Types::String.optional.meta(omittable: true)
       attribute :is_reference_plan_eligible,  Types::Strict::Bool
       attribute :deductible,                  Types::Strict::String
       attribute :family_deductible,           Types::Strict::String

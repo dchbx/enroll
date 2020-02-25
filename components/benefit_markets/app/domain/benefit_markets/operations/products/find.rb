@@ -40,7 +40,7 @@ module BenefitMarkets
 
         def create_products(products_params)
           products = products_params.collect do |params|
-            BenefitMarkets::Operations::Products::Create.new.call(params).value!
+            ::BenefitMarkets::Operations::Products::Create.new.call(product_params: params).value!
           end
 
           Success(products)

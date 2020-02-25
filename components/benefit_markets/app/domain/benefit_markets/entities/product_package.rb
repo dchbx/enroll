@@ -12,7 +12,7 @@ module BenefitMarkets
       attribute :title,                        Types::Strict::String
       attribute :description,                  Types::String.optional.meta(omittable: true)
 
-      attribute :products,                     Types::Array.of(Product)
+      attribute :products,                     Types::Array.of(BenefitMarkets::Entities::Product)
       attribute :contribution_model,           BenefitMarkets::Entities::ContributionModel
       attribute :assigned_contribution_model,  BenefitMarkets::Entities::ContributionModel.meta(omittable: true)
       attribute :contribution_models,          Types::Array.optional.meta(omittable: true) # Array.of(BenefitMarkets::Entities::ContributionModel)

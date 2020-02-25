@@ -6,7 +6,7 @@ module BenefitMarkets
       transform_keys(&:to_sym)
 
       attribute :effective_period,    Types::Range
-      # attribute :rating_area,         RatingArea
+      attribute :rating_area_id,      Types::Bson
       attribute :premium_tuples,      Types::Array.of(BenefitMarkets::Entities::PremiumTuple).meta(omittable: true)
 
     end
