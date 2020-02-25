@@ -20,7 +20,7 @@ module BenefitMarkets
         private
         
         def benefit_market(market_kind)
-          benefit_market = BenefitMarkets::BenefitMarket.by_market_kind(market_kind).first
+          benefit_market = ::BenefitMarkets::BenefitMarket.by_market_kind(market_kind).first
 
           Success(benefit_market)
         end

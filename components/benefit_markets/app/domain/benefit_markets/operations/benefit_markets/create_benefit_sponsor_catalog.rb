@@ -23,7 +23,11 @@ module BenefitMarkets
           product_packages       = yield build_product_packages(benefit_market_catalog, effective_date, service_areas, sponsor_catalog_params[:effective_period])
           sponsor_catalog        = yield create(sponsor_catalog_params, product_packages)
 
-          Success(sponsor_catalog)
+          if sponsor_catalog.success?
+            sponsor_catalog
+          else
+            Failure(sponsor_catalog)
+          end
         end
 
         private
@@ -34,7 +38,7 @@ module BenefitMarkets
         end
 
         def validate_market_kind(market_kind)
-          if BenefitMarkets::BENEFIT_MARKET_KINDS.include?(market_kind)
+          if ::BenefitMarkets::BENEFIT_MARKET_KINDS.include?(market_kind)
             Success(market_kind)
           else
             Failure(:market_kind_not_found)
@@ -43,7 +47,7 @@ module BenefitMarkets
 
         def get_enrollment_policies(benefit_market_catalog, effective_date, service_areas)
           benefit_market_catalog = benefit_market_catalog.value!
-          
+
           policies = {
             effective_date: effective_date,
             effective_period: benefit_market_catalog.effective_period_on(effective_date),
@@ -63,24 +67,29 @@ module BenefitMarkets
             product_package_params = product_package.as_json.deep_symbolize_keys.except(:products)
             product_package_params.merge!(application_period: application_period)
             filtered_products = filter_products_by_service_areas(product_package, effective_date, service_areas).value!
-            BenefitMarkets::Operations::ProductPackages::Create.new.call(product_package_params, filtered_products).value!
+            result = ::BenefitMarkets::Operations::ProductPackages::Create.new.call(product_package_params: product_package_params, products: filtered_products)
+            if result.success?
+              result.value!
+            else
+              Failure(result.failure)
+            end
           end
 
           Success(product_packages)
         end
 
         def filter_products_by_service_areas(product_package, effective_date, service_areas)
-          BenefitMarkets::Operations::Products::FindBenefitMarketProducts.new.call(effective_date: effective_date, service_areas: service_areas, product_package: product_package)
+          ::BenefitMarkets::Operations::Products::Find.new.call(effective_date: effective_date, service_areas: service_areas, product_package: product_package)
         end
 
         def create(sponsor_catalog_params, product_packages)
-          benefit_sponsor_catalog = BenefitMarkets::Operations::BenefitSponsorCatalogs::Create.new.call(sponsor_catalog_params, product_packages)
+          benefit_sponsor_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Create.new.call(sponsor_catalog_params: sponsor_catalog_params, product_packages: product_packages)
         
           Success(benefit_sponsor_catalog)
         end
 
         def find_benefit_market_catalog(effective_date, market_kind)
-          market_catalog = BenefitMarkets::Operations::BenefitMarketCatalogs::FindModel.new.call({effective_date: effective_date, market_kind: market_kind})
+          market_catalog = ::BenefitMarkets::Operations::BenefitMarketCatalogs::FindModel.new.call({effective_date: effective_date, market_kind: market_kind})
 
           Success(market_catalog)
         end

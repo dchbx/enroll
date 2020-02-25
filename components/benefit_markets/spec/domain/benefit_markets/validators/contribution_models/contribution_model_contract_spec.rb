@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe BenefitMarkets::Validators::ContributionModels::ContributionModelContract do
 
@@ -25,7 +25,7 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::ContributionModel
   let(:member_relationship) do
     ::BenefitMarkets::PricingModels::MemberRelationship.new(
       relationship_name: "Employee",
-      relationship_kinds: [{}]
+      relationship_kinds: ['self']
     )
   end
 

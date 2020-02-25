@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe BenefitMarkets::Validators::PricingModels::MemberRelationshipContract do
 
   let(:relationship_name)      { :employee }
-  let(:relationship_kinds)     { [{}] }
+  let(:relationship_kinds)     { ['self'] }
   let(:age_threshold)          { 18 }
   let(:age_comparison)         { :== }
   let(:disability_qualifier)   { false }

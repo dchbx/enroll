@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
@@ -13,7 +13,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
   let(:description)                   { 'Description' }
 
   let(:pricing_units)                 { [{name: 'name', display_name: 'Employee Only', order: 1}] }
-  let(:member_relationships)          { [{relationship_name: :employee, relationship_kinds: [{}], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
+  let(:member_relationships)          { [{relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
   let(:pricing_model) do
     {
       name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,

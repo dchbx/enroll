@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe BenefitMarkets::Validators::ContributionModels::MemberRelationshipContract do
 
   let(:relationship_name)   { :Employee }
-  let(:relationship_kinds)  { [{}] }
+  let(:relationship_kinds)  { ['self'] }
 
   let(:missing_params)      { {relationship_name: relationship_name} }
-  let(:invalid_params)      { {relationship_name: relationship_name, relationship_kinds: ['array']} }
+  let(:invalid_params)      { {relationship_name: relationship_name, relationship_kinds: [{}]} }
   let(:required_params)     { {relationship_name: relationship_name, relationship_kinds: relationship_kinds} }
   let(:error_message)       { {:relationship_kinds => ["is missing"]} }
-  let(:error_message2)      { {:relationship_kinds => {0 => ["must be a hash"]}} }
+  let(:error_message2)      { {:relationship_kinds => {0 => ["must be a string"]}} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do

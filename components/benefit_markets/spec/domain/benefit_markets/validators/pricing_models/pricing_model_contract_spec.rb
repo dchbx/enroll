@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe BenefitMarkets::Validators::PricingModels::PricingModelContract do
 
@@ -8,7 +8,7 @@ RSpec.describe BenefitMarkets::Validators::PricingModels::PricingModelContract d
   let(:price_calculator_kind)    { 'price_calculator_kindr' }
   let(:product_multiplicities)   { [:product_multiplicities]}
   let(:pricing_units)            { [{name: 'name', display_name: 'Employee Only', order: 1}] }
-  let(:member_relationships)     { [{relationship_name: :employee, relationship_kinds: [{}], age_threshold: 18, age_comparison: :==, disability_qualifier: true  }] }
+  let(:member_relationships)     { [{relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true  }] }
 
   let(:missing_params)   { {name: name1, price_calculator_kind: price_calculator_kind, pricing_units: pricing_units} }
   let(:required_params)  { missing_params.merge({product_multiplicities: product_multiplicities, member_relationships: member_relationships}) }

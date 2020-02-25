@@ -22,14 +22,14 @@ FactoryBot.define do
 
     trait :with_benefit_catalog do
       after :build do |benefit_market, evaluator|
-        benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_catalog))
+        benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_market_catalog))
       end
     end
 
     trait :with_benefit_catalog_and_product_packages do
 
       after :build do |benefit_market, evaluator|
-        benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_catalog, :with_product_packages))
+        benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_market_catalog, :with_product_packages))
       end
     end
 

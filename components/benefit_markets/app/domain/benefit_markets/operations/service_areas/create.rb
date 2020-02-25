@@ -11,7 +11,7 @@ module BenefitMarkets
 
         # @param [ Hash ] params Service Area attributes
         # @return [ BenefitMarkets::Entities::ServiceArea ] service_area Service Area
-        def call(params)
+        def call(service_area_params:)
           values       = yield validate(params)
           service_area = yield create(values)
           

@@ -11,7 +11,7 @@ module BenefitMarkets
 
         # @param [ Hash ] params Product Attributes
         # @return [ BenefitMarkets::Entities::Product ] product Product
-        def call(params)
+        def call(product_params:)
           values   = yield validate(params)
           product  = yield create(values)
           
