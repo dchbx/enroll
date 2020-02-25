@@ -8,19 +8,18 @@ module BenefitSponsors
       attribute :expiration_date,             Types::Strict::Date
       attribute :effective_period,            Types::Range
       attribute :open_enrollment_period,      Types::Range
-      attribute :terminated_on,               Types::Strict::Date
+      attribute :terminated_on,               Types::Date.optional
       attribute :aasm_state,                  Types::Strict::Symbol
       attribute :fte_count,                   Types::Strict::Integer
       attribute :pte_count,                   Types::Strict::Integer
       attribute :msp_count,                   Types::Strict::Integer
-      attribute :recorded_sic_code,           Types::Strict::String
-      attribute :predecessor_id,              Types::Strict::String
-      attribute :recorded_rating_area_id,     Types::Strict::String
+      attribute :recorded_sic_code,           Types::String.optional
+      attribute :predecessor_id,              Types::Bson.optional
+      attribute :recorded_rating_area_id,     Types::Bson
       attribute :recorded_service_area_ids,   Types::Strict::Array
-      attribute :benefit_sponsor_catalog_id,  Types::Strict::String
-      attribute :termination_kind,            Types::Strict::String
-      attribute :termination_reason,          Types::Strict::String
-      attribute :benefit_packages,            BenefitSponsors::Entities::BenefitPackage
+      attribute :benefit_sponsor_catalog_id,  Types::Bson
+      attribute :termination_kind,            Types::String.optional
+      attribute :termination_reason,          Types::String.optional
 
     end
   end

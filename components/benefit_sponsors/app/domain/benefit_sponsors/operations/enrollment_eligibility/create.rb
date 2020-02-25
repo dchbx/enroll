@@ -3,37 +3,38 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-module BenefitSposnors
+module BenefitSponsors
   module Operations
     module EnrollmentEligibility
-      
-      # Determines enrollment eligibility
+      # Creates enrollment eligibility entity
       class Create
-        # send(:include, Dry::Monads::Do.for(:call))
         send(:include, Dry::Monads[:result, :do])
 
-        # @param [ Date ] effective_date Effective date of the benefit application
-        # @param [ BenefitSponsors::Entities::BenefitSponsorship ] benefit_sponsorship Benefit Sponsorship Entity
+        # @param  [ enrollment_eligibility_params ] enrollment_eligibility_params
         # @return [ BenefitSponsors::Entities::EnrollmentEligibility ] enrollment_eligibility
-        def call(effective_date:, benefit_sponsorship:)
-          effective_date             = yield validate_effective_date(effective_date)
-          eligibility                = yield create(effective_date, benefit_sponsorship)
+        def call(enrollment_eligibility_params:)
+          params                     = yield validate_params(enrollment_eligibility_params)
+          eligibility                = yield create(params)
 
           Success(eligibility)
         end
 
         private
 
-        def validate_effective_date(effective_date)
+        def validate_params(params)
+          enrollment_eligibility = BenefitSponsors::Validators::EnrollmentEligibilityContract.new.call(params)
 
-          Success(effective_date)
+          if enrollment_eligibility.success?
+            Success(enrollment_eligibility.to_h)
+          else
+            Failure(enrollment_eligibility)
+          end
         end
 
-        def create(effective_date, benefit_sponsorship)
-          overlapping_application = benefit_sponsorship.benefit_applications.any?{|application| application.effective_period.cover?(effective_date)}
-          enrollment_kind ||= :initial
-        
-          Success(benefit_sponsor_catalog)
+        def create(params)
+          enrollment_eligibility_entity = BenefitSponsors::Entities::EnrollmentEligibility.new(params)
+
+          Success(enrollment_eligibility_entity)
         end
       end
     end

@@ -3,7 +3,7 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-module BenefitSposnors
+module BenefitSponsors
   module Operations
     module BenefitSponsorship
       
@@ -16,14 +16,15 @@ module BenefitSposnors
         # @param [ String ] sponsorship_id Benefit Sponsorship Id
         # @return [ BenefitSponsors::Entities::EnrollmentEligibility ] enrollment_eligibility
         def call(effective_date:, benefit_sponsorship_id:)
-          effective_date             = yield validate_effective_date(effective_date)
-          benefit_sponsorship        = yield find_benefit_sponsorship(benefit_sponsorship_id)
-          benefit_sponsorship_params = yield build_benefit_sponsorship(benefit_sponsorship)
-          benefit_sponsorship_values = yield validate_benefit_sponsorship(benefit_sponsorship_params)
-          benefit_sponsorship_entity = yield create_benefit_sponsorship_entity(benefit_sponsorship_values)
-          enrollment_eligibility     = yield determine_eligibility(effective_date, benefit_sponsorship_entity)
+          effective_date                  = yield validate_effective_date(effective_date)
+          benefit_sponsorship             = yield find_benefit_sponsorship(benefit_sponsorship_id)
+          benefit_sponsorship_params      = yield build_benefit_sponsorship_params(benefit_sponsorship)
+          benefit_sponsorship_values      = yield validate_benefit_sponsorship(benefit_sponsorship_params)
+          benefit_sponsorship_entity      = yield create_benefit_sponsorship_entity(benefit_sponsorship_values)
+          enrollment_eligibility_params   = yield build_enrollment_eligibility_params(effective_date, benefit_sponsorship_entity)
+          enrollment_eligibility_entity   = yield create_enrollment_eligibility_entity(enrollment_eligibility_params)
 
-          Success(enrollment_eligibility)
+          Success(enrollment_eligibility_entity)
         end
 
         private
@@ -33,16 +34,30 @@ module BenefitSposnors
           Success(effective_date)
         end
 
-        def build_benefit_sponsorship(benefit_sponsorship)
-          sponsorship_params = benefit_sponsorship.attributes.except(:benefit_applications)
-          sponsorship_params[:benefit_applications] = benefit_sponsorship.benefit_applications.collect{|ba| ba.attributes.except(:benefit_packages)}
+        def build_benefit_sponsorship_params(benefit_sponsorship)
+          sponsorship_params = benefit_sponsorship.as_json.symbolize_keys.except(:benefit_applications)
+          sponsorship_params[:benefit_applications] = benefit_sponsorship.benefit_applications.collect{|ba| ba.as_json.symbolize_keys.except(:benefit_packages)}
           Success(sponsorship_params)
         end
 
         def validate_benefit_sponsorship(benefit_sponsorship_params)
-          result = BenefitSponsors::Validators::BenefitSponsorshipContract.new.call(benefit_sponsorship_params)
+          result = BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsorshipContract.new.call(benefit_sponsorship_params)
 
-          Success(result)
+          if result.success?
+            Success(result.to_h)
+          else
+            result.failure
+          end
+        end
+
+        def build_enrollment_eligibility_params(effective_date, benefit_sponsorship_entity)
+          eligibility_params = BenefitSponsors::Operations::EnrollmentEligibility::Determine.new.call(effective_date: effective_date, benefit_sponsorship: benefit_sponsorship_entity)
+
+          if eligibility_params.success?
+            Success(eligibility_params)
+          else
+            Failure(eligibility_params)
+          end
         end
 
         def create_benefit_sponsorship_entity(benefit_sponsorship_values)
@@ -51,16 +66,20 @@ module BenefitSposnors
           Success(benefit_sponsorship_entity)
         end
 
-        def determine_eligibility(effective_date, benefit_sponsorship_entity)
-          enrollment_eligibility = BenefitMarkets::Operations::EnrollmentEligibility::Create.new.call(effective_date: effective_date, benefit_sponsorship: benefit_sponsorship_entity)
-        
-          Success(enrollment_eligibility)
+        def create_enrollment_eligibility_entity(params)
+          enrollment_eligibility_entity = BenefitSponsors::Operations::EnrollmentEligibility::Create.new.call(enrollment_eligibility_params: params.value!)
+
+          Success(enrollment_eligibility_entity)
         end
 
-        def find_benefit_sponsorship(benefit_sponsorship_Id)
-          benefit_sponsorship = BenefitSponsors::Operations::BenefitSponsorship::Find.new.call(benefit_sponsorship_id)
+        def find_benefit_sponsorship(benefit_sponsorship_id)
+          result = BenefitSponsors::Operations::BenefitSponsorship::FindModel.new.call(benefit_sponsorship_id: benefit_sponsorship_id)
 
-          Success(benefit_sponsorship)
+          if result.success?
+            result
+          else
+            result.failure
+          end
         end
       end
     end

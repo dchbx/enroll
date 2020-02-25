@@ -31,9 +31,9 @@ module BenefitMarkets
         # TODO: Refactor not to depend on product_package model
         def scope_products(effective_date, service_areas, product_package)
           product_params = BenefitMarkets::Products::Product.by_product_package(product_package)
-            .by_service_areas(service_areas.map(&:id))
-            .effective_with_premiums_on(effective_date)
-            .collect{|product| product.create_copy_for_embedding.attributes}
+                                                            .by_service_areas(service_areas.map(&:id))
+                                                            .effective_with_premiums_on(effective_date)
+                                                            .collect{|product| product.create_copy_for_embedding.as_json.deep_symbolize_keys}
 
           Success(product_params)
         end

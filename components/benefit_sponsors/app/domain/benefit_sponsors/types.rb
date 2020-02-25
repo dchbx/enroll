@@ -2,6 +2,8 @@
 require 'uri'
 require 'cgi'
 require 'dry-types'
+
+Dry::Types.load_extensions(:maybe)
 module BenefitSponsors
   module Types
     include Dry.Types()
@@ -17,6 +19,7 @@ module BenefitSponsors
     PositiveInteger     = Coercible::Integer.constrained(gteq: 0)
     HashOrNil           = Types::Hash | Types::Nil
     StringOrNil         = Types::String | Types::Nil
+    Bson                = Types.Constructor(BSON::ObjectId) { |val| BSON::ObjectId val }
 
     RequiredSymbol  = Types::Strict::Symbol.constrained(min_size: 2)
     RequiredString  = Types::Strict::String.constrained(min_size: 1)
