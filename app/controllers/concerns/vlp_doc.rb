@@ -14,7 +14,8 @@ module VlpDoc
   def validate_vlp_params(params, source, consumer_role, dependent)
     params.permit!
     if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
-      result = ::Validators::VlpV37Contract.new.call(params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h)
+      vlp_hash = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank?}
+      result = ::Validators::VlpV37Contract.new.call(vlp_hash)
       if result.failure? && source == 'person'
         add_document_errors_to_consumer_role(consumer_role, [result.errors.to_h.keys.first.to_s.titlecase, result.errors.to_h.values.flatten.first])
         return false

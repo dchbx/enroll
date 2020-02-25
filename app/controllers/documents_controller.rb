@@ -102,15 +102,13 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    if @verification_type.type_name == 'DC Residency'
-      @person.consumer_role.invoke_residency_verification!
-    else
-      @person.consumer_role.redetermine_verification!(verification_attr)
-    end
+    request_hash = {person_id: @person.id, verification_type: @verification_type.type_name}
+    result = ::Operations::CallFedHub.new.call(request_hash)
+    key, message = result.failure? ? result.failure : result.success
+
     respond_to do |format|
       format.html {
-        hub =  @verification_type.type_name == 'DC Residency' ? 'Local Residency' : 'FedHub'
-        flash[:success] = "Request was sent to #{hub}."
+        flash[key] = message
         redirect_back(fallback_location: root_path)
       }
       format.js

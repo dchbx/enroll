@@ -74,6 +74,36 @@ RSpec.describe DocumentsController, :type => :controller do
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
     end
+
+    context 'Call Hub for DHS verification(immigration status)' do
+      before :each do
+        person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
+        person.save!
+        person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
+        @immigration_type = person.verification_types.where(type_name: 'Immigration status').first
+        @immigration_type.update_attributes!(inactive: false)
+      end
+
+      it 'should redirect if verification type is Immigration status' do
+        post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: document.id }
+        expect(flash[:success]).to eq('Request was sent to FedHub.')
+      end
+
+      context 'invalid vlp document type' do
+        let(:bad_document) { FactoryBot.build(:vlp_document, subject: 'Other (With Alien Number)') }
+
+        before do
+          person.consumer_role.vlp_documents = [bad_document]
+          person.save!
+          @immigration_type.update_attributes!(inactive: false)
+        end
+
+        it 'should redirect if verification type is Immigration status' do
+          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: bad_document.id }
+          expect(flash[:danger]).to eq('Description is required for VLP Document type: Other (With Alien Number)')
+        end
+      end
+    end
   end
 
   describe "PUT extend due date" do
