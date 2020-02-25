@@ -1288,19 +1288,8 @@ class CensusEmployee < CensusMember
   end
 
   def enrollments_for_display
-    enrollments = []
-
-    coverages_selected = lambda do |enrollments|
-      return [] if enrollments.blank?
-      coverages = enrollments.non_expired_and_non_terminated.non_external
-      [coverages.detect{|c| c.coverage_kind == 'health'}, coverages.detect{|c| c.coverage_kind == 'dental'}]
-    end
-
-    enrollments += coverages_selected.call(active_benefit_group_enrollments)
-    enrollments += coverages_selected.call(renewal_benefit_group_enrollments)
-    enrollments.compact.uniq
+    HbxEnrollment.enrollments_for_display_census_employee_show(self)
   end
-
 
   def expected_to_enroll?
     expected_selection == 'enroll'

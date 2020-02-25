@@ -99,7 +99,7 @@
     <%= render 'dependents_fields', f: f %>
     <% if @census_employee.active_benefit_group_assignment.present? && @census_employee.active_benefit_group_assignment.persisted? %>
       <div class="row">
-        <% @census_employee.enrollments_for_display.compact.each do |enrollment| %>
+        <% @hbx_enrollments.each do |enrollment| %>
         <div class="col-xs-12">
           <h3>
             <%= enrollment.coverage_kind.camelcase %> Enrollment

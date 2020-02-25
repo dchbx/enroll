@@ -497,6 +497,33 @@ class HbxEnrollment
       ).to_a
     end
 
+    def enrollments_for_display_census_employee_show(census_employee)
+      enrollments = []
+      active_benefit_group_enrollments = []
+      renewal_benefit_group_enrollments = []
+      return enrollments if census_employee&.employee_role.blank?
+      non_display_states = ["shopping", "coverage_terminated", "coverage_expired", "inactive"]
+      if census_employee.active_benefit_group.try(:id)
+        active_benefit_group_enrollments = HbxEnrollment.where({
+          :"sponsored_benefit_package_id".in => [census_employee.active_benefit_group.try(:id)].compact,
+          :"employee_role_id" => census_employee.employee_role_id,
+          :"aasm_state".nin => non_display_states,
+          :"external_enrollment" => false
+        }).to_a || []
+      end
+      if census_employee.renewal_published_benefit_group.try(:id)
+        renewal_benefit_group_enrollments = HbxEnrollment.where({
+          :"sponsored_benefit_package_id".in => [census_employee.renewal_published_benefit_group.try(:id)].compact,
+          :"employee_role_id" => census_employee.employee_role_id,
+          :"aasm_state".nin => non_display_states,
+          :"external_enrollment" => false
+        }).to_a || []
+      end
+      enrollments += active_benefit_group_enrollments
+      enrollments += renewal_benefit_group_enrollments
+      enrollments.compact.uniq
+    end
+
     def by_hbx_id(policy_hbx_id)
       self.where(hbx_id: policy_hbx_id)
       # families = Family.with_enrollment_hbx_id(policy_hbx_id)

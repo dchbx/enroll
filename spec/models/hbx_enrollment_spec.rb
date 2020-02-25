@@ -18,6 +18,60 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context "#enrollments_for_display_census_employee_show for displaying individual census employee enrollments on show page" do
+      context "no census employee" do
+        it "should return blank array" do
+          expect(HbxEnrollment.enrollments_for_display_census_employee_show(nil)).to eq([])
+        end
+      end
+
+      context "census employee has active enrollments not in shopping aasm state" do
+        let(:census_employee) { FactoryBot.create(:census_employee_with_active_assignment) }
+        let(:census_employee_person) do
+          FactoryBot.create(
+            :person,
+            :with_family,
+            first_name: census_employee.first_name,
+            last_name: census_employee.last_name,
+            ssn: census_employee.ssn,
+            dob: census_employee.dob,
+            )
+
+        end
+        let(:employee_role) { double }
+        let!(:employee_role_id) { BSON::ObjectId.new }
+        let!(:active_benefit_package) do
+          double(id: BSON::ObjectId.new)
+        end
+        let(:active_benefit_enrollment) { HbxEnrollment.last }
+        before do
+          census_employee
+          census_employee_person
+          allow(census_employee).to receive(:employee_role_id).and_return(employee_role_id)
+          # Create active enrollment
+          census_employee_person.primary_family.hbx_enrollments.build(
+            household: census_employee_person.primary_family.active_household,
+            kind: "employer_sponsored"
+          ).save!
+          allow(census_employee).to receive(:active_benefit_group).and_return(active_benefit_package)
+          allow(census_employee).to receive(:employee_role).and_return(employee_role)
+          # Return query for active benefit enrollment
+          allow(HbxEnrollment).to receive(:where).with(
+            {
+              :"sponsored_benefit_package_id".in => [census_employee.active_benefit_group.try(:id)].compact,
+              :"employee_role_id" => census_employee.employee_role_id,
+              :"aasm_state".nin => ["shopping", "coverage_terminated", "coverage_expired", "inactive"],
+              :"external_enrollment" => false
+            }
+          ).and_return([active_benefit_enrollment])
+        end
+
+        it "should return array of active/renewal/non shopping enrollments" do
+          expect(HbxEnrollment.enrollments_for_display_census_employee_show(census_employee)).to include(active_benefit_enrollment)
+        end
+      end
+    end
+
     context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
 
       before do

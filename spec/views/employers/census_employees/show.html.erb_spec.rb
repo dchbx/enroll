@@ -143,16 +143,16 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
     end
 
     it "should not show the health enrollment if it is external" do
-      hbx_enrollment.update_attributes(:external_enrollment => true)
-      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      hbx_enrollment.update_attributes!(:external_enrollment => true)
+      assign(:hbx_enrollments, HbxEnrollment.enrollments_for_display_census_employee_show(census_employee))
       render template: "employers/census_employees/show.html.erb"
       expect(rendered).to_not match(/Plan/)
       expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
     end
 
     it "should not show the dental enrollment if it is external" do
-      hbx_enrollment_two.update_attributes(:external_enrollment => true)
-      allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment_two])
+      hbx_enrollment_two.update_attributes!(:external_enrollment => true)
+      assign(:hbx_enrollments, HbxEnrollment.enrollments_for_display_census_employee_show(census_employee))
       render template: "employers/census_employees/show.html.erb"
       expect(rendered).to_not match(/Plan/)
       expect(rendered).to_not have_selector('p', text: 'Benefit Group: plan name')
@@ -210,7 +210,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
 
       before do
         hbx_enrollment_two.update_attributes(:aasm_state => :inactive)
-        assign(:hbx_enrollments, [hbx_enrollment_three, hbx_enrollment_two])
+        assign(:hbx_enrollments, HbxEnrollment.enrollments_for_display_census_employee_show(census_employee))
         render template: 'employers/census_employees/show.html.erb'
       end
 
@@ -289,7 +289,6 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
         allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_package)
         allow(dental_hbx_enrollment).to receive(:product).and_return(dental_plan)
         allow(past_enrollments).to receive(:product).and_return(dental_plan)
-        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
         assign(:past_enrollments, [past_enrollments])
         allow(census_employee).to receive(:past_enrollments).and_return [past_enrollments]
         allow(past_enrollments).to receive(:total_employee_cost).and_return 0
@@ -297,11 +296,11 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
       end
 
       it "should display past enrollments" do
-        allow(census_employee).to receive(:enrollments_for_display).and_return([hbx_enrollment,dental_hbx_enrollment,past_enrollments])
         allow(past_enrollments).to receive(:coverage_year).and_return(TimeKeeper.date_of_record.last_year.year)
         allow(past_enrollments).to receive(:employer_profile).and_return(abc_profile)
         allow(past_enrollments).to receive(:decorated_hbx_enrollment).and_return(decorated_hbx_enrollment)
         allow(dental_hbx_enrollment).to receive(:total_employee_cost).and_return 0
+        assign(:hbx_enrollments, [hbx_enrollment, dental_hbx_enrollment])
         render template: "employers/census_employees/show.html.erb"
         expect(rendered).to match(/#{hbx_enrollment.coverage_year} Health Coverage/i)
         expect(rendered).to match(/#{hbx_enrollment.coverage_year} dental Coverage/i)
@@ -314,7 +313,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
           allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([dental_hbx_enrollment])
         end
         it "should display past enrollments" do
-          allow(census_employee).to receive(:enrollments_for_display).and_return([dental_hbx_enrollment])
+          assign(:hbx_enrollments, [dental_hbx_enrollment])
           allow(dental_hbx_enrollment).to receive(:total_employee_cost).and_return 1.0
           render template: "employers/census_employees/show.html.erb"
           expect(rendered).not_to match(/#{hbx_enrollment.coverage_year} health Coverage/i)
@@ -340,8 +339,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
       context "only dental, but no past enrollments" do
         let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: dental_plan, member_enrollments: [member_enrollment], product_cost_total: '')}
         before :each do
-          assign(:past_enrollments, [])
-          allow(census_employee).to receive(:enrollments_for_display).and_return([dental_hbx_enrollment])
+          assign(:hbx_enrollments, [dental_hbx_enrollment])
           allow(dental_hbx_enrollment).to receive(:total_employee_cost).and_return 0
           allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollments").and_return([dental_hbx_enrollment])
         end
