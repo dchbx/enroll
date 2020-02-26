@@ -6,7 +6,7 @@ end
 
 describe FakesController do
   let(:consumer_role) { FactoryBot.build(:consumer_role) }
-  let(:params) { { consumer_role: { vlp_documents_attributes: { "0" => { expiration_date: "06/23/2016" }}}, naturalized_citizen: false, eligible_immigration_status: false } }
+  let(:params) { { consumer_role: { vlp_documents_attributes: { "0" => { expiration_date: "06/23/2016", 'sevis_id' => '' }}}, naturalized_citizen: false, eligible_immigration_status: false } }
   let(:person_params) { ActionController::Parameters.new({person: params }) }
   let(:dependent_params) { ActionController::Parameters.new({dependent: params }) }
 
@@ -109,7 +109,8 @@ describe FakesController do
                     'passport_number' => 'Jsdhf73',
                     'sevis_id' => '1234567891',
                     'expiration_date' => '02/29/2020',
-                    'country_of_citizenship' => 'Algeria'
+                    'country_of_citizenship' => 'Algeria',
+                    'card_number' => ''
                   }
                 }
               }
@@ -141,7 +142,8 @@ describe FakesController do
                     'sevis_id' => '1234567891',
                     'expiration_date' => '02/29/2020',
                     'country_of_citizenship' => 'Algeria',
-                    'description' => 'Some type of document'
+                    'description' => 'Some type of document',
+                    'card_number' => ''
                   }
                 }
               }
