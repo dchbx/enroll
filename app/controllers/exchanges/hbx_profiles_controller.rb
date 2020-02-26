@@ -606,24 +606,8 @@ def employer_poc
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
     else
-      begin
-        @person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
-        if params[:person][:ssn].blank?
-          if @ssn_require
-            @dont_update_ssn = true
-          else
-            @person.unset(:encrypted_ssn)
-          end
-        else
-          @person.ssn = params[:person][:ssn]
-        end
-        @person.save!
-        @person.consumer_role.check_for_critical_changes(@person.primary_family, info_changed: @info_changed, no_dc_address: "false", dc_status: @dc_status) if @person.consumer_role && @person.is_consumer_role_active?
-        CensusEmployee.update_census_employee_records(@person, current_user)
-      rescue StandardError => e
-        @error_on_save = @person.errors.messages
-        @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
-      end
+      result = ::Operations::UpdateDobSsn.new.call(person_id: @person.id, params: params, info_changed: @info_changed, dc_status: @dc_status, current_user: current_user, ssn_require: @ssn_require)
+      @error_on_save, @dont_update_ssn = result.failure? ? result.failure : result.success
     end
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save

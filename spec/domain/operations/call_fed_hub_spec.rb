@@ -7,6 +7,13 @@ RSpec.describe Operations::CallFedHub, type: :model, dbclean: :after_each do
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
+  context 'invalid arguments' do
+    it 'should return a failure' do
+      result = subject.call(person_id: 'person_id', verification_type: 'verification_type')
+      expect(result.failure).to eq([:danger, 'Person not found'])
+    end
+  end
+
   context 'DC Residency' do
     let(:dc_type) { FactoryBot.build(:verification_type, type_name: 'DC Residency') }
 
