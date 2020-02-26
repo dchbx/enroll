@@ -1197,6 +1197,77 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    context 'foreign_passport_i94' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid foreign_passport_i94 document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport',
+                           i94_number: '123456789a0',
+                           passport_number: 'N000000',
+                           expiration_date: TimeKeeper.date_of_record)
+        end
+
+        it 'should return an object of type VlpDocument' do
+          expect(consumer_role.foreign_passport_i94).to be_a(::VlpDocument)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.foreign_passport_i94.subject)
+        end
+
+        it 'should match the card_number' do
+          expect(consumer_role.foreign_passport_i94.passport_number).to eq('N000000')
+        end
+
+        it 'should match the i94_number' do
+          expect(consumer_role.foreign_passport_i94.i94_number).to eq('123456789a0')
+        end
+      end
+
+      context 'invalid foreign_passport_i94 document' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.foreign_passport_i94).to be_nil
+        end
+      end
+    end
+
+    context 'foreign_passport' do
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
+
+      context 'valid foreign_passport document exists' do
+        let(:vlp_doc) do
+          FactoryBot.build(:vlp_document,
+                           subject: 'Unexpired Foreign Passport',
+                           passport_number: 'N000000',
+                           expiration_date: TimeKeeper.date_of_record)
+        end
+
+        it 'should return an object of type VlpDocument' do
+          expect(consumer_role.foreign_passport).to be_a(::VlpDocument)
+        end
+
+        it 'should return the subject' do
+          expect(::VlpDocument::VLP_DOCUMENT_KINDS).to include(consumer_role.foreign_passport.subject)
+        end
+
+        it 'should match the card_number' do
+          expect(consumer_role.foreign_passport.passport_number).to eq('N000000')
+        end
+      end
+
+      context 'invalid foreign_passport document' do
+        let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'I-551 (Permanent Resident Card)') }
+
+        it 'should not return any object of type VlpDocument' do
+          expect(consumer_role.foreign_passport).to be_nil
+        end
+      end
+    end
+
     context 'i327' do
       let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
 

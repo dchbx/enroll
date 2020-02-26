@@ -441,7 +441,7 @@ class ConsumerRole
   end
 
   def foreign_passport_i94
-    vlp_documents.select{|doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.i94_number.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def foreign_passport
