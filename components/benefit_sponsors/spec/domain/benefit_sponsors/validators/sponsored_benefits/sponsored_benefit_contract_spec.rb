@@ -42,7 +42,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitC
     context "with all/required params" do
       let(:effective_date)                { TimeKeeper.date_of_record.next_month.beginning_of_month }
       let(:application_period)            { effective_date..(effective_date + 1.year).prev_day }
-      let(:premium_ages)                  { [1..15, 16..40]}
+      let(:premium_ages)                  { 19..60 }
 
       let(:sbc_document) do
         {
@@ -52,9 +52,8 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitC
       end
 
       let(:premium_tuples)   { {age: 12, cost: 227.07} }
-      let(:rating_area)      { {active_year: effective_date.year, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}]} }
 
-      let(:premium_tables)   { [{effective_period: effective_date.beginning_of_year..(effective_date.end_of_year), premium_tuples: [premium_tuples], rating_area: rating_area}] }
+      let(:premium_tables)   { [{effective_period: effective_date.beginning_of_year..(effective_date.end_of_year), premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
 
       let(:reference_product) do
         {
