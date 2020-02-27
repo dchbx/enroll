@@ -34,3 +34,4 @@ class DeleteUploadedFiles < MongoidMigrationTask
     end
   end
 end
+
