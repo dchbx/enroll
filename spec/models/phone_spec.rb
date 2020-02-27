@@ -70,6 +70,10 @@ describe Phone, type: :model do
     it "valid with proper value" do
       expect(Phone.create(kind: "work").errors[:kind].any?).to eq false
     end
+    
+    it "is invalid with 'phone main' as value" do
+      expect(Phone.create(kind: "phone main").errors[:kind].any?).to eq true
+    end
   end
 
   let(:person) {FactoryBot.create(:person)}
