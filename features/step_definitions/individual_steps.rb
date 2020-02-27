@@ -182,7 +182,7 @@ Then(/select I-551 doc and fill details/) do
   find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
-  fill_in 'Expiration Date', with: TimeKeeper.date_of_record.to_s
+  fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
   click_link((TimeKeeper.date_of_record + 10.days).day)
 end
 
