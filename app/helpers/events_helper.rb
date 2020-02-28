@@ -59,7 +59,7 @@ module EventsHelper
   end
 
   def is_office_location_phone_valid?(office_location)
-    office_location.present? && office_location.phone.present? && ((['work', 'home', 'main'].include? office_location.phone.kind) || (['phone main', 'main'].include?(office_location.phone.kind))
+    office_location.present? && office_location.phone.present? && (['work', 'home', 'main'].include?(office_location.phone.kind) || office_location.phone.kind == 'phone main')
     #Adding phone kind 'phone main' temporary, revert once phone.kind in office location fixed.
   end
 
