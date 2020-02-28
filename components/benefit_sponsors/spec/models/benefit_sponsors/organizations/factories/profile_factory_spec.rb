@@ -61,7 +61,7 @@ module BenefitSponsors
                   :_destroy => nil,
                   :phone_attributes =>
                   {
-                    :kind => "phone main",
+                    :kind => "main",
                     :area_code => "687",
                     :number => "7868776",
                     :extension => ""
@@ -133,7 +133,7 @@ module BenefitSponsors
                   :_destroy => nil,
                   :phone_attributes =>
                   {
-                    :kind => "phone main",
+                    :kind => "main",
                     :area_code => "879",
                     :number => "0987987",
                     :extension => ""
@@ -307,7 +307,7 @@ module BenefitSponsors
                       :_destroy => "false",
                       :phone_attributes =>
                       {
-                        :kind => "phone main",
+                        :kind => "main",
                         :area_code => "878",
                         :number => phone_number,
                         :extension => "",
@@ -400,7 +400,7 @@ module BenefitSponsors
                       :_destroy => "false",
                       :phone_attributes =>
                       {
-                        :kind => "phone main",
+                        :kind => "main",
                         :area_code => "879",
                         :number => phone_number,
                         :extension => "",
@@ -502,7 +502,7 @@ module BenefitSponsors
                       :_destroy => "false",
                       :phone_attributes =>
                       {
-                        :kind => "phone main",
+                        :kind => "main",
                         :area_code => "786",
                         :number => phone_number,
                         :extension => "",

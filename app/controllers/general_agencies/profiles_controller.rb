@@ -247,7 +247,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
 
   def update_ga_staff_phone(office_location, person)
     phone = office_location.phone
-    broker_main_phone = person.phones.where(kind: "phone main").first
+    broker_main_phone = person.phones.where(:kind.in => ["phone main", "main"]).first
     if broker_main_phone.present?
       broker_main_phone.update_attributes!(
         kind: phone.kind,

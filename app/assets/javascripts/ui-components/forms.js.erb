@@ -63,7 +63,7 @@ function addOfficeLocation() {
   // selectKindOption.remove(1)
   // clears inputs from new location
   newOfficeField.querySelectorAll('input').forEach(function(input) {
-    if (input.value != 'phone main') {
+    if (input.value != 'phone main' || input.value != 'main') {
       input.value = ''
     }
   })

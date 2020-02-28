@@ -33,7 +33,7 @@ module BenefitSponsors
                 {"0"=>
                   {
                     "address_attributes"=>{"address_1"=>"ghsdcvgsv", "kind"=>"primary", "address_2"=>"sb sb", "city"=>"vsgsd", "state"=>"DC", "zip"=>"65234", "county"=>"Barnstable"},
-                    "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"5646543", "extension"=>""}
+                    "phone_attributes"=>{"kind"=>"main", "area_code"=>"564", "number"=>"5646543", "extension"=>""}
                   }
                 }
           }
@@ -72,7 +72,7 @@ module BenefitSponsors
                   {"0"=>
                     {
                       "address_attributes"=>{"address_1"=>"jhsdbhjsdb", "kind"=>"primary", "address_2"=>"jhscvdhs", "city"=>"hgvchgsv", "state"=>"DC", "zip"=>"27452"},
-                      "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"736", "number"=>"6543565", "extension"=>""}
+                      "phone_attributes"=>{"kind"=>"main", "area_code"=>"736", "number"=>"6543565", "extension"=>""}
                     }
                   }
           }

@@ -1,7 +1,7 @@
 .row.pl-1
   h4 Phone
 .row
-  = f.hidden_field :kind, value:'phone main'
+  = f.hidden_field :kind, value:'main'
   .col-md-2.mb-1
     label for="inputAreacode" Area Code *
     = f.text_field :area_code, placeholder:'202', required:'true', id:'inputAreacode', class:'form-control', minlength:'3', maxlength:'3', onkeypress:'return isNumberKey(event)'

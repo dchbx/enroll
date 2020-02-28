@@ -516,7 +516,7 @@ class Person
   end
 
   def main_phone
-    phones.detect { |phone| phone.kind == "phone main" }
+    phones.detect { |phone| ["phone main", "main"].include?(phone.kind) }
   end
 
   def home_phone

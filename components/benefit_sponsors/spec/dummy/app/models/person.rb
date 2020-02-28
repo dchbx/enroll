@@ -244,7 +244,7 @@ class Person
   end
 
   def main_phone
-    phones.detect { |phone| phone.kind == "phone main" }
+    phones.detect { |phone| phone.kind == "main" }
   end
 
   def home_phone
