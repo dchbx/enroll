@@ -126,6 +126,19 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
         end
       end
     end
+
+    context 'OE end on is greater than the BA start_on' do
+      before :each do
+        open_enrollment_period = (initial_application.start_on - 10.days)..(initial_application.start_on + 3.days)
+        initial_application.update_attributes(open_enrollment_period: open_enrollment_period)
+        initial_application.save!
+      end
+
+      it 'should return true' do
+        result = can_publish_enrollment?(hbx_enrollment, (initial_application.open_enrollment_end_on + 2.days))
+        expect(result).to eq(true)
+      end
+    end
   end
 
   context 'renewing employer' do
