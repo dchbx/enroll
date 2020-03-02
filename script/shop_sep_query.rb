@@ -67,6 +67,7 @@ def can_publish_enrollment?(enrollment, transition_at)
   benefit_application = sb.benefit_package.benefit_application
   quiet_period = benefit_application.enrollment_quiet_period
   if is_valid_benefit_application?(benefit_application)
+    return true if quiet_period.max > benefit_application.initial_quiet_period_end(benefit_application.start_on) && transition_at.in_time_zone("UTC") > benefit_application.open_enrollment_end_on
     return false if transition_at.in_time_zone("UTC") <= quiet_period.max # don't transmit enrollments until quiet period ended
     return true  if term_states.include?(enrollment.aasm_state) # new hire enrollment check not needed for terminated enrollments
     return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months))
