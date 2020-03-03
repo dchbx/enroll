@@ -295,17 +295,70 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
           expect(response).to render_template("employee_ineligibility_notice")
         end
+      end
+    end
+  end
 
-        context "that find a matching employee" do
-          let(:found_census_employees) { [census_employee] }
+  describe "POST match" do
+    context "given valid parameters and found employee" do
+      let!(:user) { FactoryBot.create(:user) }
+      # Employee role will be built below
+      let!(:person_with_employee_role) { FactoryBot.create(:person, :with_ssn, gender: 'male', dob: Date.today - 30.years)}
+      let!(:person_params) do
+        {
+          "dob" => person_with_employee_role.dob.to_s,
+          "first_name" => person_with_employee_role.first_name,
+          "last_name" => person_with_employee_role.last_name,
+          "ssn" => person_with_employee_role.ssn,
+          "gender" => person_with_employee_role.gender
+        }
+      end
+      let!(:organization_with_employer_profile) do
+         FactoryBot.build(
+            :benefit_sponsors_organizations_general_organization,
+            :with_site,
+            :with_aca_shop_cca_employer_profile_initial_application
+          ).employer_profile.add_benefit_sponsorship.tap { |benefit_sponsorship| benefit_sponsorship.save }
+      end
+      let(:person_census_employee) do
+        FactoryBot.create(
+          :census_employee,
+          first_name: person_with_employee_role.first_name,
+          last_name: person_with_employee_role.last_name,
+          ssn: person_with_employee_role.ssn,
+          dob: person_with_employee_role.dob,
+          hired_on: Date.today,
+          employer_profile_id: organization_with_employer_profile.organization.employer_profile.id,
+          benefit_sponsors_employer_profile_id: organization_with_employer_profile.organization.employer_profile.id,
+        )
+      end
+      let(:build_employee_role) do
+        person_with_employee_role.employee_roles.build(
+          hired_on: Date.today,
+          census_employee_id: person_census_employee.id,
+          employer_profile_id: organization_with_employer_profile.organization.employer_profile.id,
+          benefit_sponsors_employer_profile_id: organization_with_employer_profile.organization.employer_profile.id
+        )
+        person_with_employee_role.save!
+      end
+      let(:employee_role) { person_with_employee_role.employee_roles.first }
 
-          it "renders the 'match' template" do
-            expect(response).to have_http_status(:success)
-            expect(response).to render_template("match")
-            expect(assigns[:employee_candidate]).to eq mock_employee_candidate
-            expect(assigns[:employment_relationships]).to eq employment_relationships
-          end
-        end
+      before do
+        # Todo
+        allow_any_instance_of(CensusEmployee).to receive(:published_benefit_group_assignment).and_return(double)
+        allow_any_instance_of(CensusEmployee).to receive(:employer_profile).and_return(organization_with_employer_profile.organization.employer_profile)
+        person_census_employee
+        build_employee_role
+        person_with_employee_role.employee_roles << employee_role
+        person_with_employee_role.save!
+        organization_with_employer_profile.organization.employer_profile.add_benefit_sponsorship
+        sign_in(user)
+        binding.pry
+        post :match, params: {person: person_params}
+      end
+      it "renders 'match' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("match")
       end
     end
   end

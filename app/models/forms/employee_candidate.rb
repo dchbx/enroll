@@ -6,7 +6,6 @@ module Forms
     include PeopleNames
     include SsnField
     attr_accessor :gender
-
     attr_accessor :user_id
     attr_accessor :dob_check
     attr_accessor :is_applying_coverage
@@ -15,8 +14,8 @@ module Forms
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :dob
-    # include ::Forms::DateOfBirthField
-    #include Validations::USDate.on(:date_of_birth)
+    include ::Forms::DateOfBirthField
+    # include Validations::USDate.on(:dob)
 
     validate :does_not_match_a_different_users_person
     validates :ssn,
@@ -24,11 +23,19 @@ module Forms
               allow_blank: true,
               numericality: true
     validate :dob_not_in_future
-
     attr_reader :dob
 
+
     def dob=(val)
-      @dob = val.class == Date ? val : Date.strptime(val, "%Y-%m-%d") rescue nil
+      # Should check here if mm/dd/yyyy or yyyy-mm-dd
+      binding.pry
+      if val.class == Date
+        @dob = val
+      elsif val.match  /\A(?<mon>\d{2})\/(?<day>\d{2})\/(?<yr>\d{4})\z/
+        @dob = Date.strptime(val, "%m/%d/%Y")
+      else
+        @dob = Date.strptime(val, "%Y-%m-%d")
+      end
     end
 
     # TODO fix and use as the only way to match census employees for the employee flow or blow this away

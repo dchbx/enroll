@@ -21,10 +21,10 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def match
+    binding.pry
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id}).permit!
     @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
-    @person = @employee_candidate
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if @found_census_employees.empty?
