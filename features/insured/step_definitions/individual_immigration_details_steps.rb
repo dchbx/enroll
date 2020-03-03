@@ -174,7 +174,7 @@ Then(/(.*) selects Other With Alien Number document and fills required details (
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Other (With Alien Number)", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
-  fill_in 'Document Description', with: (correct_or_incorrect == 'correctly' ? 'alien number document 123' : '@23#5678901')
+  fill_in 'Document Description', with: (correct_or_incorrect == 'correctly' ? 'alien number document@123' : 'the length of Description should not execeed 35')
 end
 
 Then("Individual should see the Other With Alien Number document text") do
@@ -185,7 +185,7 @@ Then(/(.*) selects Other With i94 Number document and fills required details (.*
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Other (With I-94 Number)", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
-  fill_in 'Document Description', with: (correct_or_incorrect == 'correctly' ? 'i 94 document information' : '@23#5678901')
+  fill_in 'Document Description', with: (correct_or_incorrect == 'correctly' ? 'i-94 #document information' : 'the length of Description should not execeed 35')
 end
 
 Then("Individual should see the Other With i94 Number document text") do
