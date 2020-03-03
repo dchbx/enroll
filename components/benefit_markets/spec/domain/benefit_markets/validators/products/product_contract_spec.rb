@@ -6,13 +6,14 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
 
   let(:benefit_market_kind)           { :benefit_market_kind }
   let(:effective_date)                { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:effective_period)              { effective_date.beginning_of_year..(effective_date.end_of_year) }
   let(:application_period)            { effective_date..(effective_date + 1.year).prev_day }
   let(:hbx_id)                        { 'Hbx id'}
   let(:title)                         { 'Title' }
   let(:description)                   { 'Description' }
   let(:issuer_profile_id)             { BSON::ObjectId.new }
   let(:product_package_kinds)         { [:product_package_kinds] }
-  let(:kind)                          { :kind }
+  let(:kind)                          { :health }
   let(:provider_directory_url)        { 'provider_directory_url' }
   let(:is_reference_plan_eligible)    { true }
   let(:deductible)                    { 'deductible' }
@@ -22,6 +23,8 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
   let(:network_information)           { 'network_information'}
   let(:nationwide)                    { true }
   let(:dc_in_network)                 { false }
+  let(:id)                            { BSON::ObjectId.new }
+  let(:hsa_eligibility)               { true }
 
   let(:sbc_document) do
     {
@@ -29,8 +32,11 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
       language: 'language', type: 'type', source: 'source'
     }
   end
+
+  let(:premium_tables)   { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new}] }
   let(:missing_params) do
     {
+      _id: id,
       benefit_market_kind: benefit_market_kind, application_period: application_period,
       hbx_id: hbx_id, title: title, description: description, product_package_kinds: product_package_kinds,
       issuer_profile_id: issuer_profile_id, premium_ages: 19..60, provider_directory_url: provider_directory_url,
@@ -59,7 +65,6 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
   context "Given valid required parameters" do
     context "with all/required params" do
       let(:premium_tuples)   { {age: 12, cost: 227.07} }
-      let(:effective_period) { effective_date.beginning_of_year..(effective_date.end_of_year) }
 
       let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
       let(:all_params)       { missing_params.merge({kind: kind, premium_tables: premium_tables })}

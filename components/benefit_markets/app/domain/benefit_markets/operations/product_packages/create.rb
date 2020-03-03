@@ -15,27 +15,26 @@ module BenefitMarkets
         # @param [ Array<BenefitMarkets::Entities::Product> ] products Product
         # @return [ BenefitMarkets::Entities::ProductPackage ] product_package Product Package
         def call(product_package_params:, products:)
-          values                 = yield validate(product_package_params, products)
-          product_package        = yield create(values.to_h)
+          values                 = yield validate(product_package_params)
+          product_package        = yield create(values.to_h, products)
     
           Success(product_package)
         end
 
         private
 
-        def validate(product_package_params, products)
-          contract_params = product_package_params.merge(products: products.collect(&:to_h))
-          values = ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(contract_params)
+        def validate(product_package_params)
+          result = ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(product_package_params)
 
-          if values.success?
-            Success(values)
+          if result.success?
+            Success(result)
           else
-            Failure(values.errors.to_h)
+            Failure(result.errors.to_h)
           end
         end
 
-        def create(product_package_values)
-          product_package = ::BenefitMarkets::Entities::ProductPackage.new(product_package_values)
+        def create(product_package_values, products)
+          product_package = ::BenefitMarkets::Entities::ProductPackage.new(product_package_values.merge(products: products))
           
           Success(product_package)
         end

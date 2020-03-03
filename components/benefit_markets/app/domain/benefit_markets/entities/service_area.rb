@@ -5,6 +5,7 @@ module BenefitMarkets
     class ServiceArea < Dry::Struct
       transform_keys(&:to_sym)
 
+      attribute :_id,                                 Types::Bson
       attribute :active_year,                         Types::Strict::Integer
       attribute :issuer_provided_title,               Types::Strict::String
       attribute :issuer_provided_code,                Types::Strict::String

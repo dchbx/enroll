@@ -57,6 +57,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitC
 
       let(:reference_product) do
         {
+          _id: BSON::ObjectId.new,
           benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :kind,
           hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
           issuer_profile_id: BSON::ObjectId.new, premium_ages: premium_ages, provider_directory_url: 'provider_directory_url',

@@ -11,12 +11,12 @@ RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogContract do
   let(:probation_period_kinds)  { [] }
   # let(:benefit_application)     { {} }
   let(:product_packages)        { [{}] }
-  # let(:service_areas)           { [{}] }
+  let(:service_area_ids)        { [BSON::ObjectId.new] }
 
   let(:missing_params)          { {effective_date: effective_date, effective_period: effective_period, open_enrollment_period: open_enrollment_period} }
   let(:all_params)              { {} }
 
-  let(:error_message) { { :probation_period_kinds => ["is missing"], :product_packages => ["is missing"] } }
+  let(:error_message) { { :probation_period_kinds => ["is missing"], :product_packages => ["is missing"], :service_area_ids => ["is missing"] } }
 
 
   context "Given invalid required parameters" do
@@ -28,7 +28,7 @@ RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogContract do
 
   context "Given valid required parameters" do
 
-    let(:required_params)     { missing_params.merge({probation_period_kinds: probation_period_kinds, product_packages: product_packages }) }
+    let(:required_params)     { missing_params.merge({probation_period_kinds: probation_period_kinds, product_packages: product_packages, service_area_ids: service_area_ids }) }
 
     context "with a required only" do
       it "should pass validation" do

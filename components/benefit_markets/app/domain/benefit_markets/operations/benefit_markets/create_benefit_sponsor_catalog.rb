@@ -54,7 +54,7 @@ module BenefitMarkets
             open_enrollment_period: benefit_market_catalog.open_enrollment_period_on(effective_date),
             probation_period_kinds: benefit_market_catalog.probation_period_kinds,
             # business_policies: benefit_market_catalog.business_policies.collect(&:to_h),
-            service_areas: service_areas
+            service_area_ids: service_areas.pluck(:_id)
           }
           
           Success(policies)

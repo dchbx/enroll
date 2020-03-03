@@ -11,7 +11,7 @@ module BenefitMarkets
         required(:probation_period_kinds).array(:symbol)
         # optional(:benefit_application).maybe(:hash)
         required(:product_packages).array(:hash)
-        # required(:service_areas).array(:hash)
+        required(:service_area_ids).array(Types::Bson)
       end
 
       # rule(:benefit_application) do
@@ -27,13 +27,6 @@ module BenefitMarkets
           key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
         end
       end
-
-      # rule(:service_areas).each do
-      #   if key? && value
-      #     result = ServiceAreaContract.call(value)
-      #     key.failure(text: "invalid service area", error: result.errors.to_h) if result&.failure?
-      #   end
-      # end
     end
   end
 end

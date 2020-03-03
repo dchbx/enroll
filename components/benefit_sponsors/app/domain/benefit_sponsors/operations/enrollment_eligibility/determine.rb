@@ -28,7 +28,7 @@ module BenefitSponsors
 
         def application_type(effective_date, benefit_sponsorship)
           benefit_applications = benefit_sponsorship.benefit_applications
-          if is_renewing_sponsor?(benefit_applications)
+          if is_renewing_sponsor?(benefit_applications, effective_date)
             'renewing'
           elsif is_initial_sponsor?(benefit_applications, effective_date)
             'initial'
@@ -57,11 +57,11 @@ module BenefitSponsors
           effective_date.to_date > recent_benefit_application.effective_period.max.next_day.to_date || ba_states.include?(recent_benefit_application.aasm_state)
         end
 
-        def is_renewing_sponsor?(benefit_applications)
+        def is_renewing_sponsor?(benefit_applications, effective_date)
           active_benefit_application = benefit_applications.detect { |benefit_application| benefit_application.aasm_state == :active }
           return false unless active_benefit_application
 
-          active_benefit_application.effective_period.min.next_year.prev_day.to_date == active_benefit_application.effective_period.max.to_date
+          effective_date.to_date == active_benefit_application.effective_period.max.next_day.to_date
         end
       end
     end

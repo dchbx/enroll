@@ -50,6 +50,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
 
   let(:product) do
     {
+      _id: BSON::ObjectId.new,
       benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :kind,
       hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
       issuer_profile_id: BSON::ObjectId.new, premium_ages: 16..40, provider_directory_url: 'provider_directory_url',
@@ -69,8 +70,12 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
 
   let(:catalog_params) do
     {
-      effective_date: effective_date, effective_period: application_period, open_enrollment_period: open_enrollment_period,
-      probation_period_kinds: probation_period_kinds, product_packages: [product_package_entity]
+      effective_date: effective_date,
+      effective_period: application_period,
+      open_enrollment_period: open_enrollment_period,
+      probation_period_kinds: probation_period_kinds,
+      product_packages: [product_package_entity],
+      service_area_ids: [BSON::ObjectId.new]
     }
   end
 

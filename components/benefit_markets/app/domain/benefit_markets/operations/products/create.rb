@@ -21,13 +21,26 @@ module BenefitMarkets
         private
   
         def validate(params)
-          result = ::BenefitMarkets::Validators::Products::ProductContract.new.call(params)
+          contract = contract_class(params[:kind])
+          result = contract.new.call(params)
+          if result.success?
+            Success(result)
+          else
+            Failure("Unable to validate product with hios_id #{params[:hios_id]}")
+          end
+        end
 
-          Success(result)
+        def contract_class(product_kind)
+          "::BenefitMarkets::Validators::Products::#{product_kind.to_s.camelize}ProductContract".constantize
+        end
+
+        def entity_class(product_kind)
+          "::BenefitMarkets::Entities::#{product_kind.to_s.camelize}Product".constantize
         end
 
         def create(values)
-          product = ::BenefitMarkets::Entities::Product.new(values)
+          entity = entity_class(values[:kind])
+          product = entity.new(values)
 
           Success(product)
         end

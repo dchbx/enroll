@@ -12,7 +12,7 @@ module BenefitMarkets
           required(:package_kind).filled(:symbol)
           required(:title).filled(:string)
           optional(:description).maybe(:string)
-          required(:products).array(:hash)
+          optional(:products).maybe(:array)
           required(:contribution_model).filled(:hash)
           optional(:assigned_contribution_model).maybe(:hash)
           required(:contribution_models).array(:hash)
@@ -21,7 +21,8 @@ module BenefitMarkets
 
         rule(:products).each do
           if key? && value
-            result = ProductContract.new.call(value)
+            contract_class = "::BenefitMarkets::Validators::Products::#{value[:kind].to_s.camelize}ProductContract".constantize
+            result = contract_class.new.call(value)
             key.failure(text: "invalid product", error: result.errors.to_h) if result&.failure?
           end
         end

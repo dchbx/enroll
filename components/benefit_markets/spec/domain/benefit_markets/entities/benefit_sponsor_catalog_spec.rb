@@ -14,13 +14,11 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
     let(:open_enrollment_period)  { oe_start_on..(oe_start_on + 10.days) }
 
     let(:probation_period_kinds)  { [] }
-    let(:service_areas) do
-      [{
-        active_year: 2020, issuer_provided_title: 'Title', issuer_provided_code: 'issuer_provided_code',
-        issuer_profile_id: 'issuer_profile_id', issuer_hios_id: 'issuer_profile_id',
-        county_zip_ids: [{}], covered_states: [{}]
-      }]
+
+    let(:service_area_ids) do
+      [BSON::ObjectId.new]
     end
+
     let(:premium_ages)            { 16..40 }
 
     let(:pricing_units)           { [{name: 'name', display_name: 'Employee Only', order: 1}] }
@@ -62,6 +60,7 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
 
     let(:product) do
       {
+        _id: BSON::ObjectId.new,
         benefit_market_kind: :benefit_market_kind, application_period: effective_period, kind: :kind,
         hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
         issuer_profile_id: BSON::ObjectId.new, premium_ages: premium_ages, provider_directory_url: 'provider_directory_url',
@@ -82,7 +81,7 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
     let(:required_params) do
       {
         effective_date: effective_date, effective_period: effective_period, open_enrollment_period: open_enrollment_period,
-        probation_period_kinds: probation_period_kinds, product_packages: [product_packages]
+        probation_period_kinds: probation_period_kinds, product_packages: [product_packages], service_area_ids: service_area_ids
       }
     end
 

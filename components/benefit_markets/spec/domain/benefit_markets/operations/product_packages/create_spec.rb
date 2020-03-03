@@ -46,24 +46,26 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Create, dbclean: :af
 
   let(:product_params) do
     {
-      benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :kind,
+      _id: BSON::ObjectId.new, hios_id: '9879', hios_base_id: '34985', metal_level_kind: :silver,
+      ehb: 0.9, is_standard_plan: true, hsa_eligibility: true, csr_variant_id: '01', health_plan_kind: :health_plan_kind,
+      benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :health,
       hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
       issuer_profile_id: BSON::ObjectId.new, premium_ages: 19..60, provider_directory_url: 'provider_directory_url',
-      is_reference_plan_eligible: true, deductible: '123', family_deductible: '345',
+      is_reference_plan_eligible: true, deductible: '123', family_deductible: '345', rx_formulary_url: 'rx_formulary_url',
       issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information',
       nationwide: true, dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables
     }
   end
 
+  let(:product_entity)          { BenefitMarkets::Entities::HealthProduct.new(product_params) }
   let(:product_package_params) do
     {
       application_period: application_period, benefit_kind: :benefit_kind, product_kind: :product_kind, package_kind: :package_kind,
-      title: 'Title', products: [product_params], contribution_model: contribution_model, contribution_models: [contribution_model],
+      title: 'Title', products: [product_entity], contribution_model: contribution_model, contribution_models: [contribution_model],
       pricing_model: pricing_model, description: 'description', assigned_contribution_model: contribution_model
     }
   end
 
-  let(:product_entity)          { BenefitMarkets::Entities::Product.new(product_params) }
   let(:product_package_entity)  { BenefitMarkets::Entities::ProductPackage.new(product_package_params)}
   let(:params)                  { {product_package_params: product_package_entity.to_h, products: [product_entity]} }
 

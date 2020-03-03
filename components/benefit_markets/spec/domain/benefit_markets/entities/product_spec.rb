@@ -26,6 +26,7 @@ RSpec.describe BenefitMarkets::Entities::Product do
     end
     let(:required_params) do
       {
+        _id: BSON::ObjectId.new,
         benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :kind, hbx_id: 'hbx_id', title: 'title',
         product_package_kinds: [:product_package_kinds], provider_directory_url: 'provider_directory_url', issuer_profile_id:  BSON::ObjectId.new,
         premium_ages: premium_ages, is_reference_plan_eligible: true, deductible: 'deductible', family_deductible: 'family_deductible',

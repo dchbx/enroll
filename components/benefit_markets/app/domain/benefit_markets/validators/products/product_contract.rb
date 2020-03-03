@@ -6,9 +6,10 @@ module BenefitMarkets
       class ProductContract < Dry::Validation::Contract
 
         params do
+          required(:_id).filled(Types::Bson)
           required(:benefit_market_kind).filled(:symbol)
           required(:application_period).filled(type?: Range)
-          required(:hbx_id).filled(:string)
+          optional(:hbx_id).maybe(:string)
           required(:title).filled(:string)
           optional(:description).maybe(:string)
           required(:issuer_profile_id).filled(Types::Bson)
@@ -19,11 +20,12 @@ module BenefitMarkets
           required(:is_reference_plan_eligible).filled(:bool)
           required(:deductible).filled(:string)
           required(:family_deductible).filled(:string)
-          required(:issuer_assigned_id).filled(:string)
+          optional(:issuer_assigned_id).maybe(:string)
           required(:service_area_id).filled(Types::Bson)
-          required(:network_information).filled(:string)
+          optional(:network_information).maybe(:string)
           required(:nationwide).filled(:bool)
           required(:dc_in_network).filled(:bool)
+          optional(:renewal_product_id).maybe(type?: BSON::ObjectId)
 
           optional(:sbc_document).maybe(:hash)
           required(:premium_tables).array(:hash)

@@ -46,8 +46,8 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
   let(:missing_params)   { {application_period: application_period, benefit_kind: benefit_kind, product_kind: product_kind, package_kind: package_kind, title: title} }
   let(:invalid_params)   { missing_params.merge({pricing_model: {}, contribution_model: contribution_model, contribution_models: contribution_models })}
-  let(:error_message1)   { {:products => ["is missing"], :pricing_model => ["is missing"], :contribution_model => ["is missing"], :contribution_models => ["is missing"] } }
-  let(:error_message2)   { {:pricing_model => ["must be filled"], :products => ["is missing"]} }
+  let(:error_message1)   { {:pricing_model => ["is missing"], :contribution_model => ["is missing"], :contribution_models => ["is missing"] } }
+  let(:error_message2)   { {:pricing_model => ["must be filled"]} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do
@@ -76,10 +76,12 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
     let(:product) do
       {
-        benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :kind,
+        _id: BSON::ObjectId.new, hios_id: '9879', hios_base_id: '34985', metal_level_kind: :silver,
+        ehb: 0.9, is_standard_plan: true, hsa_eligibility: true, csr_variant_id: '01', health_plan_kind: :health_plan_kind,
+        benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :health,
         hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
-        issuer_profile_id: BSON::ObjectId.new, premium_ages: 18..60, provider_directory_url: 'provider_directory_url',
-        is_reference_plan_eligible: true, deductible: 'deductible', family_deductible: 'family_deductible',
+        issuer_profile_id: BSON::ObjectId.new, premium_ages: 19..60, provider_directory_url: 'provider_directory_url',
+        is_reference_plan_eligible: true, deductible: '123', family_deductible: '345', rx_formulary_url: 'rx_formulary_url',
         issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information',
         nationwide: true, dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables
       }
