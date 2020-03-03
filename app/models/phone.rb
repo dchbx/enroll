@@ -8,7 +8,7 @@ class Phone
   embedded_in :census_member, class_name: "CensusMember"
 
   KINDS = ["home", "work", "mobile", "main", "fax"]
-  OFFICE_KINDS = ["main"]
+  OFFICE_KINDS = ["phone main"]
 
   field :kind, type: String
   field :country_code, type: String, default: ""
@@ -42,8 +42,16 @@ class Phone
     allow_blank: false
 
   validates :kind,
-    inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid phone type" },
+    inclusion: { in: valid_phone_kinds, message: "%{value} is not a valid phone type" },
     allow_blank: false
+
+  def valid_phone_kinds
+    if # is a person
+      KINDS
+    else # is an office
+      KINDS + OFFICE_KINDS
+    end
+  end
 
   def blank?
     [:full_phone_number, :area_code, :number, :extension].all? do |attr|

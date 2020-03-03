@@ -8,6 +8,7 @@
     <div id="employer-info" class="row hidden"></div>
 
     <%= render 'shared/address_fields', f: f %><br>
+    <!-- This might be where the phone main is getting assigned for individual person records. Perhaps figure out where they're being added in this partial and then add a variable here to conditionally render everything except phone main for perosn records -->
     <%= render 'shared/phone_fields', f: f %><br>
 
     <div id="email_info" class="focus_effect personal-info-row">

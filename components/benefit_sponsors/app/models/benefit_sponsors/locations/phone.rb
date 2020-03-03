@@ -5,7 +5,7 @@ module BenefitSponsors
       include Mongoid::Timestamps
 
       KINDS = ["home", "work", "mobile", "main", "fax"]
-      OFFICE_KINDS = ["main"]
+      OFFICE_KINDS = ["phone main"]
 
       field :kind, type: String, default: ""
       field :country_code, type: String, default: ""
