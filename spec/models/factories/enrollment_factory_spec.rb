@@ -812,6 +812,33 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     it "should return nil for the consumer role" do
       expect(Factories::EnrollmentFactory.construct_consumer_role(ua_params,user)).not_to be
     end
+
+    context "without errors on the person and no existing consumer role" do
+      let(:person_no_consumer_role) { FactoryBot.create(:person, :with_work_email, :with_ssn) }
+      let!(:user) { FactoryBot.create(:user) }
+      let(:person_no_consumer_role_params) do
+        {
+          "first_name" => person_no_consumer_role.first_name,
+          "last_name" => person_no_consumer_role.last_name,
+          "middle_name" => person_no_consumer_role.middle_name,
+          "name_pfx" => person_no_consumer_role.name_pfx,
+          "name_sfx" => person_no_consumer_role.name_sfx,
+          "dob" => person_no_consumer_role.dob,
+          "ssn" => person_no_consumer_role.ssn,
+          "no_ssn" => "",
+          "gender" => person_no_consumer_role.gender
+        }
+      end
+
+      before :each do
+        person_no_consumer_role.consumer_role.destroy if person_no_consumer_role.consumer_role
+        expect(person_no_consumer_role.valid?).to eq(true)
+      end
+
+      it "should return the consumer role" do
+        expect(Factories::EnrollmentFactory.construct_consumer_role({ person: person_no_consumer_role_params }, user).class).to eq(ConsumerRole)
+      end
+    end
   end
 end
 

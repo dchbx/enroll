@@ -67,8 +67,8 @@ module Factories
     end
 
     def self.construct_consumer_role(person_params, user)
-      person_params = person_params[:person]
-      person, person_new = initialize_person(
+      person_params = person_params.dig(:person)
+      person, person_new = self.initialize_person(
         user,
         person_params["name_pfx"],
         person_params["first_name"],
@@ -82,7 +82,12 @@ module Factories
         person_params["no_ssn"],
         person_params["is_applying_coverage"]
       )
-      if person.blank? && person_new.blank?
+      existing_person = Person.by_ssn(person_params["ssn"].gsub("-","")).first
+      if existing_person.present? && existing_person.consumer_role.blank?
+        role = build_consumer_role(existing_person, existing_person)
+        role.update_attribute(:is_applying_coverage, (person_params["is_applying_coverage"].nil? ?  true : person_params["is_applying_coverage"]))
+        return role
+      elsif person.blank? && person_new.blank?
         begin
           raise
         rescue => e
@@ -97,10 +102,11 @@ module Factories
           log(JSON.dump(error_message), {:severity => 'error'})
         end
         return nil
+      else
+        role = build_consumer_role(person, person_new)
+        role.update_attribute(:is_applying_coverage, (person_params["is_applying_coverage"].nil? ?  true : person_params["is_applying_coverage"]))
+        return role
       end
-      role = build_consumer_role(person, person_new)
-      role.update_attribute(:is_applying_coverage, (person_params["is_applying_coverage"].nil? ?  true : person_params["is_applying_coverage"]))
-      role
     end
 
     def self.build_consumer_role(person, person_new)
@@ -312,8 +318,6 @@ module Factories
       return person.resident_role if person.resident_role.present?
       person.build_resident_role(is_applicant: true)
     end
-
-    private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
                                last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil, is_applying_coverage=true)

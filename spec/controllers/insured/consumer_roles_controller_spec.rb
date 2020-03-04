@@ -196,10 +196,33 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       post :create, params: { person: person_params }
       expect(response).to have_http_status(:redirect)
     end
-
-
   end
 
+  context "POST create with valid person params", dbclean: :after_each do
+    let(:person_no_consumer_role) { FactoryBot.create(:person, :with_work_email, :with_ssn) }
+    let!(:user) { FactoryBot.create(:user) }
+    let(:person_no_consumer_role_params) do
+      {
+        "first_name" => person_no_consumer_role.first_name,
+        "last_name" => person_no_consumer_role.last_name,
+        "middle_name" => person_no_consumer_role.middle_name,
+        "name_pfx" => person_no_consumer_role.name_pfx,
+        "name_sfx" => person_no_consumer_role.name_sfx,
+        "dob" => person_no_consumer_role.dob,
+        "ssn" => person_no_consumer_role.ssn,
+        "no_ssn" => "",
+        "gender" => person_no_consumer_role.gender
+      }
+    end
+
+    it "should create new person/consumer role object" do
+      sign_in user
+      post :create, params: { person: person_no_consumer_role_params }
+      expect(response).to have_http_status(:redirect)
+      person_no_consumer_role.reload
+      expect(person_no_consumer_role.consumer_role.present?).to eq(true)
+    end
+  end
 
   context "POST create with failed construct_employee_role", dbclean: :after_each do
     let(:person_params){
