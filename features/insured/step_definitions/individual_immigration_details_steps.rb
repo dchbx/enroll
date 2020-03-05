@@ -11,14 +11,6 @@ Then(/Individual fills demographic details/) do
   screenshot("personal_form")
 end
 
-Then(/^Individual (.*) go to Authorization and Consent page$/) do |argument|
-  if argument == 'does'
-    expect(page).to have_content('Authorization and Consent')
-  else
-    expect(page).not_to have_content('Authorization and Consent')
-  end
-end
-
 Then(/(.*) selects i327 document and fills required details (.*)$/) do |text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-327 (Reentry Permit)", match: :prefer_exact, wait: 10).click
@@ -123,18 +115,17 @@ end
 Then(/(.*) selects i94 document and fills required details (.*)$/) do |text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-94 (Arrival/Departure Record)", match: :prefer_exact, wait: 10).click
-  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '12345678901' : '@23#5678901')
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
 end
 
 Then("Individual should see the i94 document text") do
-  expect(page).to have_content('When entering the I-94 Number, only include numbers. Do not enter any other characters, letters, or spaces.')
-  expect(page).to have_content('You must enter exactly 11 digits into the I-94 Number field.')
+  step 'Individual should see the i94 text'
 end
 
 Then(/(.*) selects i94 in Unexpired Foreign Passport document and fills required details (.*)$/) do |text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", exact_text: true, match: :prefer_exact, wait: 10).click
-  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '12345678901' : '@23#5678901')
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: (correct_or_incorrect == 'correctly' ? 'L282824' : '@23#5678901')
   fill_in 'Passport Expiration Date', with: TimeKeeper.date_of_record.to_s
   click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
@@ -193,7 +184,7 @@ end
 Then(/(.*) selects Other With i94 Number document and fills required details (.*)$/) do |text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Other (With I-94 Number)", exact_text: true, match: :prefer_exact, wait: 10).click
-  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '12345678901' : '@23#5678901')
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Document Description', with: (correct_or_incorrect == 'correctly' ? 'i 94 document information' : '@23#5678901')
 end
 

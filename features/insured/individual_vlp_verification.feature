@@ -17,7 +17,7 @@ Feature: Insured VLP Verification for Individual market
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
     And Individual selects eligible immigration status
-    Then selects i94 document and fills required details correctly
+    Then selects the i94 document and fills required details correctly
     Then Individual should see the i94 text
     And Individual selects applying for coverage
     When Individual clicks on continue
@@ -31,7 +31,7 @@ Feature: Insured VLP Verification for Individual market
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
     And Individual selects eligible immigration status
-    Then selects i94 document and fills required details incorrectly
+    Then selects the i94 document and fills required details incorrectly
     Then Individual should see the i94 text
     And Individual selects applying for coverage
     When Individual clicks on continue
