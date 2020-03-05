@@ -32,7 +32,7 @@ RSpec.describe Operations::ValidateVlpDocument, type: :model, dbclean: :after_ea
 
       it 'should not call the hub with failure message' do
         result = subject.call(person_id: person.id)
-        expect(result.failure).to eq('Description is required for VLP Document type: Other (With Alien Number)')
+        expect(result.failure).to eq('Please fill in your information for Description')
       end
     end
   end

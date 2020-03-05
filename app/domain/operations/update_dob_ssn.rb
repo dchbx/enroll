@@ -23,7 +23,7 @@ module Operations
     def validate_if_person_can_update(person)
       if person&.consumer_role&.vlp_documents.present?
         result = ::Operations::ValidateVlpDocument.new.call(person_id: person.id)
-        result.failure? ? Failure([{person: ['One of the VLP Documents are invalid']}, nil]) : Success(true)
+        result.failure? ? Failure([{person: [result.failure]}, nil]) : Success(true)
       else
         Success(true)
       end

@@ -54,7 +54,7 @@ RSpec.describe Operations::CallFedHub, type: :model, dbclean: :after_each do
 
       it 'should not call the hub with failure message' do
         result = subject.call(person_id: person.id, verification_type: immigration_type.type_name)
-        expect(result.failure).to eq([:danger, 'Description is required for VLP Document type: Other (With Alien Number)'])
+        expect(result.failure).to eq([:danger, 'Please fill in your information for Description'])
       end
     end
   end

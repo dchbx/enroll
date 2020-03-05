@@ -125,7 +125,7 @@ describe FakesController do
         end
 
         it 'should add errors to the object if params are invalid' do
-          expect(person.errors.full_messages).to eq(['Description is required for VLP Document type: Other (With Alien Number)'])
+          expect(person.errors.full_messages).to eq(['Please fill in your information for Description'])
         end
       end
 
@@ -193,7 +193,7 @@ describe FakesController do
         end
 
         it 'should add errors to the object if params are invalid' do
-          expect(dependent.errors.full_messages).to eq(['Description is required for VLP Document type: Other (With Alien Number)'])
+          expect(dependent.errors.full_messages).to eq(['Please fill in your information for Description'])
         end
       end
 

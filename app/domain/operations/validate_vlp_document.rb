@@ -36,7 +36,7 @@ module Operations
         message = if errors.values.flatten.include? 'Invalid VLP Document type'
                     "VLP document type is invalid: #{vlp_doc.subject}"
                   else
-                    errors.keys.first.to_s.titlecase + ' ' + errors.values.flatten.first
+                    "Please fill in your information for #{errors.keys.first.to_s.titlecase}"
                   end
         Failure(message)
       else
