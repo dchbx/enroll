@@ -68,8 +68,6 @@ module BenefitSponsors
 
         def create_enrollment_eligibility_entity(params)
           enrollment_eligibility_entity = BenefitSponsors::Operations::EnrollmentEligibility::Create.new.call(enrollment_eligibility_params: params.value!)
-
-          Success(enrollment_eligibility_entity)
         end
 
         def find_benefit_sponsorship(benefit_sponsorship_id)

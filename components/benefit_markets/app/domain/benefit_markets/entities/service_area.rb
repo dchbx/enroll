@@ -10,8 +10,8 @@ module BenefitMarkets
       attribute :issuer_provided_title,               Types::Strict::String
       attribute :issuer_provided_code,                Types::Strict::String
       attribute :issuer_profile_id,                   Types::Bson
-      attribute :issuer_hios_id,                      Types::Strict::String
-      attribute :county_zip_ids,                      Types::Strict::Array
+      attribute :issuer_hios_id,                      Types::String.optional.meta(omittable: true)
+      attribute :county_zip_ids,                      Types::Array.optional.meta(omittable: true)
       attribute :covered_states,                      Types::Strict::Array
 
     end

@@ -28,6 +28,7 @@ module BenefitSponsors
         title: title,
         issuer_profile_id: issuer_profile_id,
         hios_id: "#{hios_base}-01",
+        dental_level: 'high',
         hios_base_id: hios_base,
         csr_variant_id: "01",
         service_area_id: service_area_id,
@@ -461,7 +462,8 @@ module BenefitSponsors
         package_kind: :single_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -482,7 +484,8 @@ module BenefitSponsors
         package_kind: :metal_level,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -503,7 +506,8 @@ module BenefitSponsors
         package_kind: :single_issuer,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
     
@@ -524,7 +528,8 @@ module BenefitSponsors
         package_kind: :metal_level,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -545,7 +550,8 @@ module BenefitSponsors
         package_kind: :multi_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -566,7 +572,8 @@ module BenefitSponsors
         package_kind: :single_issuer,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -587,7 +594,8 @@ module BenefitSponsors
         package_kind: :single_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 

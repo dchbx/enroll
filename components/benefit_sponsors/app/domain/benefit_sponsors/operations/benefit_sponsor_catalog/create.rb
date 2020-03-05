@@ -18,12 +18,9 @@ module BenefitSponsors
           enrollment_eligibility_entity               = yield get_enrollment_eligibility(benefit_sponsorship_id, effective_date)
           benefit_sponsorship                         = yield find_benefit_sponsorship(benefit_sponsorship_id)
           service_areas_entities                      = yield get_service_areas_entities(benefit_sponsorship, effective_date)
-          market_kind                                 = yield get_market_kind(benefit_sponsorship)
-          benefit_sponsor_catalog_entity              = yield get_benefit_sponsor_catalog_entity(effective_date, service_areas_entities, market_kind)
-
+          benefit_sponsor_catalog_entity              = yield get_benefit_sponsor_catalog_entity(effective_date, service_areas_entities, benefit_sponsorship)
           build_benefit_sponsor_catalog               = yield build_benefit_sponsor_catalog(benefit_sponsor_catalog_entity)
-          contribution_model_title                    = yield fetch_contribution_model_title(enrollment_eligibility_entity)
-          catalog_with_assigned_contribution_model    = yield assign_contribution_model(build_benefit_sponsor_catalog, contribution_model_title)
+          catalog_with_assigned_contribution_model    = yield assign_contribution_model(build_benefit_sponsor_catalog, enrollment_eligibility_entity)
           persisted_catalog                           = yield persist_catalog(catalog_with_assigned_contribution_model)
 
           Success(persisted_catalog)
@@ -47,8 +44,6 @@ module BenefitSponsors
 
         def get_market_kind(benefit_sponsorship)
           market_kind = benefit_sponsorship.market_kind
-
-          Success(market_kind)
         end
 
         def get_service_areas_entities(benefit_sponsorship, effective_date)
@@ -67,7 +62,8 @@ module BenefitSponsors
           end
         end
 
-        def get_benefit_sponsor_catalog_entity(effective_date, service_areas_entities, market_kind)
+        def get_benefit_sponsor_catalog_entity(effective_date, service_areas_entities, benefit_sponsorship)
+          market_kind = get_market_kind(benefit_sponsorship)
           result = BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorCatalog.new.call(effective_date: effective_date, service_areas: service_areas_entities.to_a, market_kind: market_kind)
 
           if result.success?
@@ -85,18 +81,16 @@ module BenefitSponsors
         end
 
         def fetch_contribution_model_title(enrollment_eligibility_entity)
-          title =
-            case enrollment_eligibility_entity.success.application_type
-            when 'initial'
-              'Zero Percent Sponsor Fixed Percent Contribution Model'
-            when 'renewing'
-              'Fifty Percent Sponsor Fixed Percent Contribution Model'
-            end
-
-          Success(title)
+          case enrollment_eligibility_entity.application_type
+          when 'initial'
+            'Zero Percent Sponsor Fixed Percent Contribution Model'
+          when 'renewing'
+            'Fifty Percent Sponsor Fixed Percent Contribution Model'
+          end
         end
 
-        def assign_contribution_model(benefit_sponsor_catalog, contribution_model_title)
+        def assign_contribution_model(benefit_sponsor_catalog, enrollment_eligibility_entity)
+          contribution_model_title = fetch_contribution_model_title(enrollment_eligibility_entity)
           benefit_sponsor_catalog.product_packages.each do |product_package|
             assigned_contribution_model = product_package.contribution_models.where(title: contribution_model_title).first
             product_package.assigned_contribution_model = assigned_contribution_model

@@ -51,8 +51,7 @@ module BenefitSponsors
 
           return true if recent_benefit_application.aasm_state == :active && recent_benefit_application.effective_period.cover?(effective_date)
 
-          ba_states = BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_DRAFT_STATES +
-                      BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_APPROVED_STATES +
+          ba_states = BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES +
                       BenefitSponsors::BenefitApplications::BenefitApplication::CANCELED_STATES
           effective_date.to_date > recent_benefit_application.effective_period.max.next_day.to_date || ba_states.include?(recent_benefit_application.aasm_state)
         end

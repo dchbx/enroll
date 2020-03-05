@@ -84,7 +84,7 @@ module BenefitMarkets
 
         def create(sponsor_catalog_params, product_packages)
           benefit_sponsor_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Create.new.call(sponsor_catalog_params: sponsor_catalog_params, product_packages: product_packages)
-        
+
           Success(benefit_sponsor_catalog)
         end
 

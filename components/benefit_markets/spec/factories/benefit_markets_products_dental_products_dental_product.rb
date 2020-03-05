@@ -8,6 +8,7 @@ FactoryBot.define do
     sequence(:title)     { |n| "Dental BlueChoice Silver#{n} 2,000" }
     description          { "Highest rated and highest value" }
     premium_ages         { 20..65 }
+    dental_level         { 'high' }
     # health_plan_kind     :pos
     ehb                  { 0.9943 }
     network_information  { 'DC Metro' }

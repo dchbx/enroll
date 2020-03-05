@@ -11,8 +11,8 @@ module BenefitMarkets
           required(:issuer_provided_title).filled(:string)
           required(:issuer_provided_code).filled(:string)
           required(:issuer_profile_id).filled(Types::Bson)
-          required(:issuer_hios_id).filled(:string)
-          required(:county_zip_ids).array(:hash)
+          optional(:issuer_hios_id).maybe(:string)
+          optional(:county_zip_ids).maybe(:array)
           required(:covered_states).array(:string)
         end
 
