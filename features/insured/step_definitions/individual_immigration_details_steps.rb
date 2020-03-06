@@ -179,6 +179,7 @@ end
 
 Then("Individual should see the Other With Alien Number document text") do
   step "Individual should see the i327 document text"
+  expect(page).to have_content("Enter the type of document, using no more than 35 characters.")
 end
 
 Then(/(.*) selects Other With i94 Number document and fills required details (.*)$/) do |text, correct_or_incorrect|
@@ -190,4 +191,5 @@ end
 
 Then("Individual should see the Other With i94 Number document text") do
   step "Individual should see the i94 document text"
+  expect(page).to have_content("Enter the type of document, using no more than 35 characters.")
 end
