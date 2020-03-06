@@ -38,7 +38,7 @@ module Operations
                   else
                     invalid_field = errors.keys.first
                     invalid_field = (invalid_field == :description) ? :document_description : invalid_field
-                    "Please fill in your information for #{invalid_field.to_s.titlecase}"
+                    "Please fill in your information for #{invalid_field.to_s.titlecase}" + '.'
                   end
         Failure(message)
       else
