@@ -100,7 +100,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
         it 'should redirect if verification type is Immigration status' do
           post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: bad_document.id }
-          expect(flash[:danger]).to eq('Please fill in your information for Description')
+          expect(flash[:danger]).to eq('Please fill in your information for Document Description')
         end
       end
     end
