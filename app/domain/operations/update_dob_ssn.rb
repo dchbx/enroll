@@ -33,7 +33,7 @@ module Operations
       person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
       if params[:person][:ssn].blank?
         if ssn_require
-          @dont_update_ssn = true
+          dont_update_ssn = true
         else
           person.unset(:encrypted_ssn)
         end
@@ -43,11 +43,11 @@ module Operations
       person.save!
       person.consumer_role.check_for_critical_changes(person.primary_family, info_changed: info_changed, no_dc_address: "false", dc_status: dc_status) if person.consumer_role && person.is_consumer_role_active?
       CensusEmployee.update_census_employee_records(person, current_user)
-      Success([nil, @dont_update_ssn])
+      Success([nil, dont_update_ssn])
     rescue StandardError => e
       error_on_save = person.errors.messages
       error_on_save[:census_employee] = [e.summary] if person.errors.messages.blank? && e.present?
-      Failure([error_on_save, @dont_update_ssn])
+      Failure([error_on_save, dont_update_ssn])
     end
   end
 end
