@@ -122,6 +122,9 @@ class ConsumerRole
   field :identity_rejected, type: Boolean, default: false
   field :application_rejected, type: Boolean, default: false
 
+  # field to determine the user's active selection
+  field :active_vlp_document_id, type: BSON::ObjectId
+
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true

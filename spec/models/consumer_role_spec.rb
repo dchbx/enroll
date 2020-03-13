@@ -5,6 +5,7 @@ require 'aasm/rspec'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   describe ConsumerRole, dbclean: :after_each do
+    it { is_expected.to have_attributes(active_vlp_document_id: nil) }
     it { should delegate_method(:hbx_id).to :person }
     it { should delegate_method(:ssn).to :person }
     it { should delegate_method(:no_ssn).to :person}

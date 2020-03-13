@@ -55,6 +55,7 @@ module VlpDoc
       vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
       document = consumer_role.find_document(vlp_doc_attribute[:subject])
       document.update_attributes(vlp_doc_attribute)
+      consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, document)
       elsif source == 'dependent' && dependent.present?
@@ -67,11 +68,7 @@ module VlpDoc
   end
 
   def get_vlp_doc_subject_by_consumer_role(consumer_role)
-    return nil if consumer_role.blank? || consumer_role.vlp_documents.empty?
-    naturalized_citizen_docs = ["Certificate of Citizenship", "Naturalization Certificate"]
-    docs_for_status = consumer_role.citizen_status == "naturalized_citizen" ? naturalized_citizen_docs : VlpDocument::VLP_DOCUMENT_KINDS
-    docs_for_status_uploaded = consumer_role.vlp_documents.where(:subject => {"$in" => docs_for_status})
-    docs_for_status_uploaded.any? ? docs_for_status_uploaded.order_by(:updated_at => 'desc').first.subject : nil
+    consumer_role&.vlp_documents&.where(id: consumer_role.active_vlp_document_id)&.first&.subject
   end
 
   def sensitive_info_changed?(role)

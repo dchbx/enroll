@@ -23,6 +23,16 @@ describe FakesController do
         expect(subject.update_vlp_documents(consumer_role, person_kind))
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(DateTime)
       end
+
+      context 'active_vlp_document_id' do
+        before :each do
+          subject.update_vlp_documents(consumer_role, person_kind)
+        end
+
+        it 'should return a value which is a bson object' do
+          expect(consumer_role.active_vlp_document_id).to be_a BSON::ObjectId
+        end
+      end
     end
 
     it_behaves_like "updating consumer documents", "person_params"
@@ -41,6 +51,7 @@ describe FakesController do
           consumer_role.vlp_documents = []
           consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :subject => doc_subject)
           consumer_role.citizen_status = citizen_status
+          consumer_role.active_vlp_document_id = consumer_role.vlp_documents.first.id
         end
         it "returns nil if no consumer role" do
           expect(subject.get_vlp_doc_subject_by_consumer_role(nil)).to be_nil
@@ -59,6 +70,24 @@ describe FakesController do
 
     VlpDocument::VLP_DOCUMENT_KINDS.each do |document|
       it_behaves_like "returns vlp document subject", document, "eligible_immigration_status"
+    end
+
+    context 'get_vlp_doc_subject_by_consumer_role' do
+      before :each do
+        vlp_doc1 = FactoryBot.build(:vlp_document, updated_at: TimeKeeper.date_of_record)
+        vlp_doc2 = FactoryBot.build(:vlp_document, :subject => 'I-551 (Permanent Resident Card)', updated_at: (TimeKeeper.date_of_record + 1.day))
+        consumer_role.vlp_documents = [vlp_doc1, vlp_doc2]
+        consumer_role.save!
+        consumer_role.update_attributes!(active_vlp_document_id: consumer_role.vlp_documents.first.id)
+      end
+
+      it 'should return vlp document which is active and not the one which has the latest updated at' do
+        expect(subject.get_vlp_doc_subject_by_consumer_role(consumer_role)).to eq 'I-327 (Reentry Permit)'
+      end
+
+      it 'should not return vlp document which has the latest updated at' do
+        expect(subject.get_vlp_doc_subject_by_consumer_role(consumer_role)).not_to eq consumer_role.vlp_documents.order_by(:updated_at => 'desc').first.subject
+      end
     end
   end
 
