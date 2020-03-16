@@ -11,7 +11,7 @@ describe "employers/census_employees/new.html.erb", dbclean: :after_each do
   before :each do
     @user = FactoryBot.create(:user)
     p=FactoryBot.create(:person, user: @user)
-    @hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: p)
+    @hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: p, hbx_profile: site.owner_organization.hbx_profile)
 
     sign_in @user
     assign(:employer_profile, abc_profile)

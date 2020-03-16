@@ -307,6 +307,47 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
 
+      context "non active family member has is incarcerated/inactive" do
+        let!(:person_to_deactivate) do
+          FactoryBot.create(:person)
+        end
+
+        before do
+          family = person.primary_family
+          expect(family.family_members.count).to eq(1)
+          person.primary_family.family_members.create!(person_id: person_to_deactivate.id)
+          expect(family.family_members.count).to eq(2)
+          # This would ressemble the actual deletion from the manage_family UI, such as in the case of a
+          # duplicate family member
+          incarcerated_family_member = family.family_members.where(person_id: person_to_deactivate).first
+          # this will set is_active to false
+          family.remove_family_member(person_to_deactivate, person)
+          family.save!
+          incarcerated_family_member.reload
+        end
+
+        it "should only consider active family members and redirect to coverage household page" do
+          sign_in user
+          get(
+            :new,
+            params: {
+              person_id: person.id,
+              consumer_role_id: consumer_role.id,
+              change_plan: "change",
+              hbx_enrollment_id: "123",
+              coverage_kind: hbx_enrollment.coverage_kind
+            }
+          )
+          fm_hash = assigns(:fm_hash)
+          active_family_members = assigns(:active_family_members)
+          expect(fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}).to eq(nil)
+          incarcerated_family_member = family.family_members.where(person_id: person_to_deactivate).first
+          expect(active_family_members).to_not include(incarcerated_family_member)
+          expect(active_family_members.length).to eq(1)
+          expect(response).to have_http_status("200")
+        end
+      end
+
       it "should not redirect to coverage household page if incarceration is unanswered" do
         person.unset(:is_incarcerated)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.benefit_packages[0].incarceration_status = ["incarceration_status"]
@@ -771,6 +812,51 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it "should get special_enrollment_period_id" do
         expect(family.active_household.hbx_enrollments[1].special_enrollment_period_id).to eq family.earliest_effective_shop_sep.id
+      end
+    end
+
+    context "family has active sep" do
+      let(:person1) { FactoryBot.create(:person, :with_family, :with_employee_role, first_name: "mock")}
+      let(:family1) { person1.primary_family }
+      let(:family_member_ids) {{"0" => family1.family_members.first.id}}
+      let!(:new_household) {family1.households.where(:id => {"$ne" => family.households.first.id.to_s}).first}
+      let(:start_on) { TimeKeeper.date_of_record }
+      let(:benefit_package) {hbx_enrollment.sponsored_benefit_package}
+
+      let(:qle) do
+        QualifyingLifeEventKind.create(
+          title: "Married",
+          tool_tip: "Enroll or add a family member because of marriage",
+          action_kind: "add_benefit",
+          event_kind_label: "Date of married",
+          market_kind: "shop",
+          ordinal_position: 15,
+          reason: "marriage",
+          edi_code: "32-MARRIAGE",
+          effective_on_kinds: ["first_of_next_month"],
+          pre_event_sep_in_days: 0,
+          post_event_sep_in_days: 30,
+          is_self_attested: true
+        )
+      end
+      let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
+      let!(:sep) { family1.special_enrollment_periods.create(qualifying_life_event_kind: qle, qle_on: qle.created_at, effective_on_kind: qle.event_kind_label, effective_on: benefit_package.effective_period.min, start_on: start_on, end_on: start_on + 30.days) }
+
+      let(:params) do
+        { :person_id => person1.id,
+          :employee_role_id => person1.employee_roles.first.id,
+          :market_kind => "shop",
+          :change_plan => "change_plan",
+          :hbx_enrollment_id => hbx_enrollment.id,
+          :family_member_ids => family_member_ids,
+          :enrollment_kind => 'special_enrollment',
+          :coverage_kind => hbx_enrollment.coverage_kind}
+      end
+      it "should create an hbx enrollment" do
+        sign_in user
+        allow(Person).to receive(:find).and_return(person1)
+        post :create, params: {person_id: person1.id, employee_role_id: person1.employee_roles.first.id, market_kind: "shop", family_member_ids: family_member_ids, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id, enrollment_kind: 'special_enrollment', coverage_kind: hbx_enrollment.coverage_kind }
+        expect(assigns(:change_plan)).to eq "change_by_qle"
       end
     end
 

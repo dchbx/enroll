@@ -75,6 +75,16 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
+  def if_family_has_active_shop_sep
+    if @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop? && @family.latest_shop_sep.present?
+      benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
+      if benefit_package.effective_period.cover?(@family.latest_shop_sep.effective_on)
+        @change_plan = 'change_by_qle'
+        yield
+      end
+    end
+  end
+
   def if_family_has_active_sep
     return nil if @previous_hbx_enrollment.blank?
     return unless @family.has_active_sep?(@previous_hbx_enrollment)

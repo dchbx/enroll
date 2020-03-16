@@ -5,7 +5,7 @@ INSURED_TRANSLATIONS = {
   "en.insured.consumer_roles.docs_shared.card_number" => "Card Number",
   "en.insured.consumer_roles.docs_shared.card_number_req" => "Please enter the Card Number. The Card Number is exactly 13 letters and numbers. You must enter three letters followed by 10 numbers. You may not enter any special characters. -li- If you have a Resident Alien Card issued prior to December 1997, it does not contain a Card Number. In that case please enter three ‘A’s followed by 10 zeroes (i.e., 'AAA0000000000') so that you enter exactly 13 characters. \
   -li- How to find the Card Number: The document number, also called a Card Number, is printed on the back of the current version of the card. Previous versions of the card featured the document number and expiration date on the front of the card.",
-  "en.insured.consumer_roles.docs_shared.citizenship_number" => "Citizenship Number",
+  "en.insured.consumer_roles.docs_shared.citizenship_number" => "Certificate Number",
   "en.insured.consumer_roles.docs_shared.citizenship_number_req" => "When entering a Citizenship Certification Number, include all numbers and letters. Do not enter any other characters or spaces. -li- The Certification number entered must have between 6 and 12 characters. \
   -li- How to find Citizenship Certification Number: The Certificate of Citizenship certification number is most often in the upper right hand corner of the Certificate. \
   The Certificate of Citizenship certification number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",

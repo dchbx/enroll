@@ -4,14 +4,14 @@ Feature: Broker Agency Re-Application
     Given there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
 
-    Scenario: Hbx Admin should be able to see extended application under pending tab
+    Scenario: Hbx Admin should be able to see extended application under extended tab
       Given the broker Max Planck application is in application_extended state
       Given Hbx Admin exists
       When Hbx Admin logs on to the Hbx Portal
       And Hbx Admin is on Broker Index of the Admin Dashboard
       Then Hbx Admin is on Broker Index and clicks Broker Applicants
-      Then Hbx Admin clicks on pending tab
-      Then Hbx Admin should see broker Max Planck under pending tab
+      Then Hbx Admin clicks on extended tab
+      Then Hbx Admin should see broker Max Planck under extended tab
       And Hbx Admin logs out
 
     Scenario: Hbx Admin should be able to extend a denied application
@@ -33,7 +33,7 @@ Feature: Broker Agency Re-Application
       When Hbx Admin logs on to the Hbx Portal
       And Hbx Admin is on Broker Index of the Admin Dashboard
       Then Hbx Admin is on Broker Index and clicks Broker Applicants
-      Then Hbx Admin clicks on pending tab
+      Then Hbx Admin clicks on extended tab
       When Hbx Admin clicks on the current broker applicant show button
       Then Hbx Admin should see the broker application with carrier appointments
       When Hbx Admin click deny broker button
@@ -47,7 +47,7 @@ Feature: Broker Agency Re-Application
       When Hbx Admin logs on to the Hbx Portal
       And Hbx Admin is on Broker Index of the Admin Dashboard
       Then Hbx Admin is on Broker Index and clicks Broker Applicants
-      Then Hbx Admin clicks on pending tab
+      Then Hbx Admin clicks on extended tab
       When Hbx Admin clicks on the current broker applicant show button
       Then Hbx Admin should see the broker application with carrier appointments
       When Hbx Admin click approve broker button
@@ -61,10 +61,10 @@ Feature: Broker Agency Re-Application
       When Hbx Admin logs on to the Hbx Portal
       And Hbx Admin is on Broker Index of the Admin Dashboard
       Then Hbx Admin is on Broker Index and clicks Broker Applicants
-      Then Hbx Admin clicks on pending tab
+      Then Hbx Admin clicks on extended tab
       When Hbx Admin clicks on the current broker applicant show button
       Then Hbx Admin should see the broker application with carrier appointments
       When Hbx Admin click extend broker button
       Then Hbx Admin should see the broker application extended message
-      Then broker Max Planck should receive application pending notification
+      Then broker Max Planck should receive application extended notification
       And Hbx Admin logs out

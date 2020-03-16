@@ -1516,6 +1516,12 @@ describe Family, "scopes", dbclean: :after_each do
       expect(Family.enrolled_under_benefit_application(initial_application)).to include family
     end
 
+    it '.active_and_cobra_enrolled' do
+      allow(census_employee).to receive(:family).and_return(family)
+      allow(initial_application).to receive(:active_census_employees).and_return([census_employee])
+      expect(Family.active_and_cobra_enrolled(initial_application)).to include family
+    end
+
     it '.by_enrollment_shop_market' do
       expect(Family.by_enrollment_shop_market).to include family
     end

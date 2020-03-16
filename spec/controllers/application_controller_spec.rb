@@ -64,6 +64,12 @@ RSpec.describe ApplicationController do
     it "doesn't set portal in session" do
       expect(session[:portal]).not_to be
     end
+
+    it "confirms user's last portal's environment before redirecting" do
+      request.session[:portal] = nil
+      allow(@request).to receive(:referrer) {'http://localhost:3000/'}
+      expect(controller.send(:confirm_last_portal, @request, user)).to eq root_path
+    end
   end
 
   context "authenticate_user_from_token!" do

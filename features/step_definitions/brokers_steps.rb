@@ -416,7 +416,7 @@ Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_n
       'Broker application denied'
     when 'approval'
       "Invitation to create your Broker account on #{site_short_name}"
-    when 'pending'
+    when 'extended'
       'Action Needed - Complete Broker Training for DC Health Link for Business'
     end
   open_email(
@@ -426,7 +426,7 @@ Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_n
   expect(current_email.to).to eq([broker_email_address])
 end
 
-Then(/^.+ should see broker (.*?) under pending tab$/) do |broker_name|
+Then(/^.+ should see broker (.*?) under extended tab$/) do |broker_name|
   expect(page).to have_content(broker_name)
 end
 

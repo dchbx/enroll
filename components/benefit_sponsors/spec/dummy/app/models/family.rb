@@ -174,7 +174,7 @@ class Family
   scope :outstanding_verification,   ->{ by_enrollment_individual_market.where(
     :"_id".in => HbxEnrollment.verification_outstanding.distinct(:family_id))
   }
-  
+
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
 
@@ -206,6 +206,16 @@ class Family
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
+
+  scope :active_and_cobra_enrolled, ->(benefit_application) {
+    active_family_ids = benefit_application.active_census_employees.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
+    where(:"_id".in => HbxEnrollment.where(
+      :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
+      :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
+      coverage_kind: "health",
+      :"family_id".in => active_family_ids
+    ).distinct(:family_id)
+    ) }
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }

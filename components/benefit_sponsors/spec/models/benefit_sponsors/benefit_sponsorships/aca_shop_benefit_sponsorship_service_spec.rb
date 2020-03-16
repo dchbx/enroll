@@ -96,6 +96,7 @@ module BenefitSponsors
       end
 
       after do
+        # Does this do what we think it does?
         TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
       end
 

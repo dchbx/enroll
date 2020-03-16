@@ -477,6 +477,8 @@ module ApplicationHelper
         'Decertified Date'
       when 'denied'
         'Denied Date'
+      when 'extended'
+        'Extended Date'
       else
       end
     end

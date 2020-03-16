@@ -533,6 +533,11 @@ module BenefitSponsors
       @enrolled_families ||= Family.enrolled_under_benefit_application(self)
     end
 
+    def active_and_cobra_enrolled_families
+      return @active_and_cobra_enrolled_families if defined? @active_and_cobra_enrolled_families
+      @active_and_cobra_enrolled_families ||= Family.active_and_cobra_enrolled(self)
+    end
+
     def filter_enrolled_employees(employees_to_filter, total_enrolled)
       families_to_filter = employees_to_filter.collect{|census_employee| census_employee.family }.compact
       total_enrolled    -= families_to_filter

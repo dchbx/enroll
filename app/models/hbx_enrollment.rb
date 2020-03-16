@@ -1635,7 +1635,7 @@ class HbxEnrollment
 
   def self.all_enrollments_under_benefit_application(benefit_application)
     id_list = benefit_application.benefit_packages.collect(&:_id).uniq
-    benefit_application.enrolled_families.inject([]) do |enrollments, family|
+    benefit_application.active_and_cobra_enrolled_families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_waived_and_renewing.to_a
     end
   end

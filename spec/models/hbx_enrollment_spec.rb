@@ -2710,6 +2710,10 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       TimeKeeper.set_date_of_record_unprotected!(current_date)
     end
 
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     context "for Individual market" do
       let(:ivl_family)        { FactoryBot.create(:family, :with_primary_family_member) }
 

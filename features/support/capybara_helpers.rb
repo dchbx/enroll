@@ -79,6 +79,33 @@ module CapybaraHelpers
   def click_outside_datepicker(text_outside_datepicker)
     page.find(:xpath, "//*[text()='#{text_outside_datepicker}']").click
   end
+
+  # This exists entirely to deal with the funky stuff that our
+  # UI toolkit can do to radio buttons, mainly on the IVL page.
+  def click_and_wait_on_stylized_radio(xpath, input_id, field_name, value)
+    find_field(field_name, id: input_id, visible: :all, disabled: :all, wait: 5)
+    find(:xpath, xpath).click
+    find(:xpath, xpath).click
+    begin
+      find_field(field_name, with: value, checked: true, visible: :all, disabled: :all, wait: 5)
+    rescue
+      all(:xpath, "//input[@name=\"#{field_name}\"]", visible: :all).each do |ele|
+        puts xpath
+        puts input_id
+        puts field_name
+        puts ele.tag_name.inspect
+        puts ele["type"].inspect
+        puts ele.text.inspect
+        puts ele.value.inspect
+        puts ele.visible?.inspect
+        puts ele.disabled?.inspect
+        puts ele.selected?.inspect
+        puts ele.checked?.inspect
+        puts ele.obscured?.inspect
+      end
+      raise "Couldn't find tag.  Check output for matched elements."
+    end
+  end
 end
 
 World(CapybaraHelpers)
