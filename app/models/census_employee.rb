@@ -616,7 +616,7 @@ class CensusEmployee < CensusMember
     term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
     term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
 
-    expired_benefit_group_assignment = benefit_group_assignments.sort_by(&:created_at).select{ |bga| bga.benefit_group.effective_period.include?(coverage_terminated_on) && bga.benefit_application.aasm_state == :expired}.last
+    expired_benefit_group_assignment = benefit_group_assignments.sort_by(&:created_at).select{ |bga| (bga.benefit_group.start_on..bga.benefit_group.end_on).include?(coverage_terminated_on) && bga.plan_year.aasm_state == :expired}.last
     term_eligible_expired_enrollments = expired_benefit_group_enrollments(expired_benefit_group_assignment.benefit_group).show_enrollments_sans_canceled.non_terminated if expired_benefit_group_assignment.present?
     enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments) + Array.wrap(term_eligible_expired_enrollments)).compact.uniq
 
