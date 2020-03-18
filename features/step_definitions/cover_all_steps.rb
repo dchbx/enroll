@@ -119,6 +119,10 @@ Then(/HBX Admin should see the home page with text coverage selected/) do
   screenshot("home_page")
 end
 
+Then(/^HBX Admin should see broker assister search box$/) do
+  expect(page).to have_content('Select a Broker or Assister')
+end
+
 Then(/^Hbx Admin should see an Transition family members link$/) do
   find_link('Transition Family Members').visible?
 end

@@ -28,6 +28,7 @@ Feature: Consumer requests enrollment in CoverAll
     When HBX Admin clicks on Confirm button on the summary page of plan selection
     Then HBX Admin should see the enrollment receipt page
     When CONTINUE is clicked by HBX Admin
+    Then HBX Admin should see broker assister search box
     Then HBX Admin should see the home page with text coverage selected
     And Hbx Admin logs out
 
