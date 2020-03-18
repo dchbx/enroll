@@ -154,6 +154,25 @@ module Insured::FamiliesHelper
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 
+  def enable_make_changes_shop_button?(hbx_enrollment)
+    # Return false for IVL
+    return false if hbx_enrollment&.census_employee.blank?
+    return false if !hbx_enrollment.is_shop?
+    return false unless hbx_enrollment&.sponsored_benefit_package
+    binding.pry
+    return true if hbx_enrollment&.sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record) &&
+    #hbx_enrollment&.employee_role&.can_enroll_as_new_hire? &&
+    hbx_enrollment&.family&.is_under_special_enrollment_period? &&
+    hbx_enrollment&.family&.is_eligible_to_enroll? &&
+    !(hbx_enrollment&.coverage_terminated? || hbx_enrollment&.coverage_canceled?) &&
+    hbx_enrollment.active_during?(hbx_enrollment&.family&.current_sep&.effective_on) &&
+    hbx_enrollment&.family&.most_recent_enrollment_by_coverage_kind_is_not_sep?(hbx_enrollment)
+  end
+
+  def enable_make_changes_button?(hbx_enrollment)
+    hbx_enrollment.is_ivl_by_kind? && ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier'].include?(hbx_enrollment.aasm_state)
+  end
+
   def disable_make_changes_button?(hbx_enrollment)
     # return false if IVL
     return false if hbx_enrollment.census_employee.blank?
@@ -161,9 +180,9 @@ module Insured::FamiliesHelper
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
-      # 3) qle enrolmlent period check
+      # 3) qle enrollment period check
     return false if hbx_enrollment.sponsored_benefit_package.open_enrollment_contains?(TimeKeeper.date_of_record)
-    return false if hbx_enrollment.employee_role &. can_enroll_as_new_hire?
+    return false if hbx_enrollment.employee_role&.can_enroll_as_new_hire?
     return false if hbx_enrollment.family.is_under_special_enrollment_period? && hbx_enrollment.active_during?(hbx_enrollment.family.current_sep.effective_on)
 
     # Disable only  if non of the above conditions match
@@ -323,9 +342,5 @@ module Insured::FamiliesHelper
       @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
       { @qle.title => @qle.reason }
     end
-  end
-
-  def enable_make_changes_button?(hbx_enrollment)
-    hbx_enrollment.is_ivl_by_kind? && ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier'].include?(hbx_enrollment.aasm_state)
   end
 end
