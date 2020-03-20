@@ -17,9 +17,16 @@ class DeleteUploadedFiles < MongoidMigrationTask
       csv << field_names
       Person.where(:"consumer_role.vlp_documents".exists => true).no_timeout.inject([]) do |_dummy, person|
         uploaded_files = person.consumer_role.vlp_documents.where(:verification_type.exists => true)
-        if uploaded_files.present?
-          uploaded_files.delete_all
-          csv << [person.first_name, person.last_name, person.hbx_id]
+        uploaded_file_ids = uploaded_files.inject([]) do |file_ids, uploaded_file|
+                              file_ids << uploaded_file.id unless uploaded_file.verification_type.blank?
+                              file_ids
+                            end
+        uploaded_file_ids.each do |file_id|
+          file = uploaded_files.where(id: file_id.to_s).first
+          if file.present?
+            file.delete
+            csv << [person.first_name, person.last_name, person.hbx_id]
+          end
         end
       rescue StandardError => e
         puts e.message unless Rails.env.test?
