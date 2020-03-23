@@ -161,7 +161,7 @@ class CensusEmployee < CensusMember
         :$elemMatch => {
           :start_on.gte => effective_on,
           :benefit_package_id => benefit_package.id,
-          :is_active => is_active 
+          :is_active => is_active
         }
       }
     )
@@ -1224,7 +1224,11 @@ class CensusEmployee < CensusMember
   end
 
   def can_elect_cobra?
-    ['employment_terminated'].include?(aasm_state)
+    if current_user.try(:has_hbx_staff_role?)
+      ['employment_terminated'].include?(aasm_state)
+    else
+      ['employment_terminated'].include?(aasm_state) && (cobra_begin_date >= coverage_terminated_on)
+    end
   end
 
   def have_valid_date_for_cobra?(current_user = nil)
