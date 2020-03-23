@@ -10,22 +10,27 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 
 class DeleteUploadedFiles < MongoidMigrationTask
   def migrate
-    field_names = %w[First_Name Last_Name HBX_ID]
+    field_names = %w[First_Name Last_Name HBX_ID Verification_Type Identifier Title Subject Created_At Updated_At]
     file_name = "#{Rails.root}/list_of_people_uploaded_files_deleted.csv"
+    vlp_doc_types = ::VlpDocument::VLP_DOCUMENT_KINDS + ['Other (With I-94)']
 
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
-      Person.where(:"consumer_role.vlp_documents".exists => true).no_timeout.inject([]) do |_dummy, person|
-        uploaded_files = person.consumer_role.vlp_documents.where(:verification_type.exists => true)
+      Person.where(:"consumer_role.vlp_documents.verification_type".exists => true).no_timeout.inject([]) do |_dummy, person|
+        uploaded_files = person.consumer_role.vlp_documents.where(:verification_type.exists => true,
+                                                                  :identifier.ne => nil,
+                                                                  :subject.nin => vlp_doc_types)
         uploaded_file_ids = uploaded_files.inject([]) do |file_ids, uploaded_file|
-                              file_ids << uploaded_file.id unless uploaded_file.verification_type.blank?
+                              file_ids << uploaded_file.id if uploaded_file.verification_type.present? && uploaded_file.identifier.present? && !vlp_doc_types.include?(uploaded_file.subject)
                               file_ids
                             end
         uploaded_file_ids.each do |file_id|
           file = uploaded_files.where(id: file_id.to_s).first
           if file.present?
+            csv << [person.first_name, person.last_name, person.hbx_id,
+                    file.verification_type, file.identifier, file.title,
+                    file.subject, file.created_at, file.updated_at]
             file.delete
-            csv << [person.first_name, person.last_name, person.hbx_id]
           end
         end
       rescue StandardError => e

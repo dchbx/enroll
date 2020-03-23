@@ -18,7 +18,7 @@ describe DeleteUploadedFiles, dbclean: :after_each do
     let(:vlp_doc2) { FactoryBot.build(:vlp_document, :subject => 'Other (With I-94)', updated_at: (TimeKeeper.date_of_record + 1.day)) }
 
     context 'succesful migration' do
-      let(:vlp_doc1) { FactoryBot.build(:vlp_document, subject: 'ajhssjah.png', verification_type: 'Citizenship') }
+      let(:vlp_doc1) { FactoryBot.build(:vlp_document, subject: 'ajhssjah.png', verification_type: 'Citizenship', identifier: 'bucket-123') }
 
       before :each do
         consumer_role.vlp_documents = [vlp_doc1, vlp_doc2]
