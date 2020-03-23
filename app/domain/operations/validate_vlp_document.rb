@@ -24,7 +24,7 @@ module Operations
     end
 
     def fetch_latest_vlp_document(person)
-      vlp_doc = person.consumer_role.vlp_documents.asc(:created_at).last
+      vlp_doc = person.consumer_role.vlp_documents.where(_id: person.consumer_role.active_vlp_document_id).first
       vlp_doc ? Success(vlp_doc) : Failure('VLP Document not found')
     end
 

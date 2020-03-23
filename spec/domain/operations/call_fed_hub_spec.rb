@@ -36,7 +36,7 @@ RSpec.describe Operations::CallFedHub, type: :model, dbclean: :after_each do
       person.verification_types = [immigration_type]
       person.save!
       person.consumer_role.vlp_documents = [i327_vlp_document]
-      person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+      person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding', active_vlp_document_id: i327_vlp_document.id)
       person.consumer_role.save!
     end
 
@@ -66,7 +66,7 @@ RSpec.describe Operations::CallFedHub, type: :model, dbclean: :after_each do
       person.verification_types = [immigration_type]
       person.save!
       person.consumer_role.vlp_documents = [bad_vlp_document]
-      person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+      person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding', active_vlp_document_id: bad_vlp_document.id)
       person.consumer_role.save!
     end
 
