@@ -780,6 +780,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "should render update enrollment if the save is successful" do
+      person1.consumer_role.update_attributes!(active_vlp_document_id: person1.consumer_role.vlp_documents.first.id)
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       allow(person1).to receive(:primary_family).and_return family1
       sign_in(user)

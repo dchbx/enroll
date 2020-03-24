@@ -79,7 +79,7 @@ RSpec.describe DocumentsController, :type => :controller do
       before :each do
         person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
         person.save!
-        person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
+        person.consumer_role.update_attributes(aasm_state: 'verification_outstanding', active_vlp_document_id: person.consumer_role.vlp_documents.first.id)
         @immigration_type = person.verification_types.where(type_name: 'Immigration status').first
         @immigration_type.update_attributes!(inactive: false)
       end
@@ -94,6 +94,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
         before do
           person.consumer_role.vlp_documents = [bad_document]
+          person.consumer_role.active_vlp_document_id = bad_document.id
           person.save!
           @immigration_type.update_attributes!(inactive: false)
         end
