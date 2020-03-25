@@ -6,11 +6,11 @@ footer.footer-wrapper
       .col-md-6.pl-5
           ul.list-unstyled.list-group.list-group-horizontal
             li.mr-3
-              a.call-customer-service href="tel:#{contact_center_phone_number}"
+              a.call-customer-service href="tel:#{contact_center_short_number}"
                 span
                   i.fas.fa-phone.fa-lg.fa-rotate-90
                   | &nbsp;
-                  = contact_center_phone_number
+                  = "#{Settings.contact_center.short_number} / TTY: #{Settings.contact_center.tty_number}"
             li.mr-3
               = mail_to contact_center_email_address, target: '_blank' do
                 span

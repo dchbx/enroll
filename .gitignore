@@ -53,7 +53,6 @@ __MACOSX
 .project
 tags
 
-spec/vocabularies
 components/**/spec/dummy/tmp
 components/**/spec/examples.txt
 plan_xmls.zip

@@ -76,6 +76,7 @@ Feature: Insured Plan Shopping on Individual market
     Then I should see the individual home page
     When consumer clicked on make changes button
     Then I should not see any plan which premium is 0
+    Then Individual logs out
 
   Scenario: Individual should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
@@ -119,6 +120,7 @@ Feature: Insured Plan Shopping on Individual market
     And Dependent selects eligible immigration status
     And Individual clicks on confirm member
     Then Dependent should see error message Document type cannot be blank
+    Then Individual logs out
 
   Scenario: Dependents should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
@@ -136,6 +138,7 @@ Feature: Insured Plan Shopping on Individual market
     And Dependent selects not applying for coverage
     And Individual clicks on confirm member
     Then Dependent should not see error message Document type cannot be blank
+    Then Individual logs out
 
   Scenario: Individual should see immigration details even after changing radio options
     Given Individual resumes enrollment
@@ -155,3 +158,4 @@ Feature: Insured Plan Shopping on Individual market
     When click eligible immigration status yes
     Then should find I-551 doc type
     And should find alien number
+    Then Individual logs out

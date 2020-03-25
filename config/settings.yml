@@ -169,7 +169,7 @@ aca:
     with_in_sixty_days: 60
   #
   individual_market:
-    monthly_enrollment_due_on: 15
+    monthly_enrollment_due_on: 31
     verification_outstanding_window:
       days: 0
     verification_due:
@@ -177,7 +177,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2019,11,1) %>
-      end_on: <%= Date.new(2020,02,05) %>
+      end_on: <%= Date.new(2020,04,30) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true

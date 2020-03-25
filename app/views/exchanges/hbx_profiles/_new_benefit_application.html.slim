@@ -1,8 +1,5 @@
-- is_active_ba_application = @ba_form.has_active_ba
-
 = form_tag create_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: @ba_form.benefit_sponsorship_id),class:'admin-plan-year-form', id: 'admin-create-ba', :method => :post, :remote => true do
   = hidden_field_tag :employer_actions_id, params["employer_actions_id"]
-  = render partial: 'exchanges/hbx_profiles/confirm_create_ba_modal'
 
   br
   .row
@@ -53,14 +50,6 @@
     .col-md-12
       button#adminCreatePyButton.pull-right.btn.btn-primary.disabled type="submit" data-disable-with=l10n("please_wait")
         | Submit
-      = link_to 'Submit'.html_safe, '', class: 'btn btn-primary disabled hide pull-right', id:'adminCreatePyButton2', data: {target:'#create_ba_mod', toggle: 'modal'}
-
-- if is_active_ba_application
-  javascript:
-    $( function() {
-      $('#adminCreatePyButton2').removeClass('hide');
-      $('#adminCreatePyButton').hide();
-    } );
 
 javascript:
   $( function() {
@@ -125,7 +114,6 @@ javascript:
 
     if ((employeeCounts.fte >= 1) && start_on.value && end_on.value && oe_start_on.value && oe_end_on.value) {
       document.getElementById('adminCreatePyButton').classList.remove('disabled');
-      document.getElementById('adminCreatePyButton2').classList.remove('disabled')
     } else {
       document.getElementById('adminCreatePyButton').classList.add('disabled')
     }

@@ -4,6 +4,12 @@ require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
 RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_each do
+  before :each do
+    # Overcome any timekeeper weirdness.
+    # TODO: Find out who the bad citizen is that isn't resetting timekeeper
+    #       after playing with it.
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
+  end
 
   def reset_premium_tuples
     p_table = @product.premium_tables.first

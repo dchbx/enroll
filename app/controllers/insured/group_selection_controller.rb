@@ -35,6 +35,8 @@ class Insured::GroupSelectionController < ApplicationController
 
     insure_hbx_enrollment_for_shop_qle_flow
 
+    set_change_plan
+
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
     @new_effective_on = @adapter.calculate_new_effective_on(params)
@@ -53,7 +55,11 @@ class Insured::GroupSelectionController < ApplicationController
 
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
     @fm_hash = {}
-    @family.family_members.each do |family_member|
+    # Only check eligibility for *active* family members because
+    # family members "deleted" with family#remove_family_member
+    # are set to is_active = false
+    @active_family_members = @family.family_members.active
+    @active_family_members.each do |family_member|
       family_member_eligibility_check(family_member)
     end
     if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}
@@ -208,6 +214,8 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def family_member_eligibility_check(family_member)
+    return unless (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person))
+
     role = if family_member.person.is_consumer_role_active?
              family_member.person.consumer_role
            elsif family_member.person.is_resident_role_active?
@@ -227,6 +235,12 @@ class Insured::GroupSelectionController < ApplicationController
 
   def permit_params
     params.permit!
+  end
+
+  def set_change_plan
+    @adapter.if_family_has_active_shop_sep do
+      @change_plan = 'change_by_qle'
+    end
   end
 
   def select_enrollment_members(hbx_enrollment, family_member_ids)
@@ -250,6 +264,9 @@ class Insured::GroupSelectionController < ApplicationController
       @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
         @employee_role = e_role
       end
+
+      set_change_plan
+
       benefit_group = nil
       benefit_group_assignment = nil
 

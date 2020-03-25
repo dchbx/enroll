@@ -904,6 +904,54 @@ module BenefitSponsors
       end
     end
 
+    describe '.active_and_cobra_enrolled_families',dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      include_context "setup employees with benefits"
+
+      let!(:people) { create_list(:person, 5, :with_employee_role, :with_family) }
+
+      before do
+        people.each_with_index do |person, i|
+          ce = census_employees[i]
+          family = person.primary_family
+          ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+        end
+      end
+
+      it 'should return enrolled families count' do
+        expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
+      end
+
+      context 'when family has only enrolled in dental coverage' do
+
+        let(:dental_person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+        let(:dental_family) { dental_person.primary_family }
+        let!(:dental_sponsored_benefit) { true }
+        let(:dental_census_employee) do
+          ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+          ce.update_attributes!(employee_role_id: dental_person.employee_roles.first.id)
+          ce
+        end
+
+        let!(:dental_enrollment) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            family: dental_family,
+            household: dental_family.active_household,
+            benefit_group_assignment: dental_census_employee.benefit_group_assignments.first,
+            sponsored_benefit_package_id: dental_census_employee.benefit_group_assignments.first.benefit_package.id,
+            coverage_kind: 'dental'
+          )
+        end
+
+        it 'should return enrolled families count' do
+          expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
+        end
+      end
+    end
+
     describe '.predecessor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"

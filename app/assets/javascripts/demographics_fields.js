@@ -247,7 +247,7 @@ var PersonValidations = (function(window, undefined) {
   function validationForVlpDocuments(e) {
     if ($('#vlp_documents_container').is(':visible')) {
       $('.vlp_doc_area input.doc_fields').each(function() {
-        if ($(this).attr('placeholder') == 'Citizenship Number') {
+        if ($(this).attr('placeholder') == 'Certificate Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);

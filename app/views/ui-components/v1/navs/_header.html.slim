@@ -15,12 +15,12 @@
             h4 = get_header_text(controller_name)
         ul.nav.navbar-nav.navbar-right
           li
-            a.call-customer-service href="tel:#{Settings.contact_center.phone_number}"
+            a.call-customer-service href="tel:#{Settings.contact_center.short_number}"
               span.header-text = l10n(".call_customer_service")
               br
               span
                 i.fas.fa-phone.mr-1
-              strong = Settings.contact_center.phone_number
+              strong = "#{Settings.contact_center.short_number} / TTY: #{Settings.contact_center.tty_number}"
           - if signed_in?
             li
               span.my-portal-links

@@ -17,7 +17,7 @@ module BenefitSponsors
 
       index({"subject_organization._id" => 1})
       index({"plan_design_proposals._id" => 1})
-      index({"plan_design_proposals.aasm_state" => 1, "plan_design_proposals.claim_code" => 1})
+      index({"plan_design_proposals.aasm_state" => 1, "plan_design_proposals.claim_code" => 1}, {name: "org_plan_design_proposals_claim_code_search"})
 
       scope :by_subject_organization,  ->(subject_organization){ where(:"subject_organization_id" => BSON::ObjectId.from_string(subject_organization)) }
 

@@ -29,6 +29,9 @@ require 'aca_test_helper'
 require 'rails-controller-testing'
 
 RSpec.configure do |config|
+  if (ENV['TEST_ENV_NUMBER'].nil?) && (config.instance_variable_get("@files_or_directories_to_run") == ["spec"])
+    config.pattern = "spec/**/*_spec.rb,components/benefit_markets/spec/**/*_spec.rb,components/benefit_sponsors/spec/**/*_spec.rb,components/notifier/spec/**/*_spec.rb,components/sponsored_benefits/spec/**/*_spec.rb,components/transport_gateway/spec/**/*_spec.rb,components/transport_profiles/spec/**/*_spec.rb"
+  end
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.

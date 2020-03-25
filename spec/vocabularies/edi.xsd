@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 (x64) (http://www.altova.com) by Dan Thomas (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified" version="1.0">
+	<xs:include schemaLocation="common.xsd"/>
+	<xs:element name="edi_message" type="EdiMessageType"/>
+	<xs:complexType name="EdiMessageType">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string"/>
+			<xs:element name="refer_to_id" type="xs:string"/>
+			<xs:element name="b2b_message_id" type="xs:string"/>
+			<xs:element name="receiver_id" type="xs:string"/>
+			<xs:element name="sender_id" type="xs:string"/>
+			<xs:element name="sender_name" type="xs:string"/>
+			<xs:element name="receiver_name" type="xs:string"/>
+			<xs:element name="acknowledge_mode" type="AcknowledgeModeNameType"/>
+			<!-- add enumeration? -->
+			<xs:element name="state" type="EdiMessageEventNameType"/>
+			<xs:element name="remaining_retry" type="xs:integer"/>
+			<xs:element name="direction" type="TransmissionDirectionNameType"/>
+			<xs:element name="message_date_time" type="xs:string"/>
+			<xs:element name="message_type" type="xs:string"/>
+			<xs:element name="time_to_ack" type="xs:integer"/>
+			<xs:element name="error_code" type="xs:string"/>
+			<xs:element name="error_text" type="xs:string"/>
+			<xs:element name="error_description" type="xs:string"/>
+			<xs:element name="protocol_message_id" type="xs:string"/>
+			<xs:element name="document_type" type="xs:string"/>
+			<xs:element name="b2b_timestamp" type="xs:string"/>
+			<xs:element name="conversation_id" type="xs:string"/>
+			<xs:element name="protocol_work_area" type="xs:string"/>
+			<xs:element name="correlation_id" type="xs:string"/>
+			<xs:element name="transaction_control_number" type="xs:integer"/>
+			<xs:element name="group_control_number" type="xs:integer"/>
+			<xs:element name="interchange_control_number" type="xs:integer"/>
+			<xs:element name="agreement_id" type="xs:string"/>
+			<xs:element name="document_protocol" type="xs:string"/>
+			<xs:element name="exchange_protocol" type="ExchangeProtocolNameType"/>
+			<xs:element name="transport_protocol" type="TransportProtocolNameType"/>
+			<xs:element name="url" type="xs:anyURI"/>
+			<xs:element name="tpa_name" type="xs:string"/>
+			<xs:element name="xpath_expression1" type="xs:string"/>
+			<xs:element name="xpath_expression2" type="xs:string"/>
+			<xs:element name="xpath_expression3" type="xs:string"/>
+			<xs:element name="document_definition" type="xs:string"/>
+			<xs:element name="created" type="xs:string"/>
+			<xs:element name="modified" type="xs:string"/>
+			<xs:element name="send_timestamp" type="xs:string"/>
+			<xs:element name="receive_timestamp" type="xs:string"/>
+			<xs:element name="native_msg_size" type="xs:integer"/>
+			<xs:element name="translated_msg_size" type="xs:integer"/>
+			<xs:element name="processing_time" type="xs:integer"/>
+			<xs:element name="fabric_ecid" type="xs:string"/>
+			<xs:element name="fabric_composite_name" type="xs:string"/>
+			<xs:element name="b2b_wire_message_id" type="xs:string"/>
+			<xs:element name="transport_headers" type="xs:string"/>
+			<xs:element name="am_resubmit_count" type="xs:integer"/>
+			<xs:element name="bm_resubmit_count" type="xs:integer"/>
+			<xs:element name="wm_resubmit_count" type="xs:integer"/>
+			<xs:element name="xpath_name1" type="xs:string"/>
+			<xs:element name="xpath_name2" type="xs:string"/>
+			<xs:element name="xpath_name3" type="xs:string"/>
+			<xs:element name="xpath_value1" type="xs:string"/>
+			<xs:element name="xpath_value2" type="xs:string"/>
+			<xs:element name="xpath_value3" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="AcknowledgeModeNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_ack_mode#async"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_ack_mode#sync"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_ack_mode#none"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EdiMessageEventNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_state#complete"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_state#error"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_state#batch_wait"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_state#ta1_wait"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_state#fa1_wait"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TransmissionDirectionNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_direction#inbound"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_direction#outbound"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExchangeProtocolNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#as1"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#as2"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#ebms-1.0"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#ebms-2.0"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#mllp"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#file"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#aq"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#ftp"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#sftp"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#http"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#rosettanet-1.1"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#rosettanet-2.0"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#jms"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#email"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_exchange_protocol#tcp"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TransportProtocolNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_transport_protocol#file"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_transport_protocol#aq"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_transport_protocol#ftp"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_transport_protocol#sftp"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_transport_protocol#http"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_transport_protocol#jms"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:b2b_transport_protocol#email"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="EdiEnvelopeEventType"/>
+	<xs:complexType name="EdiMessageEventType">
+		<xs:annotation>
+			<xs:documentation>Notification message associated with Individual resource</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="header">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ServiceHeaderType">
+							<xs:sequence>
+								<xs:element name="hbx_id" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="submitted_timestamp" type="xs:dateTime">
+									<xs:annotation>
+										<xs:documentation>UTC date and time when event occured</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="authorization" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Authentication/authorization credentials</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="message_id" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Value that uniqely identifies message</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="originating_service" type="xs:anyURI">
+									<xs:annotation>
+										<xs:documentation>The urn of the requesting service</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="correlation_id" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="event">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ServiceEventType">
+							<xs:sequence>
+								<xs:element name="event_name" type="EdiMessageEventNameType"/>
+								<xs:element ref="edi_message_uri"/>
+								<xs:element name="body" minOccurs="0">
+									<xs:complexType>
+										<xs:complexContent>
+											<xs:restriction base="ServiceBodyType">
+												<xs:sequence>
+													<xs:element ref="edi_message"/>
+												</xs:sequence>
+											</xs:restriction>
+										</xs:complexContent>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="edi_message_uri" type="xs:anyURI" substitutionGroup="resource_instance_uri">
+		<xs:annotation>
+			<xs:documentation>Dereferenceable identifier for EDI Message instance</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

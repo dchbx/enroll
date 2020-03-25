@@ -4,13 +4,13 @@ require Rails.root.join("lib", "sbc", "sbc_processor2015")
 describe SbcProcessor2015, dbclean: :after_each do
   let(:csv_path) { Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/sbc/*.csv')).first }
   let(:pdf_path) { Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/sbc/pdf/')).first }
-  let!(:product) { FactoryBot.create(
+  let(:product) { FactoryBot.create(
       :benefit_markets_products_health_products_health_product,
       hios_id: "59763MA0030014-01",
       application_period: Date.new(2018, 1, 1)..Date.new(2018, 12, 31),
       sbc_document: nil
   )}
-  let!(:plan){ FactoryBot.create(
+  let(:plan){ FactoryBot.create(
     :plan,
     active_year: product.active_year,
     hios_id: product.hios_id,
@@ -20,9 +20,11 @@ describe SbcProcessor2015, dbclean: :after_each do
   context "should initialize " do
 
     before(:each) do
+      product
       sbc_processor = SbcProcessor2015.new(csv_path, pdf_path)
       sbc_processor.run
       product.reload
+      plan
     end
 
     it "should map sbc to the product" do

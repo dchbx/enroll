@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified" >
+	<xs:include schemaLocation="common.xsd"/>
+	<xs:element name="process">
+		<xs:annotation>
+			<xs:documentation>Business process supporting DCHBX operations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="process" type="ProcessType"/>
+				<xs:element name="operation" type="OperationType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="OperationCategoryType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="premium_payment"/>
+			<xs:enumeration value="benefit_enrollment"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ProcessType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="cancel_group"/>
+			<xs:enumeration value="terminate_group"/>
+			<xs:enumeration value="add_member"/>
+			<xs:enumeration value="initial_enrollment"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="OperationType">
+		<xs:sequence>
+			<xs:element name="kind">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="change"/>
+						<xs:enumeration value="add"/>
+						<xs:enumeration value="cancel"/>
+						<xs:enumeration value="terminate"/>
+						<xs:enumeration value="reinstate"/>
+						<xs:enumeration value="audit"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="reason">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="birth"/>
+						<xs:enumeration value="death"/>
+						<xs:enumeration value="adoption"/>
+						<xs:enumeration value="marriage"/>
+						<xs:enumeration value="legal separation"/>
+						<xs:enumeration value="surviving spouse"/>
+						<xs:enumeration value="divorce"/>
+						<xs:enumeration value="retirement"/>
+						<xs:enumeration value="benefit selection"/>
+						<xs:enumeration value="employment termination"/>
+						<xs:enumeration value="re-enrollment"/>
+						<xs:enumeration value="location change"/>
+						<xs:enumeration value="initial enrollment"/>
+						<xs:enumeration value="termination of benefits"/>
+						<xs:enumeration value="plan change"/>
+						<xs:enumeration value="change in identifying data elements"/>
+						<xs:enumeration value="non payment"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="affected_members">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="member_id" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="effective_date" type="SimpleDateType"/>
+			<xs:element name="category" type="OperationCategoryType"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

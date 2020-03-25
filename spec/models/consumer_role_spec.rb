@@ -583,6 +583,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context "trigger_residency" do
         [nil, "111111111"].each do |ssn|
           it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, "valid", :ssa_pending, :ssa_pending, "trigger_residency!"
+          it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, "valid", :unverified, :unverified, "trigger_residency!"
           it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, "valid", :dhs_pending, :dhs_pending, "trigger_residency!"
           it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, "outstanding", :sci_verified, :sci_verified, "trigger_residency!"
           it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, "outstanding", :verification_outstanding, :verification_outstanding, "trigger_residency!"

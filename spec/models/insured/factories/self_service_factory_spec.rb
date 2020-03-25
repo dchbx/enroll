@@ -6,6 +6,7 @@ module Insured
   RSpec.describe Factories::SelfServiceFactory, type: :model, dbclean: :after_each do
 
     before :each do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
       DatabaseCleaner.clean
     end
 
@@ -23,7 +24,7 @@ module Insured
 
     describe "view methods" do
       before :each do
-        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual, metal_level_kind: {"$ne" => "catastrophic"}).first
         @product.update_attributes(ehb: 0.9844)
         enrollment.update_attributes(product: @product)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
@@ -31,7 +32,7 @@ module Insured
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, 'R-DC001').and_return(846.72)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
-        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+        family.family_members.detect { |fm| !fm.is_primary_applicant }.person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
 
       context "#find" do

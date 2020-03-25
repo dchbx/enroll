@@ -5,16 +5,16 @@ INSURED_TRANSLATIONS = {
   "en.insured.consumer_roles.docs_shared.card_number" => "Card Number",
   "en.insured.consumer_roles.docs_shared.card_number_req" => "Please enter the Card Number. The Card Number is exactly 13 letters and numbers. You must enter three letters followed by 10 numbers. You may not enter any special characters. -li- If you have a Resident Alien Card issued prior to December 1997, it does not contain a Card Number. In that case please enter three ‘A’s followed by 10 zeroes (i.e., 'AAA0000000000') so that you enter exactly 13 characters. \
   -li- How to find the Card Number: The document number, also called a Card Number, is printed on the back of the current version of the card. Previous versions of the card featured the document number and expiration date on the front of the card.",
-  "en.insured.consumer_roles.docs_shared.citizenship_number" => "Citizenship Number",
+  "en.insured.consumer_roles.docs_shared.citizenship_number" => "Certificate Number",
   "en.insured.consumer_roles.docs_shared.citizenship_number_req" => "When entering a Citizenship Certification Number, include all numbers and letters. Do not enter any other characters or spaces. -li- The Certification number entered must have between 6 and 12 characters. \
   -li- How to find Citizenship Certification Number: The Certificate of Citizenship certification number is most often in the upper right hand corner of the Certificate. \
   The Certificate of Citizenship certification number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
   "en.insured.consumer_roles.docs_shared.country_of_citizenship" => "Country of Citizenship",
   "en.insured.consumer_roles.docs_shared.expiration_date" => "%{name} Expiration Date",
   "en.insured.consumer_roles.docs_shared.i94_number" => "I 94 Number",
-  "en.insured.consumer_roles.docs_shared.i94_number_req" => "When entering the I-94 Number, only include numbers.  Do not enter any other characters, letters, or spaces. -li- You must enter exactly 11 digits into the I-94 Number field. \
+  "en.insured.consumer_roles.docs_shared.i94_number_req" => "When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position. Do not enter any other characters or spaces. -li- You must enter exactly 11 characters into the I-94 field. \
   -li- How to find the I-94 Number: \
-  The I-94 Number is also called an admission number. It is an 11 digit number found printed on Arrival/Departure Records (Form I-94 or Form I-94A). It can also be found on Form I-9.",
+  The I-94 number is also called the admissions number. It is an 11 character sequence found printed on Arrival/Departure records (For I-94 or Form I-94A.) It can also be found on the form I-9.",
   "en.insured.consumer_roles.docs_shared.naturalization_number" => "Naturalization Number",
   "en.insured.consumer_roles.docs_shared.naturalization_number_req" => "When entering a Naturalization Number, include all numbers and letters. Do not enter any  other characters or spaces. -li- The Naturalization Number entered must have between 6 and 12 numbers and letters. How to find the Naturalization Number: The Naturalization Certificate Number is most often in the upper right hand corner of the Certificate. The Naturalization Certificate Number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
   "en.insured.passport_number" => "Passport Number",

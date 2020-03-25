@@ -117,7 +117,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
         context "and today is the last day to obtain benefits starting first of next month" do
           before do
-            monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
+            # Need to revert the monthly_effective_date_deadline with following changes back on 5/1/2020
+            # monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
+            monthly_effective_date_deadline = 15
             TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, monthly_effective_date_deadline))
           end
 
@@ -128,12 +130,16 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
         context "and today is past the deadline to obtain benefits starting first of next month" do
           before do
-            monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
+            # Need to revert the monthly_effective_date_deadline with following changes back on 5/1/2020
+            # monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
+            monthly_effective_date_deadline = 15
             TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, (monthly_effective_date_deadline + 1)))
           end
 
           it "should determine the earliest effective date is month after next" do
-            expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 11, 1)
+            # Need to revert the Date.new(2015, 10, 1) with following changes back on 5/1/2020
+            # expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 11, 1)
+            expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 10, 1)
           end
         end
 
@@ -175,7 +181,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
               expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record+7.day)).to eq(TimeKeeper.date_of_record+7.day)
             end
 
-            context "and the effective date would " do               
+            context "and the effective date would " do
 
               it "termination date should be set to end_on date" do
                 expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record.next_year)).to eq benefit_coverage_period.end_on

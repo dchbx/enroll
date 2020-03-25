@@ -108,8 +108,9 @@ term_ids.each do |hbx_id|
       "$lt" => end_time
     }
   }).first.transition_at
-
+  Rails.logger.info "---processing termination #{term.hbx_id}---#{terminated_at}---#{Time.now}"
   if can_publish_enrollment?(term, terminated_at)
+    Rails.logger.info "-----publishing termination #{term.hbx_id}"
     ShopEnrollmentsPublisher.publish_action( "acapi.info.events.hbx_enrollment.terminated",
                    term.hbx_id,
                    "urn:openhbx:terms:v1:enrollment#terminate_enrollment")

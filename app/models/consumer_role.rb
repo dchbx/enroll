@@ -548,6 +548,7 @@ class ConsumerRole
 
     event :trigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process, :notify_of_eligibility_change] do
       transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :unverified, to: :unverified
       transitions from: :dhs_pending, to: :dhs_pending
       transitions from: :sci_verified, to: :sci_verified
       transitions from: :verification_outstanding, to: :sci_verified, :guard => :ssa_citizenship_verified?

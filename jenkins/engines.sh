@@ -7,7 +7,6 @@ cd $base
 root=`pwd -P`
 
 rm -rf ./log/test.log
-rm -rf ./spec/vocabularies
 rm -rf ./coverage
 rm -rf ./tmp/rspec_junit_*.xml
 rm -rf ./public/packs*

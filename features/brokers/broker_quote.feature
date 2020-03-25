@@ -53,6 +53,9 @@ Feature: Broker creates a quote for a prospect employer
     Then the broker selects plan offerings by metal level and enters <contribution_pct> for employee and deps
     And the broker should see that the save benefits button is enabled
     Then broker publishes the quote
+    And Primary Broker should see successful message of published quote
+    And Primary Broker logs out
+
 
     Examples:
       | contribution_pct |
@@ -73,6 +76,8 @@ Feature: Broker creates a quote for a prospect employer
     Then the broker selects plan offerings by metal level and enters <contribution_pct> for employee and deps
     And the broker should see that the save benefits button is enabled
     Then broker publishes the quote
+    And Primary Broker should see successful message of published quote
+    And Primary Broker logs out
 
     Examples:
       | contribution_pct |

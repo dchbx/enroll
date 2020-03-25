@@ -376,7 +376,8 @@ class Admin::Aptc < ApplicationController
 
     # 15th of the month rule
     def find_enrollment_effective_on_date(hbx_created_datetime)
-      offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
+      # offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
+      offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
       year = hbx_created_datetime.year
       month = hbx_created_datetime.month + offset_month
       # Based on the 15th of the month rule, if the effective date happpens to be after the policy's life (next year),

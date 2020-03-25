@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://openhbx.org/api/terms/1.0"
+            targetNamespace="http://openhbx.org/api/terms/1.0"
+	    elementFormDefault="qualified">
+  <xsd:include schemaLocation="common.xsd"/>
+  <xsd:include schemaLocation="organization.xsd"/>
+  <xsd:include schemaLocation="policy.xsd"/>
+  <xsd:include schemaLocation="document_storage.xsd"/>
+  <xsd:include schemaLocation="verification_services.xsd"/>
+</xsd:schema>

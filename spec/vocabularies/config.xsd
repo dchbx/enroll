@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (http://www.altova.com) by Dan Thomas (DC Department of Human Services DCAS Project) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified" version="1.0">
+  <xs:include schemaLocation="common.xsd"/>
+
+  
+  <xs:complexType name="BaseServiceEndpoint" abstract="true">
+    <xs:sequence>
+      <xs:element name="root_element" type="xs:NCName"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="HttpEndpoint">
+    <xs:complexContent>
+      <xs:extension base="BaseServiceEndpoint">
+        <xs:sequence>
+          <xs:element name="uri" type="xs:anyURI"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="endpoint" type="BaseServiceEndpoint" abstract="true"/>
+  <xs:element name="http_endpoint" type="HttpEndpoint" substitutionGroup="endpoint"/>
+  
+  <xs:complexType name="JmsEndpoint">
+    <xs:complexContent>
+      <xs:extension base="BaseServiceEndpoint">
+        <xs:sequence>
+          <xs:element name="destination_type">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="queue"/>
+                <xs:enumeration value="topic"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element name="destination_jndi_name" type="xs:string"/>
+          <xs:element name="connection_factory_jndi_name" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="jms_endpoint" type="JmsEndpoint" substitutionGroup="endpoint"/>
+  
+  <xs:complexType name="AmqpEndpoint">
+    <xs:complexContent>
+      <xs:extension base="BaseServiceEndpoint">
+        <xs:sequence>
+          <xs:element name="uri" type="xs:anyURI"/>
+          <xs:element name="amqp_exchange" type="xs:anyURI"/>
+          <xs:element name="routing_key" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="amqp_endpoint" type="AmqpEndpoint" substitutionGroup="endpoint"/>
+  
+  <xs:complexType name="Service">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="version" type="xs:string"/>
+      <xs:element ref="endpoint" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:element name="config">
+    <xs:annotation>
+      <xs:documentation>Configuration parameters for an HBX site</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="site_settings" type="HbxSiteType"/>
+        <xs:element name="services">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="service" minOccurs="1" maxOccurs="unbounded" type="Service"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="HbxSiteType">
+    <xs:sequence>
+      <xs:element name="hbx_id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>CMS-assigned unique identifier for this Exchange</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="administraive_contact" type="PersonType"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -222,6 +222,16 @@ class Family
     ).distinct(:family_id)
   ) }
 
+  scope :active_and_cobra_enrolled, ->(benefit_application) {
+    active_family_ids = benefit_application.active_census_employees.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
+    where(:"_id".in => HbxEnrollment.where(
+    :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
+    :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
+    :coverage_kind.in => ["health", "dental"],
+    :"family_id".in => active_family_ids
+    ).distinct(:family_id)
+  ) }
+
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -671,6 +681,8 @@ class Family
     else
       # This will also destroy the coverage_household_member
       if family_member.present?
+        # Note: Forms::FamilyMember.rb calls the save on destroy!
+        # here is_active is only set in memory
         family_member.is_active = false
         active_household.remove_family_member(family_member)
       end

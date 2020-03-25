@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified">
+	<xs:include schemaLocation="links.xsd"/>
+	<xs:element name="coverages">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="coverage" type="CoverageType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deductables">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="deductables" type="DeductableType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="maximums">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="maximum" type="MaximumType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="plan">
+		<xs:annotation>
+			<xs:documentation>Health insurance plan instance</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="PlanType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="PlanType">
+		<xs:annotation>
+			<xs:documentation>Individual or group insurance product that provides, or pays the cost of, health care</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:group ref="PlanCommonElementsGroup"/>
+			<xs:element name="market" type="AcaMarketPlaceNameType" minOccurs="0"/>
+			<xs:element name="metal_level" type="PlanMetalLevelNameType"/>
+			<xs:element name="coverage_type" type="QhpBenefitCoverageNameType"/>
+			<xs:element ref="rates" minOccurs="0"/>
+			<xs:element name="ehb_percent" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Essential Health Benefit factor</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="coverages" minOccurs="0"/>
+			<xs:element name="cost_structure" type="CostStructureType" minOccurs="0"/>
+			<xs:element ref="maximums" minOccurs="0"/>
+			<xs:element ref="deductables" minOccurs="0"/>
+			<xs:element name="metadata" type="xs:string" minOccurs="0"/>
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="CostStructureType">
+		<xs:sequence>
+			<xs:element name="first_tier_utilization" type="xs:int"/>
+			<xs:element name="issuer_actuarial_value" type="xs:float"/>
+			<xs:element name="multiple_in_network_tiers" type="xs:boolean"/>
+			<xs:element name="sbc_scenario">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="having_diabetes"/>
+						<xs:element name="having_a_baby"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="custom_scenarios" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="name">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="networks" type="CostByNetworkType"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CoverageType">
+		<xs:sequence>
+			<xs:element name="name">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="is_covered" type="xs:boolean"/>
+						<xs:element name="ehb_variance_reason" type="xs:string" minOccurs="0"/>
+						<xs:element name="excluded_from_in_network_moop" type="xs:boolean" minOccurs="0"/>
+						<xs:element name="excluded_from_out_of_network_moop" type="xs:boolean" minOccurs="0"/>
+						<xs:element name="exclusions" type="xs:string" minOccurs="0"/>
+						<xs:element name="quantitative_limit" type="xs:boolean" minOccurs="0"/>
+						<xs:element name="subject_to_deductable_t1" type="xs:boolean" minOccurs="0"/>
+						<xs:element name="subject_to_deductable_t2" type="xs:boolean" minOccurs="0"/>
+						<xs:element name="costs" type="CoverageCostType" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeductableType">
+		<xs:sequence>
+			<xs:element name="name"/>
+			<xs:element name="networks" type="CostByNetworkType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MaximumType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="networks" type="CostByNetworkType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PlanMetadataType">
+		<xs:sequence>
+			<xs:element name="brochure_url" type="xs:anyURI"/>
+			<xs:element name="child_only_offering" type="xs:string"/>
+			<xs:element name="disease_management_program_offered" type="xs:string"/>
+			<xs:element name="formulary_id" type="xs:string"/>
+			<xs:element name="hios_plan_id" type="xs:string"/>
+			<xs:element name="hsa_eligible" type="xs:boolean"/>
+			<xs:element name="limited_cost_sharing_plan_variation_est_adv_payment" type="xs:int"/>
+			<xs:element name="metalic_level">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="platinum"/>
+						<xs:enumeration value="gold"/>
+						<xs:enumeration value="silver"/>
+						<xs:enumeration value="bronze"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="national_network" type="xs:boolean"/>
+			<xs:element name="network_id" type="xs:string" default='"DCN001"'/>
+			<xs:element name="new_or_existing_plan">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="new"/>
+						<xs:enumeration value="existing"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="notice_required_for_pregnancy" type="xs:boolean"/>
+			<xs:element name="out_of_country_coverage" type="xs:boolean"/>
+			<xs:element name="out_of_service_area_coverage" type="xs:boolean"/>
+			<xs:element name="out_of_service_area_description" type="xs:string"/>
+			<xs:element name="plan_effective_date" type="SimpleDateType"/>
+			<xs:element name="plan_type" type="xs:string"/>
+			<xs:element name="qhp" type="xs:string"/>
+			<xs:element name="referral_required_for_specialist" type="xs:boolean"/>
+			<xs:element name="sbc_url" type="xs:anyURI"/>
+			<xs:element name="service_area_Id" type="xs:string" default='"DCS001"'/>
+			<xs:element name="unique_plan_design" type="xs:boolean"/>
+			<xs:element name="wellness_program_offered" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CoverageCostType">
+		<xs:sequence>
+			<xs:element name="coinsurance" type="CostByNetworkType"/>
+			<xs:element name="copay" type="CostByNetworkType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CostByNetworkType">
+		<xs:sequence>
+			<xs:element name="in_network_tier" type="MaxCostByCoverageCategoryType"/>
+			<xs:element name="out_of_network" type="MaxCostByCoverageCategoryType"/>
+			<xs:element name="in_network_tier_2" type="MaxCostByCoverageCategoryType" minOccurs="0"/>
+			<xs:element name="combined_in_out_network" type="MaxCostByCoverageCategoryType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProcedureType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="costs" type="CostByNetworkType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MaxCostByCoverageCategoryType">
+		<xs:sequence>
+			<xs:element name="family" type="xs:integer"/>
+			<xs:element name="individual" type="xs:integer"/>
+			<xs:element name="default_coinsurance" type="xs:integer"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="EnrolleeRelationshipNameType">
+		<xs:annotation>
+			<xs:documentation>Interpersonal relationship names between individuals in a plan enrollment</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#self"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#father"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#mother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#grandfather"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#grandmother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#grandson"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#granddaughter"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#uncle"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#aunt"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#nephew"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#niece"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#cousin"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#adopted_child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#foster_child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#son_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#daughter_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#brother_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#sister_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#father_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#mother_in_law"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#brother"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#sister"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#ward"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#stepparent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#stepson"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#stepdaughter"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#child"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#sponsored_dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#dependent_of_a_minor_dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#ex_spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#court_appointed_guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#collateral_dependent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#life_partner"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#female"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:enrollee_relationship#unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="BenchmarkPlanRequestType">
+		<xs:sequence>
+			<xs:element name="coverage_start" type="SimpleDateType"/>
+			<xs:element name="rating_area" type="nonEmptyString">
+				<xs:annotation>
+					<xs:documentation>Rating area of the covered party.  This is exchange specific.  As an example, DC has only one area "DC0", and you should always pass "DC0".</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="benchmark_plan_request" type="BenchmarkPlanRequestType">
+		<xs:annotation>
+			<xs:documentation>Element for requesting the second lowest cost silver plan (SLCSP).</xs:documentation>
+		</xs:annotation>	
+	</xs:element>
+	<xs:element name="benchmark_plan" type="PlanType">
+		<xs:annotation>
+			<xs:documentation>Response element describing the SLCSP.</xs:documentation>
+		</xs:annotation>	
+	</xs:element>
+</xs:schema>

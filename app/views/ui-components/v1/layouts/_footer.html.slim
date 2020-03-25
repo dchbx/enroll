@@ -7,11 +7,11 @@ footer.footer-wrapper#footer-uic
       .row
         ul.list-unstyled.list-inline.pull-right
           li 
-            a.call-customer-service href="tel:#{contact_center_phone_number}"
+            a.call-customer-service href="tel:#{contact_center_short_number}"
               span
                 i.fas.fa-phone.fa-lg
                 | &nbsp; 
-                = contact_center_phone_number
+                = "#{Settings.contact_center.short_number} / TTY: #{Settings.contact_center.tty_number}"
           li
             = mail_to contact_center_email_address, target: '_blank' do
               span

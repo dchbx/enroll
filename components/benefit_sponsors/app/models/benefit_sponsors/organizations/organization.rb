@@ -130,7 +130,7 @@ module BenefitSponsors
       index({ legal_name: 1 })
       index({ hbx_id: 1 })
       index({ dba: 1 },   { sparse: true })
-      index({ fein: 1 },  { unique: true, sparse: true })
+      index({ fein: 1 },  { :sparse => true, :name => "temporary_org_fein_non_unique" })
       index({ :"profiles._id" => 1 })
       index({ :"profiles._type" => 1 })
 

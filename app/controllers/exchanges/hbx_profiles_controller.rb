@@ -600,23 +600,27 @@ def employer_poc
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
-    @ssn_fields = @person.employee_roles.map{|e| e.census_employee.is_no_ssn_allowed?} if @person.employee_roles.present?
+    @ssn_fields = @person.employee_roles.map{|e| e.census_employee.is_no_ssn_allowed?} if @person.active_employee_roles.present?
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
+    @ssn_require = @ssn_fields.present? && @ssn_fields.include?(false)
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
-    elsif @ssn_fields.present? && @ssn_fields.include?(false)
-      @dont_update_ssn = true
     else
       begin
-        if params[:person][:ssn].present?
-          @person.update_attributes!(encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        @person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
+        if params[:person][:ssn].blank?
+          if @ssn_require
+            @dont_update_ssn = true
+          else
+            @person.unset(:encrypted_ssn)
+          end
         else
-          @person.unset(:encrypted_ssn)
+          @person.ssn = params[:person][:ssn]
         end
-        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date)
+        @person.save!
         @person.consumer_role.check_for_critical_changes(@person.primary_family, info_changed: @info_changed, no_dc_address: "false", dc_status: @dc_status) if @person.consumer_role && @person.is_consumer_role_active?
         CensusEmployee.update_census_employee_records(@person, current_user)
-      rescue Exception => e
+      rescue StandardError => e
         @error_on_save = @person.errors.messages
         @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
       end

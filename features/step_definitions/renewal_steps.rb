@@ -72,10 +72,10 @@ When(/^.+ selects waiver on the plan shopping page$/) do
 end
 
 When(/^.+ submits waiver reason$/) do
-  waiver_modal = find('#waive_confirm')
-  find('span', text: 'Please select waive reason').click
+  waiver_modal = find('#waive_confirm', wait: 10)
+  waiver_modal.find('span', text: 'Please select waive reason').click
   waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I have coverage through Medicaid')]").click
-  waiver_modal.find('#waiver_reason_submit').click
+  waiver_modal.find('#waiver_reason_submit', wait: 5).click
 end
 
 Then(/^.+ should see waiver summary page$/) do
