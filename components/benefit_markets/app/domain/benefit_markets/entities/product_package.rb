@@ -12,11 +12,11 @@ module BenefitMarkets
       attribute :title,                        Types::Strict::String
       attribute :description,                  Types::String.optional.meta(omittable: true)
 
-      attribute :products,                     Types::Array.of(BenefitMarkets::Entities::Product)
+      attribute :products,                     Types::Array.of(BenefitMarkets::Entities::Product).meta(omittable: false)
       attribute :contribution_model,           BenefitMarkets::Entities::ContributionModel
-      attribute :assigned_contribution_model,  BenefitMarkets::Entities::ContributionModel.meta(omittable: true)
-      attribute :contribution_models,          Types::Array.of(BenefitMarkets::Entities::ContributionModel)
-      attribute :pricing_model,                BenefitMarkets::Entities::PricingModel
+      attribute :assigned_contribution_model,  BenefitMarkets::Entities::ContributionModel.meta(omittable: false)
+      attribute :contribution_models,          Types::Array.of(BenefitMarkets::Entities::ContributionModel).meta(omittable: false)
+      attribute :pricing_model,                BenefitMarkets::Entities::PricingModel.meta(omittable: false)
 
     end
   end

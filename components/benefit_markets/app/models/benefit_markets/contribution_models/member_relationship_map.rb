@@ -45,10 +45,8 @@ module BenefitMarkets
     protected
 
     def search_member_relationships
-      return nil if contribution_unit.blank?
-      return nil if contribution_unit.contribution_model.blank?
-      return nil if contribution_unit.contribution_model.member_relationships.blank?
-      contribution_unit.contribution_model.member_relationships.detect do |mrel|
+      member_relationships = contribution_unit&.contribution_model&.member_relationships
+      (member_relationships||[]).detect do |mrel|
         mrel.relationship_name == relationship_name
       end
     end

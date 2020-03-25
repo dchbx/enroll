@@ -81,7 +81,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
 
   let(:product_package_entity)  { BenefitMarkets::Entities::ProductPackage.new(required_params)}
   let(:benefit_sponsor_catalog) { BenefitMarkets::Entities::BenefitSponsorCatalog.new(catalog_params) }
-  let(:params)                  { {product_packages: [product_package_entity], sponsor_catalog_params: benefit_sponsor_catalog.to_h} }
+  let(:params)                  { {sponsor_catalog_params: benefit_sponsor_catalog.to_h.merge(product_packages: [product_package_entity])} }
 
   context 'sending required parameters' do
 
