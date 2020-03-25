@@ -7,6 +7,8 @@ require 'dry-types'
 require 'dry-validation'
 require 'dry-struct'
 require 'dry-monads'
+require BenefitSponsors::Engine.root.join('app/domain/benefit_sponsors/types')
+
 
 module BenefitSponsors
 
@@ -91,3 +93,4 @@ module BenefitSponsors
 
   class BenefitSponsorShipIneligibleError; end
 end
+
