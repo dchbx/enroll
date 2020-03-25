@@ -14,10 +14,11 @@ module BenefitMarkets
         # @param [ Hash ] params Product Package attributes
         # @param [ Array<BenefitMarkets::Entities::Product> ] products Product
         # @return [ BenefitMarkets::Entities::ProductPackage ] product_package Product Package
-        def call(product_package_params:, products:)
-          values                 = yield validate(product_package_params)
-          product_package        = yield create(values.to_h, products)
-    
+        def call(product_package_params:, enrollment_eligibility:)
+          product_package_values      = yield validate(product_package_params)
+          product_package_values      = yield set_assigned_contribution_model(product_package_values, enrollment_eligibility)
+          product_package             = yield create(product_package_values)
+
           Success(product_package)
         end
 
@@ -27,15 +28,26 @@ module BenefitMarkets
           result = ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(product_package_params)
 
           if result.success?
-            Success(result)
+            Success(result.to_h)
           else
             Failure(result.errors.to_h)
           end
         end
 
-        def create(product_package_values, products)
-          product_package = ::BenefitMarkets::Entities::ProductPackage.new(product_package_values.merge(products: products))
-          
+        def set_assigned_contribution_model(product_package_values, enrollment_eligibility)
+          result = ::EnrollRegistry[:assign_contribution_model] {
+            {
+              product_package_values: product_package_values,
+              enrollment_eligibility: enrollment_eligibility
+            }
+          }.value!
+
+          Success(result[:product_package_values])
+        end
+
+        def create(product_package_values)
+          product_package = ::BenefitMarkets::Entities::ProductPackage.new(product_package_values)
+
           Success(product_package)
         end
       end

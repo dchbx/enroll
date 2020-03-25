@@ -31,11 +31,11 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Create, dbclean: :af
   end
 
   let(:contribution_model) do
-    {
-      title: 'title', key: :key, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
+    ::BenefitMarkets::Entities::ContributionModel.new({
+      title: 'title', key: :zero_percent_sponsor_fixed_percent_contribution_model, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
       many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
       member_relationships: member_relationships, contribution_units: [contribution_unit]
-    }
+    })
   end
 
   let(:sbc_document) do
@@ -61,13 +61,12 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Create, dbclean: :af
   let(:product_package_params) do
     {
       application_period: application_period, benefit_kind: :benefit_kind, product_kind: :product_kind, package_kind: :package_kind,
-      title: 'Title', products: [product_entity], contribution_model: contribution_model, contribution_models: [contribution_model],
-      pricing_model: pricing_model, description: 'description', assigned_contribution_model: contribution_model
+      title: 'Title', products: [product_entity], contribution_model: contribution_model.to_h, contribution_models: [contribution_model],
+      pricing_model: pricing_model, description: 'description', assigned_contribution_model: contribution_model.to_h
     }
   end
 
-  let(:product_package_entity)  { BenefitMarkets::Entities::ProductPackage.new(product_package_params)}
-  let(:params)                  { {product_package_params: product_package_entity.to_h, products: [product_entity]} }
+  let(:params)                  { {product_package_params: product_package_params, enrollment_eligibility: double(effective_date: effective_date, market_kind: :aca_shop)} }
 
   context 'sending required parameters' do
 
