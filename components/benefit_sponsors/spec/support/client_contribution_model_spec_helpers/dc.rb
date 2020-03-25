@@ -8,6 +8,7 @@ module BenefitSponsors
           "sponsor_contribution_kind" => "::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution",
           "contribution_calculator_kind" => "::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator",
           "title" => title,
+          "key" => title.downcase.gsub(/\s/, '_'),
           "many_simultaneous_contribution_units" => true,
           "contribution_units" =>
           [
