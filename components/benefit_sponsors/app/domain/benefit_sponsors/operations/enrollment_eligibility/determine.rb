@@ -37,9 +37,10 @@ module BenefitSponsors
 
         def eligibility_params(effective_date, benefit_sponsorship)
           params = {
+            market_kind: benefit_sponsorship.market_kind,
             benefit_sponsorship_id: benefit_sponsorship._id,
             effective_date: effective_date,
-            application_type: application_type(effective_date, benefit_sponsorship)
+            benefit_application_kind: application_type(effective_date, benefit_sponsorship)
           }
 
           Success(params)
@@ -48,7 +49,6 @@ module BenefitSponsors
         def is_initial_sponsor?(benefit_applications, effective_date)
           recent_benefit_application = benefit_applications.max_by(&:effective_period)
           return true unless recent_benefit_application
-
           return true if recent_benefit_application.aasm_state == :active && recent_benefit_application.effective_period.cover?(effective_date)
 
           ba_states = BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES +
