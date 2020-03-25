@@ -3,28 +3,20 @@
 module BenefitMarkets
   module Validators
     module Products
-      class ProductPackageContract < Dry::Validation::Contract
+      class ProductPackageContract < ::BenefitMarkets::Validators::ApplicationContract
 
         params do
+          required(:package_kind).filled(:symbol)
           required(:application_period).value(type?: Range)
           required(:benefit_kind).filled(:symbol)
           required(:product_kind).filled(:symbol)
-          required(:package_kind).filled(:symbol)
           required(:title).filled(:string)
-          optional(:description).maybe(:string)
-          optional(:products).maybe(:array)
-          required(:contribution_model).filled(:hash)
-          optional(:assigned_contribution_model).maybe(:hash)
-          required(:contribution_models).array(:hash)
+          required(:contribution_models).value(:array)
           required(:pricing_model).filled(:hash)
-        end
-
-        rule(:products).each do
-          if key? && value
-            contract_class = "::BenefitMarkets::Validators::Products::#{value[:kind].to_s.camelize}ProductContract".constantize
-            result = contract_class.new.call(value)
-            key.failure(text: "invalid product", error: result.errors.to_h) if result&.failure?
-          end
+          required(:products).value(:array)
+          optional(:description).maybe(:string)
+          required(:contribution_model).filled(:hash)
+          optional(:assigned_contribution_model).filled(:hash)
         end
 
         rule(:contribution_model) do
@@ -38,13 +30,6 @@ module BenefitMarkets
           if key? && value
             result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
             key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?
-          end
-        end
-
-        rule(:contribution_models).each do
-          if key? && value
-            result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
-            key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
           end
         end
 
