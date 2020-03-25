@@ -67,6 +67,7 @@ RSpec.describe BenefitMarkets::Entities::ProductPackage do
       {
         application_period: application_period, benefit_kind: :benefit_kind, product_kind: :product_kind, package_kind: :package_kind,
         title: 'Title', products: [product], contribution_model: contribution_model, contribution_models: [contribution_model],
+        assigned_contribution_model: contribution_model,
         pricing_model: pricing_model
       }
     end

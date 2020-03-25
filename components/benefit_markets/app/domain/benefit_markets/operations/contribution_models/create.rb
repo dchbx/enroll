@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    module BenefitSponsorCatalogs
+    module ContributionModels
 
       class Create
         # include Dry::Monads::Do.for(:call)
@@ -14,29 +14,29 @@ module BenefitMarkets
         # @param [ Hash ] params Benefit Sponsor Catalog attributes
         # @param [ Array<BenefitMarkets::Entities::ProductPackage> ] product_packages ProductPackage
         # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
-        def call(sponsor_catalog_params:)
-          sponsor_catalog_values  = yield validate(sponsor_catalog_params)
-          benefit_sponsor_catalog = yield create(sponsor_catalog_values)
-    
-          Success(benefit_sponsor_catalog)
+        def call(contribution_params:)
+          contribution_values = yield validate(contribution_params)
+          contribution_model  = yield create(contribution_values)
+  
+          Success(contribution_model)
         end
 
         private
 
-        def validate(sponsor_catalog_params)
-          result = ::BenefitMarkets::Validators::BenefitSponsorCatalogContract.new.call(sponsor_catalog_params)
+        def validate(params)
+          result = ::BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(params)
 
           if result.success?
             Success(result.to_h)
           else
-            Failure(result.errors)
+            Failure("Unable to validate contribution model #{result.failure}")
           end
         end
 
-        def create(sponsor_catalog_values)
-          benefit_sponsor_catalog = ::BenefitMarkets::Entities::BenefitSponsorCatalog.new(sponsor_catalog_values)
-          
-          Success(benefit_sponsor_catalog)
+        def create(values)
+          contribution_model = ::BenefitMarkets::Entities::ContributionModel.new(values)
+
+          Success(contribution_model)
         end
       end
     end
