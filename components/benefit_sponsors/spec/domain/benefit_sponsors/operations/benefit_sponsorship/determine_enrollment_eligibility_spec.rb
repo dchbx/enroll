@@ -37,7 +37,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorship::DetermineEnrollm
     end
 
     it 'should return eligibility type' do
-      expect(result.success.application_type).to eq 'initial'
+      expect(result.success.benefit_application_kind).to eq :initial
     end
   end
 
@@ -66,35 +66,35 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorship::DetermineEnrollm
       end
 
       it 'should return eligibility type' do
-        expect(result.success.application_type).to eq status
+        expect(result.success.benefit_application_kind).to eq status
       end
     end
   end
 
   describe 'for initial organizations' do
     [TimeKeeper.date_of_record.next_month.beginning_of_month, (TimeKeeper.date_of_record + 2.months).beginning_of_month, (TimeKeeper.date_of_record + 3.months).beginning_of_month].each do |eligibility_date|
-      it_behaves_like "enrollment eligibility determination", "draft", "initial", nil, eligibility_date
-      it_behaves_like "enrollment eligibility determination", "enrollment_open", "initial", nil, eligibility_date
-      it_behaves_like "enrollment eligibility determination", "enrollment_closed", "initial", nil, eligibility_date
-      it_behaves_like "enrollment eligibility determination", "binder_paid", "initial", nil, eligibility_date
-      it_behaves_like "enrollment eligibility determination", "enrollment_eligible", "initial", nil, eligibility_date
-      it_behaves_like "enrollment eligibility determination", "enrollment_ineligible", "initial", nil, eligibility_date
-      it_behaves_like "enrollment eligibility determination", "canceled", "initial", nil, eligibility_date
+      it_behaves_like "enrollment eligibility determination", "draft", :initial, nil, eligibility_date
+      it_behaves_like "enrollment eligibility determination", "enrollment_open", :initial, nil, eligibility_date
+      it_behaves_like "enrollment eligibility determination", "enrollment_closed", :initial, nil, eligibility_date
+      it_behaves_like "enrollment eligibility determination", "binder_paid", :initial, nil, eligibility_date
+      it_behaves_like "enrollment eligibility determination", "enrollment_eligible", :initial, nil, eligibility_date
+      it_behaves_like "enrollment eligibility determination", "enrollment_ineligible", :initial, nil, eligibility_date
+      it_behaves_like "enrollment eligibility determination", "canceled", :initial, nil, eligibility_date
     end
   end
 
   describe 'for organization with active application' do
     # gap in coverage case
-    it_behaves_like "enrollment eligibility determination", "active", "initial", TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year.next_month
+    it_behaves_like "enrollment eligibility determination", "active", :initial, TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year.next_month
   end
 
 
   describe 'for organizaton with off-cycle application' do
-    it_behaves_like "enrollment eligibility determination", "active", "initial", TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year.prev_month
+    it_behaves_like "enrollment eligibility determination", "active", :initial, TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year.prev_month
   end
 
   describe 'for renewing application' do
-    it_behaves_like "enrollment eligibility determination", "active", "renewing", TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year
+    it_behaves_like "enrollment eligibility determination", "active", :renewing, TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year
   end
 end
 

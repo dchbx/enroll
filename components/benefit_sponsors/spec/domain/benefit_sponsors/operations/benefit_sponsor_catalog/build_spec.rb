@@ -6,7 +6,7 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_s
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
-RSpec.describe BenefitSponsors::Operations::BenefitSponsorCatalog::Create, dbclean: :after_each do
+RSpec.describe BenefitSponsors::Operations::BenefitSponsorCatalog::Build, dbclean: :after_each do
 
   include_context "setup benefit market with market catalogs and product packages"
 
@@ -45,7 +45,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorCatalog::Create, dbcle
     end
 
     it 'should create BenefitSponsorCatalog object' do
-      expect(result.success).to be_a ::BenefitMarkets::BenefitSponsorCatalog
+      expect(result.success).to be_a ::BenefitMarkets::Entities::BenefitSponsorCatalog
     end
   end
 end
