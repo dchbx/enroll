@@ -28,6 +28,8 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   #let!(:service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
 
   let(:benefit_sponsor_catalog) {
+    # TODO: enable it for new domain operations
+    # benefit_sponsorship.benefit_sponsor_catalog_for(effective_period.min)
     benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min)
   }
   let!(:initial_application)    { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,

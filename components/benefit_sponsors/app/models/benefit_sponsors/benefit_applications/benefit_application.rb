@@ -623,6 +623,35 @@ module BenefitSponsors
     # @param [ BenefitSponsorCatalog ] The catalog valid for the effective_period immediately following this
     # BenefitApplication instance's effective_period
     # @return [ BenefitApplication ] The built renewal application instance and submodels
+    
+    # TODO: Enable this method for new domain benefit sponsor catalog
+    # def renew(async_workflow_id = nil)
+    #   renewal_effective_date = end_on.next_day
+    #   renewal_benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date)
+
+    #   renewal_application = benefit_sponsorship.benefit_applications.new(
+    #     fte_count:                fte_count,
+    #     pte_count:                pte_count,
+    #     msp_count:                msp_count,
+    #     benefit_sponsor_catalog:  renewal_benefit_sponsor_catalog,
+    #     predecessor:              self,
+    #     effective_period:         renewal_benefit_sponsor_catalog.effective_period,
+    #     open_enrollment_period:   renewal_benefit_sponsor_catalog.open_enrollment_period
+    #   )
+
+    #   renewal_application.async_renewal_workflow_id = async_workflow_id if async_workflow_id
+    #   renewal_application.pull_benefit_sponsorship_attributes
+    #   renewal_benefit_sponsor_catalog.benefit_application = renewal_application
+    #   renewal_benefit_sponsor_catalog.save
+
+    #   benefit_packages.each do |benefit_package|
+    #     new_benefit_package = renewal_application.benefit_packages.build
+    #     benefit_package.renew(new_benefit_package)
+    #   end
+
+    #   renewal_application
+    # end
+
     def renew(new_benefit_sponsor_catalog, async_workflow_id = nil)
       if new_benefit_sponsor_catalog.effective_date != end_on + 1.day
         raise StandardError, "effective period must begin on #{end_on + 1.day}"
@@ -654,6 +683,7 @@ module BenefitSponsors
 
       renewal_application
     end
+
 
     def predecessor_benefit_package(current_benefit_package)
       *previous_title, _b = current_benefit_package.title.split('(')
