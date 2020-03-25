@@ -1,0 +1,107 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+      - :aca_shop_market
+      - :benefit_market_catalog
+    features:
+      - key: :contribution_model
+        item: BenefitMarkets::Operations::ContributionModels::Create.new
+        is_enabled: true
+      - key: :assign_contribution_model
+        item: BenefitMarkets::Operations::ContributionModels::Assign.new
+        is_enabled: true
+  - namespace:
+      - :enroll_app
+      - :aca_shop_market
+      - :benefit_market_catalog
+      - :catalog_2019
+      - :contribution_model_criteria   
+    features:
+      - key: :initial_sponsor_default_2019
+        item: :contribution_model_criterion
+        is_enabled: true
+        settings:
+          - key: :contribution_model_key
+            item: :zero_percent_sponsor_fixed_percent_contribution_model
+          - key: :benefit_application_kind
+            item: :initial
+          - key: :effective_period
+            item: <%= Date.new(2020,1,1)..Date.new(2020,12,31) %>
+          - key: :order
+            item: 3
+          - key: :default
+            item: false
+          - key: :renewal_criterion_key
+            item: :initial_sponsor_default
+  - namespace:
+      - :enroll_app
+      - :aca_shop_market
+      - :benefit_market_catalog
+      - :catalog_2020
+      - :contribution_model_criteria   
+    features:
+      - key: :initial_sponsor_default
+        item: :contribution_model_criterion
+        is_enabled: true
+        settings:
+          - key: :contribution_model_key
+            item: :zero_percent_sponsor_fixed_percent_contribution_model
+          - key: :benefit_application_kind
+            item: :initial
+          - key: :effective_period
+            item: <%= Date.new(2020,1,1)..Date.new(2020,5,31) %>
+          - key: :order
+            item: 3
+          - key: :default
+            item: false
+          - key: :renewal_criterion_key
+            item: :initial_sponsor_default
+      - key: :renewal_sponsor_default
+        item: :contribution_model_criterion
+        is_enabled: true
+        settings:
+          - key: :contribution_model_key
+            item: :zero_pct_sponsor_fixed_pct_contribution_model
+          - key: :benefit_application_kind
+            item: :initial
+          - key: :effective_period
+            item: <%= Date.new(2020,1,1)..Date.new(2020,1,31) %>
+          - key: :order
+            item: 2
+          - key: :default
+            item: false
+          - key: :renewal_criterion_key
+            item: :initial_sponsor_default
+      - key: :initial_sponsor_jan_default
+        item: :contribution_model_criterion
+        is_enabled: true
+        settings:
+          - key: :contribution_model_key
+            item: :zero_pct_sponsor_fixed_pct_contribution_model
+          - key: :benefit_application_kind
+            item: :initial
+          - key: :effective_period
+            item: <%= Date.new(2020,1,1)..Date.new(2020,1,31) %>
+          - key: :order
+            item: 1
+          - key: :default
+            item: false
+          - key: :renewal_criterion_key
+            item: :initial_sponsor_default
+      - key: :renewal_sponsor_jan_default
+        item: :contribution_model_criterion
+        is_enabled: true
+        settings:
+          - key: :contribution_model_key
+            item: :zero_pct_sponsor_fixed_pct_contribution_model
+          - key: :benefit_application_kind
+            item: :initial
+          - key: :effective_period
+            item: <%= Date.new(2020,1,1)..Date.new(2020,1,31) %>
+          - key: :order
+            item: 4
+          - key: :default
+            item: false
+          - key: :renewal_criterion_key
+            item: :initial_sponsor_default
