@@ -1,0 +1,28 @@
+---
+registry:
+  - namespace:
+      - :features
+    features:
+      - key: :enroll_app
+        is_enabled: true
+        meta: 
+          label: Enroll Application
+          type: :boolean
+          default: true
+          value: true
+          description: The Enroll Application enables customers to register and enroll in products, including determining eligibility, shopping for products, calculating premiums, and securely managing their personal information
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :copyright_period_start
+            item: "2013"
+          - key: :policies_url
+            item: "https://dchealthlink.com/"         
+          - key: :faqs_url
+            item: "https://www.dchealthlink.com/Frequently-Asked-Questions"   
+          - key: :help_url
+            item: "https://www.dchealthlink.com/help"  
+          - key: :business_resource_center_url
+            item: "https://dchealthlink.com/smallbusiness/"    
+          - key: :nondiscrimination_notice_url
+            item: "https://www.dchealthlink.com/nondiscrimination"
