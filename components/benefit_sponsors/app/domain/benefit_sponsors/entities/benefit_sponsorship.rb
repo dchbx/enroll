@@ -20,6 +20,7 @@ module BenefitSponsors
       attribute :ssn_disabled_on,         Types::Date.optional
       attribute :aasm_state,              Types::Strict::Symbol
       attribute :organization_id,         Types::Bson
+      attribute :market_kind,             Types::Strict::Symbol
 
       attribute :benefit_applications,    Types::Array.of(BenefitSponsors::Entities::BenefitApplication)
 

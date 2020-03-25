@@ -21,6 +21,7 @@ module BenefitSponsors
           optional(:ssn_disabled_on).maybe(:date)
           required(:aasm_state).filled(:symbol)
           required(:organization_id).filled(Types::Bson)
+          required(:market_kind).filled(:symbol)
 
           optional(:benefit_applications).array(:hash)
         end
