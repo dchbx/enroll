@@ -66,7 +66,7 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Create, dbclean: :af
     }
   end
 
-  let(:params)                  { {product_package_params: product_package_params, enrollment_eligibility: double(effective_date: effective_date, market_kind: :aca_shop)} }
+  let(:params)                  { {product_package_params: product_package_params, enrollment_eligibility: double(effective_date: effective_date, market_kind: :aca_shop, benefit_application_kind: :initial)} }
 
   context 'sending required parameters' do
 
