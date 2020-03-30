@@ -28,60 +28,33 @@ FactoryBot.define do
         )
       ]
 
-      employee_unit = build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
-                            name: "employee",
-                            display_name: "Employee",
-                            order: 0,
-                            default_contribution_factor: 0.75,
-                            contribution_model: contribution_model)
-
-      build(:benefit_markets_contribution_models_member_relationship_map,
-            relationship_name: "employee",
-            operator: :==,
-            count: 1,
-            contribution_unit: employee_unit
-            )
-
-      spouse_unit = build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
-                          name: "spouse",
-                          display_name: "Spouse",
-                          order: 1,
-                          default_contribution_factor: 0.50,
-                          contribution_model: contribution_model)
-
-      build(:benefit_markets_contribution_models_member_relationship_map,
-            relationship_name: "spouse",
-            operator: :>=,
-            contribution_unit: spouse_unit,
-            count: 1)
-
-      dm_partner_unit =  build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
-                               name: "domestic_partner",
-                               display_name: "Domestic Partner",
-                               order: 2,
-                               default_contribution_factor: 0.25,
-                               contribution_model: contribution_model)
-
-      build(:benefit_markets_contribution_models_member_relationship_map,
-            relationship_name: "domestic_partner",
-            operator: :>=,
-            contribution_unit: dm_partner_unit,
-            count: 1
-            )
-
-      dependent_unit = build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
-                             name: "dependent",
-                             display_name: "Child Under 26",
-                             order: 3,
-                             default_contribution_factor: 0.25,
-                             contribution_model: contribution_model)
-
-      build(:benefit_markets_contribution_models_member_relationship_map,
-            relationship_name: "dependent",
-            operator: :>=,
-            contribution_unit: dependent_unit,
-            count: 1
-            )
+      contribution_model.contribution_units = [
+        build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
+              :with_member_relationship_maps,
+              name: "employee",
+              display_name: "Employee",
+              order: 0,
+              default_contribution_factor: 0.75,
+              member_relationship_operator: :==),
+        build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
+              :with_member_relationship_maps,
+              name: "spouse",
+              display_name: "Spouse",
+              order: 1,
+              default_contribution_factor: 0.50),
+        build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
+              :with_member_relationship_maps,
+              name: "domestic_partner",
+              display_name: "Domestic Partner",
+              order: 2,
+              default_contribution_factor: 0.25),
+        build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
+              :with_member_relationship_maps,
+              name: "dependent",
+              display_name: "Child Under 26",
+              order: 3,
+              default_contribution_factor: 0.25)
+      ]
     end
 
     trait :for_health_single_product do
