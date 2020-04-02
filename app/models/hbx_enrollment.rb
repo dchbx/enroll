@@ -1872,10 +1872,9 @@ class HbxEnrollment
 
   def eligibility_event_kind
     if (enrollment_kind == "special_enrollment")
-      if special_enrollment_period.blank?
-        return "unknown_sep"
-      end
-      return special_enrollment_period.qualifying_life_event_kind.reason
+      return "unknown_sep" if special_enrollment_period.blank?
+      qle_reason = special_enrollment_period.qualifying_life_event_kind.reason
+      qle_reason == 'covid-19' ? "unknown_sep" : qle_reason
     end
     return "open_enrollment" if !is_shop?
     if is_shop? && is_cobra_status?
