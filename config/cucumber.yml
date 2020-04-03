@@ -13,3 +13,4 @@ default: <%= std_opts %><%= failure_opts %> -r features
 wip: --tags @wip:11 --wip features
 rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags ~@wip
 screenshots: <%= std_opts %> -r features SCREENSHOTS=true
+semaphoreci: --format rerun --out tmp/cucumber_failures.log
