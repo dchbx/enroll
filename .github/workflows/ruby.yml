@@ -359,6 +359,7 @@ jobs:
         cucumber-2-of-2,
       ]
     steps:
+      - uses: actions/checkout@v2
       - name: Notify Yellr of success
         env:
           STATUS: passing
