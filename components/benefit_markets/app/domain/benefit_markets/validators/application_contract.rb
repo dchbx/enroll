@@ -11,7 +11,7 @@ module BenefitMarkets
 
       # @!macro ruleeach
       #   Validates a nested array of $0 params
-      #   @!method rule(contribution_models)
+      #   @!method rule(product_packages)
       rule(:product_packages).each do
         if key? && value
           if !value.is_a?(::BenefitMarkets::Entities::ProductPackage)
@@ -53,6 +53,23 @@ module BenefitMarkets
               key.failure(text: "invalid product", error: result.errors.to_h) if result&.failure?
             else
               key.failure(text: "invalid products. expected a hash or product entity")
+            end
+          end
+        end
+      end
+
+      # @!macro ruleeach
+      #   Validates a nested array of $0 params
+      #   @!method rule(contribution_units)
+      rule(:contribution_units).each do
+        if key? && value
+          contribution_units = [::BenefitMarkets::Entities::FixedPercentContributionUnit, ::BenefitMarkets::Entities::FixedDollarContributionUnit, ::BenefitMarkets::Entities::PercentWithCapContributionUnit]
+          if !contribution_units.include?(value.class)
+            if value.is_a?(Hash)
+              result = ::BenefitMarkets::Validators::ContributionModels::ContributionUnitContract.new.call(value)
+              key.failure(text: "invalid contribution unit", error: result.errors.to_h) if result&.failure?
+            else
+              key.failure(text: "invalid contribution_units. Expected a hash or contribution unit entity")
             end
           end
         end

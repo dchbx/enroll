@@ -37,7 +37,7 @@ module BenefitMarkets
         def filter_criteria(criteria, contribution_models)
           contribution_keys = contribution_models.map(&:key)
           filtered_criteria = criteria.select{|criterion| contribution_keys.include?(criterion.setting(:contribution_model_key).item) }
-          
+
           Success(filtered_criteria)
         end
 
@@ -45,7 +45,7 @@ module BenefitMarkets
           if criteria.size > 1
             sorted_criteria = criteria.sort_by{|ele| ele.setting(:order).item}
             criterion       = sorted_criteria.detect {|criterion| criterion_matches?(criterion, enrollment_eligibility) }
-            criterion       = filtered_criteria.detect {|criterion| criterion.setting(:default).item } if criterion.blank?
+            criterion       = criteria.detect {|criterion| criterion.setting(:default).item } if criterion.blank?
           else
             criterion = criteria.first
           end

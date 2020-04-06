@@ -3,7 +3,7 @@
 module BenefitMarkets
   module Validators
     module ContributionModels
-      class ContributionModelContract < Dry::Validation::Contract
+      class ContributionModelContract < ::BenefitMarkets::Validators::ApplicationContract
 
         params do
           required(:title).filled(:string)
@@ -12,15 +12,8 @@ module BenefitMarkets
           required(:contribution_calculator_kind).filled(:string)
           required(:many_simultaneous_contribution_units).filled(:bool)
           required(:product_multiplicities).array(:symbol)
-          required(:contribution_units).array(:hash)
-          required(:member_relationships).array(:hash)
-        end
-
-        rule(:contribution_units).each do
-          if key? && value
-            result = ContributionUnitContract.new.call(value)
-            key.failure(text: "invalid contribution unit for contribution model", error: result.errors.to_h) if result&.failure?
-          end
+          required(:contribution_units).value(:array)
+          required(:member_relationships).value(:array)
         end
 
         rule(:member_relationships).each do

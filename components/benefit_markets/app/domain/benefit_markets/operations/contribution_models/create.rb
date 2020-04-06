@@ -29,7 +29,7 @@ module BenefitMarkets
           if result.success?
             Success(result.to_h)
           else
-            Failure("Unable to validate contribution model #{result.failure}")
+            Failure("Unable to validate contribution model #{result.errors}")
           end
         end
 
