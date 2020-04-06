@@ -9,7 +9,7 @@ else
   failure_opts = " --format summary --out cucumber#{ENV['TEST_ENV_NUMBER']}.summary --format rerun --out tmp/cucumber_failures#{ENV['TEST_ENV_NUMBER']}.log"
 end
 %>
-default: <%= std_opts %><%= failure_opts %> -r features
+default: <%= std_opts %><%= failure_opts %> -r features --profile semaphoreci
 wip: --tags @wip:11 --wip features
 rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags ~@wip
 screenshots: <%= std_opts %> -r features SCREENSHOTS=true
