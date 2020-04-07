@@ -15,21 +15,46 @@ module BenefitMarkets
           required(:pricing_model).filled(:hash)
           required(:products).value(:array)
           optional(:description).maybe(:string)
-          required(:contribution_model).filled(:hash)
-          optional(:assigned_contribution_model).filled(:hash)
+          required(:contribution_model).value(:any)
+          optional(:assigned_contribution_model).value(:any)
+        end
+
+        rule(:contribution_models).each do
+          if key? && value
+            if !value.is_a?(::BenefitMarkets::Entities::ContributionModel)
+              if value.is_a?(Hash)
+                result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
+                key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
+              else
+                key.failure(text: "invalid contribution models. expected a hash or contribution_model entity")
+              end
+            end
+          end
         end
 
         rule(:contribution_model) do
           if key? && value
-            result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
-            key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
+            if !value.is_a?(::BenefitMarkets::Entities::ContributionModel)
+              if value.is_a?(Hash)
+                result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
+                key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
+              else
+                key.failure(text: "invalid contribution models. expected a hash or contribution_model entity")
+              end
+            end
           end
         end
 
         rule(:assigned_contribution_model) do
           if key? && value
-            result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
-            key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?
+            if !value.is_a?(::BenefitMarkets::Entities::ContributionModel)
+              if value.is_a?(Hash)
+                result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
+                key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?
+              else
+                key.failure(text: "invalid assigned contribution models. expected a hash or contribution_model entity")
+              end
+            end
           end
         end
 

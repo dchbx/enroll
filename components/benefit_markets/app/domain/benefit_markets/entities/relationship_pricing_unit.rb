@@ -5,7 +5,7 @@ module BenefitMarkets
     class RelationshipPricingUnit < BenefitMarkets::Entities::PricingUnit
       transform_keys(&:to_sym)
 
-      attribute :discounted_above_threshold,             Types::Strict::Integer
+      attribute :discounted_above_threshold,             Types::Integer.optional
       attribute :eligible_for_threshold_discount,        Types::Strict::Bool
 
     end

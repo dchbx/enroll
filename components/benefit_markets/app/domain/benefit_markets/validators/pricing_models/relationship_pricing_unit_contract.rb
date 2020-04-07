@@ -6,7 +6,7 @@ module BenefitMarkets
       class RelationshipPricingUnitContract < BenefitMarkets::Validators::PricingModels::PricingUnitContract
 
         params do
-          required(:discounted_above_threshold).filled(:integer)
+          optional(:discounted_above_threshold).maybe(:integer)
           required(:eligible_for_threshold_discount).filled(:bool)
         end
 
