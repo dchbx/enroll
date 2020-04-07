@@ -133,18 +133,18 @@ group :development, :test do
   # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
+  gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'puma',                   '~> 3.11'
+  gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
   gem 'yard',                   '~> 0.9.12',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
-  gem 'rails-controller-testing'
-  gem 'climate_control', '~> 0.2.0'
 end
 
 group :test do

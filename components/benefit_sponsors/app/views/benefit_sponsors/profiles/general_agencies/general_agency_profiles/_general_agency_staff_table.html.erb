@@ -33,7 +33,7 @@
                           profile_id: @general_agency_profile.id, person_id: staff_member.id
                       ),
                       :id => "destroy",
-                      hidden: !can_show_destroy_for_ga?(current_user, staff_member, ga_staff.count),
+                      hidden: !can_show_destroy_for_ga?(staff_member, ga_staff.count),
                       method: 'delete') do %>
                        <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
                   <% end %>

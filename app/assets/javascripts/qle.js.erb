@@ -95,7 +95,13 @@ $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
-    $('.qle-details-title').html($(this).data('title'));
+    
+    if($(this).data('title') == 'COVID-19'){
+      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
+    } else {
+      $('.qle-details-title').html($(this).data('title'));
+    }
+    
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
@@ -106,8 +112,18 @@ $(function () {
       $('#qle-date-chose').addClass('hidden');
       $('#qle-details .error-info').removeClass('hidden');
     } else {
-      init_datepicker_for_qle_date($(this).data('pre-event-sep-in-days'), $(this).data('post-event-sep-in-days'), $(this).data('current-date'));
-      $('#qle-date-chose').removeClass('hidden');
+      if ($(this).data('qle-event-date-kind') == 'submitted_at') {
+         $('#qle_date').val($(this).data('current-date'));
+         $('#qle_date').attr('placeholder',$(this).data('current-date'));
+         $('#qle_date').attr('readonly',true);
+         $('#qle_date').each(function (){ this.style.pointerEvents = 'none'; });
+      }
+      else {
+        $('#qle_date').attr('readonly',false);
+        $('#qle_date').each(function (){ this.style.pointerEvents = 'auto'; });
+        init_datepicker_for_qle_date($(this).data('pre-event-sep-in-days'), $(this).data('post-event-sep-in-days'), $(this).data('current-date'));
+        $('#qle-date-chose').removeClass('hidden');
+      }
     };
 
     $('#qle-details').removeClass('hidden');
@@ -123,7 +139,11 @@ $(function () {
     $('.seps-panel').addClass('hidden');
     $('#no_qle_checkbox').parent().addClass('hidden');
     $('#qle_flow_info #qle-menu').hide();
-    $('.qle-details-title').html($(this).data('title'));
+    if($(this).data('title') == 'COVID-19'){
+      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
+    } else {
+      $('.qle-details-title').html($(this).data('title'));
+    }
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));

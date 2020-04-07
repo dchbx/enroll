@@ -36,6 +36,8 @@ module BenefitSponsors
       census_employee
     end
 
+    let(:sponsored_benefit) { current_benefit_package.sponsored_benefit_for(coverage_kind) }
+
     let!(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         household: shop_family.latest_household,
@@ -47,14 +49,18 @@ module BenefitSponsors
                         submitted_at: current_effective_date - 20.days,
                         benefit_sponsorship_id: benefit_sponsorship.id,
                         sponsored_benefit_package_id: current_benefit_package.id,
-                        sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                        sponsored_benefit_id: sponsored_benefit.id,
                         employee_role_id: employee_role.id,
                         benefit_group_assignment: census_employee.active_benefit_group_assignment,
-                        product_id: current_benefit_package.sponsored_benefits[0].reference_product.id,
+                        product_id: sponsored_benefit.reference_product.id,
                         aasm_state: enrollment_status)
     end
 
     subject { BenefitSponsors::Factories::EnrollmentRenewalFactory.call(enrollment, benefit_package) }
+
+    before :each do
+      enrollment.update_attributes(product_id: nil) if enrollment_status == :inactive
+    end
 
     context 'Renewal factory invoked with health coverage' do
 
@@ -76,7 +82,20 @@ module BenefitSponsors
 
       let(:enrollment_status) { :inactive }
       let(:coverage_kind)     { :health }
-      let(:renewal_health_sponsored_benefit) { }
+
+      it 'should generate passive waiver' do
+        expect(subject).to be_valid
+        expect(subject.sponsored_benefit_package).to eq benefit_package
+        expect(subject.effective_on).to eq renewal_effective_date
+        expect(subject.aasm_state).to eq 'renewing_waived'
+        expect(subject.sponsored_benefit).to eq benefit_package.sponsored_benefit_for(coverage_kind)
+      end
+    end
+
+    context 'Renewal factory invoked with dental waiver' do
+
+      let(:enrollment_status) { :inactive }
+      let(:coverage_kind)     { :dental }
 
       it 'should generate passive waiver' do
         expect(subject).to be_valid
@@ -93,6 +112,7 @@ module BenefitSponsors
       let(:coverage_kind)     { :dental }
 
       it 'should generate passive renewal' do
+        allow_any_instance_of(BenefitSponsors::Factories::EnrollmentRenewalFactory).to receive(:has_renewal_product?).and_return true
         expect(subject).to be_valid
         expect(subject.coverage_kind.to_sym).to eq coverage_kind
         expect(subject.sponsored_benefit_package).to eq benefit_package
@@ -101,6 +121,48 @@ module BenefitSponsors
         expect(subject.sponsored_benefit).to eq benefit_package.sponsored_benefit_for(coverage_kind)
         expect(subject.product).to eq enrollment.product.renewal_product
       end
+    end
+
+    describe '.has_renewal_product?' do
+      let(:enrollment_status) { :coverage_selected }
+      let!(:enrollment) do
+        double("enrollment",
+               benefit_group_assignment: benefit_group_assignment,
+               is_coverage_waived?: false,
+               coverage_kind: "health",
+               product: product)
+      end
+
+      let(:product) do
+        double("Product",
+               renewal_product: double("RenewalProduct"))
+      end
+
+      let(:benefit_group_assignment) do
+        double("benefit_group_assignment",
+               census_employee: census_employee)
+      end
+
+      let(:census_employee) { instance_double("census_employee") }
+      let(:sponsored_benefit) { instance_double("sponsored_benefit") }
+
+      let(:benefit_package) do
+        instance_double("benefit_package",
+                        start_on: TimeKeeper.date_of_record)
+      end
+
+      context "#product not offered in renewal application" do
+        before(:each) do
+          allow(census_employee).to receive(:benefit_package_assignment_for).with(benefit_package).and_return(benefit_group_assignment)
+          allow(benefit_package).to receive(:sponsored_benefit_for).with(enrollment.coverage_kind).and_return(sponsored_benefit)
+          allow(sponsored_benefit).to receive(:products).with(benefit_package.start_on).and_return([product])
+        end
+
+        it "should raise error" do
+          expect{BenefitSponsors::Factories::EnrollmentRenewalFactory.new(enrollment, benefit_package)}.to raise_error(RuntimeError, "Product not offered in renewal application")
+        end
+      end
+
     end
   end
 end

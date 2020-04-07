@@ -26,4 +26,20 @@ describe FakesController do
       expect(qle.market_kind).to eq "shop"
     end
   end
+
+  context 'For covid qle' do
+    let(:qle) { FactoryBot.build(:qualifying_life_event_kind, reason: 'covid-19', effective_on_kinds: ['first_of_this_month', 'fixed_first_of_next_month'], market_kind: :shop) }
+    let(:qle_on) { TimeKeeper.date_of_record }
+    let(:effective_date_options) {
+      [[qle_on.beginning_of_month.to_s, "first_of_this_month"], [qle_on.end_of_month.next_day.to_s, "fixed_first_of_next_month"]]
+    }
+
+    before do
+      controller.instance_variable_set("@qle", qle)
+    end
+
+    it 'should return qle date option kinds' do
+      expect(subject.calculate_rule).to eq effective_date_options
+    end
+  end
 end

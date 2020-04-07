@@ -99,7 +99,8 @@ module Insured::FamiliesHelper
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
-      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+      qle_event_date_kind: qle.qle_event_date_kind.to_s
     }
 
     if qle.tool_tip.present?
@@ -108,7 +109,10 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    link_to qle.title, "javascript:void(0)", options
+
+    qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
+    
+    link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
@@ -130,6 +134,8 @@ module Insured::FamiliesHelper
       case kind
       when 'date_of_event'
         options << [qle_date.to_s, kind]
+      when 'first_of_this_month'
+        options << [qle_date.beginning_of_month.to_s, kind]
       when 'fixed_first_of_next_month'
         options << [(qle_date.end_of_month + 1.day).to_s, kind]
       end

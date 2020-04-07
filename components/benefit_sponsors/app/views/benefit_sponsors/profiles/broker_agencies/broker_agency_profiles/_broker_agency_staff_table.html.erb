@@ -33,15 +33,17 @@
               </td>
 
               <td>
-                 <%=  link_to(
-                          profiles_broker_agencies_broker_agency_staff_role_path(
-                          profile_id: @broker_agency_profile.id, person_id: staff_member.id
-                      ),
-                      :id => "destroy",
-                      hidden: !can_show_destroy?(current_user, staff_member, broker_staff.count),
-                      method: 'delete') do %>
-                       <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
+                <% if current_user.has_hbx_staff_role? || current_user.person.broker_role.present? %>
+                  <%= link_to(
+                      profiles_broker_agencies_broker_agency_staff_role_path(
+                      profile_id: @broker_agency_profile.id, person_id: staff_member.id
+                    ),
+                    :id => "destroy",
+                    hidden: !can_show_destroy_for_brokers?(staff_member, broker_staff.count),
+                    method: 'delete') do %>
+                     <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
                   <% end %>
+                <% end %>
              </td>
 
             </tbody>

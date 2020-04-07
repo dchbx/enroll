@@ -21,7 +21,7 @@ class QualifyingLifeEventKind
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
+  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date)
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -61,6 +61,8 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
+  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on]
+
   field :event_kind_label, type: String
   field :action_kind, type: String
 
@@ -79,6 +81,7 @@ class QualifyingLifeEventKind
 
   field :is_active, type: Boolean, default: true
   field :event_on, type: Date
+  field :qle_event_date_kind, type: Symbol, default: :qle_on
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
@@ -104,8 +107,17 @@ class QualifyingLifeEventKind
   validates_presence_of :title, :market_kind, :effective_on_kinds, :pre_event_sep_in_days,
                         :post_event_sep_in_days
 
-  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
+  validate :qle_date_guards
+
+  scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
+  scope :by_date, ->(date = TimeKeeper.date_of_record){ where(
+    :"$or" => [
+      {:start_on.lte => date, :end_on.gte => date},
+      {:start_on.lte => date, :end_on => {:$eq => nil}},
+      {:start_on => {:$eq => nil}, :end_on => {:$eq => nil}}
+    ]
+  )}
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -245,5 +257,20 @@ class QualifyingLifeEventKind
     start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
       "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+  end
+
+  def active?
+    return false unless is_active
+    end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
+  end
+  
+  private
+
+  def qle_date_guards
+    errors.add(:start_on, "start_on cannot be nil when end_on date present") if end_on.present? && start_on.blank?
+
+    if start_on.present? && end_on.present?
+      errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
+    end
   end
 end

@@ -108,6 +108,8 @@ class SpecialEnrollmentPeriod
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
+    raise ArgumentError.new("Qualifying life event kind is expired")  unless new_qualifying_life_event_kind.active?
+
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
     @qualifying_life_event_kind = new_qualifying_life_event_kind
@@ -225,6 +227,8 @@ private
       qle_on
     when "first_of_month"
       first_of_month_effective_date
+    when "first_of_this_month"
+      first_of_this_month_effective_date
     when "first_of_next_month"
       first_of_next_month_effective_date
     when "fixed_first_of_next_month"
@@ -239,6 +243,10 @@ private
     else
       @earliest_effective_date.next_month.end_of_month + 1.day
     end
+  end
+
+  def first_of_this_month_effective_date
+    @earliest_effective_date.beginning_of_month
   end
 
   def first_of_next_month_effective_date
