@@ -51,7 +51,7 @@ jobs:
                 exit 0
               else
                 echo "Give cucumber one more try"
-                if bundle exec cucumber tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
+                if bundle exec cucumber tmp/rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
                 then
                   echo "Cucumber worked on retry"
                   exit 0
@@ -70,7 +70,7 @@ jobs:
                 exit 0
               else
                 echo "Give cucumber one more try"
-                if bundle exec cucumber tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
+                if bundle exec cucumber tmp/rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
                 then
                   echo "Cucumber worked on retry"
                   exit 0
@@ -89,7 +89,7 @@ jobs:
                 exit 0
               else
                 echo "Give cucumber one more try"
-                if bundle exec cucumber tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
+                if bundle exec cucumber tmp/rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
                 then
                   echo "Cucumber worked on retry"
                   exit 0
@@ -108,7 +108,7 @@ jobs:
                 exit 0
               else
                 echo "Give cucumber one more try"
-                if bundle exec cucumber tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
+                if bundle exec cucumber tmp/rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
                 then
                   echo "Cucumber worked on retry"
                   exit 0
@@ -161,6 +161,7 @@ jobs:
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
         gem install semaphore_test_boosters
+        touch tmp/rerun.txt
     - name: yarn install
       if: steps.npm-cache.outputs.cache-hit != 'true'
       run: |
