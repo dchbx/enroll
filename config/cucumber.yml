@@ -1,4 +1,4 @@
 default: --format 'pretty' --strict --tags  'not @wip' --tags 'not @ma_only' --tags 'not @quoting_enabled' --tags 'not @edit_aptc' --tags 'not @more_than_sole_source' --format summary --out tmp/cucumber.summary --format rerun --out rerun.txt
 wip: --tags @wip:11 --wip features
-rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags ~@wip
-screenshots: <%= std_opts %> -r features SCREENSHOTS=true
+rerun: -format rerun --out rerun.txt --strict --tags ~@wip
+screenshots: -r features SCREENSHOTS=true
