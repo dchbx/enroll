@@ -6,6 +6,7 @@ env: # https://stackoverflow.com/questions/59867124/how-can-i-access-github-acti
   BRANCH: ${{ github.ref }}
   YELLR_KEY: ${{ secrets.YELLR_KEY }}
   YELLR_URL: ${{ secrets.YELLR_URL }}
+  STATUS: failing
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
@@ -18,7 +19,7 @@ jobs:
         node: [10]
         mongodb-version: ["3.6"]
         command_configs:
-          - name: rspec 1/4
+          - name: rspec 1/5
             test_command: rspec_booster --job 1/5
           - name: rspec 2/5
             test_command: rspec_booster --job 2/5
@@ -173,10 +174,18 @@ jobs:
         run: ${{matrix.command_configs.test_command}}
       - name: tell Yellr if failed
         if: failure()
-        run: 'curl -H "Content-Type: application/json" -H "X-API-Key: ${{ env.YELLR_KEY }}" -X POST ${{ env.YELLR_URL }} -d "{\"project\":\"enroll_dc\",\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"${{ env.SHA }}\",\"status\":\"failing\"}"'
+        run: |
+          chmod +x ./test_utilities/report_to_yellr.sh
+          ./test_utilities/report_to_yellr.sh
   notify-of-success:
     runs-on: ubuntu-latest
     needs: [testing_matrix]
     steps:
-      - name: Notify Yellr of success
-        run: 'curl -H "Content-Type: application/json" -H "X-API-Key: ${{ env.YELLR_KEY }}" -X POST ${{ env.YELLR_URL }} -d "{\"project\":\"enroll_dc\",\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"${{ env.SHA }}\",\"status\":\"passing\"}"'
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: echo results
+        env:
+          STATUS: passing
+        run: |
+          chmod +x ./test_utilities/report_to_yellr.sh
+          ./test_utilities/report_to_yellr.sh
