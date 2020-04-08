@@ -6,8 +6,7 @@ env: # https://stackoverflow.com/questions/59867124/how-can-i-access-github-acti
   BRANCH: ${{ github.ref }}
   YELLR_KEY: ${{ secrets.YELLR_KEY }}
   YELLR_URL: ${{ secrets.YELLR_URL }}
-  STATUS: failing
-  TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
+  TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
 
 jobs:
   testing_matrix:
@@ -19,7 +18,7 @@ jobs:
         node: [10]
         mongodb-version: ["3.6"]
         command_configs:
-          - name: rspec 1/5
+          - name: rspec 1/4
             test_command: rspec_booster --job 1/5
           - name: rspec 2/5
             test_command: rspec_booster --job 2/5
@@ -46,7 +45,7 @@ jobs:
           - name: cucumber 1/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 1/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
+              if touch rerun.txt; cucumber_booster --job 1/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -65,7 +64,7 @@ jobs:
           - name: cucumber 2/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 2/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
+              if touch rerun.txt; cucumber_booster --job 2/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -84,7 +83,7 @@ jobs:
           - name: cucumber 3/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 3/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
+              if touch rerun.txt; cucumber_booster --job 3/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -103,7 +102,7 @@ jobs:
           - name: cucumber 4/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 4/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
+              if touch rerun.txt; cucumber_booster --job 4/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -120,72 +119,64 @@ jobs:
               fi
             needs_chromedriver: true
     steps:
-      - name: Set up Ruby 2.5.1
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.5.1
-      - name: Setup Node.js for use with actions
-        uses: actions/setup-node@v1.1.0
-        with:
-          # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
-          version: 10.16.3
-      - name: Launch MongoDB
-        uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: ${{ matrix.mongodb-version }}
-      - uses: actions/checkout@v2
-      - name: Set up Chromedriver
-        if: matrix.command_configs.needs_chromedriver
-        uses: nanasess/setup-chromedriver@master
-        with:
-          # Optional: do not specify to match Chrome's version
-          chromedriver-version: "77.0.3865.40"
-      - name: Cache Gems
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-      - name: Cache Node Modules
-        id: npm-cache
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-      - name: bundle install
-        run: |
-          gem update --system
-          gem install bundler -v '2.0.1'
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
-          gem install semaphore_test_boosters
-          touch rerun.txt
-      - name: yarn install
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: |
-          yarn install
-      - name: run webpack
-        run: |
-          NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      - name: run tests
-        run: ${{matrix.command_configs.test_command}}
-      - name: tell Yellr if failed
-        if: failure()
-        run: |
-          chmod +x ./test_utilities/report_to_yellr.sh
-          ./test_utilities/report_to_yellr.sh
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Chromedriver
+      if: matrix.command_configs.needs_chromedriver
+      uses: nanasess/setup-chromedriver@master
+      with:
+        # Optional: do not specify to match Chrome's version
+        chromedriver-version: '77.0.3865.40'
+    - name: Cache Gems
+      uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+    - name: Cache Node Modules
+      id: npm-cache
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+    - name: bundle install
+      run: |
+        gem update --system
+        gem install bundler -v '2.0.1'
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
+        gem install semaphore_test_boosters
+        touch rerun.txt
+    - name: yarn install
+      if: steps.npm-cache.outputs.cache-hit != 'true'
+      run: |
+        yarn install
+    - name: run webpack
+      run: |
+        NODE_ENV=test RAILS_ENV=test ./bin/webpack
+    - name: run tests
+      run: ${{matrix.command_configs.test_command}}
+    - name: tell Yellr if failed
+      if: failure()
+      run: 'curl -H "Content-Type: application/json" -H "X-API-Key: ${{ env.YELLR_KEY }}" -X POST ${{ env.YELLR_URL }} -d "{\"project\":\"enroll_dc\",\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"${{ env.SHA }}\",\"status\":\"failing\"}"'
   notify-of-success:
     runs-on: ubuntu-latest
     needs: [testing_matrix]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: echo results
-        env:
-          STATUS: passing
-        run: |
-          chmod +x ./test_utilities/report_to_yellr.sh
-          ./test_utilities/report_to_yellr.sh
+    - name: Notify Yellr of success
+      run: 'curl -H "Content-Type: application/json" -H "X-API-Key: ${{ env.YELLR_KEY }}" -X POST ${{ env.YELLR_URL }} -d "{\"project\":\"enroll_dc\",\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"${{ env.SHA }}\",\"status\":\"passing\"}"'
