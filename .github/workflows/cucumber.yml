@@ -1,0 +1,121 @@
+name: Rspecs
+
+on: push
+
+jobs:
+  cucumber-1-of-2:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Set up Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: Set up Chromedriver
+      uses: nanasess/setup-chromedriver@master
+      with:
+        # Optional: do not specify to match Chrome's version
+        chromedriver-version: '77.0.3865.40'
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+        yarn install
+        RAILS_ENV=test NODE_ENV=test rake webpacker:compile
+    - name: cucumber-1-of-2
+      run: |
+        export DISPLAY=:99
+        if cucumber_booster --job 1/2; ls -ltr && ls -ltr tmp && cat rerun.txt
+        then
+          echo "Cucumber passed the first time!"
+          exit 0
+        else
+          echo "Give cucumber one more try"
+          if bundle exec cucumber @tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
+          then
+            echo "Cucumber worked on retry"
+            exit 0
+          else
+            echo "Give cucumber yet another try"
+            bundle exec cucumber @tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
+          fi
+        fi
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cucumber-screenshots
+        path: tmp/capybara
+  cucumber-2-of-2:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Set up Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: Set up Chromedriver
+      uses: nanasess/setup-chromedriver@master
+      with:
+        # Optional: do not specify to match Chrome's version
+        chromedriver-version: '77.0.3865.40'
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+        yarn install
+        RAILS_ENV=test NODE_ENV=test rake webpacker:compile
+    - name: cucumber-2-of-2
+      run: |
+        export DISPLAY=:99
+        if cucumber_booster --job 2/2
+        then
+          echo "Cucumber passed the first time!"
+          exit 0
+        else
+          echo "Give cucumber one more try"
+          if bundle exec cucumber @tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
+          then
+            echo "Cucumber worked on retry"
+            exit 0
+          else
+            echo "Give cucumber yet another try"
+            bundle exec cucumber @tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
+          fi
+        fi
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cucumber-screenshots
+        path: tmp/capybara

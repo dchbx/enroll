@@ -13,3 +13,4 @@ Feature: Employee only user should be able to enroll in IVL market
     Then Dual Role Person sign in to portal
     Then Dual Role Person should not see any button to enroll in ivl market
     And Dual Role Person logs out
+    And I fail on purpose
