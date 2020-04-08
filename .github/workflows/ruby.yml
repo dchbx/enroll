@@ -46,7 +46,7 @@ jobs:
           - name: cucumber 1/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 1/4 features
+              if cucumber_booster --job 1/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -65,7 +65,7 @@ jobs:
           - name: cucumber 2/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 2/4 features
+              if cucumber_booster --job 2/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -84,7 +84,7 @@ jobs:
           - name: cucumber 3/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 3/4 features
+              if cucumber_booster --job 3/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -103,7 +103,7 @@ jobs:
           - name: cucumber 4/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 4/4 features
+              if cucumber_booster --job 4/4 features; ls -ltr && ls -ltr tmp && cat rerun.txt
               then
                 echo "Cucumber passed the first time!"
                 exit 0
