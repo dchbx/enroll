@@ -60,6 +60,7 @@ jobs:
                   bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
                 fi
               fi
+              cat rerun.txt
             needs_chromedriver: true
           - name: cucumber 2/4
             test_command: |
@@ -79,6 +80,7 @@ jobs:
                   bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
                 fi
               fi
+              cat rerun.txt
             needs_chromedriver: true
           - name: cucumber 3/4
             test_command: |
@@ -98,6 +100,7 @@ jobs:
                   bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
                 fi
               fi
+              cat rerun.txt
             needs_chromedriver: true
           - name: cucumber 4/4
             test_command: |
@@ -117,6 +120,7 @@ jobs:
                   bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
                 fi
               fi
+              cat rerun.txt
             needs_chromedriver: true
     steps:
     - name: Set up Ruby 2.5.1
