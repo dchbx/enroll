@@ -20,6 +20,7 @@ jobs:
         command_configs:
           - name: cucumber debugging
             test_command: |
+              chmod 400 config/cucumber.yml
               cat config/cucumber.yml
               export DISPLAY=:99
               if cucumber_booster --job 1/4 features
