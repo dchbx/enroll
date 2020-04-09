@@ -1,4 +1,0 @@
-#!/usr/bin/env ruby
-
-require 'cucumber_booster_config'
-CucumberBoosterConfig::CLI.start(ARGV)

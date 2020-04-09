@@ -20,6 +20,8 @@ jobs:
         command_configs:
           - name: cucumber debugging
             test_command: |
+              cp -f config/cucumber.yml config/cucumber.yml.bak
+              cp -f config/cucumber_split.yml config/cucumber.yml
               cat config/cucumber.yml
               export DISPLAY=:99
               if cucumber_booster --job 1/4 features
@@ -27,6 +29,7 @@ jobs:
                 echo "Cucumber passed the first time!"
                 exit 0
               else
+                cp -f config/cucumber.yml.bak config/cucumber.yml
                 cat config/cucumber.yml
                 ls -ltr && ls -ltr tmp
                 echo "catting rerun.txt"
