@@ -156,10 +156,8 @@ module Insured::FamiliesHelper
 
   def enable_make_changes_shop_button?(hbx_enrollment)
     # Return false for IVL
-    return false if hbx_enrollment&.census_employee.blank?
     return false if !hbx_enrollment.is_shop?
     return false unless hbx_enrollment&.sponsored_benefit_package
-    binding.pry
     return true if hbx_enrollment&.sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record) &&
     #hbx_enrollment&.employee_role&.can_enroll_as_new_hire? &&
     hbx_enrollment&.family&.is_under_special_enrollment_period? &&

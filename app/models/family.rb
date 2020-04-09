@@ -237,7 +237,6 @@ class Family
   end
 
   def most_recent_enrollment_by_coverage_kind_is_sep?(hbx_enrollment)
-    binding.pry
     coverage_kind = hbx_enrollment.coverage_kind
     target_enrollment_effective_on = hbx_enrollment.effective_on
     most_recent_sep_enrollment_by_coverage_kind = hbx_enrollments.where(
