@@ -90,7 +90,6 @@ jobs:
         gem install bundler -v '2.0.1'
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
-        gem install vendor/bundle/cucumber_booster_config/pkg/semaphore_cucumber_booster_config-1.4.1.gem
         gem install semaphore_test_boosters
     - name: yarn install
       if: steps.npm-cache.outputs.cache-hit != 'true'
