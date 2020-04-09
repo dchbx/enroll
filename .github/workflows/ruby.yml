@@ -29,6 +29,7 @@ jobs:
                 echo "Cucumber passed the first time!"
                 exit 0
               else
+                cat config/cucumber.yml
                 cp -f config/cucumber.yml.bak config/cucumber.yml
                 cat config/cucumber.yml
                 ls -ltr && ls -ltr tmp
