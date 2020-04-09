@@ -18,31 +18,7 @@ jobs:
         node: [10]
         mongodb-version: ["3.6"]
         command_configs:
-          - name: rspec 1/4
-            test_command: rspec_booster --job 1/5
-          - name: rspec 2/5
-            test_command: rspec_booster --job 2/5
-          - name: rspec 3/5
-            test_command: rspec_booster --job 3/5
-          - name: rspec 4/5
-            test_command: rspec_booster --job 4/5
-          - name: rspec 5/5
-            test_command: rspec_booster --job 5/5
-          - name: engine rspecs
-            test_command: |
-              root=`pwd -P`
-              for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
-                echo $root/components/$test_dir
-                cd $root/components/$test_dir
-                bundle config path ../../vendor/bundle
-                bundle install
-                bundle exec rspec --fail-fast
-                if [ $? -ne 0 ]; then
-                  echo "ENGINE FAILED"
-                  exit $?
-                fi
-              done
-          - name: cucumber 1/4
+          - name: cucumber debugging
             test_command: |
               export DISPLAY=:99
               if cucumber_booster --job 1/4 features
@@ -50,63 +26,10 @@ jobs:
                 echo "Cucumber passed the first time!"
                 exit 0
               else
-                echo "Give cucumber one more try"
-                if bundle exec cucumber rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
-                then
-                  echo "Cucumber worked on retry"
-                  exit 0
-                else
-                  echo "Give cucumber yet another try"
-                  bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
-                fi
-              fi
-            needs_chromedriver: true
-          - name: cucumber 2/4
-            test_command: |
-              export DISPLAY=:99
-              if cucumber_booster --job 2/4 features
-              then
-                echo "Cucumber passed the first time!"
-                exit 0
-              else
-                echo "Give cucumber one more try"
-                if bundle exec cucumber rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
-                then
-                  echo "Cucumber worked on retry"
-                  exit 0
-                else
-                  echo "Give cucumber yet another try"
-                  bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
-                fi
-              fi
-            needs_chromedriver: true
-          - name: cucumber 3/4
-            test_command: |
-              export DISPLAY=:99
-              if cucumber_booster --job 3/4 features
-              then
-                echo "Cucumber passed the first time!"
-                exit 0
-              else
-                echo "Give cucumber one more try"
-                if bundle exec cucumber rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
-                then
-                  echo "Cucumber worked on retry"
-                  exit 0
-                else
-                  echo "Give cucumber yet another try"
-                  bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
-                fi
-              fi
-            needs_chromedriver: true
-          - name: cucumber 4/4
-            test_command: |
-              export DISPLAY=:99
-              if cucumber_booster --job 4/4 features
-              then
-                echo "Cucumber passed the first time!"
-                exit 0
-              else
+                ls -ltr && ls -ltr tmp
+                echo "catting rerun.txt"
+                cat rerun.txt
+                echo "catted rerun.txt"
                 echo "Give cucumber one more try"
                 if bundle exec cucumber rerun.txt --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
                 then
