@@ -20,16 +20,17 @@ jobs:
         command_configs:
           - name: cucumber debugging
             test_command: |
+              cat config/cucumber.yml
               export DISPLAY=:99
               if cucumber_booster --job 1/4 features
               then
                 echo "Cucumber passed the first time!"
                 exit 0
               else
+                cat config/cucumber.yml
                 ls -ltr && ls -ltr tmp
                 echo "catting rerun.txt"
                 cat rerun.txt
-                echo "catted rerun.txt"
                 echo "Give cucumber one more try"
                 if bundle exec cucumber @rerun.txt --profile first_rerun
                 then
@@ -84,7 +85,6 @@ jobs:
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
         gem install semaphore_test_boosters
-        touch rerun.txt
     - name: yarn install
       if: steps.npm-cache.outputs.cache-hit != 'true'
       run: |
