@@ -156,15 +156,11 @@ module Insured::FamiliesHelper
 
   def enable_make_changes_shop_button?(hbx_enrollment)
     # Return false for IVL
-    return false if !hbx_enrollment.is_shop?
-    return false unless hbx_enrollment&.sponsored_benefit_package
-    return true if hbx_enrollment&.sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record) &&
-    #hbx_enrollment&.employee_role&.can_enroll_as_new_hire? &&
-    hbx_enrollment&.family&.is_under_special_enrollment_period? &&
-    hbx_enrollment&.family&.is_eligible_to_enroll? &&
-    !(hbx_enrollment&.coverage_terminated? || hbx_enrollment&.coverage_canceled?) &&
-    hbx_enrollment.active_during?(hbx_enrollment&.family&.current_sep&.effective_on) &&
-    hbx_enrollment&.family&.most_recent_enrollment_by_coverage_kind_is_not_sep?(hbx_enrollment)
+    return false unless hbx_enrollment.is_shop?
+    hbx_enrollment.family.is_eligible_to_enroll? &&
+    hbx_enrollment.display_make_changes_for_ivl? &&
+    !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) &&
+    hbx_enrollment&.family&.enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment)
   end
 
   def enable_make_changes_button?(hbx_enrollment)
