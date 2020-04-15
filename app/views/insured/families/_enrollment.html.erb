@@ -132,6 +132,11 @@
             <strong> Reinstated Enrollment</strong>
           </div>
       <%end%>
+      <% if hbx_enrollment.is_reterminated_enrollment?%>
+          <div class="enrollment-effective info vertical-align-top">
+            <strong> Reterminated Enrollment</strong>
+          </div>
+      <%end%>
     </div>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">

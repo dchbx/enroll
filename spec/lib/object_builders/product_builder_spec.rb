@@ -8,6 +8,7 @@ describe "qhp builder" do
 
 
   before :all do
+    DatabaseCleaner.clean
     bcbs_issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, issuer_hios_ids: ["42690"])
 
     FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS001", active_year: 2019, issuer_profile_id: bcbs_issuer_profile.id, issuer_hios_id: "42690")

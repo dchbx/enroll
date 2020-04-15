@@ -10,6 +10,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_new_employee_paper_application_is_enabled?, to: :class
     delegate :aca_shop_market_transmit_scheduled_employers, to: :class
     delegate :aca_shop_market_transmit_employer_carrier_drop_events, to: :class
+    delegate :aca_past_enrollment_eligible_to_reterm_year, to: :class
     delegate :aca_shop_market_employer_transmission_day_of_month, to: :class
     delegate :aca_shop_market_census_employees_template_file, to: :class
     delegate :individual_market_is_enabled?, to: :class
@@ -73,7 +74,11 @@ module Config::AcaModelConcern
     end
 
     def aca_shop_market_transmit_employer_carrier_drop_events
-      @@aca_shop_market_transmit_scheduled_employers ||= Settings.aca.shop_market.transmit_carrier_drop_events
+      @aca_shop_market_transmit_employer_carrier_drop_events ||= Settings.aca.shop_market.transmit_carrier_drop_events
+    end
+
+    def aca_past_enrollment_eligible_to_reterm_year
+      @aca_past_enrollment_eligible_to_reterm_year ||= Settings.aca.past_enrollment_eligble_to_retrem.year
     end
 
     def aca_shop_market_employer_transmission_day_of_month

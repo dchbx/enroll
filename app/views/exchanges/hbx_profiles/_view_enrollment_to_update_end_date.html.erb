@@ -22,29 +22,44 @@
                 var dup_enr_ids = <%= raw @dup_enr_ids %>;
                 var input_id = this.value;
                 var output = dup_enr_ids.includes(input_id);
-                var new_term_date = jQuery(this).closest('tr').find("input[name=new_termination_date]")[0].value
+                var new_term_date = jQuery(this).closest('tr').find("input[name=new_term_date]")[0].value
                 var enrollment_effective = jQuery(this).closest('tr').find("td#enrollment_effective_on").html();
-                if(new_term_date == enrollment_effective && !output){
+                var enrollment_terminated = jQuery(this).closest('tr').find("td#enrollment_terminated_on").html();
+                var enrollment_eligible_for_reterm = jQuery(this).closest('tr').find("td#enrollment_eligible_for_reterm").text();
+
+                if (output || enrollment_eligible_for_reterm == "false") {
+                    jQuery('#no_termination_message').show();
+                    jQuery('#no_change_term_date').hide();
+                    jQuery('#cancel_message').hide();
+                    jQuery('#termination_message').hide();
+                    jQuery("a.modal_confirm").hide();
+                    return
+                }else if(new_term_date == enrollment_terminated){
+                    jQuery('#no_termination_message').hide();
+                    jQuery('#no_change_term_date').show();
+                    jQuery('#cancel_message').hide();
+                    jQuery('#termination_message').hide();
+                    jQuery("a.modal_confirm").hide();
+                    return
+                }
+
+                if(new_term_date == enrollment_effective){
                     jQuery('#cancel_message').show();
                     jQuery('#termination_message').hide();
-                    jQuery('#no_termination_message').show();
+                    jQuery('#no_termination_message').hide();
                     jQuery("a.modal_confirm").show();
-                }
-                else if(new_term_date !== enrollment_effective && output ){
-                  jQuery('#cancel_message').hide();
-                  jQuery('#termination_message').hide();
-                  jQuery('#no_termination_message').show();
-                  jQuery("a.modal_confirm").hide();
+                    jQuery('#no_change_term_date').hide();
                 }
                 else{
                     jQuery('#cancel_message').hide();
                     jQuery('#termination_message').show();
                     jQuery('#no_termination_message').hide();
                     jQuery("a.modal_confirm").show();
+                    jQuery('#no_change_term_date').hide();
                 }
             }
         });
-    } 
+    }
     jQuery("a.modal_confirm").click(function() {
         jQuery("#termiante_with_earlier_date-form").submit();
     });
@@ -70,10 +85,12 @@
                   <td> <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %> </td>
                   <td><%= hbx.hbx_id %></td>
                   <td><%= hbx.product.name %></td>
+                  <td id="enrollment_eligible_for_reterm" class="hidden"><%= hbx.enrollment_eligible_for_reterm? %></td>
                   <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
-                  <td><%= hbx.terminated_on %></td>
-                  <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  hbx.terminated_on, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" =>  hbx.terminated_on %></td>
-                  <td><%= check_box_tag "edi_required", hbx.id, false,  disabled: true%></td>
+                  <td id="enrollment_terminated_on"><%= hbx.terminated_on %></td>
+                  <% coverage_last_date = hbx.is_shop? ? hbx.sponsored_benefit_package.end_on : hbx.effective_on.end_of_year %>
+                  <td><%= text_field_tag "new_term_date", nil, readonly: true, disabled: true, value:  hbx.terminated_on, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" =>  [TimeKeeper.date_of_record, coverage_last_date].min %></td>
+                  <td><%= check_box_tag "edi_required", true, false,  disabled: true%></td>
                 </tr>
             <% end %>
             <tr><td colspan = "7"><br /></td></tr>
@@ -114,8 +131,19 @@
             </div>
             <div id="no_termination_message">
               <div>
-                <h4 class="modal-title" style="display:inline;">&nbsp;&nbsp;
-                  You cannot update the enrollment end date
+                <h4 class="modal-title">
+                  <p class="bg-warning">&nbsp;&nbsp;
+                    End Date changes allowable for current plan year </br> &nbsp;&nbsp; and previous plan year.
+                  </p>
+                </h4>
+              </div>
+            </div>
+            <div id="no_change_term_date">
+              <div>
+                <h4 class="modal-title">
+                  <p class="bg-warning">&nbsp;&nbsp;
+                    New termination date can't be same as old termination date.</br> &nbsp;&nbsp; Please pick different termination date.
+                  </p>
                 </h4>
               </div>
             </div>

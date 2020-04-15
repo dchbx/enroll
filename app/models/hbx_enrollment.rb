@@ -9,6 +9,7 @@ class HbxEnrollment
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include Config::AcaModelConcern
   include Mongoid::History::Trackable
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::HbxEnrollment
@@ -1255,8 +1256,8 @@ class HbxEnrollment
 
   def coverage_period_date_range
     is_shop? ?
-        benefit_group.plan_year.start_on..benefit_group.plan_year.start_on :
-        benefit_coverage_period.start_on..benefit_coverage_period.end_on
+        sponsored_benefit_package.start_on..sponsored_benefit_package.end_on :
+        effective_on.beginning_of_year..effective_on.end_of_year
   end
 
   def coverage_year
@@ -1670,6 +1671,7 @@ class HbxEnrollment
     state :coverage_canceled      # coverage never took effect
     state :coverage_terminated    # coverage ended
     state :coverage_reinstated    # coverage reinstated
+    state :coverage_reterminated    # coverage reterminated
 
     state :coverage_expired
     state :inactive, :after_enter => :update_renewal_coverage   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
@@ -1756,7 +1758,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
-                         :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
+                         :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated, :coverage_reterminated],
                   to: :coverage_canceled
     end
 
@@ -1772,7 +1774,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                         :unverified, :coverage_expired, :coverage_terminated],
+                         :unverified, :coverage_expired, :coverage_terminated, :coverage_reterminated],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1815,6 +1817,10 @@ class HbxEnrollment
 
     event :reinstate_coverage, :after => :record_transition do
       transitions from: :shopping, to: :coverage_reinstated
+    end
+
+    event :reterm_coverage, :after => :record_transition do
+      transitions from: [:shopping, :coverage_terminated, :coverage_termination_pending], to: :coverage_reterminated
     end
   end
 
@@ -2103,37 +2109,14 @@ class HbxEnrollment
     )
   end
 
-  def cancel_terminated_enrollment(termination_date, edi_required)
-    if effective_on == termination_date
-      prevs_state = self.aasm_state
-      self.update_attributes(aasm_state: "coverage_canceled", terminated_on: nil, termination_submitted_on: nil, terminate_reason: nil)
-      workflow_state_transitions << WorkflowStateTransition.new(
-          from_state: prevs_state,
-          to_state: "coverage_canceled"
-      )
-      self.notify_enrollment_cancel_or_termination_event(edi_required)
-      return true
-    end
+  def enrollment_eligible_for_reterm?
+    # Adding condition to allow reterm on current & previous year terminated enrollment.
+    ((effective_on.year > (TimeKeeper.date_of_record.year - aca_past_enrollment_eligible_to_reterm_year)) &&
+        (coverage_terminated? || coverage_termination_pending?))
   end
 
-  def reterm_enrollment_with_earlier_date(termination_date, edi_required)
-
-    return false unless self.coverage_terminated? || self.coverage_termination_pending?
-    return false if termination_date > self.terminated_on
-    return true if cancel_terminated_enrollment(termination_date, edi_required)
-
-    if self.is_shop? && (termination_date > ::TimeKeeper.date_of_record && self.may_schedule_coverage_termination?)
-      self.schedule_coverage_termination!(termination_date)
-      self.notify_enrollment_cancel_or_termination_event(edi_required)
-      return true
-    elsif self.may_terminate_coverage?
-      self.terminated_on = termination_date
-      self.terminate_coverage!(termination_date)
-      self.notify_enrollment_cancel_or_termination_event(edi_required)
-      return true
-    else
-      false
-    end
+  def is_reterminated_enrollment?
+    self.workflow_state_transitions.any?{|w| w.from_state == "coverage_reterminated"}
   end
 
   def is_any_member_outstanding?
