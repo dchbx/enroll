@@ -222,3 +222,5 @@ jobs:
         run: |
           chmod +x ./test_utilities/report_to_yellr.sh
           ./test_utilities/report_to_yellr.sh
+          chmod +x ./test_utilities/deploy.sh
+          ./test_utilities/deploy.sh
