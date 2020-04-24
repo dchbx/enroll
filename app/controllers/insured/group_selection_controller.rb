@@ -96,7 +96,7 @@ class Insured::GroupSelectionController < ApplicationController
       newly_designated_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
       if newly_designated_effective_on > hbx_enrollment.effective_on
         raise 'You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date.'\
-              '  ' + newly_designated_effective_on.strftime('%m/%d/%Y')
+                ' Please contact your Employer for assistance. You are eligible for employer benefits from ' + newly_designated_effective_on.strftime('%m/%d/%Y')
       end
 
       if @adapter.is_waiving?(params)
