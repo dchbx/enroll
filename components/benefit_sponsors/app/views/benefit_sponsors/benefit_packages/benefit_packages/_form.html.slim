@@ -52,7 +52,7 @@ javascript:
 
 - if is_new_package || is_new_package.nil?
   javascript:
-    window.onload = function(){
-      disableNewAddBenefitPackageButton()
-      disableDentalBenefitPackage()
+    window.onload = new function(){
+      MetalLevelSelect.disableNewAddBenefitPackageButton()
+      MetalLevelSelect.disableDentalBenefitPackage()
     }

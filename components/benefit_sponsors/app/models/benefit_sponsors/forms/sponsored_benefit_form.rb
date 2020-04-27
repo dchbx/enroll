@@ -10,7 +10,7 @@ module BenefitSponsors
       attribute :product_option_choice, String
       attribute :product_package_kind, String, default: Settings.aca.default_dental_option_kind
       attribute :elected_product_choices, Array # used for dental choice model
-      
+
       # for employee cost details
       attribute :employees_cost, Array[EmployeeCostForm]
 
@@ -37,6 +37,10 @@ module BenefitSponsors
       validates_presence_of :product_package_kind, :reference_plan_id, :sponsor_contribution
 
       validate :check_product_option_choice
+
+      def benefit_application
+        @benefit_application ||= BenefitSponsors::BenefitApplications::BenefitApplication.find(benefit_application_id)
+      end
 
       def sponsor_contribution_attributes=(attributes)
         attributes.permit! if attributes.is_a?(ActionController::Parameters)

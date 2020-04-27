@@ -1,11 +1,11 @@
 <h3>Employer Details </h3>
 
-Name: <%= @employer.legal_name %> </br>
-FEIN: <%= @employer.fein %> </br>
+Name: <%= @employer.legal_name %> <br>
+FEIN: <%= @employer.fein %> <br>
 Entity Kind: <%= @employer.entity_kind %>
 
-</br>
-</br>
+<br>
+<br>
 
 <%= link_to "Back", employers_employer_index_path %> &nbsp;&nbsp;
 <%= link_to 'Destroy',  @employers_employer,  method: :delete, confirm: 'Are you sure?'  %>

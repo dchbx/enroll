@@ -1,3 +1,4 @@
+import "../polyfills/polyfills";
 import Rails from 'rails-ujs';
 import Turbolinks from 'turbolinks';
 import { Application } from "stimulus";

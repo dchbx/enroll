@@ -9,8 +9,6 @@ function attachGroupSelectionHandlers() {
 	}
 }
 
-function InitGroupSelection() {
+export function InitGroupSelection() {
 	$(window.document).ready(attachGroupSelectionHandlers);
 }
-
-module.exports = { InitGroupSelection: InitGroupSelection };

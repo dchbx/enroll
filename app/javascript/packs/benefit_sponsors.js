@@ -1,4 +1,3 @@
-import "@babel/polyfill";
 import { Application } from "stimulus"
 import { definitionsFromContext } from "stimulus/webpack-helpers"
 import * as officeLocations from "../benefit_sponsors/office_locations.js";

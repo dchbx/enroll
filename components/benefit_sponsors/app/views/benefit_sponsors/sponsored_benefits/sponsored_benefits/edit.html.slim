@@ -33,17 +33,21 @@ javascript:
   // }
 
   function setSliderInput(element) {
-    document.querySelector(".slider-"+element.dataset.unitId).value = element.value
+    document.querySelector(".slider-"+element.dataset.unitId).value = element.value;
   }
 
   function setNumberInput(element) {
-    document.querySelector(".cl-input-"+element.dataset.unitId).value = element.value
+    document.querySelector(".cl-input-"+element.dataset.unitId).value = element.value;
   }
 
   function loadSingleProductSponsorContribution(element) {
     document.querySelectorAll("[id^='carrierProducts']").forEach(function(key) {
-      key.classList.add("hidden")
+      key.classList.add("hidden");
     })
-    document.getElementById("carrierProducts"+element.dataset.issuername).classList.remove('hidden')
-    document.getElementById("referencePlans").classList.remove('hidden')
+    document.getElementById("carrierProducts"+element.dataset.issuername).classList.remove('hidden');
+    document.getElementById("referencePlans").classList.remove('hidden');
+  }
+
+  window.onload = function() {
+    document.querySelector('#metal-level-select').classList.add('hidden');
   }

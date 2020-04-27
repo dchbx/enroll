@@ -201,8 +201,8 @@
       var referencePlanId = "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}";
       var sponsoredBenefitId = "#{@benefit_package_form.sponsored_benefits.first.id}";
 
-      calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId);
-      calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId);
+      calculateEmployerContributions(productOptionKind, referencePlanId, sponsoredBenefitId);
+      calculateEmployeeCosts(productOptionKind, referencePlanId, sponsoredBenefitId);
     }
 
     document.addEventListener('DOMContentLoaded', function() {

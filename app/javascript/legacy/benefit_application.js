@@ -30,7 +30,7 @@ function showCostDetails(cost,min,max) {
 
 function showEmployeeCostDetails(employees_cost) {
   var table = document.getElementById('eeTableBody');
-  table.querySelectorAll('tr').forEach(function(element) {
+  Array.from(table.querySelectorAll('tr')).forEach(function(element) {
     element.remove()
   });
   //modal = document.getElementById('modalInformation')
@@ -40,7 +40,7 @@ function showEmployeeCostDetails(employees_cost) {
 
   for (var employee in employees_cost) {
     var tr = document.createElement('tr')
-    estimate = employees_cost[employee];
+    var estimate = employees_cost[employee];
     tr.innerHTML =
     `
       <td class="text-center">${estimate.name}</td>
@@ -70,7 +70,7 @@ function debounceRequest(func, wait, immediate) {
 function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId, referenceModel = "benefit_package")  {
   var thing = $("input[name^='"+referenceModel+"['").serializeArray();
   var submitData = {};
-  for (item in thing) {
+  for (var item in thing) {
     submitData[thing[item].name] = thing[item].value;
   }
   // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
@@ -88,12 +88,12 @@ function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, spon
   });
 }
 
-const calculateEmployeeCosts = debounceRequest(calculateEmployeeCostsImmediate, 1000);
+export const calculateEmployeeCosts = debounceRequest(calculateEmployeeCostsImmediate, 1000);
 
 function calculateEmployerContributionsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId, referenceModel = "benefit_package")  {
   var thing = $("input[name^='"+referenceModel+"['").serializeArray();
   var submitData = { };
-  for (item in thing) {
+  for (var item in thing) {
     submitData[thing[item].name] = thing[item].value;
   }
   // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
@@ -114,9 +114,4 @@ function calculateEmployerContributionsImmediate(productOptionKind,referencePlan
   });
 }
 
-const calculateEmployerContributions = debounceRequest(calculateEmployerContributionsImmediate, 1000);
-
-module.exports = {
-  calculateEmployerContributions : calculateEmployerContributions,
-  calculateEmployeeCosts : calculateEmployeeCosts
-};
+export const calculateEmployerContributions = debounceRequest(calculateEmployerContributionsImmediate, 1000);
