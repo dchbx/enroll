@@ -256,6 +256,7 @@ class Person
   scope :all_hbx_staff_roles,         -> { exists(hbx_staff_role: true) }
   scope :all_csr_roles,               -> { exists(csr_role: true) }
   scope :all_assister_roles,          -> { exists(assister_role: true) }
+  scope :all_broker_staff_roles,      -> { exists(broker_agency_staff_roles: true) }
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :by_broker_role_npn, ->(br_npn) { where("broker_role.npn" => br_npn) }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe BrokerAgencyProfilePolicy do
+describe BrokerAgencyProfilePolicy, dbclean: :after_each do
   let(:user){FactoryBot.create(:user)}
   let(:person){FactoryBot.create(:person, user: user, broker_agency_staff_roles: [], broker_role: nil, hbx_staff_role: nil)}
   let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}

@@ -556,16 +556,6 @@ Rails.application.routes.draw do
 
   resources :translations
 
-  namespace :api, :defaults => {:format => 'xml'} do
-    namespace :v1 do
-      resources :slcsp, :only => []  do
-        collection do
-          post :plan
-        end
-      end
-    end
-  end
-
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
@@ -704,5 +694,39 @@ Rails.application.routes.draw do
   #   end
   #
   # You can have the root of your site routed with "root"
+
+  # API check_ach_routing
+
+  resources :external_applications, only: [:show]
+
+  namespace :api, defaults: {format: 'json'} do
+    namespace :v1 do
+      scope module: :api do
+        get :ping
+      end
+
+      resources :brokers, only: %i[index show] do
+        collection do
+          get :broker_staff
+        end
+      end
+
+      resources :slcsp, :only => []  do
+        collection do
+          post :plan
+        end
+      end
+    end
+
+    namespace :v2 do
+      resources :auth_tokens, only: [] do
+        collection do
+          post :refresh
+          delete :logout
+        end
+      end
+    end
+  end
+  
   root 'welcome#index'
 end

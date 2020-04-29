@@ -5,7 +5,8 @@ module AuthorizationConcern
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable and :omniauthable
     devise :database_authenticatable, :registerable, :lockable,
-           :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
+           :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true},
+           jwt_revocation_strategy: self
 
     ## Database authenticatable
     field :email,              type: String, default: ""
@@ -49,6 +50,41 @@ module AuthorizationConcern
     scope :unlocked, ->{ where(locked_at: nil) }
 
     before_save :ensure_authentication_token
+
+    has_many :whitelisted_jwts
+
+    def generate_jwt(scope, audience)
+      token, payload = Warden::JWTAuth::UserEncoder.new.call(
+        self,
+        scope,
+        audience
+      )
+      on_jwt_dispatch(token, payload)
+      token
+    end
+
+    def on_jwt_dispatch(token, payload)
+      whitelisted_jwts.create!(
+        token: token,
+        jti: payload['jti'],
+        aud: payload['aud'],
+        exp: Time.at(payload['exp'].to_i)
+      )
+    end
+
+    def self.jwt_revoked?(payload, user)
+      !user.whitelisted_jwts.where(payload.slice('jti', 'aud')).any? do |jwt|
+        Time.now > Time.at(jwt.exp.to_i)
+      end
+    end
+
+    def revoke_all_jwts!
+      WhitelistedJwt.where({:user_id => self.id}).delete_all
+    end
+
+    def self.revoke_jwt(payload, user)
+      WhitelistedJwt.where({:user_id => user.id}).delete_all
+    end
 
     def ensure_authentication_token
       if authentication_token.blank?

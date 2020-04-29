@@ -1,0 +1,2 @@
+module ExternalApplications
+end
