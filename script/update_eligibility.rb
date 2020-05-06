@@ -101,7 +101,7 @@ def check_and_run
         not_run << [hbx_id: person.hbx_id, error: 'active THH with eligibility having same aptc, csr & thh_effective_date is already present']
         puts "Skipped Creation of Eligibility for person with person_hbx_id: #{person.hbx_id} as this household already has one"
       else
-        active_household.build_thh_and_eligibility(aptc, csr, effective_date, @slcsp)
+        active_household.build_thh_and_eligibility(aptc, csr, effective_date, @slcsp, 'Renewals')
         created_eligibility << [hbx_id: person.hbx_id]
         puts "Created Eligibility for person with person_hbx_id: #{person.hbx_id}"
       end

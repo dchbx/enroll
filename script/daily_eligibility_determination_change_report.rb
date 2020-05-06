@@ -25,7 +25,7 @@ previous_day = Time.now.getlocal.prev_day
 start_time = previous_day.beginning_of_day.utc
 end_time = previous_day.end_of_day.utc
 
-source_mapper = { 'Admin_Script' => 'Create Eligibility or Renewals', 'Admin' =>  'Edit Aptc Csr', nil => 'Curam'}
+source_mapper = { 'Renewals' => 'Renewals', 'Admin' =>  'Create Eligibility or Edit Aptc Csr', 'Curam' => 'Curam'}
 CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   logger_csv << logger_field_names
   CSV.open(report_file_name, 'w', force_quotes: true) do |report_csv|

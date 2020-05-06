@@ -28,6 +28,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
         csr_percent_as_integer: csr_percent_as_integer,
         e_pdc_id: e_pdc_id,
         premium_credit_strategy_kind: premium_credit_strategy_kind,
+        source: 'Admin'
       }
     }
 
@@ -98,6 +99,16 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
           expect(EligibilityDetermination.find(eligibility_determination.id)).to eq eligibility_determination
         end
       end
+    end
+  end
+
+  context 'SOURCE_KINDS' do
+    it 'should have constant SOURCE_KINDS' do
+      expect(subject.class).to be_const_defined(:SOURCE_KINDS)
+    end
+
+    it 'should have constant SOURCE_KINDS with a specific set of list' do
+      expect(::EligibilityDetermination::SOURCE_KINDS).to eq(['Curam', 'Admin', 'Renewals'])
     end
   end
 end
