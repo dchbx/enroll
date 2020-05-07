@@ -171,7 +171,7 @@ class Family
   scope :with_reset_verifications,              ->{ where(:"_id".in => HbxEnrollment.reset_verifications.distinct(:family_id))}
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
-  scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+  scope :vlp_none_uploaded,                     ->{ where(:"vlp_documents_status".in => ["None",nil])}
   scope :outstanding_verification,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
   }
@@ -232,6 +232,7 @@ class Family
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
+
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
@@ -1054,7 +1055,7 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
-  def self.min_verification_due_date_range(start_date,end_date)
+  def self.min_verification_due_date_range(start_date, end_date)
     timekeeper_date = TimeKeeper.date_of_record + 95.days
     if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
       self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil)
@@ -1063,10 +1064,29 @@ class Family
     end
   end
 
+  def self.outstanding_verification_table_scope(scope_status)
+    scoped_families = self.outstanding_verification_datatable
+    if scope_status == "all"
+      self.outstanding_verification_datatable
+    else
+      all.each do |family|
+        unless family.all_persons_vlp_documents_status.parameterize.underscore == scope_status
+          scoped_family_ids = []
+          scoped_family_ids << family._id
+          # This is to allow scoped_families to respond like a mongo query
+          scoped_families = scoped_families.where(:"_id".nin => scoped_family_ids)
+        end
+      end
+      scoped_families
+    end
+  end
+
   def all_persons_vlp_documents_status
     outstanding_types = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
+      if member&.person&.present?
+        outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
+      end
     end
     fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) } : nil
     partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)} : nil

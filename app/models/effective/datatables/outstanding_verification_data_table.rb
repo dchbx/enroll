@@ -8,7 +8,7 @@ module Effective
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.active_family_members.size }, :filter => false, :sortable => false
-        table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => Proc.new { |row| row.vlp_documents_status}, :filter => false, :sortable => true
+        table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => Proc.new { |row| row.all_persons_vlp_documents_status}, :filter => false, :sortable => true
         table_column :verification_due, :label => 'Verification Due',:proc => Proc.new { |row|  format_date(row.best_verification_due_date) || format_date(TimeKeeper.date_of_record + 95.days) }, :filter => false, :sortable => true
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
@@ -37,9 +37,9 @@ module Effective
       def nested_filter_definition
         filters = {
         documents_uploaded: [
-          {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded', title: "Documents to review for all outstanding verifications"},
-          {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded', title: "Documents to review for some outstanding verifications"},
-          {scope: 'vlp_none_uploaded', label: 'None Uploaded', title: "No documents to review"},
+          {scope: 'fully_uploaded', label: 'Fully Uploaded', title: "Documents to review for all outstanding verifications"},
+          {scope: 'partially_uploaded', label: 'Partially Uploaded', title: "Documents to review for some outstanding verifications"},
+          {scope: 'none', label: 'None Uploaded', title: "No documents to review"},
           {scope: 'all', label: 'All', title: "All outstanding verifications"},
         ],
         top_scope: :documents_uploaded

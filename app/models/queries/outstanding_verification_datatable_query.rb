@@ -17,14 +17,13 @@ module Queries
     end
 
     def build_scope()
-
       family = Family.outstanding_verification_datatable
       person = Person
-      family= family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
+      # Arguements passed from documents_uploaded hash: fully_uploaded, partially_uploaded, none, all
+      family = family.outstanding_verification_table_scope(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
          family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from],@custom_attributes[:custom_datatable_date_to])
       end
-      #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)
       #Caution Mongo optimization on chained "$in" statements with same field

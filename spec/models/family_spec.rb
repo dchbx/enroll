@@ -1602,7 +1602,27 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
-  context 'scopes' do 
+  context 'scopes' do
+    context "outstanding verifications" do
+      context "partially uploaded scope" do
+        let(:none_uploaded_person) do
+          FactoryBot.create(:person)
+        end
+        let!(:none_uploaded_family) do
+          FactoryBot.create(:family, :with_primary_family_member, person: none_uploaded_person)    
+        end
+        before :each do
+          scoped_family_ids = [none_uploaded_family._id,]
+          outstanding_verification_families = Family.where(:"_id".in => scoped_family_ids)
+          allow(Family).to receive(:outstanding_verification_datatable).and_return(outstanding_verification_families)
+        end
+        it "should not return none uploaded family" do
+          scope_status = "partially_uploaded"
+          scoped_families = Family.outstanding_verification_table_scope(scope_status)
+          expect(scoped_families).to_not include(none_uploaded_family)
+        end
+      end
+    end
     context '.all_enrollments_by_benefit_package' do
       let(:benefit_package_to_test) do
         double(:benefit_package, :_id => 1)

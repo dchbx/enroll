@@ -44,9 +44,9 @@ end
 
 
 Then(/^the Admin has the ability to use the following filters for documents provided: Fully Uploaded, Partially Uploaded, None Uploaded, All$/) do
-  expect(page).to have_xpath('//*[@id="Tab:vlp_partially_uploaded"]', text: 'Partially Uploaded')
-  expect(page).to have_xpath('//*[@id="Tab:vlp_fully_uploaded"]', text: 'Fully Uploaded')
-  expect(page).to have_xpath('//*[@id="Tab:vlp_none_uploaded"]', text: 'None Uploaded')
+  expect(page).to have_xpath('//*[@id="Tab:partially_uploaded"]', text: 'Partially Uploaded')
+  expect(page).to have_xpath('//*[@id="Tab:fully_uploaded"]', text: 'Fully Uploaded')
+  expect(page).to have_xpath('//*[@id="Tab:none"]', text: 'None Uploaded')
   expect(page).to have_xpath('//*[@id="Tab:all"]', text: 'All')
 end
 
