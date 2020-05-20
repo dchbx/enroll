@@ -3,6 +3,11 @@ require 'aasm/rspec'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe LawfulPresenceDetermination do
+
+  after :each do
+    DatabaseCleaner.clean
+  end
+
   let(:consumer_role) {
     FactoryBot.create(:consumer_role_object)
   }
