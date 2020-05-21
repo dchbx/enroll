@@ -5,6 +5,10 @@ require File.join(Rails.root, 'spec', 'support', 'acapi_vocabulary_spec_helpers'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe 'events/lawful_presence/vlp_verification_request.xml.haml' do
+    before :all do
+      DatabaseCleaner.clean
+    end
+
     include AcapiVocabularySpecHelpers
     let!(:individual) { FactoryBot.build_stubbed :generative_individual }
 

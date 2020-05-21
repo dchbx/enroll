@@ -3,6 +3,10 @@ require File.join(Rails.root, "app", "data_migrations", "change_state_for_passiv
 
 describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
 
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:given_task_name) { "deactivate_consumer_role" }
 
   subject { ChangeStateForPassiveEnrollment.new(given_task_name, double(:current_scope => nil)) }
