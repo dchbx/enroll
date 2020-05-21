@@ -9,12 +9,7 @@
       %tax_household_id
         %id=subscriber.person.primary_family.active_household.latest_active_tax_household.hbx_assigned_id
     = render :partial=> "events/individuals/person", :object => hbx_enrollment_member.person, as: :person
-    - if hbx_enrollment_member != subscriber
-      - if subscriber
-        - if subscriber.person.person_relationship_for(hbx_enrollment_member.person).present?
-          %person_relationships
-            = render :partial => "events/individuals/person_relationship", :object => subscriber.person.person_relationship_for(hbx_enrollment_member.person)
-      - else
+    - if hbx_enrollment_member != subscriber && subscriber.person.person_relationship_for(hbx_enrollment_member.person).present?
         %person_relationships
           = render :partial => "events/individuals/person_relationship", :object => subscriber.person.person_relationship_for(hbx_enrollment_member.person)
     = render :partial => "events/individuals/person_demographics", :object => hbx_enrollment_member.person, as: :person_demographics
