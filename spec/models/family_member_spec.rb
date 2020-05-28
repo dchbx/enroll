@@ -31,13 +31,54 @@ end
 
 
 describe FamilyMember, "given a person", dbclean: :after_each do
-  let(:person) { create :person ,:with_family }
+  context "duplicate family members" do
+    let!(:person) { create :person, :with_family}
+    let!(:person_to_become_family_member) { create(:person, hbx_id: '1') }
+    let(:family) { person.families.first }
+    
+    context "attempting to save family member when a duplicate is deactivated" do
+      before :each do
+        person.person_relationships.create!(kind: "child", relative_id: person_to_become_family_member.id)
+        family.family_members.create!(person: person_to_become_family_member, is_primary_applicant: false)
+        expect(family.family_members.size).to eq(2)
+        family.reload
+        # Deactivate family member
+        # Save must be called otherwise update only in memory
+        family.remove_family_member(person_to_become_family_member, nil)
+        family.save!
+        new_family_member = family.find_family_member_by_person(person_to_become_family_member)
+        expect(new_family_member.is_active).to eq(false)
+        # Duplicate
+        duplicate_family_member = FamilyMember.new(person: person_to_become_family_member, is_primary_applicant: false)
+        family.family_members << duplicate_family_member
+      end
 
-  it "should error when trying to save duplicate family member" do
-    family_member = FamilyMember.new(:person => person) 
-    person.families.first.family_members << family_member
-    person.families.first.family_members << family_member
-    expect(family_member.errors.full_messages.join(",")).to match(/Family members Duplicate family_members for person/)
+      it "should sucessfully save the family" do
+        expect(family.save).to eq(true)
+        expect(family.family_members.size).to eq(3)
+        expect(family.family_members.active.size).to eq(2)
+      end
+    end
+
+    context "attempting to save family when family member with same hbx_id as new family member" do
+      before :each do
+        person.person_relationships.create!(kind: "child", relative_id: person_to_become_family_member.id)
+        family.family_members.create!(person: person_to_become_family_member, is_primary_applicant: false)
+        expect(family.family_members.size).to eq(2)
+        family.reload
+      end
+
+      it "should error when trying to save duplicate family member" do
+        # Duplicate
+        duplicate_family_member = FamilyMember.new(person: person_to_become_family_member, is_primary_applicant: false)
+        family.family_members << duplicate_family_member
+        # Currently this returns to true rather than false
+        expect(family.family_members.size).to eq(3)
+        expect(family.save).to eq(false)
+        expect(family.errors[:family_members][0]).to eq("is invalid")
+        expect(family.errors[:family_members][1]).to include("Duplicate family_members for person:")
+      end
+    end
   end
 end
 

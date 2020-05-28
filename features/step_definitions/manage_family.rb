@@ -35,6 +35,41 @@ Then(/^Employee will submit with wrong password$/) do
   page.find_button('Change my password').click
 end
 
+And(/^Employee (.*) replaces their spouse personal information with that of their child$/) do |named_person|
+  # Click the family tab
+  click_link 'Family'
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  spouse = person_record.person_relationships.where(kind: "spouse").first.relative
+  # The edit link
+  find("a[title='Edit Dependent #{spouse.full_name}']").click
+  fill_in('dependent[first_name]', with: "Amanda")
+  fill_in('dependent[last_name]', with: "Doe")
+  fill_in('jq_datepicker_ignore_dependent[dob]', with: "01/01/2019")
+  fill_in('dependent[ssn]', with: "994857643")
+  select("child", from: "dependent[relationship]")
+end
+
+Then(/^the family of (.*) does not contain two new family members or person records with the spouse HBX ID$/) do |named_person|
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  family_record = person_record.primary_family
+  spouse = person_record.person_relationships.where(kind: "spouse").first.relative
+  spouse_hbx_id = spouse.hbx_id.to_s
+  spouse_person_id = spouse.id.to_s
+  family_member_hbx_ids = family_record.family_members.map { |fm| fm.hbx_id.to_s }
+  family_member_spouse_hbx_id_count = []
+  family_member_hbx_ids.each { |id| family_member_spouse_hbx_id_count << id if id == spouse_hbx_id }
+  expect(family_member_spouse_hbx_id_count.length).to eq(1)
+  family_member_person_ids = family_record.family_members.map { |fm| fm.person_id.to_s }
+  family_member_spouse_person_id_count = []
+  family_member_person_ids.each { |id| family_member_spouse_person_id_count << id if id == spouse_person_id }
+  expect(family_member_spouse_person_id_count.length).to eq(1)
+end    
+
+Then(/the Employee should see a message that they were not able to create the spouse because they are a duplicate$/) do 
+  expect(page).to have_content("can not have multiple spouse or life partner")
+end
 
 Then(/^they should see a password does not match error$/) do
   expect(page).to have_text "That password does not match the one we have stored"

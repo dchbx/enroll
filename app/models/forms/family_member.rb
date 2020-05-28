@@ -35,6 +35,10 @@ module Forms
 
     HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
 
+    def full_name
+      "#{self.first_name} #{self.last_name}"
+    end
+
     def self.human_attribute_name(attr, options={})
       HUMANIZED_ATTRIBUTES[attr.to_sym] || super
     end
@@ -73,6 +77,7 @@ module Forms
     end
 
     def save
+      # There is an issue here in the cucumbers
       assign_citizen_status
       return false unless valid?
       existing_inactive_family_member = family.find_matching_inactive_member(self)

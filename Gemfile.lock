@@ -326,6 +326,7 @@ GEM
     cliver (0.3.2)
     cocaine (0.6.0)
       terrapin (= 0.6.0)
+    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.2.2)
@@ -630,6 +631,9 @@ GEM
       capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     public_suffix (3.1.0)
     puma (3.12.1)
     pundit (2.0.1)
@@ -976,6 +980,7 @@ DEPENDENCIES
   parallel_tests (~> 2.26.2)
   poltergeist (~> 1.18.0)
   prawn!
+  pry
   puma (~> 3.11)
   pundit (~> 2.0)
   railroady (~> 1.5.3)

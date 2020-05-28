@@ -162,8 +162,16 @@ class FamilyMember
 
   def no_duplicate_family_members
     return unless family
-    family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
-      errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
+    attributes_to_group_by = [:person_id, :hbx_id]
+    attributes_to_group_by.each do |attribute|
+      family.family_members.group_by { |appl| appl[attribute] }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+        all_family_members_active = v.all? { |family_member| family_member.is_active && family_member&._id&.to_s != self&._id&.to_s }
+        all_family_members_same_person = v.map(&:person_id).uniq.length == 1
+        all_family_members_same_hbx_id = v.map(&:hbx_id).uniq.length == 1
+        if all_family_members_active && all_family_members_same_person && all_family_members_same_hbx_id
+          errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
+        end
+      end
     end
   end
 end

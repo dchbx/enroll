@@ -350,6 +350,16 @@ class Family
     family_members.detect { |family_member| family_member.person_id.to_s == person._id.to_s }
   end
 
+  def find_all_family_members_by_person(person)
+    family_members_by_person = []
+    family_members.each do |fm|
+      if fm.person_id.to_s == person._id.to_s
+        family_members_by_person << fm
+      end
+    end
+    family_members_by_person.sort_by(&:created_at)
+  end
+
   def is_eligible_to_enroll?(options = {})
     current_enrollment_eligibility_reasons(qle: options[:qle]).length > 0
   end
@@ -1196,9 +1206,17 @@ private
   end
 
   def no_duplicate_family_members
-    family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
-      errors.add(:family_members, "Duplicate family_members for person: #{k}\n" +
-                          "family_members: #{v.inspect}")
+    attributes_to_group_by = [:person_id, :hbx_id]
+    attributes_to_group_by.each do |attribute|
+      family_members.group_by { |appl| appl[attribute] }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+        all_family_members_same_person = v.map(&:person_id).uniq.length == 1
+        all_family_members_same_hbx_id = v.map(&:hbx_id).uniq.length == 1
+        all_family_members_active = v.all? { |family_member| family_member.is_active }
+        errors.add(
+          :family_members,
+          "Duplicate family_members for person: #{k}\n" + "family_members: #{v.inspect}"
+        ) if all_family_members_active && all_family_members_same_person && all_family_members_same_hbx_id
+      end
     end
   end
 

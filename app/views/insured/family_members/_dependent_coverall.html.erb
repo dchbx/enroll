@@ -21,7 +21,7 @@
           <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.last_name %></span>
           <div class="text-right">
             <%=
-              link_to edit_resident_dependent_insured_family_member_path(dependent), remote: true, class: 'close close-2' do
+              link_to edit_resident_dependent_insured_family_member_path(dependent), title: "Edit Dependent #{dependent&.full_name}", remote: true, class: 'close close-2' do
                 '<i class="fa fa-edit"></i>'.html_safe
               end
             %>

@@ -691,13 +691,14 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
-  fill_in 'dependent[addresses][0][zip]', with: '01001'
+  find(:xpath, "//li[@data-index='10'][contains(., 'DC')]").click
+  fill_in 'dependent[addresses][0][zip]', with: '20500'
 end
 
 When(/^.+ clicks? confirm member$/) do
-  all(:css, ".mz").last.click
-  expect(page).to have_link('Add Member')
+  confirm_button = page.all('span').detect { |span| span.text == "CONFIRM MEMBER" }
+  confirm_button.click
+  # btn btn-primary btn-br pull-right mz
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do

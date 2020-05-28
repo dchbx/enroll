@@ -23,9 +23,9 @@
                       <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, organization_id: employer) %>
                       <% if dependent.new_record? %>
                         <%= hidden_field_tag 'family_member_remove_url', remove_url %>
-                        <%= link_to (image_tag "member-close.png"), 'javascript:;', class: 'close close-1', method: :delete, remote: true,  data: {ok: 'yes', cancel: 'no'} %>
+                        <%= link_to (image_tag "member-close.png"), 'javascript:;', class: 'close close-1', title: "Remove Dependent #{dependent&.full_name}", method: :delete, remote: true,  data: {ok: 'yes', cancel: 'no'} %>
                       <% else %>
-                        <%= link_to (image_tag "member-close.png"), remove_url, class: 'close close-2', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}?", ok: 'yes', cancel: 'no'} %>
+                        <%= link_to (image_tag "member-close.png"), remove_url, class: 'close close-2', title: "Remove Dependent #{dependent&.full_name}", :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}?", ok: 'yes', cancel: 'no'} %>
                       <% end %>
                     </div>
                 </div>

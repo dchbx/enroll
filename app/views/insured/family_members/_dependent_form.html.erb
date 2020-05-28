@@ -41,7 +41,7 @@
                 <% if !dependent.persisted? %>
                   <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \'Add Member\'. When you\'re finished, select CONTINUE.')" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
                 <% else %>
-                  <%= link_to insured_family_member_path(dependent), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")} do
+                  <%= link_to insured_family_member_path(dependent), class: 'close close-2', title: "Remove Dependent #{dependent&.full_name}", :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")} do
                       '<i class="fa fa-times"></i>'.html_safe
                     end %>
                 <% end %>
