@@ -18,7 +18,7 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 
 ## Fix this dependency -- bring into project
-# gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
+# gem 'recurring_select', '>= 2.1.0', :git => 'https://github.com/brianweiner/recurring_select'
 
 ## Fix this dependency -- bring into project
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
@@ -52,12 +52,12 @@ gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
 # gem 'mongoid-versioning',       '~> 1.2.0'
 gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
-gem 'mongoid_rails_migrations', '~> 1.2'
+gem 'mongoid_rails_migrations', '~> 1.2', '>= 1.2.1'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
 gem 'addressable',              '~> 2.3'
-gem 'animate-rails',            '~> 1.0.10'
+gem 'animate-rails', '~> 1.0.10'
 gem 'recurring_select'
 
 gem 'aws-sdk',                  '~> 2.2.4'
@@ -75,7 +75,7 @@ gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
 gem 'interactor',               '~> 3.0'
-gem 'interactor-rails',         '~> 2.2'
+gem 'interactor-rails', '~> 2.2', '>= 2.2.0'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.3'
 gem 'kaminari',                 '~> 0.17'
@@ -157,7 +157,7 @@ group :test do
   gem 'cucumber-rails',               '~> 1.6',   :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
-  gem 'poltergeist',                  '~> 1.18.0'
+  gem 'poltergeist', '~> 1.18.1'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
