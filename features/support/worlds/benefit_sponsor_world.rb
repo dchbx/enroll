@@ -16,6 +16,15 @@ module BenefitSponsorWorld
     @issuer_profile ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site)
   end
 
+  def individual_benefit_sponsorship
+    return @individual_benefit_sponsorship if @individual_benefit_sponsorship.present?
+    hbx_profile = FactoryBot.create(:hbx_profile)
+    @individual_benefit_sponsorship ||= FactoryBot.create(
+      :benefit_sponsorship,
+      :open_enrollment_coverage_period,
+      hbx_profile: hbx_profile
+    )
+  end
 end
 
 World(BenefitSponsorWorld)

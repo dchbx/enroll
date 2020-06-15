@@ -28,10 +28,20 @@
       </div>
       <div class="col-md-3">
         <div class="price-wrapper pull-right">
-          <% if @tax_household.present? && params[:market_kind]=='individual' %>
-            <h2 class="no-buffer plan-premium"><%= number_to_currency(shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.can_use_aptc?)) %></h2>
+          <%# Premium for IVL %>
+          <% if !@hbx_enrollment.is_shop? %>
+            <h2 class="no-buffer plan-premium ivl-premium">
+              <!-- Assures that the end user will see the proper premium if continuous coverage -->
+              <% previous_same_plan_enrollment = previous_same_plan_enrollment(@hbx_enrollment, plan) %>
+              <% if previous_same_plan_enrollment&.product&.hios_id&.to_s == plan.hios_id.to_s %>
+                <% cost_decorator = previous_same_plan_enrollment_cost_decorator(previous_same_plan_enrollment) %>
+                <%= number_to_currency(cost_decorator.total_employee_cost) %>
+              <% else %>
+                 <%= number_to_currency(shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.can_use_aptc?)) %>
+              <% end %>  
+            </h2>
           <% else %>
-            <h2 class="no-buffer plan-premium"><%= number_to_currency(plan.total_employee_cost) %></h2>
+            <h2 class="no-buffer plan-premium shop-premium"><%= number_to_currency(plan.total_employee_cost) %></h2>
           <% end %>
           <small>/<%= l10n("month") %></small>
         </div>

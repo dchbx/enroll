@@ -25,6 +25,18 @@ module UserWorld
     end
   end
 
+  def consumer_role(person)
+    if @consumer_role
+      @consumer_role
+    elsif person
+      @consumer_role = FactoryBot.create(:user, :with_consumer_role, person: person)
+      @consumer_role.person.update_attributes!(first_name: person[:first_name], last_name: person[:last_name])
+      @consumer_role.update_attributes!(email: person[:email])
+    else
+      @consumer_role = FactoryBot.create(:user, :with_consumer_role)
+    end
+  end
+
   # def users_by_role(role_name = nil, *traits)
   #  attributes = traits.extract_options!
   #  @users_by_role ||= {}

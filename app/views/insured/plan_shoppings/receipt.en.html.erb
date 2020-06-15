@@ -39,7 +39,14 @@
           <% if @enrollment.employee_role.present? %>
           <%= render "insured/plan_shoppings/coverage_information" %>
           <%else%>
-          <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
+            <% if previous_same_plan_enrollment(@enrollment, @plan) %>
+              <% enrollment_for_cost_estimation = previous_same_plan_enrollment(@enrollment, @plan) %>
+              <% plan_for_decoration = previous_same_plan_enrollment_cost_decorator(enrollment_for_cost_estimation) %>
+            <% else %>
+              <% enrollment_for_cost_estimation = @enrollment %>
+              <% plan_for_decoration = @plan %>
+            <% end %>
+            <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: { enrollment_for_cost_estimation: enrollment_for_cost_estimation, calculate: false, current_enrollment: @enrollment, plan: plan_for_decoration} %>
           <% end %>
 
           <% if @enrollment.is_cobra_status? %>

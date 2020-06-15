@@ -1,4 +1,5 @@
 <% calculate = (defined? calculate) ? calculate : true %>
+
 <div class="table-border table-responsive">
   <table class="table table-striped">
     <thead>
@@ -12,35 +13,39 @@
       </tr>
     </thead>
     <tbody>
-      <% @enrollment.hbx_enrollment_members.each do |member| %>
+      <% enrollment_for_cost_estimation.hbx_enrollment_members.each do |member| %>
         <tr>
           <td><%= member.person.full_name %></td>
           <td><%= member.primary_relationship %></td>
           <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-          <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+          <td class="text-right"><%= number_to_currency(plan.premium_for(member)) %></td>
           <% if calculate %>
-            <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
-            <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+            <td class="text-right"><%- number_to_currency(plan.aptc_amount(member)) %></td>
+            <td class="text-right"><%= number_to_currency(plan.employee_cost_for(member)) %></td>
           <% else %>
             <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
-            <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
+            <td class="text-right"><%= number_to_currency(plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
           <% end %>
         </tr>
       <% end %>
       <tr class="gray-row">
         <td colspan="3" class="text-right capital"><strong><%= l10n("totals") %></strong></td>
-        <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+        <td class="text-right"><strong><%= number_to_currency(plan.total_premium) %></strong></td>
         <% if calculate %>
-          <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
-          <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(plan.total_aptc_amount) %></strong></td>
+          <td class="text-right">
+            <strong>
+              <%= number_to_currency(plan.total_employee_cost) %>  
+            </strong>
+          </td>
         <% else %>
-          <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
-          <td class="text-right"><strong><%= number_to_currency(@plan.total_premium - @enrollment.applied_aptc_amount.to_f) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(enrollment_for_cost_estimation.applied_aptc_amount.to_f) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(plan.total_premium - enrollment_for_cost_estimation.applied_aptc_amount.to_f) %></strong></td>
         <% end %>
       </tr>
       <tr>
         <td colspan="5" class="text-right"><%= l10n("your_coverage_start_date") %> :</td>
-        <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
+        <td><%= current_enrollment.effective_on.strftime("%m/%d/%Y") %></td>
       </tr>
     </tbody>
   </table>

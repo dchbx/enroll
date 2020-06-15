@@ -1,5 +1,21 @@
 module Insured::FamiliesHelper
 
+  def previous_same_plan_enrollment(hbx_enrollment, plan)
+    previous_same_plan_enrollment = hbx_enrollment.family.hbx_enrollments.where(
+      :product_id.nin => [nil],
+      :aasm_state.nin => ["shopping"] + HbxEnrollment::ENROLLED_STATUSES,
+      :coverage_kind.in => [plan.kind.to_s]
+      ).where(
+      :_id.nin => [hbx_enrollment.id]
+    ).last
+  end
+
+  def previous_same_plan_enrollment_cost_decorator(previous_same_plan_enrollment)
+    previous_plan = previous_same_plan_enrollment.product
+    previous_tax_household = previous_same_plan_enrollment.household.tax_households.last
+    UnassistedPlanCostDecorator.new(previous_plan, previous_same_plan_enrollment, nil, previous_tax_household)
+  end
+
   def display_change_tax_credits_button?(hbx_enrollment)
     hbx_enrollment.has_at_least_one_aptc_eligible_member?(hbx_enrollment.effective_on.year) &&
     hbx_enrollment.product.can_use_aptc? &&
