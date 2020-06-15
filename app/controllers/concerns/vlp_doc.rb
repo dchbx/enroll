@@ -79,4 +79,11 @@ module VlpDoc
       return info_changed, dc_status
     end
   end
+
+  def native_status_changed?(role)
+    if role
+      params_hash = params.permit!.to_h
+      role.person.send("tribal_id") != params_hash["tribal_id"]
+    end
+  end
 end

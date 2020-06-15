@@ -681,6 +681,28 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    describe "#check_native_status" do
+      let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+      let(:consumer_role) {person.consumer_role}
+      let(:family) { double("Family", :person_has_an_active_enrollment? => true)}
+
+      it 'should fail indian tribe status if person updates native status field' do
+        person.update_attributes(tribal_id: "1234567")
+        consumer_role.update_attributes(aasm_state: "ssa_pending")
+        consumer_role.check_native_status(family, true)
+        expect(consumer_role.verification_types.map(&:type_name)).to include('American Indian Status')
+        expect(consumer_role.aasm_state).to include('verification_outstanding')
+      end
+
+      it 'should fail indian tribe status if no change in native status' do
+        consumer_role.update_attributes(aasm_state: "ssa_pending")
+        consumer_role.check_native_status(family, true)
+        expect(consumer_role.verification_types.map(&:type_name)).not_to include('American Indian Status')
+        expect(consumer_role.aasm_state).to include('ssa_pending')
+      end
+
+    end
+
     describe "#check_for_critical_changes" do
       sensitive_fields = ConsumerRole.new.verification_sensitive_attributes
       all_fields = FactoryBot.build(:person, :encrypted_ssn => "111111111", :gender => "male", "updated_by_id": "any").attributes.keys
