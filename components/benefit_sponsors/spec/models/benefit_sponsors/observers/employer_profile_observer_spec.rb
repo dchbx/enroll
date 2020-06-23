@@ -31,6 +31,26 @@ module BenefitSponsors
         end
       end
 
+      context 'with an employer_profile with an phone number change' do
+        before do
+          employer_profile.class.add_observer subject
+          employer_profile.assign_attributes office_locations_attributes: {
+                                                 '0' => {
+                                                     id: employer_profile.office_locations.first.id,
+                                                     phone_attributes: {
+                                                         area_code: '222'
+                                                     }
+                                                 }
+                                             }
+
+          subject.update(employer_profile)
+        end
+
+        it 'sends a notification' do
+          expect(subject).to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id=> employer_profile.hbx_id, :event_name=>"address_changed"})
+        end
+      end
+
       context "when non reported address attributes changed" do
         before do
           employer_profile.class.add_observer subject
@@ -38,6 +58,22 @@ module BenefitSponsors
                                                                                     address_attributes: {
                                                                                       updated_at: '',
                                                                                       county: ''
+                                                                                    }}}
+          subject.update(employer_profile)
+        end
+
+        it 'should not send notification' do
+          expect(subject).not_to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id => employer_profile.hbx_id, :event_name => "address_changed"})
+        end
+      end
+
+      context "when non reported phone attributes changed" do
+        before do
+          employer_profile.class.add_observer subject
+          employer_profile.assign_attributes office_locations_attributes: {'0' => { id: employer_profile.office_locations.first.id,
+                                                                                    phone_attributes: {
+                                                                                        updated_at: '',
+                                                                                        county: ''
                                                                                     }}}
           subject.update(employer_profile)
         end
