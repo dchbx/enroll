@@ -227,8 +227,18 @@ And(/^(.*) clicks Manage Family link/) do |person_name_and_role|
   click_link 'Manage Family'
 end
 
-Then(/^(.*) should see a message saying that they do not have the necessary permissions to perform that action/) do |named_person|
-  binding.pry
+Then(/^(.*) should see a disabled Save button/) do |named_person|
+  # This will check if it is interactable on the page
+  buttons = page.all('button')
+  save_button = buttons.detect { |button| button.text == 'Save' }
+  expect(save_button.blank?).to eq(true)
+  Capybara.ignore_hidden_elements = false
+  # Need to wait for hidden buttons to appear
+  sleep(2)
+  buttons = page.all('button')
+  save_button = buttons.detect { |button| button.text == 'Save' }
+  expect { save_button.click }.to raise_error(Selenium::WebDriver::Error::ElementNotInteractableError)
+  Capybara.ignore_hidden_elements = true
 end
 
 

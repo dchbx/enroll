@@ -68,13 +68,18 @@ module UserWorld
   # perhaps should be an array for suroles
   # example
   # if @admin_roles[subrole]
-  def admin(subrole)
+  def admin(subrole, named_person = nil)
     if @admin
       @admin
     else
       subrole = subrole.parameterize.underscore
       hbx_profile_id = FactoryBot.create(:hbx_profile).id
-      person = FactoryBot.create(:person)
+      if named_person.nil?
+        person = FactoryBot.create(:person)
+      else
+        person_info = people[named_person]
+        person = FactoryBot.create(:person, first_name: person_info[:first_name], last_name: person_info[:last_name])
+      end
       if subrole.blank?
         raise "No subrole was provided"
       end
@@ -86,7 +91,9 @@ module UserWorld
         raise "No permission was found for subrole #{subrole}"
       end
       hbx_staff_role = HbxStaffRole.create!( person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
-      @admin = FactoryBot.create(:user, :person => person)
+      person.hbx_staff_role = hbx_staff_role
+      person.save!
+      @admin = FactoryBot.create(:user, :person => person, roles: ['hbx_staff'])
     end
   end
 end

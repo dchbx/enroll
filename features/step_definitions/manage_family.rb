@@ -17,6 +17,10 @@ Then(/^(.*) should click on Change my Password link$/) do
   end
 end
 
+And(/^user clicks save button/) do
+  click_button 'Save'
+end
+
 Then(/they can submit a new password/) do
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
   sleep 1
