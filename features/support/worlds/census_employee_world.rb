@@ -88,8 +88,7 @@ module CensusEmployeeWorld
   def census_employee(named_person = nil)
     @census_employee ||= {}
     person = people[named_person]
-
-    if named_person.present? && @census_employee
+    if named_person.present? && @census_employee.present?
       @census_employee[named_person]
     else
       CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
@@ -163,8 +162,8 @@ And(/^there is a census employee record and employee role for (.*?) for employer
 end
 
 And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|
-  person = people[named_person]
-  census_employee.update(aasm_state: state)
+  ce = census_employee(named_person)
+  ce.update_attributes!(aasm_state: state)
 end
 
 Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |named_person, legal_name, legal_name2|
