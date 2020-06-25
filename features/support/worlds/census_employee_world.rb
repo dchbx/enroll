@@ -177,6 +177,8 @@ Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |nam
     dob: person[:dob],
     ssn: person[:ssn]
   )
+  person_record.update_attributes!(gender: person[:gender] || ['male', 'female'].sample) if person_record.gender.blank?
+  person_record.update_attributes!(ssn: person[:ssn] || "112345695") if person_record.ssn.blank?
   employee_role = FactoryBot.create(:employee_role, person: person_record, employer_profile: employer(legal_name).employer_profile)
   census_employees 1,
                    benefit_sponsorship: sponsorship, employer_profile: sponsorship.profile,
@@ -227,6 +229,7 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   person = people[named_person]
   sponsorship = employer(legal_name).benefit_sponsorships.first
   profile = sponsorship.profile
+  employer_profile = employer(legal_name).employer_profile
   ce = sponsorship.census_employees.where(:first_name => /#{person[:first_name]}/i,
                                           :last_name => /#{person[:last_name]}/i).first
   if Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first.present?
@@ -235,6 +238,7 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
     person_record = FactoryBot.create(:person_with_employee_role,
                                      first_name: person[:first_name],
                                      last_name: person[:last_name],
+                                     gender: person[:gender] || ['male', 'female'].sample,
                                      ssn: person[:ssn],
                                      dob: person[:dob] || person[:dob_date],
                                      census_employee_id: ce.id,
@@ -244,16 +248,17 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   if person_record.employee_roles.last.present?
     employee_role = person_record.employee_roles.last
   else
-    employee_role = FactoryBot.create(:employee_role, person: person_record, employer_profile: employer(legal_name).employer_profile)
+    employee_role = FactoryBot.create(:employee_role, person: person_record, employer_profile: employer(legal_name).employer_profile, ssn: person[:ssn], gender: person[:gender])
   end
-  employee_role.update_attributes!(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: profile.id)
+  employee_role.update_attributes!(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: profile.id, employer_profile_id: employer_profile.id)
   person_record.employee_roles << employee_role
   person_record.save!
   ce.update_attributes(employee_role_id: person_record.employee_roles.first.id, hired_on: TimeKeeper.date_of_record)
   sponsorship.benefit_applications.each do |benefit_application|
     benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
   end
-  unless person_record.primary_family.present?
+  if person_record.primary_family.blank?
+    binding.pry
     FactoryBot.create :family, :with_primary_family_member, person: person_record
   end
   user = FactoryBot.create(:user,

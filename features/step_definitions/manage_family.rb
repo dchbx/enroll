@@ -3,6 +3,7 @@ Given(/^Employer exists and logs in$/) do
 end
 
 Then(/^Employee should click on Manage Family button$/) do
+  binding.pry
   find('a.interaction-click-control-manage-family').click
 end
 
