@@ -157,7 +157,9 @@ def people
       dob_date: '10/10/1984',
       broker_census_employee: true,
       password: 'aA1!aA1!aA1!',
-      ssn: "222335220"
+      ssn: "222335220",
+      dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
+      email: "ricky.martin@gmail.com"
     }
   }
 end

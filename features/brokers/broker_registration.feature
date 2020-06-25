@@ -54,7 +54,7 @@ Feature: Broker Agency Registration
     And there is an employer Acme Inc.
     And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
     # And Acme Inc. employer has a staff role 
-    And there is a census employee record and employee role for Ricky Martin for employer Acme Inc.
+    Given there exists Ricky Martin employee for employer Acme Inc.
     And census employee Ricky Martin is a newly_designated_eligible employee
     And this employer Acme Inc. has first_of_month rule
 
