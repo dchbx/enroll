@@ -400,13 +400,30 @@ module BenefitSponsors
       end
     end
 
+    # This method returns the census employees based on exchange's business policy
+    # if cobra employees need to be considered
+    # BenefitSponsors::Operations::CobraEnrollmentEligibility::Determine class will determine
+    # if cobra employees have to considered
     def find_census_employees
+      exclude_cobra_employees? ? find_non_cobra_census_employees : find_all_census_employees
+    end
+
+    def find_all_census_employees
       return @census_employees if defined? @census_employees
       @census_employees ||= CensusEmployee.benefit_application_assigned(self)
     end
 
+    def find_non_cobra_census_employees
+      @find_non_cobra_census_employees ||= CensusEmployee.benefit_application_assigned(self).without_cobra
+    end
+
     def active_census_employees
       find_census_employees.active
+    end
+
+    # This method determines if the cobra employees have to be excluded from min participation calculation
+    def exclude_cobra_employees?
+      BenefitSponsors::Operations::CobraEnrollmentEligibility::Determine.new.call(effective_date: start_on, benefit_application_id: id)
     end
 
     def active_census_employees_under_py
