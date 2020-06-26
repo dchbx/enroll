@@ -14,6 +14,7 @@ class CensusEmployee < CensusMember
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
   EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
+  COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -62,6 +63,7 @@ class CensusEmployee < CensusMember
   scope :non_terminated,     ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
   scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
+  scope :without_cobra,     ->{ not_in(aasm_state: COBRA_STATES) }
   scope :non_term_and_pending,->{ where(:aasm_state.nin => (EMPLOYMENT_TERMINATED_STATES + PENDING_STATES)) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
