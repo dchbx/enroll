@@ -2,7 +2,6 @@
 
 require "rails_helper"
 require File.join(File.dirname(__FILE__), "..", "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
-# require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe BenefitSponsors::Operations::CobraEnrollmentEligibility::Determine, dbclean: :after_each do
 
