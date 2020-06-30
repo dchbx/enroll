@@ -28,9 +28,10 @@ module BenefitSponsors
         end
 
         def find_application_type(benefit_application_id)
-          type = BenefitSponsors::Operations::BenefitApplication::FindApplicationType.new.call(benefit_application_id: benefit_application_id)
+          benefit_application = BenefitSponsors::Operations::BenefitApplication::FindModel.new.call(benefit_application_id: benefit_application_id).success
+          type = benefit_application.is_renewing? ? 'renewal' : 'initial'
 
-          Success("#{type.success}_sponsor")
+          Success("#{type}_sponsor")
         end
 
         def eligibility(effective_date, application_type)
