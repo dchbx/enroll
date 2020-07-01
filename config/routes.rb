@@ -152,6 +152,7 @@ Rails.application.routes.draw do
         get :identity_verification
         post :identity_verification_datatable
         get :new_eligibility
+        get :manage_qle_dt
       end
 
       member do
