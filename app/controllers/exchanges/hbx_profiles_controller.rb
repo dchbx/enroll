@@ -354,6 +354,14 @@ def employer_poc
     end
   end
 
+  def manage_qle_dt
+    @selector = params[:scopes][:selector] if params[:scopes].present?
+    @datatable = Effective::Datatables::ManageQleDataTable.new(params[:scopes])
+    respond_to do |format|
+      format.html { render "/exchanges/hbx_profiles/manage_qle_datatable.html.erb" }
+    end
+  end
+
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
