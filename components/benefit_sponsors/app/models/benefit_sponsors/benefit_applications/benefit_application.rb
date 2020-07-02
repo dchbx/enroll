@@ -423,7 +423,7 @@ module BenefitSponsors
 
     # This method determines if the cobra employees have to be excluded from min participation calculation
     def exclude_cobra_employees?
-      BenefitSponsors::Operations::CobraEnrollmentEligibility::Determine.new.call(effective_date: start_on, benefit_application_id: id)
+      BenefitSponsors::Operations::CobraEnrollmentEligibility::Determine.new.call(effective_date: start_on, benefit_application_id: id).success
     end
 
     def active_census_employees_under_py
