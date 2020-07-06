@@ -7,9 +7,8 @@ registry:
         is_enabled: true
         meta:
           label: Enroll Application
-          type: :boolean
+          content_type: :boolean
           default: true
-          value: true
           description: The Enroll Application enables customers to register and enroll in products, including determining eligibility, shopping for products, calculating premiums, and securely managing their personal information
           is_required: true
           is_visible: true
