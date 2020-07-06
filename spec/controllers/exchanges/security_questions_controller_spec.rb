@@ -4,10 +4,12 @@ RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
 
   let(:user) { FactoryBot.create(:user, with_security_questions: false) }
   let(:person) { FactoryBot.create(:person, user: user) }
-  let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person) }
-  let(:question) { instance_double("SecurityQuestion", title: 'Your Question', id: '1') }
+  let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person, permission_id: permission.id) }
+  let(:question) { instance_double(SecurityQuestion, title: 'Your Question', id: '1') }
+  let(:permission) { FactoryBot.create(:permission) }
 
   before :each do
+    hbx_staff_role
     allow(user).to receive(:has_hbx_staff_role?).and_return true
 
     allow(SecurityQuestion).to receive(:all).and_return([question])

@@ -31,7 +31,7 @@ FactoryBot.define do
 
     trait :hbx_read_only do
       name { 'hbx_read_only' }
-      modify_family { true }
+      modify_family { false }
       modify_employer { false }
       revert_application { false }
       list_enrollments { true }

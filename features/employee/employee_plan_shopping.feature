@@ -9,9 +9,8 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     And there is an employer ABC Widgets
 
   Scenario: Employee can buy coverage under previous expired plan year using QLE if he is eligible
-
-    Given there exists Patrick Doe employee for employer ABC Widgets
-    And renewal employer ABC Widgets has expired and renewal active benefit applications
+    Given renewal employer ABC Widgets has expired and renewal active benefit applications
+    And there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has past hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee click the "Had a baby" in qle carousel
@@ -28,9 +27,8 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Patrick Doe should see "my account" page with enrollment
 
   Scenario: Employee can buy coverage from active plan year through qle with active plan year's plans in renewal period
-
-    Given there exists Patrick Doe employee for employer ABC Widgets
-    And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
+    Given renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
+    And there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has past hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee click the "Had a baby" in qle carousel
@@ -48,8 +46,8 @@ Feature: Employees can purchase coverage from both active and renewing plan year
 
   @bug @wip
    Scenario: Employee should be blocked from plan shopping if their eligibility date greater than their effective date
-    Given there exists Patrick Doe employee for employer ABC Widgets
-    And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
+    Given renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
+    And there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee click the "Had a baby" in qle carousel
@@ -61,8 +59,8 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Employee should see "You are attempting to purchase coverage through qle proir to your eligibility date" error message
 
   Scenario: Employee Receives Secure Enrollment Message after purchasing plan
-    Given there exists Patrick Doe employee for employer ABC Widgets
-    And renewal employer ABC Widgets has expired and renewal active benefit applications
+    Given renewal employer ABC Widgets has expired and renewal active benefit applications
+    And there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has past hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee click the "Had a baby" in qle carousel
@@ -82,9 +80,8 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Patrick Doe should see the appropriate SHOP template text
 
   Scenario: Employee should see the correct EE contribution on their current plan when doing plan shop
-
-    Given there exists Patrick Doe employee for employer ABC Widgets
-    And renewal employer ABC Widgets has expired and renewal active benefit applications
+    Given renewal employer ABC Widgets has expired and renewal active benefit applications
+    And there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has past hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     And Patrick Doe should have a ER sponsored enrollment

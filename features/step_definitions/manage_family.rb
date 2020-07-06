@@ -6,11 +6,11 @@ Then(/^Employee should click on Manage Family button$/) do
   find('a.interaction-click-control-manage-family').click
 end
 
-Then(/^Employee should click on the Personal Tab link$/) do
+Then(/^(.*) should click on the Personal Tab link$/) do |user_or_role|
   find('a.interaction-click-control-personal').click
 end
 
-Then(/^Employee should click on Change my Password link$/) do
+Then(/^(.*) should click on Change my Password link$/) do
   if aca_security_questions
     wait_for_ajax
     page.execute_script("document.querySelector('#change_password_link').click()")

@@ -86,7 +86,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def terminate
-    authorize EmployerProfile, :updateable?
+    authorize @employer_profile, :updateable?
     status = params[:status]
     termination_date = params["termination_date"]
 
@@ -115,7 +115,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def rehire
-    authorize EmployerProfile, :updateable?
+    authorize @employer_profile, :updateable?
     status = params[:status]
     rehiring_date = params["rehiring_date"]
     if rehiring_date.present?

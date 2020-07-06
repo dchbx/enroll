@@ -12,6 +12,10 @@ FactoryBot.define do
     can_lock_unlock { false }
     can_reset_password { false }
 
+    trait :hbx_read_only do
+      modify_family false
+    end
+
     trait :hbx_staff do
       can_complete_resident_application { true }
       can_add_sep { true }

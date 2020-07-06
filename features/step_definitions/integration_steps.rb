@@ -155,6 +155,9 @@ def people
       first_name: "Ricky",
       last_name: "Martin",
       dob_date: '10/10/1984',
+      dob: '10/10/1984',
+      gender: 'male',
+      email: 'ricky.martin@example.com',
       broker_census_employee: true,
       password: 'aA1!aA1!aA1!',
       ssn: "222335220"
@@ -217,6 +220,29 @@ def non_dc_office_location
   phone_number: "1110000",
   phone_extension: "1111"
   }
+end
+
+Then(/^(.*) should see a disabled Save button/) do |named_person|
+  # This will check if it is interactable on the page
+  buttons = page.all('button')
+  save_button = buttons.detect { |button| button.text == 'Save' }
+  expect(save_button.blank?).to eq(true)
+  Capybara.ignore_hidden_elements = false
+  # Need to wait for hidden buttons to appear
+  sleep(2)
+  buttons = page.all('button')
+  save_button = buttons.detect { |button| button.text == 'Save' }
+  expect { save_button.click }.to raise_error(Selenium::WebDriver::Error::ElementNotInteractableError)
+  Capybara.ignore_hidden_elements = true
+end
+
+
+And(/^(.*) clicks family home page link for (.*)/) do |person_name_and_role, family_primary_person|
+  click_link family_primary_person
+end
+
+And(/^(.*) clicks Manage Family link/) do |person_name_and_role|
+  click_link 'Manage Family'
 end
 
 Given(/^User has existing security questions/) do

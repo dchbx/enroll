@@ -10,6 +10,7 @@ class Exchanges::SecurityQuestionsController < ApplicationController
   end
 
   def create
+    authorize HbxProfile, :modify_admin_tabs?
     @question = SecurityQuestion.new(security_question_params)
     if @question.save
       redirect_to exchanges_security_questions_path, notice: 'Question was successfully created'
@@ -19,10 +20,12 @@ class Exchanges::SecurityQuestionsController < ApplicationController
   end
 
   def edit
+    authorize HbxProfile, :modify_admin_tabs?
     @question = SecurityQuestion.find(params[:id])
   end
 
   def update
+    authorize HbxProfile, :modify_admin_tabs?
     @question = SecurityQuestion.find(params[:id])
     if @question.safe_to_edit_or_delete? && @question.update_attributes(security_question_params)
       redirect_to exchanges_security_questions_path, notice: 'Question was updated successfully'
@@ -32,6 +35,7 @@ class Exchanges::SecurityQuestionsController < ApplicationController
   end
 
   def destroy
+    authorize HbxProfile, :modify_admin_tabs?
     @question = SecurityQuestion.find(params[:id])
     if @question.safe_to_edit_or_delete?
       @question.destroy

@@ -9,7 +9,7 @@ Background: Setup site, employer, and benefit application
     And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
     And Acme Inc. employer has a staff role 
     And there is a census employee record for Patrick Doe for employer Acme Inc.
-    And census employee Patric Doe is a newly_designated_eligible employee
+    And census employee Patrick Doe is a newly_designated_eligible employee
     And this employer Acme Inc. has first_of_month rule
 
   Scenario: Newly designated should not get effective date before renewing plan year start date

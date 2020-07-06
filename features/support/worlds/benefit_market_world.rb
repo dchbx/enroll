@@ -65,12 +65,12 @@ module BenefitMarketWorld
     @dental_issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
 
-  def qualifying_life_events
+  def qualifying_life_events(market_kind = 'shop')
     @qualifying_life_events ||= [
       :effective_on_event_date,
       :effective_on_first_of_month,
       :effective_on_fixed_first_of_next_month
-    ].map { |event_trait| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "shop", post_event_sep_in_days: 90) }
+    ].map { |event_trait| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: market_kind, post_event_sep_in_days: 90) }
   end
 
   def set_initial_application_dates(status)
@@ -181,6 +181,10 @@ World(BenefitMarketWorld)
 
 Given(/^Qualifying life events are present$/) do
   qualifying_life_events
+end
+
+Given(/^Individual Qualifying life events are present$/) do
+  qualifying_life_events('individual')
 end
 
 # Following step can be used to initialize benefit market catalog for initial employer with health/dental benefits

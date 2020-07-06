@@ -4,7 +4,7 @@ class FamilyPolicy < ApplicationPolicy
     if user_person
       primary_applicant = @record.primary_applicant
       return true if (@record.primary_applicant.person_id == user_person.id)
-      return true if can_modify_family?(user_person)
+      return true if can_view_family?(user_person)
       broker_staff_roles = user_person.active_broker_staff_roles
       broker_role = user_person.broker_role
       employee_roles = primary_applicant.person.active_employee_roles
@@ -36,12 +36,52 @@ class FamilyPolicy < ApplicationPolicy
     return true if user.person.hbx_staff_role
   end
 
+  def can_view_family?(user_person)
+    hbx_staff_role = user_person.hbx_staff_role
+    hbx_staff_role.present?
+  end
+
   def can_modify_family?(user_person)
     hbx_staff_role = user_person.hbx_staff_role
     return false unless hbx_staff_role
     permission = hbx_staff_role.permission
     return false unless permission
     permission.modify_family
+  end
+
+  def can_manage_coverage?
+    user_person = @user.person
+    if user_person
+      primary_applicant = @record.primary_applicant
+      return true if (@record.primary_applicant.person_id == user_person.id)
+      return true if can_modify_family?(user_person)
+      broker_role = user_person.broker_role
+      employee_roles = primary_applicant.person.active_employee_roles
+      if broker_role
+        ivl_broker_account = @record.active_broker_agency_account
+        if ivl_broker_account
+          return true if (ivl_broker_account.benefit_sponsors_broker_agency_profile_id == broker_role.benefit_sponsors_broker_agency_profile_id)
+        end
+        if employee_roles.any?
+          broker_agency_profile_account_ids = employee_roles.map do |er|
+            er.employer_profile.active_broker_agency_account
+          end.compact.map(&:benefit_sponsors_broker_agency_profile_id)
+          return true if broker_agency_profile_account_ids.include?(broker_role.benefit_sponsors_broker_agency_profile_id)
+        end
+      end
+      ga_roles = user_person.active_general_agency_staff_roles
+      if ga_roles.any?
+        if employee_roles.any?
+          general_agency_profile_account_ids = employee_roles.map do |er|
+            er.employer_profile.active_general_agency_account
+          end.compact.map(&:general_agency_profile_id)
+          ga_roles.each do |ga_role|
+            return true if general_agency_profile_account_ids.include?(ga_role.general_agency_profile_id)
+          end
+        end
+      end
+    end
+    false
   end
 
   def can_broker_modify_family?(broker, broker_staff)

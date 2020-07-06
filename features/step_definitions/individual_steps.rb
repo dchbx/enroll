@@ -310,7 +310,8 @@ end
 
 And(/I click on continue button on household info form/) do
   screenshot("line 161")
-  click_link 'Continue', :wait => 10
+  click_link 'Continue'
+  sleep(10)
 end
 
 Then(/consumer clicked on Go To My Account/) do
@@ -374,7 +375,9 @@ Then(/I click on back to my account$/) do
 end
 
 And(/^I click on continue button on group selection page$/) do
-  click_button 'CONTINUE', :wait => 10
+  wait_for_ajax
+  sleep 5
+  click_button 'CONTINUE'
 end
 
 And(/I select a plan on plan shopping page/) do

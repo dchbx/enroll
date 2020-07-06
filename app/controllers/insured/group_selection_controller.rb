@@ -306,6 +306,8 @@ class Insured::GroupSelectionController < ApplicationController
     @shop_for_plans = @adapter.shop_for_plans
     @optional_effective_on = @adapter.optional_effective_on
 
+    authorize @family, :can_manage_coverage?
+
     @adapter.if_employee_role do |emp_role|
       @employee_role = emp_role
       @role = emp_role

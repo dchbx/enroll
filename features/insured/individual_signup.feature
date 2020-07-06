@@ -42,7 +42,7 @@ Feature: Insured Plan Shopping on Individual market
     And I select a past qle date
     Then I should see confirmation and continue
     When I click on continue button on household info form
-    And I click on "shop for new plan" button on household info page
+    When Employee clicks Shop for new plan button
     And I select a plan on plan shopping page
     And I click on purchase button on confirmation page
     When I click on continue on qle confirmation page

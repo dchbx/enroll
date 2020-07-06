@@ -3,7 +3,8 @@ require File.join(Rails.root, "lib/migration_task")
 class DefinePermissions < MigrationTask
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'
-
+  
+  # Note: This may need to be updated from 
   def initial_hbx
     Permission
       .find_or_initialize_by(name: 'hbx_staff')
@@ -14,7 +15,7 @@ class DefinePermissions < MigrationTask
                           view_agency_staff: true, manage_agency_staff: true)
     Permission
       .find_or_initialize_by(name: 'hbx_read_only')
-      .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
+      .update_attributes!(modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission

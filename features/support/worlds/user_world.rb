@@ -25,6 +25,29 @@ module UserWorld
     end
   end
 
+  def hbx_read_only(named_person = nil)
+    if @hbx_read_only
+      @hbx_read_only
+    else
+      hbx_profile_id = FactoryBot.create(:hbx_profile).id
+      if named_person.nil?
+        person = FactoryBot.create(:person)
+      else
+        person_info = people[named_person]
+        person = FactoryBot.create(:person, first_name: person_info[:first_name], last_name: person_info[:last_name])
+      end
+      subrole = 'hbx_read_only'
+      permission = Permission.where(name: subrole).first
+      hbx_staff_role = HbxStaffRole.create!(person: person, permission_id: permission.id, subrole: subrole, hbx_profile_id: hbx_profile_id)
+      raise("No permission present for hbx_read_only") if permission.blank?
+      user = FactoryBot.create(:user, person: person)
+      user.roles << 'hbx_staff'
+      user.person.hbx_staff_role = hbx_staff_role
+      user.save!
+      @hbx_read_only = user
+    end
+  end
+
   # def users_by_role(role_name = nil, *traits)
   #  attributes = traits.extract_options!
   #  @users_by_role ||= {}
@@ -70,7 +93,7 @@ end
 
 World(UserWorld)
 
-Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) logged in$/) do |type, subrole, logged_in|
+Given(/^that a user(?: (.*?))? with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) logged in$/) do |named_person, type, subrole, logged_in|
   case type
     when "Employer"
       user = employee(employer)
@@ -83,7 +106,10 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
       user = employer_staff
     when 'Employee Role'
       user = employee_role
+    when 'HBX Read Only'
+      user = hbx_read_only(named_person)
     else
+      raise("Nothing for subrole " + subrole)
       user = users_by_role(type)
   end
   case logged_in

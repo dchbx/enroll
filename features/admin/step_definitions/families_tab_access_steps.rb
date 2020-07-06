@@ -8,6 +8,10 @@ When(/^user clicks on Families dropdown link$/) do
   family_dropdown.click
 end
 
+And(/^user clicks on Families index page link from dropdown/) do
+  click_link 'Families'
+end
+
 Then(/^the user should see (.*) options enabled in the families dropdown$/) do |enabled_options|
 	page_links = page.all('a')
 	non_nil_href_page_links = page_links.reject { |page_link| page_link[:href].nil? }

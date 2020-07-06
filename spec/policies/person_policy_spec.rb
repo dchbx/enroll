@@ -17,7 +17,7 @@ describe PersonPolicy do
 
     it 'hbx_read_only' do 
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_read_only))
-      expect(policy.updateable?).to be true
+      expect(policy.updateable?).to be false
     end
 
     it 'hbx_csr_supervisor' do
