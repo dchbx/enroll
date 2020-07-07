@@ -14,6 +14,7 @@ module Queries
       qles = qles.by_market_kind('individual') if @custom_attributes['manage_qles'] == 'ivl_qles'
       qles = qles.by_market_kind('shop') if @custom_attributes['manage_qles'] == 'shop_qles'
       qles = qles.by_market_kind('fehb') if @custom_attributes['manage_qles'] == 'fehb_qles'
+
       qles = qles.where(market_kind: 'individual', :aasm_state.in => [:active, :expired_pending]).order(ordinal_position: :asc) if @custom_attributes['individual_options'] == 'ivl_active_qles'
       qles = qles.where(market_kind: 'individual', aasm_state: :expired).order(ordinal_position: :asc) if @custom_attributes['individual_options'] == 'ivl_inactive_qles'
       qles = qles.where(market_kind: 'individual', aasm_state: :draft).order(ordinal_position: :asc) if @custom_attributes['individual_options'] == 'ivl_draft_qles'
