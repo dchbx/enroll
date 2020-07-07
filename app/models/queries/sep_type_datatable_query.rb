@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class SepTypeDatatableQuery
 
@@ -7,44 +9,20 @@ module Queries
       @custom_attributes = attributes
     end
 
-    def build_scope()
+    def build_scope
       qles = QualifyingLifeEventKind.all
-      if @custom_attributes['manage_qles'] == 'ivl_qles'
-        qles = qles.by_market_kind('individual')
-      end
-      if @custom_attributes['manage_qles'] == 'shop_qles'
-        qles = qles.by_market_kind('shop')
-      end
-      if @custom_attributes['manage_qles'] == 'congress_qles'
-        qles = qles.by_market_kind('fehb')
-      end
-      if @custom_attributes['individual_options'] == 'ivl_active_qles'
-        qles = qles.by_market_kind('individual').active
-      end
-      if @custom_attributes['individual_options'] == 'ivl_inactive_qles'
-        qles = qles.by_market_kind('individual').where(is_active: false).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc)
-      end
-      if @custom_attributes['individual_options'] == 'ivl_draft_qles'
-        qles = qles.by_market_kind('individual')
-      end
-      if @custom_attributes['employer_options'] == 'shop_active_qles'
-        qles = qles.by_market_kind('shop').active
-      end
-      if @custom_attributes['employer_options'] == 'shop_inactive_qles'
-        qles = qles.by_market_kind('shop').where(is_active: false).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc)
-      end
-      if @custom_attributes['employer_options'] == 'shop_draft_qles'
-        qles = qles.by_market_kind('shop').active
-      end
-      if @custom_attributes['individual_options'] == 'congress_active_qles'
-        qles = qles.by_market_kind('fehb').active
-      end
-      if @custom_attributes['individual_options'] == 'congress_inactive_qles'
-        qles = qles.by_market_kind('fehb').where(is_active: false).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc)
-      end
-      if @custom_attributes['individual_options'] == 'congress_draft_qles'
-        qles = qles.by_market_kind('fehb').active
-      end
+      qles = qles.by_market_kind('individual') if @custom_attributes['manage_qles'] == 'ivl_qles'
+      qles = qles.by_market_kind('shop') if @custom_attributes['manage_qles'] == 'shop_qles'
+      qles = qles.by_market_kind('fehb') if @custom_attributes['manage_qles'] == 'fehb_qles'
+      qles = qles.by_market_kind('individual').active if @custom_attributes['individual_options'] == 'ivl_active_qles'
+      qles = qles.by_market_kind('individual').where(is_active: false).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) if @custom_attributes['individual_options'] == 'ivl_inactive_qles'
+      qles = qles.by_market_kind('individual') if @custom_attributes['individual_options'] == 'ivl_draft_qles'
+      qles = qles.by_market_kind('shop').active if @custom_attributes['employer_options'] == 'shop_active_qles'
+      qles = qles.by_market_kind('shop').where(is_active: false).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) if @custom_attributes['employer_options'] == 'shop_inactive_qles'
+      qles = qles.by_market_kind('shop') if @custom_attributes['employer_options'] == 'shop_draft_qles'
+      qles = qles.by_market_kind('fehb').active if @custom_attributes['congress_options'] == 'fehb_active_qles'
+      qles = qles.by_market_kind('fehb').where(is_active: false).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) if @custom_attributes['congress_options'] == 'fehb_inactive_qles'
+      qles = qles.by_market_kind('fehb') if @custom_attributes['congress_options'] == 'fehb_draft_qles'
       qles
     end
 
@@ -68,6 +46,5 @@ module Queries
     def size
       build_scope.count
     end
-
   end
 end
