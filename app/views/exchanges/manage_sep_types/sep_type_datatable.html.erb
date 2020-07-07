@@ -1,0 +1,16 @@
+<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+
+<p id="notice"><%= notice %></p>
+
+<div class='container'>
+	<h1> Manage Sep Types </h1>
+	<%= link_to "Sorting Sep Types", sorting_sep_types_exchanges_manage_sep_types_path, class: "btn btn-info" %>
+	<%= raw render_datatable(@datatable) %>
+</div>
+
+<script>
+	initializeDataTables();
+	jQuery('.buttons-csv').hide()
+	jQuery('.buttons-excel').hide()
+	jQuery('.dataTables_filter').hide()
+</script>

@@ -80,6 +80,13 @@ Rails.application.routes.draw do
       get :find_sep, on: :collection
     end
 
+    resources :manage_sep_types do
+      collection do
+        get 'sep_types_dt'
+        get 'sorting_sep_types'
+      end
+    end
+
     resources :scheduled_events do
       collection do
         get 'current_events'
