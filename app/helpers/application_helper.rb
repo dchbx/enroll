@@ -97,7 +97,7 @@ module ApplicationHelper
       concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :start_date => "07/01/2016", :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
     end
   end
-  
+
   # TODO Resource Registry Changes.  <<<------
   def generate_breadcrumbs(breadcrumbs)
     html = "<ul class='breadcrumb'>".html_safe
