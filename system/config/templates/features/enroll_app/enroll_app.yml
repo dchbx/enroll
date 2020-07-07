@@ -26,3 +26,7 @@ registry:
             item: "https://dchealthlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
             item: "https://www.dchealthlink.com/nondiscrimination"
+
+      - key: :send_secure_message_family
+        item: :send_secure_message
+        is_enabled: true

@@ -10,6 +10,3 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,6,6)..Date.new(2020,9,15) %>
-      - key: :send_secure_message_ivl
-        item: :send_secure_message
-        is_enabled: true
