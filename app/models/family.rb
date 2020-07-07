@@ -233,22 +233,6 @@ class Family
     ).distinct(:family_id)
   ) }
 
-  def enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment)
-    coverage_kind = hbx_enrollment.coverage_kind
-    target_enrollment_effective_on = hbx_enrollment.effective_on
-    most_recent_sep_enrollment_by_coverage_kind = hbx_enrollments.where(
-      coverage_kind: coverage_kind,
-      enrollment_kind: 'special_enrollment'
-    ).last
-    # Return false if no SEP enrollments
-    return false if most_recent_sep_enrollment_by_coverage_kind.blank?
-    # Return true if referring to the same target enrollment being checked
-    return true if hbx_enrollment == most_recent_sep_enrollment_by_coverage_kind
-    # Return true here because you should be able to edit the most recent enrollment only,
-    # but if this is trying to render on an old enrollment, don't show
-    return true if most_recent_sep_enrollment_by_coverage_kind.effective_on > target_enrollment_effective_on
-  end
-
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end

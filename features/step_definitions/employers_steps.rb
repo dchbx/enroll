@@ -1028,9 +1028,9 @@ end
 
 When(/^employer selects (.*) employee on Employee Roster$/) do |named_person|
   person = people[named_person]
-  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
-  expect(page).to have_content ce.full_name
-  click_link ce.full_name
+  CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  expect(page).to have_content "Patrick Doe"
+  click_link census_employee.full_name
 end
 
 Then(/^employer should see enrollment tile$/) do

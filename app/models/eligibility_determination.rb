@@ -6,6 +6,8 @@ class EligibilityDetermination
 
   embedded_in :tax_household
 
+  SOURCE_KINDS = %w[Curam Admin Renewals].freeze
+
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
 
   #   csr_0:   "02", # Native Americans
@@ -45,6 +47,11 @@ class EligibilityDetermination
   before_validation :set_premium_credit_strategy, :set_determined_at
 
   validates_presence_of :determined_at, :max_aptc, :csr_percent_as_integer
+
+  validates :source,
+            allow_blank: false,
+            inclusion: { in: SOURCE_KINDS,
+                         message: "%{value} is not a valid source kind" }
 
   validates :premium_credit_strategy_kind,
     allow_blank: false,

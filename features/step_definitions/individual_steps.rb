@@ -675,8 +675,8 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
 
   if household.tax_households.blank?
-    household.build_thh_and_eligibility(80, 0, start_on, current_product.id)
-    household.build_thh_and_eligibility(80, 0, future_start_on, future_product.id)
+    household.build_thh_and_eligibility(80, 0, start_on, current_product.id, 'Admin')
+    household.build_thh_and_eligibility(80, 0, future_start_on, future_product.id, 'Admin')
     household.save!
   end
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship

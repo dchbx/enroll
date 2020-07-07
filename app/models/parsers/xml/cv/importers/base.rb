@@ -24,7 +24,7 @@ module Parsers::Xml::Cv::Importers
         person_object.person_relationships.build({
           relative_id: relationship.object_individual, #use subject_individual or object_individual
           kind: relation,
-        })
+        }) if relationship.subject_individual != relationship.object_individual
       end
       person.addresses.each do |address|
         kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'

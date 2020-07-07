@@ -268,32 +268,53 @@ class Admin::Aptc < ApplicationController
       return current_aptc_applied_hash
     end
 
+    def build_new_thh_with_determination(current_thh, date, max_aptc, csr_percentage)
+      household = current_thh.household
+      current_ed = current_thh.latest_eligibility_determination
+      thh_params = {allocated_aptc: 0.0,
+                    effective_starting_on: Date.new(date.year, date.month, date.day),
+                    is_eligibility_determined: true,
+                    submitted_at: Time.zone.today}
+      thh = household.tax_households.build(thh_params)
+      thh.save!
+
+      ed_params = {source: 'Admin',
+                   benchmark_plan_id: current_ed.benchmark_plan_id,
+                   max_aptc: max_aptc,
+                   csr_percent_as_integer: csr_percentage,
+                   determined_at: date,
+                   determined_on: date}
+      thh.eligibility_determinations.build(ed_params).save!
+
+      current_thh.tax_household_members.each do |thh_member|
+        thh_member_params = thh_member.attributes.slice('applicant_id',
+                                                        'is_subscriber',
+                                                        'is_ia_eligible',
+                                                        'is_medicaid_chip_eligible',
+                                                        'is_totally_ineligible',
+                                                        'is_uqhp_eligible')
+        thh.tax_household_members.build(thh_member_params).save!
+      end
+      thh.save!
+      household.end_multiple_thh
+    end
+
     # Redetermine Eligibility on Max APTC / CSR Update.
     def redetermine_eligibility_with_updated_values(family, params, hbxs, year)
       eligibility_redetermination_result = false
-      latest_eligibility_determination = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination
+      tax_household = family.active_household.latest_active_tax_household_with_year(year)
+      latest_eligibility_determination = tax_household.latest_eligibility_determination
       max_aptc = latest_eligibility_determination.max_aptc
       csr_percent_as_integer = latest_eligibility_determination.csr_percent_as_integer
       csr_percentage_param = params[:csr_percentage] == "limited" ? -1 : params[:csr_percentage].to_i # storing "limited" CSR as -1
       unless (params[:max_aptc].to_f == max_aptc.to_f) && (csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
-        effective_starting_on = family.active_household.latest_active_tax_household_with_year(year).effective_starting_on
+        effective_starting_on = tax_household.effective_starting_on
         if effective_starting_on > TimeKeeper.date_of_record
           eligibility_date = effective_starting_on
         else
           eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
         end
-        # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_at" timestamp and the corresponsing csr/aptc update.
-        tax_household = family.active_household.latest_active_tax_household_with_year(year)
-        tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date,
-                                                        "determined_on"                 => eligibility_date,
-                                                        "csr_eligibility_kind"          => latest_eligibility_determination.csr_eligibility_kind,
-                                                        "premium_credit_strategy_kind"  => latest_eligibility_determination.premium_credit_strategy_kind,
-                                                        "csr_percent_as_integer"        => csr_percentage_param,
-                                                        "max_aptc"                      => params[:max_aptc].to_f,
-                                                        "benchmark_plan_id"             => latest_eligibility_determination.benchmark_plan_id,
-                                                        "e_pdc_id"                      => latest_eligibility_determination.e_pdc_id,
-                                                        "source"                        => "Admin"
-                                                       }).save!
+        build_new_thh_with_determination(tax_household, eligibility_date, params[:max_aptc].to_f, csr_percentage_param)
         eligibility_redetermination_result = true
       end
       eligibility_redetermination_result

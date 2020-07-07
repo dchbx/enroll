@@ -39,7 +39,7 @@ describe 'daily_eligibility_determination_change_report' do
     expect(@file_content[1][7]).to eq(eligibilty_determination.csr_percent_as_integer.to_s)
   end
 
-  it 'should return Curam as the source is nil' do
+  it 'should return Curam as the source Curam' do
     expect(@file_content[1][10]).to eq('Curam')
   end
 

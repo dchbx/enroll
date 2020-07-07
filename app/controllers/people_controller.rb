@@ -141,7 +141,7 @@ class PeopleController < ApplicationController
       @dependent = family.family_members.new(id: params[:family_member][:id], person: member)
       respond_to do |format|
         if member.save && @dependent.save
-          @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
+          @person.ensure_relationship_with(member, params[:family_member][:primary_relationship])
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else

@@ -259,22 +259,49 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let!(:slcsp) { HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id }
 
-  it "should create one active tax household for the specified year" do
-    expect(active_household.tax_households.count).to be 0
-    active_household.build_thh_and_eligibility(60, 94, date, slcsp)
-    expect(active_household.tax_households.count).to be 1
+  context 'for one active tax household' do
+    before do
+      active_household.build_thh_and_eligibility(60, 94, date, slcsp, 'Renewals')
+    end
+
+    it 'should create one active tax household for the specified year' do
+      expect(active_household.tax_households.count).to be 1
+    end
+
+    it 'should create ED with source Renewals' do
+      expect(active_household.tax_households.first.latest_eligibility_determination.source).to eq('Renewals')
+    end
   end
 
-  it "should create one eligibility determination for respective tax household" do
-    active_household.build_thh_and_eligibility(200, 73, date, slcsp)
-    expect(active_household.latest_active_thh.eligibility_determinations.count).to be 1
+  context 'create one ED' do
+    before do
+      active_household.build_thh_and_eligibility(200, 73, date, slcsp, 'Admin')
+      @eligibility_determination = active_household.latest_active_thh.latest_eligibility_determination
+    end
+
+    it "should create one eligibility determination for respective tax household" do
+      expect(active_household.latest_active_thh.eligibility_determinations.count).to be 1
+    end
+
+    it 'should create ED with source Admin' do
+      expect(@eligibility_determination.source).to eq('Admin')
+    end
   end
 
-  it "end dates all prior THH for the given year" do
-    2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp)}
-    expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
-  end
+  context 'end date duplicate THH' do
+    before :each do
+      2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp, 'Renewals')}
+      @ed = active_household.latest_active_thh.latest_eligibility_determination
+    end
 
+    it 'end dates all prior THH for the given year' do
+      expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
+    end
+
+    it 'should have Renewals as source' do
+      expect(@ed.source).to eq('Renewals')
+    end
+  end
 end
 
 describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do
@@ -310,29 +337,5 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     it "should create new eligibility_determination instance" do
       expect(household100.tax_households[0].eligibility_determinations).not_to be []
     end
-  end
-end
-
-describe "financial assistance eligibiltiy for a family", type: :model, dbclean: :after_each do
-  let!(:person) { FactoryBot.create(:person, :with_family) }
-  let!(:active_household) { person.primary_family.active_household }
-  let!(:date) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
-  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
-  let!(:slcsp) { HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id }
-
-  it "should create one active tax household for the specified year" do
-    expect(active_household.tax_households.count).to be 0
-    active_household.build_thh_and_eligibility(60, 94, date, slcsp)
-    expect(active_household.tax_households.count).to be 1
-  end
-
-  it "should create one eligibility determination for respective tax household" do
-    active_household.build_thh_and_eligibility(200, 73, date, slcsp)
-    expect(active_household.latest_active_thh.eligibility_determinations.count).to be 1
-  end
-
-  it "end dates all prior THH for the given year" do
-    2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp)}
-    expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
   end
 end

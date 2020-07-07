@@ -30,7 +30,7 @@
               <%= format_date TimeKeeper.date_according_to_exchange_at(@census_employee.created_at) %></span>&nbsp;&nbsp;
               <% end %>
             <% if is_terminated(@census_employee)%>
-              <span><strong>Terminated:</strong>
+              <span><strong>Coverage Ends:</strong>
               <%= format_date @census_employee.coverage_terminated_on %></span>&nbsp;&nbsp;
             <% end %>
             <h5 class="label label-success census-employee-aasm <%= @census_employee.aasm_state %>">

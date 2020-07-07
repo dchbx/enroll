@@ -28,6 +28,10 @@ RSpec.describe Employers::BrokerAgencyController do
 
   describe ".index" do
 
+    before do
+      Person.create_indexes
+    end
+
     it "should render js template" do
       sign_in(@user)
       get :index, params: {employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name}, xhr: true

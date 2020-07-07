@@ -6,6 +6,7 @@ Feature: Employer hires borker
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for draft initial employer with health benefits
     Given there is a Broker Agency exists for District Brokers Inc
+    Given all permissions are present
     And the broker Max Planck is primary broker for District Brokers Inc
     Given there is a Broker Agency exists for Browns Inc
     And the broker Jane Goodall is primary broker for Browns Inc

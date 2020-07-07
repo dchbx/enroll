@@ -2,11 +2,6 @@ name: Rspec and Cucumbers
 on: push
 
 env: # https://stackoverflow.com/questions/59867124/how-can-i-access-github-action-environment-variables-within-a-bash-script-run-by
-  SHA: ${{ github.sha }}
-  BRANCH: ${{ github.ref }}
-  YELLR_KEY: ${{ secrets.YELLR_KEY }}
-  YELLR_URL: ${{ secrets.YELLR_URL }}
-  STATUS: failing
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
@@ -159,10 +154,10 @@ jobs:
         with:
           ruby-version: 2.5.1
       - name: Setup Node.js for use with actions
-        uses: actions/setup-node@v1.1.0
+        uses: actions/setup-node@v1
         with:
           # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
-          version: 10.16.3
+          node-version: 10.16.3
       - name: Launch MongoDB
         uses: wbari/start-mongoDB@v0.2
         with:
@@ -171,9 +166,6 @@ jobs:
       - name: Set up Chromedriver
         if: matrix.command_configs.needs_chromedriver
         uses: nanasess/setup-chromedriver@master
-        with:
-          # Optional: do not specify to match Chrome's version
-          chromedriver-version: "77.0.3865.40"
       - name: Cache Gems
         uses: actions/cache@v1
         with:
@@ -205,20 +197,3 @@ jobs:
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: run tests
         run: ${{matrix.command_configs.test_command}}
-      - name: tell Yellr if failed
-        if: failure()
-        run: |
-          chmod +x ./test_utilities/report_to_yellr.sh
-          ./test_utilities/report_to_yellr.sh
-  notify-of-success:
-    runs-on: ubuntu-latest
-    needs: [testing_matrix]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: echo results
-        env:
-          STATUS: passing
-        run: |
-          chmod +x ./test_utilities/report_to_yellr.sh
-          ./test_utilities/report_to_yellr.sh

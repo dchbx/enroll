@@ -861,21 +861,6 @@ When(/^Employer publishes a plan year$/) do
 
   find('.interaction-click-control-publish-plan-year').click
 end
-And(/^.+ click the Shop for new plan button$/) do
-  click_button 'Shop for new plan'
-end
-
-And(/^.+ abandon shopping and clicks My Insured Portal to return to families home page/) do
-  click_link 'My Insured Portal'
-end
-
-And(/^.+ click the Back to My Account button$/) do
-  click_link 'Back To My Account'
-end
-
-Then(/^.+ should not see the Make Changes button on their current enrollment tile$/) do
-  expect(page).to_not have_content('Make Changes')
-end
 
 When(/^.+ should see a published success message$/) do
   expect(find('.alert')).to have_content('Plan Year successfully published')
@@ -989,17 +974,6 @@ Then(/^I should see not qualify message$/) do
   expect(page).to have_content "The date you submitted does not qualify for special enrollment"
   screenshot("not_qualify")
 end
-
-When(/^I select current date as qle date$/) do
-  expect(page).to have_content "Married"
-  screenshot("past_qle_date")
-  fill_in "qle_date", :with => (TimeKeeper.date_of_record).strftime("%m/%d/%Y")
-  click_link((TimeKeeper.date_of_record).day)
-  within '#qle-date-chose' do
-    click_link "CONTINUE"
-  end
-end
-
 
 When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"

@@ -5,6 +5,10 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
 
 RSpec.describe "insured/group_selection/new.html.erb" do
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   let(:adapter) { instance_double(GroupSelectionPrevaricationAdapter) }
   context "coverage selection", dbclean: :after_each do
   

@@ -25,7 +25,7 @@ previous_day = Time.now.getlocal.prev_day
 start_time = previous_day.beginning_of_day.utc
 end_time = previous_day.end_of_day.utc
 
-source_mapper = { 'Admin_Script' => 'Create Eligibility or Renewals', 'Admin' =>  'Edit Aptc Csr', nil => 'Curam'}
+source_mapper = { 'Renewals' => 'Renewals', 'Admin' =>  'Create Eligibility or Edit Aptc Csr', 'Curam' => 'Curam'}
 CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   logger_csv << logger_field_names
   CSV.open(report_file_name, 'w', force_quotes: true) do |report_csv|
@@ -54,7 +54,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
             report_csv << [primary_person.first_name, primary_person.last_name,
                            primary_person.hbx_id, e_case_id, current_max_aptc,
                            format('%.2f', new_ed.max_aptc.to_f), current_csr_percent,
-                           new_ed.csr_percent_as_integer, new_ed.determined_on,
+                           new_ed.csr_percent_as_integer, new_ed.determined_at,
                            current_csr_kind, new_csr_kind,
                            year, enrollment.product&.title, enrollment.product&.hios_id,
                            enrollment&.applied_aptc_amount]
@@ -63,7 +63,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
           report_csv << [primary_person.first_name, primary_person.last_name,
                          primary_person.hbx_id, e_case_id, current_max_aptc,
                          format('%.2f', new_ed.max_aptc.to_f), current_csr_percent,
-                         new_ed.csr_percent_as_integer, new_ed.determined_on,
+                         new_ed.csr_percent_as_integer, new_ed.determined_at,
                          current_csr_kind, new_csr_kind,
                          year, 'N/A', 'N/A', 'N/A']
         end

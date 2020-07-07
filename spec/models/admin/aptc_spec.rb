@@ -99,21 +99,6 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
     # REDETERMINE ELIGIBILITY
     context "redetermine_eligibility_with_updated_values" do
       let(:params) { {"max_aptc"=>"27.00", "csr_percentage"=>"73", "commit"=>"Update"} }
-      let(:save_mock) { double{ "save_mock" } }
-      let(:eligibility_determination) { double("eligibility_determination", :build => save_mock)}
-      before(:each) do
-        allow(tax_household).to receive(:eligibility_determinations).and_return eligibility_determination
-         allow(eligibility_determination).to receive(:sort).and_return eligibility_determination
-         allow(eligibility_determination).to receive(:last).and_return eligibility_determination
-         allow(eligibility_determination).to receive(:max_aptc).and_return sample_max_aptc_1
-         allow(eligibility_determination).to receive(:csr_percent_as_integer).and_return sample_csr_percent_1
-         allow(eligibility_determination).to receive(:csr_eligibility_kind).and_return "csr_94"
-         allow(eligibility_determination).to receive(:premium_credit_strategy_kind).and_return "allocated_lump_sum_credit"
-         allow(eligibility_determination).to receive(:benchmark_plan_id).and_return "123321"
-         allow(eligibility_determination).to receive(:e_pdc_id).and_return "3614116"
-         allow(eligibility_determination).to receive(:csr_percent_as_integer).and_return sample_csr_percent_1
-         allow(save_mock).to receive(:save!).and_return true
-      end
 
       it "should save a new determination when the Max APTC / CSR is updated" do
         expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [], year)).to eq true

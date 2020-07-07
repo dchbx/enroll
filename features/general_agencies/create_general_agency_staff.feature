@@ -3,6 +3,7 @@ Feature: Assign General Agency Staff to General Agency
   Scenario: General Staff has not signed up on the HBX
     Given a CCA site exists with a benefit market
     Given there is a General Agency exists for District Agency Inc
+    Given all permissions are present
     And the staff Max Planck is primary ga staff for District Agency Inc
     Given a general agency agent visits the DCHBX
     When they click the 'New General Agency' button

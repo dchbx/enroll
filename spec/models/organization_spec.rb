@@ -275,6 +275,10 @@ RSpec.describe Organization, dbclean: :after_each do
     let(:agency_1) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "Health Brokers Inc") }
     let(:agency_2) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "DC Health Inc") }
 
+    before do
+      Person.create_indexes
+    end
+
     context ".scopes" do
       context 'approved_broker_agencies' do
 

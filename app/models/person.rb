@@ -561,7 +561,7 @@ class Person
     end
     if existing_relationship
       existing_relationship.update_attributes(:kind => relationship)
-    else
+    elsif id != person.id
       self.person_relationships << PersonRelationship.new({
         :kind => relationship,
         :relative_id => person.id
@@ -794,6 +794,26 @@ class Person
       end
     end
 
+    def broker_ga_search_hash(s_str)
+      clean_str = s_str.strip
+      s_rex = Regexp.new("^" + Regexp.escape(clean_str), true)
+      if clean_str =~ /[a-z]/i
+        {
+          "$or" => ([
+            {"first_name" => s_rex},
+            {"last_name" => s_rex},
+          ] + additional_exprs(clean_str))
+        }
+      else
+        {
+          "$or" => [
+            {"broker_role.npn" => s_rex},
+            {"general_agency_staff_roles.npn" => s_rex}
+          ]
+        }
+      end
+    end
+
     def additional_exprs(clean_str)
       additional_exprs = []
       if clean_str.include?(" ")
@@ -805,17 +825,35 @@ class Person
       additional_exprs
     end
 
-    def search_first_name_last_name_npn(s_str, query=self)
+    def search_first_name_last_name_npn(s_str, query = self)
       clean_str = s_str.strip
-      s_rex = ::Regexp.new(::Regexp.escape(s_str.strip), true)
-      query.where({
-        "$or" => ([
-          {"first_name" => s_rex},
-          {"last_name" => s_rex},
-          {"broker_role.npn" => s_rex},
-          {"general_agency_staff_roles.npn" => s_rex}
-          ] + additional_exprs(clean_str))
-        })
+      if clean_str =~ /[a-z]/i
+        people_user_ids = query.collection.aggregate([
+                            {"$match" => {
+                              "$text" => {"$search" => clean_str}
+                            }.merge(Person.broker_ga_search_hash(clean_str))},
+                            {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
+                            {"$sort" => {"last_name" => 1, "first_name" => 1}},
+                            {"$project" => {"_id" => 1}}
+                          ], {allowDiskUse: true}).map do |rec|
+                            rec["_id"]
+                          end
+        query.where(:id => {"$in" => people_user_ids})
+      else
+        query.where(broker_ga_search_hash(s_str))
+      end
+    end
+
+    def brokers_matching_search_criteria(search_str)
+      broker_role_certified.search_first_name_last_name_npn(search_str)
+    end
+
+    def agencies_with_matching_broker(search_str)
+      if brokers_matching_search_criteria(search_str).exists(:"broker_role.benefit_sponsors_broker_agency_profile_id" => true)
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:benefit_sponsors_broker_agency_profile_id)
+      else
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:broker_agency_profile_id)
+      end
     end
 
     def general_agencies_matching_search_criteria(search_str)

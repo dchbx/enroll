@@ -3212,90 +3212,6 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
   end
 
-  context '.display_make_changes_for_shop?' do
-    let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
-    let!(:person) { FactoryBot.create(:person)}
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let!(:household) { FactoryBot.create(:household, family: family) }
-    let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
-    let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
-    let!(:sponsored_benefit) { double }
-
-    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-    let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1)}
-    let!(:enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
-                        aasm_state: 'coverage_selected')
-    end
-    let(:employee_role_double) { double(id: 1) }
-
-    context 'for ivl' do
-      before do
-        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-        allow(enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit)
-        allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(true)
-        enrollment.kind = 'individual'
-        enrollment.save
-      end
-
-      it 'should return false' do
-        expect(enrollment.display_make_changes_for_shop?).to be_falsey
-      end
-    end
-
-    context 'for shop' do
-      before :each do
-        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-        allow(enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit)
-        allow(enrollment).to receive(:employee_role).and_return(employee_role_double)
-      end
-
-      context "is_not_most_recent_sep_enrollment?" do
-        before do
-          # False for "or" statements
-          allow(enrollment.employee_role).to receive(:can_enroll_as_new_hire?).and_return(false)
-          allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(false)
-        end
-
-        it 'should display make changes if true' do
-          allow(enrollment.family).to receive(:enrollment_is_not_most_recent_sep_enrollment?).with(enrollment).and_return(true)
-          expect(enrollment.display_make_changes_for_shop?).to eq(true)
-        end
-
-        it "should not display make changes if false" do
-          allow(enrollment.family).to receive(:enrollment_is_not_most_recent_sep_enrollment?).with(enrollment).and_return(false)
-          expect(enrollment.display_make_changes_for_shop?).to be_falsey
-        end
-      end
-
-      context "can_enroll_as_new_hire?" do
-        before do
-          # False for "or" statements
-          allow(enrollment.family).to receive(:enrollment_is_not_most_recent_sep_enrollment?).with(enrollment).and_return(false)
-          allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(false)
-        end
-
-        it "should display make changes if true" do
-          allow(enrollment.employee_role).to receive(:can_enroll_as_new_hire?).and_return(true)
-          expect(enrollment.display_make_changes_for_shop?).to eq(true)
-        end
-
-        it "should not display make changes if false" do
-          allow(enrollment.employee_role).to receive(:can_enroll_as_new_hire?).and_return(false)
-          expect(enrollment.display_make_changes_for_shop?).to be_falsey
-        end
-      end
-    end
-  end
-
   context '.display_make_changes_for_ivl?' do
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}
@@ -3327,8 +3243,8 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
         enrollment.save
       end
 
-      it 'should return false' do
-        expect(enrollment.display_make_changes_for_ivl?).to be_falsey
+      it 'should return true' do
+        expect(enrollment.display_make_changes_for_ivl?).to be_truthy
       end
     end
 

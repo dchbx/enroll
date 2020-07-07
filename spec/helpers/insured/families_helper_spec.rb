@@ -342,6 +342,147 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         end
       end
     end
+
+    describe "#disable_make_changes_button?" do
+      let(:hbx_enrollment) do
+        instance_double(
+          HbxEnrollment,
+          census_employee: census_employee,
+          is_shop?: is_shop,
+          sponsored_benefit_package: sponsored_benefit_package,
+          employee_role: employee_role,
+          family: family
+        )
+      end
+
+      let(:census_employee) do
+        instance_double(CensusEmployee)
+      end
+
+      let(:is_shop) { true }
+
+      let(:todays_date) { double }
+
+      let(:sponsored_benefit_package) do
+        instance_double(
+          BenefitSponsors::BenefitPackages::BenefitPackage
+        )
+      end
+
+      let(:employee_role) do
+        instance_double(
+          EmployeeRole,
+          can_enroll_as_new_hire?: can_enroll_as_new_hire
+        )
+      end
+
+      let(:family) do
+        instance_double(
+          Family,
+          current_sep: current_sep,
+          is_under_special_enrollment_period?: under_special_enrollment_period
+        )
+      end
+
+      let(:current_sep) { double(effective_on: active_during_date) }
+
+      let(:active_during_date) { double }
+
+      let(:under_special_enrollment_period) { false }
+      let(:open_enrollment_contains) { false }
+      let(:can_enroll_as_new_hire) { false }
+      let(:active_during) { false }
+
+      before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(todays_date)
+        allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).
+          with(todays_date).and_return(open_enrollment_contains)
+        allow(hbx_enrollment).to receive(:active_during?).
+          with(active_during_date).and_return(active_during)
+      end
+
+      context "given a non-census employee enrollment" do
+        let(:census_employee) { nil }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+      context "given an enrollment which has a census employee, but is not shop" do
+        let(:is_shop) { false }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - when inside open enrollment for the same benefit package as this enrollment
+      " do
+
+        let(:open_enrollment_contains) { true }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - but the corresponding employee role can enroll as a new hire
+      " do
+        let(:can_enroll_as_new_hire) { true }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - and the corresponding employee role can not enroll as a new hire
+      - but the family is under a special enrollment period which overlaps with when this enrollment is active
+      " do
+        let(:under_special_enrollment_period) { true }
+        let(:active_during) { true }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - and the corresponding employee role can not enroll as a new hire
+      - and the family is not under a special enrollment period
+      " do
+
+        it "disables the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_truthy
+        end
+      end
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - and the corresponding employee role can not enroll as a new hire
+      - and the family is under a special enrollment period, but the SEP doesn't overlap with this enrollment's active period
+      " do
+        let(:under_special_enrollment_period) { true }
+
+        it "disables the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_truthy
+        end
+      end
+    end
+
   end
 
   describe "#Enrollment coverage", dbclean: :after_each do

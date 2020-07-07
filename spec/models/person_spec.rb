@@ -764,15 +764,65 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe "with no relationship to a dependent" do
-    describe "after ensure_relationship_with" do
-      it "should have the new relationship"
-    end
-  end
+  describe 'ensure_relationship_with' do
+    let(:person10) { FactoryBot.create(:person) }
 
-  describe "with an existing relationship to a dependent" do
-    describe "after ensure_relationship_with a different type of relationship" do
-      it "should correct the existing relationship"
+    describe 'with no relationship to a dependent' do
+      context 'after ensure_relationship_with' do
+        let(:person11) { FactoryBot.create(:person) }
+
+        before do
+          person10.ensure_relationship_with(person11, 'child')
+          person10.save!
+        end
+
+        it 'should have the new relationship' do
+          expect(person10.person_relationships.first.relative_id).to eq(person11.id)
+        end
+
+        it 'should have fixed number of relationships' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
+      end
+    end
+
+    describe 'with an existing relationship to a dependent' do
+      context 'after ensure_relationship_with a different type of relationship' do
+        let(:person11) do
+          human = FactoryBot.create(:person)
+          person10.person_relationships << PersonRelationship.new(relative_id: human.id, kind: 'child')
+          person10.save!
+          human
+        end
+
+        before do
+          person10.ensure_relationship_with(person11, 'spouse')
+          person10.save!
+        end
+
+        it "should correct the existing relationship" do
+          expect(person10.person_relationships.first.kind).to eq('spouse')
+        end
+
+        it 'should not have the old relationship' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
+      end
+    end
+
+    context 'should not create a relationship from self to self' do
+      before do
+        person10.ensure_relationship_with(person10, 'unrelated')
+        person10.save!
+      end
+
+      it 'should not create any relationships' do
+        expect(person10.person_relationships).to be_empty
+      end
+
+      it 'should have fixed number of relationships' do
+        expect(person10.person_relationships.count).to be_zero
+      end
     end
   end
 
@@ -1346,6 +1396,35 @@ describe Person, :dbclean => :after_each do
     end
   end
 
+  describe '.brokers_matching_search_criteria' do
+    let(:person) { FactoryBot.create(:person, :with_broker_role)}
+    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:name) { person.full_name}
+
+    before do
+      Person.create_indexes
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+      person.broker_role.update_attributes!(aasm_state: "active")
+      person.broker_role.update_attributes!(npn: "11111111")
+      person.save!
+    end
+
+    context 'when searched with first_name and last_name' do
+      it 'should return matching agency' do
+        people = Person.brokers_matching_search_criteria(name)
+        expect(people.count).to eq(1)
+        expect(people.first.full_name).to eq(name)
+      end
+    end
+
+    context 'when searched with npn' do
+      it 'should return matching agency' do
+        people = Person.brokers_matching_search_criteria("11111111")
+        expect(people.count).to eq(1)
+        expect(people.first.broker_role.npn).to eq(person.broker_role.npn)
+      end
+    end
+  end
 
   describe "staff_for_employer", dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"

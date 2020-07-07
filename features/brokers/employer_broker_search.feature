@@ -8,6 +8,7 @@ Feature: Employer terminates borker and hires new broker
     Given there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
     Given there is a Broker Agency exists for Browns Inc
+    Given all permissions are present
     And the broker Jane Goodall is primary broker for Browns Inc
     Given there is an employer ABC Widgets
     And ABC Widgets employer has a staff role

@@ -3,6 +3,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_each do
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   let(:subject)  { Class.new { extend Insured::GroupSelectionHelper } }
 
   describe "#can shop individual" do
@@ -728,10 +732,10 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
     let(:active_bg) { double("ActiveBenefitGroup", plan_year: double("ActivePlanYear")) }
     let(:renewal_bg) { double("RenewalBenefitGroup", plan_year: double("RenewingPlanYear")) }
-    let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, effective_on: TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile)}
     let(:census_employee) { double("CensusEmployee", active_benefit_group: active_bg, employer_profile: employer_profile)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: employee_role.person)}
+    let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, effective_on: TimeKeeper.date_of_record)}
 
     before do
       allow(employee_role).to receive(:census_employee).and_return census_employee
@@ -780,6 +784,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return false
+          sep.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
         end
 
         it "should return true if active benefit group offers dental" do
@@ -799,6 +804,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           allow(active_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return true
+          sep.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
         end
 
         it "should return true if renewal benefit group offers dental" do

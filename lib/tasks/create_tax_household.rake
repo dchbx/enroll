@@ -25,7 +25,7 @@ namespace :task do
     if person.present?
       return unless person.primary_family
       active_household = person.primary_family.active_household
-      active_household.build_thh_and_eligibility(max_aptc, csr, effective_date, slcsp)
+      active_household.build_thh_and_eligibility(max_aptc, csr, effective_date, slcsp, 'Admin')
       puts "THH & Eligibility created successfully" unless Rails.env.test?
     else
       puts "No Person Record Found with hbx_id #{hbx_id}" unless Rails.env.test?

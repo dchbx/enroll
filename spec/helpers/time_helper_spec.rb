@@ -42,6 +42,16 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       end
     end
 
+    context "for employee with cobra enrollment" do
+      it "sets the plan years last day on the calendar widget and allows to change the enrollment termination date" do
+        enrollment.update_attributes(kind: "employer_sponsored_cobra")
+        enrollment.effective_on = (TimeKeeper.date_of_record - 7.days)
+        #latest_date = Date.new(enrollment.effective_on.year, 12, 31)
+        latest_date = enrollment.effective_on + 1.year - 1.day
+        expect(helper.set_date_max_to_plan_end_of_year(enrollment)).to eq(latest_date)
+      end
+    end
+
     context "for enrollment in individual market"do
       it "sets the latest date able to terminate an enrollment to be the last day of the calendar year in which the enrollment starts" do
         individual_enrollment.effective_on = (TimeKeeper.date_of_record - 7.days)

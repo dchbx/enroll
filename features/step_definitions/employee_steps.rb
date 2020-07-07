@@ -86,7 +86,7 @@ And(/employee (.*) with a dependent has (.*) relationship with age (.*) than 26/
   @family = person.primary_family
   dependent = FactoryBot.create :person, dob: dob
   fm = FactoryBot.create :family_member, family: @family, person: dependent
-  person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
+  person.ensure_relationship_with(dependent, kind)
   ch = @family.active_household.immediate_family_coverage_household
   ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
   ch.save
