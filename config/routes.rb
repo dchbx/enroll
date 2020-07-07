@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
@@ -296,7 +298,7 @@ Rails.application.routes.draw do
       ##get :privacy, on: :collection
     end
 
-    resources :employee, :controller=>"employee_roles", only: [:create, :edit, :update, :show] do
+    resources :employee, :controller => "employee_roles", only: [:create, :edit, :update, :show] do
       collection do
         get 'new_message_to_broker'
         post 'send_message_to_broker'
@@ -333,10 +335,10 @@ Rails.application.routes.draw do
   namespace :employers do
 
     # Redirect from Enroll old model to Enroll new model
-    match '/employer_profiles/new' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+    match '/employer_profiles/new', to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
     #match '/employer_profiles/:id/*path' , to: redirect('/'), via: [:get, :post]
     #match '/employer_profiles/:id' , to: redirect('/'), via: [:get, :post]
-    match '/' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+    match '/', to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
 
     post 'search', to: 'employers#search'
 
@@ -348,7 +350,7 @@ Rails.application.routes.draw do
       end
     end
 
-    #TODO REFACTOR
+    #TODO: refactor
     resources :people do
       collection do
         get 'search'
@@ -461,7 +463,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :agency_messages
         get :assign_history
-        get  :commission_statements
+        get :commission_statements
       end
       member do
         get :general_agency_index
@@ -578,7 +580,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :people do #TODO Delete
+  resources :people do #TODO: delete
     get 'select_employer'
     get 'my_account'
 
@@ -594,7 +596,7 @@ Rails.application.routes.draw do
 
   end
 
-  match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
+  match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
@@ -625,7 +627,7 @@ Rails.application.routes.draw do
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
 
-  resources :documents, only: [ :new, :create, :destroy, :update] do
+  resources :documents, only: [:new, :create, :destroy, :update] do
     get :document_reader,on: :member
     get :autocomplete_organization_legal_name, :on => :collection
     collection do
