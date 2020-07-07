@@ -1,0 +1,87 @@
+<div class="container mt-3">
+ <!-- Nav tabs -->
+	<ul class="nav nav-tabs">
+		<li class="nav-item">
+			<a class="nav-link active" data-toggle="tab" href="#individual">Individual</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-toggle="tab" href="#shop">Shop</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-toggle="tab" href="#fehb">Fehb</a>
+		</li>
+	</ul>
+
+ <!-- Tab panes -->
+	<div class="tab-content">
+	 	<div id="individual" class="container tab-pane active"><br>
+	    <h3>Individual</h3>
+	    <p>
+	   	<div class="container">
+				<div class="row">
+				  <table>
+						<tr>
+							<th>title</th>
+							<th>id</th>
+						</tr>
+						<% @sortable.by_market_kind('individual').each do |sort|%>
+	           	<tr>
+	              <td><%= sort.title%></td>
+	              <td><%= sort.ordinal_position%></td>
+	           	</tr>
+         		<%end%>
+					</table>
+				</div>
+			</div>
+			</p>
+   	</div>
+	 	<div id="shop" class="container tab-pane fade"><br>
+	    <h3>shop</h3>
+	    <p>
+	   	<div class="container">
+				<div class="row">
+				  <table>
+						<tr>
+							<th><h3>title</h3></th>
+							<th><h3>id</h3></th>
+						</tr>
+						<% @sortable.by_market_kind('shop').each do |sort|%>
+	           	<tr>
+	              <td><%= sort.title%></td>
+	              <td><%= sort.ordinal_position%></td>
+	           	</tr>
+         		<%end%>
+					</table>
+				</div>
+			</div>
+			</p>
+   	</div>
+	 	<div id="fehb" class="container tab-pane fade"><br>
+	    <h3>fehb</h3>
+	    <p>
+	   	<div class="container">
+				<div class="row">
+				  <table>
+						<tr>
+							<th><h3>title</h3></th>
+							<th><h3>id</h3></th>
+						</tr>
+						<% @sortable.by_market_kind('fehb').each do |sort|%>
+	           	<tr>
+	              <td><%= sort.title%></td>
+	              <td><%= sort.ordinal_position%></td>
+	           	</tr>
+         		<%end%>
+					</table>
+				</div>
+			</div>
+			</p>
+   	</div>
+  </div>
+</div>
+
+
+<!-- <script type="text/javascript">
+Sortable.create(simpleList, { /* options */ });
+</script> -->
+
