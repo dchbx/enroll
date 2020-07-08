@@ -1,10 +1,11 @@
 <%= render "ui-components/v1/navs/primary_nav.html.slim" %>
 
-<p id="notice"><%= notice %></p>
-
 <div class='container'>
-	<h1> Qualifying Life Events </h1>
-	<%= raw render_datatable(@datatable) %>
+  <h1> Qualifying Life Events </h1>
+    <%#= link_to 'Create Qualifying Life Event', exchanges_manage_qles_path, {class: 'btn btn-default'} %>
+    <%= link_to 'Create Qualifying Life Event', new_exchanges_manage_qle_path, {class: 'btn btn-default'} %>
+
+    <%= raw render_datatable(@datatable) %>
 </div>
 
 
