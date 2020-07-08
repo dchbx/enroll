@@ -1,0 +1,44 @@
+<%= form_for @announcement || Announcement.new, url: exchanges_announcements_path, method: :post, html: {class: 'form-horizontal'} do |f| %>
+  <% if @announcement.present? && @announcement.errors.any? %>
+    <div class="alert alert-error">
+      <h4>
+        <%= "#{pluralize(@announcement.errors.size, "error")} prohibited this announcement from being saved:" %>
+      </h4>
+      <ul>
+        <% @announcement.errors.full_messages.each do |msg| %>
+          <li> <%= msg %> </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :content, 'Announcement', class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= f.text_field :content, {class: 'form-control', required: true} %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :start_date, 'Msg Start Date', class: 'col-sm-2 control-label' %>
+    <div class="col-sm-5">
+      <%= datepicker_control f, :start_date, {:class => "form-control", required: true} %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :end_date, 'Msg End Date', class: 'col-sm-2 control-label' %>
+    <div class="col-sm-5">
+      <%= datepicker_control f, :end_date, {:class => "form-control", required: true, :'data-date-min' => "+0d"} %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :audiences, 'Audience', class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= f.collection_check_boxes :audiences, Announcement::AUDIENCE_KINDS, :to_s, :to_s %>
+    </div>
+  </div>
+  <div class="form-group <%=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+    <div class="col-sm-offset-2 col-sm-10">
+      <%= f.submit 'Create Announcement', class: 'btn btn-default' %>
+    </div>
+  </div>
+<% end %>

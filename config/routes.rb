@@ -66,6 +66,7 @@ Rails.application.routes.draw do
   namespace :exchanges do
 
     resources :inboxes, only: [:show, :destroy]
+    resources :manage_qles
     resources :announcements, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
     end
