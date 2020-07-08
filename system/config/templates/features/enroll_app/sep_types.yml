@@ -1,0 +1,26 @@
+---
+registry:
+  - namespace:
+      - :create_qle
+    features:
+      - key: :sep_types
+        is_enabled: true
+        meta:
+          label: Create Sep Types
+          content_type: :legend
+          default: :''
+          description: 'Create Sep Types'
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :label
+            item: 'Create Sep Types'
+          - key: :title
+            item: <%= ENV['title'] %>
+            meta:
+              label: Title
+              content_type: :text_field
+              default: ''
+              description: Enter title
+              is_required: false
+              is_visible: true
