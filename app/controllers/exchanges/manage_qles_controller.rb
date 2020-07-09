@@ -7,5 +7,7 @@ class Exchanges::ManageQlesController < ApplicationController
 
   end
 
+  def create
 
+  end
 end
