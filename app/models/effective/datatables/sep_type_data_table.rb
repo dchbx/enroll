@@ -9,6 +9,14 @@ module Effective
         table_column :Market, :label => 'Market', :proc => proc { |row| row.market_kind}, :filter => false, :sortable => false
         table_column :start_date, :label => 'Start Date', :proc => proc { |row| row.start_on }, :filter => false, :sortable => false
         table_column :state, :label => 'State', :proc => proc { |row| row.is_active ? 'active' : 'Inactive'}, :filter => false, :sortable => false
+        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+          dropdown = [
+            ['Edit'],
+            ['update']
+          ]
+
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id.to_s}"}, formats: :html
+        }, :filter => false, :sortable => false
       end
 
       def collection
