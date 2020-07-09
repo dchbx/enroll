@@ -34,6 +34,7 @@
     "postcss-smart-import": "^0.7.6",
     "rails-ujs": "^5.2.3",
     "rxjs": "^6.5.2",
+    "sortablejs": "^1.10.2",
     "stimulus": "^1.0.1",
     "sweetalert2": "^8.13.0",
     "turbolinks": "^5.2.0",
