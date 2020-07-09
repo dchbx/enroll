@@ -98,6 +98,84 @@ module ApplicationHelper
     end
   end
 
+  # TODO Resource Registry Chnages.---->>>
+
+  def build_option_field(option, form)
+    type = option.meta.content_type&.to_sym
+
+    input_control = case type
+                      when :swatch
+                        input_swatch_control(option, form)
+                      when :base_64
+                        input_file_control(option, form)
+                      when :radio_select
+                        input_radio_control(option, form)
+                      when :select
+                        select_control(option, form)
+                      when :number
+                        input_number_control(option, form)
+                      when :email
+                        input_email_control(option, form)
+                      when :currency
+                        input_currency_control(option, form)
+                      when :date
+                        input_date_control(option, form)
+                      else
+                        input_text_control(option, form)
+                    end
+
+    if type == :radio_select
+      radio_form_group(option, input_control)
+    else
+      form_group(option, input_control)
+    end
+  end
+
+  def input_date_control(setting, form)
+    id = setting[:key].to_s
+
+    meta = setting[:meta]
+    input_value = setting.item || meta&.default
+    aria_describedby = id
+
+    # if meta[:attribute]
+    #   tag.input(nil, type: "text", value: input_value, id: id, name: form&.object_name.to_s + "[#{id}]",class: "form-control", required: true)
+    # else
+    tag.input(nil, type: "date", value: input_value, id: id, name: form&.object_name.to_s + "[settings][#{setting.key}]",class: "form-control", required: true)
+    # end
+  end
+
+  def select_control(setting, form)
+    id = setting[:key].to_s
+    selected_option = "Choose..."
+    meta = setting[:meta]
+    options = meta.value || meta.default
+
+    aria_describedby = id
+
+    option_list = tag.option(selected_option, selected: true)
+    meta.enum.each do |choice|
+      option_list += tag.option(choice.values.first)
+    end
+
+    tag.select(option_list, id: id, class: "form-control", name: form&.object_name.to_s + "[settings][#{id}]")
+  end
+
+  def input_number_control(setting, form)
+    id = setting[:key].to_s
+    meta = setting[:meta]
+    input_value = meta.value || meta.default
+    # input_value = setting[:value] || setting[:default]
+    aria_describedby = id
+
+    # if setting[:attribute]
+    tag.input(nil, type: "number", step:"any", value: input_value, id: id, name: form&.object_name.to_s + "[settings][#{id}]",class: "form-control", required: true, oninput: "check(this)")
+    # else
+    #   tag.input(nil, type: "number", step:"any", value: input_value, id: id, name: form&.object_name.to_s + "[value]",class: "form-control", required: true, oninput: "check(this)")
+    # end
+  end
+
+  # TODO Resource Registry Changes.  <<<------
   def generate_breadcrumbs(breadcrumbs)
     html = "<ul class='breadcrumb'>".html_safe
     breadcrumbs.each_with_index do |breadcrumb, index|

@@ -15,12 +15,97 @@ registry:
         settings:
           - key: :label
             item: 'Create Sep Types'
+          - key: :start_on
+            item: <%= ENV['start_on'] %>
+            meta:
+              label: Start Date
+              content_type: :date
+              default: ''
+              description: Enter Start Date
+              is_required: true
+              is_visible: true
+          - key: :end_on
+            item: <%= ENV['end_on'] %>
+            meta:
+              label: End Date
+              content_type: :date
+              default: ''
+              description: Enter End Date
+              is_required: true
+              is_visible: true
           - key: :title
             item: <%= ENV['title'] %>
             meta:
               label: Title
               content_type: :text_field
               default: ''
-              description: Enter title
-              is_required: false
+              description: Enter Title
+              is_required: true
+              is_visible: true
+          - key: :tool_tip
+            item: <%= ENV['tool_tip'] %>
+            meta:
+              label: Tool Tip
+              content_type: :text_field
+              default: ''
+              description: Enter Toot Tip
+              is_required: true
+              is_visible: true
+          - key: :sep_start
+            item: <%= ENV['sep_start'] %>
+            meta:
+              label: Sep Start( In Days )
+              content_type: :number
+              default: ''
+              description: Enter Sep Start(In Days)
+              is_required: true
+              is_visible: true
+          - key: :sep_end
+            item: <%= ENV['sep_end'] %>
+            meta:
+              label: Sep End( In Days )
+              content_type: :number
+              default: ''
+              description: Enter Sep End( In Days )
+              is_required: true
+              is_visible: true
+          - key: :market
+            item: <%= ENV['market'] %>
+            meta:
+              label: Market
+              content_type: :select
+              enum: [{individual: "Individual"}, {shop: "Shop"}, {congress: "Congress"}]
+              default: ''
+              description: Select Market Kind
+              is_required: true
+              is_visible: true
+          - key: :self_attestation
+            item: <%= ENV['self_attestation'] %>
+            meta:
+              label: Self Attestation
+              content_type: :select
+              enum: [{self_service: "Self-Service"}, {admin_only: "Admin Only"}]
+              default: ''
+              description: Select Self Attestation Type
+              is_required: true
+              is_visible: true
+          - key: :reason
+            item: <%= ENV['reason'] %>
+            meta:
+              label: Reason
+              content_type: :select
+              enum: [{self_service: "Self-Service"}, {admin_only: "Admin Only"}]
+              default: ''
+              description: Select Reason
+              is_required: true
+              is_visible: true
+          - key: :coverage_effective
+            item: <%= ENV['coverage_effective'] %>
+            meta:
+              label: Coverage Effective
+              enum: [{self_service: "Self-Service"}, {admin_only: "Admin Only"}]
+              content_type: :select
+              default: ''
+              description: Select Coverage Effective Type
+              is_required: true
               is_visible: true
