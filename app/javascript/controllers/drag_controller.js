@@ -12,21 +12,17 @@ export default class extends Controller {
 	end(event) {
 		let index = event.item.dataset.index
 		let market_kind = event.item.dataset.market_kind
-		let data = {}
+		let data = []
 		var cards = document.querySelectorAll('.card.mb-4')
-		data.market_kind = market_kind
-		data.sort = [...cards].reduce(function(data, card, index) { return [...data, { id: card.dataset.id, position: index + 1 }] }, [])
-		Rails.ajax({
-			url: 'sort',
-			type: 'PATCH',
-			data: JSON.stringify(data),
-			dataType: 'application/json',
-			success: function(a,b,c) {
-				alert(a['message']);
-		  },
-		  error: function(a,b,c) {
-				alert(a['message']);
-		  }
+		market_kind = market_kind
+		data = [...cards].reduce(function(data, card, index) { return [...data, { id: card.dataset.id, position: index + 1 }] }, [])
+		fetch('sort',{
+			method: 'PATCH',
+			body: JSON.stringify({market_kind: market_kind, sort_data: data}),
+			headers: {
+								'Content-Type': 'application/json',
+								'X-CSRF-Token': Rails.csrfToken()
+								}
 		})
 	}
 }
