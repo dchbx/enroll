@@ -86,6 +86,7 @@ Rails.application.routes.draw do
       collection do
         get 'sep_types_dt'
         get 'sorting_sep_types'
+        patch 'sort'
       end
     end
 
