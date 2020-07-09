@@ -1,0 +1,13 @@
+import 'bootstrap';
+import 'jquery-ui';
+import '../css/application.scss';
+import '@fortawesome/fontawesome-free';
+import '@fortawesome/fontawesome-free/js/solid.js';
+import '@fortawesome/fontawesome-free/js/regular.js';
+import '@fortawesome/fontawesome-free/js/brands.js';
+import '@fortawesome/fontawesome-free/js/fontawesome.js';
+import '@fortawesome/fontawesome-free/svgs/regular/copyright.svg';
+import '@fortawesome/fontawesome-free/svgs/regular/envelope.svg';
+import '@fortawesome/fontawesome-free/svgs/solid/phone.svg';
+import '@fortawesome/fontawesome-free/svgs/solid/question.svg';
+import 'sweetalert2';

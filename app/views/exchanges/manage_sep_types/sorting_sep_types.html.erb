@@ -15,73 +15,47 @@
  <!-- Tab panes -->
 	<div class="tab-content">
 	 	<div id="individual" class="container tab-pane active"><br>
-	    <h3>Individual</h3>
-	    <p>
+	    <h2>titles</h2>
 	   	<div class="container">
 				<div class="row">
-				  <table>
-						<tr>
-							<th>title</th>
-							<th>id</th>
-						</tr>
-						<% @sortable.by_market_kind('individual').each do |sort|%>
-	           	<tr>
-	              <td><%= sort.title%></td>
-	              <td><%= sort.ordinal_position%></td>
-	           	</tr>
-         		<%end%>
-					</table>
+					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
+						<% @sortable.where(market_kind: "individual").active.each_with_index do |sort, i|%>
+		          <div data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+		          	<%= sort.title%>
+		          </div>
+	         	<%end%>
+	        </div>
 				</div>
 			</div>
-			</p>
    	</div>
 	 	<div id="shop" class="container tab-pane fade"><br>
-	    <h3>shop</h3>
-	    <p>
+	    <h2>titles</h2>
 	   	<div class="container">
 				<div class="row">
-				  <table>
-						<tr>
-							<th><h3>title</h3></th>
-							<th><h3>id</h3></th>
-						</tr>
-						<% @sortable.by_market_kind('shop').each do |sort|%>
-	           	<tr>
-	              <td><%= sort.title%></td>
-	              <td><%= sort.ordinal_position%></td>
-	           	</tr>
-         		<%end%>
-					</table>
+					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
+						<% @sortable.where(market_kind: "shop").active.each_with_index do |sort, i|%>
+		          <div data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i + 1%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+		          	<%= sort.title%>
+		          </div>
+	         	<%end%>
+	        </div>
 				</div>
 			</div>
-			</p>
    	</div>
 	 	<div id="fehb" class="container tab-pane fade"><br>
-	    <h3>fehb</h3>
-	    <p>
+	    <h2>titles</h2>
 	   	<div class="container">
 				<div class="row">
-				  <table>
-						<tr>
-							<th><h3>title</h3></th>
-							<th><h3>id</h3></th>
-						</tr>
-						<% @sortable.by_market_kind('fehb').each do |sort|%>
-	           	<tr>
-	              <td><%= sort.title%></td>
-	              <td><%= sort.ordinal_position%></td>
-	           	</tr>
-         		<%end%>
-					</table>
+					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/sort">
+						<% @sortable.by_market_kind('fehb').active.each do |sort|%>
+		          <div data-id="<%= sort.id %>" data-market_kind="<%=sort.market_kind%>"  class="card card-body mb-4"><%= sort.title%></div>
+	         	<%end%>
+	        </div>
 				</div>
 			</div>
-			</p>
-   	</div>
+   	</div>s
   </div>
 </div>
 
-
-<!-- <script type="text/javascript">
-Sortable.create(simpleList, { /* options */ });
-</script> -->
+<%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
 
