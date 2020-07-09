@@ -7,7 +7,7 @@ module Exchanges
     include ::Pundit
     include ::SepAll
 
-    layout "single_column"
+   layout "single_column"
 
     def sep_types_dt
       @selector = params[:scopes][:selector] if params[:scopes].present?
@@ -26,12 +26,14 @@ module Exchanges
 
     def sort
       begin
-        params['sort_data'].values.each do |data|
-          QualifyingLifeEventKind.active.where(market_kind: params[:market_kind], id: data['id']).update(ordinal_position: data['position'])
+        market_kind = params.permit!.to_h['market_kind']
+        sort_data = params.permit!.to_h['sort_data']
+        sort_data.each do |sort|
+          QualifyingLifeEventKind.active.where(market_kind: market_kind, id: sort['id']).update(ordinal_position: sort['position'])
         end
-        render json: { status: 200, message: 'Successfully sorted' }
+        flash[:success] = 'Successfully sorted'
       rescue => e
-        render json: { status: 500, message: 'An error occured while sorting' }
+        flash[:danger] = 'An error occured while sorting'
       end
     end
   end
