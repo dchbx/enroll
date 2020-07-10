@@ -7,8 +7,8 @@ module Exchanges
     include ::Pundit
     include ::SepAll
 
-    layout "single_column"
-    layout 'bootstrap_4', only: [:new]
+    layout "single_column", except: [:new, :sorting_sep_types]
+    layout 'bootstrap_4', only: [:new, :sorting_sep_types]
 
     def new
 
