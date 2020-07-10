@@ -7,7 +7,16 @@ module Exchanges
     include ::Pundit
     include ::SepAll
 
-   layout "single_column"
+    layout "single_column"
+    layout 'bootstrap_4', only: [:new]
+
+    def new
+
+    end
+
+    def create
+
+    end
 
     def sep_types_dt
       @selector = params[:scopes][:selector] if params[:scopes].present?
