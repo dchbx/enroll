@@ -5,6 +5,7 @@
 <div class='container'>
 	<h1> Manage Sep Types </h1>
 	<%= link_to "Sorting Sep Types", sorting_sep_types_exchanges_manage_sep_types_path, class: "btn btn-info" %>
+    <%= link_to 'Create Sep Types', new_exchanges_manage_sep_types_path, {class: 'btn btn-default'} %>
 	<%= raw render_datatable(@datatable) %>
 </div>
 
