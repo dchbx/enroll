@@ -1,5 +1,5 @@
 <%#binding.pry%>
-<%= form_for @qle || QualifyingLifeEventKind.new, url: exchanges_manage_qles_path, method: :post, html: {class: 'form-horizontal'} do |f| %>
+<%= form_for @qle || QualifyingLifeEventKind.new, url: exchanges_manage_sep_types_path, method: :post, html: {class: 'form-horizontal'} do |f| %>
     <% if @qle.present? && @qle.errors.any? %>
         <div class="alert alert-error">
           <h4>
