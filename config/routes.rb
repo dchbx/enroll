@@ -66,7 +66,6 @@ Rails.application.routes.draw do
   namespace :exchanges do
 
     resources :inboxes, only: [:show, :destroy]
-    resources :manage_qles
     resources :announcements, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
     end
@@ -168,7 +167,6 @@ Rails.application.routes.draw do
         get :identity_verification
         post :identity_verification_datatable
         get :new_eligibility
-        get :manage_qle_dt
       end
 
       member do
