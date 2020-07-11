@@ -51,26 +51,26 @@ registry:
               description: Enter Toot Tip
               is_required: true
               is_visible: true
-          - key: :sep_start
-            item: <%= ENV['sep_start'] %>
+          - key: :pre_event_sep_in_days
+            item: <%= ENV['pre_event_sep_in_days'] %>
             meta:
-              label: Sep Start( In Days )
+              label: Pre Event SEP( In Days )
               content_type: :number
               default: ''
               description: Enter Sep Start(In Days)
               is_required: true
               is_visible: true
-          - key: :sep_end
-            item: <%= ENV['sep_end'] %>
+          - key: :post_event_sep_in_days
+            item: <%= ENV['post_event_sep_in_days'] %>
             meta:
-              label: Sep End( In Days )
+              label: Post Event SEP( In Days )
               content_type: :number
               default: ''
               description: Enter Sep End( In Days )
               is_required: true
               is_visible: true
-          - key: :market
-            item: <%= ENV['market'] %>
+          - key: :market_kind
+            item: <%= ENV[':market_kind'] %>
             meta:
               label: Market
               content_type: :select
@@ -79,8 +79,8 @@ registry:
               description: Select Market Kind
               is_required: true
               is_visible: true
-          - key: :self_attestation
-            item: <%= ENV['self_attestation'] %>
+          - key: :is_self_attested
+            item: <%= ENV['is_self_attested'] %>
             meta:
               label: Self Attestation
               content_type: :select
@@ -94,16 +94,16 @@ registry:
             meta:
               label: Reason
               content_type: :select
-              enum: [{self_service: "Self-Service"}, {admin_only: "Admin Only"}]
+              enum: [{lost_access_to_mec: "lost_access_to_mec"}, {adoption: "adoption"}]
               default: ''
               description: Select Reason
               is_required: true
               is_visible: true
-          - key: :coverage_effective
-            item: <%= ENV['coverage_effective'] %>
+          - key: :effective_on_kinds
+            item: <%= ENV['effective_on_kinds'] %>
             meta:
-              label: Coverage Effective
-              enum: [{self_service: "Self-Service"}, {admin_only: "Admin Only"}]
+              label: Effective On Kind
+              enum: [{date_of_event: "date_of_event"}, {first_of_month: "first_of_month"}]
               content_type: :select
               default: ''
               description: Select Coverage Effective Type
