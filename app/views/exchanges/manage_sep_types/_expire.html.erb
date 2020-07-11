@@ -1,0 +1,38 @@
+<div class="bottom-pd">
+  <%= form_for @qle, remote: true, url: expire_sep_type_exchanges_manage_sep_types_path, method: "post", class: "form" do |f|%>
+
+      <h3 class='title'>Expire Sep Type</h3>
+
+      <table  class="table table-striped">
+        <tr>
+          <th>Title</th>
+          <th>Market</th>
+          <th>State</th>
+          <th>Start date</th>
+          <th>End date</th>
+        </tr>
+        <tr>
+          <td><%= @qle.title %></td>
+          <td><%= @qle.market_kind %></td>
+          <td><%= @qle.aasm_state %></td>
+          <td><%= @qle.start_on %></td>
+          <!--#TODO Use Registry Here-->
+          <td><%= text_field_tag "end_on", nil, readonly: true, value: @qle.end_on.present? ? @qle.end_on : TimeKeeper.date_of_record, id: "qle-date-picker_#{@qle.id}", class: "form-control date-field date-picker", "data-date-min" =>  @qle.start_on.present? ? @qle.start_on + 1.day : Date.new(2014,1,1) %></td>
+          <%= hidden_field_tag :qle_id, @qle.id %>
+        </tr>
+        <tr><td colspan = "7"><br /></td></tr>
+        <tr>
+          <td colspan = "6">
+            <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+            <%= f.submit "Expire", :class => "btn btn-primary"%>
+          </td>
+        </tr>
+      </table>
+  <% end %>
+</div>
+
+
+
+
+
+

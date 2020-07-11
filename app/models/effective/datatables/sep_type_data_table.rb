@@ -11,10 +11,12 @@ module Effective
         table_column :state, :label => 'State', :proc => proc { |row| row.is_active ? 'active' : 'Inactive'}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
-            ['Edit'],
-            ['update']
+              #TODO pundit policy
+              ['Publish', sep_type_to_publish_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id.to_s}"),
+               publish_sep_type(row, pundit_allow(Family, :can_update_ssn?)) ],
+              ['Expire', sep_type_to_expire_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id.to_s}"),
+               expire_sep_type(row, pundit_allow(Family, :can_update_ssn?)) ]
           ]
-
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
       end
@@ -25,6 +27,16 @@ module Effective
 
       def global_search?
         true
+      end
+
+      def publish_sep_type(qle, allow)
+        return 'disabled' unless allow  #TODO pundit policy
+        qle.draft? ? 'ajax' : 'disabled'
+      end
+
+      def expire_sep_type(qle, allow)
+        return 'disabled' unless allow  #TODO pundit policy
+        (qle.can_be_expire_pending? || qle.can_be_expired?) ? 'ajax' : 'disabled' # TODO fix DB aasm_states.
       end
 
       def nested_filter_definition

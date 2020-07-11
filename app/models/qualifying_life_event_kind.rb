@@ -2,6 +2,7 @@ class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
   include Config::AcaModelConcern
+  include AASM
 
   # Model Changes to support IVL needs
   ## effective_on_kinds -- type changed to Array to support multiple choices (view to provide choice when size > 1)
@@ -78,6 +79,7 @@ class QualifyingLifeEventKind
   field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
+  field :aasm_state, type: Symbol, default: :draft
 
   field :is_active, type: Boolean, default: true
   field :event_on, type: Date
@@ -108,6 +110,7 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   validate :qle_date_guards
+  embeds_many :workflow_state_transitions, as: :transitional
 
   scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
@@ -197,7 +200,45 @@ class QualifyingLifeEventKind
     reason == "lost_access_to_mec"
   end
 
+  aasm do
+    state :draft, initial: true
+    state :active
+    state :expire_pending
+    state :expired
+
+    event :publish, :after => :record_transition do
+      transitions from: :draft, to: :active, :after => [:activate_qle]  #TODO qle guards
+    end
+
+    event :schedule_expiration, :after => :record_transition do
+      transitions from: [:active, :expire_pending], to: :expire_pending, :after => [:set_end_date]
+    end
+
+    event :expire, :after => :record_transition do
+      transitions from: [:active, :expire_pending], to: :expired, :after => [:set_end_date, :deactivate_qle]
+    end
+
+    event :advance_date, :after => :record_transition do
+      transitions from: [:active, :expire_pending], to: :expired, :after => [:deactivate_qle]
+    end
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: aasm.from_state,
+        to_state: aasm.to_state,
+        event: aasm.current_event
+    )
+  end
+
   class << self
+
+    def advance_day(new_date)
+      QualifyingLifeEventKind.where(:end_on.gt => new_date ).each do |qle|
+        qle.advance_date! if qle.may_advance_date?
+      end
+    end
+
     def shop_market_events
       by_market_kind('shop').and(:is_self_attested.ne => false).active.to_a
     end
@@ -263,8 +304,36 @@ class QualifyingLifeEventKind
     return false unless is_active
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
+
+  def can_be_expire_pending?
+    if end_on.present?
+      [:active, :expire_pending].include?(aasm_state) && self.end_on >= TimeKeeper.date_of_record
+    else
+      [:active, :expire_pending].include?(aasm_state)
+    end
+  end
+
+  def can_be_expired?
+    if end_on.present?
+      [:active, :expire_pending].include?(aasm_state) && (end_on.present? && TimeKeeper.date_of_record > self.end_on)
+    else
+      [:active, :expire_pending].include?(aasm_state)
+    end
+  end
   
   private
+
+  def set_end_date(end_date = TimeKeeper.date_of_record)
+    self.update_attributes({ end_on: end_date })
+  end
+
+  def activate_qle
+    self.update_attributes(is_active: true)
+  end
+
+  def deactivate_qle
+    self.update_attributes(is_active: false)
+  end
 
   def qle_date_guards
     errors.add(:start_on, "start_on cannot be nil when end_on date present") if end_on.present? && start_on.blank?
