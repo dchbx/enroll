@@ -1,4 +1,3 @@
-<%#binding.pry%>
 <%= form_for @qle || QualifyingLifeEventKind.new, url: exchanges_manage_sep_types_path, method: :post, html: {class: 'form-horizontal'} do |f| %>
     <% if @qle.present? && @qle.errors.any? %>
         <div class="alert alert-error">
@@ -27,14 +26,14 @@
 
         <div class="row justify-content-start">
           <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:sep_start),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:self_attestation),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
           </div>
           <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:sep_end),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_effective),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
           </div>
         </div>
       </div>
