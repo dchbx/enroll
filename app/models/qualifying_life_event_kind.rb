@@ -216,7 +216,7 @@ class QualifyingLifeEventKind
     state :active
     state :expire_pending
     state :expired
-    
+
     event :publish, :after => [:record_transition, :update_qle_reason_types] do   #activate QLE  concept
       transitions from: :draft, to: :active, :after => [:activate_qle]  #TODO qle guards  # title should be uniq
     end
