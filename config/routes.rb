@@ -82,10 +82,15 @@ Rails.application.routes.draw do
     end
 
     resources :manage_sep_types do
+      root 'manage_sep_types#sep_types_dt'
       collection do
         get 'sep_types_dt'
         get 'sorting_sep_types'
         patch 'sort'
+        get 'sep_type_to_publish'
+        get 'sep_type_to_expire'
+        post 'publish_sep_type'
+        post 'expire_sep_type'
       end
     end
 

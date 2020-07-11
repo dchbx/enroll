@@ -1,0 +1,36 @@
+<div class="bottom-pd">
+  <%= form_for @qle, remote: true, url: publish_sep_type_exchanges_manage_sep_types_path, method: "post", class: "form" do |f|%>
+
+      <h3 class='title'>Publish Sep Type</h3>
+
+      <table  class="table table-striped">
+        <tr>
+          <th>Title</th>
+          <th>Market</th>
+          <th>State</th>
+          <th>Start date</th>
+        </tr>
+        <tr>
+          <td><%= @qle.title %></td>
+          <td><%= @qle.market_kind %></td>
+          <td><%= @qle.aasm_state %></td>
+          <td><%= @qle.start_on %></td>
+          <%= hidden_field_tag :qle_id, @qle.id %>
+        </tr>
+        <tr><td colspan = "7"><br /></td></tr>
+        <tr>
+          <td colspan = "6">
+            <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+            <%= f.submit "Publish", :class => "btn btn-primary"%>
+          </td>
+        </tr>
+      </table>
+  <% end %>
+</div>
+
+
+
+
+
+
+
