@@ -216,7 +216,7 @@ class QualifyingLifeEventKind
     state :active
     state :expire_pending
     state :expired
-
+    
     event :publish, :after => [:record_transition, :update_qle_reason_types] do   #activate QLE  concept
       transitions from: :draft, to: :active, :after => [:activate_qle]  #TODO qle guards  # title should be uniq
     end
@@ -340,6 +340,7 @@ class QualifyingLifeEventKind
     Types.send(:remove_const, const_name)
     Types.const_set(const_name, Types::Coercible::String.enum(*reasons))
   end
+
 
   def set_end_date(end_date = TimeKeeper.date_of_record)
     self.update_attributes({ end_on: end_date })
