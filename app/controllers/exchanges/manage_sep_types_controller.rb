@@ -7,15 +7,32 @@ module Exchanges
     include ::Pundit
     include ::SepAll
 
-    layout "single_column", except: [:new, :sorting_sep_types]
-    layout 'bootstrap_4', only: [:new, :sorting_sep_types]
+    layout 'single_column', except: [:new, :sorting_sep_types, :edit, :create]
+    layout 'bootstrap_4', only: [:new, :sorting_sep_types, :edit, :create]
 
     def new
 
     end
 
     def create
+      formatted_params = format_create_params(params)
+      result = ::Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
 
+      if result.failure?
+        respond_to do |format|
+          format.html do
+            flash[:error] = result.failure.first
+            render default_template, :flash => { :error => result.failure.first }
+          end
+        end
+      else
+        respond_to do |format|
+          format.html do
+            flash[:success] = result.success.first
+            redirect_to sep_types_dt_exchanges_manage_sep_types_path
+          end
+        end
+      end
     end
 
     def sep_type_to_publish
@@ -101,6 +118,17 @@ module Exchanges
       rescue => e
         flash[:danger] = 'An error occured while sorting'
       end
+    end
+
+    private
+
+    def default_template
+      :new
+    end
+
+    def format_create_params(params)
+      params.permit!
+      params['qualifying_life_event_kind']['settings'].to_h
     end
   end
 end
