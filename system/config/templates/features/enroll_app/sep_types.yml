@@ -74,7 +74,7 @@ registry:
             meta:
               label: Market
               content_type: :select
-              enum: [{individual: "Individual"}, {shop: "Shop"}, {congress: "Congress"}]
+              enum: [{individual: "Individual"}, {shop: "Shop"}, {fehb: "Fehb"}]
               default: ''
               description: Select Market Kind
               is_required: true
