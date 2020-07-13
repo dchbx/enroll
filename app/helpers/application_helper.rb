@@ -146,21 +146,20 @@ module ApplicationHelper
   end
 
   def select_control(setting, form)
-    id = setting[:key].to_s
-    selected_option = "Choose..."
+    id   = setting[:key]
     meta = setting[:meta]
-    options = form.object.send("#{id}".to_sym) || meta.default || 'Choose...'
-    aria_describedby = id
+    
+    # options = form.object.send(id) || meta.default || 'Choose...'
+    aria_describedby = id.to_s
 
-    select_options = meta.enum.collect {|tt| tt.to_a.flatten}
-    option_list = tag.option(selected_option, selected: true)
-    select_options.each do |choice|
-      true_or_false = choice[1] == form.object.send("#{id}".to_sym)
-      choice[0] = choice[0].to_s.humanize
-      option_list += tag.option(choice, selected: true_or_false)
+    value = form.object.send(id)
+    option_list = tag.option("Choose...", selected: (value.blank? ? true : false))
+    
+    meta.enum.each do |choice|
+      option_list += tag.option(choice.first[1], selected: (choice.first[0].to_s == value.to_s), value: choice.first[0])
     end
 
-    tag.select(option_list, id: id, class: "form-control", name: form&.object_name.to_s + "[settings][#{id}]")
+    tag.select(option_list, id: id.to_s, class: "form-control", name: form&.object_name.to_s + "[settings][#{id}]")
   end
 
   def input_number_control(setting, form)
