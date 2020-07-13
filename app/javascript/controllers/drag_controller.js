@@ -45,6 +45,7 @@ export default class extends Controller {
 			setTimeout(function() {
 			  flashDiv.hide();
 			}, 3000);
+
   		})
 	}
 }
