@@ -135,7 +135,7 @@ module ApplicationHelper
     id = setting[:key].to_s
 
     meta = setting[:meta]
-    input_value = setting.item || meta&.default
+    input_value = form.object.send("#{id}".to_sym) || setting.item || meta&.default
     aria_describedby = id
 
     # if meta[:attribute]
@@ -149,13 +149,15 @@ module ApplicationHelper
     id = setting[:key].to_s
     selected_option = "Choose..."
     meta = setting[:meta]
-    options = meta.value || meta.default
-
+    options = form.object.send("#{id}".to_sym) || meta.default || 'Choose...'
     aria_describedby = id
 
+    select_options = meta.enum.collect {|tt| tt.to_a.flatten}
     option_list = tag.option(selected_option, selected: true)
-    meta.enum.each do |choice|
-      option_list += tag.option(choice.values.first)
+    select_options.each do |choice|
+      true_or_false = choice[1] == form.object.send("#{id}".to_sym)
+      choice[0] = choice[0].to_s.humanize
+      option_list += tag.option(choice, selected: true_or_false)
     end
 
     tag.select(option_list, id: id, class: "form-control", name: form&.object_name.to_s + "[settings][#{id}]")
@@ -164,8 +166,7 @@ module ApplicationHelper
   def input_number_control(setting, form)
     id = setting[:key].to_s
     meta = setting[:meta]
-    input_value = meta.value || meta.default
-    # input_value = setting[:value] || setting[:default]
+    input_value = form.object.send("#{id}".to_sym) || meta.default
     aria_describedby = id
 
     # if setting[:attribute]
