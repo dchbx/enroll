@@ -4,13 +4,10 @@
 body {
   background-color: $medium-gray;
   -webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale;
   font-family: 'Open Sans', sans-serif;
 }
 
-#sort_success_msg {
-  display: none;
-}
 .card-body {
     flex: 1 1 auto;
     min-height: 1px;
@@ -43,4 +40,3 @@ footer {
 .welcome-text {
   margin-top: 70px;
 }
-

@@ -119,8 +119,9 @@ module Exchanges
         sort_data.each do |sort|
           QualifyingLifeEventKind.active.where(market_kind: market_kind, id: sort['id']).update(ordinal_position: sort['position'])
         end
+        render json: { message: "Successfully sorted", status: 'success' }, status: :ok
       rescue => e
-        flash[:danger] = 'An error occured while sorting'
+        render json: { message: "An error occured while sorting", status: 'error' }, status: :internal_server_error
       end
     end
 
