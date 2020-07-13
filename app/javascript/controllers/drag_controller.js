@@ -24,5 +24,6 @@ export default class extends Controller {
 								'X-CSRF-Token': Rails.csrfToken()
 								}
 		})
+		.then(result => document.getElementById("sort_success_msg").style.display="block")
 	}
 }

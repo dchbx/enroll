@@ -119,7 +119,6 @@ module Exchanges
         sort_data.each do |sort|
           QualifyingLifeEventKind.active.where(market_kind: market_kind, id: sort['id']).update(ordinal_position: sort['position'])
         end
-        flash[:success] = 'Successfully sorted'
       rescue => e
         flash[:danger] = 'An error occured while sorting'
       end
