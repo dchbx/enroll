@@ -98,6 +98,7 @@ module ApplicationHelper
     end
   end
 
+
   # TODO Resource Registry Changes.  <<<------
   def generate_breadcrumbs(breadcrumbs)
     html = "<ul class='breadcrumb'>".html_safe
