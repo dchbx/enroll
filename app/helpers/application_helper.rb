@@ -131,11 +131,42 @@ module ApplicationHelper
     end
   end
 
+  def input_text_control(setting, form)
+    id = setting[:key].to_s
+    meta = setting[:meta]
+    input_value = form.object.send(id) || setting.item || meta&.default
+    aria_describedby = id
+
+    tag.input(nil, type: "text", value: input_value, id: id, name: form&.object_name.to_s + "[settings][#{setting.key}]", class: "form-control", required: true)
+  end
+
+  def input_radio_control(setting, form)
+    id = setting[:key].to_s
+    meta = setting.meta
+    input_value = form.object.send(id).to_s || setting.item || meta&.default
+    aria_label  = 'Radio button for following text input'
+
+    if setting.is_a?(ResourceRegistry::Setting)
+      element_name = form&.object_name.to_s + "[settings][#{id}]"
+    else
+      element_name = form&.object_name.to_s + "[is_enabled]"
+      input_value  = setting.is_enabled
+    end
+
+    meta.enum.collect do |choice|
+      choice = eval(choice) if choice.is_a?(String)
+      input_group do
+        tag.div(tag.div(tag.input(nil, type: 'radio', name: element_name, value: choice.first[0], checked: input_value.to_s == choice.first[0].to_s, required: true), class: 'input-group-text'), class: 'input-group-prepend') +
+          tag.input(nil, type: 'text', placeholder: choice.first[1], class: 'form-control', aria: {label: aria_label })
+      end
+    end.join('').html_safe
+  end
+
   def input_date_control(setting, form)
     id = setting[:key].to_s
 
     meta = setting[:meta]
-    input_value = form.object.send("#{id}".to_sym) || setting.item || meta&.default
+    input_value = form.object.send(id) || setting.item || meta&.default
     aria_describedby = id
 
     # if meta[:attribute]
@@ -165,14 +196,21 @@ module ApplicationHelper
   def input_number_control(setting, form)
     id = setting[:key].to_s
     meta = setting[:meta]
-    input_value = form.object.send("#{id}".to_sym) || meta.default
+    input_value = form.object.send(id) || meta.default
     aria_describedby = id
+    element_name = form&.object_name.to_s + "[settings][#{id}]"
 
     # if setting[:attribute]
-    tag.input(nil, type: "number", step:"any", value: input_value, id: id, name: form&.object_name.to_s + "[settings][#{id}]",class: "form-control", required: true, oninput: "check(this)")
+    tag.input(nil, type: 'number', step: 'any', value: input_value, id: id, name: element_name,class: 'form-control', required: true, oninput: 'check(this)')
     # else
     #   tag.input(nil, type: "number", step:"any", value: input_value, id: id, name: form&.object_name.to_s + "[value]",class: "form-control", required: true, oninput: "check(this)")
     # end
+  end
+
+  def effective_on_kinds_collection
+    ::QualifyingLifeEventKind::EffectiveOnKinds.inject([]) do |os_objects, effective_on_kind|
+      os_objects << OpenStruct.new({name: effective_on_kind.humanize, value: effective_on_kind})
+    end
   end
 
   # TODO Resource Registry Changes.  <<<------

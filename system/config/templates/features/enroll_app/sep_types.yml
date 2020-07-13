@@ -83,10 +83,10 @@ registry:
             item: <%= ENV['is_self_attested'] %>
             meta:
               label: Self Attestation
-              content_type: :select
-              enum: [{self_service: "Self-Service"}, {admin_only: "Admin Only"}]
-              default: ''
-              description: Select Self Attestation Type
+              content_type: :radio_select
+              default: true
+              enum: [ {'true': 'Self-Service' }, { 'false': 'Admin Only'} ]
+              description: 'Select Self Attestation Type'
               is_required: true
               is_visible: true
           - key: :reason
@@ -94,7 +94,7 @@ registry:
             meta:
               label: Reason
               content_type: :select
-              enum: [{lost_access_to_mec: "Lost Access To MEC"}, {adoption: "Adoption"}]
+              enum: [{lost_access_to_mec: 'Lost Access To MEC'}, {adoption: 'Adoption'}]
               default: ''
               description: Select Reason
               is_required: true
@@ -103,7 +103,7 @@ registry:
             item: <%= ENV['effective_on_kinds'] %>
             meta:
               label: Effective On Kind
-              enum: [{date_of_event: "date_of_event"}, {first_of_month: "first_of_month"}]
+              enum: [{date_of_event: 'Date of Event'}, {first_of_month: 'First of Month'}]
               content_type: :select
               default: ''
               description: Select Coverage Effective Type
