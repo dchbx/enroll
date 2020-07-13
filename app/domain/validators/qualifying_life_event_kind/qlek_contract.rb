@@ -19,11 +19,11 @@ module Validators
       end
 
       rule(:pre_event_sep_in_days) do
-        key.failure('Invalid Pre Event SEP( In Days )') unless value > 0
+        key.failure('Invalid Pre Event SEP( In Days )') unless value >= 0
       end
 
       rule(:post_event_sep_in_days) do
-        key.failure('Invalid Post Event SEP( In Days )') unless value > 0
+        key.failure('Invalid Post Event SEP( In Days )') unless value >= 0
       end
 
       rule(:market_kind) do
