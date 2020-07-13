@@ -8,6 +8,7 @@ module Exchanges
     include ::SepAll
 
    layout "single_column"
+   layout 'bootstrap_4', only: [:new, :sorting_sep_types]
 
     def sep_types_dt
       @selector = params[:scopes][:selector] if params[:scopes].present?
@@ -31,7 +32,6 @@ module Exchanges
         sort_data.each do |sort|
           QualifyingLifeEventKind.active.where(market_kind: market_kind, id: sort['id']).update(ordinal_position: sort['position'])
         end
-        flash[:success] = 'Successfully sorted'
       rescue => e
         flash[:danger] = 'An error occured while sorting'
       end
