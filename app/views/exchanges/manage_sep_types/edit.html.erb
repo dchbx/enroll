@@ -1,0 +1,40 @@
+<%# form.object.send("#{id}".to_sym).to_s %>
+
+<%= form_for @qle, url: exchanges_manage_sep_type_path(@qle.id), method: :post, html: {class: 'form-horizontal'} do |f| %>
+    <div class="container">
+      <div class="col-12">
+        <div class="row justify-content-start">
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:start_on), f) %>
+          </div>
+
+          <div class="col-6">
+            <%#= datepicker_control f, :end_on, {:class => "floatlabel form-control", :placeholder => "mm/dd/yyyy", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true}, f.object.end_on %>
+
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on), f) %>
+          </div>
+        </div>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:title), f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
+
+        <div class="row justify-content-start">
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
+          </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
+          </div>
+        </div>
+      </div>
+    </div>
+   <%#= TODO pundit poilcy%>
+    <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+      <div class="col-sm-offset-2 col-sm-10">
+        <%= f.submit 'Create Announcement', class: 'btn btn-default' %>
+      </div>
+    </div>
+<% end %>
