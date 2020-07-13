@@ -12,17 +12,14 @@ module Operations
         merged_params    = yield merge_additional_params(qle_create_params)
         validated_params = yield validate_params(merged_params)
         entity_object    = yield initialize_entity(validated_params)
-        create_qlek_object(entity_object)
+        create(entity_object)
       end
 
       private
 
       def merge_additional_params(qle_create_params)
         max_ordinal_position = fetch_max_ordinal_position_by_market(qle_create_params[:market_kind])
-        is_self_attested = fetch_is_self_attested(qle_create_params[:is_self_attested])
         params = qle_create_params.merge({ ordinal_position: (max_ordinal_position + 1),
-                                           is_self_attested: is_self_attested,
-                                           effective_on_kinds: [qle_create_params[:effective_on_kinds]],
                                            market_kind: qle_create_params[:market_kind].downcase})
 
         Success(fix_date_params(params))
@@ -44,9 +41,10 @@ module Operations
         Success(result)
       end
 
-      def create_qlek_object(entity_object)
+      def create(entity_object)
         model_params = entity_object.to_h
         ::QualifyingLifeEventKind.new(model_params).save!
+        # TODO: return created object.
         Success(['A new SEP Type was successfully created.'])
       end
 
@@ -55,12 +53,9 @@ module Operations
         qleks.pluck(:ordinal_position).max || 0
       end
 
-      def fetch_is_self_attested(self_attested)
-        self_attested == 'Self-Service'
-      end
-
       # TODO: refactor code to send dates in dd/mm/yyyy or fix the contract to store the date from mm/dd/yyyy format
       def fix_date_params(params)
+        # TODO: use parse to fix the issue.
         start_on = params[:start_on]
         start_on = "#{start_on.split('/').second}/#{start_on.split('/').first}/#{start_on.split('/').last}"
         end_on = params[:end_on]
