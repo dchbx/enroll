@@ -8,6 +8,19 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+#sort_success_msg {
+  display: none;
+}
+.card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 0.25rem;
+}
+
+.manage_sep_types .mb-4, .my-4 {
+    margin-bottom: 0.50rem !important;
+}
+
 .nm-content {
   height: calc(100vh - 175px);
   overflow-y: auto;
@@ -30,3 +43,4 @@ footer {
 .welcome-text {
   margin-top: 70px;
 }
+
