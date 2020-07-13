@@ -11,24 +11,21 @@ module Exchanges
     layout 'bootstrap_4', only: [:new, :sorting_sep_types, :edit, :create]
 
     def new
-
+      @qle = ::Forms::QualifyingLifeEventKindForm.for_new({})
     end
 
     def create
       formatted_params = format_create_params(params)
+      @qle = ::Forms::QualifyingLifeEventKindForm.new(formatted_params)
       result = ::Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
 
-      if result.failure?
-        respond_to do |format|
-          format.html do
+      respond_to do |format|
+        format.html do
+          if result.failure?
             flash[:error] = result.failure.first
             render default_template, :flash => { :error => result.failure.first }
-          end
-        end
-      else
-        respond_to do |format|
-          format.html do
-            flash[:success] = result.success.first
+          else
+            flash[:success] = 'A new SEP Type was successfully created.'
             redirect_to sep_types_dt_exchanges_manage_sep_types_path
           end
         end
@@ -128,7 +125,8 @@ module Exchanges
 
     def format_create_params(params)
       params.permit!
-      params['qualifying_life_event_kind']['settings'].to_h
+      effective_on_kinds = params['forms_qualifying_life_event_kind_form']['effective_on_kinds'].reject(&:blank?)
+      params['forms_qualifying_life_event_kind_form']['settings'].merge({'effective_on_kinds' => effective_on_kinds}).to_h
     end
   end
 end

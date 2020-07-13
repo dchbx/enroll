@@ -19,11 +19,11 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
         title: 'test title',
         tool_tip: 'jhsdjhs',
         pre_event_sep_in_days: '10',
-        is_self_attested: 'Self-Service',
+        is_self_attested: 'true',
         reason: 'lost_access_to_mec',
         post_event_sep_in_days: '88',
         market_kind: 'Individual',
-        effective_on_kinds: 'date_of_event' }
+        effective_on_kinds: ['date_of_event'] }
     end
 
     before :each do
@@ -47,11 +47,11 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
         title: 'test title',
         tool_tip: 'jhsdjhs',
         pre_event_sep_in_days: '10',
-        is_self_attested: 'Self-Service',
+        is_self_attested: 'true',
         reason: 'lost_access_to_mec',
         post_event_sep_in_days: '88',
         market_kind: 'Individual',
-        effective_on_kinds: 'date_of_event' }
+        effective_on_kinds: ['date_of_event'] }
     end
 
     before :each do
