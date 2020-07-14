@@ -17,12 +17,10 @@ module Operations
 
       private
 
-      def merge_additional_params(qle_create_params)
-        max_ordinal_position = fetch_max_ordinal_position_by_market(qle_create_params[:market_kind])
-        params = qle_create_params.merge({ ordinal_position: (max_ordinal_position + 1),
-                                           market_kind: qle_create_params[:market_kind].downcase})
-
-        Success(fix_date_params(params))
+      def merge_additional_params(params)
+        params.merge!({ordinal_position: 0})
+        params.merge!({reason: params[:other_reason]}) if params['reason'] == 'other'
+        Success(params)
       end
 
       def validate_params(merged_params)
@@ -43,25 +41,9 @@ module Operations
 
       def create(entity_object)
         model_params = entity_object.to_h
-        ::QualifyingLifeEventKind.new(model_params).save!
-        # TODO: return created object.
-        Success(['A new SEP Type was successfully created.'])
-      end
-
-      def fetch_max_ordinal_position_by_market(market_kind)
-        qleks = ::QualifyingLifeEventKind.by_market_kind(market_kind)
-        qleks.pluck(:ordinal_position).max || 0
-      end
-
-      # TODO: refactor code to send dates in dd/mm/yyyy or fix the contract to store the date from mm/dd/yyyy format
-      def fix_date_params(params)
-        # TODO: use parse to fix the issue.
-        start_on = params[:start_on]
-        start_on = "#{start_on.split('/').second}/#{start_on.split('/').first}/#{start_on.split('/').last}"
-        end_on = params[:end_on]
-        end_on = "#{end_on.split('/').second}/#{end_on.split('/').first}/#{end_on.split('/').last}"
-
-        params.merge({start_on: start_on, end_on: end_on})
+        qlek = ::QualifyingLifeEventKind.new(model_params)
+        qlek.save!
+        Success(qlek)
       end
 
     end

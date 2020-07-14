@@ -14,15 +14,15 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
   context 'for success case' do
 
     let(:qlek_create_params) do
-      { start_on: TimeKeeper.date_of_record.to_s,
-        end_on: (TimeKeeper.date_of_record + 30.days).to_s,
+      { start_on: "#{TimeKeeper.date_of_record.year}-07-01",
+        end_on: "#{TimeKeeper.date_of_record.year}-08-01",
         title: 'test title',
         tool_tip: 'jhsdjhs',
         pre_event_sep_in_days: '10',
         is_self_attested: 'true',
         reason: 'lost_access_to_mec',
         post_event_sep_in_days: '88',
-        market_kind: 'Individual',
+        market_kind: 'individual',
         effective_on_kinds: ['date_of_event'] }
     end
 
@@ -31,7 +31,11 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
     end
 
     it 'should return success' do
-      expect(@result).to eq(Dry::Monads::Result::Success.new(['A new SEP Type was successfully created.']))
+      expect(@result).to be_a(Dry::Monads::Result::Success)
+    end
+
+    it 'should return a qlek object' do
+      expect(@result.success).to be_a(::QualifyingLifeEventKind)
     end
 
     it 'should create QualifyingLifeEventKind object' do
@@ -42,15 +46,15 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
   context 'for failure case' do
 
     let(:qlek_create_params) do
-      { start_on: (TimeKeeper.date_of_record + 30.days).to_s,
-        end_on: TimeKeeper.date_of_record.to_s,
+      { start_on: "#{TimeKeeper.date_of_record.year}-08-19",
+        end_on: "#{TimeKeeper.date_of_record.year}-07-19",
         title: 'test title',
         tool_tip: 'jhsdjhs',
         pre_event_sep_in_days: '10',
         is_self_attested: 'true',
         reason: 'lost_access_to_mec',
         post_event_sep_in_days: '88',
-        market_kind: 'Individual',
+        market_kind: 'individual',
         effective_on_kinds: ['date_of_event'] }
     end
 

@@ -31,7 +31,7 @@ module Validators
       end
 
       rule(:ordinal_position) do
-        key.failure('Invalid Ordinal Position') unless value > 0
+        key.failure('Invalid Ordinal Position') unless value >= 0
       end
 
       rule(:end_on, :start_on) do
