@@ -32,6 +32,14 @@ module Exchanges
       end
     end
 
+    def edit
+      @qle = QualifyingLifeEventKind.find(params[:id])
+    end
+
+    def update
+
+    end
+
     def sep_type_to_publish
       # authorize Family, :can_update_ssn? # TODO pundit policy
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
