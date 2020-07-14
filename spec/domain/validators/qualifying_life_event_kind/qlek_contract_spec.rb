@@ -14,8 +14,8 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
   context 'success case' do
     let(:contract_params) do
-      { start_on: "01/01/#{TimeKeeper.date_of_record.year}",
-        end_on: "02/02/#{TimeKeeper.date_of_record.year}",
+      { start_on: "#{TimeKeeper.date_of_record.year}-07-01",
+        end_on: "#{TimeKeeper.date_of_record.year}-08-01",
         title: "test title",
         tool_tip: "jhsdjhs",
         pre_event_sep_in_days: "10",
@@ -42,8 +42,8 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
   context 'failure case' do
     let(:contract_params) do
-      { start_on: "03/03/#{TimeKeeper.date_of_record.year}",
-        end_on: "02/02/#{TimeKeeper.date_of_record.year}",
+      { start_on: "#{TimeKeeper.date_of_record.year}-08-19",
+        end_on: "#{TimeKeeper.date_of_record.year}-07-19",
         title: "test title",
         tool_tip: "jhsdjhs",
         pre_event_sep_in_days: "10",
