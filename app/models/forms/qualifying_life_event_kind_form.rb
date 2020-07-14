@@ -39,6 +39,7 @@ module Forms
     attribute :ivl_effective_kinds, Types::Array.of(Types::String)
     attribute :shop_effective_kinds, Types::Array.of(Types::String)
     attribute :fehb_effective_kinds, Types::Array.of(Types::String)
+    
 
     def self.for_new(params = {})
       if params.blank?
