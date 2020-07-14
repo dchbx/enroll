@@ -98,7 +98,27 @@ module ApplicationHelper
     end
   end
 
+
+
   # TODO Resource Registry Chnages.---->>>
+
+  def custom_form_group(setting, control)
+    id          = setting[:key].to_s
+    # label       = setting[:title] || id.titleize
+    label       = setting.meta.label || id.titleize
+    help_id     = id + 'HelpBlock'
+    help_text   = setting.meta.description
+    aria_label  = "#{setting.meta.content_type.to_s.humanize} button for following text input" #setting[:aria_label] || "Radio button for following text input"
+
+
+    tag.div(class: "form-group") do
+      tag.label(for: id, value: label, aria: { label: aria_label }) do
+        label
+      end +
+      control + tag.small(help_text, id: help_id, class: %w(form-text text-muted))
+    end
+  end
+
 
   def build_option_field(option, form)
     type = option.meta.content_type&.to_sym
@@ -110,6 +130,8 @@ module ApplicationHelper
                         input_file_control(option, form)
                       when :radio_select
                         input_radio_control(option, form)
+                      when :checkbox_select
+                        input_checkbox_control(option, form)
                       when :select
                         select_control(option, form)
                       when :number
@@ -124,8 +146,8 @@ module ApplicationHelper
                         input_text_control(option, form)
                     end
 
-    if type == :radio_select
-      radio_form_group(option, input_control)
+    if type == :radio_select || type == :checkbox_select
+      custom_form_group(option, input_control)
     else
       form_group(option, input_control)
     end
@@ -161,6 +183,24 @@ module ApplicationHelper
       end
     end.join('').html_safe
   end
+
+  def input_checkbox_control(setting, form)
+    id = setting[:key].to_s
+    meta = setting.meta
+    input_value = form.object.send(id).to_s || setting.item || meta&.default
+    aria_label  = 'Checkbox button for following text input'
+
+    element_name = form&.object_name.to_s + "[settings][#{id}][]"
+
+    meta.enum.collect do |choice|
+      choice = eval(choice) if choice.is_a?(String)
+      input_group do
+        tag.div(tag.div(tag.input(nil, type: 'checkbox', name: element_name, value: choice.first[0], checked: input_value.include?(choice.first[0].to_s), required: false), class: 'input-group-text'), class: 'input-group-prepend') +
+          tag.input(nil, type: 'text', placeholder: choice.first[1], class: 'form-control', aria: {label: aria_label })
+      end
+    end.join('').html_safe
+  end
+
 
   def input_date_control(setting, form)
     id = setting[:key].to_s
