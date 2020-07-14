@@ -68,7 +68,9 @@ module VlpDoc
   end
 
   def get_vlp_doc_subject_by_consumer_role(consumer_role)
-    consumer_role&.vlp_documents&.where(id: consumer_role.active_vlp_document_id)&.first&.subject
+    unless consumer_role.local_residency_validation == 'attested' && consumer_role.residency_determined_at.present?
+      consumer_role&.vlp_documents&.where(id: consumer_role.active_vlp_document_id)&.first&.subject
+    end
   end
 
   def sensitive_info_changed?(role)
