@@ -39,7 +39,6 @@
     </div>
 <% end %>
 
-
 <script type="text/javascript" charset="utf-8">
   document.getElementById("other_reason").setAttribute("type", "hidden");
   document.getElementById("other_reasonHelpBlock").style.display = "none";
@@ -60,7 +59,7 @@
     }
     var str = "<option>" + "Choose..." + "</option>"
       for (var item of items) {
-          str += "<option>" + item + "</option>"
+        str += "<option>" + item[0] + "</option>" + "<value>" + item[1] + "</value>"
       }
     str += "<option>" + "other" + "</option>"
     document.getElementById("reason").innerHTML = str;
@@ -77,4 +76,4 @@
       document.getElementById("other_reasonHelpBlock").style.display = "none";  
     }
   });
-</script>>
+</script>

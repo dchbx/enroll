@@ -19,31 +19,29 @@ module Forms
     attribute :market_kind, String
     attribute :effective_on_kinds, Array[String]
     attribute :ordinal_position, Integer
+    attribute :id, String
+
     attribute :ivl_reasons, Array[String]
     attribute :shop_reasons, Array[String]
     attribute :fehb_reasons, Array[String]
     attribute :other_reason, String
 
-    attribute :id, String
-
-    def self.for_new(params)
-      form = self.new(params)
-      form[:ivl_reasons] = individual_market_reasons
-      form[:shop_reasons] = shop_market_reasons
-      form[:fehb_reasons] = fehb_market_reasons
-      form
+    def self.for_new(_params)
+      self.new(fetch_market_reasons)
     end
 
-    def self.individual_market_reasons
-      QualifyingLifeEventKind.individual_market_events.map(&:reason).map(&:humanize)
-    end
+    class << self
+      def fetch_market_reasons
+        { ivl_reasons: market_reasons('individual'),
+          shop_reasons: market_reasons('shop'),
+          fehb_reasons: market_reasons('fehb')}
+      end
 
-    def self.fehb_market_reasons
-      QualifyingLifeEventKind.fehb_market_events.map(&:reason).map(&:humanize)
-    end
-
-    def self.shop_market_reasons
-      QualifyingLifeEventKind.shop_market_events.map(&:reason).map(&:humanize)
+      def market_reasons(market_kind)
+        QualifyingLifeEventKind.send("#{market_kind}_market_events").map(&:reason).uniq.inject([]) do |options_select, reason|
+          options_select << [reason.titleize, reason]
+        end
+      end
     end
   end
 end
