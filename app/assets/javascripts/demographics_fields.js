@@ -277,7 +277,7 @@ var PersonValidations = (function(window, undefined) {
             PersonValidations.restoreRequiredAttributes(e);
           } else {}
         }
-        if ($(this).attr('placeholder') == 'Naturalization Number' ) {
+        if ($(this).attr('placeholder') == 'Naturalization Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
