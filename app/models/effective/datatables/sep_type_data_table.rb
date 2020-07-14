@@ -9,6 +9,7 @@ module Effective
         table_column :Market, :label => 'Market', :proc => proc { |row| row.market_kind}, :filter => false, :sortable => false
         table_column :start_date, :label => 'Start Date', :proc => proc { |row| row.start_on }, :filter => false, :sortable => false
 
+
         table_column :state, :label => 'State', :proc => proc { |row| row.aasm_state}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
