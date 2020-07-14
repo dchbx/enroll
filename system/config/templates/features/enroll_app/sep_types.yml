@@ -103,8 +103,8 @@ registry:
             item: <%= ENV['effective_on_kinds'] %>
             meta:
               label: Effective On Kind
-              enum: [{date_of_event: 'Date of Event'}, {first_of_month: 'First of Month'}]
-              content_type: :select
+              enum: [{date_of_event: Date of Event}, {first_of_month: First of Month}, {first_of_this_month: First of This Month}, {first_of_next_month: First of Next Month}, {fixed_first_of_next_month: Fixed First of Next Month}, {exact_date: Exact Date}]
+              content_type: :checkbox_select
               default: ''
               description: Select Coverage Effective Type
               is_required: true

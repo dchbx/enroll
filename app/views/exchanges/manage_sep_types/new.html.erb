@@ -24,13 +24,7 @@
           <div class="col-6">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
-
-            <%= f.collection_check_boxes(:effective_on_kinds, effective_on_kinds_collection, :value, :name)  do |effective_on_kind| %>
-              <div>
-                <%= effective_on_kind.label(:'data-value' => effective_on_kind.value) { effective_on_kind.check_box + effective_on_kind.text } %>
-              </div>
-            <% end %>
-
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
           </div>
         </div>
       </div>
