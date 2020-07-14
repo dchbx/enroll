@@ -35,7 +35,6 @@ module Forms
     end
 
     def self.individual_market_reasons
-      binding.pry
       QualifyingLifeEventKind.individual_market_events.map(&:reason).map(&:humanize)
     end
 
