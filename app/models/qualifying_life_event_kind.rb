@@ -81,7 +81,7 @@ class QualifyingLifeEventKind
   field :ordinal_position, type: Integer
   field :aasm_state, type: Symbol, default: :draft
 
-  field :is_active, type: Boolean, default: true
+  field :is_active, type: Boolean, default: false
   field :event_on, type: Date
   field :qle_event_date_kind, type: Symbol, default: :qle_on
   field :coverage_effective_on, type: Date
