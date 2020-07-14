@@ -30,7 +30,7 @@ export default class extends Controller {
 				let flashDiv = $("#sort_notification_msg");
 				flashDiv.show()
   			if (data['status'] === "success"){
-                
+
 				flashDiv.addClass("success")
 				flashDiv.removeClass("error")
 				flashDiv.find(".toast-header").addClass("success")
