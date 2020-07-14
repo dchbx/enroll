@@ -278,7 +278,7 @@ var PersonValidations = (function(window, undefined) {
           } else {}
         }
         if ($(this).attr('placeholder') == 'Naturalization Number' ) {
-          if ($(this).val().length < 1 && $('#naturalization_doc_type_select').is(':visible')) {
+          if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
           } else {}
@@ -287,7 +287,7 @@ var PersonValidations = (function(window, undefined) {
 
         } else {
           if ($(this).attr('placeholder') == 'Passport Number') {
-            if ($(this).val().length < 1 && $('#vlp_documents_container').is(':visible')) {
+            if ($(this).val().length < 1) {
               alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
               PersonValidations.restoreRequiredAttributes(e);
 
