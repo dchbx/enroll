@@ -29,10 +29,13 @@ export default class extends Controller {
   			console.log("Result - " + data['status'])
   			let flasshDiv = $("#sort_success_msg");
   			if (data['status'] === "success"){
-  				flasshDiv.html("<div class='alert alert-success'><div class='row'><div class='col-md-12'><div class='row'><a class='close' data-dismiss='alert' href='#'>×</a>Successfully sorted</div></div></div></div>")
+  				flasshDiv.html("<div class='alert alert-success'><div class='row'><div class='col-md-12'><div class='row'><a class='close' data-dismiss='alert' href='#'>×</a>" + data['message'] + "</div></div></div></div>")
   			}else{
-  				flasshDiv.html("<div class='alert alert-danger'><div class='row'><div class='col-md-12'><div class='row'><a class='close' data-dismiss='alert' href='#'>×</a>Successfully sorted</div></div></div></div>")
+  				flasshDiv.html("<div class='alert alert-danger'><div class='row'><div class='col-md-12'><div class='row'><a class='close' data-dismiss='alert' href='#'>×</a>" + data['message'] + "</div></div></div></div>")
   			}
+			setTimeout(function() {
+			  flasshDiv.html("");
+			}, 3000);
   		})
 	}
 }
