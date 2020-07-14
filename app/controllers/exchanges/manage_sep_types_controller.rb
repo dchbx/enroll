@@ -133,8 +133,7 @@ module Exchanges
 
     def format_create_params(params)
       params.permit!
-      effective_on_kinds = params['forms_qualifying_life_event_kind_form']['effective_on_kinds'].reject(&:blank?)
-      params['forms_qualifying_life_event_kind_form']['settings'].merge({'effective_on_kinds' => effective_on_kinds}).to_h
+      params['forms_qualifying_life_event_kind_form']['settings'].to_h
     end
   end
 end
