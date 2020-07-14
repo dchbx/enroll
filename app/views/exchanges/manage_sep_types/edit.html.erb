@@ -1,5 +1,3 @@
-<%# form.object.send("#{id}".to_sym).to_s %>
-
 <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle.id), method: :post, html: {class: 'form-horizontal'} do |f| %>
     <div class="container">
       <div class="col-12">
@@ -9,8 +7,6 @@
           </div>
 
           <div class="col-6">
-            <%#= datepicker_control f, :end_on, {:class => "floatlabel form-control", :placeholder => "mm/dd/yyyy", :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true}, f.object.end_on %>
-
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on), f) %>
           </div>
         </div>
@@ -26,15 +22,23 @@
           <div class="col-6">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
+
+            <%= f.collection_check_boxes(:effective_on_kinds, effective_on_kinds_collection, :value, :name)  do |effective_on_kind| %>
+              <div>
+                <%= effective_on_kind.label(:'data-value' => effective_on_kind.value) { effective_on_kind.check_box + effective_on_kind.text } %>
+              </div>
+            <% end %>
+
           </div>
         </div>
       </div>
     </div>
-   <%#= TODO pundit poilcy%>
-    <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
-      <div class="col-sm-offset-2 col-sm-10">
-        <%= f.submit 'Create Announcement', class: 'btn btn-default' %>
+    <%#= TODO pundit poilcy%>
+    <% if @qle.draft? %>
+      <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+        <div class="col-sm-offset-2 col-sm-10">
+          <%= f.submit 'Update SEP Type', class: 'btn btn-default' %>
+        </div>
       </div>
-    </div>
+    <% end %>
 <% end %>
