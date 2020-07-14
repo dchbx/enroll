@@ -103,6 +103,7 @@ module ApplicationHelper
 
 
 
+
   def effective_on_kinds_collection
     ::QualifyingLifeEventKind::EffectiveOnKinds.inject([]) do |os_objects, effective_on_kind|
       os_objects << OpenStruct.new({name: effective_on_kind.humanize, value: effective_on_kind})
