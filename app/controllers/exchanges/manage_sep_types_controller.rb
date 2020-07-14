@@ -9,7 +9,7 @@ module Exchanges
 
     
 
-    
+
     layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types]
 
