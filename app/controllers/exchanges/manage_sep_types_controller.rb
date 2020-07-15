@@ -11,13 +11,13 @@ module Exchanges
     layout 'bootstrap_4', only: [:new, :sorting_sep_types, :edit, :create]
 
     def new
-      @qle = ::Forms::QualifyingLifeEventKindForm.for_new({})
+      @qle = Forms::QualifyingLifeEventKindForm.for_new({})
     end
 
     def create
       formatted_params = format_create_params(params)
-      @qle = ::Forms::QualifyingLifeEventKindForm.new(formatted_params)
-      result = ::Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
+      @qle = Forms::QualifyingLifeEventKindForm.new(formatted_params)
+      result = Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
 
       respond_to do |format|
         format.html do
@@ -37,7 +37,6 @@ module Exchanges
     end
 
     def update
-
     end
 
     def sep_type_to_publish
@@ -133,7 +132,7 @@ module Exchanges
 
     def format_create_params(params)
       params.permit!
-      params['forms_qualifying_life_event_kind_form']['settings'].to_h
+      params['forms_qualifying_life_event_kind_form'].to_h
     end
   end
 end
