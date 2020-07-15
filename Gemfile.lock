@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 75b66bd642632266647132a22516f3c96c6bdf94
+  revision: 2f3288ce459ef52a7d0d643479f5caf4ff0a6d75
   branch: branch_0.8.0
   specs:
     resource_registry (0.7.0)
@@ -440,7 +440,7 @@ GEM
       dry-equalizer (~> 0.3)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.5.1)
+    dry-validation (1.5.2)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.4)
