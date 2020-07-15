@@ -11,6 +11,7 @@ FactoryBot.define do
     post_event_sep_in_days { 30 }
     is_self_attested { true }
     ordinal_position { 15 }
+    is_active { false }
     tool_tip { "Enroll or add a family member because of marriage" }
 
     trait :effective_on_event_date do
