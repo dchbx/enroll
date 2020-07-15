@@ -243,4 +243,42 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
     consts.each {|const| Types.send(:remove_const, const.to_sym) if types_module_constants.include?(const.to_sym)}
     load File.join(Rails.root, 'app/domain/types.rb')
   end
+
+  context 'for sorting_sep_types' do
+
+    before do
+      sign_in(current_user)
+      get :sorting_sep_types
+    end
+
+    it 'should return http redirect' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'should have response body' do
+      expect(response.body).to match /Individual/i
+      expect(response.body).to match /Shop/i
+      expect(response.body).to match /Congress/i
+    end
+  end
+
+  context 'for sort' do
+    let(:params) do
+      { 'market_kind' => 'shop', 'sort_data' => [{'id' => q1.id, 'position' => 3}, 'id' => q2.id, 'position' => 4]}
+    end
+
+    before do
+      sign_in(current_user)
+      patch :sort, params: params
+    end
+
+    it 'should return http redirect' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'should update the position' do
+      expect(QualifyingLifeEventKind.find(q1.id).ordinal_position).to equal 3
+      expect(QualifyingLifeEventKind.find(q2.id).ordinal_position).to equal 4
+    end
+  end
 end
