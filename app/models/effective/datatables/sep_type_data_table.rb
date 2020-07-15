@@ -42,7 +42,7 @@ module Effective
       def nested_filter_definition
         manage_qles_tab = [
           {scope: 'all', label: 'All'},
-          {scope: 'shop_qles', label: 'SHOP', subfilter: :employer_options},
+          {scope: 'shop_qles', label: 'Shop', subfilter: :employer_options},
           {scope: 'fehb_qles', label: 'Congress', subfilter: :congress_options}
         ]
         manage_qles_tab.insert(1, {scope: 'ivl_qles', label: 'Individual', subfilter: :individual_options}) if individual_market_is_enabled?
