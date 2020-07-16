@@ -10,8 +10,8 @@ module Operations
 
       def call(params)
         values = yield validate(params)
-        entity = yield create_entity(values)
-        qle    = yield create_model(entity)
+        entity = yield initialize_entity(values)
+        qle    = yield persist_data(entity)
 
         Success(qle)
       end
@@ -29,13 +29,13 @@ module Operations
         end
       end
 
-      def create_entity(values)
+      def initialize_entity(values)
         result = ::Entities::QualifyingLifeEventKind.new(values.to_h)
 
         Success(result)
       end
 
-      def create_model(entity)
+      def persist_data(entity)
         qle = ::QualifyingLifeEventKind.new(entity.to_h)
         qle.save!
 
