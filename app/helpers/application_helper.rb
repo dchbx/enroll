@@ -98,12 +98,6 @@ module ApplicationHelper
     end
   end
 
-  def effective_on_kinds_collection
-    ::QualifyingLifeEventKind::EffectiveOnKinds.inject([]) do |os_objects, effective_on_kind|
-      os_objects << OpenStruct.new({name: effective_on_kind.humanize, value: effective_on_kind})
-    end
-  end
-
   # TODO Resource Registry Changes.  <<<------
   def generate_breadcrumbs(breadcrumbs)
     html = "<ul class='breadcrumb'>".html_safe
