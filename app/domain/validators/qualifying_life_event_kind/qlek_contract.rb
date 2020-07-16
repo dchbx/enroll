@@ -15,7 +15,17 @@ module Validators
         required(:post_event_sep_in_days).filled(:integer)
         required(:market_kind).filled(:string)
         required(:effective_on_kinds).array(:string)
-        required(:ordinal_position).filled(:integer)
+        optional(:ordinal_position).filled(:integer)
+        optional(:other_reason).filled(:string)
+
+        before(:value_coercer) do |result|
+          other_params = {ordinal_position: 0}
+          if result.to_h[:reason] == 'other'
+            other_params[:reason] = result.to_h[:other_reason]
+          end
+
+          result.to_h.merge(other_params || {})
+        end
       end
 
       rule(:pre_event_sep_in_days) do

@@ -8,44 +8,39 @@ module Operations
     class Create
       include Dry::Monads[:result, :do]
 
-      def call(qle_create_params)
-        merged_params    = yield merge_additional_params(qle_create_params)
-        validated_params = yield validate_params(merged_params)
-        entity_object    = yield initialize_entity(validated_params)
-        create(entity_object)
+      def call(params)
+        values = yield validate(params)
+        entity = yield create_entity(values)
+        qle    = yield create_model(entity)
+
+        Success(qle)
       end
 
       private
 
-      def merge_additional_params(params)
-        params.merge!({ordinal_position: 0})
-        params.merge!({reason: params[:other_reason]}) if params['reason'] == 'other'
-        Success(params)
-      end
-
-      def validate_params(merged_params)
-        result = ::Validators::QualifyingLifeEventKind::QlekContract.new.call(merged_params)
-
+      def validate(params)
+        result = ::Validators::QualifyingLifeEventKind::QlekContract.new.call(params)
+ 
         if result.success?
           Success(result)
         else
           errors = result.errors.to_h.values.flatten
-          Failure(errors)
+          Failure([result, errors])
         end
       end
 
-      def initialize_entity(validated_params)
-        result = ::Entities::QualifyingLifeEventKind.new(validated_params.to_h)
+      def create_entity(values)
+        result = ::Entities::QualifyingLifeEventKind.new(values.to_h)
+
         Success(result)
       end
 
-      def create(entity_object)
-        model_params = entity_object.to_h
-        qlek = ::QualifyingLifeEventKind.new(model_params)
-        qlek.save!
-        Success(qlek)
-      end
+      def create_model(entity)
+        qle = ::QualifyingLifeEventKind.new(entity.to_h)
+        qle.save!
 
+        Success(qle)
+      end
     end
   end
 end

@@ -11,19 +11,19 @@ module Exchanges
     layout 'bootstrap_4', only: [:new, :sorting_sep_types, :edit, :create]
 
     def new
-      @qle = Forms::QualifyingLifeEventKindForm.for_new({})
+      @qle = Forms::QualifyingLifeEventKindForm.for_new
     end
 
     def create
       formatted_params = format_create_params(params)
-      @qle = Forms::QualifyingLifeEventKindForm.new(formatted_params)
       result = Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
 
       respond_to do |format|
         format.html do
           if result.failure?
-            flash[:error] = result.failure.first
-            render default_template, :flash => { :error => result.failure.first }
+            @qle = Forms::QualifyingLifeEventKindForm.for_new(result.failure[0].to_h)
+
+            render :new, :flash => { :error => result.failure[1] }
           else
             flash[:success] = 'A new SEP Type was successfully created.'
             redirect_to sep_types_dt_exchanges_manage_sep_types_path
@@ -37,6 +37,23 @@ module Exchanges
     end
 
     def update
+      formatted_params = format_create_params(params)
+      result = Operations::QualifyingLifeEventKind::Update.new.call(formatted_params)
+
+      respond_to do |format|
+        format.html do
+          if result.failure?
+            @qle = QualifyingLifeEventKind.new(formatted_params)
+            @qle = Forms::QualifyingLifeEventKindForm.new(formatted_params)
+
+            flash[:error] = result.failure.first
+            render :new, :flash => { :error => result.failure.first }
+          else
+            flash[:success] = 'A new SEP Type was successfully created.'
+            redirect_to sep_types_dt_exchanges_manage_sep_types_path
+          end
+        end
+      end
     end
 
     def sep_type_to_publish
@@ -126,8 +143,11 @@ module Exchanges
 
     private
 
-    def default_template
-      :new
+    def qle_params
+      params.require(:qualifying_life_event_kind_form).permit(
+        :start_on,:end_on,:title,:tool_tip,:pre_event_sep_in_days,
+        :is_self_attested, :reason, :post_event_sep_in_days,
+        :market_kind,:effective_on_kinds, :ordinal_position).to_h.symbolize_keys
     end
 
     def format_create_params(params)
