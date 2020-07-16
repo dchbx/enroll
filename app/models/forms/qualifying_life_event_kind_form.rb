@@ -63,6 +63,15 @@ module Forms
       self.new(update_params)
     end
 
+    def self.for_edit(params)
+      qlek_params = fetch_qlek_data(params[:id])
+      qlek_params.merge!(fetch_market_reasons)
+      qlek_params.symbolize_keys!
+      params = default_keys_hash
+      params.merge!(qlek_params)
+      self.new(params)
+    end
+
     class << self
       def fetch_additional_params
         { ivl_reasons: market_reasons('individual'),
