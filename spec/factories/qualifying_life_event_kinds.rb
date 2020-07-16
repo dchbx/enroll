@@ -23,6 +23,13 @@ FactoryBot.define do
       tool_tip { "Enroll or add a family member due to birth" }
     end
 
+    trait :adoption do
+      title { "Adopted a child" }
+      reason {"adoption"}
+      edi_code {"05-ADOPTION"}
+      tool_tip {"Enroll or add a family member due to adoption"}
+    end
+
     trait :effective_on_first_of_month do
       title { "Married" }
       edi_code { "32-MARRIAGE" }
