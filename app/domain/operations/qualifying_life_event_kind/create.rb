@@ -21,6 +21,9 @@ module Operations
       def validate(params)
         result = ::Validators::QualifyingLifeEventKind::QlekContract.new.call(params)
 
+      def validate(params)
+        result = ::Validators::QualifyingLifeEventKind::QlekContract.new.call(params)
+ 
         if result.success?
           Success(result)
         else
@@ -31,7 +34,6 @@ module Operations
 
       def initialize_entity(values)
         result = ::Entities::QualifyingLifeEventKind.new(values.to_h)
-
         Success(result)
       end
 
