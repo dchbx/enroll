@@ -7,8 +7,8 @@ module Exchanges
     include ::Pundit
     include ::SepAll
 
-    layout 'single_column', except: [:new, :sorting_sep_types, :edit, :create]
-    layout 'bootstrap_4', only: [:new, :sorting_sep_types, :edit, :create]
+    layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types]
+    layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types]
 
     def new
       @qle = Forms::QualifyingLifeEventKindForm.for_new
@@ -33,23 +33,23 @@ module Exchanges
     end
 
     def edit
-      @qle = QualifyingLifeEventKind.find(params[:id])
+      params.permit!
+      @qle = Forms::QualifyingLifeEventKindForm.for_edit(params.to_h)
     end
 
     def update
-      formatted_params = format_create_params(params)
+      formatted_params = format_update_params(params)
       result = Operations::QualifyingLifeEventKind::Update.new.call(formatted_params)
 
       respond_to do |format|
         format.html do
           if result.failure?
-            @qle = QualifyingLifeEventKind.new(formatted_params)
-            @qle = Forms::QualifyingLifeEventKindForm.new(formatted_params)
+            @qle = Forms::QualifyingLifeEventKindForm.for_update(formatted_params)
 
-            flash[:error] = result.failure.first
-            render :new, :flash => { :error => result.failure.first }
+            flash[:danger] = result.failure[1].first
+            render :edit
           else
-            flash[:success] = 'A new SEP Type was successfully created.'
+            flash[:success] = 'The SEP Type was successfully updated.'
             redirect_to sep_types_dt_exchanges_manage_sep_types_path
           end
         end
@@ -151,6 +151,12 @@ module Exchanges
 
     def format_create_params(params)
       params.permit!
+      params['forms_qualifying_life_event_kind_form'].to_h
+    end
+
+    def format_update_params(params)
+      params.permit!
+      params['forms_qualifying_life_event_kind_form'].merge!({_id: params[:id]})
       params['forms_qualifying_life_event_kind_form'].to_h
     end
   end

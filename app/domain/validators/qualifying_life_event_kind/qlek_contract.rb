@@ -17,6 +17,7 @@ module Validators
         required(:effective_on_kinds).array(:string)
         optional(:ordinal_position).filled(:integer)
         optional(:other_reason).maybe(:string)
+        optional(:_id).maybe(:string)
 
         before(:value_coercer) do |result|
           other_params = {}
