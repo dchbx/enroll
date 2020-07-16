@@ -7,7 +7,6 @@ Feature: Admin can manage sep types like create, edit, update, delete and sort
     And the user will see the Manage Sep Types under admin dropdown
     When Admin clicks Manage Sep Types
     
-
   Scenario: Navigate to Manage Sep Types screen
     When the Admin is navigated to the Manage Sep Types screen
     Then the Admin has the ability to use the following filters for documents provided: All, Individual, Shop and Congress
