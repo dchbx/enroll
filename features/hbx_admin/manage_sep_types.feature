@@ -15,7 +15,20 @@ Feature: Admin can manage sep types like create, edit, update, delete and sort
   Scenario: Admin has ability to sort the sep types and save the positions to the database
     Given the Admin is navigated to the Manage Sep Types screen
     When Admin will click on the Sorting Sep Types button
-    Then Admin will see three tabs Individual, Shop and Congress markets
-    And Admin will sort Individual market sep types
+    Then Admin should see three tabs Individual, Shop and Congress markets
+    When Admin clicks on Individual tab
+    Then Admin should see listed Individual market sep types with ascending ordinal positions
+    When Admin sorts Individual sep types by drag and drop
     Then Admin should see successful message after sorting
+    And listed Individual sep types ordrinal postions should change
+    When Admin clicks on Shop tab
+    Then Admin should see listed Shop market sep types with ascending ordinal positions
+    When Admin sorts Shop sep types by drag and drop
+    Then Admin should see successful message after sorting
+    And listed Shop sep types ordrinal postions should change
+    When Admin clicks on Congress tab
+    Then Admin should see listed Congress market sep types with ascending ordinal positions
+    When Admin sorts Congress sep types by drag and drop
+    Then Admin should see successful message after sorting
+    And listed Congress sep types ordrinal postions should change
     And Hbx Admin logs out
