@@ -16,15 +16,13 @@ module Validators
         required(:market_kind).filled(:string)
         required(:effective_on_kinds).array(:string)
         optional(:ordinal_position).filled(:integer)
-        optional(:other_reason).filled(:string)
+        optional(:other_reason).maybe(:string)
 
         before(:value_coercer) do |result|
-          other_params = {ordinal_position: 0}
-          if result.to_h[:reason] == 'other'
-            other_params[:reason] = result.to_h[:other_reason]
-          end
-
-          result.to_h.merge(other_params || {})
+          other_params = {}
+          other_params[:ordinal_position] = 0 if result.to_h[:ordinal_position].nil?
+          other_params[:reason] = result.to_h[:other_reason] if result.to_h[:reason] == 'other'
+          result.to_h.merge(other_params)
         end
       end
 

@@ -15,16 +15,16 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
 
   context 'for create' do
     let(:post_params) do
-      { 'forms_qualifying_life_event_kind_form' => { 'settings' => { 'start_on' => '2020-07-01',
-                                                                     'end_on' => '2020-07-31',
-                                                                     'title' => 'test title',
-                                                                     'tool_tip' => 'jhsdjhs',
-                                                                     'pre_event_sep_in_days' => '10',
-                                                                     'is_self_attested' => 'true',
-                                                                     'reason' => 'lost_access_to_mec',
-                                                                     'post_event_sep_in_days' => '88',
-                                                                     'market_kind' => 'Individual'},
-                                                                     'effective_on_kinds' => ['date_of_event'] }}
+      { :forms_qualifying_life_event_kind_form => { start_on: '2020-07-01',
+                                                    end_on: '2020-07-31',
+                                                    title: 'test title',
+                                                    tool_tip: 'jhsdjhs',
+                                                    pre_event_sep_in_days: '10',
+                                                    is_self_attested: 'true',
+                                                    reason: 'lost_access_to_mec',
+                                                    post_event_sep_in_days: '88',
+                                                    market_kind: 'individual',
+                                                    effective_on_kinds: ['date_of_event'] }}
     end
 
     before do

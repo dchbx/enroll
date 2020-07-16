@@ -23,8 +23,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
         reason: "lost_access_to_mec",
         post_event_sep_in_days: "88",
         market_kind: "individual",
-        effective_on_kinds: ["date_of_event"],
-        ordinal_position: 1 }
+        effective_on_kinds: ["date_of_event"]}
     end
 
     before  do
@@ -51,8 +50,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
         reason: "lost_access_to_mec",
         post_event_sep_in_days: "88",
         market_kind: "individual",
-        effective_on_kinds: ["date_of_event"],
-        ordinal_position: 1 }
+        effective_on_kinds: ["date_of_event"]}
     end
 
     before  do
