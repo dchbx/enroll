@@ -20,10 +20,11 @@ module Forms
     attribute :market_kind, Types::String
     attribute :effective_on_kinds, Types::Array.of(Types::String)
     attribute :ordinal_position, Types::Integer.default(0)
-    attribute :id, Types::String.optional
+    attribute :_id, Types::String.optional
 
     attribute :reason, Types::String
     attribute :other_reason, Types::String
+    attribute :draft, Types::Bool
 
     attribute :ivl_reasons, Types::Array.of(Types::String)
     attribute :shop_reasons, Types::Array.of(Types::String)
@@ -32,12 +33,21 @@ module Forms
 
     def self.for_new(params = {})
       if params.blank?
-        params = schema.inject({}) {|hash, item| hash[item.name]= nil; hash}
+        params = default_keys_hash
       else
         schema.each {|item| params[item.name] = nil unless params.has_key?(item.name)}
       end
 
       new(params.merge(fetch_market_reasons))
+    end
+
+    def self.for_edit(params)
+      qlek_params = fetch_qlek_data(params[:id])
+      qlek_params.merge!(fetch_market_reasons)
+      qlek_params.symbolize_keys!
+      params = default_keys_hash
+      params.merge!(qlek_params)
+      self.new(params)
     end
 
     class << self
@@ -50,6 +60,19 @@ module Forms
       def market_reasons(market_kind)
         QualifyingLifeEventKind.send("#{market_kind}_market_events").map(&:reason).uniq.inject([]) do |options_select, reason|
           options_select << [reason.titleize, reason]
+        end
+      end
+
+      def fetch_qlek_data(id)
+        qle = ::QualifyingLifeEventKind.find(id)
+        params = qle.attributes
+        params.merge!({draft: qle.draft?})
+      end
+
+      def default_keys_hash
+        schema.inject({}) do |attribte_hash, item|
+          attribte_hash[item.name] = nil
+          attribte_hash
         end
       end
     end

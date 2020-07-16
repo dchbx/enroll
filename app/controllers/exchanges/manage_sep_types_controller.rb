@@ -22,8 +22,8 @@ module Exchanges
         format.html do
           if result.failure?
             @qle = Forms::QualifyingLifeEventKindForm.for_new(result.failure[0].to_h)
-
-            render :new, :flash => { :error => result.failure[1] }
+            flash[:danger] = result.failure[1].first
+            render :new
           else
             flash[:success] = 'A new SEP Type was successfully created.'
             redirect_to sep_types_dt_exchanges_manage_sep_types_path
