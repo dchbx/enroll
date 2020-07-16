@@ -65,11 +65,14 @@ module Forms
 
     def self.for_edit(params)
       qlek_params = fetch_qlek_data(params[:id])
-      qlek_params.merge!(fetch_market_reasons)
-      qlek_params.symbolize_keys!
-      params = default_keys_hash
-      params.merge!(qlek_params)
-      self.new(params)
+      edit_params = default_keys_hash.merge(qlek_params.symbolize_keys)
+      self.new(edit_params)
+    end
+
+    def self.for_update(params)
+      qlek_params = fetch_qlek_data(params[:_id]).merge(params)
+      update_params = default_keys_hash.merge(qlek_params.symbolize_keys)
+      self.new(update_params)
     end
 
     class << self
