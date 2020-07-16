@@ -12,7 +12,7 @@ Feature: Admin can manage sep types like create, edit, update, delete and sort
     Then the Admin has the ability to use the following filters for documents provided: All, Individual, Shop and Congress
     And Hbx Admin logs out
 
-  Scenario: Admin has ability to sort the sep types and save the positions to the database
+  Scenario: Admin has ability to sort the sep types and saves the ordinal positions to the database
     Given the Admin is navigated to the Manage Sep Types screen
     When Admin will click on the Sorting Sep Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
