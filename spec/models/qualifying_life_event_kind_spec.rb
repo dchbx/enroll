@@ -15,7 +15,8 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
         reason: "marriage",
         effective_on_kinds: ["first_of_month"],
         pre_event_sep_in_days: 0,
-        post_event_sep_in_days: 30
+        post_event_sep_in_days: 30,
+        is_active: true
       }
     end
 
@@ -189,7 +190,8 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
           reason: "marriage",
           effective_on_kinds: ["first_of_month"],
           pre_event_sep_in_days: 0,
-          post_event_sep_in_days: 30
+          post_event_sep_in_days: 30,
+          is_active: true
         }
       end
 

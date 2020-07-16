@@ -1277,7 +1277,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       before :each do
         allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
+          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth", is_active: true),
           :qle_on => qle_on
           ))
       end
@@ -1296,7 +1296,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       before :each do
         allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19"),
+          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19", is_active: true),
           :qle_on => qle_on
           ))
       end
