@@ -11,11 +11,13 @@ FactoryBot.define do
     post_event_sep_in_days { 30 }
     is_self_attested { true }
     ordinal_position { 15 }
-    is_active { false }
+    is_active { true }
+    aasm_state {:active}
     tool_tip { "Enroll or add a family member because of marriage" }
 
     trait :effective_on_event_date do
       title { "Had a baby" }
+      reason {"birth"}
       edi_code { "02-BIRTH" }
       effective_on_kinds { ["date_of_event"] }
       tool_tip { "Enroll or add a family member due to birth" }

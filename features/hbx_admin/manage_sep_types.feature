@@ -1,21 +1,21 @@
 Feature: Admin can manage sep types like create, edit, update, delete and sort
   Background:
-    Given an HBX admin exists
-    Given the HBX admin is logged in
+    Given a Hbx admin with read and write permissions exists
+    When Hbx Admin logs on to the Hbx Portal
     Given the user is on the Main Page
-    And the user will see the Manage Sep Types tab 
-    When Admin clicks Manage Sep Types tab under admin dropdown
+    Given Qualifying life events of all markets are present
+    And the user will see the Manage Sep Types under admin dropdown
+    When Admin clicks Manage Sep Types
     
-
   Scenario: Navigate to Manage Sep Types screen
     When the Admin is navigated to the Manage Sep Types screen
     Then the Admin has the ability to use the following filters for documents provided: All, Individual, Shop and Congress
     And Hbx Admin logs out
 
-  Scenario: Admin has ability to sort the sep types and save the positions to database
-    When the Admin is navigated to the Manage Sep Types screen
-    Then Admin will click on the Sorting Sep Types button
-    #/html/body/div[3]/div[3]/a[1]
-
-    # Then the Admin has the ability to use the following filters for documents provided: Fully Uploaded, Partially Uploaded, None Uploaded, All
-    # Then the Admin is directed to that user's My DC Health Link page
+  Scenario: Admin has ability to sort the sep types and save the positions to the database
+    Given the Admin is navigated to the Manage Sep Types screen
+    When Admin will click on the Sorting Sep Types button
+    Then Admin will see three tabs Individual, Shop and Congress markets
+    And Admin will sort Individual market sep types
+    Then Admin should see successful message after sorting
+    And Hbx Admin logs out

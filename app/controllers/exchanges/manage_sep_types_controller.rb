@@ -114,8 +114,7 @@ module Exchanges
     end
 
     def sep_types_dt
-      @selector = params[:scopes][:selector] if params[:scopes].present?
-      @datatable = Effective::Datatables::SepTypeDataTable.new(params[:scopes])
+      @datatable = Effective::Datatables::SepTypeDataTable.new
       respond_to do |format|
         format.html { render "/exchanges/manage_sep_types/sep_type_datatable.html.erb" }
       end
