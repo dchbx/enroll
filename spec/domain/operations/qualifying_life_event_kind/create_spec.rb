@@ -63,7 +63,11 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
     end
 
     it 'should return failure' do
-      expect(@result).to eq(Dry::Monads::Result::Failure.new(['End on must be after start on date']))
+      expect(@result).to be_a(Dry::Monads::Result::Failure)
+    end
+
+    it 'should return error message' do
+      expect(@result.failure[1]).to eq(['End on must be after start on date'])
     end
 
     it 'should not create any QualifyingLifeEventKind objects' do
