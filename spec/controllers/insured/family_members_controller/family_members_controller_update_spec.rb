@@ -11,7 +11,7 @@ RSpec.describe Insured::FamilyMembersController do
         addresses: [],
         same_with_primary: 'true',
         family_id: family_id,
-        family_member: family_member
+        family_member: family_member,
       )
     end
     let(:family) { instance_double(Family, id: family_id) }
@@ -31,10 +31,7 @@ RSpec.describe Insured::FamilyMembersController do
       )
     end
     let(:consumer_role) do
-      instance_double(
-        ConsumerRole,
-        person: double(no_dc_address: false)
-      )
+      FactoryBot.create(:consumer_role)
     end
 
     let(:dependent_controller_parameters) do

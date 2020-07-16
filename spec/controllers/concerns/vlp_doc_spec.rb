@@ -20,13 +20,13 @@ describe FakesController do
 
       it "should convert the date string to dateTime instance" do
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(String)
-        expect(subject.update_vlp_documents(consumer_role, person_kind))
+        expect(subject.update_vlp_documents?(consumer_role, person_kind))
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(DateTime)
       end
 
       context 'active_vlp_document_id' do
         before :each do
-          subject.update_vlp_documents(consumer_role, person_kind)
+          subject.update_vlp_documents?(consumer_role, person_kind)
         end
 
         it 'should return a value which is a bson object' do
@@ -122,7 +122,7 @@ describe FakesController do
     end
   end
 
-  context '#validate_vlp_params' do
+  context '#validate_vlp_params?' do
     context 'for primary' do
       let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
 
@@ -150,7 +150,7 @@ describe FakesController do
         let(:params) { ActionController::Parameters.new(invalid_params)}
 
         before do
-          subject.validate_vlp_params(params, 'person', person.consumer_role, nil)
+          subject.validate_vlp_params?(params, 'person', person.consumer_role, nil)
         end
 
         it 'should add errors to the object if params are invalid' do
@@ -183,7 +183,7 @@ describe FakesController do
         let(:params) { ActionController::Parameters.new(valid_params)}
 
         before do
-          subject.validate_vlp_params(params, 'person', person.consumer_role, nil)
+          subject.validate_vlp_params?(params, 'person', person.consumer_role, nil)
         end
 
         it 'should not add any errors to the object if params are valid' do
@@ -218,7 +218,7 @@ describe FakesController do
         let(:params) { ActionController::Parameters.new(invalid_params)}
 
         before do
-          subject.validate_vlp_params(params, 'dependent', nil, dependent)
+          subject.validate_vlp_params?(params, 'dependent', nil, dependent)
         end
 
         it 'should add errors to the object if params are invalid' do
@@ -250,7 +250,7 @@ describe FakesController do
         let(:params) { ActionController::Parameters.new(valid_params)}
 
         before do
-          subject.validate_vlp_params(params, 'dependent', nil, dependent)
+          subject.validate_vlp_params?(params, 'dependent', nil, dependent)
         end
 
         it 'should not add any errors to the object if params are valid' do

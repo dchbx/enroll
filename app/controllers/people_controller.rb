@@ -194,7 +194,7 @@ class PeopleController < ApplicationController
     @family = @person.primary_family
     @person.updated_by = current_user.oim_id unless current_user.nil?
     if @person.is_consumer_role_active? && request.referer.include?("insured/families/personal")
-      @valid_vlp = update_vlp_documents(@person.consumer_role, 'person')
+      @valid_vlp = update_vlp_documents?(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
       redirect_path = family_account_path
@@ -202,7 +202,8 @@ class PeopleController < ApplicationController
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
-      if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
+      # TODO: Originally this said @valid_vlp != false, which is super sloppy and suggests that true and nil share the same results
+      if @valid_vlp.blank? && @person.update_attributes!(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active?
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)

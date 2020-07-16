@@ -92,7 +92,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
         post :update,  params: {id: person.id, person: person_attributes}
         expect(response).to redirect_to(personal_insured_families_path)
         expect(assigns(:person)).not_to be_nil
-        expect(assigns(:valid_vlp)).to eq(true)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
       end
 
@@ -103,14 +102,18 @@ RSpec.describe PeopleController, dbclean: :after_each do
         person_attributes.merge!({"is_applying_coverage" => "false"})
 
         post :update, params: {id: person.id, person: person_attributes}
-        expect(assigns(:valid_vlp)).to eq(true)
         expect(assigns(:person).consumer_role.is_applying_coverage).to eq false
       end
 
-      context 'person update failed' do
+      context "residency verified, but vlp docs present" do
         let!(:invalid_vlp_doc) { FactoryBot.build(:vlp_document, subject: 'Other (With Alien Number)') }
         let!(:consumer_role_attributes) { person.consumer_role.attributes.to_hash}
-        let!(:person_attributes) { person.attributes.to_hash}
+        let!(:person_attributes) do
+          attrs = person.attributes.to_hash
+          attrs[:naturalized_citizen] = 'true'
+          attrs[:eligible_immigration_status] = 'true'
+          attrs
+        end
         let!(:invalid_vlp_documents_attributes) { {"1" => invalid_vlp_doc.attributes.to_hash}}
 
         before do
@@ -118,12 +121,12 @@ RSpec.describe PeopleController, dbclean: :after_each do
           allow(consumer_role).to receive(:check_for_critical_changes).and_return(true)
           consumer_role_attributes[:vlp_documents_attributes] = invalid_vlp_documents_attributes
           person_attributes[:consumer_role] = consumer_role_attributes
+          consumer_role.update_attributes!(local_residency_validation: 'attested')
+          consumer_role.update_attributes!(residency_determined_at: TimeKeeper.date_of_record - 6.months)
           post :update, params: {id: person.id, person: person_attributes}
         end
-
-        it "should update is_applying_coverage" do
-          expect(assigns(:valid_vlp)).to eq(false)
-          expect(flash[:alert]).to include('Person update failed.')
+        it "should not throw errors" do
+          expect(flash[:alert]).to eq(nil)
         end
       end
     end

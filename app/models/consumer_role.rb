@@ -861,13 +861,13 @@ class ConsumerRole
 
   def check_native_status(family, native_status_changed)
     return unless native_status_changed
-    return unless family.person_has_an_active_enrollment?(person)
+    return unless family.person_has_an_active_enrollment?(person) if family
 
     if person.tribal_id.present?
       fail_indian_tribe
       fail_native_status!
     else
-      pass_native_status! if all_types_verified? && !fully_verified?
+      pass_native_status! if all_types_verified? && !fully_verified? && verification_outstanding?
     end
   end
 

@@ -281,7 +281,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     context "to verify new addreses not created on updating the existing address" do
 
       before :each do
-        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        allow(controller).to receive(:update_vlp_documents?).and_return(true)
         put :update, params: { person: person_params, id: "test" }
       end
 
@@ -301,7 +301,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
     context "updates active employee roles if active employee roles are present for dual roles" do
       before :each do
-        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        allow(controller).to receive(:update_vlp_documents?).and_return(true)
         allow(person).to receive(:employee_roles).and_return [employee_role]
         put :update, params: { person: person_params, id: "test" }
       end
@@ -314,7 +314,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
     it "should update existing person" do
       allow(consumer_role).to receive(:update_by_person).and_return(true)
-      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:update_vlp_documents?).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:redirect)
@@ -322,7 +322,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should redirect to family members path when current user is admin & doing new paper app" do
-      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:update_vlp_documents?).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return true
       put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:redirect)
@@ -330,7 +330,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should not update the person" do
-      allow(controller).to receive(:update_vlp_documents).and_return(false)
+      allow(controller).to receive(:update_vlp_documents?).and_return(false)
       allow(consumer_role).to receive(:update_by_person).and_return(true)
       put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:success)
@@ -338,7 +338,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should not update the person" do
-      allow(controller).to receive(:update_vlp_documents).and_return(false)
+      allow(controller).to receive(:update_vlp_documents?).and_return(false)
       allow(consumer_role).to receive(:update_by_person).and_return(false)
       put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:success)
@@ -353,7 +353,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should call bubble_address_errors_by_person" do
-      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:update_vlp_documents?).and_return(true)
       allow(consumer_role).to receive(:update_by_person).and_return(false)
       expect(controller).to receive(:bubble_address_errors_by_person)
       put :update, params: { person: person_params, id: "test" }
@@ -377,7 +377,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
     it "should redirect to family members path when current user has application type as Curam" do
       allow(consumer_role).to receive(:update_by_person).and_return(true)
-      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:update_vlp_documents?).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:redirect)
@@ -387,7 +387,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Curam' do
       person_params["family"]["application_type"] = "Curam"
       allow(consumer_role).to receive(:update_by_person).and_return(true)
-      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:update_vlp_documents?).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, params: { person: person_params, id: "test" }
       expect(consumer_role.identity_validation). to eq 'valid'
@@ -400,7 +400,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     it "should redirect to family members path when current user has application type as Mobile" do
       person_params["family"]["application_type"] = "Mobile"
       allow(consumer_role).to receive(:update_by_person).and_return(true)
-      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:update_vlp_documents?).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, params: { person: person_params, id: "test" }
       expect(response).to have_http_status(:redirect)
@@ -410,7 +410,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Mobile' do
       person_params["family"]["application_type"] = "Mobile"
       allow(consumer_role).to receive(:update_by_person).and_return(true)
-      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:update_vlp_documents?).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, params: { person: person_params, id: "test" }
       expect(consumer_role.identity_validation). to eq 'valid'

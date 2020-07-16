@@ -11,11 +11,29 @@ module VlpDoc
     ]
   end
 
-  def validate_vlp_params(params, source, consumer_role, dependent)
-    params.permit!
+  def run_validate_vlp_params?(params, source, consumer_role)
+    if consumer_role.present?
+      # This means that they are completely verified and require no validation
+      return false if consumer_role.local_residency_validation == 'attested' && consumer_role.residency_determined_at.present?
+    end
     # REFS 88247: This will prevent an error from being thrown that
     # doesn't allow updating of person that has VLP docs, but has verified residency status
-    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true")
+    # This commit originally fixed the bug in 88247
+    # https://github.com/dchbx/enroll/blob/643b132a7bb150ebc05ec8f6ffaf370b2b97e2d2/app/controllers/concerns/vlp_doc.rb#L18
+    # but needed restructuring to preven tother failures
+    if (params[source][:naturalized_citizen] == "true" && params[source][:naturalized_citizen].present?)
+      return false
+    end
+    if (params[source][:eligible_immigration_status] == "true" && params[source][:naturalized_citizen].present?)
+      return false
+    end
+    # If none of the above conditions are false, run the validations
+    true
+  end
+
+  def validate_vlp_params?(params, source, consumer_role, dependent)
+    params.permit!
+    if run_validate_vlp_params?(params, source, consumer_role)
       if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
         vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
         result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
@@ -32,15 +50,18 @@ module VlpDoc
         end
       end
     end
+    # Return true if validations are not run
     true
   end
 
-  def update_vlp_documents(consumer_role, source = 'person', dependent = nil)
+  def update_vlp_documents?(consumer_role, source = 'person', dependent = nil)
     return true if consumer_role.blank?
+    # This condition mentioned in consumer roles controller update spec
+    return false if params[source][:is_applying_coverage] == "false" && source != 'dependent'
     return true if params[source][:is_applying_coverage] == "false"
-    return false unless validate_vlp_params(params, source, consumer_role, dependent)
-
-    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
+    return false unless validate_vlp_params?(params, source, consumer_role, dependent)
+    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") &&
+      (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
       elsif source == 'dependent' && dependent.present?
@@ -57,15 +78,21 @@ module VlpDoc
 
       doc_params = params.require(source).permit(*vlp_doc_params_list)
       vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
-      document = consumer_role.find_document(vlp_doc_attribute[:subject])
-      document.update_attributes(vlp_doc_attribute)
-      consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
+      if vlp_doc_attribute
+        document = consumer_role.find_document(vlp_doc_attribute[:subject])
+        document.update_attributes(vlp_doc_attribute)
+        consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
+      end
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, document)
       elsif source == 'dependent' && dependent.present?
         add_document_errors_to_dependent(dependent, document)
       end
-      return document.errors.blank?
+      if document.present?
+        return document.errors.blank?
+      else
+        return false
+      end
     else
       return true
     end
