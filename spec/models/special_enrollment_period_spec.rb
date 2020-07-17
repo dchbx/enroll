@@ -15,7 +15,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                           is_self_attested: true,
                           ordinal_position: 20,
                           event_kind_label: 'Date of domestic partnership',
-                          tool_tip: "Enroll or add a family member due to a new domestic partnership"
+                          tool_tip: "Enroll or add a family member due to a new domestic partnership",
+                          is_active: true
                         )
                         }
   let(:retro_ivl_qle) { QualifyingLifeEventKind.create(
@@ -30,7 +31,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                           effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
                           pre_event_sep_in_days: 0,
                           post_event_sep_in_days: 60,
-                          is_self_attested: true
+                          is_self_attested: true,
+                          is_active: true
                         )
                         }
 
@@ -46,7 +48,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                           effective_on_kinds: ["first_of_next_month"],
                           pre_event_sep_in_days: 0,
                           post_event_sep_in_days: 30,
-                          is_self_attested: true
+                          is_self_attested: true,
+                          is_active: true
                         )
                         }
 
@@ -62,7 +65,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                                          effective_on_kinds: ["first_of_next_month"],
                                          pre_event_sep_in_days: 60,
                                          post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
-                                         is_self_attested: true
+                                         is_self_attested: true,
+                                         is_active: true
                                        )
                                        }
 
@@ -78,7 +82,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                                           effective_on_kinds: ["first_of_next_month"],
                                           pre_event_sep_in_days: 0,
                                           post_event_sep_in_days: 30, # "60 days before loss of coverage and 60 days after",
-                                          is_self_attested: true
+                                          is_self_attested: true,
+                                          is_active: true
                                         )
                                         }
 
@@ -106,7 +111,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       effective_on_kinds: ["first_of_next_month"],
       pre_event_sep_in_days: 0,
       post_event_sep_in_days: 30,
-      is_self_attested: true
+      is_self_attested: true,
+      is_active: true
     )
   end
 
@@ -411,7 +417,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     let(:sep_first_of_month) { SpecialEnrollmentPeriod.new(qualifying_life_event_kind: qle_first_of_month, effective_on_kind: 'first_of_month', qle_on: event_date) }
     let(:sep_expired) { SpecialEnrollmentPeriod.new(qualifying_life_event_kind: qle_first_of_month, qle_on: expired_event_date) }
     let(:sep) { SpecialEnrollmentPeriod.new }
-    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: 'shop') }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true) }
 
 
     context "SHOP QLE and event date are specified" do
