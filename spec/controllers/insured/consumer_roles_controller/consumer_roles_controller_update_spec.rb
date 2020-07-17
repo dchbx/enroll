@@ -59,7 +59,7 @@ RSpec.describe Insured::ConsumerRolesController do
       end
 
       it "updates the 'is_applying_coverage' value for the dependent" do
-        expect(consumer_role).to receive(:update_attribute).with(:is_applying_coverage, is_applying_coverage_value).and_return(true)
+        expect(consumer_role).to receive(:update_attributes).with(is_applying_coverage: is_applying_coverage_value).and_return(true)
         put :update, params: {id: consumer_role_id, person: person_update_properties, exit_after_method: true}
       end
     end

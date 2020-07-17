@@ -202,14 +202,13 @@ class PeopleController < ApplicationController
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
-      # Originally this said @valid_vlp != false, which is super sloppy and suggests that true and nil share the same results
-      if @valid_vlp.blank? && @person.update_attributes(person_params.except(:is_applying_coverage))
+      if @valid_vlp.blank? && @person.update_attributes!(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active?
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
         end
-        if @person.consumer_role.present? && (person_params[:is_applying_coverage].present?)
-          @person.consumer_role.update_attributes(is_applying_coverage: person_params[:is_applying_coverage])
+        if person_params[:is_applying_coverage] && @person.consumer_role.present?
+          @person.consumer_role.update_attributes(is_applying_coverage: params[:person][:is_applying_coverage])
         end
         # if dual role, this will update both ivl and ee
         @person.active_employee_roles.each { |role| role.update_attributes(contact_method: person_params[:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?

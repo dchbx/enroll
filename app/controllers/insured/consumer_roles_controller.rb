@@ -207,9 +207,8 @@ class Insured::ConsumerRolesController < ApplicationController
   def update
     authorize @consumer_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
-
     if update_vlp_documents?(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
-      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) if (!params[:person][:is_applying_coverage].nil?)
+      @consumer_role.update_attributes(is_applying_coverage: params[:person][:is_applying_coverage]) if params[:person][:is_applying_coverage].present?
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
       @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
       if save_and_exit

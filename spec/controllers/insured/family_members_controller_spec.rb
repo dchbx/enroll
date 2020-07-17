@@ -228,9 +228,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
     end
 
-    describe "when update_vlp_documents failed" do
+    describe "when update_vlp_documents? failed" do
       before :each do
-        allow(controller).to receive(:update_vlp_documents).and_return false
+        allow(controller).to receive(:update_vlp_documents?).and_return false
       end
 
       it "should render the new template" do
@@ -351,14 +351,14 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     describe "with a valid dependent" do
       let(:update_result) { true }
       it "should render the show template" do
-        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        allow(controller).to receive(:update_vlp_documents?).and_return(true)
         put :update, params: {id: dependent_id, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
       end
 
-      it "should render the edit template when update_vlp_documents failure" do
-        allow(controller).to receive(:update_vlp_documents).and_return(false)
+      it "should render the edit template when update_vlp_documents? failure" do
+        allow(controller).to receive(:update_vlp_documents?).and_return(false)
         put :update, params: {id: dependent_id, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")

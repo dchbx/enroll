@@ -56,7 +56,7 @@ RSpec.describe Insured::FamilyMembersController do
 
 
       it "updates the 'is_applying_coverage' value for the dependent" do
-        expect(consumer_role).to receive(:update_attribute).with(:is_applying_coverage, is_applying_coverage_value).and_return(true)
+        expect(consumer_role).to receive(:update_attributes).with(is_applying_coverage: is_applying_coverage_value).and_return(true)
         put :update, params: {id: dependent_id, dependent: dependent_update_properties}
       end
     end
@@ -67,7 +67,7 @@ RSpec.describe Insured::FamilyMembersController do
       end
 
       it "does not change the 'is_applying_coverage' value for the dependent" do
-        expect(consumer_role).not_to receive(:update_attribute)
+        expect(consumer_role).not_to receive(:update_attributes)
         put :update, params: {id: dependent_id, dependent: dependent_update_properties}
       end
     end
