@@ -51,9 +51,13 @@ When("Admin clicks on Individual tab") do
   find(:xpath, '//div[2]/div[2]/ul/li[1]/a').click
 end
 
-Then("Admin should see listed Individual market sep types with ascending ordinal positions") do
+Then("I should see listed Individual market sep types") do
   expect(page).to have_content('Had a baby')
   expect(page).to have_content('Married')
+end
+
+Then(/^\w+ should see listed Individual market sep types with ascending ordinal positions$/) do
+  step "I should see listed Individual market sep types"
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
   birth_ivl['data-ordinal_position'] == '1'
   marraige_ivl = page.all('div').detect { |div| div[:id] == 'marriage_individual'}
@@ -79,7 +83,7 @@ When("Admin clicks on Shop tab") do
   find(:xpath, '//div[2]/div[2]/ul/li[2]/a').click
 end
 
-Then("Admin should see listed Shop market sep types with ascending ordinal positions") do
+Then(/^\w+ should see listed Shop market sep types with ascending ordinal positions$/) do
   expect(page).to have_content('Losing other health insurance')
   expect(page).to have_content('Adopted a child')
   birth_ivl = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_shop'}
@@ -107,7 +111,7 @@ When("Admin clicks on Congress tab") do
   find(:xpath, '//div[2]/div[2]/ul/li[3]/a').click
 end
 
-Then("Admin should see listed Congress market sep types with ascending ordinal positions") do
+Then(/^\w+ should see listed Congress market sep types with ascending ordinal positions$/) do
   expect(page).to have_content('Covid-19')
   expect(page).to have_content('Married')
   birth_shop = page.all('div').detect { |div| div[:id] == 'covid-19_fehb'}
@@ -134,4 +138,12 @@ end
 Then(/^Admin should see successful message after sorting$/) do
   expect(page).to have_content('Successfully sorted')
   sleep(3)
+end
+
+When("Individual with known qles visits the Insured portal outside of open enrollment") do
+  FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+  visit "/"
+  click_link 'Consumer/Family Portal'
+  screenshot("individual_start")
 end
