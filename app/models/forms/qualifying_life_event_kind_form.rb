@@ -61,7 +61,9 @@ module Forms
       end
 
       def market_reasons(market_kind)
-        QualifyingLifeEventKind.send("#{market_kind}_market_events").map(&:reason).uniq.inject([]) do |options_select, reason|
+        reasons = "Types::#{market_kind.humanize}QleReasons".constantize.values
+
+        reasons.inject([]) do |options_select, reason|
           options_select << [reason.titleize, reason]
         end
       end
