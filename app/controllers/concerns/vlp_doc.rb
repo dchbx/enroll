@@ -57,7 +57,6 @@ module VlpDoc
   def update_vlp_documents?(consumer_role, source = 'person', dependent = nil)
     return true if consumer_role.blank?
     # This condition mentioned in consumer roles controller update spec
-    return false if params[source][:is_applying_coverage] == "false" && source != 'dependent'
     return true if params[source][:is_applying_coverage] == "false"
     return false unless validate_vlp_params?(params, source, consumer_role, dependent)
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") &&
