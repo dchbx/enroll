@@ -1,3 +1,5 @@
+require Rails.root.join('app', 'domain', 'types.rb')
+
 EnrollRegistry = ResourceRegistry::Registry.new
 
 EnrollRegistry.configure do |config|
