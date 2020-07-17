@@ -564,7 +564,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
             effective_on_kinds: ["first_of_next_month"],
             pre_event_sep_in_days: 0,
             post_event_sep_in_days: 30,
-            is_self_attested: true
+            is_self_attested: true,
+            is_active: true
         )
       end
 
@@ -884,7 +885,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           effective_on_kinds: ["first_of_next_month"],
           pre_event_sep_in_days: 0,
           post_event_sep_in_days: 30,
-          is_self_attested: true
+          is_self_attested: true,
+          is_active: true
         )
       end
       let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
