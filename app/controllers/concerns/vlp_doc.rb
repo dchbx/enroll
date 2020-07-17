@@ -13,19 +13,24 @@ module VlpDoc
 
   def validate_vlp_params(params, source, consumer_role, dependent)
     params.permit!
-    if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
-      vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
-      result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
-      if result.failure? && source == 'person'
-        invalid_key = result.errors.to_h.keys.first
-        invalid_field = (invalid_key == :description) ? :document_description : invalid_key
-        add_document_errors_to_consumer_role(consumer_role, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
-        return false
-      elsif result.failure? && source == 'dependent'
-        invalid_key = result.errors.to_h.keys.first
-        invalid_field = (invalid_key == :description) ? :document_description : invalid_key
-        add_document_errors_to_dependent(dependent, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
-        return false
+    # REFS 88247: This will prevent an error from being thrown that displays missing documents for
+    # already verified users
+    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") ||
+      (consumer_role&.local_residency_validation != 'attested' && consumer_role&.residency_determined_at.blank?)
+      if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
+        vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
+        result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
+        if result.failure? && source == 'person'
+          invalid_key = result.errors.to_h.keys.first
+          invalid_field = (invalid_key == :description) ? :document_description : invalid_key
+          add_document_errors_to_consumer_role(consumer_role, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
+          return false
+        elsif result.failure? && source == 'dependent'
+          invalid_key = result.errors.to_h.keys.first
+          invalid_field = (invalid_key == :description) ? :document_description : invalid_key
+          add_document_errors_to_dependent(dependent, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
+          return false
+        end
       end
     end
     true
