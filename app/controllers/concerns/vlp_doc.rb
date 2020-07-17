@@ -56,7 +56,8 @@ module VlpDoc
 
   def update_vlp_documents?(consumer_role, source = 'person', dependent = nil)
     return true if consumer_role.blank?
-    return false if params[source][:is_applying_coverage] == "false"
+    # Will allow the updating of applying for coverage to true or false - which are passed as strings.
+    return false if params[source][:is_applying_coverage].present?
     return false unless validate_vlp_params?(params, source, consumer_role, dependent)
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") &&
       (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)

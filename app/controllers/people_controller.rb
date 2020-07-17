@@ -208,7 +208,9 @@ class PeopleController < ApplicationController
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
         end
-        @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && (!person_params[:is_applying_coverage].nil?)
+        if @person.consumer_role.present? && (person_params[:is_applying_coverage].present?)
+          @person.consumer_role.update_attributes(is_applying_coverage: person_params[:is_applying_coverage])
+        end
         # if dual role, this will update both ivl and ee
         @person.active_employee_roles.each { |role| role.update_attributes(contact_method: person_params[:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
