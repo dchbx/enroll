@@ -24,3 +24,4 @@ module Types
 
   FehbEffectiveOnKinds = Types::Coercible::String.enum(*QualifyingLifeEventKind::FEHB_EFFECTIVE_ON_KINDS)
 end
+
