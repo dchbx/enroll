@@ -21,18 +21,17 @@ module VlpDoc
     # This commit originally fixed the bug in 88247
     # https://github.com/dchbx/enroll/blob/643b132a7bb150ebc05ec8f6ffaf370b2b97e2d2/app/controllers/concerns/vlp_doc.rb#L18
     # but needed restructuring to preven tother failures
-    if (params[source][:naturalized_citizen] == "true" && params[source][:naturalized_citizen].present?)
-      return false
+    if params[source][:naturalized_citizen].present?
+      return true if params[source][:naturalized_citizen] == "true"
     end
-    if (params[source][:eligible_immigration_status] == "true" && params[source][:naturalized_citizen].present?)
-      return false
+    if params[source][:eligible_immigration_status].present?
+      return true if params[source][:eligible_immigration_status] == "true" 
     end
-    # If none of the above conditions are false, run the validations
-    true
   end
 
   def validate_vlp_params?(params, source, consumer_role, dependent)
     params.permit!
+    binding.pry
     if run_validate_vlp_params?(params, source, consumer_role)
       if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
         vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
@@ -50,20 +49,22 @@ module VlpDoc
         end
       end
     end
-    # Return true if validations are not run
-    true
   end
 
 
   def update_vlp_documents?(consumer_role, source = 'person', dependent = nil)
     return true if consumer_role.blank?
-    return false unless validate_vlp_params?(params, source, consumer_role, dependent)
+    # Only on nil return
+    binding.pry
+    return false unless validate_vlp_params?(params, source, consumer_role, dependent).nil?
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") &&
       (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
-      if source == 'person'
-        add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
-      elsif source == 'dependent' && dependent.present?
-        add_document_errors_to_dependent(dependent, ["document type", "cannot be blank"])
+      if params[source][:is_applying_coverage] != 'false'
+        if source == 'person'
+          add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
+        elsif source == 'dependent' && dependent.present?
+          add_document_errors_to_dependent(dependent, ["document type", "cannot be blank"])
+        end
       end
       return false
     end
@@ -91,8 +92,6 @@ module VlpDoc
       else
         return false
       end
-    else
-      return true
     end
   end
 

@@ -238,6 +238,7 @@ end
 
 Then(/^\w+ agrees? to the privacy agreeement/) do
   wait_for_ajax
+  sleep 2
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
@@ -286,7 +287,7 @@ And(/Individual clicks on add member button/) do
 end
 
 And(/Individual again clicks on add member button/) do
-  find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
+  #find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
   expect(page).to have_content('Lives with primary subscriber')
 
   fill_in "dependent[first_name]", :with => @u.first_name
@@ -294,8 +295,8 @@ And(/Individual again clicks on add member button/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   click_link('15')
   fill_in 'dependent[ssn]', :with => @u.ssn
-  find('.label', :text => 'This Person Is', :wait => 10).click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
+  #find('.label', :text => 'This Person Is', :wait => 10).click
+  #find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
