@@ -1,0 +1,49 @@
+
+- heading: Personal Info
+  lines:
+    - cells:
+      - gutter: 12
+        text: 'Apply for coverage for this person ?*'
+        type: 'radio'
+        values:
+          - label: 'Yes'
+            value: true
+          - label: 'No'
+            value: false
+        attribute: 'smoker'
+- heading: Step 2
+  lines:
+    - cells:
+      - gutter: 12
+        text: 'Is this person a neutalised citizen ?'
+        type: 'radio'
+        values:
+          - label: 'Yes'
+            value: true
+          - label: 'No'
+            value: false
+        options:
+          not_sure: true
+          help_link: '/not_sure_help'
+
+    - cells:
+      - gutter: 12
+        text: 'This person will be claimed as dependent by ? '
+        type: 'dropdown'
+        values:
+          - Select who will calim this person
+          - person two
+          - person three
+
+    - cells:
+      - gutter: 6
+      - type: input
+      - placeholder: 'FIRST NAME'
+      - required: 1
+      - name: 'first_name'
+
+      - gutter: 6
+      - type: input
+      - placeholder: 'LAST NAME'
+      - required: 1
+      - name: 'last_name'

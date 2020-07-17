@@ -1,0 +1,87 @@
+<%= workflow_form_for @model do %>
+  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+    <div class="col-md-9">
+      <div class="">
+        <% if !@current_step.heading.nil? %>
+        <p class="alert alert-error hide"></p>
+          <h2 class="darkblue"><%= personalize_heading_text(@current_step.heading) %></h2>
+          <% if !@current_step.heading_text.nil? %>
+            <% if @current_step.heading_text.present? %>
+              <p><%= @current_step.heading_text%></p>
+              <p class="memo">* = required field</p>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <div class="focus_effect module">
+          <% @current_step.sections.each do |section| %>
+            <div class="margin-bottom-30 margin-bottom-adjustment">
+              <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="back-link">
+            <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+            <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <% if @model.class.name == "FinancialAssistance::Application" and @steps.last_step?(@current_step) %>
+          <%= submit_tag 'Submit Application', :class => "btn btn-lg btn-primary"  %>
+      <% else %>
+        <% if  @steps.last_step?(@current_step) %>
+          <%= hidden_field_tag 'last_step', true %>
+        <% end %>
+        <% if (@model.class == FinancialAssistance::Applicant && (@model.is_required_to_file_taxes.nil? || @model.is_claimed_as_tax_dependent.nil?)) || (@model.class == FinancialAssistance::Application && @model.is_requesting_voter_registration_application_in_mail.nil?) %>
+          <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" , disabled: (local_assigns[:disabled].nil? ? 'false' : disable) %>
+        <% else %>
+          <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
+        <% end %>
+      <% end %>
+      <p class="small-left-margin very-small-margin-top faded">
+        <ul class='list-unstyled list-right-section'>
+          <li>
+            <% if @current_step.to_i == 1 %>
+              <%= link_to find_previous_from_step_one do %>
+                <%= image_tag 'icons/list.png' %>
+                PREVIOUS
+              <% end %>
+            <% else %>
+              <%= link_to previous_step_for do %>
+                <%= image_tag 'icons/list.png' %>
+                PREVIOUS
+              <% end %>
+            <% end %>
+          </li>
+          <li>
+            <a href="#">
+              <%= image_tag 'icons/list.png' %>
+              SAVE &amp; EXIT
+            </a>
+            <br>
+            <br>
+          </li>
+          <li>
+            <p>
+              If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
+            </p>
+          </li>
+          <br class="clear">
+        </ul>
+      </p>
+
+      <div class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
+        Help me sign up
+      </div>
+      <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+    </div>
+  </div>
+<% end %>
+
+<%= render partial: '/financial_assistance/shared/to_previous_modal' %>
