@@ -40,3 +40,28 @@ footer {
 .welcome-text {
   margin-top: 70px;
 }
+
+#sort_notification_msg {
+  display: none;
+  float: right;
+  opacity: 1;
+  border-color: #c3e6cb;
+  max-width: 466px;
+  margin-right: -110px;
+}
+
+#sort_notification_msg.success{
+  background-color: #d4edda;
+}
+
+#sort_notification_msg .success{
+  background-color: #d4edda;
+}
+
+#sort_notification_msg.error{
+  background-color: #ecb4b4;
+}
+
+#sort_notification_msg .error{
+  background-color: #ecb4b4;
+}

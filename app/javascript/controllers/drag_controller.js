@@ -14,6 +14,7 @@ export default class extends Controller {
 		let market_kind = event.item.dataset.market_kind
 		let data = []
 		var cards = document.querySelectorAll('.card.mb-4')
+		var textContent = event.item.textContent
 		market_kind = market_kind
 		data = [...cards].reduce(function(data, card, index) { return [...data, { id: card.dataset.id, position: index + 1 }] }, [])
 		fetch('sort',{
@@ -26,16 +27,30 @@ export default class extends Controller {
 		})
 		.then(response => response.json())
   		.then(data => {
-  			console.log("Result - " + data['status'])
-  			let flasshDiv = $("#sort_success_msg");
+				let flashDiv = $("#sort_notification_msg");
+				flashDiv.show()
   			if (data['status'] === "success"){
-  				flasshDiv.html("<div class='alert alert-success'><div class='row'><div class='col-md-12'><div class='row'><a class='close' data-dismiss='alert' href='#'>×</a>" + data['message'] + "</div></div></div></div>")
+				flashDiv.addClass("success")
+				flashDiv.removeClass("error")
+				flashDiv.find(".toast-header").addClass("success")
+				flashDiv.find(".toast-header").removeClass("error")
   			}else{
-  				flasshDiv.html("<div class='alert alert-danger'><div class='row'><div class='col-md-12'><div class='row'><a class='close' data-dismiss='alert' href='#'>×</a>" + data['message'] + "</div></div></div></div>")
+					flashDiv.addClass("error")
+					flashDiv.removeClass("success")
+					flashDiv.find(".toast-header").addClass("error")
+					flashDiv.find(".toast-header").removeClass("success")
   			}
+				flashDiv.find(".toast-header strong").text(data['message'])
+				flashDiv.find(".toast-body").text(textContent)
 			setTimeout(function() {
-			  flasshDiv.html("");
+			  flashDiv.hide();
 			}, 3000);
   		})
 	}
 }
+
+$( document ).ready(function() {
+	$( "#sort_notification_msg .close" ).click(function() {
+		$("#sort_notification_msg").hide();
+	});
+});
