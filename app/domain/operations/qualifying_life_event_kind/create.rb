@@ -40,8 +40,20 @@ module Operations
       def persist_data(entity)
         qle = ::QualifyingLifeEventKind.new(entity.to_h)
         qle.save!
+        update_reason_types(qle)
 
         Success(qle)
+      end
+
+      def update_reason_types(qle)
+        const_name = "#{qle.market_kind.humanize}QleReasons"
+        const_with_namespace = "Types::#{const_name}"
+        reasons = const_with_namespace.constantize.values
+
+        if reasons.exclude?(qle.reason)
+          Types.send(:remove_const, const_name)
+          Types.const_set(const_name, Types::Coercible::String.enum(*(reasons + [qle.reason])))
+        end
       end
     end
   end
