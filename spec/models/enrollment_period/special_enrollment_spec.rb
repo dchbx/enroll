@@ -33,7 +33,8 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
                               effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
                               pre_event_sep_in_days: 0,
                               post_event_sep_in_days: 30,
-                              is_self_attested: true
+                              is_self_attested: true,
+                              is_active: true
                             )
                           }
   let(:qle_on)         { Date.current }
