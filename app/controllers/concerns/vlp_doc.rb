@@ -54,50 +54,45 @@ module VlpDoc
     true
   end
 
-  def run_vlp_document_updates?(params, source)
-    return true unless params[source][:is_applying_coverage] == "false"
-  end
 
   def update_vlp_documents?(consumer_role, source = 'person', dependent = nil)
     return true if consumer_role.blank?
-    if run_vlp_document_updates?(params, source)
-      return false unless validate_vlp_params?(params, source, consumer_role, dependent)
-      if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") &&
-        (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
-        if source == 'person'
-          add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
-        elsif source == 'dependent' && dependent.present?
-          add_document_errors_to_dependent(dependent, ["document type", "cannot be blank"])
-        end
+    return false unless validate_vlp_params?(params, source, consumer_role, dependent)
+    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") &&
+      (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
+      if source == 'person'
+        add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
+      elsif source == 'dependent' && dependent.present?
+        add_document_errors_to_dependent(dependent, ["document type", "cannot be blank"])
+      end
+      return false
+    end
+    if params[source][:consumer_role] && params[source][:consumer_role][:vlp_documents_attributes]
+        if params[:dependent].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
+          params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
+      elsif params[:person].present? && params[:person][:consumer_role].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
+        params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], "%m/%d/%Y")
+      end
+
+      doc_params = params.require(source).permit(*vlp_doc_params_list)
+      vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
+      if vlp_doc_attribute
+        document = consumer_role.find_document(vlp_doc_attribute[:subject])
+        document.update_attributes(vlp_doc_attribute)
+        consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
+      end
+      if source == 'person'
+        add_document_errors_to_consumer_role(consumer_role, document)
+      elsif source == 'dependent' && dependent.present?
+        add_document_errors_to_dependent(dependent, document)
+      end
+      if document.present?
+        return document.errors.blank?
+      else
         return false
       end
-      if params[source][:consumer_role] && params[source][:consumer_role][:vlp_documents_attributes]
-          if params[:dependent].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
-            params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
-        elsif params[:person].present? && params[:person][:consumer_role].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
-          params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], "%m/%d/%Y")
-        end
-
-        doc_params = params.require(source).permit(*vlp_doc_params_list)
-        vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
-        if vlp_doc_attribute
-          document = consumer_role.find_document(vlp_doc_attribute[:subject])
-          document.update_attributes(vlp_doc_attribute)
-          consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
-        end
-        if source == 'person'
-          add_document_errors_to_consumer_role(consumer_role, document)
-        elsif source == 'dependent' && dependent.present?
-          add_document_errors_to_dependent(dependent, document)
-        end
-        if document.present?
-          return document.errors.blank?
-        else
-          return false
-        end
-      else
-        return true
-      end
+    else
+      return true
     end
   end
 
