@@ -72,10 +72,10 @@ registry:
           - key: :market_kind
             item: <%= ENV[':market_kind'] %>
             meta:
-              label: Market
+              label: Market Kind
               content_type: :select
               enum: [{individual: "Individual"}, {shop: "Shop"}, {fehb: "Fehb"}]
-              default: ''
+              default: [{individual: "Individual"}]
               description: Select Market Kind
               is_required: true
               is_visible: true

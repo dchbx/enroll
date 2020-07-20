@@ -22,7 +22,11 @@ class QualifyingLifeEventKind
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date)
+  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date) 
+
+  IvlEffectiveOnKinds = %w(date_of_event fixed_first_of_next_month first_of_next_month first_of_month exact_date)
+  ShopEffectiveOnKinds = %w(first_of_next_month date_of_event first_of_this_month fixed_first_of_next_month)
+  FehbEffectiveOnKinds = %w(first_of_next_month date_of_event first_of_this_month fixed_first_of_next_month)
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -76,7 +80,7 @@ class QualifyingLifeEventKind
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean
-  field :date_options_available, type: Mongoid::Boolean
+  field :date_options_available, type: Mongoid::Boolean  # TODO check on create form and purpose of it.
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
   field :aasm_state, type: Symbol, default: :draft
@@ -114,6 +118,7 @@ class QualifyingLifeEventKind
 
   scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
+  scope :non_draft, ->{ where(:aasm_state.nin => [:draft]) }
   scope :by_date, ->(date = TimeKeeper.date_of_record){ where(
     :"$or" => [
       {:start_on.lte => date, :end_on.gte => date},
@@ -206,15 +211,15 @@ class QualifyingLifeEventKind
     state :expire_pending
     state :expired
 
-    event :publish, :after => :record_transition do
-      transitions from: :draft, to: :active, :after => [:activate_qle]  #TODO qle guards
+    event :publish, :after => :record_transition do   #activate QLE  concept
+      transitions from: :draft, to: :active, :after => [:activate_qle]  #TODO qle guards  # title should be uniq
     end
 
-    event :schedule_expiration, :after => :record_transition do
+    event :schedule_expiration, :after => :record_transition do  # TODO end date should be future
       transitions from: [:active, :expire_pending], to: :expire_pending, :after => [:set_end_date]
     end
 
-    event :expire, :after => :record_transition do
+    event :expire, :after => :record_transition do #TODO end date should past
       transitions from: [:active, :expire_pending], to: :expired, :after => [:set_end_date, :deactivate_qle]
     end
 
