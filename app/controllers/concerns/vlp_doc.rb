@@ -13,10 +13,7 @@ module VlpDoc
 
   def validate_vlp_params(params, source, consumer_role, dependent)
     params.permit!
-    # REFS 88247: This will prevent an error from being thrown that displays missing documents for
-    # already verified users
-    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") ||
-      (consumer_role&.local_residency_validation != 'attested' && consumer_role&.residency_determined_at.blank?)
+    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true")
       if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
         vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
         result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
