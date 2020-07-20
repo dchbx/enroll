@@ -22,11 +22,11 @@ class QualifyingLifeEventKind
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date) 
+  EFFECTIVE_ON_KINDS = %w[date_of_event exact_date first_of_month first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
 
-  IvlEffectiveOnKinds = %w(date_of_event fixed_first_of_next_month first_of_next_month first_of_month exact_date)
-  ShopEffectiveOnKinds = %w(first_of_next_month date_of_event first_of_this_month fixed_first_of_next_month)
-  FehbEffectiveOnKinds = %w(first_of_next_month date_of_event first_of_this_month fixed_first_of_next_month)
+  IVL_EFFECTIVE_ON_KINDS = %w[date_of_event exact_date first_of_month first_of_next_month fixed_first_of_next_month].freeze
+  SHOP_EFFECTIVE_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
+  FEHB_EFFECTIVE_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -116,6 +116,7 @@ class QualifyingLifeEventKind
   validate :qle_date_guards
   embeds_many :workflow_state_transitions, as: :transitional
 
+  scope :active_by_state, ->{ where(:aasm_state.in => [:active, :expire_pending]) }
   scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
   scope :non_draft, ->{ where(:aasm_state.nin => [:draft]) }
