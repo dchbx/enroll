@@ -82,7 +82,7 @@ class QualifyingLifeEventKind
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean
-  field :date_options_available, type: Mongoid::Boolean
+  field :date_options_available, type: Mongoid::Boolean  # TODO check on create form and purpose of it.
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
   field :aasm_state, type: Symbol, default: :draft
