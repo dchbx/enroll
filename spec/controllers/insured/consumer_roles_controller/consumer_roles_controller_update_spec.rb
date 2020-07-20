@@ -33,9 +33,7 @@ RSpec.describe Insured::ConsumerRolesController do
     let(:consumer_role) do
       double(
         person: person,
-        policy_class: ConsumerRolePolicy,
-        residency_determined_at: nil,
-        local_residency_validation: nil
+        policy_class: ConsumerRolePolicy
       )
     end
 
