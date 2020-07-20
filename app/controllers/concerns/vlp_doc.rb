@@ -55,15 +55,21 @@ module VlpDoc
 
       doc_params = params.require(source).permit(*vlp_doc_params_list)
       vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
-      document = consumer_role.find_document(vlp_doc_attribute[:subject])
-      document.update_attributes(vlp_doc_attribute)
-      consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
+      if vlp_doc_attribute
+        document = consumer_role.find_document(vlp_doc_attribute[:subject])
+        document.update_attributes(vlp_doc_attribute)
+        consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
+      end
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, document)
       elsif source == 'dependent' && dependent.present?
         add_document_errors_to_dependent(dependent, document)
       end
-      return document.errors.blank?
+      if document.present?
+        return document.errors.blank?
+      else
+        return false
+      end
     else
       return true
     end
