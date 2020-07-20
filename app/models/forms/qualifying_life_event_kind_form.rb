@@ -30,6 +30,9 @@ module Forms
     attribute :shop_reasons, Types::Array.of(Types::String)
     attribute :fehb_reasons, Types::Array.of(Types::String)
 
+    attribute :ivl_effective_kinds, Types::Array.of(Types::String)
+    attribute :shop_effective_kinds, Types::Array.of(Types::String)
+    attribute :fehb_effective_kinds, Types::Array.of(Types::String)
 
     def self.for_new(params = {})
       if params.blank?
@@ -38,7 +41,7 @@ module Forms
         schema.each {|item| params[item.name] = nil unless params.has_key?(item.name)}
       end
 
-      new(params.merge(fetch_market_reasons))
+      new(params.merge(fetch_additional_params))
     end
 
     def self.for_edit(params)
@@ -54,15 +57,17 @@ module Forms
     end
 
     class << self
-      def fetch_market_reasons
+      def fetch_additional_params
         { ivl_reasons: market_reasons('individual'),
           shop_reasons: market_reasons('shop'),
-          fehb_reasons: market_reasons('fehb')}
+          fehb_reasons: market_reasons('fehb'),
+          ivl_effective_kinds: ::Types::IndividualEffectiveOnKinds.values,
+          shop_effective_kinds: ::Types::ShopEffectiveOnKinds.values,
+          fehb_effective_kinds: ::Types::FehbEffectiveOnKinds.values }
       end
 
       def market_reasons(market_kind)
         reasons = "Types::#{market_kind.humanize}QleReasons".constantize.values
-
         reasons.inject([]) do |options_select, reason|
           options_select << [reason.titleize, reason]
         end
@@ -70,7 +75,7 @@ module Forms
 
       def fetch_qlek_data(id)
         qle = ::QualifyingLifeEventKind.find(id)
-        params = qle.attributes.merge(fetch_market_reasons)
+        params = qle.attributes.merge(fetch_additional_params)
         params.merge!({draft: qle.draft?})
       end
 
