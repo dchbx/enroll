@@ -4,6 +4,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 describe "shared/_comparison.html.erb", dbclean: :after_each do
 
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   include_context 'setup benefit market with market catalogs and product packages'
   include_context 'setup initial benefit application'
 
