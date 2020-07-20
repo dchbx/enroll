@@ -36,6 +36,10 @@ module Validators
         end
       end
 
+      rule(:end_on, :start_on) do
+        key.failure('End on must be after start on date') if values[:end_on] < values[:start_on]
+      end
+
       rule(:pre_event_sep_in_days) do
         key.failure('Invalid Pre Event SEP( In Days )') unless value >= 0
       end

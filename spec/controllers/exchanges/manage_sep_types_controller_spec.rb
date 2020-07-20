@@ -262,18 +262,22 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
     context 'success case' do
       before do
         sign_in(current_user)
-        post :update, params: post_params
       end
 
       it 'should return http redirect' do
+        post :update, params: post_params
         expect(response).to have_http_status(:redirect)
       end
 
       it 'should have success flash message' do
+        post_params[:forms_qualifying_life_event_kind_form].merge!({reason: 'test birth'})
+        post :update, params: post_params
         expect(flash[:success]).to eq 'The SEP Type was successfully updated.'
       end
 
       it 'should redirect to sep types dt action' do
+        post_params[:forms_qualifying_life_event_kind_form].merge!({reason: 'test had a baby'})
+        post :update, params: post_params
         expect(response).to redirect_to(sep_types_dt_exchanges_manage_sep_types_path)
       end
     end
@@ -298,7 +302,6 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
       end
     end
   end
-
 
   context 'for sorting_sep_types' do
 
@@ -336,5 +339,9 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
       expect(QualifyingLifeEventKind.find(q1.id).ordinal_position).to equal 3
       expect(QualifyingLifeEventKind.find(q2.id).ordinal_position).to equal 4
     end
+  end
+
+  def invoke_dry_types_script
+    load File.join(Rails.root, 'app/domain/types.rb')
   end
 end
