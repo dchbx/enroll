@@ -31,7 +31,7 @@ registry:
               content_type: :date
               default: ''
               description: Enter End Date
-              is_required: true
+              is_required: false
               is_visible: true
           - key: :title
             item: <%= ENV['title'] %>

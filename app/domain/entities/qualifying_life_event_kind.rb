@@ -5,7 +5,7 @@ module Entities
     transform_keys(&:to_sym)
 
     attribute :start_on, Types::Date
-    attribute :end_on, Types::Date
+    attribute :end_on, Types::Date.optional
     attribute :title, Types::String
     attribute :tool_tip, Types::String
     attribute :pre_event_sep_in_days, Types::Integer
