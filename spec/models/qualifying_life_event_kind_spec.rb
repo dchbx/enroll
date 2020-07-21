@@ -314,4 +314,42 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
       end
     end
   end
+
+  context 'aasm states' do
+    context 'update_qle_reason_types' do
+      context 'for adding a reason' do
+        let!(:qlek) do
+          FactoryBot.create(:qualifying_life_event_kind,
+                            aasm_state: :draft,
+                            reason: 'add reason')
+        end
+
+        before do
+          qlek.publish!
+        end
+
+        it 'should include new reason in the ShopQleReasons type' do
+          expect(::Types::ShopQleReasons.values).to include(qlek.reason)
+        end
+      end
+
+      context 'for removing a reason' do
+        let!(:qlek) do
+          FactoryBot.create(:qualifying_life_event_kind,
+                            aasm_state: :active,
+                            reason: 'remove reason',
+                            start_on: (TimeKeeper.date_of_record - 50.days),
+                            end_on: (TimeKeeper.date_of_record - 30.days))
+        end
+
+        before do
+          qlek.expire!
+        end
+
+        it 'should remove reason from the ShopQleReasons type' do
+          expect(::Types::ShopQleReasons.values).not_to include(qlek.reason)
+        end
+      end
+    end
+  end
 end
