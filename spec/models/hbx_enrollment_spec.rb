@@ -2425,7 +2425,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
       let(:benefit_package) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first}
       let(:benefit_coverage_period) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first}
-      let(:family) {mikes_family}
+      let(:family) { mikes_family }
+      let(:product) do
+        BenefitMarkets::Products::Product.find(benefit_package.benefit_ids.first) 
+      end
       let(:existing_ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month, family: family, benefit_package_id: benefit_package.id)}
       let(:new_ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month, family: family, benefit_package_id: benefit_package.id)}
 
@@ -2442,7 +2445,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
-        new_ivl_enrollment.cancel_previous(TimeKeeper.date_of_record.year)
+        ::Operations::ProductSelectionEffects::TerminatePreviousSelections.call({
+          enrollment: new_ivl_enrollment,
+          product: product
+        })
         existing_ivl_enrollment.reload
         expect(existing_ivl_enrollment.aasm_state).to eq "coverage_canceled"
       end
