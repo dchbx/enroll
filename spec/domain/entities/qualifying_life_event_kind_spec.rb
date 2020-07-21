@@ -28,6 +28,17 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
     it 'should not raise error' do
       expect { ::Entities::QualifyingLifeEventKind.new(input_params) }.not_to raise_error
     end
+
+    context 'for end_on as optional' do
+      before do
+        input_params.merge!({end_on: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
   end
 
   describe 'with invalid arguments' do
