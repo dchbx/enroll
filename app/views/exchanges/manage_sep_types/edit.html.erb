@@ -1,68 +1,193 @@
 <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), method: :patch do |f| %>
-  <div class="container">
-    <div class="col-12">
-      <div class="row justify-content-start">
-        <div class="col-6">
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:start_on), f) %>
+  <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;">
+      <div class="col-4">
+        <h3 class="heading-text">
+          <% if @qle.draft %>
+            Update Sep Type
+          <% else%>
+            Sep Type Details
+          <%end%>
+        </h3>
+      </div>
+      <div class="col-12" style="line-height: 0.8; margin-top: 20px;">
+        <div class="row justify-content-start">
+          <div class="col-6" >
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
+          </div>
         </div>
 
-        <div class="col-6">
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on), f) %>
-        </div>
-      </div>
-      <%= build_option_field(EnrollRegistry[:sep_types].setting(:title), f) %>
-      <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
 
-      <div class="row justify-content-start">
-        <div class="col-6">
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
+        <div class="row justify-content-start">
+          <div class="col-6" >
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
+          </div>
+          <div class="col-6" >
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
+          </div>
         </div>
-        <div class="col-6">
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
-          <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
+        <div class="row justify-content-start">
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:start_on),f) %>
+          </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on),f) %>
+          </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
+          </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
+          </div>
+        </div>
+        <div class="row justify-content-start">
+          <div class="col-6" >
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+          </div>
+          <div class="col-6" id="effective_on_kinds">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
+          </div>
         </div>
       </div>
-    </div>
+
+
+      <% if @qle.draft %> <%#= TODO pundit poilcy%>
+        <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+          <div class="col-sm-offset-2 col-sm-10">
+            <%= f.submit 'Update SEP Type', class:"btn btn-primary" %>
+          </div>
+        </div>
+      <% end %>
   </div>
-  <%#= TODO pundit poilcy%>
-  <% if @qle.draft %>
-    <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
-      <div class="col-sm-offset-2 col-sm-10">
-        <%= f.submit 'Update SEP Type', class:"btn btn-primary" %>
-      </div>
-    </div>
-  <% end %>
 <% end %>
 
 <script type="text/javascript" charset="utf-8">
-  document.getElementById("other_reason").setAttribute("type", "hidden");
-  document.getElementById("other_reasonHelpBlock").style.display = "none";
-  document.querySelector("label[for='other_reason']").style.display = "none";
-  document.getElementById('market_kind').addEventListener('change', function() {
+   document.addEventListener("DOMContentLoaded", function() {
+    var market = document.getElementById('market_kind')
+    var other_reason = "<%= @qle.other_reason%>"
+    initialize_reasons(market);
+    initialize_effective_kind(market);
+    check_selected_reason();
+
+    if (other_reason != ""){
+      document.getElementById("other_reason").setAttribute("type", "show");
+       document.getElementById("other_reasonHelpBlock").style.display = "block";
+      document.querySelector("label[for='other_reason']").style.display = "block";
+    }else{
+      document.getElementById("other_reason").setAttribute("type", "hidden");
+      document.getElementById("other_reasonHelpBlock").style.display = "none";
+      document.querySelector("label[for='other_reason']").style.display = "none";
+    }
+  });
+
+  var initialize_effective_kind = function (market){
+    var effective_on_kinds= document.getElementById('effective_on_kinds').querySelectorAll('input[type=checkbox]')
+    for (var effective_on_kind of effective_on_kinds){
+      effective_on_kind.disabled = false
+      effective_on_kind.checked = false
+      effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
+    }
+
+    if (market.value == "individual"){
+      var ivl_effective_kinds = <%= raw @qle.ivl_effective_kinds %>;
+      for (var effective_on_kind of effective_on_kinds){
+        if ((ivl_effective_kinds.includes(effective_on_kind.value)) == false){
+          effective_on_kind.disabled = true
+          effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = true
+        }
+      }
+    }
+    else if (market.value == "shop"){
+      var shop_effective_kinds = <%= raw @qle.shop_effective_kinds %>;
+      for (var effective_on_kind of effective_on_kinds){
+        if ((shop_effective_kinds.includes(effective_on_kind.value)) == false){
+          effective_on_kind.disabled = true
+          effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = true
+        }
+      }
+    }
+    else if (market.value == "fehb"){
+      var fehb_effective_kinds = <%= raw @qle.fehb_effective_kinds %>;
+      for (var effective_on_kind of effective_on_kinds){
+        if ((fehb_effective_kinds.includes(effective_on_kind.value)) == false){
+          effective_on_kind.disabled = true
+          effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = true
+        }
+      }
+    }
+    check_selected_effective_on_kinds();
+  };
+
+  var initialize_reasons = function (market){
     var items ;
-    if (this.value == "individual"){
+    if (market.value == "individual"){
       items = <%= raw @qle.ivl_reasons %>;
+      set_selected_reason(items, "individual");
     }
-    else if (this.value == "shop"){
+    else if (market.value == "shop"){
       items = <%= raw @qle.shop_reasons %>;
+      set_selected_reason(items, "shop");
     }
-    else if (this.value == "fehb"){
-        items = <%= raw @qle.fehb_reasons %>;
+    else if (market.value == "fehb"){
+      items = <%= raw @qle.fehb_reasons %>;
+      set_selected_reason(items, "fehb");
     }
-    else if (this.value == "Choose..."){
+    else if (market.value == "Choose..."){
       items = []
     }
     var str = "<option>" + "Choose..." + "</option>"
-      for (var item of items) {
-        str += "<option>" + item[0] + "</option>" + "<value>" + item[1] + "</value>"
-      }
-    str += "<option>" + "other" + "</option>"
+    for (var item of items) {
+      str += "<option value='" + item[1] + "'>" + item[0] + "</option>"
+    }
+    if (items.length != 0){
+      str += "<option value='other'>"+ "Other" + "</option>"
+    }
     document.getElementById("reason").innerHTML = str;
+    check_selected_reason();
+  };
+
+  var set_selected_reason = function (reasons, market){
+    var sele_market = "<%= @qle.market_kind %>"
+    var sele_reason = "<%= (@qle.reason && @qle.other_reason) ? "other" : @qle.reason %>"
+    if (sele_market == market && sele_reason.length != 0 && reasons.flat(1).includes(sele_reason) == false){ 
+      reasons.push([sele_reason.toUpperCase(), sele_reason])
+    }
+  };
+
+  var check_selected_reason = function (){
+    var reasons = document.getElementById("reason").options
+    var selected_reason = "<%= (@qle.reason && @qle.other_reason) ? "other" : @qle.reason %>"
+     for (var reason of reasons){
+      if (selected_reason == reason.value) {
+        reason.selected = true
+      }
+    }
+  };
+
+  var check_selected_effective_on_kinds = function (){
+    var effective_on_kinds= document.getElementById('effective_on_kinds').querySelectorAll('input[type=checkbox]')
+    var market = document.getElementById('market_kind')
+    var sele_market = "<%= @qle.market_kind %>"
+    var selected_effec_on_kinds = "<%= @qle.effective_on_kinds %>"
+     for (var effective_on_kind of effective_on_kinds){
+      if(selected_effec_on_kinds.includes(effective_on_kind.value) == true && sele_market == market.value){
+        effective_on_kind.checked = true
+        effective_on_kind.disabled = false
+        effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
+      }
+    }
+  };
+
+  document.getElementById('market_kind').addEventListener('change', function() {
+    var selected_reason = "<%= (@qle.reason && @qle.other_reason) ? "other" : @qle.reason %>"
+    initialize_reasons(this);
+    initialize_effective_kind(this);
+    document.getElementById("other_reason").setAttribute("type", "hidden");
+    document.querySelector("label[for='other_reason']").style.display = "none";
+    document.getElementById("other_reasonHelpBlock").style.display = "none";
   });
+
   document.getElementById('reason').addEventListener('change', function() {
     if (this.value == "other"){
        document.getElementById("other_reason").setAttribute("type", "show");
