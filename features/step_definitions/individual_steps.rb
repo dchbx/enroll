@@ -342,7 +342,7 @@ And(/consumer clicked on continue for plan shopping/) do
   find(".interaction-click-control-continue").click
 end
 
-Then(/I should land on home page$/) do
+Then(/^.+ should land on home page$/) do
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
