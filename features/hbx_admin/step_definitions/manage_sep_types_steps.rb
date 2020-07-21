@@ -148,10 +148,14 @@ When("Individual with known qles visits the Insured portal outside of open enrol
   screenshot("individual_start")
 end
 
-And(/Employee signed in$/) do
+And("Employee signed in") do
   find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "patrick.doe@dc.gov"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
+end
+
+Then("Employee should land on home page") do
+  step "I should land on home page"
 end
