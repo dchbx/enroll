@@ -342,6 +342,11 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
   end
 
   def invoke_dry_types_script
+    consts = ['IndividualQleReasons', 'ShopQleReasons',
+              'FehbQleReasons', 'IndividualEffectiveOnKinds',
+              'ShopEffectiveOnKinds', 'FehbEffectiveOnKinds']
+    types_module_constants = Types.constants(false)
+    consts.each {|const| Types.send(:remove_const, const.to_sym) if types_module_constants.include?(const.to_sym)}
     load File.join(Rails.root, 'app/domain/types.rb')
   end
 end
