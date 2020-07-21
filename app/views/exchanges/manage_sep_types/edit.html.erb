@@ -1,64 +1,63 @@
 <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), method: :patch do |f| %>
   <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;">
-      <div class="col-4">
-        <h3 class="heading-text">
-          <% if @qle.draft %>
-            Update Sep Type
-          <% else%>
-            Sep Type Details
-          <%end%>
-        </h3>
-      </div>
-      <div class="col-12" style="line-height: 0.8; margin-top: 20px;">
-        <div class="row justify-content-start">
-          <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
-          </div>
-        </div>
-
-        <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
-        <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
-
-        <div class="row justify-content-start">
-          <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
-          </div>
-          <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
-          </div>
-        </div>
-        <div class="row justify-content-start">
-          <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:start_on),f) %>
-          </div>
-          <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on),f) %>
-          </div>
-          <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
-          </div>
-          <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
-          </div>
-        </div>
-        <div class="row justify-content-start">
-          <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
-          </div>
-          <div class="col-6" id="effective_on_kinds">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
-          </div>
+    <div class="col-4">
+      <h3 class="heading-text">
+        <% if @qle.draft %>
+          Update SEP Type
+        <% else%>
+          SEP Type Details
+        <%end%>
+      </h3>
+    </div>
+    <div class="col-12" style="line-height: 0.8; margin-top: 20px;">
+      <div class="row justify-content-start">
+        <div class="col-6" >
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
         </div>
       </div>
 
+      <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
+      <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
 
-      <% if @qle.draft %> <%#= TODO pundit poilcy%>
-        <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
-          <div class="col-sm-offset-2 col-sm-10">
-            <%= f.submit 'Update SEP Type', class:"btn btn-primary" %>
-          </div>
+      <div class="row justify-content-start">
+        <div class="col-6" >
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
         </div>
-      <% end %>
+        <div class="col-6" >
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
+        </div>
+      </div>
+      <div class="row justify-content-start">
+        <div class="col-6">
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:start_on),f) %>
+        </div>
+        <div class="col-6">
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on),f) %>
+        </div>
+        <div class="col-6">
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
+        </div>
+        <div class="col-6">
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
+        </div>
+      </div>
+      <div class="row justify-content-start">
+        <div class="col-6" >
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+        </div>
+        <div class="col-6" id="effective_on_kinds">
+          <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
+        </div>
+      </div>
+    </div>
+
+    <% if @qle.draft %> <%#= TODO pundit poilcy%>
+      <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+        <div class="col-sm-offset-2 col-sm-10">
+          <%= f.submit 'Update SEP Type', class:"btn btn-primary" %>
+        </div>
+      </div>
+    <% end %>
   </div>
 <% end %>
 
