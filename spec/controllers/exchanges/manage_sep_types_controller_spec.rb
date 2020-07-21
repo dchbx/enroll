@@ -20,8 +20,8 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
 
   context 'for new' do
     before do
-      q1.update_attributes!(market_kind: 'individual', is_self_attested: true)
-      invoke_dry_types_script
+      q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
+      q1.publish!
       sign_in(current_user)
       get :new
     end
@@ -99,8 +99,8 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
 
   context 'for edit' do
     before do
-      q1.update_attributes!(market_kind: 'individual', is_self_attested: true)
-      invoke_dry_types_script
+      q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
+      q1.publish!
       sign_in(current_user)
       get :edit, params: {id: q1.id}
     end
@@ -209,9 +209,9 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
     end
 
     it 'should have response body' do
-      expect(response.body).to match /Individual/i
-      expect(response.body).to match /Shop/i
-      expect(response.body).to match /Congress/i
+      expect(response.body).to match(/Individual/i)
+      expect(response.body).to match(/Shop/i)
+      expect(response.body).to match(/Congress/i)
     end
   end
 
@@ -236,6 +236,11 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
   end
 
   def invoke_dry_types_script
+    consts = ['IndividualQleReasons', 'ShopQleReasons',
+              'FehbQleReasons', 'IndividualEffectiveOnKinds',
+              'ShopEffectiveOnKinds', 'FehbEffectiveOnKinds']
+    types_module_constants = Types.constants(false)
+    consts.each {|const| Types.send(:remove_const, const.to_sym) if types_module_constants.include?(const.to_sym)}
     load File.join(Rails.root, 'app/domain/types.rb')
   end
 end
