@@ -84,3 +84,39 @@ Feature: Admin can manage sep types like create, edit, update, delete and sort
     Then I should land on home page
     Then I should see the "Married" at the top of the ivl qle list
     Then Individual logs out
+
+  Scenario: Admin on sorting Shop market sep types will reflect the same order on the individual insured home page qle carousel
+    Given the Admin is navigated to the Manage Sep Types screen
+    When Admin will click on the Sorting Sep Types button
+    Then Admin should see three tabs Individual, Shop and Congress markets
+    When Admin clicks on Shop tab
+    Then Admin should see listed Shop market sep types with ascending ordinal positions
+    And Hbx Admin logs out
+    Given a CCA site exists with a benefit market
+    Given benefit market catalog exists for active initial employer with health benefits
+    And there is an employer Acme Inc.
+    And initial employer Acme Inc. has active benefit application
+    And there is a census employee record for Patrick Doe for employer Acme Inc.
+    And employee Patrick Doe has past hired on date
+    Given Employee has not signed up as an HBX user
+    And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
+    Then Employee should see the "Covid-19" at the top of the shop qle list
+    Then Employee logs out
+    When Hbx Admin logs on to the Hbx Portal
+    Given the user is on the Main Page
+    And the user will see the Manage Sep Types under admin dropdown
+    When Admin clicks Manage Sep Types
+    Given the Admin is navigated to the Manage Sep Types screen
+    When Admin will click on the Sorting Sep Types button
+    Then Admin should see three tabs Individual, Shop and Congress markets
+    When Admin clicks on Shop tab
+    Then Admin should see listed Shop market sep types with ascending ordinal positions
+    When Admin sorts Shop sep types by drag and drop
+    Then Admin should see successful message after sorting
+    And listed Shop sep types ordrinal postions should change
+    And Hbx Admin logs out
+    When employee visits the Employee Portal page
+    And Employee signed in
+    Then Employee should land on home page
+    And Employee should see the "Married" at the top of the shop qle list
+    Then Employee logs out
