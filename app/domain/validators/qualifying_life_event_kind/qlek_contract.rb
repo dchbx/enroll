@@ -6,7 +6,7 @@ module Validators
 
       params do
         required(:start_on).filled(:date)
-        required(:end_on).filled(:date)
+        optional(:end_on).maybe(:date)
         required(:title).filled(:string)
         required(:tool_tip).filled(:string)
         required(:pre_event_sep_in_days).filled(:integer)
@@ -20,16 +20,20 @@ module Validators
         optional(:_id).maybe(:string)
 
         before(:value_coercer) do |result|
+          result_hash = result.to_h
           other_params = {}
-          other_params[:ordinal_position] = 0 if result.to_h[:ordinal_position].nil?
-          other_params[:reason] = result.to_h[:other_reason] if result.to_h[:reason] == 'other'
-          other_params[:reason] = (other_params[:reason] ? other_params : result.to_h)[:reason].parameterize.underscore
-          result.to_h.merge(other_params)
+          other_params[:ordinal_position] = 0 if result_hash[:ordinal_position].nil?
+          other_params[:reason] = result_hash[:other_reason] if result_hash[:reason] == 'other'
+          other_params[:reason] = (other_params[:reason] ? other_params : result_hash)[:reason].parameterize.underscore
+          result_hash.merge(other_params)
         end
       end
 
       rule(:end_on, :start_on) do
-        key.failure('End on must be after start on date') if values[:end_on] < values[:start_on]
+        if values[:end_on].present?
+          key.failure('must be a date') unless values[:end_on].is_a?(Date)
+          key.failure('End on must be after start on date') if values[:end_on].is_a?(Date) && values[:end_on] < values[:start_on]
+        end
       end
 
       rule(:pre_event_sep_in_days) do
