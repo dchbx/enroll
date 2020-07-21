@@ -159,4 +159,3 @@ end
 Then("Employee should land on home page") do
   step "I should land on home page"
 end
-
