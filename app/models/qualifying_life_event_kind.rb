@@ -28,6 +28,8 @@ class QualifyingLifeEventKind
   SHOP_EFFECTIVE_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
   FEHB_EFFECTIVE_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
 
+  TERMINATION_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
+
   REASON_KINDS = [
     "lost_access_to_mec",
     "adoption",
@@ -80,7 +82,7 @@ class QualifyingLifeEventKind
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean
-  field :date_options_available, type: Mongoid::Boolean  # TODO check on create form and purpose of it.
+  field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
   field :aasm_state, type: Symbol, default: :draft
@@ -91,6 +93,9 @@ class QualifyingLifeEventKind
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
+  field :is_visible, type: Mongoid::Boolean
+  field :termination_on_kinds, type: Array, default: []
+  field :coverage_end_on, type: Date
 
   index({action_kind: 1})
   index({market: 1, ordinal_position: 1 })
