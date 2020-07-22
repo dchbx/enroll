@@ -18,7 +18,7 @@
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
         <div class="row justify-content-start">
-          <div class="col-6" >
+          <div class="col-6" id= "market_kind">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
           </div>
           <!--<div class="col-6" >-->
@@ -67,10 +67,11 @@
 
 <script type="text/javascript" charset="utf-8">
    document.addEventListener("DOMContentLoaded", function() {
-    var market = document.getElementById('market_kind')
+    var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
     var other_reason = "<%= @qle.other_reason%>"
     initialize_reasons(market);
     initialize_effective_kind(market);
+    disable_termination_kind(market);
 
     if (other_reason != ""){
       document.getElementById("other_reason").setAttribute("type", "show");
@@ -131,9 +132,6 @@
     else if (market.value == "fehb"){
       items = <%= raw @qle.fehb_reasons %>;
     }
-    else if (market.value == "Choose..."){
-      items = []
-    }
     var str = "<option>" + "Choose..." + "</option>"
     for (var item of items) {
       str += "<option value='" + item[1] + "'>" + item[0] + "</option>"
@@ -145,8 +143,9 @@
   };
 
   document.getElementById('market_kind').addEventListener('change', function() {
-    initialize_reasons(this);
-    initialize_effective_kind(this);
+    var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
+    initialize_reasons(market);
+    initialize_effective_kind(market);
     document.getElementById("other_reason").setAttribute("type", "hidden");
     document.querySelector("label[for='other_reason']").style.display = "none";
     document.getElementById("other_reasonHelpBlock").style.display = "none";
