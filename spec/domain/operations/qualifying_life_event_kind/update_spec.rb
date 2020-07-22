@@ -26,7 +26,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Update, type: :model, dbclea
         'post_event_sep_in_days' => '88',
         'market_kind' => 'individual',
         'effective_on_kinds' => ['date_of_event'],
-        '_id' => qlek.id.to_s }
+        '_id' => qlek.id.to_s,
+        'coverage_effective_on' => "#{TimeKeeper.date_of_record.year}-07-01",
+        'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-08-01",
+        'event_kind_label' => 'event kind label',
+        'is_visible' => true,
+        'date_options_available' => true }
     end
 
     before :each do
@@ -60,7 +65,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Update, type: :model, dbclea
         'post_event_sep_in_days' => '88',
         'market_kind' => 'individual',
         'effective_on_kinds' => ['date_of_event'],
-        '_id' => qlek.id.to_s }
+        '_id' => qlek.id.to_s,
+        'coverage_effective_on' => "#{TimeKeeper.date_of_record.year}-07-01",
+        'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-08-01",
+        'event_kind_label' => 'event kind label',
+        'is_visible' => true,
+        'date_options_available' => true }
     end
 
     before :each do

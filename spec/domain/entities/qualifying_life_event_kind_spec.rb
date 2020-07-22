@@ -11,14 +11,20 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
       { :start_on => TimeKeeper.date_of_record,
         :end_on => (TimeKeeper.date_of_record + 25.days),
         :title => 'A new SEP Type',
-        :tool_tip => 'tool tip',
+        :tool_tip => 'test tool tip',
         :pre_event_sep_in_days => 4,
         :is_self_attested => true,
         :reason => 'lost_access_to_mec',
         :post_event_sep_in_days => 7,
         :market_kind => 'individual',
         :effective_on_kinds => ['date_of_event'],
-        :ordinal_position => 1 }
+        :ordinal_position => 1,
+        coverage_effective_on: TimeKeeper.date_of_record,
+        coverage_end_on: (TimeKeeper.date_of_record + 25.days),
+        event_kind_label: 'event kind label',
+        is_visible: true,
+        termination_on_kinds: [],
+        date_options_available: true }
     end
 
     it 'should initialize' do
@@ -32,6 +38,61 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
     context 'for end_on as optional' do
       before do
         input_params.merge!({end_on: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for end_on as optional' do
+      before do
+        input_params.merge!({end_on: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for tool_tip as optional' do
+      before do
+        input_params.merge!({tool_tip: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for coverage_effective_on as optional' do
+      before do
+        input_params.merge!({coverage_effective_on: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for coverage_end_on as optional' do
+      before do
+        input_params.merge!({coverage_end_on: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for termination_on_kinds as empty' do
+      before do
+        input_params.merge!({termination_on_kinds: []})
         @result = ::Entities::QualifyingLifeEventKind.new(input_params)
       end
 
