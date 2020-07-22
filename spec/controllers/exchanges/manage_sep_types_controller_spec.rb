@@ -240,6 +240,10 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'should render sorting_sep_types template' do
+      expect(response).to render_template('exchanges/manage_sep_types/sorting_sep_types.html.erb')
+    end
+
     it 'should have response body' do
       expect(response.body).to match(/Individual/i)
       expect(response.body).to match(/Shop/i)
@@ -257,13 +261,26 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
       patch :sort, params: params
     end
 
-    it 'should return http redirect' do
-      expect(response).to have_http_status(:ok)
+    context 'success case' do
+
+      it 'should return http redirect' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'should update the position' do
+        expect(QualifyingLifeEventKind.find(q1.id).ordinal_position).to equal 3
+        expect(QualifyingLifeEventKind.find(q2.id).ordinal_position).to equal 4
+      end
     end
 
-    it 'should update the position' do
-      expect(QualifyingLifeEventKind.find(q1.id).ordinal_position).to equal 3
-      expect(QualifyingLifeEventKind.find(q2.id).ordinal_position).to equal 4
+    context 'failure case' do
+      let(:params) do
+        { 'market_kind' => 'shop', 'sort_data' => nil}
+      end
+
+      it 'should return http redirect' do
+        expect(response).to have_http_status(:internal_server_error)
+      end
     end
   end
 
@@ -279,6 +296,10 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
 
     it 'should return http ok' do
       expect(response).to have_http_status(:ok)
+    end
+
+    it 'should render sep_type_datatable template' do
+      expect(response).to render_template('exchanges/manage_sep_types/sep_type_datatable.html.erb')
     end
 
     it 'should update the position' do
