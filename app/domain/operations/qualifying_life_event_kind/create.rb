@@ -21,9 +21,6 @@ module Operations
       def validate(params)
         result = ::Validators::QualifyingLifeEventKind::QlekContract.new.call(params)
 
-      def validate(params)
-        result = ::Validators::QualifyingLifeEventKind::QlekContract.new.call(params)
- 
         if result.success?
           Success(result)
         else
@@ -46,3 +43,4 @@ module Operations
     end
   end
 end
+
