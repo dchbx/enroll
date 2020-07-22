@@ -56,7 +56,7 @@ module Exchanges
       end
     end
 
-    def sep_type_to_publish
+    def sep_type_to_publish #pending specs
       # authorize Family, :can_update_ssn? # TODO pundit policy
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @row = params[:qle_action_id]
@@ -65,7 +65,7 @@ module Exchanges
       end
     end
 
-    def sep_type_to_expire
+    def sep_type_to_expire #pending specs
       # authorize Family, :can_update_ssn? # TODO pundit policy
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @row = params[:qle_action_id]
@@ -74,7 +74,7 @@ module Exchanges
       end
     end
 
-    def publish_sep_type
+    def publish_sep_type #pending specs
       begin
         @qle = QualifyingLifeEventKind.find(params[:qle_id])
         if @qle.present? && @qle.may_publish?
@@ -90,64 +90,7 @@ module Exchanges
       redirect_to exchanges_manage_sep_types_root_path, flash: message
     end
 
-    def expire_sep_type
-      begin
-        @qle = QualifyingLifeEventKind.find(params[:qle_id])
-        end_on = Date.strptime(params["end_on"], "%m/%d/%Y") rescue nil
-        if @qle.present? && end_on.present?
-          if end_on >= TimeKeeper.date_of_record
-            if @qle.may_schedule_expiration?
-              @qle.schedule_expiration!(end_on)
-              message = {notice: "Expiration Date Set On Sep Type Successfully."}
-            end
-          else
-            if @qle.may_expire?
-              @qle.expire!(end_on)
-              message = {notice: "Sep Type Expired Successfully."}
-            end
-          end
-        end
-      rescue Exception => e
-        message = {error: e.to_s}
-      end
-       redirect_to exchanges_manage_sep_types_root_path, flash: message
-    end
-
-    def sep_type_to_publish
-      # authorize Family, :can_update_ssn? # TODO pundit policy
-      @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      @row = params[:qle_action_id]
-      respond_to do |format|
-        format.js { render "sep_type_to_publish"}
-      end
-    end
-
-    def sep_type_to_expire
-      # authorize Family, :can_update_ssn? # TODO pundit policy
-      @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      @row = params[:qle_action_id]
-      respond_to do |format|
-        format.js { render "sep_type_to_expire"}
-      end
-    end
-
-    def publish_sep_type
-      begin
-        @qle = QualifyingLifeEventKind.find(params[:qle_id])
-        if @qle.present? && @qle.may_publish?
-          if @qle.publish!
-            message = {notice: "Sep Type Published Successfully."}
-          else
-            message = {notice: "Unable to Publish Sep Type."}
-          end
-        end
-      rescue Exception => e
-      message = {error: e.to_s}
-      end
-      redirect_to exchanges_manage_sep_types_root_path, flash: message
-    end
-
-    def expire_sep_type
+    def expire_sep_type  #pending specs
       begin
         @qle = QualifyingLifeEventKind.find(params[:qle_id])
         end_on = Date.strptime(params["end_on"], "%m/%d/%Y") rescue nil
@@ -188,7 +131,7 @@ module Exchanges
       begin
         market_kind = params.permit!.to_h['market_kind']
         sort_data = params.permit!.to_h['sort_data']
-        sort_data.each do |sort|
+        sort_data.each do |sort| # TODO fix update
           QualifyingLifeEventKind.active.where(market_kind: market_kind, id: sort['id']).update(ordinal_position: sort['position'])
         end
         render json: { message: "Successfully sorted", status: 'success' }, status: :ok
