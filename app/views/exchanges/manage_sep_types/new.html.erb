@@ -7,51 +7,59 @@
       </div>
       <div class="col-12" style="line-height: 0.8; margin-top: 20px;" >
         <div class="row justify-content-start">
-          <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
-          </div>
-        </div>
-
-        <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
-        <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
-
-        <div class="row justify-content-start">
-          <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
-          </div>
-          <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
-          </div>
-        </div>
-        <div class="row justify-content-start">
           <div class="col-6">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:start_on),f) %>
           </div>
           <div class="col-6">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on),f) %>
           </div>
-          <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
-          </div>
-          <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
-          </div>
         </div>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
         <div class="row justify-content-start">
           <div class="col-6" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
+          </div>
+          <!--<div class="col-6" >-->
+            <!--<div class="row justify-content-start">-->
+              <!--<div class="col-6" >-->
+                <!--<%#= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>-->
+              <!--</div>-->
+              <!--<div class="col-6">-->
+                <!--<%#= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+          <div class="col-6" >
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
+          </div>
+
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_effective_on),f) %>
           </div>
           <div class="col-6" id="effective_on_kinds">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
           </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_end_on),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_visible),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:date_options_available),f) %>
+          </div>
+          <div class="col-6" >
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:termination_on_kinds),f) %>
+          </div>
         </div>
       </div>
-
       <%#= TODO pundit poilcy%>
       <%# TODO Cancel button%>
       <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
         <div class="col-sm-offset-2 col-sm-10">
-          <%= f.submit 'Create SEP Type', class:"btn btn-primary" %>
+          <%= f.submit 'Create Draft SEP Type', class:"btn btn-primary" %>
         </div>
       </div>
     </div>
