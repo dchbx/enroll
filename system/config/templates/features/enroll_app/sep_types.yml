@@ -49,7 +49,7 @@ registry:
               content_type: :text_field
               default: ''
               description: Enter Toot Tip
-              is_required: true
+              is_required: false
               is_visible: true
           - key: :pre_event_sep_in_days
             item: <%= ENV['pre_event_sep_in_days'] %>
@@ -73,9 +73,9 @@ registry:
             item: <%= ENV[':market_kind'] %>
             meta:
               label: Market Kind
-              content_type: :select
-              enum: [{individual: "Individual"}, {shop: "Shop"}, {fehb: "Fehb"}]
-              default: [{individual: "Individual"}]
+              content_type: :radio_select
+              enum: [{individual: "Individual"}, {shop: "Shop"}, {fehb: "Congress"}]
+              default: :individual
               description: Select Market Kind
               is_required: true
               is_visible: true
@@ -118,3 +118,61 @@ registry:
               description: Select Coverage Effective Type
               is_required: true
               is_visible: true
+          - key: :termination_on_kinds
+            item: <%= ENV['termination_on_kinds'] %>
+            meta:
+              label: Termination On Kind
+              enum: [{date_of_event: Date of Event}, {first_of_month: First of Month}, {first_of_this_month: First of This Month}, {first_of_next_month: First of Next Month}, {fixed_first_of_next_month: Fixed First of Next Month}, {exact_date: Exact Date}]
+              content_type: :checkbox_select
+              default: ''
+              description: Select Termination Effective Type
+              is_required: false
+              is_visible: true
+          - key: :coverage_effective_on
+            item: <%= ENV['coverage_effective_on'] %>
+            meta:
+              label: Eligibility Start Date
+              content_type: :date
+              default: ''
+              description: Enter Eligibility Start Date
+              is_required: false
+              is_visible: true
+          - key: :coverage_end_on
+            item: <%= ENV['coverage_end_on'] %>
+            meta:
+              label: Eligibility End Date
+              content_type: :date
+              default: ''
+              description: Enter Eligibility End Date
+              is_required: false
+              is_visible: true
+          - key: :is_visible
+            item: <%= ENV['is_visible'] %>
+            meta:
+              label: Visibility
+              content_type: :radio_select
+              default: true
+              enum: [ {'true': 'Customer & Admin' }, { 'false': 'Admin Only'} ]
+              description: 'Select Visibility'
+              is_required: true
+              is_visible: true
+          - key: :date_options_available
+            item: <%= ENV['date_options_available'] %>
+            meta:
+              label: Date Options Available
+              content_type: :radio_select
+              default: true
+              enum: [ {'true': 'True' }, { 'false': 'False'} ]
+              description: 'Select Date Options Availabilty'
+              is_required: true
+              is_visible: true
+          - key: :event_kind_label
+            item: <%= ENV['event_kind_label'] %>
+            meta:
+              label: Event Label
+              content_type: :text_field
+              default: ''
+              description: Enter Event Label
+              is_required: true
+              is_visible: true
+
