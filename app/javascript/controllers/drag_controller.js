@@ -11,12 +11,23 @@ export default class extends Controller {
 
 	end(event) {
 		let index = event.item.dataset.index
+		let rowId = event.item.dataset.id
+		let prevPosition = parseInt(index) + 1
 		let market_kind = event.item.dataset.market_kind
 		let data = []
 		var cards = document.querySelectorAll('.card.mb-4')
 		var textContent = event.item.textContent
 		market_kind = market_kind
 		data = [...cards].reduce(function(data, card, index) { return [...data, { id: card.dataset.id, position: index + 1 }] }, [])
+
+		for (var i = 0; i < data.length; i++) {
+			if (data[i]['id'] === rowId && prevPosition === parseInt(data[i]['position'])){
+				return;
+			}
+		}
+
+		var sortedCards = [...cards].map(sortCards)
+
 		fetch('sort',{
 			method: 'PATCH',
 			body: JSON.stringify({market_kind: market_kind, sort_data: data}),
@@ -48,6 +59,11 @@ export default class extends Controller {
 
   		})
 	}
+}
+
+function sortCards(card, index){
+	card.dataset.index = index;
+	card.dataset.ordinal_position = index+1;
 }
 
 $( document ).ready(function() {

@@ -1,6 +1,6 @@
 <div class="container mt-3">
 
-	<h4 class='title'>Sort Sep Type</h4>
+	<h4 class='title'>Sort SEP Types</h4>
 	<!-- Nav tabs -->
 	<div id="sort_notification_msg"  class="toast" role="alert" aria-live="assertive" aria-atomic="true">
 		<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
@@ -22,6 +22,9 @@
 		<li class="nav-item">
 			<a class="nav-link" data-toggle="tab" href="#fehb">Congress</a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link right-align" href="/exchanges/manage_sep_types/sep_types_dt">SEP Type List</a>
+		</li>
 	</ul>
 
 	<div  id="sort_success_msg" class="row flash module"></div>
@@ -29,12 +32,13 @@
  <!-- Tab panes -->
 	<div class="tab-content">
 	 	<div id="individual" class="container tab-pane active"><br>
+			<h3>Titles</h3>
 	   	<div class="container">
 				<div class="row">
 					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
 						<% @sortable.where(market_kind: "individual").active.each_with_index do |sort, i|%>
 		          <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
-		          	<%= sort.title%>
+								<%= sort.title%>
 		          </div>
 	         	<%end%>
 	        </div>
@@ -43,12 +47,13 @@
    	</div>
 
 	 	<div id="shop" class="container tab-pane fade"><br>
+			<h3>Titles</h3>
 	   	<div class="container">
 				<div class="row">
 					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
 						<% @sortable.where(market_kind: "shop").active.each_with_index do |sort, i|%>
-		          <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i + 1%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
-		          	<%= sort.title%>
+		          <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+								<%= sort.title%>
 		          </div>
 	         	<%end%>
 	        </div>
@@ -57,11 +62,14 @@
    	</div>
 
 	 	<div id="fehb" class="container tab-pane fade"><br>
+			<h3>Titles</h3>
 	   	<div class="container">
 				<div class="row">
 					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/sort">
 						<% @sortable.by_market_kind('fehb').active.each do |sort|%>
-		          <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-market_kind="<%=sort.market_kind%>"  class="card card-body mb-4"><%= sort.title%></div>
+		          <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+								<%= sort.title%>
+		          </div>
 	         	<%end%>
 	        </div>
 				</div>
