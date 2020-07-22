@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 9231d02a5b028f3e3320bcbd5d70a08475e4c707
+  revision: 50fcc8cd51a4e255c738ddb8a9569f6c7408260f
   branch: branch_0.8.0
   specs:
     resource_registry (0.7.0)
@@ -268,7 +268,7 @@ GEM
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
     bindex (0.8.1)
-    bootsnap (1.4.6)
+    bootsnap (1.4.7)
       msgpack (~> 1.0)
     bson (4.8.2)
     builder (3.2.4)
