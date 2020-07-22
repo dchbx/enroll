@@ -13,16 +13,23 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
   end
 
   let(:contract_params) do
-    { start_on: "#{TimeKeeper.date_of_record.year}-07-01",
-      end_on: "#{TimeKeeper.date_of_record.year}-08-01",
-      title: 'Test Title',
-      tool_tip: 'jhsdjhs',
-      pre_event_sep_in_days: '10',
-      is_self_attested: true,
-      reason: 'Lost Access To Mec',
-      post_event_sep_in_days: '88',
-      market_kind: 'individual',
-      effective_on_kinds: ['date_of_event']}
+    { :start_on => TimeKeeper.date_of_record,
+      :end_on => (TimeKeeper.date_of_record + 25.days),
+      :title => 'A new SEP Type',
+      :tool_tip => 'test tool tip',
+      :pre_event_sep_in_days => '4',
+      :is_self_attested => true,
+      :reason => 'lost_access_to_mec',
+      :post_event_sep_in_days => '7',
+      :market_kind => 'individual',
+      :effective_on_kinds => ['date_of_event'],
+      :ordinal_position => 1,
+      coverage_effective_on: TimeKeeper.date_of_record,
+      coverage_end_on: (TimeKeeper.date_of_record + 25.days),
+      event_kind_label: 'event kind label',
+      is_visible: true,
+      termination_on_kinds: ['date_of_event'],
+      date_options_available: true }
   end
 
   context 'success case' do
@@ -45,6 +52,81 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
     context 'for end_on being optional' do
       before do
         contract_params.merge!({end_on: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return success' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should not have any errors' do
+        expect(@result.errors.empty?).to be_truthy
+      end
+    end
+
+    context 'for tool_tip being optional' do
+      before do
+        contract_params.merge!({tool_tip: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return success' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should not have any errors' do
+        expect(@result.errors.empty?).to be_truthy
+      end
+    end
+
+    context 'for coverage_effective_on being optional' do
+      before do
+        contract_params.merge!({coverage_effective_on: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return success' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should not have any errors' do
+        expect(@result.errors.empty?).to be_truthy
+      end
+    end
+
+    context 'for coverage_end_on being optional' do
+      before do
+        contract_params.merge!({coverage_end_on: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return success' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should not have any errors' do
+        expect(@result.errors.empty?).to be_truthy
+      end
+    end
+
+    context 'for termination_on_kinds being optional for individual' do
+      before do
+        contract_params.merge!({termination_on_kinds: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return success' do
+        expect(@result.success?).to be_truthy
+      end
+
+      it 'should not have any errors' do
+        expect(@result.errors.empty?).to be_truthy
+      end
+    end
+
+    context 'for termination_on_kinds being mandatory' do
+      before do
+        contract_params.merge!({market_kind: 'shop'})
         @result = subject.call(contract_params)
       end
 
@@ -131,6 +213,36 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
       it 'should return error message as end_on is not a date' do
         expect(@result.errors.messages.first.text).to eq('must be a date')
+      end
+    end
+
+    context 'for termination_on_kinds being empty for shop market' do
+      before do
+        contract_params.merge!({market_kind: 'shop', termination_on_kinds: []})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should return error message' do
+        expect(@result.errors.messages.first.text).to eq('must be selected')
+      end
+    end
+
+    context 'for termination_on_kinds being empty for fehb market' do
+      before do
+        contract_params.merge!({market_kind: 'fehb', termination_on_kinds: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should return error message' do
+        expect(@result.errors.messages.first.text).to eq('must be selected')
       end
     end
   end
