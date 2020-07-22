@@ -8,7 +8,7 @@ When("Admin clicks Manage Sep Types") do
 end
 
 Given("the Admin is navigated to the Manage Sep Types screen") do
-  expect(page).to have_content('Manage Sep Types')
+  expect(page).to have_content('Manage SEP Types')
 end
 
 And(/^the Admin has the ability to use the following filters for documents provided: All, Individual, Shop and Congress$/) do
