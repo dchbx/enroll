@@ -198,7 +198,6 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
   end
 
   context 'for sorting_sep_types' do
-
     before do
       sign_in(current_user)
       get :sorting_sep_types
@@ -329,6 +328,25 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
     it 'should update the position' do
       expect(QualifyingLifeEventKind.find(q1.id).ordinal_position).to equal 3
       expect(QualifyingLifeEventKind.find(q2.id).ordinal_position).to equal 4
+    end
+  end
+
+  context 'for sep_types_dt' do
+    let!(:hbx_person) { FactoryBot.create(:person, user: current_user )}
+    let!(:permission)  { FactoryBot.create(:permission, :hbx_staff, can_complete_resident_application: true) }
+    let!(:role) {FactoryBot.create(:hbx_staff_role, person: hbx_person, subrole: "hbx_staff", permission_id: permission.id)}
+
+    before do
+      sign_in(current_user)
+      get :sep_types_dt
+    end
+
+    it 'should return http ok' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'should update the position' do
+      expect(response.body).to match /Sorting Sep Types/i
     end
   end
 
