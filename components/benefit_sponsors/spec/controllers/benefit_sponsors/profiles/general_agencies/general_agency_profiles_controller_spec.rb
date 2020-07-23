@@ -1,6 +1,11 @@
 require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Profiles::GeneralAgencies::GeneralAgencyProfilesController, type: :controller, dbclean: :after_each do
+
+    before :all do
+      DatabaseCleaner.clean
+    end
+
     routes { BenefitSponsors::Engine.routes }
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
     let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
