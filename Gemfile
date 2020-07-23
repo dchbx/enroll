@@ -34,6 +34,7 @@ gem 'database_cleaner',       '~> 1.7'
 gem 'acapi',              git: "https://github.com/dchbx/acapi.git", branch: 'master'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
+gem 'financial_assistance', path: 'components/financial_assistance'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
