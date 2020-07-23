@@ -29,6 +29,7 @@ module Validators
           result_hash = result.to_h
           other_params = {}
           other_params[:ordinal_position] = 0 if result_hash[:ordinal_position].nil?
+          result_hash[:reason] = "" if result_hash[:reason] == 'Choose...'
           other_params[:reason] = result_hash[:other_reason] if result_hash[:reason] == 'other'
           other_params[:reason] = (other_params[:reason] ? other_params : result_hash)[:reason].parameterize.underscore
           other_params[:termination_on_kinds] = [] if result_hash[:market_kind].to_s == 'individual' && result_hash[:termination_on_kinds].nil?
@@ -49,7 +50,7 @@ module Validators
 
       rule(:reason) do
         reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:reason).uniq
-        key.failure('sep type object exists with same reason') if reasons.include?(value)
+        key.failure('SEP type object exists with same reason') if reasons.include?(value)
       end
 
       rule(:post_event_sep_in_days) do

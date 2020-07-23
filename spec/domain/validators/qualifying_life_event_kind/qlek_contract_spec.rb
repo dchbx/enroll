@@ -196,8 +196,8 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
         expect(@result.errors.empty?).to be_falsy
       end
 
-      it 'should return error message as start date is after end date' do
-        expect(@result.errors.messages.first.text).to eq('sep type object exists with same reason')
+      it 'should return error message if reason already exists' do
+        expect(@result.errors.messages.first.text).to eq('SEP type object exists with same reason')
       end
     end
 
