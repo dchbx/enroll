@@ -77,6 +77,12 @@
 
   var initialize_effective_kind = function (market){
     var effective_on_kinds= document.getElementById('effective_on_kinds').querySelectorAll('input[type=checkbox]')
+    for (var effective_on_kind of effective_on_kinds){
+      effective_on_kind.disabled = false
+      effective_on_kind.checked = false
+      effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
+    }
+
     if (market.value == "individual"){
       var ivl_effective_kinds = <%= raw @qle.ivl_effective_kinds %>;
       for (var effective_on_kind of effective_on_kinds){
@@ -108,6 +114,11 @@
 
    var disable_termination_kind = function (market){
      var termination_on_kinds= document.getElementById('termination_on_kinds').querySelectorAll('input[type=checkbox]')
+     for (var termination_on_kind of termination_on_kinds){
+       termination_on_kind.disabled = false
+       termination_on_kind.checked = false
+       termination_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
+     }
      if (market.value == "individual"){
        for (var termination_on_kind of termination_on_kinds){
          termination_on_kind.disabled = true
@@ -148,7 +159,7 @@
     var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
     initialize_reasons(market);
     initialize_effective_kind(market);
-    disable_termination_kind(market)
+    disable_termination_kind(market);
     document.getElementById("other_reason").setAttribute("type", "hidden");
     document.querySelector("label[for='other_reason']").style.display = "none";
     document.getElementById("other_reasonHelpBlock").style.display = "none";
