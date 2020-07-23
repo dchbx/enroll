@@ -108,6 +108,20 @@ PATH
       webpacker (~> 4.0.2)
 
 PATH
+  remote: components/financial_assistance
+  specs:
+    financial_assistance (0.1.0)
+      aasm (~> 4.8)
+      config (~> 2.0)
+      money-rails (~> 1.13)
+      mongoid (~> 7.0.2)
+      mongoid-autoinc (~> 6.0)
+      pundit (~> 2.0)
+      rails (~> 5.2.3)
+      slim (~> 3.0)
+      symmetric-encryption (~> 3.9.1)
+
+PATH
   remote: components/notifier
   specs:
     notifier (0.0.1)
@@ -942,6 +956,7 @@ DEPENDENCIES
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi
+  financial_assistance!
   forgery (~> 0.7.0)
   haml (~> 5.0)
   httparty (~> 0.16)
