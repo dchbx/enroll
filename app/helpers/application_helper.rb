@@ -1,5 +1,8 @@
 module ApplicationHelper
   include FloatHelper
+  include FinancialAssistance::SharedHelper
+  include FinancialAssistance::ApplicationHelper
+  include FinancialAssistance::NavigationHelper
 
   def can_employee_shop?(date)
     return false if date.blank?
