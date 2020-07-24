@@ -63,6 +63,7 @@
         <div class="col-sm-offset-2 col-sm-10">
           <% if @qle.draft %>
             <%= f.submit l10n("exchange.manage_sep_types.update_sep_types"), class:'btn btn-outline-primary' %>
+            <%= f.submit l10n('exchange.manage_sep_types.publish'), name: (f&.object_name.to_s + "[publish]"), value: l10n('exchange.manage_sep_types.publish'), class:'btn btn-outline-primary' %>
           <% end %>
           <%= link_to l10n("exchange.manage_sep_types.cancel"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary' %>
         </div>

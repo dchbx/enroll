@@ -16,38 +16,63 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
     context 'for success case' do
 
       let(:qlek_create_params) do
-        { start_on: "#{TimeKeeper.date_of_record.year}-07-01",
-          end_on: "#{TimeKeeper.date_of_record.year}-08-01",
-          title: 'test title',
-          tool_tip: 'jhsdjhs',
-          pre_event_sep_in_days: '10',
-          is_self_attested: 'true',
-          reason: 'lost_access_to_mec',
-          post_event_sep_in_days: '88',
-          market_kind: 'individual',
-          effective_on_kinds: ['date_of_event'],
-          coverage_effective_on: "#{TimeKeeper.date_of_record.year}-07-01",
-          coverage_end_on: "#{TimeKeeper.date_of_record.year}-08-01",
-          event_kind_label: 'event kind label',
-          is_visible: true,
-          date_options_available: true }
+        { 'start_on': "#{TimeKeeper.date_of_record.year}-07-01",
+          'end_on': "#{TimeKeeper.date_of_record.year}-08-01",
+          'title': 'test title',
+          'tool_tip': 'jhsdjhs',
+          'pre_event_sep_in_days': '10',
+          'is_self_attested': 'true',
+          'reason': 'lost_access_to_mec',
+          'post_event_sep_in_days': '88',
+          'market_kind': 'individual',
+          'effective_on_kinds': ['date_of_event'],
+          'coverage_effective_on': "#{TimeKeeper.date_of_record.year}-07-01",
+          'coverage_end_on': "#{TimeKeeper.date_of_record.year}-08-01",
+          'event_kind_label': 'event kind label',
+          'is_visible': true,
+          'date_options_available': true }
 
       end
 
-      before :each do
-        @result = subject.call(qlek_create_params)
+      context 'without publish' do
+        before :each do
+          @result = subject.call(qlek_create_params)
+        end
+
+        it 'should return success' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
+
+        it 'should return a qlek object' do
+          expect(@result.success).to be_a(::QualifyingLifeEventKind)
+        end
+
+        it 'should create QualifyingLifeEventKind object' do
+          expect(::QualifyingLifeEventKind.all.count).to eq(1)
+        end
       end
 
-      it 'should return success' do
-        expect(@result).to be_a(Dry::Monads::Result::Success)
-      end
+      context 'for publish' do
+        before :each do
+          qlek_create_params.merge!({'publish': 'Publish'})
+          @result = subject.call(qlek_create_params)
+        end
 
-      it 'should return a qlek object' do
-        expect(@result.success).to be_a(::QualifyingLifeEventKind)
-      end
+        it 'should return success' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
 
-      it 'should create QualifyingLifeEventKind object' do
-        expect(::QualifyingLifeEventKind.all.count).to eq(1)
+        it 'should return a qlek object' do
+          expect(@result.success).to be_a(::QualifyingLifeEventKind)
+        end
+
+        it 'should create QualifyingLifeEventKind object' do
+          expect(::QualifyingLifeEventKind.all.count).to eq(1)
+        end
+
+        it 'should publish the newly created qlek object' do
+          expect(QualifyingLifeEventKind.all.first.active?).to be_truthy
+        end
       end
     end
 
