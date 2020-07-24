@@ -43,6 +43,7 @@ gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.g
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "transport_profiles", path: "components/transport_profiles"
+gem 'ui_helpers',         path: 'components/ui_helpers'
 #######################################################
 
 ## MongoDB gem dependencies
