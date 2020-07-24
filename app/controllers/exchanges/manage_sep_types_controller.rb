@@ -2,10 +2,9 @@
 
 module Exchanges
   class ManageSepTypesController < ApplicationController
-    include ::DataTablesAdapter
-    include ::DataTablesSearch
+    include ::DataTablesAdapter #TODO check
     include ::Pundit
-    include ::SepAll
+    include ::L10nHelper
 
     layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types]
@@ -17,7 +16,7 @@ module Exchanges
     def create
       formatted_params = format_create_params(params)
       result = Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
-
+      # result = EnrollRegistry[:sep_types] { formatted_params }
       respond_to do |format|
         format.html do
           if result.failure?
