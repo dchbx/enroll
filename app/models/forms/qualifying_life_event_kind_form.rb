@@ -57,7 +57,7 @@ module Forms
     end
 
     def self.for_update(params)
-      qlek_params = fetch_qlek_data(params[:_id]).merge(params)
+      qlek_params = fetch_qlek_data(params[:_id], params)
       update_params = default_keys_hash.merge(qlek_params.symbolize_keys)
       self.new(update_params)
     end
@@ -79,9 +79,13 @@ module Forms
         end
       end
 
-      def fetch_qlek_data(id)
+      def fetch_qlek_data(id, update_params = nil)
         qle = ::QualifyingLifeEventKind.find(id)
-        params = qle.attributes.merge(fetch_additional_params)
+        params = if update_params.present?
+                   update_params.merge(fetch_additional_params)
+                 else
+                   qle.attributes.merge(fetch_additional_params)
+                 end
         params.merge!({draft: qle.draft?})
       end
 
