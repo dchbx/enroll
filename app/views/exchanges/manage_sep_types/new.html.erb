@@ -55,11 +55,10 @@
         </div>
       </div>
     </div>
-    <%#= TODO pundit poilcy%>
-    <%# TODO Cancel button%>
-    <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+    <div class="form-group <%=pundit_class(QualifyingLifeEventKind, :test_policy?)%>">
       <div class="col-sm-offset-2 col-sm-10">
-        <%= f.submit l10n("exchange.manage_sep_types.create_draft"), class:"btn btn-primary" %>
+        <%= f.submit l10n("exchange.manage_sep_types.create_draft"), class:"btn btn-outline-primary" %>
+        <%= link_to l10n("exchange.manage_sep_types.cancel"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary' %>
       </div>
     </div>
   </div>
