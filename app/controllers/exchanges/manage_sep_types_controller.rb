@@ -25,7 +25,7 @@ module Exchanges
             @failure = result.failure
             render :new
           else
-            flash[:success] = 'A new SEP Type was successfully created.'
+            flash[:success] = l10n("controller.manage_sep_type.create_success")
             redirect_to sep_types_dt_exchanges_manage_sep_types_path
           end
         end
@@ -48,7 +48,7 @@ module Exchanges
             @failure = result.failure
             render :edit
           else
-            flash[:success] = 'The SEP Type was successfully updated.'
+            flash[:success] = l10n("controller.manage_sep_type.update_success")
             redirect_to sep_types_dt_exchanges_manage_sep_types_path
           end
         end
@@ -78,9 +78,9 @@ module Exchanges
         @qle = QualifyingLifeEventKind.find(params[:qle_id])
         if @qle.present? && @qle.may_publish?
           if @qle.publish!
-            message = {notice: "Sep Type Published Successfully."}
+            message = {notice: l10n("controller.manage_sep_type.publish_success")}
           else
-            message = {notice: "Unable to Publish Sep Type."}
+            message = {notice: l10n("controller.manage_sep_type.publish_failure")}
           end
         end
       rescue Exception => e
@@ -97,12 +97,12 @@ module Exchanges
           if end_on >= TimeKeeper.date_of_record
             if @qle.may_schedule_expiration?
               @qle.schedule_expiration!(end_on)
-              message = {notice: "Expiration Date Set On Sep Type Successfully."}
+              message = {notice: l10n("controller.manage_sep_type.enpire_pending_success")}
             end
           else
             if @qle.may_expire?
               @qle.expire!(end_on)
-              message = {notice: "Sep Type Expired Successfully."}
+              message = {notice: l10n("controller.manage_sep_type.expire_success")}
             end
           end
         end
@@ -133,9 +133,9 @@ module Exchanges
         sort_data.each do |sort| # TODO fix update
           QualifyingLifeEventKind.active.where(market_kind: market_kind, id: sort['id']).update(ordinal_position: sort['position'])
         end
-        render json: { message: "Successfully sorted", status: 'success' }, status: :ok
+        render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
       rescue => e
-        render json: { message: "An error occured while sorting", status: 'error' }, status: :internal_server_error
+        render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
       end
     end
 

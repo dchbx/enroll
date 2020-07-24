@@ -12,9 +12,9 @@
     <div class="col-4">
       <h3 class="heading-text">
         <% if @qle.draft %>
-          Update SEP Type
+          <%= l10n("exchange.manage_sep_types.update_sep_type")%>
         <% else%>
-          SEP Type Details
+          <%= l10n("exchange.manage_sep_types.sep_type_details")%>
         <%end%>
       </h3>
     </div>
@@ -63,7 +63,7 @@
     <% if @qle.draft %> <%#= TODO pundit poilcy%>
       <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
         <div class="col-sm-offset-2 col-sm-10">
-          <%= f.submit 'Update SEP Type', class:"btn btn-primary" %>
+          <%= f.submit l10n("exchange.manage_sep_types.update_sep_types"), class:"btn btn-primary" %>
         </div>
       </div>
     <% end %>

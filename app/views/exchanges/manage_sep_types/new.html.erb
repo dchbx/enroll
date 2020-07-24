@@ -11,7 +11,7 @@
     <% end %>
     <div class="col-12">
       <h3 class="heading-text">
-        Create SEP Type
+        <%= l10n("exchange.manage_sep_types.create_sep_type")%>
       </h3>
     </div>
     <div class="col-12" style="line-height: 0.8; margin-top: 20px;" >
@@ -59,7 +59,7 @@
     <%# TODO Cancel button%>
     <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
       <div class="col-sm-offset-2 col-sm-10">
-        <%= f.submit 'Create Draft', class:"btn btn-primary" %>
+        <%= f.submit l10n("exchange.manage_sep_types.create_draft"), class:"btn btn-primary" %>
       </div>
     </div>
   </div>

@@ -1,29 +1,29 @@
 <div class="container mt-3">
 
-	<h4 class='title'>Sort SEP Types</h4>
+	<h4 class='title'><%= l10n("exchange.manage_sep_types.sort_sep_types")%></h4>
 	<!-- Nav tabs -->
 	<div id="sort_notification_msg"  class="toast" role="alert" aria-live="assertive" aria-atomic="true">
 		<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
 		  <span aria-hidden="true">&times;</span>
 		</button>
 	  <div class="toast-header">
-	    <strong class="mr-auto">Successfully Sorted</strong>
+	    <strong class="mr-auto"></strong>
 	  </div>
 	  <div class="toast-body"></div>
 	</div>
 
 	<ul class="nav nav-tabs">
 		<li class="nav-item">
-			<a class="nav-link active" data-toggle="tab" href="#individual">Individual</a>
+			<a class="nav-link active" data-toggle="tab" href="#individual"><%= l10n("exchange.manage_sep_types.individual")%></a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-toggle="tab" href="#shop">Shop</a>
+			<a class="nav-link" data-toggle="tab" href="#shop"><%= l10n("exchange.manage_sep_types.shop")%></a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-toggle="tab" href="#fehb">Congress</a>
+			<a class="nav-link" data-toggle="tab" href="#fehb"><%= l10n("exchange.manage_sep_types.fehb")%></a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link right-align" href="/exchanges/manage_sep_types/sep_types_dt">SEP Type List</a>
+			<a class="nav-link right-align" href="/exchanges/manage_sep_types/sep_types_dt"><%= l10n("exchange.manage_sep_types.sep_type_list")%></a>
 		</li>
 	</ul>
 
@@ -32,7 +32,8 @@
  <!-- Tab panes -->
 	<div class="tab-content">
 	 	<div id="individual" class="container tab-pane active"><br>
-			<h3>Titles</h3>
+          <!--// TODO  check here-->
+			<h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
 	   	<div class="container">
 				<div class="row">
 					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
@@ -47,7 +48,7 @@
    	</div>
 
 	 	<div id="shop" class="container tab-pane fade"><br>
-			<h3>Titles</h3>
+			<h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
 	   	<div class="container">
 				<div class="row">
 					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
@@ -62,7 +63,7 @@
    	</div>
 
 	 	<div id="fehb" class="container tab-pane fade"><br>
-			<h3>Titles</h3>
+			<h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
 	   	<div class="container">
 				<div class="row">
 					<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/sort">
