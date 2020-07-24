@@ -175,7 +175,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       end
 
       it 'should return error message as start date is after end date' do
-        expect(@result.errors.messages.first.text).to eq('one of the selected values is invalid')
+        expect(@result.errors.messages.first.text).to eq('One of the selected values is invalid')
       end
     end
 
@@ -197,7 +197,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       end
 
       it 'should return error message if reason already exists' do
-        expect(@result.errors.messages.first.text).to eq('SEP type object exists with same reason')
+        expect(@result.errors.messages.first.text).to eq('Active SEP type exists with same reason')
       end
     end
 
@@ -216,34 +216,36 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       end
     end
 
-    context 'for termination_on_kinds being empty for shop market' do
-      before do
-        contract_params.merge!({market_kind: 'shop', termination_on_kinds: []})
-        @result = subject.call(contract_params)
-      end
+    # TODO uncomment spec when code uncommented here
+    # app/domain/validators/qualifying_life_event_kind/qlek_contract.rb:98
+    # context 'for termination_on_kinds being empty for shop market' do
+    #   before do
+    #     contract_params.merge!({market_kind: 'shop', termination_on_kinds: []})
+    #     @result = subject.call(contract_params)
+    #   end
+    #
+    #   it 'should return failure' do
+    #     expect(@result.failure?).to be_truthy
+    #   end
+    #
+    #   it 'should return error message' do
+    #     expect(@result.errors.messages.first.text).to eq('must be selected')
+    #   end
+    # end
 
-      it 'should return failure' do
-        expect(@result.failure?).to be_truthy
-      end
-
-      it 'should return error message' do
-        expect(@result.errors.messages.first.text).to eq('must be selected')
-      end
-    end
-
-    context 'for termination_on_kinds being empty for fehb market' do
-      before do
-        contract_params.merge!({market_kind: 'fehb', termination_on_kinds: nil})
-        @result = subject.call(contract_params)
-      end
-
-      it 'should return failure' do
-        expect(@result.failure?).to be_truthy
-      end
-
-      it 'should return error message' do
-        expect(@result.errors.messages.first.text).to eq('must be selected')
-      end
-    end
+    # context 'for termination_on_kinds being empty for fehb market' do
+    #   before do
+    #     contract_params.merge!({market_kind: 'fehb', termination_on_kinds: nil})
+    #     @result = subject.call(contract_params)
+    #   end
+    #
+    #   it 'should return failure' do
+    #     expect(@result.failure?).to be_truthy
+    #   end
+    #
+    #   it 'should return error message' do
+    #     expect(@result.errors.messages.first.text).to eq('must be selected')
+    #   end
+    # end
   end
 end
