@@ -75,7 +75,7 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
         end
 
         it 'should have success flash message' do
-          expect(flash[:success]).to eq 'A new SEP Type was successfully created.'
+          expect(flash[:success]).to eq 'New SEP Type Created Successfully.'
         end
 
         it 'should redirect to sep types dt action' do
@@ -95,7 +95,7 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
         end
 
         it 'should have success flash message' do
-          expect(flash[:success]).to eq 'A new SEP Type was successfully created.'
+          expect(flash[:success]).to eq 'New SEP Type Created Successfully.'
         end
 
         it 'should redirect to sep types dt action' do
@@ -119,8 +119,8 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
         expect(response).to render_template('new')
       end
 
-      it 'should have success flash message' do
-        expect(flash[:danger]).to eq 'End on must be after start on date'
+      it 'should have error message' do
+        expect(response.body).to have_content(("End on must be after start on date"))
       end
     end
   end
@@ -199,7 +199,7 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
       it 'should have success flash message' do
         post_params[:forms_qualifying_life_event_kind_form].merge!({reason: 'test birth'})
         post :update, params: post_params
-        expect(flash[:success]).to eq 'The SEP Type was successfully updated.'
+        expect(flash[:success]).to eq 'SEP Type Updated Successfully.'
       end
 
       it 'should redirect to sep types dt action' do
@@ -224,8 +224,8 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
         expect(response).to render_template('edit')
       end
 
-      it 'should have success flash message' do
-        expect(flash[:danger]).to eq 'End on must be after start on date'
+      it 'should have error message' do
+        expect(response.body).to have_content(("End on must be after start on date"))
       end
     end
   end
