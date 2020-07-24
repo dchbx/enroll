@@ -3,12 +3,12 @@ module FinancialAssistance
 
     before_action :set_current_person
 
-    include UIHelpers::WorkflowController
+    include ::UIHelpers::WorkflowController
     include NavigationHelper
     include ApplicationHelper
 
-    before_filter :find_application_and_applicant
-    before_filter :load_support_texts, only: [:index, :other]
+    before_action :find_application_and_applicant
+    before_action :load_support_texts, only: [:index, :other]
 
     def index
       save_faa_bookmark(@person, request.original_url)
