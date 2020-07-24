@@ -43,7 +43,7 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: false, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false,
-                          view_agency_staff: true, manage_agency_staff: true
+                          view_agency_staff: true, manage_agency_staff: true, can_manage_qles: true
                         )
     Permission
       .find_or_initialize_by(name: 'super_admin')
@@ -51,7 +51,7 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false,
-                          view_agency_staff: true, manage_agency_staff: true
+                          view_agency_staff: true, manage_agency_staff: true, can_manage_qles: true
                         )
       #puts 'Permissions Updated!'
   end
@@ -82,6 +82,7 @@ class DefinePermissions < MigrationTask
     hbx_admin_can_transition_family_members
     hbx_admin_can_delete_identity_application_documents
     hbx_admin_can_access_pay_now
+    hbx_admin_can_manage_qles
   end
 
   def build_test_roles
@@ -205,6 +206,11 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_create_benefit_application
     Permission.super_admin.update_attributes(can_create_benefit_application: true)
     Permission.hbx_tier3.update_attributes(can_create_benefit_application: true)
+  end
+
+  def hbx_admin_can_manage_qles
+    Permission.super_admin.update_attributes(can_manage_qles: true)
+    Permission.hbx_tier3.update_attributes(can_manage_qles: true)
   end
 
   def grant_super_admin_access

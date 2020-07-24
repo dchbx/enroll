@@ -6,6 +6,7 @@ module Exchanges
     include ::Pundit
     include ::L10nHelper
 
+    before_action :updateable?
     layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types]
 
@@ -55,7 +56,6 @@ module Exchanges
     end
 
     def sep_type_to_publish #pending specs
-      # authorize Family, :can_update_ssn? # TODO pundit policy
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @row = params[:qle_action_id]
       respond_to do |format|
@@ -64,7 +64,6 @@ module Exchanges
     end
 
     def sep_type_to_expire #pending specs
-      # authorize Family, :can_update_ssn? # TODO pundit policy
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @row = params[:qle_action_id]
       respond_to do |format|
@@ -156,6 +155,10 @@ module Exchanges
       params.permit!
       params['forms_qualifying_life_event_kind_form'].merge!({_id: params[:id]})
       params['forms_qualifying_life_event_kind_form'].to_h
+    end
+
+    def updateable?
+      authorize QualifyingLifeEventKind, :can_manage_qles? rescue redirect_to root_path, :flash => { :error => l10n("controller.manage_sep_type.not_authorized") }
     end
   end
 end
