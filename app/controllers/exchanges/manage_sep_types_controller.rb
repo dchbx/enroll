@@ -22,7 +22,7 @@ module Exchanges
         format.html do
           if result.failure?
             @qle = Forms::QualifyingLifeEventKindForm.for_new(result.failure[0].to_h)
-            flash[:danger] = result.failure[1].first
+            @failure = result.failure
             render :new
           else
             flash[:success] = 'A new SEP Type was successfully created.'
@@ -44,9 +44,8 @@ module Exchanges
       respond_to do |format|
         format.html do
           if result.failure?
-            @qle = Forms::QualifyingLifeEventKindForm.for_update(formatted_params)
-
-            flash[:danger] = result.failure[1].first
+            @qle = Forms::QualifyingLifeEventKindForm.for_update(result.failure[0].to_h)
+            @failure = result.failure
             render :edit
           else
             flash[:success] = 'The SEP Type was successfully updated.'
