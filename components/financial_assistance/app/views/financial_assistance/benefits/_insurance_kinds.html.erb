@@ -1,0 +1,44 @@
+<div class="instruction-row row row-form-wrapper no-buffer row-height">
+	<div class="col-md-9 checklist-title">
+		<span> <b class="run-glossary"> <%= text %> </b></span>
+	</div>
+</div>
+<div class="instruction-row row row-form-wrapper lightgray no-buffer row-height">
+ 	<div class="col-md-12 checklist-title-header">
+  	<span> <b> Check any boxes that apply to this person </b> and enter details when requested. </span>
+  </div>
+</div>
+
+<br />
+
+<% insurance_kinds.each do |insurance_kind| %>
+  <div id="<%= insurance_kind %>"class="benefit-kind">
+    <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
+      <div class="col-md-10 benefits-check">
+        <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp
+        <span class="run-glossary"> <%= FinancialAssistance::Benefit::INSURANCE_TYPE[insurance_kind.to_sym] %> </span>
+      </div>
+    </div>
+
+    <div class="benefits-list <%= kind %>">
+      <% @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).each do |benefit| %>
+        <%if benefit.insurance_kind == 'employer_sponsored_insurance'%>
+          <%= render partial: 'esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
+        <% else %>
+          <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class='new-benefit-form hidden <%= insurance_kind %>'>
+      <% if insurance_kind == 'employer_sponsored_insurance'%>
+        <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
+      <% else %>
+        <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
+      <% end %>
+    </div>
+    <div class="col-md-12 add-more-link-<%=insurance_kind%>" id="add-more-link">
+      <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{FinancialAssistance::Benefit::INSURANCE_TYPE[insurance_kind.to_sym]}".html_safe, "javascript:void(0);", :id => "add_new_insurance_kind", :class => "#{'hidden' unless @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present? }" %>
+    </div>
+  </div>
+<% end %>

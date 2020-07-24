@@ -1,0 +1,338 @@
+<%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
+  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+    <div class="col-md-9">
+      <p class="alert alert-error hide"></p>
+      <div class="row">
+      <div class="col-md-12">
+        <div class="title-icon">
+          <span class="fa-icon fa-stack fa-lg">
+              <i class="fa fa-circle-thin fa-stack-2x ques-icon"></i>
+              <i class="fa fa-question fa-stack-2x "></i>
+          </span>
+        </div>
+        <h2 class="fa-darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %></h2>
+      </div>
+    </div>
+      <!-- <h2 class="darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %> </h2> -->
+      <p>Answer these questions for this person. When you're finished, select CONTINUE.</p>
+      <p class="memo">* = required field</p>
+
+        <% if @applicant.present? && @applicant.person.no_ssn == "1" %>
+          <div class="row row-form-wrapper no-buffer row-height">
+            <div class='col-md-6'>
+              <span class="fa-text-color">Has this person applied for an SSN *</span>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes") %>
+              <label class="radio-yml" for="is_ssn_applied_yes">Yes</label>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_ssn_applied", false, class: "radio-yml", id: "is_ssn_applied_no") %>
+              <label class="radio-yml" for="is_ssn_applied_no">No</label>
+            </div>
+          </div>
+
+          <div class="row row-form-wrapper no-buffer row-height">
+            <div class='col-md-6'>
+              <span class="fa-text-color">Why doesn't this person have an SSN?</span>
+            </div>
+            <div class='col-md-2'>
+              <%= f.text_field :non_ssn_apply_reason, class: "floatlabel", id: "no_ssn_reason", placeholder: "Reason" %>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Is this person pregnant? *</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_pregnant", true, class: "radio-yml", id: "is_pregnant_yes", required: true) %>
+            <label class="radio-yml" for="is_pregnant_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_pregnant", false, class: "radio-yml", id: "is_pregnant_no", required: true) %>
+            <label class="radio-yml" for="is_pregnant_no">No</label>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_pregnant" data-toggle="modal" data-target="#is_pregnant">Not Sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_pregnant"} %>
+          </div>
+        </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-lg-6 col-md-6 top-buffer'>
+          <span class="fa-text-color">Pregnancy due date?</span>
+        </div>
+        <div class='col-lg-6 col-md-6'>
+          <%= f.text_field :pregnancy_due_on, class: "jq-datepicker floatlabel", id: "applicant_pregnancy_due_on", placeholder: "Due Date" %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class="fa-text-color">How many children is this person expecting?</span>
+        </div>
+        <div class='col-lg-3 col-md-3 fa-select select-box'>
+          <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, {:id => 'children_expected_count', :prompt => true}) %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class="fa-text-color">Was this person pregnant in the last 60 days?</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_post_partum_period", true, class: "radio-yml", id: "is_post_partum_period_yes") %>
+          <label class="radio-yml" for="is_post_partum_period_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_post_partum_period", false, class: "radio-yml", id: "is_post_partum_period_no") %>
+            <label class="radio-yml" for="is_post_partum_period_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-lg-6 col-md-6 top-buffer'>
+          <span class="fa-text-color">Pregnancy end on date</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.text_field :pregnancy_end_on, class: "jq-datepicker floatlabel", id: "applicant_pregnancy_end_on", placeholder: "Due Date" %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class="fa-text-color">Was this person on Medicaid during pregnancy?</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_enrolled_on_medicaid", true, class: "radio-yml", id: "medicaid_pregnency_yes") %>
+          <label class="radio-yml" for="medicaid_pregnency_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_enrolled_on_medicaid", false, class: "radio-yml", id: "is_post_partum_period_no")%>
+          <label class="radio-yml" for="medicaid_pregnency_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class="fa-text-color">Was this person in foster care at age 18 or older? *</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_former_foster_care", true, class: "radio-yml", id: "is_former_foster_care_yes", required: true) %>
+          <label class="radio-yml" for="is_former_foster_care_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_former_foster_care", false, class: "radio-yml", id: "is_former_foster_care_no", required: true) %>
+          <label class="radio-yml" for="is_former_foster_care_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class="fa-text-color">Where was this person in foster care?</span>
+        </div>
+        <div class='col-md-2'>
+          <label></label>
+          <%= f.select(:foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, {:id => 'foster_care_us_state', :class => "form-control", :prompt => true}) %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class="fa-text-color">How old was this person when they left foster care?</span>
+        </div>
+        <div class='col-md-2'>
+          <label></label>
+          <%= f.select(:age_left_foster_care, options_for_select([*1..applicant_age(@applicant)],selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, {:id => 'age_left_foster_care', :class => "form-control", :prompt => true}) %>
+        </div>
+      </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Was this person enrolled in Medicaid when they left foster care?</span>
+          </div>
+
+          <div class='col-md-2'>
+            <%= f.radio_button("had_medicaid_during_foster_care", true, class: "radio-yml", id: "had_medicaid_during_foster_care_yes", required: true)%>
+            <label class="radio-yml" for="had_medicaid_during_foster_care_yes">Yes</label>
+          </div>
+
+          <div class='col-md-2'>
+            <%= f.radio_button("had_medicaid_during_foster_care", false, class: "radio-yml", id: "had_medicaid_during_foster_care_no", required: true) %>
+                <label class="radio-yml" for="had_medicaid_during_foster_care_no">No</label>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Is this person a student? *</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_student", true, class: "radio-yml", id: "is_student_yes") %>
+            <label class="radio-yml" for="is_student_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_student", false, class: "radio-yml", id: "is_student_no") %>
+            <label class="radio-yml" for="is_student_no">No</label>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">What is the type of student?</span>
+          </div>
+          <div class='col-md-3'>
+            <label></label>
+            <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_kind', :class => "form-control", :prompt => true}) %>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Student status end on date?</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.text_field :student_status_end_on, class: "jq-datepicker floatlabel", id: "applicant_student_status_end_on", placeholder: "End on" %>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">What type of school do you go to?</span>
+          </div>
+          <div class='col-md-3'>
+            <label></label>
+            <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_school_kind', :class => "form-control", :prompt => true}) %>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Is this person blind? *</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_self_attested_blind", true, class: "radio-yml", id: "is_self_attested_blind_yes", required: true) %>
+            <label class="radio-yml" for="is_self_attested_blind_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_self_attested_blind", false, class: "radio-yml", id: "is_self_attested_blind_no", required: true )%>
+            <label class="radio-yml" for="is_self_attested_blind_no">No</label>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_self_assisted_blind" data-toggle="modal" data-target="#is_self_assisted_blind">Not Sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_self_assisted_blind"} %>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Does this person need help with daily life activities, such as dressing or bathing? *</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("has_daily_living_help", true, class: "radio-yml", id: "has_daily_living_help_yes", required: true) %>
+            <label class="radio-yml" for="has_daily_living_help_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("has_daily_living_help", false, class: "radio-yml", id: "has_daily_living_no", required: true) %>
+            <label class="radio-yml" for="has_daily_living_help_no">No</label>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#has_daily_living_help" data-toggle="modal" data-target="#has_daily_living_help">Not Sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_daily_living_help"} %>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Does this person need help paying for any medical bills from the last 3 months? *</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("need_help_paying_bills", true, class: "radio-yml", id: "need_help_paying_bills_yes", required: true)%>
+            <label class="radio-yml" for="need_help_paying_bills_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("need_help_paying_bills", false, class: "radio-yml", id: "need_help_paying_bills_no", required: true )%>
+            <label class="radio-yml" for="need_help_paying_bills_no">No</label>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#need_help_paying_bills" data-toggle="modal" data-target="#need_help_paying_bills">Not Sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "need_help_paying_bills"} %>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color"><%= l10n("faa.other_ques.disability_question") %></span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_physically_disabled", true, class: "radio-yml", id: 'radio_physically_disabled_yes', required: true) %>
+            <label class="radio-yml" for="radio_physically_disabled_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_physically_disabled", false, class: "radio-yml", id: 'radio_physically_disabled_no', required: true) %>
+            <label class="radio-yml" for="radio_physically_disabled_no">No</label>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_pregnant" data-toggle="modal" data-target="#is_physically_disabled">Not Sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %>
+          </div>
+        </div>
+        <% if @person.eligible_immigration_status.present? %>
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Did you move to the U.S. on or after August 22, 1996?</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_resident_post_092296", true, class: "radio-yml", id: "is_resident_post_092296_yes", required: true) %>
+            <label class="radio-yml" for="is_resident_post_092296_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_resident_post_092296", false, class: "radio-yml", id: "is_resident_post_092296_no", required: true) %>
+            <label class="radio-yml" for="is_resident_post_092296_no">No</label>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Are you an honorably discharged veteran or active duty member of the military?</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_veteran_or_active_military", true, class: "radio-yml", id: "is_veteran_or_active_military_yes", required: true) %>
+            <label class="radio-yml" for="is_veteran_or_active_military_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_veteran_or_active_military", false, class: "radio-yml", id: "is_veteran_or_active_military_no", required: true) %>
+            <label class="radio-yml" for="is_veteran_or_active_military_no">No</label>
+          </div>
+        </div>
+        <% end %>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Are you the spouse or dependent child of such a veteran or individual in active duty status?</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_vets_spouse_or_child", true, class: "radio-yml", id: "is_vets_spouse_or_child_yes") %>
+            <label class="radio-yml" for="is_vets_spose_or_child_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_vets_spouse_or_child", false, class: "radio-yml", id: "is_vets_spouse_or_child_no") %>
+            <label class="radio-yml" for="is_vets_spouse_or_child_no">No</label>
+          </div>
+        </div>
+        <br><br>
+    </div>
+
+    <%= content_for :submit_button do %>
+      <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
+    <% end %>
+
+    <div class='col-md-3'>
+      <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+        previous_url: financial_assistance_application_applicant_benefits_path(@application, @applicant)
+      } %>
+    </div>
+  </div>
+<%end%>

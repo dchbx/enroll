@@ -1,0 +1,7 @@
+stopEditingBenefit();
+ $("<%= id %>").closest(".benefit-kind").find('#add_new_insurance_kind').removeClass("hidden");
+<%if @benefit.insurance_kind == 'employer_sponsored_insurance'%>
+    $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'esi_benefit', locals: { benefit: @benefit, insurance_kind: @benefit_insurance_kind, kind: @benefit_kind }) %>");
+<% else %>
+    $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'non_esi_benefit', locals: { benefit: @benefit, insurance_kind: @benefit_insurance_kind, kind: @benefit_kind }) %>");
+<% end %>

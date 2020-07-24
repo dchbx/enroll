@@ -1,0 +1,27 @@
+<%= deduction_form_for @application, @applicant, deduction do |f| %>
+  <div class="focus_effect_module">
+    <div class="row row-form-wrapper no-buffer row-height row-edit-border">
+      <%= f.hidden_field :kind, value: kind %>
+      <div class="col-md-3">
+        <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
+        <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(deduction.amount), required: true %>
+      </div>
+      <div class="col-md-3 fa-select select-box">
+        <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
+        <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: deduction.frequency_kind), {include_blank: "Choose"}, {:required => true}) %>
+      </div>
+      <div class="col-md-3">
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{deduction.id}", class: "datepicker-js floatlabel" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{deduction.id}", class: "datepicker-js floatlabel" %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 pull-right">
+        <a class="btn btn-default deduction-cancel">Cancel</a>
+        <%= f.submit 'Save', class: 'btn btn-danger' %>
+      </div>
+    </div>
+  </div>
+<% end %>
