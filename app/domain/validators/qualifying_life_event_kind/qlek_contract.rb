@@ -3,6 +3,7 @@
 module Validators
   module QualifyingLifeEventKind
     class QlekContract < ::Dry::Validation::Contract
+      include DryL10nHelper
 
       params do
         required(:start_on).filled(:date)
@@ -39,29 +40,30 @@ module Validators
 
       rule(:end_on, :start_on) do
         if values[:end_on].present?
-          key.failure('must be a date') unless values[:end_on].is_a?(Date)
-          key.failure('End on must be after start on date') if values[:end_on].is_a?(Date) && values[:end_on] < values[:start_on]
+          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:end_on].is_a?(Date)
+          key.failure(l10n("validators.qualifying_life_event_kind.end_date_valid")) if values[:end_on].is_a?(Date) && values[:end_on] < values[:start_on]
         end
       end
 
       rule(:pre_event_sep_in_days) do
-        key.failure('Invalid Pre Event SEP( In Days )') unless value >= 0
+        key.failure(l10n("validators.qualifying_life_event_kind.pre_event_sep_in_days")) unless value >= 0
       end
 
       rule(:reason) do
         reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:reason).uniq
-        key.failure('SEP type object exists with same reason') if reasons.include?(value)
+        key.failure(l10n("validators.qualifying_life_event_kind.reason")) if reasons.include?(value)
       end
 
       rule(:post_event_sep_in_days) do
-        key.failure('Invalid Post Event SEP( In Days )') unless value >= 0
+        key.failure(l10n("validators.qualifying_life_event_kind.post_event_sep_in_days")) unless value >= 0
       end
 
       rule(:market_kind) do
-        key.failure('Invalid Market Kind') unless ::QualifyingLifeEventKind::MARKET_KINDS.include?(value)
+        key.failure(l10n("validators.qualifying_life_event_kind.market_kind")) unless ::QualifyingLifeEventKind::MARKET_KINDS.include?(value)
       end
 
       rule(:effective_on_kinds) do
+        key.failure(l10n("validators.qualifying_life_event_kind.effective_on_kinds")) if values[:effective_on_kinds].blank?
         effective_on_kinds_by_market = case values[:market_kind]
                                        when 'shop'
                                          ::QualifyingLifeEventKind::SHOP_EFFECTIVE_ON_KINDS
@@ -71,30 +73,33 @@ module Validators
                                          ::QualifyingLifeEventKind::FEHB_EFFECTIVE_ON_KINDS
                                        end
 
-        key.failure('one of the selected values is invalid') if value.any? {|each_kind| !effective_on_kinds_by_market.include?(each_kind)}
+        if values[:effective_on_kinds].present?
+          key.failure(l10n("validators.qualifying_life_event_kind.effective_on_kinds_valid")) if value.any? {|each_kind| !effective_on_kinds_by_market.include?(each_kind)}
+        end
       end
 
       rule(:ordinal_position) do
-        key.failure('Invalid Ordinal Position') unless value >= 0
+        key.failure(l10n("validators.qualifying_life_event_kind.ordinal_position")) unless value >= 0
       end
 
       rule(:coverage_effective_on) do
         if values[:coverage_effective_on].present?
-          key.failure('must be a date') unless values[:coverage_effective_on].is_a?(Date)
+          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_effective_on].is_a?(Date)
         end
       end
 
       rule(:coverage_end_on) do
         if values[:coverage_end_on].present?
-          key.failure('must be a date') unless values[:coverage_end_on].is_a?(Date)
+          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_end_on].is_a?(Date)
         end
       end
 
       rule(:termination_on_kinds) do
-        key.failure('must be selected') if values[:market_kind] != 'individual' && values[:termination_on_kinds].blank?
+        # TODO uncomment when required mandatory for shop market
+        #key.failure('must be selected') if values[:market_kind] != 'individual' && values[:termination_on_kinds].blank?
 
         if values[:termination_on_kinds].present?
-          key.failure('contents must be a strings') if values[:termination_on_kinds].any? {|ele| !ele.is_a?(String)}
+          key.failure(l10n("validators.qualifying_life_event_kind.termination_on_kind")) if values[:termination_on_kinds].any? {|ele| !ele.is_a?(String)}
         end
       end
     end
