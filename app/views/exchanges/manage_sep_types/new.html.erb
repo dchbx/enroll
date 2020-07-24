@@ -55,7 +55,7 @@
         </div>
       </div>
     </div>
-    <div class="form-group <%=pundit_class(QualifyingLifeEventKind, :test_policy?)%>">
+    <div class="form-group <%=pundit_class(QualifyingLifeEventKind, :can_manage_qles?)%>">
       <div class="col-sm-offset-2 col-sm-10">
         <%= f.submit l10n("exchange.manage_sep_types.create_draft"), class:"btn btn-outline-primary" %>
         <%= link_to l10n("exchange.manage_sep_types.cancel"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary' %>
