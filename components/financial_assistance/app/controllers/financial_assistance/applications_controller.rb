@@ -7,14 +7,14 @@ module FinancialAssistance
     before_action :init_cfl_service, only: :review_and_submit
     before_action :family_relationships, only: :review_and_submit
 
-    include UIHelpers::WorkflowController
+    include ::UIHelpers::WorkflowController
     include NavigationHelper
     include Acapi::Notifiers
     include L10nHelper
     include ApplicationHelper
     require 'securerandom'
 
-    before_filter :load_support_texts, only: [:edit, :help_paying_coverage]
+    before_action :load_support_texts, only: [:edit, :help_paying_coverage]
 
     def index
       @family = @person.primary_family
