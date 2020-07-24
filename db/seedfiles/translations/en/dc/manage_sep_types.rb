@@ -30,4 +30,5 @@ MANAGE_SEP_TYPES_TRANSLATIONS = {
   "en.datatables.sep_type_data_table.active" => "Active",
   "en.datatables.sep_type_data_table.inactive" => "Inactive",
   "en.datatables.sep_type_data_table.draft" => "Draft",
+  "en.controller.sep_type_data_table.not_authorized" => "Not Authorized To Access Manage SEP Type Page.",
 }
