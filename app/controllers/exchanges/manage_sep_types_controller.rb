@@ -39,7 +39,7 @@ module Exchanges
 
     def update
       formatted_params = format_update_params(params)
-      result = Operations::QualifyingLifeEventKind::Update.new.call(formatted_params)
+      result = Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
 
       respond_to do |format|
         format.html do

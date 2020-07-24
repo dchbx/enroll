@@ -11,7 +11,7 @@ module Operations
       def call(params)
         values = yield validate(params)
         entity = yield initialize_entity(values)
-        qle    = yield persist_data(entity)
+        qle    = yield persist_data(entity, params['_id'])
 
         Success(qle)
       end
@@ -34,9 +34,15 @@ module Operations
         Success(result)
       end
 
-      def persist_data(entity)
-        qle = ::QualifyingLifeEventKind.new(entity.to_h)
-        qle.save!
+      def persist_data(entity, obj_id)
+        if obj_id
+          qle = ::QualifyingLifeEventKind.find(obj_id)
+          qle.assign_attributes(entity.to_h)
+          qle.save!
+        else
+          qle = ::QualifyingLifeEventKind.new(entity.to_h)
+          qle.save!
+        end
 
         Success(qle)
       end
