@@ -18,6 +18,7 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.select_term_reason" => "Please select terminate reason",
   "en.exchange.manage_sep_types.create_sep_type" => "Create SEP Type",
   "en.exchange.manage_sep_types.create_draft" => "Create Draft",
+  "en.exchange.manage_sep_types.cancel" => "Cancel",
   "en.exchange.manage_sep_types.update_sep_type" => "Update SEP Type",
   "en.exchange.manage_sep_types.sep_type_details" => "SEP Type Details",
   "en.exchange.manage_sep_types.update_sep_types" => "Update SEP Type",
@@ -37,6 +38,6 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.manage_sep_types.individual" => "Individual",
   "en.exchange.manage_sep_types.shop" => "Shop",
   "en.exchange.manage_sep_types.fehb" => "Congress",
-  "en.exchange.manage_sep_types.sep_type_list" => "SEP Type List",
+  "en.exchange.manage_sep_types.sep_type_list" => "List SEP Types",
   "en.exchange.manage_sep_types.titles" => "Titles",
 }

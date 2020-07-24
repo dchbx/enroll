@@ -23,7 +23,7 @@
 			<a class="nav-link" data-toggle="tab" href="#fehb"><%= l10n("exchange.manage_sep_types.fehb")%></a>
 		</li>
 		<li class="nav-item">
-			<a class="btn btn-sep-sort-default nav-link right-align" href="/exchanges/manage_sep_types/sep_types_dt"><%= l10n("exchange.manage_sep_types.sep_type_list")%></a>
+          <%= link_to l10n("exchange.manage_sep_types.sep_type_list"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary right-align' %>
 		</li>
 	</ul>
 
