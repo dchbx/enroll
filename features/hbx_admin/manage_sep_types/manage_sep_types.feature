@@ -1,9 +1,9 @@
 Feature: Admin can manage SEP Types like create, edit, update, delete and sort
   Background:
-    Given a Hbx admin with read and write permissions exists
+    Given a Hbx admin with hbx_tier3 permissions exists
     When Hbx Admin logs on to the Hbx Portal
     Given the user is on the Main Page
-    Given Qualifying life events of all markets are present
+    And Qualifying life events of all markets are present
     And the user will see the Manage SEP Types under admin dropdown
     When Admin clicks Manage SEP Types
 
@@ -32,6 +32,6 @@ Feature: Admin can manage SEP Types like create, edit, update, delete and sort
     When Admin sorts Congress SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Congress SEP Types ordinal postions should change
-    When Admin clicks on SEP Type List button
+    When Admin clicks on List SEP Types link
     Then Admin navigates to SEP Type List page
     And Hbx Admin logs out

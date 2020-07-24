@@ -1,3 +1,15 @@
+Given(/^a Hbx admin with hbx_tier3 permissions exists$/) do
+  #Note: creates an enrollment for testing purposes in the UI
+  p_staff=Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: true)
+  person = people['Hbx Admin']
+  hbx_profile = FactoryBot.create :hbx_profile
+  user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
+end
+
 And(/^the user will see the Manage SEP Types under admin dropdown$/) do
   find('.dropdown-toggle', :text => "Admin").click
   expect(page).to have_content('Manage SEP Types')
@@ -13,7 +25,7 @@ end
 
 Then("Admin should see sorting SEP Types button and create SEP Type button") do
   expect(page).to have_content('Sorting SEP Types')
-  step "Admin navigates on Create SEP Type page"
+  step "Admin navigates to Create SEP Type page"
 end
 
 And(/^the Admin has the ability to use the following filters for documents provided: All, Individual, Shop and Congress$/) do
@@ -23,8 +35,8 @@ And(/^the Admin has the ability to use the following filters for documents provi
   expect(page).to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress')
 end
 
-When("Admin clicks on SEP Type List button") do
-  click_link 'SEP Type List'
+When("Admin clicks on List SEP Types link") do
+  click_link 'List SEP Types'
 end
 
 Then("Admin navigates to SEP Type List page") do
@@ -44,7 +56,7 @@ def fehb_qualifying_life_events
   {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map { |event_trait , ordinal_position| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", post_event_sep_in_days: 90, ordinal_position: ordinal_position)}
 end
 
-Given(/^Qualifying life events of all markets are present$/) do
+And(/^Qualifying life events of all markets are present$/) do
   ivl_qualifying_life_events
   shop_qualifying_life_events
   fehb_qualifying_life_events
@@ -173,26 +185,124 @@ Then("Employee should land on home page") do
   step "I should land on home page"
 end
 
-When("Admin clicks on the Create SEP Type button") do
-  reasons = QualifyingLifeEventKind.by_market_kind('shop').active_by_state.pluck(:reason).uniq
+And("expired Qualifying life events of Shop market is present") do
+  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: 'shop', post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
+  reasons = QualifyingLifeEventKind.by_market_kind('shop').non_draft.pluck(:reason).uniq
   Types.const_set('ShopQleReasons', Types::Coercible::String.enum(*reasons))
+end
+
+When("Admin clicks on the Create SEP Type button") do
   page.find('.interaction-click-control-create-sep-types').click
 end
 
-And("Admin navigates on Create SEP Type page") do
+Then("Admin navigates to Create SEP Type page") do
   expect(page).to have_content('Create SEP Type')
 end
 
-And ("Admin fill the form page") do
-  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'draft', reason: 'domestic partnership')
-  load File.join(Rails.root, 'app/domain/types.rb')
-  find(:xpath, '//input[@value="shop"]', :wait => 10).click
+When("Admin fills the Create SEP Type form page for Shop market") do
   fill_in "Start Date", with: TimeKeeper.date_of_record.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
   fill_in "End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
   fill_in "Title", with: "Entered into a legal domestic partnership"
   fill_in "Event Label", with: "Date of domestic partnership"
   fill_in "Tool Tip", with: "Enroll or add a family member due to a new domestic partnership"
-  sleep(3)
-  find(:xpath, '//input[@value="shop"]', :wait => 10).click
+end
+
+And("Admin selects Shop market radio button and their reason") do
+  sleep(2)
+  find(:xpath, '//input[@value="shop"]', :wait => 2).click
   find(:xpath, '//select[@id="reason"]', :wait => 10).click
+  find("option[value='domestic partnership']").click
+end
+
+And("Admin fills rest of the form on create page") do
+  find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']").set(true)
+  find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]'][value='date_of_event']").set(true)
+  fill_in "Pre Event SEP( In Days )", with: "0"
+  fill_in "Post Event SEP( In Days )", with: "30"
+end
+
+And("Admin clicks on Create Draft button") do
+  page.find_button('Create Draft').click
+end
+
+Then("Admin should see SEP Type Created Successfully message") do
+  expect(page).to have_content('New SEP Type Created Successfully')
+end
+
+When("Admin navigates to SEP Types List page") do
+  step "Admin should see sorting SEP Types button and create SEP Type button"
+end
+
+When("Admin clicks Shop filter on SEP Types datatable") do
+  divs = page.all('div')
+  shop_filter = divs.detect { |div| div.text == 'Shop' && div[:id] == 'Tab:shop_qles' }
+  shop_filter.click
+end
+
+And("Admin clicks Draft filter under Shop filter on SEP Types datatable") do
+  filter_divs = page.all('div')
+  shop_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:shop_qles-shop_draft_qles' }
+  shop_draft_filter.click
+end
+
+Then("Admin should see newly SEP created title on Datatable") do
+  expect(page).to have_content('Entered into a legal domestic partnership')
+end
+
+Given("expired Qualifying life events of Individual market is present") do
+  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: 'individual', post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
+  reasons = QualifyingLifeEventKind.by_market_kind('individual').non_draft.pluck(:reason).uniq
+  Types.const_set('IndividualQleReasons', Types::Coercible::String.enum(*reasons))
+end
+
+When("Admin fills the Create SEP Type form page for Individual market") do
+  step "Admin fills the Create SEP Type form page for Shop market"
+end
+
+When("Admin selects Individual market radio button and their reason") do
+  sleep(2)
+  find(:xpath, '//input[@value="individual"]', :wait => 2).click
+  find(:xpath, '//select[@id="reason"]', :wait => 10).click
+  find("option[value='domestic partnership']").click
+end
+
+When("Admin clicks Individual filter on SEP Types datatable") do
+  divs = page.all('div')
+  ivl_filter = divs.detect { |div| div.text == 'Individual' && div[:id] == 'Tab:ivl_qles' }
+  ivl_filter.click
+end
+
+When("Admin clicks Draft filter under Individual filter on SEP Types datatable") do
+  filter_divs = page.all('div')
+  ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
+  ivl_draft_filter.click
+end
+
+Given("expired Qualifying life events of Congress market is present") do
+  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: 'fehb', post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
+  reasons = QualifyingLifeEventKind.by_market_kind('fehb').non_draft.pluck(:reason).uniq
+  Types.const_set('FehbQleReasons', Types::Coercible::String.enum(*reasons))
+end
+
+When("Admin fills the Create SEP Type form page for Congress market") do
+  step "Admin fills the Create SEP Type form page for Shop market"
+end
+
+When("Admin selects Congress market radio button and their reason") do
+  sleep(2)
+  find(:xpath, '//input[@value="fehb"]', :wait => 2).click
+  find(:xpath, '//select[@id="reason"]', :wait => 10).click
+  find("option[value='domestic partnership']").click
+end
+
+When("Admin clicks Congress filter on SEP Types datatable") do
+  divs = page.all('div')
+  fehb_filter = divs.detect { |div| div.text == 'Congress' && div[:id] == 'Tab:fehb_qles' }
+  fehb_filter.click
+end
+
+When("Admin clicks Draft filter under Congress filter on SEP Types datatable") do
+  filter_divs = page.all('div')
+  fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
+  fehb_draft_filter.click
 end
