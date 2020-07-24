@@ -1,0 +1,19 @@
+<% if (application.present? && application.ready_for_attestation?) %>
+  <div class="household-status ready-4-review">
+  	<span class="note purple"> </span>
+    <div class="whitebox white">
+      <p>Your Application for Help Paying for Coverage</p>
+      <p class="info-needed"><i class="fa fa-check fa-lg" aria-hidden="true"></i> <span>Ready for Review</span></p>
+      <p class="sub-desc">You must enter all required information for everyone in your household.</p>
+    </div>
+  </div>
+<% else %>
+	<div class="household-status">
+    <span class="note purple"> </span>
+    <div class="whitebox white">
+      <p>Your Application for Help Paying for Coverage</p>
+      <p class="info-needed"><i class="fa fa-refresh fa-lg" aria-hidden="true"></i> <span>Info Needed</span></p>
+      <p class="sub-desc">You must enter all required information for everyone in your household.</p>
+    </div>
+  </div>
+<% end %>

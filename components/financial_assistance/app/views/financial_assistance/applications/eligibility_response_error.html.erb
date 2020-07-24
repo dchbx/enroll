@@ -1,0 +1,24 @@
+<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+  <div class="col-md-9">
+    <div class="">
+      <p class="alert alert-error hide"></p>
+      <h2 class="darkblue">Eligibility Response Error</h2>
+      <h4 class="darkblue">
+        We’re sorry, but we can’t determine your eligibility right now. Please call DC Health Link at (855) 532-5465 or email info@dchealthlink.com to report this issue.
+      </h4>
+      <% if @application.determination_http_status_code.present? %>
+        <h4 class="darkblue">
+          Report the error code "<%= @application.determination_http_status_code %>" to help us fix the problem as soon as possible.
+        </h4>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: financial_assistance_applications_path,
+      next_url: find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
+    } %>
+  </div>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+</div>

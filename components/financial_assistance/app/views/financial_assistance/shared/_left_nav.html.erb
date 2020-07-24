@@ -1,0 +1,133 @@
+<nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
+  <ul class="nav nav-stacked" id="left-navigation">
+    <% if defined?(@applicant) %>
+      <li class="activer list-box step-tabs no-hover global-nav">
+        <a href="<%= edit_financial_assistance_application_path(@application) %>">
+          <i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i>
+          My Household</a>
+      </li>
+      <li class="activer list-box step-tabs income-style no-hover">
+        <%= content_tag("a", "Income and Coverage Info", :class => 'cna')  %>
+      </li>
+      <ul class="nav nav-stacked mr-top">
+
+        <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %> applicant-nav">
+          <% if @applicant.tax_info_complete?%>
+            <span class="fa fa-check applicant-check"></span>
+            <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1), class: "" do %>
+              Tax Info
+            <% end %>
+          <% else %>
+            <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1), class: "no-check" do %>
+              Tax Info
+            <% end %>
+          <% end %>
+        </li>
+
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income) %> applicant-nav">
+          <% if @applicant.embedded_document_section_entry_complete?(:income)%>
+            <span class="fa fa-check applicant-check"></span>
+            <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
+              Job Income
+            <% end %>
+          <% else %>
+            <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "no-check" do %>
+              Job Income
+            <% end %>
+          <% end %>
+        </li>
+
+        <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %> applicant-nav">
+          <% if @applicant.embedded_document_section_entry_complete?(:other_income)%>
+            <span class="fa fa-check applicant-check"></span>
+            <%= link_to other_financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
+              Other Income
+            <% end %>
+          <% else %>
+            <%= link_to other_financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "no-check" do %>
+              Other Income
+            <% end %>
+          <% end %>
+        </li>
+
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %> applicant-nav">
+          <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
+            <span class="fa fa-check applicant-check"></span>
+            <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant), class: "" do %>
+              Income Adjustments
+            <% end %>
+          <% else %>
+            <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant), class: "no-check" do %>
+              Income Adjustments
+            <% end %>
+          <% end %>
+        </li>
+
+        <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
+          <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
+            <span class="fa fa-check applicant-check"></span>
+            <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant), class: "" do %>
+              Health Coverage
+            <% end %>
+          <% else %>
+            <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant), class: "no-check" do %>
+              Health Coverage
+            <% end %>
+          <% end %>
+        </li>
+
+        <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %> applicant-nav">
+          <% if @applicant.other_questions_complete?%>
+            <span class="fa fa-check applicant-check"></span>
+            <%= link_to other_questions_financial_assistance_application_applicant_path(@application, @applicant), class: "" do %>
+              Other Questions
+            <% end %>
+          <% else %>
+            <%= link_to other_questions_financial_assistance_application_applicant_path(@application, @applicant), class: "no-check" do %>
+              Other Questions
+            <% end %>
+          <% end %>
+        </li>
+      </ul>
+    <% else %>
+      <li class="activer list-box step-tabs no-hover global-nav">
+
+
+        <a href="<%= financial_assistance_applications_path %>">
+          <i class="fa fa-arrow-circle-left white-font previous-icon" aria-hidden="true"></i>
+          <span class="view-nav-app float-left"> View My Applications </span>
+        </a>
+      </li>
+
+      <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w no-hover">
+        <% if @application.present? && @application.is_draft?  %>
+          <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
+        <% else %>
+          <a href="javascript:void(0);" class="cna">Household Info</a>
+        <% end %>
+      </li>
+
+      <% if @application.incomplete_applicants?%>
+        <% if @application.active_applicants.count > 1 %>
+          <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable'>
+            <a class="cna">Family Relationships</a>
+          </li>
+        <% end %>
+      <% else %>
+        <% if @application.active_applicants.count > 1 and @application.is_draft? %>
+          <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable global-nav'>
+            <%= link_to 'Family Relationships', insured_family_relationships_path%>
+          </li>
+        <% end %>
+      <% end %>
+
+      <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> global-nav indent-w no-hover-disable">
+        <% if @application.ready_for_attestation? and @application.is_draft? %>
+          <%= link_to "Review & Submit", review_and_submit_financial_assistance_application_path(@application) %>
+        <% else %>
+          <a href="javascript:void(0);" class="cna">Review & Submit</a>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</nav>

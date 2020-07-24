@@ -1,0 +1,37 @@
+<div id="<%= dom_id income %>" class="income">
+  <div class="display-income">
+    <div class="focus_effect_module">
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-2 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">NET AMOUNT</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= number_to_currency(income.amount) %></span>
+        </div>
+
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">HOW OFTEN</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= frequency_kind_options.invert[income.frequency_kind] %></span>
+        </div>
+
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">START</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.start_on %></span>
+        </div>
+
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">END</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.end_on %></span>
+        </div>
+
+        <div class="col-md-1 form-group-lg no-pd class-fa-household fa-adjustment">
+          <a class="income-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
+          <a class="self-employed-income-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+        </div>
+      </div>
+      </br>
+    </div>
+  </div>
+
+  <div class="income-edit-form hidden">
+    <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: income } %>
+  </div>
+</div>

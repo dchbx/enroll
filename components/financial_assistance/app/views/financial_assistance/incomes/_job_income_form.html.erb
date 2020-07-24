@@ -1,0 +1,67 @@
+<%= income_form_for @application, @applicant, income do |f| %>
+  <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
+  <div class="focus_effect_module row-edit-border">
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-12">
+        <%= f.text_field :employer_name, placeholder: 'EMPLOYER NAME *', required: true, class: "floatlabel" %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-3">
+        <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
+        <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true %>
+      </div>
+      <div class="col-md-3 fa-select select-box">
+        <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
+        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {prompt: 'Choose' }, {:required => true} %>
+      </div>
+      <div class="col-md-3">
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income.id}", class: "datepicker-js floatlabel" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income.id}", class: "datepicker-js floatlabel" %>
+      </div>
+    </div>
+
+    <%= f.fields_for :employer_address do |income_fields| %>
+      <%= income_fields.hidden_field :kind, value: 'work' %>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6">
+          <%= income_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: income.employer_address.try(:address_1), required: true, class: "floatlabel ph-width" %>
+        </div>
+        <div class="col-md-6">
+          <%= income_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2 (APT, UNIT, ETC.)', value: income.employer_address.try(:address_2), class: "floatlabel ph-width" %>
+        </div>
+      </div>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-4">
+          <%= income_fields.text_field :city, placeholder: 'CITY *', required: true, value: income.employer_address.try(:city), class: "floatlabel" %>
+        </div>
+        <div class="col-md-4 fa-select select-box">
+          <%= income_fields.label :state, 'State *', class: 'label-color' %>
+          <%= income_fields.select :state, options_for_select(state_options, selected: income.employer_address.try(:state)), {prompt: 'Choose' }, {:required => true} %>
+        </div>
+        <div class="col-md-4">
+          <%= income_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: income.employer_address.try(:zip), class: "floatlabel" %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= f.fields_for :employer_phone do |phone_fields| %>
+      <%= phone_fields.hidden_field :kind, value: "work" %>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-12">
+          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: income.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+    <div class="row">
+      <div class="col-md-3 pull-right cancel-save-mt">
+        <a class="btn btn-default income-cancel">Cancel</a>
+        <%= f.submit 'Save', class: 'btn btn-danger' %>
+      </div>
+    </div>
+<% end %>

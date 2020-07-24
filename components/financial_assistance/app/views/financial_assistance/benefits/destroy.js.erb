@@ -1,0 +1,5 @@
+stopEditingBenefit();
+<% if @applicant.benefits.where(kind: @benefit_kind).of_insurance_kind(@benefit_insurance_kind).blank? %>
+  <% selector_id = @benefit_kind == "is_eligible" ? "eligible-benefit-kinds" : "enrolled-benefit-kinds" %>
+  afterDestroyHide("<%= selector_id %>", "<%= @benefit_insurance_kind %>");
+ <% end %>

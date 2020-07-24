@@ -1,0 +1,74 @@
+- step:
+    heading: Income Adjustments for <family-member-name-placeholder>
+    heading_text: Tell us about other income adjustments options for this person. When you're finished select CONTINUE.
+    sections:
+      - section:
+          lines:
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: What Kind of adjustments to income is ? *
+                  required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: kind
+                  required: true
+                  id: 'frequency_kind'
+                  values:
+                    - alimony_paid
+                    - deductable_part_of_self_employment_taxes
+                    - domestic_production_activities
+                    - penalty_on_early_withdrawel_of_savings
+                    - educator_expenses
+                    - rent_or_royalties
+                    - self_employment_sep_simple_and_qualified_plans
+                    - self_employed_health_insurance
+                    - student_loan_interest
+                    - moving_expenses
+                    - health_savings_account
+                    - ira_deduction
+                    - reservists_performing_artists_and_fee_basis_government_official_expenses
+                    - tution_and_fees
+                  model: deduction
+                  attribute: kind
+            - cells:
+                - gutter: 3
+                  type: input
+                  name: amount
+                  placeholder: AMOUNT *
+                  required: true
+                  model: deduction
+                  attribute: amount
+                - gutter: 3
+                  type: dropdown
+                  id: 'frequency_kind'
+                  name: How Often
+                  required: true
+                  values:
+                    - biweekly
+                    - daily
+                    - half_yearly
+                    - monthly
+                    - quarterly
+                    - weekly
+                    - yearly
+                  model: deduction
+                  attribute: frequency_kind
+                - gutter: 3
+                  type: input_date
+                  name: start_on
+                  placeholder: FROM *
+                  required: true
+                  model: deduction
+                  attribute: start_on
+                - gutter: 3
+                  type: input_date
+                  name: end_on
+                  placeholder: TO *
+                  required: true
+                  model: deduction
+                  attribute: end_on
+            # - cells:
+            #     - gutter: 12
+            #       type: checkbox
+            #       label: Student Loan Interest
