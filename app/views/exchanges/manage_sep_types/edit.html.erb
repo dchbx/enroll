@@ -1,5 +1,14 @@
 <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), method: :patch do |f| %>
   <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;">
+    <% if @failure.present? %>
+      <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+        <% @failure[0].errors.to_h.each do |name, message| %>
+          <ul>
+            <li><%= "#{name.to_s.humanize}: #{message.first}" %></li>
+          </ul>
+        <% end %>
+      </div>
+    <% end %>
     <div class="col-4">
       <h3 class="heading-text">
         <% if @qle.draft %>
