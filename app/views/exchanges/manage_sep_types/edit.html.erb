@@ -59,14 +59,14 @@
         </div>
       </div>
     </div>
-
-    <% if @qle.draft %> <%#= TODO pundit poilcy%>
-      <div class="form-group <%#=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+      <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <%= f.submit l10n("exchange.manage_sep_types.update_sep_types"), class:"btn btn-primary" %>
+          <% if @qle.draft %>
+            <%= f.submit l10n("exchange.manage_sep_types.update_sep_types"), class:'btn btn-outline-primary' %>
+          <% end %>
+          <%= link_to l10n("exchange.manage_sep_types.cancel"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary' %>
         </div>
       </div>
-    <% end %>
   </div>
 <% end %>
 
