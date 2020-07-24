@@ -55,7 +55,7 @@ export default class extends Controller {
 				flashDiv.find(".toast-body").text(textContent)
 			setTimeout(function() {
 			  flashDiv.hide();
-			}, 3000);
+			}, 3500);
 
   		})
 	}

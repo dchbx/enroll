@@ -1,44 +1,18 @@
-Feature: Admin can manage sep types like create, edit, update, delete and sort
+Feature: Admin has ability to sort SEP Types and the positions of SEPs will reflect on the user and hbx portal home page qle carousel to plan shop
   Background:
     Given a Hbx admin with read and write permissions exists
     When Hbx Admin logs on to the Hbx Portal
     Given the user is on the Main Page
     Given Qualifying life events of all markets are present
-    And the user will see the Manage Sep Types under admin dropdown
-    When Admin clicks Manage Sep Types
-    
-  Scenario: Navigate to Manage Sep Types screen
-    When the Admin is navigated to the Manage Sep Types screen
-    Then the Admin has the ability to use the following filters for documents provided: All, Individual, Shop and Congress
-    And Hbx Admin logs out
+    And the user will see the Manage SEP Types under admin dropdown
+    When Admin clicks Manage SEP Types
 
-  Scenario: Admin has ability to sort the sep types and saves the ordinal positions to the database
-    Given the Admin is navigated to the Manage Sep Types screen
-    When Admin will click on the Sorting Sep Types button
+  Scenario: Admin will sort Individual market SEP Types and it will reflect the same order on the individual insured home page qle carousel
+    Given the Admin is navigated to the Manage SEP Types screen
+    When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Individual tab
-    Then Admin should see listed Individual market sep types with ascending ordinal positions
-    When Admin sorts Individual sep types by drag and drop
-    Then Admin should see successful message after sorting
-    And listed Individual sep types ordrinal postions should change
-    When Admin clicks on Shop tab
-    Then Admin should see listed Shop market sep types with ascending ordinal positions
-    When Admin sorts Shop sep types by drag and drop
-    Then Admin should see successful message after sorting
-    And listed Shop sep types ordrinal postions should change
-    When Admin clicks on Congress tab
-    Then Admin should see listed Congress market sep types with ascending ordinal positions
-    When Admin sorts Congress sep types by drag and drop
-    Then Admin should see successful message after sorting
-    And listed Congress sep types ordrinal postions should change
-    And Hbx Admin logs out
-
-  Scenario: Admin on sorting Individual market sep types will reflect the same order on the individual insured home page qle carousel
-    Given the Admin is navigated to the Manage Sep Types screen
-    When Admin will click on the Sorting Sep Types button
-    Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on Individual tab
-    Then Admin should see listed Individual market sep types with ascending ordinal positions
+    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
     And Hbx Admin logs out
     Given Individual has not signed up as an HBX user
     When Individual with known qles visits the Insured portal outside of open enrollment
@@ -62,21 +36,21 @@ Feature: Admin can manage sep types like create, edit, update, delete and sort
     When I click on none of the situations listed above apply checkbox
     And I click on back to my account button
     Then I should land on home page
-    And I should see listed Individual market sep types
+    And I should see listed Individual market SEP Types
     And I should see the "Had a baby" at the top of the ivl qle list
     And I click on log out link
     When Hbx Admin logs on to the Hbx Portal
     Given the user is on the Main Page
-    And the user will see the Manage Sep Types under admin dropdown
-    When Admin clicks Manage Sep Types
-    Given the Admin is navigated to the Manage Sep Types screen
-    When Admin will click on the Sorting Sep Types button
+    And the user will see the Manage SEP Types under admin dropdown
+    When Admin clicks Manage SEP Types
+    Given the Admin is navigated to the Manage SEP Types screen
+    When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Individual tab
-    Then Admin should see listed Individual market sep types with ascending ordinal positions
-    When Admin sorts Individual sep types by drag and drop
+    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
+    When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
-    And listed Individual sep types ordrinal postions should change
+    And listed Individual SEP Types ordinal postions should change
     And Hbx Admin logs out
     Then Individual resumes enrollment
     And I click on sign in existing account
@@ -85,12 +59,12 @@ Feature: Admin can manage sep types like create, edit, update, delete and sort
     Then I should see the "Married" at the top of the ivl qle list
     Then Individual logs out
 
-  Scenario: Admin on sorting Shop market sep types will reflect the same order on the individual insured home page qle carousel
-    Given the Admin is navigated to the Manage Sep Types screen
-    When Admin will click on the Sorting Sep Types button
+  Scenario: Admin will sort Shop market SEP Types and it will reflect the same order on the employee home page qle carousel
+    Given the Admin is navigated to the Manage SEP Types screen
+    When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Shop tab
-    Then Admin should see listed Shop market sep types with ascending ordinal positions
+    Then Admin should see listed Shop market SEP Types with ascending ordinal positions
     And Hbx Admin logs out
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
@@ -104,16 +78,16 @@ Feature: Admin can manage sep types like create, edit, update, delete and sort
     Then Employee logs out
     When Hbx Admin logs on to the Hbx Portal
     Given the user is on the Main Page
-    And the user will see the Manage Sep Types under admin dropdown
-    When Admin clicks Manage Sep Types
-    Given the Admin is navigated to the Manage Sep Types screen
-    When Admin will click on the Sorting Sep Types button
+    And the user will see the Manage SEP Types under admin dropdown
+    When Admin clicks Manage SEP Types
+    Given the Admin is navigated to the Manage SEP Types screen
+    When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Shop tab
-    Then Admin should see listed Shop market sep types with ascending ordinal positions
-    When Admin sorts Shop sep types by drag and drop
+    Then Admin should see listed Shop market SEP Types with ascending ordinal positions
+    When Admin sorts Shop SEP Types by drag and drop
     Then Admin should see successful message after sorting
-    And listed Shop sep types ordrinal postions should change
+    And listed Shop SEP Types ordinal postions should change
     And Hbx Admin logs out
     When employee visits the Employee Portal page
     And Employee signed in
