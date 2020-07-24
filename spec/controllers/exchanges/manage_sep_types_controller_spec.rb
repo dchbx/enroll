@@ -14,7 +14,14 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
     invoke_dry_types_script
   end
 
-  let(:current_user){FactoryBot.create(:user)}
+  let!(:person) do
+    per = FactoryBot.create(:person, :with_hbx_staff_role)
+    permission = FactoryBot.create(:permission, can_manage_qles: true)
+    per.hbx_staff_role.update_attributes!(permission_id: permission.id)
+    per
+  end
+
+  let!(:current_user){FactoryBot.create(:user, person: person)}
   let(:q1){FactoryBot.create(:qualifying_life_event_kind, is_active: true)}
   let(:q2){FactoryBot.create(:qualifying_life_event_kind, is_active: true)}
 
@@ -285,11 +292,9 @@ RSpec.describe ::Exchanges::ManageSepTypesController do
   end
 
   context 'for sep_types_dt' do
-    let!(:hbx_person) { FactoryBot.create(:person, user: current_user)}
-    let!(:permission)  { FactoryBot.create(:permission, :hbx_staff, can_complete_resident_application: true) }
-    let!(:role) {FactoryBot.create(:hbx_staff_role, person: hbx_person, subrole: "hbx_staff", permission_id: permission.id)}
 
     before do
+      person.hbx_staff_role.permission.update_attributes!(can_complete_resident_application: true)
       sign_in(current_user)
       get :sep_types_dt
     end
