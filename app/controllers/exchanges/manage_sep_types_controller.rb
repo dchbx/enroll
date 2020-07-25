@@ -64,7 +64,8 @@ module Exchanges
     end
 
     def sep_type_to_expire #pending specs
-      @qle = QualifyingLifeEventKind.find(params[:qle_id])
+      params.permit!
+      @qle = ::Operations::QualifyingLifeEventKind::Transform.new.call(params.to_h)
       @row = params[:qle_action_id]
       respond_to do |format|
         format.js { render "sep_type_to_expire"}
@@ -126,11 +127,8 @@ module Exchanges
 
     def sort
       begin
-        market_kind = params.permit!.to_h['market_kind']
-        sort_data = params.permit!.to_h['sort_data']
-        sort_data.each do |sort| # TODO fix update
-          QualifyingLifeEventKind.active.where(market_kind: market_kind, id: sort['id']).update(ordinal_position: sort['position'])
-        end
+        params.permit!
+        Operations::QualifyingLifeEventKind::Sort.new.call(params.to_h)
         render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
       rescue => e
         render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
