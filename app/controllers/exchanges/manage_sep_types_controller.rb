@@ -65,7 +65,7 @@ module Exchanges
 
     def sep_type_to_expire #pending specs
       params.permit!
-      @qle = ::Operations::QualifyingLifeEventKind::Transform.new.call(params.to_h)
+      @qle = ::QualifyingLifeEventKind.find(params[:qle_id])
       @row = params[:qle_action_id]
       respond_to do |format|
         format.js { render "sep_type_to_expire"}
@@ -90,25 +90,13 @@ module Exchanges
 
     def expire_sep_type  #pending specs
       begin
-        @qle = QualifyingLifeEventKind.find(params[:qle_id])
-        end_on = Date.strptime(params["end_on"], "%m/%d/%Y") rescue nil
-        if @qle.present? && end_on.present?
-          if end_on >= TimeKeeper.date_of_record
-            if @qle.may_schedule_expiration?
-              @qle.schedule_expiration!(end_on)
-              message = {notice: l10n("controller.manage_sep_type.enpire_pending_success")}
-            end
-          else
-            if @qle.may_expire?
-              @qle.expire!(end_on)
-              message = {notice: l10n("controller.manage_sep_type.expire_success")}
-            end
-          end
-        end
+        result = ::Operations::QualifyingLifeEventKind::Transform.new.call(params)
+        @qle = result.success.first
+        message = {notice: l10n("controller.manage_sep_type.#{result.success[1]}")}
       rescue Exception => e
         message = {error: e.to_s}
       end
-       redirect_to exchanges_manage_sep_types_root_path, flash: message
+      redirect_to exchanges_manage_sep_types_root_path, flash: message
     end
 
     def sep_types_dt
@@ -128,7 +116,7 @@ module Exchanges
     def sort
       begin
         params.permit!
-        Operations::QualifyingLifeEventKind::Sort.new.call(params.to_h)
+        ::Operations::QualifyingLifeEventKind::Sort.new.call(params.to_h)
         render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
       rescue => e
         render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
