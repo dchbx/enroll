@@ -12,9 +12,14 @@ Feature: Admin has ability to create a new SEP type for users
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
-    When Admin fills the Create SEP Type form page for <market_kind> market
+    When Admin fills Create SEP Type form with start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
     And Admin selects <market_kind> market radio button and their reason
-    And Admin fills rest of the form on create page
+    And Admin selects effective on kinds events for Create SEP Type
+    And Admin selects termination on kinds events for Create SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
     And Admin clicks on Create Draft button
     Then Admin should see SEP Type Created Successfully message
     When Admin navigates to SEP Types List page
